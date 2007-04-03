@@ -3,7 +3,7 @@
 // Start Graphing Functions
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $range = $to - $from;
   $points_per_sample = 3;
   $xpoints = '540';
@@ -81,7 +81,7 @@ function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, 
 
 
 function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $points_per_sample = 3;
   $range = $to - $from;
   $xpoints = '540';
@@ -139,7 +139,7 @@ function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 
 function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $optsa = array ( 
@@ -222,7 +222,7 @@ function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
 }
 
 function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-    global $rrdtool; global $installdir;
+    global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $optsa = array(
@@ -276,7 +276,7 @@ function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vert
 
 
 function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array(
@@ -314,7 +314,7 @@ function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 }
 
 function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array(
@@ -354,7 +354,7 @@ function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 
 
 function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array(
@@ -409,7 +409,7 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
 }
 
 function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $points_per_sample = 3;
   $range = $to - $from;
   $rrd = "rrd/" . $rrd;
@@ -477,7 +477,7 @@ function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $v
 }
 
 function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical ,"--alt-autoscale-max",
@@ -509,7 +509,7 @@ function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
 }
 
 function unixfsgraph ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
                  "-l 0",
                  "-E", 
@@ -554,7 +554,7 @@ function unixfsgraph ($device, $graph, $from, $to, $width, $height, $title, $ver
 }
 
 function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical,"--alt-autoscale-max",
@@ -588,7 +588,7 @@ function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
 
 function tempgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 

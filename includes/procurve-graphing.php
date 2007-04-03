@@ -2,7 +2,7 @@
 
 function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 
@@ -36,7 +36,7 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 
 function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $memrrd = $database;

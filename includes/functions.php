@@ -343,7 +343,7 @@ function fixifName ($inf) {
 
 function trafgraph ($rrd, $graph, $from, $to, $width, $height)
 {
-  global $rrdtool; global $installdir;    
+  global $rrdtool, $installdir, $mono_font;    
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--alt-autoscale-max",
@@ -395,7 +395,7 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height)
 }
 
 function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--alt-autoscale-max",
@@ -436,7 +436,7 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
 
 function errorgraph ($rrd, $graph, $from, $to, $width, $height)
 {
-    global $rrdtool; global $installdir;
+    global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 
@@ -480,7 +480,7 @@ function errorgraph ($rrd, $graph, $from, $to, $width, $height)
 
 function nucastgraph ($rrd, $graph, $from, $to, $width, $height)
 {
-    global $rrdtool; global $installdir;
+    global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to,
@@ -521,7 +521,7 @@ function nucastgraph ($rrd, $graph, $from, $to, $width, $height)
 
 function cpugraph ($rrd, $graph , $from, $to, $width, $height)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $optsa = array( "--start", $from, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
@@ -560,7 +560,7 @@ function cpugraph ($rrd, $graph , $from, $to, $width, $height)
 
 function tempgraph ($rrd, $graph, $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 
@@ -598,7 +598,7 @@ function tempgraph ($rrd, $graph, $from, $to, $width, $height, $title, $vertical
 
 function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $rrd = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $optsa = array( "--start", $from, "--width", $width, "--height", $height, "--alt-autoscale-max",
@@ -630,7 +630,7 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
 
 function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool; global $installdir;
+ global $rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $memrrd = $database;
@@ -661,7 +661,7 @@ function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical
 }
 
 function ip_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--alt-autoscale-max", "-E", "-l 0",
@@ -713,7 +713,7 @@ function ip_graph ($rrd, $graph, $from, $to, $width, $height) {
 }
 
 function icmp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--alt-autoscale-max", "-E", "-l 0",
@@ -770,7 +770,7 @@ function icmp_graph ($rrd, $graph, $from, $to, $width, $height) {
 }
 
 function tcp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--alt-autoscale-max", "-E", "-l 0",
@@ -822,7 +822,7 @@ function tcp_graph ($rrd, $graph, $from, $to, $width, $height) {
 }
 
 function udp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--alt-autoscale-max", "-E", "-l 0",
