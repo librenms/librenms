@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * SNMP class with CDP functionality
+ *
+ * @author Rick Hodger <rick@fuzzi.org.uk>
+ * @version 1.0
+ * @copyright Copyright &copy; 2006, Rick Hodger
+ * @package snmp-cdp
+ * @filesource
+ */
+/**
+ * SNMP class with CDP functionality
+ *
+ * Class is named snmp-cdp. Can retreive a list of ports, and use those
+ * to determine if they are connected to a CDP enabled device.
+ * @package snmp-cdp
+ */
+
 class snmpCDP {
  
     var $community = "public";
