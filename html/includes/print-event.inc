@@ -15,7 +15,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\">
     <td width=0></td>
     <td class=syslog width=180>
-      $entry[humandate]
+      $entry[datetime]
     </td>");
   if(!$_GET[id] && !$overview) {
     $dev['id'] = $entry['host'];
