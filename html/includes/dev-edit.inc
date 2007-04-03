@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION[userlevel] < '5') { 
+if($_SESSION['userlevel'] < '5') { 
   print_error("Insufficient Privileges");
 } else {
 
@@ -9,13 +9,6 @@ if($_POST['editing']) {
     include("includes/edit-host.inc");
   }
 }
-
-if($_POST['addsrv']) {
-  if($userlevel > "5") {
-    include("includes/add-srv.inc");
-  }
-}
-
 
 $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `id` = '$_GET[id]'"));
 $descr  = $device['purpose'];
@@ -84,54 +77,7 @@ echo("/></td>
 </form></td>
 <td width=50></td><td>");
 
-$srvdir = $installdir . "/includes/services/";
-
-if ($handle = opendir($srvdir)) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != "..") {
-            $services[] = $file;
-            $servicesform .= "<option value='$file'>$file</option>";
-        }
-    }
-    closedir($handle);
-}
-
-echo("
-
-<h4>Add Service</h4>
-
-<form id='addsrv' name='addsrv' method='post' action=''>
-  <input type=hidden name='addsrv' value='yes'>
-  <table width='200' border='0'>
-      <td>
-        Type
-      </td> 
-      <td>
-        <select name='type'>
-          $servicesform
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>Description</div></td>
-      <td colspan='2'><textarea name='descr' cols='50'></textarea></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>IP Address</div></td>
-      <td colspan='2'><input name='ip'></textarea></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>Parameters</div></td>
-      <td colspan='2'><input name='params'></textarea></td>
-    </tr>
-   <tr>
-  </table>
-  <input type='submit' name='Submit' value='Add' />
-  <label><br />
-  </label>
-</form>");
-
-echo("</td></tr></table>");
+  echo("</td></tr></table>");
 
 }
 
