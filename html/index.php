@@ -28,7 +28,7 @@ if($_GET[debug]) {
   <title><?php echo("$page_title"); ?></title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <!-- <meta http-equiv="refresh" content="300"> -->
-  <link href="/css/styles.css" rel="stylesheet" type="text/css">
+  <link href="<? echo("$stylesheet"); ?>" rel="stylesheet" type="text/css">
   <?php include("includes/ajaxtabs.inc"); ?>
 </head>
 <SCRIPT LANGUAGE="JavaScript">
