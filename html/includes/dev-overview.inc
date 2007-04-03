@@ -42,7 +42,7 @@ echo("<p class=sectionhead>Recent Events</p><div style='height: 5px;'></div>
 
 while($entry = mysql_fetch_array($data)) {
 
-include("includes/print-event.inc");
+include("includes/print-event-short.inc");
 
 }
 echo("</table></div>");
@@ -68,15 +68,10 @@ echo("
   $sql = "SELECT * FROM interfaces WHERE host = '$id'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
-    $up_admin = $data['up_admin'];
-    $up = $data['up'];
-    if ($up_admin == "down") { $status = "grey"; }
-    if ($up_admin == "up" && $up == "down") { $status = "red"; }
-    if ($up_admin == "up" && $up == "up") { $status = "blue"; }
-    echo("$ifbreak<a class=$status>" . generateiflink($data, makeshortif(strtolower($data['if']))) . "</a>");
-    $ifbreak = ", ";
+    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['if']))));
+    $ifsep = ", ";
   }
-  unset($break);
+  unset($ifsep);
   echo("</div>");
 
   echo("</div>");
