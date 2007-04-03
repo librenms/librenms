@@ -1,7 +1,7 @@
 <meta http-equiv="refresh" content="60">
 <?
 
-$sql = "select *,DATE_FORMAT(datetime, '%D %M %Y %T') as humandate from logs ORDER BY datetime DESC LIMIT 1000";
+$sql = "select *,DATE_FORMAT(datetime, '%D %M %Y %T') as humandate from syslog ORDER BY datetime DESC LIMIT 1000";
 
 echo("
 <table cellspacing=0 cellpadding=2>
