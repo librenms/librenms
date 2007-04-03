@@ -5,11 +5,23 @@ Released under the GNU Public License
 Introduction
 ------------
 
-Project Observer is an auto-discovering network monitoring system. It's not designed to be a drop-in replacement for 
-Nagios, Mon, JFFNMS or similar applications. It's designed to be an easily-navigable interface to the health of your 
-network.
+Project Observer is an auto-discovering network monitoring system. 
+
+It's designed to be an easily-navigable interface to the health of your network.
 
 ***********************************************************
+Release 0.2.5
+Added new CDP detection code and proper CDP link removal
+Added service addition page
+Added device overview
+Added more interface pages
+Added syslogging using syslog-ng
+Added temperature monitoring and discovery
+Added TCP/IP/UDP/ICMP statistics collection and graphing
+Fixed some graphs
+Tidied up some font sizes
+Added stylesheet variable into config.php to allow custom files to be used
+
 Release 0.2.4
 Fixed some misnamed files
 Fixed some hardcoded binary locations
@@ -56,12 +68,12 @@ Release 0.1.0 - October 2006
 Initial Release.
 Basic discovery in place. Graphing in place.
 
+
 Feature Waiting List
 --------------------
 
 * Verification of discovered devices and interfaces
 * Serial number tracking
 * Manual layer 1 linking
-* Service Monitoring
+* Proper Service Monitoring
 * Alerting
-* Temperature Monitoring
