@@ -26,8 +26,8 @@ function temp_graph ($device, $graph, $from, $to, $width, $height, $title, $vert
     $optsa[] = "GPRINT:temp$fs[temp_id]:MAX:%3.0lf°C\l";
     $iter++;
  }
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
   $ret = rrd_graph("$imgfile", $opts, count($opts));
