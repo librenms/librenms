@@ -1,0 +1,26 @@
+Basic Installation Instructions
+-------------------------------
+
+Point apache to the html directory. Give apache read/write access to rrd and graphs (check symlinks in html/ work!)
+
+Create a database, give a user full privileges on it. Insert the mysql schema file into it.
+
+Edit your config.php
+
+Customise html/includes/topnav.inc to be useful for your organisation (put some handy links in it!)
+
+Put cron.sh into your crontab for every 5 mins and cron-hourly.sh into your crontab for every hour.
+
+add a host with 'host-add.php <hostname> <snmp community>'
+
+Cisco network devices with cdp enabled should be detected automatically in waves each hour as it spiders outwards
+(run discover.php manually to speed it up!)
+
+Servers will need to be added manually.
+
+Replace the logo!
+
+Login to the web interface with the username 'admin' and the password 'observer'.
+
+*** Drop me an email to adama@memetic.org ***
+
