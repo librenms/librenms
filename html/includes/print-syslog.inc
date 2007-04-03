@@ -17,10 +17,10 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     <td class=syslog width=150>
       $entry[datetime]
     </td>
-    <td class=list-bold width=100>
+    <td class=list-bold width=75>
       $entry[priority]
     </td>
-    <td class=syslog width=100>
+    <td class=syslog width=175>
       $entry[program]
     </td>
     <td class=syslog>
