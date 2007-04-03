@@ -29,8 +29,10 @@ $nets =  array ("172.22.0.0/16", "10.0.0.0/8");
 
 $mydomain = "project-observer.net";
 
-$page_title = "Project Observer Network Monitoring";
+$page_title  = "Project Observer Network Monitoring";
 $title_image = "/images/logo.gif";
+$stylesheet  = "/css/styles.css"; 
+
 
 ### Which special sections should we show?
 $show_if_customers = 0;
