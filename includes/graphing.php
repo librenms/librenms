@@ -1,7 +1,7 @@
 <?php
 
 function temp_graph ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool; global $installdir;
+  global $rrdtool, $installdir, $mono_font;
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
                  "-l 0",
                  "-E",
