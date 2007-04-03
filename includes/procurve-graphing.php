@@ -18,8 +18,8 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
                  "GPRINT:load:MIN:Min\:%3.2lf",
                  "GPRINT:load:MAX:Max\:%3.2lf\\n");
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
 
@@ -53,8 +53,8 @@ function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertic
              LINE1.5:TOTAL#cc0000:";
 
   if($width <= "300") {$opts .= "\
-                                 --font LEGEND:7:$installdir/DejaVuSansMono.ttf \
-                                 --font AXIS:6:$installdir/DejaVuSansMono.ttf \
+                                 --font LEGEND:7:$mono_font \
+                                 --font AXIS:6:$mono_font \
                                  --font-render-mode normal";}
 
 

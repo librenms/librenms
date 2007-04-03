@@ -376,8 +376,8 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height)
                  "LINE1:d95thout#aa0000:" );
   
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
@@ -417,8 +417,8 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
 		 "GPRINT:out:LAST:%6.2lf%spps",
                  "GPRINT:out:AVERAGE:%6.2lf%spps",
                  "GPRINT:out:MAX:%6.2lf%spps\\n");
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
@@ -461,8 +461,8 @@ function errorgraph ($rrd, $graph, $from, $to, $width, $height)
                    "GPRINT:out:AVERAGE:%6.2lf%spps",
                    "GPRINT:out:MAX:%6.2lf%spps\\n",
                    );
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
@@ -502,8 +502,8 @@ function nucastgraph ($rrd, $graph, $from, $to, $width, $height)
                  "GPRINT:out:LAST:%6.2lf%spps",
                  "GPRINT:out:AVERAGE:%6.2lf%spps",
                  "GPRINT:out:MAX:%6.2lf%spps\\n");
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
@@ -542,8 +542,8 @@ function cpugraph ($rrd, $graph , $from, $to, $width, $height)
                  "GPRINT:5m:MIN:Min\:%6.2lf",
                  "GPRINT:5m:MAX:Max\:%6.2lf\\n");
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
 
@@ -579,8 +579,8 @@ function tempgraph ($rrd, $graph, $from, $to, $width, $height, $title, $vertical
             "GPRINT:out:MIN:Min\:%6.2lf",
             "GPRINT:out:MAX:Max\:%6.2lf\\n");
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
 
@@ -610,8 +610,8 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
             "GPRINT:cuptime:LAST:Cur\:%6.2lf",
             "GPRINT:cuptime:AVERAGE:Avg\: %6.2lf",
             "GPRINT:cuptime:MAX:Max\:%6.2lf\\n");
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
@@ -651,8 +651,8 @@ function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical
              LINE1.5:MEMTOTAL#cc0000:";
 
   if($width <= "300") {$opts .= "\
-                                 --font LEGEND:7:$installdir/DejaVuSansMono.ttf \
-                                 --font AXIS:6:$installdir/DejaVuSansMono.ttf \
+                                 --font LEGEND:7:$mono_font \
+                                 --font AXIS:6:$mono_font \
                                  --font-render-mode normal";}
 
 
@@ -702,7 +702,7 @@ function ip_graph ($rrd, $graph, $from, $to, $width, $height) {
                  "GPRINT:ipOutNoRoutes:AVERAGE: %6.2lf%s",
                  "GPRINT:ipOutNoRoutes:MAX: %6.2lf%s\\n"
 		 );
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf", "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf", "--font-render-mode", "normal");}
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font", "--font", "AXIS:6:$mono_font", "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
   $ret = rrd_graph("$imgfile", $opts, count($opts));
   if( !is_array($ret) ) { 
@@ -759,7 +759,7 @@ function icmp_graph ($rrd, $graph, $from, $to, $width, $height) {
                  "GPRINT:icmpOutEchoReps:AVERAGE: %6.2lf%s",
                  "GPRINT:icmpOutEchoReps:MAX: %6.2lf%s\\n"
                  );
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf", "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf", "--font-render-mode", "normal");}
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font", "--font", "AXIS:6:$mono_font", "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
   $ret = rrd_graph("$imgfile", $opts, count($opts));
   if( !is_array($ret) ) {
@@ -811,7 +811,7 @@ function tcp_graph ($rrd, $graph, $from, $to, $width, $height) {
                  "GPRINT:tcpRetransSegs:AVERAGE: %6.2lf%s",
                  "GPRINT:tcpRetransSegs:MAX: %6.2lf%s\\n",
                  );
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf", "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf", "--font-render-mode", "normal");}
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font", "--font", "AXIS:6:$mono_font", "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
   $ret = rrd_graph("$imgfile", $opts, count($opts));
   if( !is_array($ret) ) {
@@ -848,7 +848,7 @@ function udp_graph ($rrd, $graph, $from, $to, $width, $height) {
                  "GPRINT:udpNoPorts:AVERAGE: %6.2lf%s",
                  "GPRINT:udpNoPorts:MAX: %6.2lf%s\\n",
                  );
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf", "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf", "--font-render-mode", "normal");}
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font", "--font", "AXIS:6:$mono_font", "--font-render-mode", "normal");}
   $opts = array_merge($optsa, $optsb);
   $ret = rrd_graph("$imgfile", $opts, count($opts));
   if( !is_array($ret) ) {
