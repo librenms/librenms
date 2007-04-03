@@ -9,7 +9,15 @@ Project Observer is an auto-discovering network monitoring system.
 
 It's designed to be an easily-navigable interface to the health of your network.
 
-***********************************************************
+Installation
+------------
+
+Please see http://www.project-observer.org.
+
+
+Changelog
+---------
+
 Release 0.2.5
 Added new CDP detection code and proper CDP link removal
 Added service addition page
