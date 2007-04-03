@@ -23,7 +23,6 @@ $ipcalc = "/usr/bin/ipcalc";
 $snmpwalk = "/usr/bin/snmpwalk";
 $snmpget = "/usr/bin/snmpget";
 
-
 ### List of networks to allow scanning-based discovery
 $nets =  array ("172.22.0.0/16", "10.0.0.0/8");
 
@@ -66,7 +65,7 @@ $warn_colour_b = "#ffcccc";
 # No changes below this line #
 ##############################
 
-$observer_version = "0.2.4";
+$observer_version = "0.2.5";
 
 ### Connect to database
 if (!@mysql_connect($db_host, $db_user, $db_pass)) {
