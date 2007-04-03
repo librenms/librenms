@@ -1,0 +1,67 @@
+Copyright (C) 2007 Adam Armstrong <adama@memetic.org>
+
+Released under the GNU Public License
+
+Introduction
+------------
+
+Project Observer is an auto-discovering network monitoring system. It's not designed to be a drop-in replacement for 
+Nagios, Mon, JFFNMS or similar applications. It's designed to be an easily-navigable interface to the health of your 
+network.
+
+***********************************************************
+Release 0.2.4
+Fixed some misnamed files
+Fixed some hardcoded binary locations
+Removed some messy AJAX
+Replaced the menu bar
+Added some new menu items
+Cleaned up presentation of some pages
+
+Release 0.2.3
+Fixed some broken graphing code
+Added host add/remove to web interface
+Added host/interface/service status to web interface
+Tidied up some code
+
+Release 0.2.2
+Replaced old layout with new 'Project Observer' layout
+Added recognition of SNOM SIP phones, data collection and some graphing
+Modified standard layout to remove Vostron-specific elements
+Added cpu graphing for ProCurve devices
+Added tabs for device page and AJAX loading of contents
+Detection of HP ProCurve devices
+Detection of m0n0wall devices by new snmp-id
+Can now disable the Transit, Peering and Customer sections
+Added some tabbing to Interface
+Added detection of Net/Open/DragonFlyBSD
+
+Release 0.2.1 - 19th January 2007
+Modification of graphing disply style
+Seperatation of device types
+Implementation of storage graphing
+
+Release 0.2.0 - 20th December 2006
+Cleanup of graphing code
+Seperation of customer-accessible interface
+Preliminary alerting system
+
+Release 0.1.2 - Late November 2006
+Graphing of additional server-related data
+
+Release 0.1.1 - November 2006
+Removal of large amounts of perl.
+
+Release 0.1.0 - October 2006
+Initial Release.
+Basic discovery in place. Graphing in place.
+
+Feature Waiting List
+--------------------
+
+* Verification of discovered devices and interfaces
+* Serial number tracking
+* Manual layer 1 linking
+* Service Monitoring
+* Alerting
+* Temperature Monitoring

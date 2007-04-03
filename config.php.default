@@ -1,0 +1,83 @@
+<?php
+
+### Database config
+$db_host = "localhost";
+$db_user = "observer";
+$db_pass = "";
+$db_name = "observer";
+
+### Installation Location
+$installdir = "/var/sites/network.vostron.net/";
+
+### Default community
+$community = "public";
+
+### File containing syslog
+$syslogfile = "";
+
+### Location of executables
+$rrdtool = "/usr/bin/rrdtool";
+$fping = "/usr/sbin/fping";
+$ipcalc = "/usr/bin/ipcalc";
+
+$snmpwalk = "/usr/bin/snmpwalk";
+$snmpget = "/usr/bin/snmpget";
+
+
+### List of networks to allow scanning-based discovery
+$nets =  array ("172.22.0.0/16", "10.0.0.0/8");
+
+$mydomain = "project-observer.net";
+
+$page_title = "Project Observer Network Monitoring";
+$title_image = "/images/logo.gif";
+
+### Which special sections should we show?
+$show_if_customers = 0;
+$show_if_transit = 0;
+$show_if_peering = 0;
+$show_locations = 1;
+
+### Interface name strings to ignore
+$bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
+             "-atm layer", "-atm subif", "-shdsl", "-adsl", 
+             "async", "plip", "-physical", "-signalling", "control plane",
+             "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
+
+### Mountpoints to ignore
+
+$ignore_mount = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
+
+### Valis OSes
+$valid_os = array("IOS", "Linux", "OpenBSD", "FreeBSD", "NetBSD", "ProCurve", "m0n0wall", "pfSense", "Snom", "Voswall", "DragonFly");
+
+### Style Options
+
+$list_colour_a = "#ffffff";
+$list_colour_b = "#eeeeee";
+
+$warn_colour_a = "#ffeeee";
+$warn_colour_b = "#ffcccc";
+
+
+##############################
+# No changes below this line #
+##############################
+
+$observer_version = "0.2.4";
+
+### Connect to database
+if (!@mysql_connect($db_host, $db_user, $db_pass)) {
+        echo "<h2>MySQL Error</h2>";
+        die;
+}
+mysql_select_db($db_name);
+
+$now = time();
+$day = time() - (24 * 60 * 60);
+$twoday = time() - (2 * 24 * 60 * 60);
+$week = time() - (7 * 24 * 60 * 60);
+$month = time() - (31 * 24 * 60 * 60);
+$year = time() - (365 * 24 * 60 * 60);
+
+?>

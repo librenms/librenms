@@ -1,0 +1,11 @@
+Options FollowSymlinks Multiviews
+
+RewriteBase /
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !^(.*)\.php$
+RewriteCond %{REQUEST_URI} !^(.*)\.css$
+RewriteCond %{REQUEST_URI} !^(.*)\.jpg$
+RewriteCond %{REQUEST_URI} !^(.*)\.gif$
+RewriteCond %{REQUEST_URI} !^(.*)\.png$
+
+RewriteRule ^([a-z]+)$	?page=$1
