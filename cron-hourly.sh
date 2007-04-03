@@ -8,4 +8,5 @@
 ./discover-storage.php
 ./cleanup.php
 ./discover-temperatures.php
+./generate-map.sh
 ./discover-cisco-temp.php
