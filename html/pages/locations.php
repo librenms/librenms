@@ -19,7 +19,7 @@ while($device = mysql_fetch_array($device_query)) {
    if($loc != "") { 
      echo("<table border=0 cellspacing=0 cellpadding=7 class=devicetable width=100%>
            <tr bgcolor='$bg'>
-             <td class=interface width=300><a class='list-bold' href='?page=list&location=$device[location]'>$loc</a></td>
+             <td class=interface width=300><a class='list-bold' href='?page=devices&location=$device[location]'>$loc</a></td>
              <td width='100'>$alert</td>
              <td width='100'>$num devices</td>
              <td width='100'>$net network</td>
