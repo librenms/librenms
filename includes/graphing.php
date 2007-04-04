@@ -52,7 +52,7 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height)
 
   $hostname = gethostbyid($device);
 
-  $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `host` = '$device'");
+  $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `host` = '$device' AND ifType LIKE '%ethernet%' OR `ifType` LIKE '%erial%'");
 
   while($int = mysql_fetch_row($query)) {
 
