@@ -56,16 +56,16 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height)
 
   while($int = mysql_fetch_row($query)) {
 
-    $this_opts = array ("DEF:inoctets" . $int[0] . "=" . $rrd_dir . "/" . $hostname . "." . $int[0] . ".rrd:INOCTETS:AVERAGE",
+    if(is_file($rrd_dir . "/" . $hostname . "." . $int[0] . ".rrd")) {
+      $this_opts = array ("DEF:inoctets" . $int[0] . "=" . $rrd_dir . "/" . $hostname . "." . $int[0] . ".rrd:INOCTETS:AVERAGE",
                         "DEF:outoctets" . $int[0] . "=" . $rrd_dir . "/" . $hostname . "." . $int[0] . ".rrd:OUTOCTETS:AVERAGE");
                         $in_thing .= $seperator . "inoctets" . $int[0] . ",UN,0," . "inoctets" . $int[0] . ",IF";
                         $out_thing .= $seperator . "outoctets" . $int[0] . ",UN,0," . "outoctets" . $int[0] . ",IF";
 			$pluses .= $plus;
                         $seperator = ",";
 			$plus = ",+";
-
-    $opts = array_merge($opts, $this_opts);
-
+      $opts = array_merge($opts, $this_opts);
+    }
   }
 
   $opts_end = array(
