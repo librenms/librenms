@@ -13,7 +13,7 @@
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
   $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
   echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
-           <td valign=top width=275>
+           <td valign=top width=300>
               <span class=list-large><a onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\" 
                class='$ifclass' href='?page=interface&id=$interface[id]'>
                  $i. $inf
@@ -27,9 +27,9 @@
       $break = " ";
     } 
   echo("</span>");
-  echo("</td><td width=80>");
+  echo("</td><td width=70>");
   if($speed && $speed != "") { echo("<span class=box-desc>$speed</span>"); }
-  echo("</td><td width=80>");
+  echo("</td><td width=110>");
   if($iftype && $iftype != "") { echo("<span class=box-desc>$iftype</span>"); } else { echo("-"); } 
   echo("</td><td width=80>");
   if($mac && $mac != "") { echo("<span class=box-desc>$mac</span>"); } else { echo("-"); }

@@ -10,14 +10,16 @@
 
   while($data = mysql_fetch_array($query)) {
     unset($class);
-    $iid = $data[iid];
-    $ifIndex = $data[ifIndex];
-    $did = $data[did];
-    $hostname = $data[hostname];
-    $up = $data[up];
-    $up_admin = $data[up_admin];
-    $ifname = fixifname($data[ifname]);
-    $ifalias = $data[ifalias];
+    $iid = $data['iid'];
+    $ifIndex = $data['ifIndex'];
+    $did = $data['did'];
+    $device[id] = $did;
+    $device['hostname'] = $data['hostname'];
+    $hostname = $data['hostname'];
+    $up = $data['up'];
+    $up_admin = $data['up_admin'];
+    $ifname = fixifname($data['ifname']);
+    $ifalias = $data['ifalias'];
     $ifalias = str_replace("Cust: ", "", $ifalias);
     $ifalias = str_replace("[PNI]", "Private", $ifalias);
     $ifclass = ifclass($up, $up_admin);
@@ -47,9 +49,9 @@
     echo("
            <tr bgcolor='$bg'>
              <td width='7'></td>
-             <td width='250'><span class=interface>$useifalias</span></td>
-             <td width='200'><a href='?page=device&id=$did' $mouseoverhost>$hostname</a></td>
-             <td width='100'><a href='?page=interface&id=$iid' class=$ifclass $mouseoverint><span class=interface-desc>$ifname</span></td>
+             <td width='250'><span style='font-weight: bold;' class=interface>$useifalias</span></td>
+             <td width='200'>" . generatedevicelink($device) . "</td>
+             <td width='100'>" . generateiflink($data, makeshortif($data['if'])) . "</td>
              <td>$notes</td>
            </tr>
          ");
