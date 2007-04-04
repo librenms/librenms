@@ -20,7 +20,7 @@
              $device[version]</td>
              <td width='200'>$device[hardware]<br />
              $device[features]</td>
-             <td>" . formatUptime($device[device_uptime]) . "
+             <td>" . formatUptime($device[uptime]) . "
              <br />
              $device[location]</td>
              <td width=10>
