@@ -15,7 +15,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\">
     <td width=0></td>
     <td class=syslog width=180>
-      $entry[datetime]
+      " . $entry['datetime'] . "
     </td>");
   if(!$_GET[id] && !$overview) {
     $dev['id'] = $entry['host'];
@@ -25,14 +25,17 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     </td>");
   }
 
-    $if['id'] = $entry[interface];
+  echo("<td class=list-bold width=175>");
+
+  if($if['id']) {
+    $if['id'] = $entry['interface'];
     $if['if'] = $interface;
-    echo("<td class=list-bold width=175>
-      " . generateiflink($if) . "
-    </td>
+    echo(generateiflink($if));
+  }  
+  echo("</td>");
     <td width=20>$icon</td>
     <td class=syslog>
-      $entry[message]
+      " . $entry['message'] . "
     </td>
     <td></td>
   </tr>");
