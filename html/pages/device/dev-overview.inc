@@ -50,7 +50,11 @@ echo("</table></div>");
 echo("</td><td width=50% valign=top>");
 
 if($interfaces['total']) {
+  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>
+        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['id'], 490, 100, $day, $now) . "</div>");
+}
 
+if($interfaces['total']) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p class=sectionhead>Interfaces</p><div style='height: 5px;'></div>");
 

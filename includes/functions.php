@@ -68,6 +68,11 @@ function generatedevicelink($device, $text=0) {
   return $link;
 }
 
+
+function device_traffic_image($device, $width, $height, $from, $to) {
+  return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "' />";
+}
+
 function devclass($device) {
    if ($device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
    if ($device['ignore'] == '1') {
