@@ -1,8 +1,5 @@
 <?php
 
-if($_GET['ignore']) { mysql_query("UPDATE devices SET `ignore` = '1' WHERE `id` = '$_GET[ignore]'"); }
-if($_GET['unignore']) { mysql_query("UPDATE devices SET `ignore` = '0' WHERE `id` = '$_GET[unignore]'"); }
-
 if($_GET['location']) { $where = "AND location = '$_GET[location]'"; }
 if($_GET['location'] == "Unset") { $where = "AND location = ''"; }
 if($_GET['type']) { $where = "AND type = '$_GET[type]'"; }
