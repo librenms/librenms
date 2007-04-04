@@ -28,7 +28,6 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $snmp_output = trim($snmp_output);
   $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);
   $snmp_output = str_replace("No Such Instance currently exists at this OID", "", $snmp_output);
-
   $ifPhysAddress = strtolower(str_replace("\"", "", $ifPhysAddress));
   $ifPhysAddress = str_replace(" ", ":", $ifPhysAddress);
   echo("Looking at $old_if on $hostname \n");
@@ -39,6 +38,8 @@ while ($interface = mysql_fetch_array($interface_query)) {
   if ($ifAlias == " ") { $ifAlias = str_replace(" ", "", $ifAlias); }
   $ifAlias = trim(str_replace("\"", "", $ifAlias));
   $ifAlias = trim($ifAlias);
+  if($interface['os'] == "IOS") { $ifType = trim(str_replace("\"", "", `snmpget -O qv -v2c -c $community $hostname 1.3.6.1.4.1.9.2.2.1.1.1.$ifIndex`)); }
+
 
   $rrdfile = "rrd/" . $hostname . ".". $ifIndex . ".rrd";
   if(!is_file($rrdfile)) {

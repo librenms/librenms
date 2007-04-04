@@ -338,6 +338,7 @@ function fixifName ($inf) {
         $inf = str_replace("-802.1q Vlan subif", "", $inf);
         $inf = str_replace("serial", "Serial", $inf);
         $inf = str_replace("-aal5 layer", " aal5", $inf);
+	$inf = str_replace("null", "Null", $inf);
         $inf = str_replace("atm", "ATM", $inf);
         $inf = str_replace("port-channel", "Port-Channel", $inf);
         $inf = str_replace("dial", "Dial", $inf);
@@ -535,17 +536,19 @@ function cpugraph ($rrd, $graph , $from, $to, $width, $height)
                  "--title", $title,
                  "DEF:5s=$database:LOAD5S:AVERAGE",
                  "DEF:5m=$database:LOAD5M:AVERAGE",
-                 "AREA:5s#FAFDCE:5sec",
-                 "LINE1.25:5s#dd8800:",
-                 "GPRINT:5s:LAST:Cur\:%6.2lf",
-                 "GPRINT:5s:AVERAGE:Avg\: %6.2lf",
-		 "GPRINT:5s:MIN:Min\:%6.2lf",
-                 "GPRINT:5s:MAX:Max\:%6.2lf\\n",
+                 "COMMENT: Days     Current  Minimum  Maximum  Average\\n",
+                 "AREA:5m#c5aa00:",
+                 "AREA:5s#ffeeaa:5 sec",
+                 "LINE1:5s#ea8f00:",
+                 "GPRINT:5s:LAST:%6.2lf ",
+                 "GPRINT:5s:AVERAGE:%6.2lf ",
+                 "GPRINT:5s:MAX:%6.2lf ",
+                 "GPRINT:5s:AVERAGE:%6.2lf\\n",
                  "LINE1.25:5m#aa2200:5min",
-                 "GPRINT:5m:LAST:Cur\:%6.2lf",
-                 "GPRINT:5m:AVERAGE:Avg\: %6.2lf",
-                 "GPRINT:5m:MIN:Min\:%6.2lf",
-                 "GPRINT:5m:MAX:Max\:%6.2lf\\n");
+                 "GPRINT:5m:LAST:%6.2lf ",
+                 "GPRINT:5m:AVERAGE:%6.2lf ",
+                 "GPRINT:5m:MAX:%6.2lf ",
+                 "GPRINT:5m:AVERAGE:%6.2lf\\n");
 
   if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
                                       "--font", "AXIS:6:$mono_font",
@@ -556,45 +559,7 @@ function cpugraph ($rrd, $graph , $from, $to, $width, $height)
 
   if( !is_array($ret) ) {
     $err = rrd_error();
-    #echo "rrd_graph() ERROR: $err\n";
-    return FALSE;
-  } else {
-    return $imgfile;
-  }
-}
-
-function tempgraph ($rrd, $graph, $from, $to, $width, $height, $title, $vertical)
-{
- global $rrdtool, $installdir, $mono_font;
-    $database = "rrd/" . $rrd;
-    $imgfile = "graphs/" . "$graph";
-
-  $optsa = array( "--start", $from, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
-                 "-E",  "-l 0", "--title", $title,
-	    "DEF:in=$database:TEMPIN1:AVERAGE",
-	    "DEF:out=$database:TEMPOUT1:AVERAGE",
-            "LINE1.5:in#cc0000:Inlet ",
-            "GPRINT:in:LAST: Cur\:%6.2lf",
-            "GPRINT:in:AVERAGE:Avg\: %6.2lf",
-            "GPRINT:in:MIN:Min\:%6.2lf",
-            "GPRINT:in:MAX:Max\:%6.2lf\\n",
-            "LINE1.25:out#009900:Outlet ",
-            "GPRINT:out:LAST:Cur\:%6.2lf",
-            "GPRINT:out:AVERAGE:Avg\: %6.2lf",
-            "GPRINT:out:MIN:Min\:%6.2lf",
-            "GPRINT:out:MAX:Max\:%6.2lf\\n");
-
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
-                                      "--font", "AXIS:6:$mono_font",
-                                      "--font-render-mode", "normal");}
-  $opts = array_merge($optsa, $optsb);
-
-
-  $ret = rrd_graph("$imgfile", $opts, count($opts));
-
-  if( !is_array($ret) ) {
-    $err = rrd_error();
-#    echo "rrd_graph() ERROR: $err\n";
+    echo "rrd_graph() ERROR: $err\n";
     return FALSE;
   } else {
     return $imgfile;
@@ -610,11 +575,13 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
                    "-E",  "-l 0",
             "DEF:uptime=$rrd:uptime:AVERAGE",
             "CDEF:cuptime=uptime,86400,/",
+            "COMMENT: Days     Current  Minimum  Maximum  Average\\n",
             "AREA:cuptime#EEEEEE:Uptime",
             "LINE1.25:cuptime#36393D:",
-            "GPRINT:cuptime:LAST:Cur\:%6.2lf",
-            "GPRINT:cuptime:AVERAGE:Avg\: %6.2lf",
-            "GPRINT:cuptime:MAX:Max\:%6.2lf\\n");
+            "GPRINT:cuptime:LAST:%6.2lf ",
+            "GPRINT:cuptime:AVERAGE:%6.2lf ",
+            "GPRINT:cuptime:MAX:%6.2lf ",
+            "GPRINT:cuptime:AVERAGE:%6.2lf\\n");
   if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
                                       "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
@@ -625,7 +592,7 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
 
   if( !is_array($ret) ) {
     $err = rrd_error();
- #   echo "rrd_graph() ERROR: $err\n";
+#    echo "rrd_graph() ERROR: $err\n";
     return FALSE;
   } else {
     return $imgfile;
@@ -651,9 +618,19 @@ function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical
              DEF:PROCUSED=$memrrd:PROCUSED:AVERAGE \
 	     CDEF:FREE=IOFREE,PROCFREE,+ \
              CDEF:USED=IOUSED,PROCUSED,+ \
-             AREA:USED#ee9900:Used \
-             AREA:FREE#FAFDCE:Free:STACK \
-             LINE1.5:MEMTOTAL#cc0000:";
+             COMMENT:'Bytes    Current  Minimum  Maximum  Average\\n' \
+             AREA:USED#f0e0a0:Used\
+             GPRINT:USED:LAST:\%6.2lf%s\
+             GPRINT:USED:MIN:%6.2lf%s\
+	     GPRINT:USED:MAX:%6.2lf%s\
+             GPRINT:USED:AVERAGE:'%6.2lf%s \\n'\
+             AREA:FREE#cccccc:Free:STACK\
+             GPRINT:FREE:LAST:\%6.2lf%s\
+             GPRINT:FREE:MIN:%6.2lf%s\
+             GPRINT:FREE:MAX:%6.2lf%s\
+             GPRINT:FREE:AVERAGE:%6.2lf%s\
+             LINE1:USED#d0b080:\
+             LINE1:MEMTOTAL#000000:";
 
   if($width <= "300") {$opts .= "\
                                  --font LEGEND:7:$mono_font \

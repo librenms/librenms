@@ -18,7 +18,10 @@
     $device = getifhost($_GET['if']);
     $ifIndex = getifindexbyid($_GET['if']);
   }
-  $hostname = gethostbyid($device);
+  if($device) {
+    $hostname = gethostbyid($device);
+  }
+
   $from = $_GET['from'];
   $to = $_GET['to'];
   $width = $_GET['width'];
@@ -34,6 +37,9 @@
 
   switch ($type) {
 
+  case 'global_bits':
+    $graph = graph_global_bits ("global_bits.png", $from, $to, $width, $height);
+    break;
   case 'device_bits':
     $graph = graph_device_bits ($device, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;  
