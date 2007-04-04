@@ -87,7 +87,7 @@ echo("</ul>");
 echo("
 <div class=contentstyle>");
 
-include("includes/$section.inc");
+include("pages/$page/$section.inc");
 
 echo("</div>
 ");

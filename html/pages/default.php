@@ -1,7 +1,6 @@
 <?php
 
-
-$sql = mysql_query("SELECT * FROM `devices` WHERE `uptime` > '0' AND `uptime` < '86400'");
+$sql = mysql_query("SELECT * FROM `devices` AS D, `device_uptime` AS U WHERE D.id = U.device_id AND U.device_uptime > '0' AND U.device_uptime < '86400'");
 while($device = mysql_fetch_array($sql)){
   $rebooted[] = "$device[id]";
 }
