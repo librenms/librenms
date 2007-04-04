@@ -26,12 +26,12 @@ $snmpget = "/usr/bin/snmpget";
 ### List of networks to allow scanning-based discovery
 $nets =  array ("172.22.0.0/16", "10.0.0.0/8");
 
+### Customisation Options
 $mydomain = "project-observer.net";
-
 $page_title  = "Project Observer Network Monitoring";
 $title_image = "/images/logo.gif";
 $stylesheet  = "/css/styles.css"; 
-
+$mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
 
 ### Which special sections should we show?
 $show_if_customers = 0;
