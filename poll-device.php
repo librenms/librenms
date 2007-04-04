@@ -188,13 +188,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $update .= $seperator . "`uptime` = '$newuptime'";
     $seperator = ", ";
   }
-  if ( $newuptime && $newuptime < $uptime  ) {
-    $update .= $seperator . "`lastchange` = NOW()";
-    $seperator = ", ";
-  } elseif($status != $newstatus) { 
-    $update .= $seperator . "`lastchange` = NOW()";
-    $seperator = ", ";
-  }
+
   if( $status != $newstatus ) {
     $update .= $seperator . "`status` = '$newstatus'";
     $seperator = ", ";
@@ -206,6 +200,15 @@ while ($device = mysql_fetch_array($device_query)) {
     }
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('$id', NULL, NOW(), 'Device status changed to $stat')");
   }
+
+  if ( $newuptime ) {
+    $update_uptime = mysql_query("UPDATE device_uptime SET device_uptime = '$newuptime' WHERE `device_id` = '$id'");
+    if(mysql_affected_rows() == '0') {
+      $insert_uptime = mysql_query("INSERT INTO device_uptime (`device_uptime`, `device_id`) VALUES ('$newuptime','$id')");
+    }
+  }
+
+
   if ($update) {
     $update_query  = "UPDATE `devices` SET ";
     $update_query .= $update;

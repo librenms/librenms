@@ -14,8 +14,8 @@ function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $ver
                  "GPRINT:calls:LAST:Cu\: %2.0lf/min",
                  "GPRINT:calls:AVERAGE:Av\: %2.0lf/min",
                  "GPRINT:calls:MAX:Mx\: %2.0lf/min\\n");
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$installdir/DejaVuSansMono.ttf",
-                                      "--font", "AXIS:6:$installdir/DejaVuSansMono.ttf",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($optsa, $optsb);
