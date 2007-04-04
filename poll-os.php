@@ -1,15 +1,8 @@
 #!/usr/bin/php
 <?
-#
-# Statistics Polling Script
-#
 
 include("config.php");
 include("includes/functions.php");
-
-#
-# Poll Device Statistics
-#
 
 $device_query = mysql_query("SELECT id,hostname,os,community,snmpver FROM `devices` WHERE `id` LIKE '%" . $argv[1] . "' AND status = '1' ORDER BY id DESC");
 while ($device = mysql_fetch_array($device_query)) {

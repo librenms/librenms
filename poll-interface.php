@@ -68,13 +68,13 @@ while ($interface = mysql_fetch_array($interface_query)) {
   if ( $old_if != $ifDescr && $ifDescr != "" ) {
      $update = "`if` = '$ifDescr'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Name: $old_if -> $ifDescr')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Name -> $ifDescr')");
   }
 
   if ( $old_alias != $ifAlias ) {
      $update .= $seperator . "`name` = \"$ifAlias\"";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Desc: $old_alias -> $ifAlias')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Desc  -> $ifAlias')");
   }
   if ( $old_up != $ifOperStatus && $ifOperStatus != "" ) {
      $update .= $seperator . "`up` = '$ifOperStatus'";
@@ -90,22 +90,22 @@ while ($interface = mysql_fetch_array($interface_query)) {
   if ( $old_duplex != $ifDuplex && $ifDuplex != "" ) {
      $update .= $seperator . "`ifDuplex` = '$ifDuplex'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Duplex changed to $ifDuplex')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Duplex -> $ifDuplex')");
   }
   if ( $old_type != $ifType && $ifType != "" ) {
      $update .= $seperator . "`ifType` = '$ifType'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Type changed to $ifType')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Type -> $ifType')");
   }
   if ( $old_mtu != $ifMtu && $ifMtu != "" ) {
      $update .= $seperator . "`ifMtu` = '$ifMtu'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'MTU changed to $ifMtu')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'MTU -> $ifMtu')");
   }
   if ( $old_physaddress != $ifPhysAddress && $ifPhysAddress != "" ) {
      $update .= $seperator . "`ifPhysAddress` = '$ifPhysAddress'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'MAC changed to $ifPhysAddress')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'MAC -> $ifPhysAddress')");
   }
 
   if ( $old_speed != $ifSpeed && $ifSpeed != "" ) {
@@ -113,7 +113,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $seperator = ", ";
      $prev = humanspeed($old_speed); 
      $now = humanspeed($ifSpeed);
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Speed changed from $prev -> $now')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) values ($interface[host], $interface[sqlid], NOW(), 'Speed -> $now')");
   }
 
   if ($update) {
