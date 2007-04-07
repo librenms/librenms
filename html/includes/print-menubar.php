@@ -1,7 +1,7 @@
 <?php 
 
   $service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
-  $if_alerts = mysql_result(mysql_query("SELECT count(id) FROM `interfaces` WHERE `up` = 'down' AND `up_admin` = 'up' AND `ignore` = '0'"),0);
+  $if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
   $device_alerts = "0"; 
   $device_alert_sql = "WHERE 0";
 
@@ -10,7 +10,7 @@
 
     if($device[status] == 0 && $device[ignore] == '0') { $this_alert = "1"; } elseif($device[ignore] == '0') {
       if(mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_host = '$device[id]'"),0)) { $this_alert = "1"; }
-      if(mysql_result(mysql_query("SELECT count(id) FROM interfaces WHERE `up` = 'down' AND `up_admin` = 'up' AND host = '$device[id]'"),0)) { $this_alert = "1"; }
+      if(mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '$device[id]'"),0)) { $this_alert = "1"; }
     }
 
     if($this_alert) { 

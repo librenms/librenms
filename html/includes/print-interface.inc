@@ -2,61 +2,62 @@
 
 #  This file prints a table row for each interface 
  
-  $if_id = $interface['id'];
-  $inf = fixifName($interface['if']);
+  $if_id = $interface['interface_id'];
+  $ifDescr = fixifName($interface['ifDescr']);
   $ifIndex = $interface['ifIndex'];
-  $ifclass = ifclass($interface['up'], $interface['up_admin']);
-  $ifname = $interface['name'];
-  $speed = humanspeed($interface['ifSpeed']);
-  $mac = $interface['ifPhysAddress'];
-  if($ifname) {$ifname = $ifname . "</br>";}
+  $ifAlias = $interface['ifAlias'];
+  $ifSpeed = humanspeed($interface['ifSpeed']);
+  $ifPhysAddress = $interface['ifPhysAddress'];
+  $ifType = fixiftype($interface['ifType']);
+
+  if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+
   $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
+
   echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
            <td valign=top width=300>
-              <span class=list-large><a onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\" 
-               class='$ifclass' href='?page=interface&id=$interface[id]'>
-                 $i. $inf
-              </a></span><br /><span class=interface-desc>$ifname</span>");
+              <span class=list-large>
+                " . generateiflink($interface, "$i. $ifDescr") . "
+              </span><br /><span class=interface-desc>$ifAlias</span>");
   unset ($break);
-  $iftype = fixiftype($interface[ifType]);
   if(!$dographs) {
-    $ipdata = mysql_query("SELECT * FROM `ipaddr` WHERE `interface_id` = '$interface[id]'");
+    $ipdata = mysql_query("SELECT * FROM `ipaddr` WHERE `interface_id` = '$interface[interface_id]'");
     while($ip = mysql_fetch_Array($ipdata)) {
       echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[addr]')\">$ip[addr]/$ip[cidr]</a>");
       $break = " ";
     } 
   echo("</span>");
   echo("</td><td width=70>");
-  if($speed && $speed != "") { echo("<span class=box-desc>$speed</span>"); }
+  if($ifSpeed && $ifSpeed != "") { echo("<span class=box-desc>$ifSpeed</span>"); }
   echo("</td><td width=150>");
-  if($iftype && $iftype != "") { echo("<span class=box-desc>$iftype</span>"); } else { echo("-"); } 
+  if($ifType && $iftype != "") { echo("<span class=box-desc>" . $ifType . "</span>"); } else { echo("-"); } 
   echo("</td><td width=80>");
-  if($mac && $mac != "") { echo("<span class=box-desc>$mac</span>"); } else { echo("-"); }
+  if($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . $interface['ifPhysAddress'] . "</span>"); } else { echo("-"); }
   echo("</td><td width=80>");
-  if($interface[ifMtu] && $interface[ifMtu] != "") { echo("<span class=box-desc>MTU $interface[ifMtu]</span>"); } else { echo("-"); }
+  if($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
 
-#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex $interface[ifDuplex]</span>"); } else { echo("-"); }
+#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 }
 
 echo("</td>");
      echo("<td valign=top class=interface-desc>");
-     if ( strpos($inf, "oopback") === false && !$dographs) {
-       $link_query = mysql_query("select I.if, D.hostname, D.id AS dev_id, I.id from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.id AND I.host = D.id");
+     if ( strpos($ifDescr, "oopback") === false && !$dographs) {
+       $link_query = mysql_query("select I.ifDescr, D.hostname, D.id, I.interface_id from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.id");
        while($link = mysql_fetch_array($link_query)) {
          echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link) . " on " . generatedevicelink($link) . "</a><br />");
          $br = "<br />";
        }
        unset($br);
        $adj_sql = "SELECT * FROM networks AS N, interfaces AS I, adjacencies AS A ";
-        $adj_sql = $adj_sql . "WHERE I.id = A.interface_id AND A.network_id = N.id ";
-        $adj_sql = $adj_sql . "AND I.id = '$if_id'";
+        $adj_sql = $adj_sql . "WHERE I.interface_id = A.interface_id AND A.network_id = N.id ";
+        $adj_sql = $adj_sql . "AND I.interface_id = '$if_id'";
         $adj_query = mysql_query("$adj_sql");
         while($adjs = mysql_fetch_array($adj_query)) {
           $network_id = $adjs['network_id'];
-          $newsql = "SELECT *, I.id AS iid, D.id AS did FROM adjacencies AS A, networks as N, interfaces as I, devices as D ";
-          $newsql = $newsql . "WHERE N.id = '$network_id'  AND A.network_id = N.id AND I.id = A.interface_id AND D.id = I.host ";
-          $newsql = $newsql . "AND D.id != '$device[id]' AND I.if NOT LIKE '%loopback%' GROUP BY D.id ORDER BY D.hostname";
+          $newsql = "SELECT *, I.interface_id AS iid, D.id AS did FROM adjacencies AS A, networks as N, interfaces as I, devices as D ";
+          $newsql = $newsql . "WHERE N.id = '$network_id'  AND A.network_id = N.id AND I.interface_id = A.interface_id AND D.id = I.device_id ";
+          $newsql = $newsql . "AND D.id != '$device[id]' AND I.ifDescr NOT LIKE '%loopback%' GROUP BY D.id ORDER BY D.hostname";
           $new_query = mysql_query($newsql);
           while($new = mysql_fetch_array($new_query)) {
             if ($new['status'] == '0') { $class = "red"; } else { $class = "blue"; }
@@ -67,7 +68,7 @@ echo("</td>");
             $this_ifid = $new['iid'];
             $this_hostid = $new['did'];
             $this_hostname = $new['hostname'];
-            $this_ifname = fixifName($new['if']);
+            $this_ifname = fixifName($new['ifDescr']);
             $wq = mysql_query("select count(*) FROM links  WHERE dst_if = '$this_ifid' AND src_if = $if_id;");
             if (@mysql_result($wq, 0) == '0' && $this_hostname != $hostname) {
               $graph_url = "graph.php?if=$this_ifid&from=$twoday&to=$now&width=400&height=120&type=bits";

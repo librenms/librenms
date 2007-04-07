@@ -30,9 +30,9 @@ while ($device = mysql_fetch_row($device_query)) {
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
       if (preg_match('/ng[0-9]+$/', $if)) {  }
       if ($nullintf == 0) {
-        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `host` = '$id' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
+        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '$id' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           echo "Adding port $ifName \n";
-          mysql_query("INSERT INTO `interfaces` (`host`,`ifIndex`,`if`) VALUES ('$id','$ifIndex','$ifName')");
+          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('$id','$ifIndex','$ifName')");
         } else { 
           # echo("Already have $ifName \n"); 
         }

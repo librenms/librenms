@@ -5,10 +5,10 @@ $devices['up'] = mysql_result(mysql_query("SELECT count(id) FROM devices  WHERE 
 $devices['down'] = mysql_result(mysql_query("SELECT count(id) FROM devices WHERE status = '0' AND `ignore` = '0'"),0);
 $devices['disabled'] = mysql_result(mysql_query("SELECT count(id) FROM devices WHERE `ignore` = '1'"),0);
 
-$interfaces['count'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces"),0);
-$interfaces['up'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces  WHERE up = 'up'"),0);
-$interfaces['down'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces WHERE up = 'down' AND up_admin = 'up'"),0);
-$interfaces['disabled'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces WHERE up_admin = 'down'"),0);
+$interfaces['count'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces"),0);
+$interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE ifOperStatus = 'up'"),0);
+$interfaces['down'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
+$interfaces['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE ifAdminStatus = 'down'"),0);
 
 $services['count'] = mysql_result(mysql_query("SELECT count(service_id) FROM services"),0);
 $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'"),0);

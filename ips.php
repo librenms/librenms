@@ -10,7 +10,7 @@ while ($device = mysql_fetch_array($q)) {
   $hostid = $device['id'];
   $community = $device['community'];
   echo("$hostname\n");
-  $oids = `snmpwalk -v2c -Osq -c $community $hostname ipAdEntIfIndex | sed s/ipAdEntIfIndex.//g`;
+  $oids = `snmpbulkwalk -v2c -Osq -c $community $hostname ipAdEntIfIndex | sed s/ipAdEntIfIndex.//g`;
   $oids = trim($oids);
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
@@ -22,8 +22,8 @@ while ($device = mysql_fetch_array($q)) {
     list($net,$cidr) = explode("/", $network);
     $cidr = trim($cidr);
     if($mask == "255.255.255.255") { $cidr = "32"; $network = "$address/$cidr"; }
-    if (mysql_result(mysql_query("SELECT count(id) FROM `interfaces` WHERE host = '$hostid' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
-      $i_query = "SELECT id FROM `interfaces` WHERE host = '$hostid' AND `ifIndex` = '$ifIndex'";
+    if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE device_id = '$hostid' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
+      $i_query = "SELECT interface_id FROM `interfaces` WHERE device_id = '$hostid' AND `ifIndex` = '$ifIndex'";
       $interface_id = mysql_result(mysql_query($i_query), 0);
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipaddr` WHERE `addr` = '$address' AND `cidr` = '$cidr' AND `interface_id` = '$interface_id'"), 0) == '0') {
        mysql_query("INSERT INTO `ipaddr` (`addr`, `cidr`, `network`, `interface_id`) VALUES ('$address', '$cidr', '$net', '$interface_id')");
@@ -38,7 +38,6 @@ while ($device = mysql_fetch_array($q)) {
         mysql_query("INSERT INTO `adjacencies` (`network_id`, `interface_id`) VALUES ('$network_id', '$interface_id')");
         echo("Create Adjacency : $hostname, $interface_id, $network_id, $network, $ifIndex\n");
       }
-
     } else { }
   }
 }

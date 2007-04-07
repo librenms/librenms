@@ -27,7 +27,7 @@ echo("
     <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
   </a>
 </li>");
-if(mysql_result(mysql_query("select count(id) from interfaces WHERE host = '$device[id]'"), 0) > '0') {
+if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '$device[id]'"), 0) > '0') {
   echo("
 <li class=$select[devifs]>
   <a href='?page=device&id=$device[id]&section=dev-ifs' >
