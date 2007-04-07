@@ -27,12 +27,12 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
   echo("<td class=list-bold width=175>");
 
-  if($if['id']) {
-    $if['id'] = $entry['interface'];
-    $if['if'] = $interface;
+  if($interface) {
+    $if['interface_id'] = $entry['interface'];
+    $if['ifDescr'] = $interface;
     echo(generateiflink($if));
   }  
-  echo("</td>");
+  echo("</td>
     <td width=20>$icon</td>
     <td class=syslog>
       " . $entry['message'] . "

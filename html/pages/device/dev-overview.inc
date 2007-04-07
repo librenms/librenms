@@ -6,10 +6,10 @@ $id = $_GET[id];
 
 $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE id = '$_GET[id]'"));
 
-$interfaces['total'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces  WHERE host = '$id'"),0);
-$interfaces['up'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces  WHERE host = '$id' AND up = 'up'"),0);
-$interfaces['down'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces WHERE host = '$id' AND up = 'down' AND up_admin = 'up'"),0);
-$interfaces['disabled'] = mysql_result(mysql_query("SELECT count(id) FROM interfaces WHERE host = '$id' AND up_admin = 'down'"),0);
+$interfaces['total'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '$id'"),0);
+$interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '$id' AND ifOperStatus = 'up'"),0);
+$interfaces['down'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE device_id = '$id' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
+$interfaces['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE device_id = '$id' AND ifAdminStatus = 'down'"),0);
 
 $services['total'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '$id'"),0);
 $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_host = '$id' AND service_status = '1' AND service_ignore ='0'"),0);
@@ -69,7 +69,7 @@ echo("
 
   echo("<div style='margin: 8px; font-size: 11px; font-weight: bold;'>");
 
-  $sql = "SELECT * FROM interfaces WHERE host = '$id'";
+  $sql = "SELECT * FROM interfaces WHERE `device_id` = '$id'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
     echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['if']))));

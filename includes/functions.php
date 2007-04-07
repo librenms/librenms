@@ -47,13 +47,13 @@ function geteventicon ($message) {
 }
 
 
-function generateiflink($iface, $text=0) {
+function generateiflink($interface, $text=0) {
   global $twoday;
   global $now;
-  if(!$text) { $text = fixIfName($iface['if']); }
-  $class = ifclass($iface['up'], $iface['up_admin']);
-  $graph_url = "graph.php?if=$iface[id]&from=$twoday&to=$now&width=400&height=120&type=bits";
-  $link = "<a class=$class href='?page=interface&id=$iface[id]'  onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  if(!$text) { $text = fixIfName($interface['ifDescr']); }
+  $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
+  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$twoday&to=$now&width=400&height=120&type=bits";
+  $link = "<a class=$class href='?page=interface&id=" . $interface[interface_id] . "'  onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
@@ -975,19 +975,19 @@ function gethostbyid($id) {
 }
 
 function getifhost($id) {
-     $sql = mysql_query("SELECT `host` from `interfaces` WHERE `id` = '$id'");
+     $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
 
 function getifindexbyid($id) {
-     $sql = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `id` = '$id'");
+     $sql = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
 
 function getifbyid($id) {
-     $sql = mysql_query("SELECT `if` FROM `interfaces` WHERE `id` = '$id'");
+     $sql = mysql_query("SELECT `ifDescr` FROM `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }

@@ -7,7 +7,7 @@ include("config.php");
 include("includes/functions.php");
 
 $query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
-          WHERE A.interface_id = I.id AND I.host = D.id AND D.status = '1' AND I.id LIKE '%$argv[1]'";
+          WHERE A.interface_id = I.interface_id AND I.device_id = D.id AND D.status = '1'";
 
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
@@ -22,29 +22,28 @@ while($row = mysql_fetch_array($data)) {
   }
 }
 
-$query = "SELECT *, I.id as id FROM interfaces AS I, devices as D 
+$query = "SELECT * FROM interfaces AS I, devices as D 
           WHERE I.host = D.id AND D.status = '1'";
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
-  $id = $row['id'];
   $index = $row[ifIndex];
   $hostname = $row['hostname'];
   $community = $row['community'];
   $response = trim(`snmpget -v2c -Osq -c $community $hostname ifIndex.$index | cut -d " " -f 2`);
   if($response != $index) {
-    mysql_query("delete from interfaces where id = '$id'");
-    echo("Deleted $row[if] from $hostname\n");
+    mysql_query("delete from interfaces where id = '" . $row['interface_id'] . "'");
+    echo("Deleted $row[ifDescr] from $hostname\n");
   }
 }
 
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at start\n");
-$interface_query = mysql_query("SELECT id,host FROM `interfaces`");
+$interface_query = mysql_query("SELECT interface_id,device_id FROM `interfaces`");
 while ($interface = mysql_fetch_array($interface_query)) {
-  $host = $interface['host'];
-  $id = $interface['id'];
-  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `id` = '$host'"), 0) == '0') {
-    mysql_query("delete from interfaces where `id` = '$id'");
-    echo("Deleting if $id \n");
+  $device_id = $interface['device_id'];
+  $interface_id = $interface['interface_id'];
+  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `id` = '$device_id'"), 0) == '0') {
+    mysql_query("delete from interfaces where `interface_id` = '$interface_id'");
+    echo("Deleting if $interface_id \n");
   } 
 }
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at end\n");
@@ -55,7 +54,7 @@ while ($link = mysql_fetch_array($link_query)) {
   $id = $link['id'];
   $src = $link['src_if'];
   $dst = $link['dst_if'];
-  if(mysql_result(mysql_query("SELECT COUNT(id) FROM `interfaces` WHERE `id` = '$src'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(id) FROM `interfaces` WHERE `id` = '$dst'"), 0) == '0') {
+  if(mysql_result(mysql_query("SELECT COUNT(interface_id) FROM `interfaces` WHERE `interface_id` = '$src'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `interface_id` = '$dst'"), 0) == '0') {
     mysql_query("delete from links where `id` = '$id'");
     echo("Deleting link $id \n");
   }
@@ -63,12 +62,12 @@ while ($link = mysql_fetch_array($link_query)) {
 echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at end\n");
 
 echo(mysql_result(mysql_query("SELECT COUNT(adj_id) FROM `adjacencies`"), 0) . " adjacencies at start\n");
-$link_query = mysql_query("SELECT * FROM `adjacencies` AS A, `interfaces` AS I, `devices` AS D, networks AS N WHERE I.id = A.interface_id AND D.id = I.host AND N.id = A.network_id;");
+$link_query = mysql_query("SELECT * FROM `adjacencies` AS A, `interfaces` AS I, `devices` AS D, networks AS N WHERE I.interface_id = A.interface_id AND D.id = I.device_id AND N.id = A.network_id;");
 while ($link = mysql_fetch_array($link_query)) {
   $id = $link['adj_id'];
   $netid = $link['network_id'];
   $ifid = $link['interface_id'];
-  if(mysql_result(mysql_query("SELECT COUNT(id) FROM `interfaces` WHERE `id` = '$ifid'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(id) FROM `networks` WHERE `id` = '$netid'"), 0) == '0') {
+  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `interface_id` = '$ifid'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(id) FROM `networks` WHERE `id` = '$netid'"), 0) == '0') {
     $remove = 1;
     echo("Removed Interface!\n");
   }
