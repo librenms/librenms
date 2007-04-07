@@ -26,7 +26,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $features = $device['features'];
     $location = $device['location'];
     $old_sysDescr = $device['sysDescr'];
-    $uptime = $device['uptime'];
     $os = $device['os'];
     if($os == "FreeBSD" || $os == "OpenBSD" || $os == "Linux" || $os == "Windows") { $uptimeoid = ".1.3.6.1.2.1.25.1.1.0"; } else { $uptimeoid = "1.3.6.1.2.1.1.3.0"; }
     if($device['monowall']) { $uptimeoid = ".1.3.6.1.2.1.1.3.0"; }
@@ -148,17 +147,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $newstatus = '0';
   }
 
-  $uptimerrd = "rrd/" . $hostname . "-uptime.rrd";
-  if(!is_file($uptimerrd)) {
-    $woo = `rrdtool create $uptimerrd \
-      DS:uptime:GAUGE:600:0:U \
-      RRA:AVERAGE:0.5:1:600 \
-      RRA:AVERAGE:0.5:6:700 \
-      RRA:AVERAGE:0.5:24:775 \
-      RRA:AVERAGE:0.5:288:797`;
-  }
-  rrd_update($uptimerrd, "N:$newuptime");
-
   if ( $sysDescr && $sysDescr != $old_sysDescr ) {
     $update = "`sysDescr` = '$sysDescr'";
     $seperator = ", ";
@@ -200,14 +188,20 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($newuptime) {
     echo("Uptime : $newuptime\n");
 
+    $uptimerrd = "rrd/" . $hostname . "-uptime.rrd";
+    if(!is_file($uptimerrd)) {
+      $woo = `rrdtool create $uptimerrd \
+        DS:uptime:GAUGE:600:0:U \
+        RRA:AVERAGE:0.5:1:600 \
+        RRA:AVERAGE:0.5:6:700 \
+        RRA:AVERAGE:0.5:24:775 \
+        RRA:AVERAGE:0.5:288:797`;
+    }
+    rrd_update($uptimerrd, "N:$newuptime");
+
     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = '$newuptime' WHERE `device_id` = '$id' AND `attrib_type` = 'uptime'");
     if(mysql_affected_rows() == '0') {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('$id', 'uptime', '$newuptime')");
-    }
-
-    $update_uptime = mysql_query("UPDATE device_uptime SET device_uptime = '$newuptime' WHERE `device_id` = '$id'");
-    if(mysql_affected_rows() == '0') {
-      $insert_uptime = mysql_query("INSERT INTO device_uptime (`device_uptime`, `device_id`) VALUES ('$newuptime','$id')");
     }
   }
 
