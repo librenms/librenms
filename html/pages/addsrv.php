@@ -12,7 +12,7 @@ if($_POST['addsrv']) {
 
 if ($handle = opendir($installdir . "/includes/services/")) {
     while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != "..") {
+        if ($file != "." && $file != ".." && !strstr($file, ".")) {
             $servicesform .= "<option value='$file'>$file</option>";
         }
     }
