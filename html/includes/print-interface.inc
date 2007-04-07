@@ -29,7 +29,7 @@
   echo("</span>");
   echo("</td><td width=70>");
   if($speed && $speed != "") { echo("<span class=box-desc>$speed</span>"); }
-  echo("</td><td width=110>");
+  echo("</td><td width=150>");
   if($iftype && $iftype != "") { echo("<span class=box-desc>$iftype</span>"); } else { echo("-"); } 
   echo("</td><td width=80>");
   if($mac && $mac != "") { echo("<span class=box-desc>$mac</span>"); } else { echo("-"); }

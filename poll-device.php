@@ -184,10 +184,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('$id', NULL, NOW(), 'Changed hardware from $hardware to $newhardware')");
   }
-  if ( $newuptime && $uptime != $newuptime ) {
-    $update .= $seperator . "`uptime` = '$newuptime'";
-    $seperator = ", ";
-  }
 
   if( $status != $newstatus ) {
     $update .= $seperator . "`status` = '$newstatus'";
@@ -201,7 +197,14 @@ while ($device = mysql_fetch_array($device_query)) {
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('$id', NULL, NOW(), 'Device status changed to $stat')");
   }
 
-  if ( $newuptime ) {
+  if ($newuptime) {
+    echo("Uptime : $newuptime\n");
+
+    $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = '$newuptime' WHERE `device_id` = '$id' AND `attrib_type` = 'uptime'");
+    if(mysql_affected_rows() == '0') {
+      $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('$id', 'uptime', '$newuptime')");
+    }
+
     $update_uptime = mysql_query("UPDATE device_uptime SET device_uptime = '$newuptime' WHERE `device_id` = '$id'");
     if(mysql_affected_rows() == '0') {
       $insert_uptime = mysql_query("INSERT INTO device_uptime (`device_uptime`, `device_id`) VALUES ('$newuptime','$id')");
