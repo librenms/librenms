@@ -343,6 +343,8 @@ function fixifName ($inf) {
         $inf = str_replace("dial", "Dial", $inf);
         $inf = str_replace("hp procurve switch software Loopback interface", "Loopback Interface", $inf);
         $inf = str_replace("control plane interface", "Control Plane", $inf);
+        $inf = preg_replace("", "Interface \\1", $inf);
+        $inf = preg_replace("/^([0-9]+)$/", "Interface \\1", $inf);
 	return $inf;
 }
 
