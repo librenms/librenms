@@ -5,7 +5,7 @@ include("config.php");
 include("includes/functions.php");
 include("includes/cdp.php");
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND `os` = 'IOS' ORDER BY `id` DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND `os` = 'IOS' ORDER BY `device_id` DESC");
 
 while ($device = mysql_fetch_array($device_query)) {
 
