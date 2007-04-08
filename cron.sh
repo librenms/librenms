@@ -3,7 +3,6 @@
 ./poll-reachability.php
 ./poll-device.php &
 ./poll-interface.php &
-./poll-temperatures.php &
 ./ips.php &
 ./check-services.php
 ./alerts.php
