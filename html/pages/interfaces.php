@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.id ORDER BY D.hostname, I.ifDescr";
+$sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
@@ -14,7 +14,7 @@ while($interface = mysql_fetch_array($query)) {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $speed = humanspeed($interface['ifSpeed']);
-  $if_link = generateiflink($interface);
+  $if_link = generateiflink($interface, makeshortif($interface['ifDescr']));
   $dev_link = generatedevicelink($interface);
   $type = humanmedia($interface['ifType']);
 
