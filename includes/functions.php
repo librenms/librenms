@@ -327,13 +327,13 @@ function fixiftype ($type) {
 }
 
 function fixifName ($inf) {
+        if(strstr($inf, "oopback")) { $inf = "loopback"; }
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("gig", "Gig", $inf);
         $inf = str_replace("fast", "Fast", $inf);
         $inf = str_replace("ten", "Ten", $inf);
         $inf = str_replace("vlan", "Vlan", $inf);
         $inf = str_replace("ether", "Ether", $inf);
-        $inf = str_replace("loop", "Loop", $inf);
         $inf = str_replace("-802.1q Vlan subif", "", $inf);
         $inf = str_replace("serial", "Serial", $inf);
         $inf = str_replace("-aal5 layer", " aal5", $inf);
@@ -341,10 +341,10 @@ function fixifName ($inf) {
         $inf = str_replace("atm", "ATM", $inf);
         $inf = str_replace("port-channel", "Port-Channel", $inf);
         $inf = str_replace("dial", "Dial", $inf);
-        $inf = str_replace("hp procurve switch software Loopback interface", "Loopback Interface", $inf);
+        $inf = str_replace("hp procurve switch software loopback interface", "Loopback Interface", $inf);
         $inf = str_replace("control plane interface", "Control Plane", $inf);
-        $inf = preg_replace("", "Interface \\1", $inf);
-        $inf = preg_replace("/^([0-9]+)$/", "Interface \\1", $inf);
+        $inf = str_replace("loop", "Loop", $inf);
+        $inf = preg_replace("/^([0-9]+)$/", "Interface \\0", $inf);
 	return $inf;
 }
 
