@@ -14,11 +14,15 @@ while($interface = mysql_fetch_array($query)) {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $speed = humanspeed($interface['ifSpeed']);
-  $if_link = generateiflink($interface, makeshortif($interface['ifDescr']));
-  $dev_link = generatedevicelink($interface);
   $type = humanmedia($interface['ifType']);
 
-  echo("<tr bgcolor=$row_colour><td><a href='' class=list-bold>$dev_link</a></td><td class=list-bold>$if_link</td><td>$speed</td><td>$type</td><td>" . $interface[ifAlias] . "</td></tr>\n");
+  echo("<tr bgcolor=$row_colour>
+          <td class=list-bold>" . generatedevicelink($interface) . "</td>
+          <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . "</td>
+          <td>$speed</td>
+          <td>$type</td>
+          <td>" . $interface[ifAlias] . "</td>
+        </tr>\n");
 
   $row++;
 

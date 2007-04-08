@@ -14,13 +14,15 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $snmp_cmd .= " ifDescr." . $interface['ifIndex'] . " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ";
   $snmp_cmd .= "ifAlias." . $interface['ifIndex'] . " ifSpeed." . $interface['ifIndex'] . " 1.3.6.1.2.1.10.7.2.1." . $interface['ifIndex'];
   $snmp_cmd .= " ifType." . $interface['ifIndex'] . " ifMtu." . $interface['ifIndex'] . " ifPhysAddress." . $interface['ifIndex'];
+  $snmp_cmd .= " 1.3.6.1.4.1.9.2.2.1.1.1." . $interface['ifIndex'];
 
   $snmp_output = trim(`$snmp_cmd`);
   $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);
   $snmp_output = str_replace("No Such Instance currently exists at this OID", "", $snmp_output);
+  $snmp_output = str_replace("\"", "", $snmp_output);
 
   echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
-  list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifDuplex, $ifType, $ifMtu, $ifPhysAddress) = explode("\n", $snmp_output);
+  list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifDuplex, $ifType, $ifMtu, $ifPhysAddress, $ifHardType) = explode("\n", $snmp_output);
   $ifDescr = trim(str_replace("\"", "", $ifDescr));
   if ($ifDuplex == 3) { $ifDuplex = "half"; } elseif ($ifDuplex == 2) { $ifDuplex = "full"; } else { $ifDuplex = "unknown"; }
   $ifDescr = strtolower($ifDescr);
@@ -30,11 +32,6 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   $ifPhysAddress = strtolower(str_replace("\"", "", $ifPhysAddress));
   $ifPhysAddress = str_replace(" ", ":", $ifPhysAddress);
-
-  if($device['os'] == "IOS") {
-    $locIfHardType_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.4.1.9.2.2.1.1.1." . $interface['ifIndex'];
-    $locIfHardType = trim(str_replace("\"", "", `$locIfHardType_cmd`));
-  }
 
   $rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
   if(!is_file($rrdfile)) {
@@ -102,6 +99,13 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $seperator = ", ";
      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'MAC -> $ifPhysAddress')");
   }
+
+  if ( $interface['ifHardType'] != $ifHardType && $ifHardType != "" ) {
+     $update .= $seperator . "`ifHardType` = '$ifHardType'";
+     $seperator = ", ";
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" .$interface['interface_id'] . "', NOW(), 'HW Type -> $ifHardType')");
+  }
+
 
   if ( $interface['ifSpeed'] != $ifSpeed && $ifSpeed != "" ) {
      $update .= $seperator . "`ifSpeed` = '$ifSpeed'";
