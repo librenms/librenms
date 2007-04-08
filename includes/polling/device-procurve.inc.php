@@ -3,12 +3,12 @@
 $cpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
 $memrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
 
-$cpu_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0`;
+$cpu_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0";
 $cpu     = `$cpu_cmd`;
 
 
 $mem_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
-$mem_cmd .= " 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.5.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.6.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.7.1`;
+$mem_cmd .= " 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.5.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.6.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.7.1";
 $mem      = `$mem_cmd`;
 
 list ($memtotal, $memfree, $memused) = explode("\n", $mem);
