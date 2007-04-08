@@ -19,6 +19,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpable = isSNMPable($hostname, $community, $snmpver);
   }
   if ($pingable !== FALSE && $snmpable !== FALSE ) {
+
     $newstatus = '1';
     $hardware = $device['hardware'];
     $version = $device['version'];
@@ -43,8 +44,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $mins = $mins + ($hours * 60);
     $secs = $secs + ($mins * 60);
     $newuptime = $secs;
-
-    include("poll-device-netstats.php");    
 
     switch ($os) {
     case "FreeBSD":
@@ -143,6 +142,11 @@ while ($device = mysql_fetch_array($device_query)) {
       pollDevice();
     }   
     $newlocation = str_replace("\"","", $sysLocation); 
+  
+  include("includes/polling/temperatures.inc.php");
+
+  include("includes/polling/device-netstats.inc.php");
+
   } else {
     $newstatus = '0';
   }
