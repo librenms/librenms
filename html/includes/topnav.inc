@@ -1,9 +1,9 @@
 <?php
 
-$devices['count'] = mysql_result(mysql_query("SELECT count(id) FROM devices"),0);
-$devices['up'] = mysql_result(mysql_query("SELECT count(id) FROM devices  WHERE status = '1' AND `ignore` = '0'"),0);
-$devices['down'] = mysql_result(mysql_query("SELECT count(id) FROM devices WHERE status = '0' AND `ignore` = '0'"),0);
-$devices['disabled'] = mysql_result(mysql_query("SELECT count(id) FROM devices WHERE `ignore` = '1'"),0);
+$devices['count'] = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
+$devices['up'] = mysql_result(mysql_query("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"),0);
+$devices['down'] = mysql_result(mysql_query("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'"),0);
+$devices['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM devices WHERE `ignore` = '1'"),0);
 
 $interfaces['count'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces"),0);
 $interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE ifOperStatus = 'up'"),0);

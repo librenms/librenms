@@ -7,15 +7,14 @@
 
   $query_a = mysql_query("SELECT * FROM `devices`");
   while($device = mysql_fetch_array($query_a)) {
-
-    if($device[status] == 0 && $device[ignore] == '0') { $this_alert = "1"; } elseif($device[ignore] == '0') {
+    if($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif($device['ignore'] == '0') {
       if(mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_host = '$device[id]'"),0)) { $this_alert = "1"; }
-      if(mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '$device[id]'"),0)) { $this_alert = "1"; }
+      if(mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device[device_id] . "'"),0)) { $this_alert = "1"; }
     }
 
     if($this_alert) { 
      $device_alerts++;
-     $device_alert_sql .= " OR `id` = '$device[id]'"; 
+     $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'"; 
     }    
     unset($this_alert);
   }

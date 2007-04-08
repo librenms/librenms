@@ -11,15 +11,15 @@
   include("includes/authenticate.inc");
 
   if($_GET['host']) {
-    $device = $_GET['host'];
+    $device_id = $_GET['host'];
   } elseif($_GET['device']) {
-    $device = $_GET['device'];
-  } else {
-    $device = getifhost($_GET['if']);
+    $device_id = $_GET['device'];
+  } elseif($_GET['if']) {
+    $device_id = getifhost($_GET['if']);
     $ifIndex = getifindexbyid($_GET['if']);
   }
-  if($device) {
-    $hostname = gethostbyid($device);
+  if($device_id) {
+    $hostname = gethostbyid($device_id);
   }
 
   $from = $_GET['from'];
@@ -33,7 +33,7 @@
 
   $graphfile = $hostname . ".". $ifIndex . "-" . $type . ".png";
 
-  $os = gethostosbyid($device);
+  $os = gethostosbyid($device_id);
 
   switch ($type) {
 
@@ -41,7 +41,7 @@
     $graph = graph_global_bits ("global_bits.png", $from, $to, $width, $height);
     break;
   case 'device_bits':
-    $graph = graph_device_bits ($device, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;  
   case 'bits':
     $graph = trafgraph ($hostname . ".". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -59,7 +59,7 @@
     $graph = uptimegraph ($hostname . "-uptime.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'unixfs':
-    $graph = unixfsgraph ($device, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = unixfsgraph ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'calls':
     $graph = callsgraphSNOM ($hostname . "-data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -90,7 +90,7 @@
     }
     break;
   case 'temp':
-      $graph = temp_graph ($device, $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = temp_graph ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'mem':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
@@ -127,7 +127,7 @@
     break;
   case 'unixfs':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
-      $graph = unixfsgraph ($device, $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = unixfsgraph ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'postfix':

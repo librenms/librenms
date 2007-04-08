@@ -1,8 +1,8 @@
 <?php
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, `device_uptime` AS U WHERE D.id = U.device_id AND U.device_uptime > '0' AND U.device_uptime < '86400'");
+$sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS U WHERE D.device_id = U.device_id AND U.attrib_type = 'uptime' AND U.attrib_value > '0' AND U.attrib_value < '86400'");
 while($device = mysql_fetch_array($sql)){
-  $rebooted[] = "$device[id]";
+  $rebooted[] = "$device[device_id]";
 }
 ?>
 
@@ -20,41 +20,41 @@ while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
-    $thisnode = "$device[id]";
+    $thisnode = $device['device_id'];
     if ($nodes[$i] == $thisnode) { 
      $already = "yes"; 
     }
     $i++;
   }
-  if(!$already) { $nodes[] = "$device[id]"; }
+  if(!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT D.id as `id` FROM `interfaces` AS I, `devices` AS D WHERE I.host = D.id AND up = 'down' AND up_admin = 'up'");
+$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'");
 while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
-    $thisnode = "$device[id]";
+    $thisnode = $device['device_id'];
     if ($nodes[$i] == $thisnode) {
      $already = "yes";
     }
     $i++;
   }
-  if(!$already) { $nodes[] = "$device[id]"; }
+  if(!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT D.id as `id` FROM `services` AS S, `devices` AS D WHERE S.service_host = D.id AND service_status = 'down'");
+$sql = mysql_query("SELECT D.device_id  FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down'");
 while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
-    $thisnode = "$device[id]";
+    $thisnode = $device['device_id'];
     if ($nodes[$i] == $thisnode) {
      $already = "yes";
     }
     $i++;
   }
-  if(!$already) { $nodes[] = "$device[id]"; }
+  if(!$already) { $nodes[] = $device['device_id']; }
 }
 
 foreach($nodes as $node) {
@@ -63,11 +63,11 @@ foreach($nodes as $node) {
 
   $host = gethostbyid($node);
 
-  $ints = mysql_result(mysql_query("SELECT count(id) FROM `interfaces` WHERE `up` = 'down' AND `up_admin` = 'up' AND `host` = '$node'"),0);
+  $ints = mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `device_id` = '$node'"),0);
   $services = mysql_result(mysql_query("SELECT count(service_id) FROM `services` WHERE `service_status` = '0' AND `service_host` = '$node'"),0);
 
   $intlist = array();
-  $sql = mysql_query("SELECT `if`, `name` FROM interfaces WHERE `up` = 'down' AND `up_admin` = 'up' AND `host` = '$node'");
+  $sql = mysql_query("SELECT `ifDescr`, `ifAlias` FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `device_id` = '$node'");
   while($int = mysql_fetch_row($sql)) { $intlist[] = "<b>$int[0]</b> - $int[1]"; } 
   foreach ($intlist as $intname) { $intpop .= "$br $intname"; $br = "<br />"; }
   unset($br);

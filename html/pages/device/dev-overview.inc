@@ -4,7 +4,7 @@ $overview = 1;
 
 $id = $_GET[id];
 
-$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE id = '$_GET[id]'"));
+$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
 
 $interfaces['total'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '$id'"),0);
 $interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '$id' AND ifOperStatus = 'up'"),0);
@@ -51,7 +51,7 @@ echo("</td><td width=50% valign=top>");
 
 if($interfaces['total']) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>
-        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['id'], 490, 100, $day, $now) . "</div>");
+        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['device_id'], 490, 100, $day, $now) . "</div>");
 }
 
 if($interfaces['total']) {

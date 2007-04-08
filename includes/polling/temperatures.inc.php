@@ -1,17 +1,19 @@
 <?
 
-$query = "SELECT * FROM temperature AS T temp_host = '" . $device[id] . "'";
+$query = "SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] . "'";
 $temp_data = mysql_query($query);
 while($temperature = mysql_fetch_array($temp_data)) {
 
-  $community = $temperature[community];
-  $hostname = $temperature[hostname];
-  $snmpver = $temperature[snmpver];
-
   $temp_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " " . $temperature['temp_oid'];
+  echo($temp_cmd);
   $temp = `$temp_cmd`;
 
-  $temprrd  = "rrd/" . $temperature[hostname] . "-temp" . $temperature[temp_id] . ".rrd";
+  $temprrd  = "rrd/" . $device[hostname] . "-temp-" . $temperature[temp_id] . ".rrd";
+  $temprrdold  = "rrd/" . $device[hostname] . "-temp" . $temperature[temp_id] . ".rrd";
+  if (is_file($temprrdold)) { 
+    rename($temprrdold, $temprrd); 
+  }
+
   if (!is_file($temprrd)) {
     `rrdtool create $temprrd \
      --step 300 \

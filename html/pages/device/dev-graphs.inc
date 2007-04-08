@@ -1,6 +1,6 @@
 <?
 
-$device_query = mysql_query("select * from devices WHERE id = '$_GET[id]'");
+$device_query = mysql_query("select * from devices WHERE `device_id` = '$_GET[id]'");
 while($device = mysql_fetch_array($device_query)) {
    $hostname = $device[hostname];
    $bg="#ffffff";

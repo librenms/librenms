@@ -6,7 +6,7 @@ function pollDeviceHP() {
 
    global $device;
    global $community;
-   $id = $device['id'];
+   $id = $device['device_id'];
    $hostname = $device['hostname'];
    $hardware = $device['hardware'];
    $version = $device['version'];

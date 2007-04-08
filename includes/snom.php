@@ -7,7 +7,7 @@ function pollDeviceSNOM() {
    global $device;
    global $community;
    $snmpver = $device['snmpver'];
-   $id = $device['id'];
+   $id = $device['device_id'];
    $hostname = $device['hostname'];
    $hardware = $device['hardware'];
    $version = $device['version'];
