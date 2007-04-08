@@ -7,15 +7,13 @@ include("includes/functions.php");
 $interface_query = mysql_query("SELECT * FROM `interfaces`");
 while ($interface = mysql_fetch_array($interface_query)) {
 
- $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE id = '" . $interface['device_id'] . "'"));
+ $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'"));
  if($device['status'] == '1') {
 
   $snmp_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifName." . $interface['ifIndex'];
   $snmp_cmd .= " ifDescr." . $interface['ifIndex'] . " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ";
   $snmp_cmd .= "ifAlias." . $interface['ifIndex'] . " ifSpeed." . $interface['ifIndex'] . " 1.3.6.1.2.1.10.7.2.1." . $interface['ifIndex'];
   $snmp_cmd .= " ifType." . $interface['ifIndex'] . " ifMtu." . $interface['ifIndex'] . " ifPhysAddress." . $interface['ifIndex'];
-
-  echo($snmp_cmd);
 
   $snmp_output = trim(`$snmp_cmd`);
   $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);

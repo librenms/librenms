@@ -1,15 +1,12 @@
 <?php
 
-if($_GET['ignore']) { mysql_query("UPDATE devices SET `ignore` = '1' WHERE `id` = '$_GET[ignore]'"); }
-if($_GET['unignore']) { mysql_query("UPDATE devices SET `ignore` = '0' WHERE `id` = '$_GET[unignore]'"); }
-
 if($_GET['location']) { $where = "WHERE location = '$_GET[location]'"; }
 if($_GET['location'] == "Unset") { $where = "WHERE location = ''"; }
 if($_GET['type']) { $where = "WHERE type = '$_GET[type]'"; }
 
 $sql = "select * from devices $where ORDER BY `ignore`, `status`, `os`, `hostname`";
 
-if($_GET['status'] == "alerted") { $sql = "select * from devices " . $device_alert_sql . " GROUP BY `id` ORDER BY `ignore`, `status`, `os`, `hostname`"; }
+if($_GET['status'] == "alerted") { $sql = "select * from devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`"; }
 
 $device_query = mysql_query($sql);
 

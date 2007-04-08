@@ -53,18 +53,17 @@ function generateiflink($interface, $text=0) {
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$twoday&to=$now&width=400&height=120&type=bits";
-  $link = "<a class=$class href='?page=interface&id=" . $interface[interface_id] . "'  onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  $link = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
 function generatedevicelink($device, $text=0) {
   global $twoday;
   global $now;
-  if($device['dev_id']) { $id = $device['dev_id']; } else { $id = $device['id']; }
   $class = devclass($device);
-  if(!$text) { $text = $device[hostname]; }
-  $graph_url = "graph.php?host=$id&from=$twoday&to=$now&width=400&height=120&type=cpu";
-  $link = "<a class=$class href='?page=device&id=$id' onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  if(!$text) { $text = $device['hostname']; }
+  $graph_url = "graph.php?host=" . $device[device_id] . "&from=$twoday&to=$now&width=400&height=120&type=cpu";
+  $link = "<a class=$class href='?page=device&id=" . $device['device_id'] . "' onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
@@ -85,7 +84,7 @@ function devclass($device) {
 
 function getImage($host) {
 
-$sql = "SELECT * FROM `devices` WHERE `id` = '$host'";
+$sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
 $data = mysql_fetch_array(mysql_query($sql));
 
 $type = strtolower($data['os']);
@@ -108,8 +107,8 @@ $type = strtolower($data['os']);
 
 function delHost($id) {
 
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE id = '$id'"), 0);
-  mysql_query("DELETE FROM `devices` WHERE `id` = '$id'");
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `host` = '$id'");
   while($int_data = mysql_fetch_array($int_query)) {
     $int_if = $int_data['if'];
@@ -123,7 +122,7 @@ function delHost($id) {
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
-  mysql_query("DELETE FROM `interfaces` WHERE `host` = '$id'");
+  mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
   `rm -f rrd/$host-*.rrd`;
   echo("Removed device $host<br />");
@@ -282,12 +281,12 @@ function isValidInterface($if) {
       }  else { return 0; }
 }
 
-function ifclass($up, $up_admin) {
+function ifclass($ifOperStatus, $ifAdminStatus) {
         $ifclass = "interface-upup";
 
-        if ($up_admin == "down") { $ifclass = "interface-admindown"; }
-        if ($up_admin == "up" && $up == "down") { $ifclass = "interface-updown"; }
-        if ($up_admin == "up" && $up == "up") { $ifclass = "interface-upup"; }
+        if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
+        if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
+        if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
 	return $ifclass;
 }
 
@@ -939,37 +938,18 @@ function createHost ($host, $community, $snmpver){
 	}
 }
 
-function createInterface ($host, $if, $ifIndex, $up,$up_admin,$speed,$duplex,$mac,$name){
-	$sql = "INSERT INTO `interfaces` (`host`,`if`,`ifIndex`, `up`,`up_admin`,`speed`,`duplex`,`mac`,`name`)";
-	$sql = $sql . " VALUES ('$host', '$if','$ifIndex','$up','$up_admin','$speed','$duplex','$mac',\"$name\")";
-	mysql_query($sql);
-}
-
-function updateInterfaceStatus ($id,$ifOperStatus,$ifAdminStatus,$speed,$duplex,$mac,$ifAlias) {
-        $sql = "UPDATE `interfaces` SET `up` = '$ifOperStatus', `up_admin` = '$ifAdminStatus', `speed` = '$speed', ";
-        $sql .= "`duplex` = '$duplex', `mac` = '$mac', `name` = \"$ifAlias\"  WHERE `id` = '$id'";
-        mysql_query($sql);
-	echo("$sql\n");
-}
-
-function updateInterface ($host, $if, $ifIndex, $up, $up_admin, $speed, $duplex, $mac, $name){
-        $sql = "UPDATE `interfaces` SET `up` = '$up',`up_admin` = '$up_admin',`speed` = '$speed',`duplex` = '$duplex',`mac` = '$mac',`name` =  \"$name\"";
-        $sql .= " WHERE `host` = '$host' AND `if` = '$if'";
-        mysql_query($sql);
-}
-
 function isDomainResolves($domain){
      return gethostbyname($domain) != $domain;
 }
 
 function hoststatus($id) {
-    $sql = mysql_query("SELECT `status` FROM `devices` WHERE `id` = '$id'");
+    $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
     $result = @mysql_result($sql, 0);
     return $result;
 }
 
 function gethostbyid($id) {
-     $sql = mysql_query("SELECT `hostname` FROM `devices` WHERE `id` = '$id'");
+     $sql = mysql_query("SELECT `hostname` FROM `devices` WHERE `device_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
@@ -993,13 +973,13 @@ function getifbyid($id) {
 }
 
 function getidbyname($domain){
-     $sql = mysql_query("SELECT `id` FROM `devices` WHERE `hostname` = '$domain'");
+     $sql = mysql_query("SELECT `device_id` FROM `devices` WHERE `hostname` = '$domain'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
 
 function gethostosbyid($id) {
-     $sql = mysql_query("SELECT `os` FROM `devices` WHERE `id` = '$id'");
+     $sql = mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
