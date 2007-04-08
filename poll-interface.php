@@ -4,7 +4,9 @@
 include("config.php");
 include("includes/functions.php");
 
-$interface_query = mysql_query("SELECT * FROM `interfaces`");
+if($argv[1]) { $where = "WHERE `interface_id` LIKE '%$argv[1]'"; }
+
+$interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
  $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'"));
@@ -22,6 +24,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $snmp_output = str_replace("\"", "", $snmp_output);
 
   echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
+
   list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifDuplex, $ifType, $ifMtu, $ifPhysAddress, $ifHardType) = explode("\n", $snmp_output);
   $ifDescr = trim(str_replace("\"", "", $ifDescr));
   if ($ifDuplex == 3) { $ifDuplex = "half"; } elseif ($ifDuplex == 2) { $ifDuplex = "full"; } else { $ifDuplex = "unknown"; }
