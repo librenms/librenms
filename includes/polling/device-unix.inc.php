@@ -55,10 +55,11 @@ $oid_ssCpuRawIdle         = ".1.3.6.1.4.1.2021.11.53.0";
 $oid_hrSystemProcesses    = ".1.3.6.1.2.1.25.1.6.0";
 $oid_hrSystemNumUsers     = ".1.3.6.1.2.1.25.1.5.0";
 
-$cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
-$cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
-$cmd .= " $oid_hrSystemNumUsers .1.3.6.1.4.1.2021.1.101.1";
-list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $cputemp) = explode("\n", $s);
+$cpu_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+$cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
+$cpu_cmd .= " $oid_hrSystemNumUsers .1.3.6.1.4.1.2021.1.101.1";
+$cpu  = `$cpu_cmd`;
+list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $cputemp) = explode("\n", $cpu);
 
 ## Create CPU RRD if it doesn't already exist
 if (!is_file($cpurrd)) {
