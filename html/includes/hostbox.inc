@@ -9,7 +9,7 @@
    $type = strtolower($device['os']);
    unset($image);
 
-   $image = getImage($device[id]);
+   $image = getImage($device['device_id']);
 
    echo("
             <tr bgcolor='$bg'>

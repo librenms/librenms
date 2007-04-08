@@ -125,7 +125,7 @@ while ($device = mysql_fetch_array($device_query)) {
         echo("$ciscomodel");
         $newhardware = str_replace("\"", "", $ciscomodel);
       }
-      pollDeviceHP();
+      include("includes/polling/device-procurve.inc.php");
       break;
     case "Snom":
       $cmd      = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.2.1.7526.2.4";
