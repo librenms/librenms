@@ -7,16 +7,16 @@
 include("config.php");
 include("includes/functions.php");
 
-$device_query = mysql_query("SELECT id,hostname,status,community,snmpver FROM `devices` WHERE `id` LIKE '%" . $argv[1] . "' ORDER BY `id` DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` LIKE '%" . $argv[1] . "' ORDER BY `device_id` DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
-   $id = $device['id'];
+   $id = $device['device_id'];
    $hostname = $device['hostname'];
    $old_status = $device['status'];
    $community = $device['community'];
    $snmpver = $device['snmpver'];
 
-   echo("- > $hostname\n");
+   echo("$hostname\n");
 
    $status = `$fping $hostname | cut -d " " -f 3`;
    $status = trim($status);
@@ -34,19 +34,17 @@ while ($device = mysql_fetch_array($device_query)) {
      $status='0';
    }
 
-   echo("$old_status => $status \n");
 
-
-   if($status != $old_status) {
-     mysql_query("UPDATE `devices` SET `status`= '$status' WHERE `id` = '$id'");
+   if($status != $device['status']) {
+     mysql_query("UPDATE `devices` SET `status`= '$status' WHERE `device_id` = '" . $device['device_id'] . "'");
      if ($status == '1') { 
        $stat = "Up"; 
-       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '$id', 'Device is up\n')");
+       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is up\n')");
      } else {
        $stat = "Down";
-       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '$id', 'Device is down\n')");
+       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
      }
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('$id', NULL, NOW(), 'Device status changed to $stat')");
+     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to $stat')");
      echo("Status Changed!\n");
    }
 }
