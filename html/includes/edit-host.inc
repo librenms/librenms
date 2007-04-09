@@ -6,7 +6,7 @@
   $ignore = $_POST['ignore'];
   $type = $_POST['type'];
 
-  $sql = "UPDATE `devices` SET `purpose` = '$descr', `apache` = '$apache', `type` = '$type', `ignore` = '$ignore' WHERE `id` = '$_GET[id]'";
+  $sql = "UPDATE `devices` SET `purpose` = '$descr', `apache` = '$apache', `type` = '$type', `ignore` = '$ignore' WHERE `device_id` = '$_GET[id]'";
   $query = mysql_query($sql);
 
   $rows_updated = mysql_affected_rows();

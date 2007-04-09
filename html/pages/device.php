@@ -1,22 +1,20 @@
 <?
 
-$selected[iface] = "selected";
+$selected['iface'] = "selected";
 
-if(!$_GET[section]) { 
-  $_GET[section] = "dev-overview"; 
+if(!$_GET['section']) { 
+  $_GET['section'] = "dev-overview"; 
 }
-$section = $_GET[section];
+$section = $_GET['section'];
 $sectionx = str_replace("-", "", $section);
 $select[$sectionx] = "selected";
 
 
-$device_query = mysql_query("select * from devices WHERE `device_id` = '$_GET[id]'");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $_GET['id'] . "'");
 while($device = mysql_fetch_array($device_query)) {
-   $hostname = $device[hostname];
-   #$bg="#ffffff";
-   echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
-   include("includes/device-header.inc");
-   echo("</table><br />");
+  echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
+  include("includes/device-header.inc");
+  echo("</table><br />");
 
 echo("<div class=mainpane>");
 
