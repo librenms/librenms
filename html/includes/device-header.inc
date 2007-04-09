@@ -8,13 +8,13 @@
    $type = strtolower($device['os']);
    unset($image);
 
-   $image = getImage($device[id]);
+   $image = getImage($device['device_id']);
 
    echo("
             <tr >
              <td width='40' align=center valign=middle>$image</td>
              <td valign=middle><span style='font-weight: bold; font-size: 20px;'>" . generatedevicelink($device) . "</span>
-             <br />$device[purpose]</td>
+             <br />" . $device['purpose'] . "</td>
              <td></td>
            </tr>");
 

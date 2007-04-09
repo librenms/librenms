@@ -6,6 +6,7 @@
      $class = "list-device-ignored";
      if ($device['status'] == '1') { $class = "list-device-ignored-up"; }
    }
+
    $type = strtolower($device['os']);
    unset($image);
 
