@@ -72,7 +72,7 @@ echo("
   $sql = "SELECT * FROM interfaces WHERE `device_id` = '$id'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
-    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['if']))));
+    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['ifDescr']))));
     $ifsep = ", ";
   }
   unset($ifsep);

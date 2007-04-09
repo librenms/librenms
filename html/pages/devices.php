@@ -13,7 +13,8 @@ $device_query = mysql_query($sql);
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
 while($device = mysql_fetch_array($device_query)) {
-  $device[uptime] = @mysql_result(mysql_query("SELECT device_uptime FROM device_uptime WHERE device_id = '" . $device[id] ."'" ), 0);
+  $device['uptime'] = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] ."' AND `attrib_type` = 'uptime'"), 0);
+
   include("includes/hostbox.inc");
 }
 

@@ -7,7 +7,7 @@ include("config.php");
 include("includes/functions.php");
 
 $query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
-          WHERE A.interface_id = I.interface_id AND I.device_id = D.id AND D.status = '1'";
+          WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
 
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
@@ -23,7 +23,7 @@ while($row = mysql_fetch_array($data)) {
 }
 
 $query = "SELECT * FROM interfaces AS I, devices as D 
-          WHERE I.host = D.id AND D.status = '1'";
+          WHERE I.device_id = D.device_id AND D.status = '1'";
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
   $index = $row[ifIndex];
@@ -31,8 +31,12 @@ while($row = mysql_fetch_array($data)) {
   $community = $row['community'];
   $response = trim(`snmpget -v2c -Osq -c $community $hostname ifIndex.$index | cut -d " " -f 2`);
   if($response != $index) {
-    mysql_query("delete from interfaces where id = '" . $row['interface_id'] . "'");
-    echo("Deleted $row[ifDescr] from $hostname\n");
+    mysql_query("DELETE from interfaces where interface_id = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `links` WHERE `src_if` = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `links` WHERE `dst_if` = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '" . $row['interface_id'] . "'");
+    echo("Removed interface " . $row['ifDescr'] . " from " . $row['hostname'] . "<br />");
   }
 }
 
@@ -41,7 +45,7 @@ $interface_query = mysql_query("SELECT interface_id,device_id FROM `interfaces`"
 while ($interface = mysql_fetch_array($interface_query)) {
   $device_id = $interface['device_id'];
   $interface_id = $interface['interface_id'];
-  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `id` = '$device_id'"), 0) == '0') {
+  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `device_id` = '$device_id'"), 0) == '0') {
     mysql_query("delete from interfaces where `interface_id` = '$interface_id'");
     echo("Deleting if $interface_id \n");
   } 
