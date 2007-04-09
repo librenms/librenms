@@ -4,15 +4,11 @@
 
 include("config.php");
 
-$srvdir = $installdir . "/includes/services/";
+$data = `snmptable -Ov -v2c -c v05tr0n82 sotsci-sw01 ifTable`;
 
-if ($handle = opendir($srvdir)) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != "..") {
-            echo "$file\n";
-        }
-    }
-    closedir($handle);
-}
+$data = trim(preg_replace("/(\ +)/", " ", $data));
+
+echo("$data");
+
 
 ?>
