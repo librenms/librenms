@@ -17,7 +17,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver']);
   }
 
-  if ($pingable && $snmpable) {
+  if ($snmpable) {
     $status = '1';
     if($device['os'] == "FreeBSD" || $device['os'] == "OpenBSD" || $device['os'] == "Linux" || $device['os'] == "Windows") { 
       $uptimeoid = ".1.3.6.1.2.1.25.1.1.0"; 

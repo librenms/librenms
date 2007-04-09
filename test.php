@@ -3,12 +3,25 @@
 <?php
 
 include("config.php");
+include("includes/functions.php");
 
-$data = `snmptable -Ov -v2c -c v05tr0n82 sotsci-sw01 ifTable`;
+$query = mysql_query("SELECT * FROM devices WHERE device_id = '8'");
 
-$data = trim(preg_replace("/(\ +)/", " ", $data));
+$array = mysql_fetch_array($query);
 
-echo("$data");
+echo($array[1] . "\n");
+
+mysql_query("UPDATE `devices` SET `hostname` = 'sotsci-fw-office01.vostron.net' WHERE `device_id` = '8'");
+
+echo(mysql_affected_rows() . " rows changed\n");
+
+$query = mysql_query("SELECT * FROM devices WHERE device_id = '8'");
+
+$array = mysql_fetch_array($query);
+
+echo($array[1] . "\n");
+
+
 
 
 ?>

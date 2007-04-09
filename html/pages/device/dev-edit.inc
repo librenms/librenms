@@ -10,7 +10,7 @@ if($_POST['editing']) {
   }
 }
 
-$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `id` = '$_GET[id]'"));
+$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
 $descr  = $device['purpose'];
 
 if($updated && $update_message) { 
