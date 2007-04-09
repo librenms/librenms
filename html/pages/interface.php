@@ -1,16 +1,14 @@
 <?
 
-$interface_query = mysql_query("select * from interfaces WHERE id = '$_GET[id]'");
+$interface_query = mysql_query("select * from interfaces WHERE interface_id = '$_GET[id]'");
 $interface = mysql_fetch_array($interface_query);
 
  $device_query = mysql_query("select * from devices where id = '$interface[host]'");
  $device = mysql_fetch_array($device_query);
 
  $hostname = $device['hostname'];
- $hostid   = $device['id'];
- $ifname   = $interface['if'];
- $up = $interface['up'];
- $up_admin = $interface['up_admin'];
+ $hostid   = $device['interface_id'];
+ $ifname   = $interface['ifDescr'];
  $ifIndex   = $interface['ifIndex'];
  $speed = humanspeed($interface['ifSpeed']);
 
@@ -19,9 +17,9 @@ $interface = mysql_fetch_array($interface_query);
  if($interface['ifPhysAddress']) { $mac = "$interface[ifPhysAddress]"; } 
 
  $color = "black";
- if ($up_admin == "down") { $status = "<span class='grey'>Disabled</span>"; }
- if ($up_admin == "up" && $up == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
- if ($up_admin == "up" && $up == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
+ if ($interface['ifAdminStatus'] == "down") { $status = "<span class='grey'>Disabled</span>"; }
+ if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "down") { $status = "<span class='red'>Enabled / Disconnected</span>"; }
+ if ($interface['ifAdminStatus'] == "up" && $interface['ifOperStatus'] == "up") { $status = "<span class='green'>Enabled / Connected</span>"; }
 
  $i = 1; 
  $inf = fixifName($ifname);

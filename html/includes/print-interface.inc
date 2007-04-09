@@ -9,6 +9,9 @@
   $ifSpeed = humanspeed($interface['ifSpeed']);
   $ifPhysAddress = $interface['ifPhysAddress'];
   $ifType = fixiftype($interface['ifType']);
+  $ifHardType = $interface['ifHardType'];
+
+#  echo($interface['ifHardType']);
 
   if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
@@ -22,7 +25,7 @@
               </span><br /><span class=interface-desc>$ifAlias</span>");
   unset ($break);
   if(!$dographs) {
-    $ipdata = mysql_query("SELECT * FROM `ipaddr` WHERE `interface_id` = '$interface[interface_id]'");
+    $ipdata = mysql_query("SELECT * FROM `ipaddr` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
     while($ip = mysql_fetch_Array($ipdata)) {
       echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[addr]')\">$ip[addr]/$ip[cidr]</a>");
       $break = " ";
@@ -30,20 +33,22 @@
   echo("</span>");
   echo("</td><td width=70>");
   if($ifSpeed && $ifSpeed != "") { echo("<span class=box-desc>$ifSpeed</span>"); }
+  echo("<br />");
+  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
   echo("</td><td width=150>");
-  if($ifType && $iftype != "") { echo("<span class=box-desc>" . $ifType . "</span>"); } else { echo("-"); } 
-  echo("</td><td width=80>");
+  if($ifType && $ifType != "") { echo("<span class=box-desc>" . $ifType . "</span>"); } else { echo("-"); } 
+  echo("<br />");
+  if($ifHardType && $ifHardType != "") { echo("<span class=box-desc>" . $ifHardType . "</span>"); } else { echo("-"); }
+  echo("</td><td width=150>");
   if($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . $interface['ifPhysAddress'] . "</span>"); } else { echo("-"); }
-  echo("</td><td width=80>");
+  echo("<br />");
   if($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
-
-#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 }
 
 echo("</td>");
      echo("<td valign=top class=interface-desc>");
      if ( strpos($ifDescr, "oopback") === false && !$dographs) {
-       $link_query = mysql_query("select I.ifDescr, D.hostname, D.id, I.interface_id from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.id");
+       $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
          echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link) . " on " . generatedevicelink($link) . "</a><br />");
          $br = "<br />";

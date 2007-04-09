@@ -300,9 +300,11 @@ function makeshortif($if) {
         $if = str_replace("pos","Pos", $if);
 	$if = str_replace("port-channel","Po", $if);
         $if = str_replace("atm","Atm", $if);
+	$if = str_replace("null", "Null", $if);
 	$if = str_replace("loopback","Lo", $if);        
 	$if = str_replace("dialer","Di", $if);
 	$if = str_replace("vlan","Vlan", $if);
+        $if = str_replace("tunnel","Tunnel", $if);
 	return $if;
 }
 
