@@ -60,9 +60,9 @@ echo("</td>");
         $adj_query = mysql_query("$adj_sql");
         while($adjs = mysql_fetch_array($adj_query)) {
           $network_id = $adjs['network_id'];
-          $newsql = "SELECT *, I.interface_id AS iid, D.id AS did FROM adjacencies AS A, networks as N, interfaces as I, devices as D ";
-          $newsql = $newsql . "WHERE N.id = '$network_id'  AND A.network_id = N.id AND I.interface_id = A.interface_id AND D.id = I.device_id ";
-          $newsql = $newsql . "AND D.id != '$device[id]' AND I.ifDescr NOT LIKE '%loopback%' GROUP BY D.id ORDER BY D.hostname";
+          $newsql = "SELECT * FROM adjacencies AS A, networks as N, interfaces as I, devices as D ";
+          $newsql = $newsql . "WHERE N.id = '$network_id'  AND A.network_id = N.id AND I.interface_id = A.interface_id AND D.device_id = I.device_id ";
+          $newsql = $newsql . "AND D.device_id != '$device[id]' AND I.ifDescr NOT LIKE '%loopback%' GROUP BY D.device_id ORDER BY D.hostname";
           $new_query = mysql_query($newsql);
           while($new = mysql_fetch_array($new_query)) {
             if ($new['status'] == '0') { $class = "red"; } else { $class = "blue"; }
@@ -70,8 +70,8 @@ echo("</td>");
               $class = "grey";
               if ($new['status'] == '1') { $class = "green"; }
             }
-            $this_ifid = $new['iid'];
-            $this_hostid = $new['did'];
+            $this_ifid = $new['interface_id'];
+            $this_hostid = $new['device_id'];
             $this_hostname = $new['hostname'];
             $this_ifname = fixifName($new['ifDescr']);
             $wq = mysql_query("select count(*) FROM links  WHERE dst_if = '$this_ifid' AND src_if = $if_id;");
