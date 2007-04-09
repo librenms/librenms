@@ -29,6 +29,7 @@ if($_GET[debug]) {
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <!-- <meta http-equiv="refresh" content="300"> -->
   <link href="<?php  echo($stylesheet);  ?>" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="/favicon.ico" />
 </head>
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
