@@ -8,13 +8,14 @@ include("includes/functions.php");
 if($argv[1]) { 
   $host = strtolower($argv[1]);
   $id = getidbyname($host);
-  mysql_query("DELETE FROM `devices` WHERE `id` = '$id'");
-  mysql_query("DELETE FROM `interfaces` WHERE `host` = '$id'");
-  `rm -f rrd/$host-*.rrd`;
-  `./cleanup.php`;
-  echo("Removed $host");
+  if($id) {
+    delHost($id);
+    echo("Removed $host\n");
+  } else {
+    echo("Host doesn't exist!\n");
+  }
 } else {
-  echo("Need host to remove!\n\n");
+    echo("Need host to remove!\n\n");
 }
 
 ?>

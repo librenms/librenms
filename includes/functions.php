@@ -109,21 +109,25 @@ function delHost($id) {
 
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `host` = '$id'");
+  $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
   while($int_data = mysql_fetch_array($int_query)) {
-    $int_if = $int_data['if'];
-    $int_id = $int_data['id'];
+    $int_if = $int_data['ifDescr'];
+    $int_id = $int_data['interface_id'];
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `links` WHERE `src_if` = '$int_id'");
     mysql_query("DELETE from `links` WHERE `dst_if` = '$int_id'");
     mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
     echo("Removed interface $int_id ($int_if)<br />");
   }
+  mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `temperature` WHERE `temp_host` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
+  mysql_query("DELETE FROM `syslog` WHERE `host` = '$id'");
   mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
+  mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   `rm -f rrd/$host-*.rrd`;
   echo("Removed device $host<br />");
 }
