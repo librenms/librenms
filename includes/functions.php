@@ -253,10 +253,8 @@ function isSNMPable($hostname, $community, $snmpver) {
 
 function isPingable($hostname) {
    global $fping;
-   $status = `$fping $hostname | cut -d " " -f 3`;
-   $status = trim($status);
-
-   if($status == "alive") {
+   $status = `$fping $hostname`;
+   if(strstr($status, "alive")) {
      return TRUE;
    } else {
      return FALSE;
