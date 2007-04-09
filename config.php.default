@@ -32,6 +32,7 @@ $page_title  = "Project Observer Network Monitoring";
 $title_image = "/images/logo.gif";
 $stylesheet  = "/css/styles.css"; 
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
+$favicon = "/favicon.ico";
 
 ### Which special sections should we show?
 $show_if_customers = 0;
