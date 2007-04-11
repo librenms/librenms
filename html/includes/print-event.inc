@@ -18,7 +18,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
       " . $entry['datetime'] . "
     </td>");
   if(!$_GET[id] && !$overview) {
-    $dev['id'] = $entry['host'];
+    $dev['device_id'] = $entry['host'];
     $dev['hostname'] = $hostname;
     echo("<td class=list-bold width=250>
       " . generatedevicelink($dev) . "

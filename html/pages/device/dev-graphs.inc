@@ -47,9 +47,12 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "cpu";              include ("includes/print-device-graph.php");
       echo("<br />");
       if($device[os] == "m0n0wall" || $device[os] == "pfSense" || $device[os] == "Voswall" || $device[monowall]) {
-        echo("<div class=graphhead>Device Uptime</div>");
-        $graph_type = "uptime";         include ("includes/print-device-graph.php"); break;
+        echo("<div class=graphhead>IP Statistics</div>");
+        $graph_type = "ip_graph";           include ("includes/print-device-graph.php");
         echo("<br />");
+        echo("<div class=graphhead>Device Uptime</div>");
+        $graph_type = "uptime";         include ("includes/print-device-graph.php");
+        break;
       }
       if($device['os'] != "NetBSD") {
       echo("<div class=graphhead>Memory Utilisation</div>");
@@ -57,13 +60,13 @@ while($device = mysql_fetch_array($device_query)) {
       echo("<br />");
       }
 
-      if(mysql_result(mysql_query("SELECT count(storage_id) FROM storage WHERE host_id = '$device[id]'"),0)) {
+      if(mysql_result(mysql_query("SELECT count(storage_id) FROM storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Storage</div>");
         $graph_type = "unixfs";           include ("includes/print-device-graph.php");
         echo("<br />");
       }
 
-      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '$device[id]'"),0)) {
+      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Temperatures</div>");
         $graph_type = "temp";           include ("includes/print-device-graph.php");
         echo("<br />");

@@ -30,6 +30,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpdata = `$snmp_cmd`;
     $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
+    $snmpdata = str_replace("\"", "", $snmpdata);
     list($sysUptime, $sysLocation, $ciscomodel, $sysDescr) = explode("\n", $snmpdata);
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
@@ -50,23 +51,23 @@ while ($device = mysql_fetch_array($device_query)) {
     case "Voswall":
     case "NetBSD":
     case "pfSense":
-      if($device['os'] == "FreeBSD") {
+      if ($device['os'] == "FreeBSD") {
         $sysDescr = str_replace(" 0 ", " ", $sysDescr);
         list(,,$version) = explode (" ", $sysDescr);
         $hardware = "i386";
         $features = "GENERIC";
-      } elseif($device['os'] == "DragonFly") {
+      } elseif ($device['os'] == "DragonFly") {
         list(,,$version,,,$features,,$hardware) = explode (" ", $sysDescr);
-      } elseif($device['os'] == "NetBSD") {
+      } elseif ($device['os'] == "NetBSD") {
         list(,,$version,,,$features) = explode (" ", $sysDescr);
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
         list(,,$hardware) = explode ("$features", $sysDescr);
-      } elseif($device['os'] == "OpenBSD") {
+      } elseif ($device['os'] == "OpenBSD") {
         list(,,$version,$features,$hardware) = explode (" ", $sysDescr);
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
-      } elseif($device['os'] == "m0n0wall" || $device['os'] == "Voswall") { 
+      } elseif ($device['os'] == "m0n0wall" || $device['os'] == "Voswall") { 
 	list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = split(" ", $sysDescr);
 	$features = $freebsda . " " . $freebsdb;
 	$hardware = "$hardware ($arch)";	
@@ -143,26 +144,32 @@ while ($device = mysql_fetch_array($device_query)) {
     $status = '0';
   }
 
+  unset( $update ) ;
+
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
-    $update = "`sysDescr` = '$sysDescr'";
+    $update .= "`sysDescr` = '$sysDescr'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysDescr -> $sysDescr')");
   }
+
   if ( $location && $device['location'] != $location ) {
-    $update = "`location` = '$location'";
+    $update .= "`location` = '$location'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Location -> $location')");
   }
+
   if ( $version && $device['version'] != $version ) {
     $update .= $seperator . "`version` = '$version'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'OS Version -> $version')");
   }
+
   if ( $features && $features != $device['features'] ) {
     $update .= $seperator . "`features` = '$features'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'OS Features -> $features')");
   }
+
   if ( $hardware && $hardware != $device['hardware'] ) {
     $update .= $seperator . "`hardware` = '$hardware'";
     $seperator = ", ";

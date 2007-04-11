@@ -16,8 +16,8 @@ while($l = mysql_fetch_array($q)){
   unset($maybehost);
   unset($perhapshost);
 
-  $maybehost = @mysql_result(mysql_query("SELECT D.id as id FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '$l[host]' AND I.id = A.interface_id AND D.id = I.host"),0);
-  $perhapshost = @mysql_result(mysql_query("SELECT id FROM devices WHERE `hostname` = '$l[host]'"),0);
+  $maybehost = @mysql_result(mysql_query("SELECT D.device_id as device_id FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '" . $l['host'] . "' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"),0);
+  $perhapshost = @mysql_result(mysql_query("SELECT device_id FROM devices WHERE `hostname` = '$l[host]'"),0);
 
   if($maybehost) { 
     $host = $maybehost;
@@ -27,7 +27,7 @@ while($l = mysql_fetch_array($q)){
 
   if($host) {
 
-    if(mysql_result(mysql_query("SELECT os FROM `devices` WHERE `id` = '$host'"),0) == "IOS") {
+    if(mysql_result(mysql_query("SELECT os FROM `devices` WHERE `device_id` = '$host'"),0) == "IOS") {
       list(,$l[msg]) = split(": %", $l[msg]);
       $l[msg] = "%" . $l[msg];
       $l[msg] = preg_replace("/^%(.+):\ /", "\\1||", $l[msg]);

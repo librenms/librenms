@@ -393,26 +393,6 @@ function fixIOSHardware($hardware){
 
 }
 
-function updateHost ($host, $community, $snmpver)
-{
-#        $soft = `snmpget -O vq -$snmpver -c $community $host sysDescr.0 | grep IOS | sed s/Cisco\ IOS\ Software\,// | sed s/\"\ //g | sed s/IOS\  \(tm\)\ // | sed s/\,\ RELEASE\ SOFTWARE.*// | sed s/.*\ Software\ // | sed s/\,\ /\|\|/ | sed s/\Version\ // | sed s/,\ EARLY\ DEPLOYMENT\ RELEASE\ SOFTWARE\ .*//`;
-        $sysdescr = `snmpget -O vq -$snmpver -c $community $host sysDescr.0`;
-        $sysdecr = str_replace("\"","", $sysdescr);
-	$location = str_replace("\"","", `snmpget -O vq -v2c -c $community $host sysLocation.0`);
-        list ($features, $version) = explode('||', $soft);
-        $features = str_replace("(","", $features);
-        $features = str_replace(")","", $features);
-        $version = str_replace("\n","", $version);
-        $version = trim($version);
-        $location = trim($location);
-        list ($hardware, $features) = explode("-", $features);
-        $hardware = fixIOSHardware($hardware);
-        $features = fixIOSFeatures($features);
-        $sql = "UPDATE `devices` SET `hardware` = '$hardware', `features` = '$features', `version` = '$version', `sysdesc` = '$sysdescr', `location` = '$location' WHERE `hostname` = '$host'";
-#	echo("$sql \n");    
-#        mysql_query($sql);
-}
-
 function getHostOS($host, $community, $snmpver) {
 	$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host sysDescr.0`);
         if ($sysDescr == "") {$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host 1.3.6.1.2.1.7526.2.4`);}

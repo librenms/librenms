@@ -3,11 +3,11 @@
 include("config.php");
 include("includes/functions.php");
   
-$sql = "SELECT * FROM devices WHERE id LIKE '%$argv[1]' AND status = '1' AND os != 'Snom' order by id DESC";
+$sql = "SELECT * FROM devices WHERE device_id LIKE '%$argv[1]' AND status = '1' AND os != 'Snom' order by device_id DESC";
 $q = mysql_query($sql);
 while ($device = mysql_fetch_array($q)) {
   $hostname = $device['hostname'];
-  $hostid = $device['id'];
+  $hostid = $device['device_id'];
   $community = $device['community'];
   echo("$hostname\n");
   $oids = `snmpbulkwalk -v2c -Osq -c $community $hostname ipAdEntIfIndex | sed s/ipAdEntIfIndex.//g`;
