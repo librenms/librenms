@@ -3,7 +3,7 @@
 include("config.php");
 include("includes/functions.php");
   
-$sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.service_host = D.id ORDER by D.id DESC";
+$sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.service_host = D.device_id ORDER by D.device_id DESC";
 $query = mysql_query($sql);
 while ($service = mysql_fetch_array($query)) {
 
