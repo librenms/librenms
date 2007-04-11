@@ -5,7 +5,7 @@ include("includes/functions.php");
 
 # Discover interfaces
 
-$device_query = mysql_query("SELECT id,hostname,community,snmpver FROM `devices` WHERE `id` LIKE '%" . $argv[1] . "' AND status = '1' AND os != 'Snom' ORDER BY id DESC");
+$device_query = mysql_query("SELECT device_id,hostname,community,snmpver FROM `devices` WHERE `device_id` LIKE '%" . $argv[1] . "' AND status = '1' AND os != 'Snom' ORDER BY device_id DESC");
 while ($device = mysql_fetch_row($device_query)) {
 
   $id = $device['0'];

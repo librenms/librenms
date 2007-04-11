@@ -2,9 +2,6 @@
 
 $id = $device['device_id'];
 $hostname = $device['hostname'];
-$hardware = $device['hardware'];
-$version = $device['version'];
-$features = $device['features'];
 
 $loadrrd  = "rrd/" . $hostname . "-load.rrd";
 $loadgraph = "public_html/graphs/" . $hostname . "-load.png";
