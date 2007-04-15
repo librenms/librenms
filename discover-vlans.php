@@ -14,7 +14,10 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if($vtpversion == '1' || $vtpversion == '2') { 
 
-    echo("VLAN Trunking Protocol Version $vtpversion\n");
+    $vtp_domain_cmd = "snmpget -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.9.9.46.1.2.1.1.2.1";
+    $vtp_domain = trim(str_replace("\"", "", `$vtp_domain_cmd 2>/dev/null`));
+
+    echo("VLAN Trunking Protocol Version $vtpversion Domain : $vtp_domain\n");
 
     $vlans_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ";
     $vlans_cmd .= "1.3.6.1.4.1.9.9.46.1.3.1.1.2.1 | sed s/.1.3.6.1.4.1.9.9.46.1.3.1.1.2.1.//g | cut -f 1 -d\" \"";
@@ -28,6 +31,11 @@ while ($device = mysql_fetch_array($device_query)) {
       $vlan_descr = `$vlan_descr_cmd`;
 
       $vlan_descr = trim(str_replace("\"", "", $vlan_descr));
+
+      if(mysql_result(mysql_query("SELECT COUNT(vlan_id) FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "' AND `vlan_domain` = '" . $vtp_domain . "' AND `vlan_vlan` = '" . $vlan . "'"), 0) == '0') {
+        echo "Adding VLAN $vlan - $vlan_descr \n";
+        mysql_query("INSERT INTO `vlans` (`device_id`,`vlan_domain`,`vlan_vlan`, `vlan_descr`) VALUES (" . $device['device_id'] . ",'" . $vtp_domain . "','$vlan', '$vlan_descr')");
+      }
 
       echo("VLAN $vlan ($vlan_descr)\n");
 
