@@ -3,7 +3,7 @@
 
 include("config.php");
 include("includes/functions.php");
-include("includes/cdp.php");
+include("includes/cdp.inc.php");
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND `os` = 'IOS' ORDER BY `device_id` DESC");
 

@@ -25,6 +25,16 @@ echo("
     <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
   </a>
 </li>");
+
+if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+  echo("
+<li class=$select[devvlans]>
+  <a href='?page=device&id=" . $device['device_id'] . "&section=dev-vlans' >
+    <img src='images/16/rainbow.png' align=absmiddle border=0> VLANs
+  </a>
+</li>");
+}
+
 if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=$select[devifs]>
@@ -38,6 +48,7 @@ if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE d
   </a>
 </li>");
 }
+
 echo("<li class=$select[devgraphs]>
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-graphs'>
     <img src='images/16/server_chart.png' align=absmiddle border=0> Host Graphs

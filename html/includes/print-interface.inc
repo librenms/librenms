@@ -34,7 +34,15 @@
   echo("</td><td width=70>");
   if($ifSpeed && $ifSpeed != "") { echo("<span class=box-desc>$ifSpeed</span>"); }
   echo("<br />");
-  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
+#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
+
+  if($device['os'] == "IOS") {
+
+    if($interface['ifTrunk']) { echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>"); 
+    } elseif ($interface['ifVlan']) { echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"); }
+
+  }
+
   echo("</td><td width=150>");
   if($ifType && $ifType != "") { echo("<span class=box-desc>" . $ifType . "</span>"); } else { echo("-"); } 
   echo("<br />");
