@@ -49,11 +49,11 @@ while ($device = mysql_fetch_array($device_query)) {
     } else { echo("Bad DNS for $dst_host\n"); }
     if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$dst_host'"), 0) == '1' && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$src_host'"), 0) == '1' &&
-      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `if` = '$dst_if' AND hostname = '$dst_host' AND D.id = I.host"), 0) == '1' && 
-      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `if` = '$src_if' AND hostname = '$src_host' AND D.id = I.host"), 0) == '1')
+      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND hostname = '$dst_host' AND D.device_id = I.device_id"), 0) == '1' && 
+      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
    {
-      $dst_if_id   = mysql_result(mysql_query("SELECT I.id FROM `interfaces` AS I, `devices` AS D WHERE `if` = '$dst_if' AND hostname = '$dst_host' AND D.id = I.host"), 0);
-      $src_if_id   = mysql_result(mysql_query("SELECT I.id FROM `interfaces` AS I, `devices` AS D WHERE `if` = '$src_if' AND hostname = '$src_host' AND D.id = I.host"), 0);
+      $dst_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND hostname = '$dst_host' AND D.device_id = I.device_id"), 0);
+      $src_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0);
       $linkalive[] = $src_if_id . "," . $dst_if_id;
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `dst_if` = '$dst_if_id' AND `src_if` = '$src_if_id'"),0) == '0') 
       { 
