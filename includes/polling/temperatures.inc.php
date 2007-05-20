@@ -8,11 +8,9 @@ while($temperature = mysql_fetch_array($temp_data)) {
   echo($temp_cmd);
   $temp = `$temp_cmd`;
 
-  $temprrd  = "rrd/" . $device[hostname] . "-temp-" . $temperature[temp_id] . ".rrd";
-  $temprrdold  = "rrd/" . $device[hostname] . "-temp" . $temperature[temp_id] . ".rrd";
-  if (is_file($temprrdold)) { 
-    rename($temprrdold, $temprrd); 
-  }
+
+
+  $temprrd  = "rrd/" . $device[hostname] . "-temp-" . str_replace(" ", "_",$temperature['temp_descr']) . ".rrd";
 
   if (!is_file($temprrd)) {
     `rrdtool create $temprrd \
@@ -25,6 +23,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
   }
 
   $temp = str_replace("\"", "", $temp);
+  if($temperature['temp_tenths']) { $temp = $temp / 10; }
   echo("$temprrd, N:$temp");
 
   `rrdtool update $temprrd N:$temp`;

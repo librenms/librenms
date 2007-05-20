@@ -3,11 +3,6 @@
    $community = $device['community'];
    $id = $device['device_id'];
    $hostname = $device['hostname'];
-   $hardware = $device['hardware'];
-   $version = $device['version'];
-   $features = $device['features'];
-   $location = $device['location'];
-   $os = $device['location'];
 
    $temprrd  = "rrd/" . $hostname . "-temp.rrd";
    $tempgraph = "public_html/graphs/" . $hostname . "-temp.png";

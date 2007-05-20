@@ -20,9 +20,9 @@ while ($dr = mysql_fetch_array($dq)) {
   $hrStorageSize = $dr['hrStorageAllocationUnits'] * $dr['hrStorageSize']; 
   $hrStorageDescr = $dr['hrStorageDescr'];
   $cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " hrStorageUsed.$hrStorageIndex";
-  $used = `$cmd`;
-  $used = $used * $hrStorageAllocationUnits;
-  $perc = $used / $hrStorageSize * 100;
+  $used_units = trim(`$cmd`);
+  $used = $used_units * $hrStorageAllocationUnits;
+  $perc = round($used / $hrStorageSize * 100, 2);
 
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
   $storerrd  = "rrd/" . $hostname . "-storage-" . $filedesc . ".rrd";
@@ -42,6 +42,8 @@ while ($dr = mysql_fetch_array($dq)) {
      RRA:MAX:0.5:288:800`;
   }  
   rrd_update($storerrd, "N:$hrStorageSize:$used:$perc");
+  mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
+
 }
 
 ## Set OIDs

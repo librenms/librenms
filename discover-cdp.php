@@ -42,7 +42,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $ip = gethostbyname($dst_host);
     if ( match_network($nets, $ip) ) {	   
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$dst_host'"), 0) == '0' ) {
-        createHost ($dst_host);
+        createHost ($dst_host, $community, "v2c");
       } else { 
         #echo("Already got host $dst_host\n"); 
       }

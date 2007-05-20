@@ -30,7 +30,7 @@ if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id =
   echo("
 <li class=$select[devvlans]>
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-vlans' >
-    <img src='images/16/rainbow.png' align=absmiddle border=0> VLANs
+    <img src='images/16/vlans.png' align=absmiddle border=0> VLANs
   </a>
 </li>");
 }
@@ -39,7 +39,7 @@ if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE d
   echo("
 <li class=$select[devifs]>
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-ifs' >
-    <img src='images/16/link.png' align=absmiddle border=0> Port Details
+    <img src='images/16/server_link.png' align=absmiddle border=0> Port Details
   </a>
 </li>
 <li class=$select[devifgraphs]>
@@ -60,7 +60,7 @@ if(mysql_result(mysql_query("select count(service_id) from services WHERE servic
   echo("
 <li class=$select[devsrv]>
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-srv'>
-    <img src='images/16/cog.png' align=absmiddle border=0> Service Details
+    <img src='images/16/server_cog.png' align=absmiddle border=0> Service Details
   </a>
 </li>
 ");

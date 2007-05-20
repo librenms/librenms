@@ -15,16 +15,16 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\">
     <td width=0></td>
     <td class=syslog width=150>
-      $entry[datetime]
+      " . $entry['datetime'] . "
     </td>
     <td class=list-bold width=75>
-      $entry[priority]
+      " . $entry['priority'] . "
     </td>
     <td class=syslog width=175>
-      $entry[program]
-    </td>
+      " . $entry['program'] . "
+    </td> 
     <td class=syslog>
-      $entry[msg]
+      " . htmlspecialchars($entry['msg']) . "
     </td>
     <td></td>
   </tr>");
