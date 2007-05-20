@@ -75,50 +75,51 @@ while ($device = mysql_fetch_array($device_query)) {
       } elseif ($device['os'] == "Linux") {
         list(,,$version) = explode (" ", $sysDescr);
         if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
-#        list($version,$features,$featuresb) = explode("-", $version);
+        if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86_64"; }
         $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.2021.7890.1.101.1";
-        $features = `$cmd`;
+        $features = trim(`$cmd`);
         $features = str_replace("No Such Object available on this agent at this OID", "", $features);
         $features = str_replace("\"", "", $features);
-      } 
+        // Detect Dell hardware via OpenManage SNMP
+        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
+        $hw = trim(str_replace("\"", "", `$cmd`));      
+        if(strstr($hw, "No")) { unset($hw); } else { $hardware = "Dell " . $hw; }
+      }
+
       include("includes/polling/device-unix.inc.php");
       break;
     case "Windows":
-      if($device['os'] == "Windows") {
-        if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
-        if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }
-        if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
-        if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
-      }
+      if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
+      if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }
+      if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
+      if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
       pollDeviceWin();
       break;
+
     case "IOS":
-      if ($device['os'] == "IOS") {
-        $version = str_replace("Cisco IOS Software,", "", $sysDescr);
-        $version = str_replace("IOS (tm) ", "", $version);
-        $version = str_replace(",RELEASE SOFTWARE", "", $version);
-        $version = str_replace(",MAINTENANCE INTERIM SOFTWARE", "", $version);
-        $version = str_replace("Version ","", $version);
-        $version = str_replace("Cisco Internetwork Operating System Software", "", $version);
-        $version = trim($version);
-        list($version) = explode("\n", $version);
-        $version = preg_replace("/^[A-Za-z0-9\ \_]*\(([A-Za-z0-9\-\_]*)\), (.+), .*/", "\\1|\\2", $version);
-        $version = str_replace("-M|", "|", $version);
-        $version = str_replace("-", "|", $version);
-        list($hardware, $features, $version) = explode("|", $version);
-        $features = fixIOSFeatures($features);
-        #$hardware = fixIOSHardware($hardware);
-        $ciscomodel = str_replace("\"", "", $ciscomodel);
-        if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
-        echo("\n|$ciscomodel|$hardware\n");
-        if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
-          echo("$ciscomodel");
-          $hardware = $ciscomodel;
-        }
-        
+      $version = str_replace("Cisco IOS Software,", "", $sysDescr);
+      $version = str_replace("IOS (tm) ", "", $version);
+      $version = str_replace(",RELEASE SOFTWARE", "", $version);
+      $version = str_replace(",MAINTENANCE INTERIM SOFTWARE", "", $version);
+      $version = str_replace("Version ","", $version);
+      $version = str_replace("Cisco Internetwork Operating System Software", "", $version);
+      $version = trim($version);
+      list($version) = explode("\n", $version);
+      $version = preg_replace("/^[A-Za-z0-9\ \_]*\(([A-Za-z0-9\-\_]*)\), (.+), .*/", "\\1|\\2", $version);
+      $version = str_replace("-M|", "|", $version);
+      $version = str_replace("-", "|", $version);
+      list($hardware, $features, $version) = explode("|", $version);
+      $features = fixIOSFeatures($features);
+      #$hardware = fixIOSHardware($hardware);
+      $ciscomodel = str_replace("\"", "", $ciscomodel);
+      if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
+      if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
+        $hardware = $ciscomodel;
       }
+      echo($device['version'] . " $version"); 
       include("includes/polling/device-ios.inc.php");
       break;
+
     case "ProCurve":
       $sysDescr = str_replace(", ", ",", $sysDescr);
       list($hardware, $features, $version) = explode(",", $sysDescr);
@@ -147,13 +148,13 @@ while ($device = mysql_fetch_array($device_query)) {
   unset( $update ) ;
 
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
-    $update .= "`sysDescr` = '$sysDescr'";
+    $update .= $seperator . "`sysDescr` = '$sysDescr'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysDescr -> $sysDescr')");
   }
 
   if ( $location && $device['location'] != $location ) {
-    $update .= "`location` = '$location'";
+    $update .= $seperator . "`location` = '$location'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Location -> $location')");
   }

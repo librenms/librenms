@@ -17,11 +17,11 @@ function temp_graph ($device, $graph, $from, $to, $width, $height, $title, $vert
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
 
-    $temperature['temp_descr'] = str_pad($temperature['temp_descr'], 28);
-    $temperature['temp_descr'] = substr($temperature['temp_descr'],0,28);
+    $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
+    $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
 
-    $optsa[] = "DEF:temp" . $temperature[temp_id] . "=rrd/" . $hostname . "-temp-" . $temperature['temp_id'] . ".rrd:temp:AVERAGE";
-    $optsa[] = "LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr];
+    $optsa[] = "DEF:temp" . $temperature[temp_id] . "=rrd/" . $hostname . "-temp-" . str_replace(" ", "_", $temperature['temp_descr']) . ".rrd:temp:AVERAGE";
+    $optsa[] = "LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lf°C";
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf°C\l";
     $iter++;

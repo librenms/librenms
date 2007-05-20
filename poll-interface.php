@@ -81,6 +81,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
   }
 
   if($ifOperStatus == "up") {
+
     $snmp_data_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifOutErrors." . $interface['ifIndex'] . " ifInUcastPkts." . $interface['ifIndex'] . " ifOutUcastPkts." . $interface['ifIndex'];
@@ -104,9 +105,32 @@ while ($interface = mysql_fetch_array($interface_query)) {
      echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
   }
  }
-}
 
-mysql_query("UPDATE interfaces set ifPhysAddress = '' WHERE ifPhysAddress = 'No Such Instance currently exists at this OID'");
+  if ( $interface['ifAlias'] != $ifAlias ) {
+     $update .= $seperator . "`ifAlias` = '$ifAlias'";
+     $seperator = ", ";
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
+  }
+  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
+     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
+     $seperator = ", ";
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
+  }
+  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
+     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
+     $seperator = ", ";
+     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
+  }
+  if ($update) {
+     $update_query  = "UPDATE `interfaces` SET ";
+     $update_query .= $update;
+     $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
+     $update_result = mysql_query($update_query);
+  }
+
+
+}
 
 ?>
 

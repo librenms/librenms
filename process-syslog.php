@@ -9,6 +9,9 @@ $discard = 0;
 $total = 0;
 
 
+mysql_query("DELETE FROM `logs` WHERE `msg` LIKE '%Connection from UDP: [89.21.224.44]:%'");
+mysql_query("DELETE FROM `logs` WHERE `msg` LIKE '%Connection from UDP: [89.21.224.35]:%'");
+
 $q = mysql_query("SELECT * FROM `logs`");
 while($l = mysql_fetch_array($q)){
 
@@ -55,6 +58,5 @@ while($l = mysql_fetch_array($q)){
 
 }
 
-echo("$total records processed: $add added to database, $discard discarded");
-
+#echo("$total records processed: $add added to database, $discard discarded");
 ?>
