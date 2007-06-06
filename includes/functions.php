@@ -7,6 +7,8 @@ include("windows.php");
 include("procurve.php");
 include("snom.php");
 include("graphing.php");
+include("print-functions.php");
+
 
 function formatStorage($size) {
   $sizes = Array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');

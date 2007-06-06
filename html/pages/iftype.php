@@ -2,33 +2,25 @@
 if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
-if($_GET['id']) {
-  $type = $_GET['id'];
-  $sql  = "select *, I.id as iid, I.ifIndex as ifIndex, D.id as did, D.hostname as hostname, I.if as ifname, I.name as ifalias ";
-  $sql .= "from interfaces as I, devices as D WHERE `name` like '$type: %' AND I.host = D.id ORDER BY I.name";
+if($_GET['type']) {
+  $type = $_GET['type'];
+  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like '$type: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
     $done = "yes";
     unset($class);
-    $iid = $data[iid];
-    $ifIndex = $data[ifIndex];
-    $did = $data[did];
-    $hostname = $data[hostname];
-    $up = $data[up];
-    $up_admin = $data[up_admin];
-    $ifname = fixifname($data[ifname]);
-    $ifalias = $data[ifalias];
-    $ifalias = str_replace($type . ": ", "", $ifalias);
-    $ifalias = str_replace("[PNI]", "Private", $ifalias);
-    $ifclass = ifclass($up, $up_admin);
+    $data['ifAlias'] = str_replace($type . ": ", "", $data['ifAlias']);
+    $data['ifAlias'] = str_replace("[PNI]", "Private", $data['ifAlias']);
+    $ifclass = ifclass($data['ifOperStatus'], $data['ifAdminStatus']);
     if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
     echo("<tr bgcolor='$bg'>
-             <td><span class=interface><a href='?page=interface&id=$iid'>$ifalias</a></span><br /> 
-            <span class=interface-desc><a href='?page=device&id=$did'>$hostname</a> <a href='?page=interface&id=$iid'>$ifname</a></span></td></tr><tr bgcolor='$bg'><td>");
+             <td><span class=interface><a href='?page=interface&id=" . $data['interface_id'] . "'>" . $data['ifAlias'] . "</a></span><br /> 
+            <span class=interface-desc><a href='?page=device&id=" . $data['device_id'] . "'>" . $data['hostname'] . "</a> <a href='?page=interface&id=" . $data['interface_id'] . "'>" . $data['ifDescr'] . "</a></span></td></tr><tr bgcolor='$bg'><td>");
 
-if(file_exists("rrd/" . $hostname . ".". $ifIndex . ".rrd")) {
+if(file_exists("rrd/" . $data['hostname'] . "." . $data['ifIndex'] . ".rrd")) {
 
     $graph_type = "bits";
+    $iid = $data['interface_id'];
     include("includes/print-interface-graphs.php");
 
 }

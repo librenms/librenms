@@ -9,6 +9,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   unset($update); unset($update_query); unset($seperator);  unset($version); unset($uptime); unset($features); 
   unset($location); unset($hardware);
+  unset($sysDescr);
 
   $pingable = isPingable($device['hostname']);
   $snmpable = FALSE;

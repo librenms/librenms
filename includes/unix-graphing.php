@@ -508,7 +508,53 @@ function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
   }
 }
 
-function unixfsgraph ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
+function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertical) {
+  global $rrdtool, $installdir, $mono_font;
+  $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
+                 "-l 0",
+                 "-E",
+                 "-b 1024",
+                 "--title", $title);
+  $imgfile = "graphs/" . "$graph";
+  $iter = "1";
+  $sql = mysql_query("SELECT * FROM storage where storage_id = '$id'");
+  $optsa[] = "COMMENT:                       Size      Used    %age\l";
+  while($fs = mysql_fetch_array($sql)) {
+    $hostname = gethostbyid($fs['host_id']);
+    if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
+    } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
+    } elseif($iter=="7") {$colour="FF0084"; $iter = "0"; }
+
+    $descr = str_pad($fs[hrStorageDescr], 16);
+    $descr = substr($descr,0,16);
+
+
+    $text = str_replace("/", "_", $fs['hrStorageDescr']);
+    $optsa[] = "DEF:$fs[storage_id]=rrd/$hostname-storage-$text.rrd:used:AVERAGE";
+    $optsa[] = "DEF:$fs[storage_id]s=rrd/$hostname-storage-$text.rrd:size:AVERAGE";
+    $optsa[] = "DEF:$fs[storage_id]p=rrd/$hostname-storage-$text.rrd:perc:AVERAGE";
+    $optsa[] = "LINE1.25:$fs[storage_id]p#" . $colour . ":$descr";
+    $optsa[] = "GPRINT:$fs[storage_id]s:LAST:%6.2lf%SB";
+    $optsa[] = "GPRINT:$fs[storage_id]:LAST:%6.2lf%SB";
+    $optsa[] = "GPRINT:$fs[storage_id]p:LAST:%3.0lf%%\l";
+    $iter++;
+  }
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
+                                      "--font-render-mode", "normal");}
+  $opts = array_merge($optsa, $optsb);
+  $ret = rrd_graph("$imgfile", $opts, count($opts));
+  if( !is_array($ret) ) {
+    $err = rrd_error();
+    #echo "rrd_graph() ERROR: $err\n";
+    return FALSE;
+  } else {
+    return $imgfile;
+  }
+}
+
+
+function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $rrdtool, $installdir, $mono_font;
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
                  "-l 0",

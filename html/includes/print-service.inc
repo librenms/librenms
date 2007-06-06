@@ -23,7 +23,7 @@ if(!$samehost) {
 
 
   echo("
-         <tr style=\"background-color: $bg; padding: 5px;\"><td valign=top>" . $service['service_id'] . ".</td>");
+         <tr style=\"background-color: $bg; padding: 5px;\">");
 
 if($device_id) {
   if(!$samehost) { 

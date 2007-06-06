@@ -37,6 +37,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
   echo("<p class=sectionhead>Storage</p>");
   echo("<table width=100%>");
   $i = '1';
+
   echo("<tr class=tablehead><td>Mountpoint</td><td width=203>Usage</td><td width=40>%</td><td width=75>Total</td>
           <td width=75>Used</td></tr>");
   $drives = mysql_query("SELECT * FROM `storage` WHERE host_id = '" . $device['device_id'] . "'");
@@ -46,8 +47,12 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
     $perc  = $drive['storage_perc'];
     $total = formatStorage($total);
     $used = formatStorage($used);
+
+    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125";
+    $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
+
     if($perc > '80') { $drv_class='red'; } else { $drvclass='';  }
-    echo("<tr><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td><img src='percentage.php?per=" . $perc . "'>
+    echo("<tr><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td><a href='#' $store_popup><img src='percentage.php?per=" . $perc . "'></a>
           </td><td>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
     $i++;
   }

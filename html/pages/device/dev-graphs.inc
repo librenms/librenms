@@ -5,7 +5,6 @@ while($device = mysql_fetch_array($device_query)) {
    $hostname = $device[hostname];
    $bg="#ffffff";
 
-
    echo("<div style='clear: both;'>");
 
    switch ($device['os']) {
@@ -62,13 +61,13 @@ while($device = mysql_fetch_array($device_query)) {
 
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Storage</div>");
-        $graph_type = "unixfs";           include ("includes/print-device-graph.php");
+        $graph_type = "unixfs_dev";           include ("includes/print-device-graph.php");
         echo("<br />");
       }
 
       if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Temperatures</div>");
-        $graph_type = "temp";           include ("includes/print-device-graph.php");
+        $graph_type = "dev_temp";           include ("includes/print-device-graph.php");
         echo("<br />");
       }
       echo("<div class=graphhead>IP Statistics</div>");
@@ -124,9 +123,9 @@ while($device = mysql_fetch_array($device_query)) {
       echo("<br />");
       $graph_type = "mem";              include ("includes/print-device-graph.php");
       echo("<br />");
-      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '$device[id]'"),0)) {
+      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Temperatures</div>");
-        $graph_type = "temp";             include ("includes/print-device-graph.php");
+        $graph_type = "dev_temp";             include ("includes/print-device-graph.php");
         echo("<br />");
       }
       echo("<div class=graphhead>IP Statistics</div>");
