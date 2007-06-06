@@ -5,7 +5,7 @@ include("includes/functions.php");
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `os` = 'IOS' AND `status` = '1'");
 while ($device = mysql_fetch_array($device_query)) {
-  $id = $device['id'];
+  $id = $device['device_id'];
   $hostname = $device['hostname'];
   $community = $device['community'];
   echo("Detecting IOS temperature sensors for $hostname\n");

@@ -58,8 +58,11 @@
   case 'uptime':
     $graph = uptimegraph ($hostname . "-uptime.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
+  case 'unixfs_dev':
+    $graph = unixfsgraph_dev ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'unixfs':
-    $graph = unixfsgraph ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = unixfsgraph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'calls':
     $graph = callsgraphSNOM ($hostname . "-data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -90,7 +93,10 @@
     }
     break;
   case 'temp':
-      $graph = temp_graph ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = temp_graph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'dev_temp':
+      $graph = temp_graph_dev ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'mem':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {

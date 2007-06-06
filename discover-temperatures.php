@@ -69,14 +69,13 @@ while ($sensor = mysql_fetch_array($query)) {
         $i = 0;
         while ($i < count($temp_exists) && !$exists) {
             $thistemp = $sensor['temp_host'] . " " . $sensor['temp_oid'];
-            if ($temp_exists[$i] == $thistemp) { $exists = 1; echo("Match!"); }
+            if ($temp_exists[$i] == $thistemp) { $exists = 1; }
             $i++;
-	    echo("$temp_exists[$i] == $thistemp \n");
         }
 
         if(!$exists) { 
           echo("Deleting...\n");
-#          mysql_query("DELETE FROM temperature WHERE temp_id = '" . $sensor['temp_id'] . "'"); 
+          mysql_query("DELETE FROM temperature WHERE temp_id = '" . $sensor['temp_id'] . "'"); 
         }
 
 

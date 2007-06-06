@@ -76,14 +76,14 @@ echo("  <li><hr width=140 /></li>
 </li>
 <li><a class="menu2four" href="?page=locations"><img src='/images/16/building.png' border=0 align=absmiddle> Locations</a></li>
 
-<li><a><img src='/images/16/connect.png' border=0 align=absmiddle> Interfaces
+<li><a><img src='/images/16/connect.png' border=0 align=absmiddle> Ports
 <!--[if IE 7]><!--></a><!--<![endif]-->
 
 <table><tr><td>
         <ul>
 
 
-<li><a href='?page=interfaces'><img src='/images/16/connect.png' border=0 align=absmiddle> All Interfaces</a></li>
+<li><a href='?page=interfaces'><img src='/images/16/connect.png' border=0 align=absmiddle> All Ports</a></li>
 <li><hr width=140 /></li>
 
 <?php
@@ -98,17 +98,14 @@ if($interface_alerts) {
 echo("<li><a href='?page=interfaces&status=0'><img src='/images/16/link_error.png' border=0 align=absmiddle> Alerts ($interface_alerts)</a></li>");
 }
 
-
 ?>
-
-
 
 </ul></td></tr></table>
 
 <!--[if lte IE 6]></a><![endif]-->
 </li>
 
-
+<li><a class="menu2four" href="?page=temperatures"><img src='/images/16/weather_sun.png' border=0 align=absmiddle> Temperatures</a></li>
 
 <li style='float: right;'><a href='?page=configuration'><img src='/images/16/wrench.png' border=0 align=absmiddle> Configuration</a></li>
 </ul>

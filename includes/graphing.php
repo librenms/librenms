@@ -1,6 +1,54 @@
 <?php
 
-function temp_graph ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
+function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertical) {
+  global $rrdtool, $installdir, $mono_font;
+  $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
+                 "-l 0",
+                 "-E",
+                 "-b 1024",
+                 "--title", $title);
+  $hostname = gethostbyid($device);
+  $imgfile = "graphs/" . "$graph";
+  $iter = "1";
+  $sql = mysql_query("SELECT * FROM temperature where temp_id = '$temp'");
+  $optsa[] = "COMMENT:                                  Cur    Max";
+  while($temperature = mysql_fetch_array($sql)) {
+    $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['temp_host'] . "'"),0);
+    if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
+    } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
+    } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
+
+    $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
+    $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
+
+    $temprrd  = addslashes("rrd/$hostname-temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+    $temprrd  = str_replace(")", "_", $temprrd);
+    $temprrd  = str_replace("(", "_", $temprrd);
+
+
+
+    $optsa[] = "DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE";
+    $optsa[] = "LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
+    $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lf°C";
+    $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf°C\l";
+    $iter++;
+ }
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
+                                      "--font-render-mode", "normal");}
+  $opts = array_merge($optsa, $optsb);
+  $ret = rrd_graph("$imgfile", $opts, count($opts));
+  if( !is_array($ret) ) {
+    $err = rrd_error();
+    echo "rrd_graph() ERROR: $err\n";
+    return FALSE;
+  } else {
+    return $imgfile;
+  }
+}
+
+
+function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $rrdtool, $installdir, $mono_font;
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
                  "-l 0",
@@ -20,7 +68,13 @@ function temp_graph ($device, $graph, $from, $to, $width, $height, $title, $vert
     $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
     $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
 
-    $optsa[] = "DEF:temp" . $temperature[temp_id] . "=rrd/" . $hostname . "-temp-" . str_replace(" ", "_", $temperature['temp_descr']) . ".rrd:temp:AVERAGE";
+    $temprrd  = addslashes("rrd/$hostname-temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+    $temprrd  = str_replace(")", "_", $temprrd);
+    $temprrd  = str_replace("(", "_", $temprrd);
+
+
+
+    $optsa[] = "DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE";
     $optsa[] = "LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lf°C";
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf°C\l";
