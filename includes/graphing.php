@@ -28,7 +28,8 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
 
 
     $optsa[] = "DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE";
-    $optsa[] = "LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
+    $optsa[] = "AREA:temp" . $temperature[temp_id] . "#ffcccc:" . $temperature[temp_descr_fixed];
+    $optsa[] = "LINE1.5:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lf°C";
     $optsa[] = "GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf°C\l";
     $iter++;
