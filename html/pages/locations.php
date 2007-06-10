@@ -6,12 +6,12 @@ while($device = mysql_fetch_array($device_query)) {
 
    if($bg == "#ffffff") { $bg = "#eeeeee"; } else { $bg="#ffffff"; }
 
-   $num = mysql_result(mysql_query("SELECT COUNT(id) FROM devices WHERE location = '$device[location]'"),0);
-   $net = mysql_result(mysql_query("SELECT COUNT(id) FROM devices WHERE location = '$device[location]' AND type = 'network'"),0);
-   $srv = mysql_result(mysql_query("SELECT COUNT(id) FROM devices WHERE location = '$device[location]' AND type = 'server'"),0);
-   $fwl = mysql_result(mysql_query("SELECT COUNT(id) FROM devices WHERE location = '$device[location]' AND type = 'firewall'"),0);
+   $num = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '$device[location]'"),0);
+   $net = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '$device[location]' AND type = 'network'"),0);
+   $srv = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '$device[location]' AND type = 'server'"),0);
+   $fwl = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '$device[location]' AND type = 'firewall'"),0);
 
-   $hostalerts = mysql_result(mysql_query("SELECT COUNT(id) FROM devices WHERE location = '$device[location]' AND status = '0'"),0);
+   $hostalerts = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '$device[location]' AND status = '0'"),0);
    if($hostalerts) { $alert = "<img src='/images/16/flag_red.png'>"; }
 
    $loc = $device[location];
