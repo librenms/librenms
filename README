@@ -12,6 +12,9 @@ It's designed to be an easily-navigable interface to the health of your network.
 Installation
 ------------
 
+Installation of Observer is currently not for the faint of heart! There is no automated
+install script, so it'll probably take quite a bit of fiddling!
+
 Please see http://www.project-observer.org.
 
 Changelog
