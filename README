@@ -17,6 +17,15 @@ Please see http://www.project-observer.org.
 Changelog
 ---------
 
+Release 0.3.0-pre1 ( 24th June 2007 )
+Added VLAN features for cisco devices
+Added scripts to check for interface errors
+Added extraction of current interface rates from rrd files
+Added some syslog stuff
+Added email notification for device reboots
+
+.. Lots of other updates, most of which i've forgotten about!
+
 Release 0.2.5
 Added new CDP detection code and proper CDP link removal
 Added service addition page
