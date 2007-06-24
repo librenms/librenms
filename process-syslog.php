@@ -4,10 +4,11 @@
 include("config.php");
 include("includes/functions.php");
 
+if(!$enable_syslog) { exit(); }
+
 $add = 0;
 $discard = 0;
 $total = 0;
-
 
 mysql_query("DELETE FROM `logs` WHERE `msg` LIKE '%Connection from UDP: [89.21.224.44]:%'");
 mysql_query("DELETE FROM `logs` WHERE `msg` LIKE '%Connection from UDP: [89.21.224.35]:%'");
@@ -26,7 +27,7 @@ while($l = mysql_fetch_array($q)){
     $host = $maybehost;
   } elseif($perhapshost) {
     $host = $perhapshost;
-  }
+  } else { `echo Failed log entry from $l[host] > /var/log/observer.log`; }
 
   if($host) {
 
@@ -36,11 +37,8 @@ while($l = mysql_fetch_array($q)){
       $l[msg] = preg_replace("/^%(.+):\ /", "\\1||", $l[msg]);
       list($l[program], $l[msg]) = explode("||", $l[msg]);
     } else {
-
       $l[msg] = preg_replace("/^" . $l[program] . ":\ /", "", $l[msg]);
-
     }
-
 
 
     $x  = "INSERT INTO syslog (`host` , `facility` , `priority` , `level` , `tag` , `datetime` , `program` , `msg` )";

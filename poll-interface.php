@@ -10,6 +10,11 @@ $interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
  $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'"));
+ unset($ifAdminStatus, $ifOperStatus, $ifAlias, $ifDescr);
+
+ $interface['hostname'] = $device['hostname'];
+ $interface['device_id'] = $device['device_id'];
+
  if($device['status'] == '1') {
 
   unset($update);
@@ -105,29 +110,36 @@ while ($interface = mysql_fetch_array($interface_query)) {
      echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
   }
  }
+ 
+ $rates = interface_rates ($interface);
+  mysql_query("UPDATE `interfaces` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
 
-  if ( $interface['ifAlias'] != $ifAlias ) {
-     $update .= $seperator . "`ifAlias` = '$ifAlias'";
-     $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
-  }
-  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
-     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
-     $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
-  }
-  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
-     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
-     $seperator = ", ";
-     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
-  }
-  if ($update) {
-     $update_query  = "UPDATE `interfaces` SET ";
-     $update_query .= $update;
-     $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-     $update_result = mysql_query($update_query);
-  }
+ 
+
+ 
+
+#  if ( $interface['ifAlias'] != $ifAlias ) {
+#     $update .= $seperator . "`ifAlias` = '$ifAlias'";
+#     $seperator = ", ";
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
+#  }
+#  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
+#     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
+#     $seperator = ", ";
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
+#  }
+#  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
+#     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
+#     $seperator = ", ";
+#     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
+#  }
+#  if ($update) {
+#     $update_query  = "UPDATE `interfaces` SET ";
+#     $update_query .= $update;
+#     $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
+#     $update_result = mysql_query($update_query);
+#  }
 
 
 }

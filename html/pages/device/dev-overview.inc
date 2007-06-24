@@ -24,12 +24,13 @@ echo("
   <tr><td width=50% valign=top>");
 
 
-if(file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc")) {
+#if(file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
-  include("includes/dev-data-" . strtolower($device[os]) . ".inc");
+#  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
+#  include("includes/dev-data-" . strtolower($device[os]) . ".inc.php");
+  include("includes/dev-overview-data.inc.php");
   echo("</div>");
-}
+#}
 
 
 if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
@@ -38,22 +39,22 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
   echo("<table width=100%>");
   $i = '1';
 
-  echo("<tr class=tablehead><td>Mountpoint</td><td width=203>Usage</td><td width=40>%</td><td width=75>Total</td>
+  echo("<tr class=tablehead><td>Mountpoint</td><td width=203>Usage</td><td width=40></td><td width=75>Total</td>
           <td width=75>Used</td></tr>");
   $drives = mysql_query("SELECT * FROM `storage` WHERE host_id = '" . $device['device_id'] . "'");
   while($drive = mysql_fetch_array($drives)) {
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
     $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
-    $perc  = $drive['storage_perc'];
+    $perc  = round($drive['storage_perc'], 0);
     $total = formatStorage($total);
     $used = formatStorage($used);
 
     $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125";
     $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
 
-    if($perc > '80') { $drv_class='red'; } else { $drvclass='';  }
+    if($perc > '80') { $drv_colour='#cc0000'; } else { $drvclass='#0000cc';  }
     echo("<tr><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td><a href='#' $store_popup><img src='percentage.php?per=" . $perc . "'></a>
-          </td><td>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
+          </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
     $i++;
   }
   echo("</table>");
@@ -74,14 +75,12 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_h
   while($temp = mysql_fetch_array($temps)) {
     if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    if($temp['temp_current'] < '30') { $temp_class=''; 
-    } elseif($temp['temp_current'] < '40') { $temp_class='blue';
-    } elseif($temp['temp_current'] < '50') { $temp_class='green';
-    } elseif($temp['temp_current'] < '60') { $temp_class='orange';
-    } else { $temp_class='red'; }
+    $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
+
+    $temp_colour = percent_colour($temp_perc);
 
     $temp['temp_descr'] = truncate($temp['temp_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td>" . $temp['temp_descr'] . "</td><td width=40 class=tablehead><span class='$temp_class'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
+    echo("<tr bgcolor='$row_colour'><td>" . $temp['temp_descr'] . "</td><td width=40 class=tablehead><span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
@@ -112,7 +111,7 @@ echo("</td><td width=50% valign=top>");
 
 if($interfaces['total']) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>
-        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['device_id'], 490, 100, $day, $now) . "</div>");
+        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['device_id'], 490, 100, $day, '-300s') . "</div>");
 }
 
 if($interfaces['total']) {

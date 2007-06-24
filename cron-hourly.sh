@@ -10,3 +10,4 @@
 ./discover-cisco-temp.php &
 ./discover-vlans.php &
 ./update-interface.php &
+./check-errors.php &

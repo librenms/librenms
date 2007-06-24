@@ -192,7 +192,14 @@ while ($device = mysql_fetch_array($device_query)) {
 
 
   if ($uptime) {
-    echo("Uptime : $uptime\n");
+
+
+    $old_uptime = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
+
+    if( $uptime < $old_uptime ) {
+      mail($notify_email, "Rebooted: " . $device['hostname'], "Device " . $device['hostname'] . " rebooted at " . date('l dS F Y h:i:s A'));
+    }
+
 
     $uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
     if(!is_file($uptimerrd)) {
@@ -209,6 +216,7 @@ while ($device = mysql_fetch_array($device_query)) {
     if(mysql_affected_rows() == '0') {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'uptime', '$uptime')");
     }
+
   }
 
 
