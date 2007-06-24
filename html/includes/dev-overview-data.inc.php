@@ -2,7 +2,7 @@
 
   echo("<div style='font-family: courier, serif; margin: 10px';><strong>" . $device['sysDescr'] . "</strong></div>");
 
-  $uptime = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
+  $uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
 
 #  if(strtolower($device['os']) == "ios") {
     echo("
@@ -14,12 +14,15 @@
         <tr>
           <td class=list-bold>Hardware</td>
           <td>" . $device['hardware']. "</td>
-        </tr>
-        <tr>
+        </tr>");
+
+   if($uptime) {
+        echo("<tr>
           <td class=list-bold>Uptime</td>
           <td>" . formatUptime($uptime) . "</td>
-        </tr>
-        
+        </tr>");
+    }
+    echo("        
 
       </table>");
   

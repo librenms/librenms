@@ -43,8 +43,8 @@
   echo("</td><td width=100>");
   if($interface['ifOperStatus'] == "up") {
 
-    $in_perc = round($interface['in_rate']/$interface['ifSpeed']*100);
-    $out_perc = round($interface['in_rate']/$interface['ifSpeed']*100);
+    $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
+    $out_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
    
     echo("<img src='/images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . formatRates($interface['in_rate']) . "</span><br />");
     echo("<img align=absmiddle src='/images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . formatRates($interface['out_rate']) . "</span>");
