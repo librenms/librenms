@@ -1,9 +1,12 @@
 <?php
 
-if($_POST['id'] && $_SESSION['userlevel'] > '9') {
+if($_SESSION['userlevel'] < 10) {
+  echo("<span class='alert'>You are not permitted to perform this function</span>");
+  exit;
+}
+
+if($_POST['id'] {
   delHost($id);  
-} elseif ($_POST['id']) {
-echo("<p class='errorbox'><b>Error:</b> You don't have the necessary privileges to remove hosts.</p>");  
 }
 
 ?>

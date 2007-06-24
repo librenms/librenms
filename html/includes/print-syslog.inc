@@ -3,8 +3,12 @@
 
 if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
-  $hostname = gethostbyid($entry['host']);
-  $interface = fixifname(getifbyid($entry['interface']));
+#  if($entry['interface']) {
+#    $interface = fixifname(getifbyid($entry['interface']));
+#  }
+
+  $entry['device_id'] = $entry['host'];
+  $entry['hostname'] = gethostbyid($entry['host']);
 
   unset($icon);
 
@@ -12,15 +16,20 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   if($icon) {$icon = "<img src='/images/16/$icon'>"; }
 
 
+
   echo("<tr style=\"background-color: $bg\">
     <td width=0></td>
-    <td class=syslog width=150>
-      " . $entry['datetime'] . "
+    <td class=syslog width=175>");
+
+  if($page == "syslog") {
+    echo("" . generatedevicelink($entry) . "<br />");
+  }
+
+  echo($entry['datetime'] . "
     </td>
-    <td class=list-bold width=75>
+    <td class=syslog width=100>
       " . $entry['priority'] . "
-    </td>
-    <td class=syslog width=175>
+      <br />
       " . $entry['program'] . "
     </td> 
     <td class=syslog>

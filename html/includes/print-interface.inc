@@ -2,6 +2,11 @@
 
 #  This file prints a table row for each interface 
  
+  $interface['device_id'] = $device['device_id'];
+  $interface['hostname'] = $device['hostname'];
+
+  if(!$_GET['type']) { $_GET['type'] = "bits"; }
+
   $if_id = $interface['interface_id'];
   $ifDescr = fixifName($interface['ifDescr']);
   $ifIndex = $interface['ifIndex'];
@@ -10,18 +15,22 @@
   $ifPhysAddress = $interface['ifPhysAddress'];
   $ifType = fixiftype($interface['ifType']);
   $ifHardType = $interface['ifHardType'];
-
-#  echo($interface['ifHardType']);
-
+#  $errors = interface_errors($interface);
+#  $rates = interface_rates($interface);
+  
   if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+
+  if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
+    $error_img = generateiflink($interface,"<img src='/images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
+  } else { $error_img = ""; }
 
   $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
 
   echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
            <td valign=top width=300>
               <span class=list-large>
-                " . generateiflink($interface, "$i. $ifDescr") . "
+                " . generateiflink($interface, "$i. $ifDescr") . " $error_img
               </span><br /><span class=interface-desc>$ifAlias</span>");
   unset ($break);
   if(!$dographs) {
@@ -31,6 +40,16 @@
       $break = " ";
     } 
   echo("</span>");
+  echo("</td><td width=100>");
+  if($interface['ifOperStatus'] == "up") {
+
+    $in_perc = round($interface['in_rate']/$interface['ifSpeed']*100);
+    $out_perc = round($interface['in_rate']/$interface['ifSpeed']*100);
+   
+    echo("<img src='/images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . formatRates($interface['in_rate']) . "</span><br />");
+    echo("<img align=absmiddle src='/images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . formatRates($interface['out_rate']) . "</span>");
+    
+  }
   echo("</td><td width=70>");
   if($ifSpeed && $ifSpeed != "") { echo("<span class=box-desc>$ifSpeed</span>"); }
   echo("<br />");
@@ -84,7 +103,7 @@ echo("</td>");
             $this_ifname = fixifName($new['ifDescr']);
             $wq = mysql_query("select count(*) FROM links  WHERE dst_if = '$this_ifid' AND src_if = $if_id;");
             if (@mysql_result($wq, 0) == '0' && $this_hostname != $hostname) {
-              $graph_url = "graph.php?if=$this_ifid&from=$twoday&to=$now&width=400&height=120&type=bits";
+              $graph_url = "graph.php?if=$this_ifid&from=$twoday&to=$now&width=400&height=120&type=bits'";
               echo("$br &nbsp;<img src='images/16/bullet_go.png' alt='Same Subnet' align=absmiddle />" . generateiflink($new) . " on " . generatedevicelink($new));
               $br = "<br />";
             }
@@ -97,15 +116,44 @@ echo("</td>");
 
      // If we're showing graphs, generate the graph and print the img tags
      if($dographs && is_file("rrd/" . $hostname . ".". $ifIndex . ".rrd")) {
-          $daily_traffic = "graph.php?if=$if_id&type=bits&from=$day&to=$now&width=210&height=100";
-          $weekly_traffic = "graph.php?if=$if_id&type=bits&from=$week&to=$now&width=210&height=100";
-          $monthly_traffic = "graph.php?if=$if_id&type=bits&from=$month&to=$now&width=210&height=100";
-          $yearly_traffic = "graph.php?if=$if_id&type=bits&from=$year&to=$now&width=210&height=100";
+ 
+           $type = $_GET['type'];
 
-          echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=3>");
-          echo("<img src='$daily_traffic'> <img src='$weekly_traffic'> ");
-          echo("<img src='$monthly_traffic'> <img src='$yearly_traffic'>");
-          echo("</td></tr>");
+#           echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=3>");
+#           include("includes/print-interface-graphs.php");
+#           echo("</td></tr>");
+       
+          $daily_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$day&to=$now&width=210&height=100";
+          $daily_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$day&to=$now&width=500&height=150";
+
+          $weekly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$week&to=$now&width=210&height=100";
+          $weekly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$week&to=$now&width=500&height=150";
+
+          $monthly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$month&to=$now&width=210&height=100";
+          $monthly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$month&to=$now&width=500&height=150";
+
+          $yearly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$year&to=$now&width=210&height=100";
+          $yearly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$year&to=$now&width=500&height=150";
+
+  echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=3>");
+
+  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT, BORDER, 0);\" 
+        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
+  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT, BORDER, 0);\"
+        onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
+  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350, BORDER, 0);\"
+        onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
+  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350, BORDER, 0);\"
+        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
+
+
+
+  echo("</td></tr>");
+
+#          echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=3>");
+#          echo("<img src='$daily_traffic'> <img src='$weekly_traffic'> ");
+#          echo("<img src='$monthly_traffic'> <img src='$yearly_traffic'>");
+#          echo("</td></tr>");
       }
 
    

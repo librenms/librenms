@@ -1,5 +1,13 @@
 <?php
 
+if($_SESSION['userlevel'] < 10) { 
+
+echo("<span class='alert'>You are not permitted to perform this function</span>");
+exit;
+
+}
+
+
 if($_POST['hostname'] && $_POST['community']) {
   if($_SESSION['userlevel'] > '5') {
     $hostname = $_POST['hostname'];

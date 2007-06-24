@@ -1,11 +1,11 @@
 <?php
 
-if($_SESSION[userlevel] < '5') { 
-  print_error("Insufficient Privileges");
+if($_SESSION['userlevel'] < '10') { 
+  echo("<span class='alert'>Insufficient privileges to perform this function.</span>");
 } else {
 
 if($_POST['addsrv']) {
-  if($userlevel > "5") {
+  if($userlevel == '10') {
     include("includes/add-srv.inc");
   }
 }

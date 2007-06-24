@@ -6,8 +6,9 @@ $db_user = "observer";
 $db_pass = "";
 $db_name = "observer";
 
-### Installation Location
-$installdir = "/var/sites/network.vostron.net/";
+### Installation Locations
+$installdir = "/var/sites/observer/";
+$rrd_dir    = $installdir . "rrd/";
 
 ### Default community
 $community = "public";
@@ -39,6 +40,8 @@ $show_if_customers = 0;
 $show_if_transit = 0;
 $show_if_peering = 0;
 $show_locations = 1;
+
+$enable_syslog = 0;
 
 ### Interface name strings to ignore
 $bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",

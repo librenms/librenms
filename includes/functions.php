@@ -9,44 +9,96 @@ include("snom.php");
 include("graphing.php");
 include("print-functions.php");
 
+function devicepermitted($device_id) {
+  global $_SESSION;
+  if($_SESSION['level'] > "5") { $allowed = true; 
+  } elseif ( @mysql_result(mysql_query("SELECT * FROM devices_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `device_id` = $device_id"), 0) > '0' ) {
+    $allowed = true;
+  } else { $allowed = false; }
+  return $allowed;
+
+}
+
+function formatRates($rate) {
+  $sizes = Array('bps', 'Kbps', 'Mbps', 'Gbps', 'Tbps', 'Pbps', 'Ebps');
+  $round = Array('0','0','0','2','2','2','2','2','2');
+  $ext = $sizes[0];
+  for ($i=1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
+  return round($rate, $round[$i]).$ext;
+}
 
 function formatStorage($size) {
   $sizes = Array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
   $ext = $sizes[0];
-  for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) {
-   $size = $size / 1024;
-   $ext  = $sizes[$i];
-  }
+  for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
   return round($size, 2).$ext;
 }
 
+
+function percent_colour($perc)
+{
+ $r = min(255, 5 * ($perc - 50));
+ $b = max(0, 255 - (5 * $perc));
+
+ return sprintf('#%02x%02x%02x', $r, 0, $b);
+} 
+
+function percent_colour_old($perc) {
+  $red = round(5 * $perc);
+  $blue = round(255 - (5 * $perc));
+  if($red > '255') { $red = "255"; } 
+  if($blue < '0') { $blue = "0"; }
+  $red = dechex($red);
+  $blue = dechex($blue);
+  if(strlen($red) == 1) { $red = "0$red"; }
+  if(strlen($blue) == 1) { $blue = "0$blue"; }
+  $colour = "#$red" . "00" . "$blue";
+  return $colour;
+}
+
 function print_error($text){
-
-echo("<table class=errorbox cellpadding=3><tr><td><img src='/images/15/exclamation.png' align=absmiddle> $text</td></tr></table>");
-
+  echo("<table class=errorbox cellpadding=3><tr><td><img src='/images/15/exclamation.png' align=absmiddle> $text</td></tr></table>");
 }
 
 function print_message($text){
-
-echo("<table class=messagebox cellpadding=3><tr><td><img src='/images/16/tick.png' align=absmiddle> $text</td></tr></table>");
-
+  echo("<table class=messagebox cellpadding=3><tr><td><img src='/images/16/tick.png' align=absmiddle> $text</td></tr></table>");
 }
 
 function truncate($substring, $max = 50, $rep = '...') {
-  if(strlen($substring) < 1){
-     $string = $rep;
-  }else{
-    $string = $substring;
-  }
-      
-  $leave = $max - strlen ($rep);
-      
-  if(strlen($string) > $max){
-    return substr_replace($string, $rep, $leave);
-  }else{
-    return $string;
-  }      
+  if(strlen($substring) < 1){ $string = $rep; } else { $string = $substring; }
+  $leave = $max - strlen ($rep);      
+  if(strlen($string) > $max){ return substr_replace($string, $rep, $leave); } else { return $string; }      
 }
+
+
+function interface_rates ($interface) {
+  global $rrdtool;
+  $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  $data = trim(`$rrdtool fetch -s -600s -e now $rrdfile AVERAGE | grep : | cut -d" " -f 2,3 | grep e`);
+#  $data = trim(`$rrdtool fetch -s -301s -e -300s $rrdfile AVERAGE | grep : | cut -d" " -f 2,3`);
+  foreach( explode("\n", $data) as $entry) {
+    list($in, $out) = split(" ", $entry);
+    $rate['in'] = $in * 8;
+    $rate['out'] = $out * 8;
+  }
+  return $rate;
+}
+
+
+function interface_errors ($interface) {
+  global $rrdtool;
+  $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  $data = trim(`$rrdtool fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d" " -f 4,5`);
+  foreach( explode("\n", $data) as $entry) {
+        list($in, $out) = explode(" ", $entry);
+        $in_errors += ($in * 300);
+        $out_errors += ($out * 300);
+  }
+  $errors['in'] = round($in_errors);
+  $errors['out'] = round($out_errors);
+  return $errors;
+}
+
 
 function geteventicon ($message) {
   if($message == "Device status changed to Down") { $icon = "server_connect.png"; }
@@ -58,14 +110,15 @@ function geteventicon ($message) {
   if($icon) { return $icon; } else { return false; }
 }
 
-
-function generateiflink($interface, $text=0) {
+function generateiflink($interface, $text=0,$type=bits) {
   global $twoday;
   global $now;
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
+  if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$twoday&to=$now&width=400&height=120&type=bits";
-  $link = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$twoday&to=$now&width=400&height=120&type=" . $type;
+  $link  = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  ";
+  $link .= "onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
@@ -95,30 +148,23 @@ function devclass($device) {
 
 
 function getImage($host) {
-
 $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
 $data = mysql_fetch_array(mysql_query($sql));
-
 $type = strtolower($data['os']);
-
   if(file_exists("images/os/$type" . ".png")){ $image = "<img src='images/os/$type.png'>";
   } elseif(file_exists("images/os/$type" . ".gif")){ $image = "<img src='images/os/$type.gif'>"; }
   if($device['monowall']) {$image = "<img src='images/os/m0n0wall.png'>";}
-
   if($type == "linux") {
     $features = strtolower(trim($data[features]));
     list($distro) = split(" ", $features);
     if(file_exists("images/os/$distro" . ".png")){ $image = "<img src='images/os/$distro" . ".png'>";
     } elseif(file_exists("images/os/$distro" . ".gif")){ $image = "<img src='images/os/$distro" . ".gif'>"; }
   }
-
   return $image;
-
 }
 
 
 function delHost($id) {
-
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
@@ -167,18 +213,15 @@ function scanUDP ($host, $port, $timeout) {
   $handle = fsockopen($host, $port, &$errno, &$errstr, 2); 
   if (!$handle) { 
   } 
-
   socket_set_timeout ($handle, $timeout); 
   $write = fwrite($handle,"\x00"); 
   if (!$write) { 
     next; 
   } 
-
   $startTime = time(); 
   $header = fread($handle, 1); 
   $endTime = time(); 
   $timeDiff = $endTime - $startTime;  
-
   if ($timeDiff >= $timeout) { 
     fclose($handle); 
     return 1; 
@@ -225,10 +268,8 @@ function humanspeed($speed) {
 
 
 function netmask2cidr($netmask) {
-
  list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
  return $cidr;
-
 }
 
 function cidr2netmask() {
@@ -297,7 +338,6 @@ function isValidInterface($if) {
 
 function ifclass($ifOperStatus, $ifAdminStatus) {
         $ifclass = "interface-upup";
-
         if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
         if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
         if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
@@ -330,16 +370,13 @@ function utime() {
 }
 
 function fixiftype ($type) {
-
 	$type = str_replace("ethernetCsmacd", "Ethernet", $type);
         $type = str_replace("tunnel", "Tunnel", $type);
         $type = str_replace("softwareLoopback", "Software Loopback", $type);
         $type = str_replace("propVirtual", "Ethernet VLAN", $type);
         $type = str_replace("ethernetCsmacd", "Ethernet", $type);
-        $type = str_replace("l2vlan", "Ethernet VLAN", $type);
-        
+        $type = str_replace("l2vlan", "Ethernet VLAN", $type);       
 	return ($type);
-
 }
 
 function fixifName ($inf) {
@@ -400,7 +437,6 @@ function fixIOSHardware($hardware){
 	$hardware = str_replace("C3200XL", "Cisco Catalyst 3200XL", $hardware);
 	$hardware = str_replace("C3550", "Cisco Catalyst 3550", $hardware);
 	$hardware = str_replace("C2950", "Cisco Catalyst 2950", $hardware);
-
 	return $hardware;
 
 }

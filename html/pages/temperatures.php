@@ -1,6 +1,11 @@
 <?php
 
-$sql = "SELECT * FROM `temperature` AS T, `devices` AS D WHERE T.temp_host = D.device_id ORDER BY D.hostname, T.temp_descr";
+if($_SESSION['userlevel'] == '10') {
+  $sql = "SELECT * FROM `temperature` AS T, `devices` AS D WHERE T.temp_host = D.device_id ORDER BY D.hostname, T.temp_descr";
+} else {
+  $sql = "SELECT * FROM `temperature` AS T, `devices` AS D, devices_perms as P WHERE T.temp_host = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, T.temp_descr";
+}
+
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
@@ -28,11 +33,15 @@ while($temp = mysql_fetch_array($query)) {
         " . $temp['temp_descr'] . "</a> ";
 
 
+  $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
+  $temp_colour = percent_colour($temp_perc);
+
+
 
   echo("<tr bgcolor=$row_colour>
           <td class=list-bold>" . generatedevicelink($temp) . "</td>
           <td>$temp_popup</td>
-          <td>" . print_temperature($temp['temp_current'], $temp['temp_limit']) . "</td>
+          <td style='color: $temp_colour; font-weight: bold;'>" . $temp['temp_current'] . "</td>
           <td>" . $temp['temp_limit'] . "</td>
           <td>" . $temp['temp_notes'] . "</td>
         </tr>\n");

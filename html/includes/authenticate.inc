@@ -22,12 +22,13 @@ if($_GET['logout']) {
     $encrypted=$_COOKIE['encrypted'];
   }
 
-  $sql = "select username, level from users where username='$_SESSION[username]' and password='$encrypted'"; 
+  $sql = "select username, level, user_id from users where username='$_SESSION[username]' and password='$encrypted'"; 
   $row = mysql_fetch_row(mysql_query($sql));
 
   if ( $_SESSION['username'] != "" && $row[0] == $_SESSION['username'] ) {
     $_SESSION['userlevel'] = $row[1];
     $_SESSION['authenticated'] = true;
+    $_SESSION['user_id'] = $row[2];
     setcookie("username", $username);
     setcookie("encrypted", $encrypted);
   }
