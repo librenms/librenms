@@ -35,6 +35,8 @@ $stylesheet  = "/css/styles.css";
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
 $favicon = "/favicon.ico";
 
+$notify_email = "admin@vostron.com";
+
 ### Which special sections should we show?
 $show_if_customers = 0;
 $show_if_transit = 0;
