@@ -126,7 +126,10 @@ echo("<li><a href='?page=interfaces&status=0'><img src='/images/16/link_error.pn
 <!--[if lte IE 6]></a><![endif]-->
 </li>
 
-<li><a class="menu2four" href="?page=temperatures"><img src='/images/16/weather_sun.png' border=0 align=absmiddle> Temperatures</a></li>
+<li><a class="menu2four" href="?page=temperatures"><img src='/images/16/flame.png' border=0 align=absmiddle> Temperatures</a></li>
+
+<li><a class="menu2four" href="?page=storage"><img src='/images/16/database.png' border=0 align=absmiddle> Storage</a></li>
+
 
 <li style='float: right;'><a><img src='/images/16/wrench.png' border=0 align=absmiddle> Configuration
 <!--[if IE 7]><!--></a><!--<![endif]-->

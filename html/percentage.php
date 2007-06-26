@@ -1,6 +1,6 @@
 <?php 
     // returns a PNG graph from the $_GET['per'] variable 
-    $width = '201';
+    if(!$_GET['width']) { $width = '201'; } else { $width =$_GET['width']; } 
     $height = '7';
     $per = imagecreate($width,$height); 
     $background = imagecolorallocate($per, 0xFF, 0xFF, 0xFF); 
