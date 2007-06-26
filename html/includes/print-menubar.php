@@ -128,8 +128,25 @@ echo("<li><a href='?page=interfaces&status=0'><img src='/images/16/link_error.pn
 
 <li><a class="menu2four" href="?page=temperatures"><img src='/images/16/weather_sun.png' border=0 align=absmiddle> Temperatures</a></li>
 
-<li style='float: right;'><a href='?page=configuration'><img src='/images/16/wrench.png' border=0 align=absmiddle> Configuration</a></li>
+<li style='float: right;'><a><img src='/images/16/wrench.png' border=0 align=absmiddle> Configuration
+<!--[if IE 7]><!--></a><!--<![endif]-->
+    <table><tr><td>
+    <ul>
+    <li><a href="?page=preferences"><img src='/images/16/wrench_orange.png' border=0 align=absmiddle> My Settings</a></li>
+    <li><a href="?page=preferences"><img src='/images/16/key.png' border=0 align=absmiddle> Change Password</a></li>
+    <?php if($userlevel == '10') {
+      echo("
+        <li><hr /></li>
+        <li><a href='?page=settings'><img src='/images/16/report.png' border=0 align=absmiddle> System Settings</a></li>
+        <li><hr /></li>
+	<li><a href='?page=adduser'><img src='/images/16/user_add.png' border=0 align=absmiddle> Add User</a></li>
+        <li><a href='?page=deluser'><img src='/images/16/user_delete.png' border=0 align=absmiddle> Remove User</a></li>
+        <li><a href='?page=edituser'><img src='/images/16/user_edit.png' border=0 align=absmiddle> Edit User</a></li>");              
+    } ?>
+    </ul>
+    </td></tr></table>
+<!--[if lte IE 6]></a><![endif]-->
+</li>
 </ul>
-
 
 </div>

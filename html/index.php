@@ -82,7 +82,7 @@ function popUp(URL) {
 
 
 <div class="content-mat" style="border: 1px none #fcc;">
-<div id="content" style="border: 1px none #ccc;">
+<div id="content" style="border: 1px none #ccc; min-height:650px;">
 <div style="margin: 7px;"></div>
 <?php
   if($_SESSION['authenticated']) {
