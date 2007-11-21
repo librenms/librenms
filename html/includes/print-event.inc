@@ -35,7 +35,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("</td>
     <td width=20>$icon</td>
     <td class=syslog>
-      " . $entry['message'] . "
+      " . htmlspecialchars($entry['message']) . "
     </td>
     <td></td>
   </tr>");

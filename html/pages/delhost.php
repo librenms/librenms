@@ -5,8 +5,8 @@ if($_SESSION['userlevel'] < 10) {
   exit;
 }
 
-if($_POST['id'] {
-  delHost($id);  
+if($_POST['id']) {
+  delHost($id);
 }
 
 ?>
@@ -17,11 +17,11 @@ if($_POST['id'] {
   <p><select name="id">
 <?php
 
-$query = mysql_query("SELECT id,hostname FROM `devices` ORDER BY `hostname`");
+$query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
 
 while($data = mysql_fetch_array($query)) {
 
-  echo("<option value='$data[id]'>$data[hostname]</option>");
+  echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
 
 }
 

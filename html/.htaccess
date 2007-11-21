@@ -9,3 +9,4 @@ RewriteCond %{REQUEST_URI} !^(.*)\.gif$
 RewriteCond %{REQUEST_URI} !^(.*)\.png$
 
 RewriteRule ^([a-z]+)$	?page=$1
+

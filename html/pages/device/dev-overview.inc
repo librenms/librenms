@@ -2,9 +2,9 @@
 
 $overview = 1;
 
-$id = $_GET[id];
+#$id = $_GET['id'];
 
-$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
+#$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
 
 $interfaces['total'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '" . $device['device_id'] . "'"),0);
 $interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'up'"),0);
@@ -45,16 +45,24 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
   while($drive = mysql_fetch_array($drives)) {
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
     $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
-    $perc  = round($drive['storage_perc'], 0);
+    $drive['perc']  = round($drive['storage_perc'], 0);
     $total = formatStorage($total);
     $used = formatStorage($used);
 
-    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125";
-    $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
+
+    $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
+
+    $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
+    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125\'>";
+    $fs_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     if($perc > '80') { $drv_colour='#cc0000'; } else { $drvclass='#0000cc';  }
-    echo("<tr><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td><a href='#' $store_popup><img src='percentage.php?per=" . $perc . "'></a>
-          </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
+    echo("<tr><td class=tablehead><a href='".$fs_url."' $fs_popup>" . $drive['hrStorageDescr'] . "</a></td>
+            <td><a href='#' $fs_popup><img src='percentage.php?per=" . $drive['perc'] . "'></a></td>
+            <td style='font-weight: bold; color: $drv_colour'>" . $drive['perc'] . "%</td>
+            <td>" . $total . "</td>
+            <td>" . $used . "</td>
+          </tr>");
     $i++;
   }
   echo("</table>");
@@ -78,9 +86,14 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_h
     $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
 
     $temp_colour = percent_colour($temp_perc);
+    $temp_url  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$month&to=$now&width=400&height=125";
+    $temp_link  = "<a href='?page=device&id=".$device['device_id']."&section=dev-temp' onmouseover=\"return ";
+    $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['temp_descr'];
+    $temp_link .= "</div><img src=\'$temp_url\'>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+    $temp_link .= $temp['temp_descr'] . "</a>";
 
     $temp['temp_descr'] = truncate($temp['temp_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td>" . $temp['temp_descr'] . "</td><td width=40 class=tablehead><span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
+    echo("<tr bgcolor='$row_colour'><td><strong>$temp_link</strong></td><td width=40 class=tablehead><span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
@@ -132,6 +145,7 @@ echo("
   $sql = "SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
+    $data['hostname'] = $device['hostname'];
     echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['ifDescr']))));
     $ifsep = ", ";
   }

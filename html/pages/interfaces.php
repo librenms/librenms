@@ -1,6 +1,6 @@
 <?php
 
-if ($_SESSION['userlevel'] == '10') {
+if ($_SESSION['userlevel'] >= '5') {
   $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
 } else {
   $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";

@@ -5,8 +5,9 @@
   $temp = $_POST['temp'];
   $ignore = $_POST['ignore'];
   $type = $_POST['type'];
+  $disabled = $_POST['disabled'];
 
-  $sql = "UPDATE `devices` SET `purpose` = '$descr', `apache` = '$apache', `type` = '$type', `ignore` = '$ignore' WHERE `device_id` = '$_GET[id]'";
+  $sql = "UPDATE `devices` SET `purpose` = '$descr', `apache` = '$apache', `type` = '$type', `ignore` = '$ignore',  `disabled` = '$disabled' WHERE `device_id` = '$_GET[id]'";
   $query = mysql_query($sql);
 
   $rows_updated = mysql_affected_rows();

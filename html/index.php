@@ -30,7 +30,9 @@ if($_GET[debug]) {
   <!-- <meta http-equiv="refresh" content="300"> -->
   <link href="<?php  echo($stylesheet);  ?>" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="<?php  echo($favicon);  ?>" />
+  <link rel="stylesheet" href="css/mktree.css" type="text/css">
 </head>
+<script type="text/javascript" src="js/mktree.js"></script>
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
 function popUp(URL) {
@@ -105,10 +107,11 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
     echo("<br /> <center>Generated in $gentime seconds 
-          <br /> <a href='http://www.project-observer.org'>Project Observer $observer_version</a> &copy; 2006-2007 Adam Armstrong
-          <br /> Development Sponsored by <a href='http://www.vostron.net'>Vostron</a>.");
+          <br /> <a href='http://www.project-observer.org'>Project Observer " . $config['version'] . "</a> &copy; 2006-2007 Adam Armstrong");
           
 ?>
+
+
 </body>
 </html>
 

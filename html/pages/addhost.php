@@ -7,7 +7,6 @@ exit;
 
 }
 
-
 if($_POST['hostname'] && $_POST['community']) {
   if($_SESSION['userlevel'] > '5') {
     $hostname = $_POST['hostname'];

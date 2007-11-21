@@ -1,16 +1,67 @@
 <?php 
-    // returns a PNG graph from the $_GET['per'] variable 
-    if(!$_GET['width']) { $width = '201'; } else { $width =$_GET['width']; } 
-    $height = '7';
-    $per = imagecreate($width,$height); 
-    $background = imagecolorallocate($per, 0xFF, 0xFF, 0xFF); 
-    $foreground = imagecolorallocate($per, 0x00, 0x8A, 0x01); 
-    $border = imagecolorallocate($per, 0x99, 0x99, 0x99); 
-    if ($_GET['per'] > 0) {
-        $grad = imagecreatefrompng("images/grad.png"); 
-        $per2 = imagecopy($per, $grad, 1, 1, 0, 0, ($_GET['per'] * $width / 100), 5); 
-        imagerectangle($per, 0, 0, $width-1, $height-1 , $border); 
-    } 
-    header("Content-type: image/png"); 
-    imagepng($per, '', 100); 
+
+if (isset($_GET["dir"])) {
+  $dir = $_GET["dir"];
+} else {
+  $dir = "h";
+};
+
+if (isset($_GET["width"])) {
+  $length = $_GET["width"];
+} else {
+  $length = 200;
+};
+
+if (isset($_GET["per"])) {
+  $percent = $_GET["per"];
+} else {
+  $percent = 0;
+};
+
+//calculate length of percent full
+$percentlength = round(($percent / 100) * $length);
+
+//send headers
+Header("Content-Type: image/png");
+
+if ($dir == "v") {
+  //create image
+  $image = ImageCreate(6, $length);
+} else {
+  //dir == h
+  //create image
+  $image = ImageCreate($length, 6);
+};
+
+//Make colours
+$grey = ImageColorAllocate($image, 200, 200, 200);
+if($percent < '40') {
+$colour = ImageColorAllocate($image, 0, 128, 0);
+} elseif($percent < '70') {
+$colour = ImageColorAllocate($image, 0, 0, 128);
+} else {
+$colour = ImageColorAllocate($image, 128, 0, 0);
+}
+
+//Fill image with grey
+ImageFill($image, 0, 0, $grey);
+
+if ($dir == "v") {
+  //create colour percent bar
+  ImageFilledRectangle($image, 0, $length - $percentlength, 6, $length , $colour);
+} else {
+  //dir == h
+  //create colour percent bar
+  ImageFilledRectangle($image, 0, 0, $percentlength, 6, $colour);
+};
+
+//send picture to browser
+$border = imagecolorallocate($per, 0x99, 0x99, 0x99);
+imagerectangle($image, 0, 0, $length, 6, $border);
+
+ImagePNG($image);
+
+//clean up image as to not to crash the server
+@imagedestroy($image);
+
 ?> 

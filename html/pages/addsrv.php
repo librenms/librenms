@@ -5,7 +5,7 @@ if($_SESSION['userlevel'] < '10') {
 } else {
 
 if($_POST['addsrv']) {
-  if($userlevel == '10') {
+  if($_SESSION['userlevel'] == '10') {
     include("includes/add-srv.inc");
   }
 }
@@ -21,7 +21,7 @@ if ($handle = opendir($installdir . "/includes/services/")) {
 
 $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
 while($device = mysql_fetch_array($query)) {
-  $devicesform .= "<option value='" . $device[id] . "'>" . $device['hostname'] . "</option>";
+  $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
 }
 
 if($updated) { print_message("Device Settings Saved"); }

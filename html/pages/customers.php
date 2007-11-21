@@ -1,7 +1,7 @@
 <?php
 
   $sql  = "SELECT * FROM `interfaces` AS I, `devices` AS D";
-  $sql .= " WHERE `ifAlias` like 'Cust: %' AND I.device_id = D.device_id AND D.hostname LIKE '%" . $mydomain . "' ORDER BY I.ifAlias";
+  $sql .= " WHERE `ifAlias` like 'Cust: %' AND I.device_id = D.device_id AND D.hostname LIKE '%" . $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
 
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }

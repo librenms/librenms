@@ -1,5 +1,7 @@
 <?php
 
+if($_SESSION['userlevel'] >= '5') {
+
 $devices['count'] = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
 $devices['up'] = mysql_result(mysql_query("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"),0);
 $devices['down'] = mysql_result(mysql_query("SELECT count(*) FROM devices WHERE status = '0' AND `ignore` = '0'"),0);
@@ -15,11 +17,28 @@ $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM servic
 $services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'"),0);
 $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_ignore = '1'"),0);
 
+} else {
+
+  $devices['count']       = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id"),0);
+  $devices['up']          = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND D.status = '1' AND D.ignore = '0'"),0);
+  $devices['down']        = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND D.status = '0' AND D.ignore = '0'"),0);
+  $devices['disabled']    = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND D.ignore = '1'"),0);
+
+  $interfaces['count']    = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id"),0);
+  $interfaces['up']       = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'up'"),0);
+  $interfaces['down']     = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
+  $interfaces['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifAdminStatus = 'down'"),0);
+
+  $services['count']      = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id"),0);
+  $services['up']         = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id AND service_status = '1' AND service_ignore ='0'"),0);
+  $services['down']       = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id AND service_status = '0' AND service_ignore = '0'"),0);
+  $services['disabled']   = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id AND service_ignore = '1'"),0);
+
+}
+
 if($devices['down']) { $devices['bgcolour'] = "#ffcccc"; } else { $devices['bgcolour'] = ""; }
 if($interfaces['down']) { $interfaces['bgcolour'] = "#ffcccc"; } else { $interfaces['bgcolour'] = "#e5e5e5"; }
 if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['bgcolour'] = ""; }
-
-
 
 ?>
 

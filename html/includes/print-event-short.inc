@@ -15,15 +15,15 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\">
     <td width=0></td>
     <td class=syslog width=140>
-      $entry[humandate]
+      ".$entry['humandate']."
     </td>");
-  $if['interface_id'] = $entry[interface];
+  $if['interface_id'] = $entry['interface'];
   $if['ifDescr'] = makeshortif($interface);
     echo("<td class=list-bold width=75>
       "  . generateiflink($if) . "
     </td>
     <td class=syslog>" . 
-      truncate($entry[message], 45)
+      htmlspecialchars(truncate($entry['message'], 45))
     . "</td>
     <td></td>
   </tr>");
