@@ -15,14 +15,13 @@ if($_GET['logout']) {
   if($_POST['username'] && $_POST['password']){ 
     $_SESSION['username']=$_POST['username']; 
     $_SESSION['password']=$_POST['password'];   
-    $password = $_SESSION['password'];
-    $encrypted = md5($password);
+    $_SESSION['encrypted'] = md5($_SESSION['password']);
   } elseif($_COOKIE['username'] && $_COOKIE['encrypted'] && !$_SESSION['authenticated']) {
     $_SESSION['username']=$_COOKIE['username'];
-    $encrypted=$_COOKIE['encrypted'];
+    $_SESSION['encrypted']=$_COOKIE['encrypted'];
   }
 
-  $sql = "select username, level, user_id from users where username='$_SESSION[username]' and password='$encrypted'"; 
+  $sql = "select username, level, user_id from users where username='" . $_SESSION['username'] . "' and password='" . $_SESSION['encrypted'] . "'"; 
   $row = mysql_fetch_row(mysql_query($sql));
 
   if ( $_SESSION['username'] != "" && $row[0] == $_SESSION['username'] ) {

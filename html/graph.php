@@ -1,8 +1,8 @@
 <?php
 
-#  ini_set('display_errors', 1);
-#  ini_set('display_startup_errors', 1);
-#  ini_set('log_errors', 1);
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
   ini_set('allow_url_fopen', 0);
 #  ini_set('error_reporting', E_ALL);
 
@@ -31,12 +31,15 @@
 
   $type = $_GET['type'];
 
-  $graphfile = $hostname . ".". $ifIndex . "-" . $type . ".png";
+  $graphfile = strgen() . ".png";
 
   $os = gethostosbyid($device_id);
 
   switch ($type) {
 
+  case 'multi_bits':
+    $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height);
+    break;
   case 'global_bits':
     $graph = graph_global_bits ("global_bits.png", $from, $to, $width, $height);
     break;
@@ -137,10 +140,12 @@
     }
     break;
   case 'postfix':
+  case 'mail':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = mailsgraphUnix ($hostname . "-mail.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = mailsgraphUnix ($hostname . "-mailstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
+  case 'mailerrors':
   case 'postfixerrors':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
       $graph = mailerrorgraphUnix ($hostname, $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -148,7 +153,7 @@
     break;
   case 'courier':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = couriergraphUnix ($hostname . "-courier.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = couriergraphUnix ($hostname . "-courierstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'apachehits':
@@ -165,9 +170,11 @@
   }
 
   if($graph) {
+    header('Content-type: image/png');
     echo(`cat graphs/$graphfile`);
   } else {  
-#    echo(`cat images/no-graph.png`);
+    header('Content-type: image/png');
+    echo(`cat images/no-graph.png`);
   }
 
   $delete = `rm graphs/$graphfile`; 

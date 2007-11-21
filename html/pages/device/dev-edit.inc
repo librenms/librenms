@@ -5,7 +5,7 @@ if($_SESSION['userlevel'] < '5') {
 } else {
 
 if($_POST['editing']) {
-  if($userlevel > "5") {
+  if($_SESSION['userlevel'] > "5") {
     include("includes/edit-host.inc");
   }
 }
@@ -18,8 +18,6 @@ if($updated && $update_message) {
 } elseif ($update_message) {
   print_error($update_message);
 }
-
-
 
 if($device['type'] == 'server') { $server_select = "selected"; }
 if($device['type'] == 'network') { $network_select = "selected"; }
@@ -54,12 +52,12 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
     </tr>
     <tr>
       <td width='300'><div align='right'>Disable</div></td>
-      <td width='300'><input name='disable' type='checkbox' id='disable' value='1'");
-if($device['disabled']) {echo("checked=checked");}
+      <td width='300'><input name='disabled' type='checkbox' id='disabled' value='1'");
+if($device['disabled']) { echo("checked=checked"); }
 echo("/></td>
       <td width='300'><div align='right'>Ignore</div></td>
       <td width='300'><input name='ignore' type='checkbox' id='disable' value='1'");
-if($device['ignore']) {echo("checked=checked");}
+if($device['ignore']) { echo("checked=checked"); }
 echo("/></td>
     </tr>
     <tr>

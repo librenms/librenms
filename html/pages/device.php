@@ -1,5 +1,7 @@
 <?
 
+if(devicepermitted($_GET['id'])) {
+
 $selected['iface'] = "selected";
 
 if(!$_GET['section']) { 
@@ -55,15 +57,39 @@ echo("<li class=" . $select['dev-graphs'] . ">
 </li>
 ");
 
+if(mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
+
+  echo("
+<li class=" . $select['dev-enyphysical'] . ">
+  <a href='?page=device&id=" . $device['device_id'] . "&section=dev-entphysical'>
+    <img src='images/16/bricks.png' align=absmiddle border=0> Inventory
+  </a>
+</li>
+");
+
+
+}
+
 if(mysql_result(mysql_query("select count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=" . $select['dev-temp'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-temp'>
-    <img src='images/16/weather_sun.png' align=absmiddle border=0> Temps
+    <img src='images/16/flame.png' align=absmiddle border=0> Temps
   </a>
 </li>
 ");
 }
+
+if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
+  echo("
+<li class=" . $select['dev-storage'] . ">
+  <a href='?page=device&id=" . $device['device_id'] . "&section=dev-storage'>
+    <img src='images/16/database.png' align=absmiddle border=0> Storage
+  </a>
+</li>
+");
+}
+
 
 if(mysql_result(mysql_query("select count(service_id) from services WHERE service_host = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
@@ -90,7 +116,7 @@ echo("
 </li>
 ");
 
-if($_SESSION[userlevel] > "5") {
+if($_SESSION[userlevel] >= "5") {
   echo("
 <li class=" . $select['dev-edit'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-edit'>
@@ -110,5 +136,7 @@ include("pages/$page/$section.inc");
 echo("</div>
 ");
 }
+
+} else { echo("<span class=alert>You do not have the necessary access permissions to view this device.</span>"); }
 ?>
 

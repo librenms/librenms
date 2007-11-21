@@ -27,9 +27,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
   echo($entry['datetime'] . "
     </td>
-    <td class=syslog width=100>
-      " . $entry['priority'] . "
-      <br />
+    <td class=syslog width=200>
       " . $entry['program'] . "
     </td> 
     <td class=syslog>

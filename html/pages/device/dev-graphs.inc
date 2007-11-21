@@ -92,15 +92,15 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "procs";            include ("includes/print-device-graph.php");
      echo("<br />");
       if($device[postfix] == '1') {
-        echo("<div class=graphhead>Postfix Mail Statistics</div>");
+        echo("<div class=graphhead>Postfix Messages</div>");
         $graph_type = "postfix";        include ("includes/print-device-graph.php");
         echo("<br />");
-        echo("<div class=graphhead>Postfix Mail Error Statistics</div>");
+        echo("<div class=graphhead>Postfix Errors</div>");
         $graph_type = "postfixerrors";  include ("includes/print-device-graph.php");
         echo("<br />");
       }
       if($device[courier] == '1') {
-        echo("<div class=graphhead>Postfix Mail Statistics</div>");
+        echo("<div class=graphhead>Courier IMAP/POP3</div>");
         $graph_type = "courier";        include ("includes/print-device-graph.php");
         echo("<br />");
       }
@@ -119,8 +119,8 @@ while($device = mysql_fetch_array($device_query)) {
    case "IOS":
       echo("<div class=graphhead>CPU Usage</div>");
       $graph_type = "cpu";              include ("includes/print-device-graph.php");
-      echo("<div class=graphhead>Memory Usage</div>");
       echo("<br />");
+      echo("<div class=graphhead>Memory Usage</div>");
       $graph_type = "mem";              include ("includes/print-device-graph.php");
       echo("<br />");
       if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {

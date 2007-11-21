@@ -5,7 +5,7 @@ if($_SESSION[userlevel] < '5') {
 } else {
 
 if($_POST['delsrv']) {
-  if($userlevel > "5") {
+  if($_SESSION['userlevel'] > "5") {
     include("includes/del-srv.inc");
   }
 }

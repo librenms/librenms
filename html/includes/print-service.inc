@@ -29,7 +29,7 @@ if($device_id) {
   if(!$samehost) { 
     $device['device_id'] = $device_id;
     $device['hostname'] = $device_hostname;
-    echo("<td valign=top width=200><span style='font-weight:bold;'>" . generatedevicelink($device) . "</span></td>");  
+    echo("<td valign=top width=250><span style='font-weight:bold;'>" . generatedevicelink($device) . "</span></td>");  
   } else { 
     echo("<td></td>");  
   }

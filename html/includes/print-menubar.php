@@ -57,7 +57,7 @@
   echo("        <li><hr width=140 /></li>
         <li><a href='?page=devices&status=alerted'><img src='/images/16/server_error.png' border=0 align=absmiddle> Alerts ($device_alerts)</a></li>");
 
-if($_SESSION['userlevel'] > '5') {
+if($_SESSION['userlevel'] >= '10') {
   echo("
         <li><hr width=140 /></li>
         <li><a href='?page=addhost'><img src='/images/16/server_add.png' border=0 align=absmiddle> Add Device</a></li>
@@ -80,7 +80,7 @@ echo("  <li><hr width=140 /></li>
 } ?>
 
 <?php
-if($_SESSION['userlevel'] > '5') {
+if($_SESSION['userlevel'] >= '10') {
   echo("
 
         <li><hr width=140 /></li>
@@ -105,11 +105,14 @@ if($_SESSION['userlevel'] > '5') {
 
 <?php
 
-if($_SESSION['userlevel'] > '5') {
+if($_SESSION['userlevel'] >= '5') {
   echo("<li><hr width=140 /></li>");
   if($show_if_customers) { echo("<li><a href='?page=customers'><img src='/images/16/group_link.png' border=0 align=absmiddle> Customers</a></li>"); $ifbreak = 1;}
+  if($show_if_l2tp) { echo("<li><a href='?page=iftype&type=l2tp'><img src='/images/16/user.png'border=0 align=absmiddle> L2TP</a></li>"); $ifbreak = 1; }
+
   if($show_if_transit) { echo("<li><a href='?page=iftype&type=transit'><img src='/images/16/world_link.png' border=0 align=absmiddle> Transit</a></li>");  $ifbreak = 1; }
   if($show_if_peering) { echo("<li><a href='?page=iftype&type=peering'><img src='/images/16/bug_link.png' border=0 align=absmiddle> Peering</a></li>"); $ifbreak = 1; }
+
   if($show_if_core) { echo("<li><a href='?page=iftype&type=core'><img src='/images/16/brick_link.png' border=0 align=absmiddle> Core</a></li>"); $ifbreak = 1;}
 }
 
@@ -137,7 +140,7 @@ echo("<li><a href='?page=interfaces&status=0'><img src='/images/16/link_error.pn
     <ul>
     <li><a href="?page=preferences"><img src='/images/16/wrench_orange.png' border=0 align=absmiddle> My Settings</a></li>
     <li><a href="?page=preferences"><img src='/images/16/key.png' border=0 align=absmiddle> Change Password</a></li>
-    <?php if($userlevel == '10') {
+    <?php if($_SESSION['userlevel'] >= '10') {
       echo("
         <li><hr /></li>
         <li><a href='?page=settings'><img src='/images/16/report.png' border=0 align=absmiddle> System Settings</a></li>
