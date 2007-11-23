@@ -2,7 +2,7 @@
 
 function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 {
- global $rrdtool, $installdir, $mono_font;
+ global $config,$rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 
@@ -21,7 +21,7 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
   if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
                                       "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
-  $opts = array_merge($optsa, $optsb);
+  $opts = array_merge($config['rrdgraph_defaults'], $$optsa, $optsb);
 
   $ret = rrd_graph("$imgfile", $opts, count($opts));
 
@@ -36,29 +36,34 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 
 function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertical)
 {
- global $rrdtool, $installdir, $mono_font;
+ global $config,$rrdtool, $installdir, $mono_font;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $memrrd = $database;
-    $opts = "--start $from \
-            --alt-autoscale-max \
-            --width $width --height $height \
-            -l 0 -E \
-            -b 1024 \
-             DEF:TOTAL=$memrrd:TOTAL:AVERAGE \
-             DEF:FREE=$memrrd:FREE:AVERAGE \
-             DEF:USED=$memrrd:USED:AVERAGE \
-             AREA:USED#ee9900:Used \
-             AREA:FREE#FAFDCE:Free:STACK \
-             LINE1.5:TOTAL#cc0000:";
+    $opts = array("--start", "$from", "--alt-autoscale-max", "--width", "$width", "--height", "$height",
+            "-l", "0", "-E", "-b", "1024",
+             "DEF:TOTAL=$memrrd:TOTAL:AVERAGE",
+             "DEF:FREE=$memrrd:FREE:AVERAGE",
+             "DEF:USED=$memrrd:USED:AVERAGE",
+             "AREA:USED#ee9900:Used",
+             "AREA:FREE#FAFDCE:Free:STACK",
+             "LINE1.5:TOTAL#cc0000:");
 
-  if($width <= "300") {$opts .= "\
-                                 --font LEGEND:7:$mono_font \
-                                 --font AXIS:6:$mono_font \
-                                 --font-render-mode normal";}
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
+                                      "--font", "AXIS:6:$mono_font",
+                                      "--font-render-mode", "normal");}
 
+  $opts = array_merge($config['rrdgraph_defaults'], $$opts, $optsb);
 
-    `$rrdtool graph $imgfile $opts`;
+  $ret = rrd_graph("$imgfile", $opts, count($opts));
+
+  if( !is_array($ret) ) {
+    $err = rrd_error();
+    #echo "rrd_graph() ERROR: $err\n";
+    return FALSE;
+  } else {
     return $imgfile;
+  }
+
 }
 

@@ -4,19 +4,47 @@
 include("config.php");
 include("includes/functions.php");
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` like '%$argv[1]' AND `ignore` = '0' ORDER BY `device_id` ASC");
+echo("Project Observer Poller v$observer_version\n\n");
+
+if($argv[1] == "--device" && $argv[2]) {  
+  $where = "AND `device_id` = '".$argv[2]."'";
+} elseif ($argv[1] == "--odd") {
+  $where = "AND MOD(device_id,2) = 1";
+} elseif ($argv[1] == "--even") {
+  $where = "AND MOD(device_id,2) = 0";
+} elseif ($argv[1] == "--all") {
+  $where = "";
+} else {
+  echo("--device <device id>    Poll single device\n");
+  echo("--all                   Poll all devices\n\n");
+  echo("No polling type specified!\n");
+  exit;
+}
+
+echo("Starting polling run:\n\n");
+
+
+
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  unset($update); unset($update_query); unset($seperator);  unset($version); unset($uptime); unset($features); 
-  unset($location); unset($hardware);
-  unset($sysDescr);
+  echo("Polling " . $device['hostname'] . " ( ".$device['device_id']." )\n\n");
+
+  unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
+  unset($location); unset($hardware); unset($sysDescr);
 
   $pingable = isPingable($device['hostname']);
+
+  if($pingable) { echo("Pings : yes :)\n"); } else { echo("Pings : no :(\n"); }
+
   $snmpable = FALSE;
 
   if($pingable) {
     $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver']);
+    if($snmpable) { echo("SNMP : yes :)"); } else { echo("SNMP : no :("); }
   }
+
+  echo("\n");
 
   if ($snmpable) {
     $status = '1';
@@ -25,14 +53,22 @@ while ($device = mysql_fetch_array($device_query)) {
     } else { 
       $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
     }
-    $snmp_cmd =  "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
-    $snmp_cmd .= " $uptimeoid sysLocation.0 .1.3.6.1.2.1.47.1.1.1.1.13.1 sysDescr.0";
-    $snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
+      $snmp_cmd =  "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+      $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysDescr.0";
+      $snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
+    if($device['os'] == "IOS") { 
+      $snmp_cmdb =  "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+      $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
+      $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
+      $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
+
+    } else { unset($ciscomodel); }
+
     $snmpdata = `$snmp_cmd`;
     $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
-    list($sysUptime, $sysLocation, $ciscomodel, $sysDescr) = explode("\n", $snmpdata);
+    list($sysUptime, $sysLocation, $sysContact, $sysDescr) = explode("\n", $snmpdata);
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
     list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
@@ -98,6 +134,7 @@ while ($device = mysql_fetch_array($device_query)) {
       break;
 
     case "IOS":
+      echo("Device is Cisco! \n$sysDescr\n");
       $version = str_replace("Cisco IOS Software,", "", $sysDescr);
       $version = str_replace("IOS (tm) ", "", $version);
       $version = str_replace(",RELEASE SOFTWARE", "", $version);
@@ -112,12 +149,11 @@ while ($device = mysql_fetch_array($device_query)) {
       list($hardware, $features, $version) = explode("|", $version);
       $features = fixIOSFeatures($features);
       #$hardware = fixIOSHardware($hardware);
-      $ciscomodel = str_replace("\"", "", $ciscomodel);
+
       if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
       if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
         $hardware = $ciscomodel;
       }
-      echo($device['version'] . " $version"); 
       include("includes/polling/device-ios.inc.php");
       break;
 
@@ -126,7 +162,6 @@ while ($device = mysql_fetch_array($device_query)) {
       list($hardware, $features, $version) = explode(",", $sysDescr);
       list($version) = explode("(", $version);
       if(!strstr($ciscomodel, " ")) {
-        echo("$ciscomodel");
         $hardware = str_replace("\"", "", $ciscomodel);
       }
       include("includes/polling/device-procurve.inc.php");
@@ -139,14 +174,27 @@ while ($device = mysql_fetch_array($device_query)) {
     }   
     $location = str_replace("\"","", $sysLocation); 
   
+  echo("Polling temperatures\n");
   include("includes/polling/temperatures.inc.php");
   include("includes/polling/device-netstats.inc.php");
+  echo("Polling interfaces\n");
+  $where = "WHERE device_id = '" . $device['device_id'] . "'";
+  include("includes/polling/interfaces.inc.php");
 
   } else {
     $status = '0';
   }
 
   unset( $update ) ;
+  unset( $seperator) ;
+
+  if ( $sysContact && $sysContact != $device['sysContact'] ) {
+    $update .= $seperator . "`sysContact` = '$sysContact'";
+    $seperator = ", ";
+    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Contact -> $sysContact')");
+  }
+
+  echo("$update\n");
 
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
     $update .= $seperator . "`sysDescr` = '$sysDescr'";
@@ -197,9 +245,9 @@ while ($device = mysql_fetch_array($device_query)) {
     $old_uptime = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
 
     if( $uptime < $old_uptime ) {
-      mail($notify_email, "Rebooted: " . $device['hostname'], "Device " . $device['hostname'] . " rebooted at " . date('l dS F Y h:i:s A'));
+      if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+      mail($notify_email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
     }
-
 
     $uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
     if(!is_file($uptimerrd)) {
@@ -224,11 +272,14 @@ while ($device = mysql_fetch_array($device_query)) {
     $update_query  = "UPDATE `devices` SET ";
     $update_query .= $update;
     $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . "\n" . $update_query . "\n\n");
+    echo("Updating " . $device['hostname'] . "\n" . $update_query . "\n");
     $update_result = mysql_query($update_query);
   } else {
-    echo("No Changes to " . $device['hostname'] . "\n\n");
+    echo("No Changes to " . $device['hostname'] . "\n");
   }
+
+  echo("\n");
+
 }   
 
 ?>

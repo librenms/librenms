@@ -27,17 +27,18 @@ while($l = mysql_fetch_array($q)){
     $host = $maybehost;
   } elseif($perhapshost) {
     $host = $perhapshost;
-  } else { `echo Failed log entry from $l[host] > /var/log/observer.log`; }
+  } else { `echo Failed log entry from $l[host] >> /var/log/observer.log`; }
 
   if($host) {
 
     if(mysql_result(mysql_query("SELECT os FROM `devices` WHERE `device_id` = '$host'"),0) == "IOS") {
       list(,$l[msg]) = split(": %", $l[msg]);
       $l[msg] = "%" . $l[msg];
-      $l[msg] = preg_replace("/^%(.+):\ /", "\\1||", $l[msg]);
+      $l[msg] = preg_replace("/^%(.+?):\ /", "\\1||", $l[msg]);
       list($l[program], $l[msg]) = explode("||", $l[msg]);
     } else {
-      $l[msg] = preg_replace("/^" . $l[program] . ":\ /", "", $l[msg]);
+      $program = addslashes($l['program']);
+      $l['msg'] = preg_replace("/^$program:\ /", "", $l['msg']);
     }
 
 

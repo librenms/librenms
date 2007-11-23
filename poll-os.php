@@ -14,7 +14,7 @@ while ($device = mysql_fetch_array($device_query)) {
    $host = trim(strtolower($hostname));
    $host_os = getHostOS($host, $community, $device[snmpver]);
    if($old_os != $host_os) {
-      $sql = mysql_query("UPDATE `devices` SET `os` = '$host_os' WHERE `id` = '$id'");
+      $sql = mysql_query("UPDATE `devices` SET `os` = '$host_os' WHERE `device_id` = '$id'");
       echo("Updated host : $host ($host_os)\n");
    } else echo("Not Updated host : $host ($host_os)\n");
 }

@@ -57,7 +57,7 @@ echo("<li class=" . $select['dev-graphs'] . ">
 </li>
 ");
 
-if(mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
+if(@mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
 
   echo("
 <li class=" . $select['dev-enyphysical'] . ">

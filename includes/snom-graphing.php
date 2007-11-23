@@ -1,7 +1,7 @@
 <?php
 
 function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $rrdtool, $installdir, $mono_font;
+  global $config, $rrdtool, $installdir, $mono_font;
   $database = "rrd/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $optsa = array( "--start", $from, "--end", $to, "--width", $width, "--height", $height, "--vertical-label", $vertical ,"--alt-autoscale-max",
@@ -18,7 +18,7 @@ function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $ver
                                       "--font", "AXIS:6:$mono_font",
                                       "--font-render-mode", "normal");}
 
-  $opts = array_merge($optsa, $optsb);
+  $opts = array_merge($config['rrdgraph_defaults'], $optsa, $optsb);
 
   $ret = rrd_graph("$imgfile", $opts, count($opts));
 
