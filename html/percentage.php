@@ -56,7 +56,7 @@ if ($dir == "v") {
 };
 
 //send picture to browser
-$border = imagecolorallocate($per, 0x99, 0x99, 0x99);
+$border = @imagecolorallocate($percent, 250, 250, 250);
 imagerectangle($image, 0, 0, $length, 6, $border);
 
 ImagePNG($image);

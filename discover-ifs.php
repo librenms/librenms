@@ -23,12 +23,16 @@ while ($device = mysql_fetch_row($device_query)) {
       $if = trim(strtolower($ifName));
       $nullintf = 0;
       foreach($bif as $bi) {
+
+#        echo("'$bi' -> '$if'\n");
+
         if (strstr($if, $bi)) {
+	  echo("'$bi' -> '$if' MATCH!\n");
           $nullintf = 1;
         }
       }
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
-      if (preg_match('/ng[0-9]+$/', $if)) {  }
+      if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '$id' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           echo "Adding port $ifName \n";

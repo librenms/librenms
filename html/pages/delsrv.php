@@ -10,7 +10,7 @@ if($_POST['delsrv']) {
   }
 }
 
-$query = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.service_host = D.id ORDER BY hostname");
+$query = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id ORDER BY hostname");
 while($device = mysql_fetch_array($query)) {
   $servicesform .= "<option value='" . $device[service_id] . "'>" . $device['service_id'] .  "." . $device['hostname'] . " - " . $device['service_type'] .  "</option>";
 }

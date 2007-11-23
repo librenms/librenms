@@ -1,5 +1,7 @@
 <?php 
   ini_set('allow_url_fopen', 0);
+  ini_set('display_errors', 0);
+
 
 if($_GET[debug]) {
   ini_set('display_errors', 1);

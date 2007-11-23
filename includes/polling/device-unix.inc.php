@@ -1,19 +1,12 @@
 <?php
 
-$id = $device['device_id'];
-$hostname = $device['hostname'];
-
-$loadrrd  = "rrd/" . $hostname . "-load.rrd";
-$loadgraph = "public_html/graphs/" . $hostname . "-load.png";
-$cpurrd   = "rrd/" . $hostname . "-cpu.rrd";
-$cpugraph = "public_html/graphs/" . $hostname . "-cpu.png";   
-$memrrd   = "rrd/" . $hostname . "-mem.rrd";
-$memgraph = "public_html/graphs/" . $hostname . "-mem.png";
-$sysrrd   = "rrd/" . $hostname . "-sys.rrd";
-$sysgraph = "public_html/graphs/" . $hostname . "-sys.png";
+$loadrrd  = "rrd/" . $device['hostname'] . "-load.rrd";
+$cpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
+$memrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
+$sysrrd   = "rrd/" . $device['hostname'] . "-sys.rrd";
 
 ## Check Disks
-$dq = mysql_query("SELECT * FROM storage WHERE host_id = '$id'");
+$dq = mysql_query("SELECT * FROM storage WHERE host_id = '" . $device['device_id'] . "'");
 while ($dr = mysql_fetch_array($dq)) {
   $hrStorageIndex = $dr['hrStorageIndex'];
   $hrStorageAllocationUnits = $dr['hrStorageAllocationUnits'];
@@ -25,7 +18,7 @@ while ($dr = mysql_fetch_array($dq)) {
   $perc = round($used / $hrStorageSize * 100, 2);
 
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
-  $storerrd  = "rrd/" . $hostname . "-storage-" . $filedesc . ".rrd";
+  $storerrd  = "rrd/" . $device['hostname'] . "-storage-" . $filedesc . ".rrd";
   if (!is_file($storerrd)) {
     `rrdtool create $storerrd \
      --step 300 \
@@ -43,6 +36,20 @@ while ($dr = mysql_fetch_array($dq)) {
   }  
   rrd_update($storerrd, "N:$hrStorageSize:$used:$perc");
   mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
+
+    if($dr['storage_perc'] < '40' && $perc >= '40') {
+
+    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+
+    $msg  = "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'] . " is " . $perc;
+    $msg .= " at " . date('l dS F Y h:i:s A');
+
+    mail($email, "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'], $msg, $config['email_headers']);
+
+    echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "/n");
+
+  }
+
 
 }
 
@@ -148,26 +155,16 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
   rrd_update($loadrrd, "N:$load1:$load5:$load10");
   rrd_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
 
+  if($device['courier']) {
+    include("includes/polling/courierstats.inc.php");
+  }
+
+  if($device['postfix']) {
+    include("includes/polling/mailstats.inc.php");
+  }
+
   if($device['apache']) {
-    $apacherrd = "rrd/" . $hostname . "-apache.rrd";
-    if(!is_file($apacherrd)) {
-      $woo= `rrdtool create $apacherrd         \
-           DS:bits:COUNTER:600:U:10000000   \
-           DS:hits:COUNTER:600:U:10000000  \
-           RRA:AVERAGE:0.5:1:800      \
-           RRA:AVERAGE:0.5:6:700      \
-           RRA:AVERAGE:0.5:24:775     \
-           RRA:AVERAGE:0.5:288:797    \
-           RRA:MAX:0.5:1:800          \
-           RRA:MAX:0.5:6:700          \
-           RRA:MAX:0.5:24:775         \
-           RRA:MAX:0.5:288:797`;
-    }
-
-    list($ahits,$abits) = explode("\n", `./get-apache.sh $hostname`);  
-    $abits = $abits * 8;
-
-    rrd_update($apacherrd,"N:$abits:$ahits");
-  } // end apache
+   include("includes/polling/apachestats.inc.php");
+  }
 
 } // end Non-m0n0wall

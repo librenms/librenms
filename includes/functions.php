@@ -9,9 +9,34 @@ include("snom.php");
 include("graphing.php");
 include("print-functions.php");
 
+function strgen ($length = 8)
+{
+    $entropy = array(0,1,2,3,4,5,6,7,8,9,'a','A','b','B','c','C','d','D','e',
+    'E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n',
+    'N','o','O','p','P','q','Q','r','R','s','S','t','T','u','U','v','V','w',
+    'W','x','X','y','Y','z','Z');
+    
+    $string = "";
+    
+    for ($i=0; $i<$length; $i++)
+    {
+        $key = mt_rand(0,61);
+        $string .= $entropy[$key];
+    }
+    
+    return $string;
+}
+
+function interfacepermitted($interface_id) {
+
+  return devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interface WHERE interface_id = '$interface_id'"),0));
+
+}
+
+
 function devicepermitted($device_id) {
   global $_SESSION;
-  if($_SESSION['level'] > "5") { $allowed = true; 
+  if($_SESSION['userlevel'] >= "5") { $allowed = true; 
   } elseif ( @mysql_result(mysql_query("SELECT * FROM devices_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `device_id` = $device_id"), 0) > '0' ) {
     $allowed = true;
   } else { $allowed = false; }
@@ -34,13 +59,25 @@ function formatStorage($size) {
   return round($size, 2).$ext;
 }
 
+function arguments($argv) {
+    $_ARG = array();
+    foreach ($argv as $arg) {
+      if (ereg('--([^=]+)=(.*)',$arg,$reg)) {
+        $_ARG[$reg[1]] = $reg[2];
+      } elseif(ereg('-([a-zA-Z0-9])',$arg,$reg)) {
+            $_ARG[$reg[1]] = 'true';
+        }
+   
+    }
+  return $_ARG;
+}
 
 function percent_colour($perc)
 {
- $r = min(255, 5 * ($perc - 50));
- $b = max(0, 255 - (5 * $perc));
+ $r = min(255, 5 * ($perc - 25));
+ $b = max(0, 255 - (5 * ($perc + 25)));
 
- return sprintf('#%02x%02x%02x', $r, 0, $b);
+ return sprintf('#%02x%02x%02x', $r, $b, $b);
 } 
 
 function percent_colour_old($perc) {
@@ -72,10 +109,10 @@ function truncate($substring, $max = 50, $rep = '...') {
 
 
 function interface_rates ($interface) {
-  global $rrdtool;
+  global $config;
   $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
-  $data = trim(`$rrdtool fetch -s -600s -e now $rrdfile AVERAGE | grep : | cut -d" " -f 2,3 | grep e`);
-#  $data = trim(`$rrdtool fetch -s -301s -e -300s $rrdfile AVERAGE | grep : | cut -d" " -f 2,3`);
+  $cmd  = $config['rrdtool']." fetch -s -600s -e now ".$rrdfile." AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
+  $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
     list($in, $out) = split(" ", $entry);
     $rate['in'] = $in * 8;
@@ -86,9 +123,10 @@ function interface_rates ($interface) {
 
 
 function interface_errors ($interface) {
-  global $rrdtool;
+  global $config;
   $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
-  $data = trim(`$rrdtool fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d" " -f 4,5`);
+  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d\" \" -f 4,5";
+  $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
         list($in, $out) = explode(" ", $entry);
         $in_errors += ($in * 300);
@@ -111,24 +149,27 @@ function geteventicon ($message) {
 }
 
 function generateiflink($interface, $text=0,$type=bits) {
-  global $twoday;
-  global $now;
+  global $twoday; global $now; global $config; global $day;
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$twoday&to=$now&width=400&height=120&type=" . $type;
+  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
   $link  = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  ";
-  $link .= "onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  $link .= "onmouseover=\"return overlib('<div class=list-large>" . $interface['hostname'] . " - " . $interface['ifDescr'] . "</div><div>";
+  $link .= $interface['ifAlias'] . "</div><img src=\'$graph_url\'>'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
-function generatedevicelink($device, $text=0) {
-  global $twoday;
-  global $now;
+function generatedevicelink($device, $text=0, $start=0, $end=0) {
+  global $twoday; global $day; global $now; global $config;
+  if(!$start) { $start = $day; }
+  if(!$end) { $end = $now; }
   $class = devclass($device);
   if(!$text) { $text = $device['hostname']; }
-  $graph_url = "graph.php?host=" . $device[device_id] . "&from=$twoday&to=$now&width=400&height=120&type=cpu";
-  $link = "<a class=$class href='?page=device&id=" . $device['device_id'] . "' onmouseover=\"return overlib('<img src=\'$graph_url\'>');\" onmouseout=\"return nd();\">$text</a>";
+  $graph_url = "graph.php?host=" . $device[device_id] . "&from=$start&to=$end&width=400&height=120&type=cpu";
+  $link  = "<a class=$class href='?page=device&id=" . $device['device_id'] . "' ";
+  $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU Load</div>";
+  $link .= "<img src=\'$graph_url\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
@@ -376,6 +417,8 @@ function fixiftype ($type) {
         $type = str_replace("propVirtual", "Ethernet VLAN", $type);
         $type = str_replace("ethernetCsmacd", "Ethernet", $type);
         $type = str_replace("l2vlan", "Ethernet VLAN", $type);       
+	$type = str_replace("frameRelay", "Frame Relay", $type);
+	$type = str_replace("propPointToPointSerial", "PointToPoint Serial", $type);
 	return ($type);
 }
 
@@ -406,7 +449,6 @@ function fixIOSFeatures($features){
 	$features = str_replace("ADVSECURITYK9", "Advanced Security Crypto", $features);
         $features = str_replace("K91P", "Provider Crypto", $features);
 	$features = str_replace("K4P", "Provider Crypto", $features);
-        $features = str_replace("ADVIPSERVICESK9_WAN", "Adv IP Services Crypto + WAN", $features);
         $features = str_replace("ADVIPSERVICESK9", "Adv IP Services Crypto", $features);
         $features = str_replace("ADVIPSERVICES", "Adv IP Services", $features);
         $features = str_replace("IK9P", "IP Plus Crypto", $features);
@@ -418,17 +460,20 @@ function fixIOSFeatures($features){
         $features = str_replace("IPBASE", "IP Base", $features);
         $features = str_replace("IPSERVICE", "IP Services", $features);
         $features = preg_replace("/^P$/", "Service Provider", $features);
+        $features = str_replace("JK9S", "Enterprise Plus Crypto", $features);
         $features = str_replace("IK9S", "IP Plus Crypto", $features);
 	$features = str_replace("I6Q4L2", "Layer 2", $features);
         $features = str_replace("I6K2L2Q4", "Layer 2 Crypto", $features);
 	$features = str_replace("C3H2S", "Layer 2 SI/EI", $features);
+	$features = str_replace("_WAN", " + WAN", $features);
 	return $features;
 }
 
 function fixIOSHardware($hardware){
 
         $hardware = preg_replace("/C([0-9]+)/", "Cisco \\1", $hardware);
-        $hardware = str_replace("cat4000","Catalyst 4000", $hardware);
+	$hardware = preg_replace("/CISCO([0-9]+)/", "Cisco \\1", $hardware);
+        $hardware = str_replace("cat4000","Cisco Catalyst 4000", $hardware);
         $hardware = str_replace("s3223_rp","Cisco Catalyst 6500 SUP32", $hardware);
         $hardware = str_replace("s222_rp","Cisco Catalyst 6500 SUP2", $hardware);
         $hardware = str_replace("c6sup2_rp","Cisco Catalyst 6500 SUP2", $hardware);
@@ -437,6 +482,7 @@ function fixIOSHardware($hardware){
 	$hardware = str_replace("C3200XL", "Cisco Catalyst 3200XL", $hardware);
 	$hardware = str_replace("C3550", "Cisco Catalyst 3550", $hardware);
 	$hardware = str_replace("C2950", "Cisco Catalyst 2950", $hardware);
+	$hardware = str_replace("C7301", "Cisco 7301", $hardware);
 	return $hardware;
 
 }
