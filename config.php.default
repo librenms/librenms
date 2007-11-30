@@ -1,53 +1,78 @@
 <?php
 
 ### Database config
-$db_host = "localhost";
-$db_user = "observer";
-$db_pass = "";
-$db_name = "observer";
+$config['db_host'] = "localhost";
+$config['db_user'] = "root";
+$config['db_pass'] = "katak";
+$config['db_name'] = "observer-demo";
 
-### Installation Locations
-$installdir = "/var/sites/observer/";
-$rrd_dir    = $installdir . "rrd/";
+
+### Installation Location
+$installdir 	= "/var/sites/observer/";
+$htmldir	= $installdir . "html";
+$rrd_dir	= $installdir . "rrd";
 
 ### Default community
-$community = "public";
+$community = "";
+$community = $config['community'];
 
 ### File containing syslog
 $syslogfile = "";
 
 ### Location of executables
-$rrdtool = "/usr/bin/rrdtool";
-$fping = "/usr/sbin/fping";
-$ipcalc = "/usr/bin/ipcalc";
 
-$snmpwalk = "/usr/bin/snmpwalk";
-$snmpget = "/usr/bin/snmpget";
+$config['rrdtool'] = "/usr/bin/rrdtool";
+$rrdtool = $config['rrdtool'];
+
+$config['fping'] = "/usr/sbin/fping";
+$fping = $config['fping'];
+
+$config['ipcalc'] = "/usr/bin/ipcalc";
+$ipcalc = $config['ipcalc'];
+
+$config['snmpwalk'] = "/usr/bin/snmpwalk";
+$snmpwalk = $config['snmpwalk'];
+
+$config['snmpget'] = "/usr/bin/snmpget";
+$snmpget = $config['snmpget'];
+
+### RRDGraph Settings
+
+# Set the general colours and other settings for rrdtool graphs
+
+$config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#E5E5E5", "-c", "SHADEB#E5E5E5",
+                                     "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#aaaaaa",
+                                     "-c", "MGRID#FFAAAA", "-c", "FRAME#5e5e5e", "-c", "ARROW#5e5e5e",
+                                     "-R", "normal");
+
+$config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
+
 
 ### List of networks to allow scanning-based discovery
-$nets =  array ("172.22.0.0/16", "10.0.0.0/8");
+$nets =  array ("89.21.224.0/19", "10.0.0.0/8", "172.22.0.0/16", "213.253.1.0/24");
 
-### Customisation Options
-$mydomain = "project-observer.net";
-$page_title  = "Project Observer Network Monitoring";
-$title_image = "/images/logo.gif";
+### Your company domain name
+$config['mydomain'] = "project-observer.org";
+$mydomain = $config['mydomain'];
+$page_title  = "Project Observer";
+$title_image = "/images/observer-header.png";
 $stylesheet  = "/css/styles.css"; 
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
 $favicon = "/favicon.ico";
 
-$notify_email = "admin@vostron.com";
-
-### Which special sections should we show?
-$show_if_customers = 0;
+### Which interface sections should we show?
+$show_if_customers = 1;
 $show_if_transit = 0;
 $show_if_peering = 0;
+$show_if_core = 0;
+$show_if_l2tp =0;
 $show_locations = 1;
 
-$enable_syslog = 0;
+$enable_syslog = 1;
 
 ### Interface name strings to ignore
 $bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
-             "-atm layer", "-atm subif", "-shdsl", "-adsl", 
+             "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm",
              "async", "plip", "-physical", "-signalling", "control plane",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
 
@@ -58,6 +83,29 @@ $ignore_mount = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
 ### Valis OSes
 $valid_os = array("IOS", "Linux", "OpenBSD", "FreeBSD", "NetBSD", "ProCurve", "m0n0wall", "pfSense", "Snom", "Voswall", "DragonFly");
 
+### entPhysicalVendorType rewrites
+
+$entPhysicalVendorTypes = array (
+  'cevC7xxxIo1feTxIsl' => 'C7200-IO-FE-MII',
+  'cevChassis7140Dualfe' => 'C7140-2FE',
+  'cevChassis7204' => "C7204",
+  'cevChassis7204Vxr' => 'C7204VXR',
+  'cevChassis7206' => 'C7206',
+  'cevChassis7206Vxr' => 'C7206VXR',
+  'cevCpu7200Npe200' => 'NPE-200',
+  'cevCpu7200Npe225' => 'NPE-225',
+  'cevCpu7200Npe300' => 'NPE-300',
+  'cevCpu7200Npe400' => 'NPE-400',
+  'cevCpu7200Npeg1' => 'NPE-G1',
+  'cevCpu7200Npeg2' => 'NPE-G2',
+  'cevPa1feTxIsl' => 'PA-FE-TX-ISL',
+  'cevPa2feTxI82543' => 'PA-2FE-TX',
+  'cevPa8e' => 'PA-8E',
+  'cevPaA8tX21' => 'PA-8T-X21',
+  'cevMGBIC1000BaseLX' => '1000BaseLX GBIC',
+  'cevPort10GigBaseLR' => '10GigBaseLR');
+
+
 ### Style Options
 
 $list_colour_a = "#ffffff";
@@ -66,19 +114,20 @@ $list_colour_b = "#eeeeee";
 $warn_colour_a = "#ffeeee";
 $warn_colour_b = "#ffcccc";
 
-
 ##############################
 # No changes below this line #
 ##############################
 
-$observer_version = "0.2.5";
+$observer_version = "0.3.1";
 
 ### Connect to database
-if (!@mysql_connect($db_host, $db_user, $db_pass)) {
+if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
         echo "<h2>MySQL Error</h2>";
         die;
 }
-mysql_select_db($db_name);
+mysql_select_db($config['db_name']);
+
+# Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 
 $now = time();
 $day = time() - (24 * 60 * 60);
