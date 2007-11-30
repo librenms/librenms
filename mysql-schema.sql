@@ -354,6 +354,8 @@ CREATE TABLE `users` (
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
 
+INSERT into users (username, password, descr, level) values ('admin',MD5('observer'),'Admin',10);
+
 -- --------------------------------------------------------
 
 -- 
