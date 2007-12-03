@@ -36,12 +36,21 @@
     }
     $previfalias = $device['ifAlias'];
 
+    if($device['os'] == "IOS") {
+
+      if($interface['ifTrunk']) { $vlan = "<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>";
+      } elseif ($interface['ifVlan']) { $vlan = "<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"; 
+      } else { $vlan = ""; }
+
+    }
+
     echo("
            <tr bgcolor='$bg'>
              <td width='7'></td>
              <td width='250'><span style='font-weight: bold;' class=interface>$useifalias</span></td>
              <td width='200'>" . generatedevicelink($device) . "</td>
              <td width='100'>" . generateiflink($interface, makeshortif($interface['ifDescr'])) . "</td>
+             <td width='100'>$vlan</td>
              <td>$notes</td>
            </tr>
          ");
