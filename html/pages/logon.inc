@@ -6,7 +6,7 @@
     <tr>
       <td><div align='right'><img src='/images/password.png' width='128' height='128'></div></td>
       <td>
-        <form action='index.php' method=post>
+        <form action='". $_SERVER['REQUEST_URI'] ."' method=post>
           <h3>Please log in:</h3>
 
           <div style='height: 0px;'></div>

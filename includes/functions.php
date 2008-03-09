@@ -8,6 +8,8 @@ include("procurve.php");
 include("snom.php");
 include("graphing.php");
 include("print-functions.php");
+include("billing-functions.php");
+
 
 function strgen ($length = 8)
 {
@@ -27,12 +29,33 @@ function strgen ($length = 8)
     return $string;
 }
 
-function interfacepermitted($interface_id) {
+function billpermitted($bill_id) {
 
-  return devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interface WHERE interface_id = '$interface_id'"),0));
+  global $_SESSION;
+  if($_SESSION['userlevel'] >= "5") {
+    $allowed = TRUE;
+  } elseif (@mysql_result(mysql_query("SELECT count(*) FROM bill_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `bill_id` = $bill_id"), 0) > '0') {
+    $allowed = TRUE;
+  } else {
+    $allowed = FALSE;
+  }
+  return $allowed;
 
 }
 
+
+function interfacepermitted($interface_id) {
+
+  global $_SESSION;
+  if($_SESSION['userlevel'] >= "5") { 
+    $allowed = true; 
+  } elseif ( devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interface WHERE interface_id = '$interface_id'"),0))) {
+    $allowed = true;
+  } elseif ( @mysql_result(mysql_query("SELECT count(*) FROM interface_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0) > '0') {
+    $allowed = true;
+  } else { $allowed = FALSE; }
+  return $allowed;
+}
 
 function devicepermitted($device_id) {
   global $_SESSION;
@@ -287,9 +310,11 @@ function humanspeed($speed) {
         $speed = preg_replace("/^0$/", "-", $speed);
         $speed = preg_replace("/^9000$/", "9Kbps", $speed);
 	$speed = preg_replace("/^48000$/", "48Kbps", $speed);
+	$speed = preg_replace("/^56000$/", "56Kbps", $speed);
         $speed = preg_replace("/^64000$/", "64Kbps", $speed);
         $speed = preg_replace("/^128000$/", "128Kbps", $speed);
         $speed = preg_replace("/^256000$/", "256Kbps", $speed);
+	$speed = preg_replace("/^448000$/", "448Kbps", $speed);
         $speed = preg_replace("/^512000$/", "512Kbps", $speed);
 	$speed = preg_replace("/^768000$/", "768Kbps", $speed);
         $speed = preg_replace("/^1024000$/", "1Mbps", $speed);
@@ -297,6 +322,8 @@ function humanspeed($speed) {
         $speed = preg_replace("/^4192000$/", "4Mbps", $speed);
 	$speed = preg_replace("/^10000000$/", "10Mbps", $speed);
 	$speed = preg_replace("/^34000000$/", "34Mbps", $speed);
+        $speed = preg_replace("/^45000000$/", "45Mbps", $speed);
+        $speed = preg_replace("/^54000000$/", "54Mbps", $speed);
         $speed = preg_replace("/^100000000$/", "100Mbps", $speed);
  	$speed = preg_replace("/^155000000$/", "155Mbps", $speed);
         $speed = preg_replace("/^622000000$/", "622Mbps", $speed);
@@ -428,6 +455,7 @@ function fixifName ($inf) {
         $inf = str_replace("gig", "Gig", $inf);
         $inf = str_replace("fast", "Fast", $inf);
         $inf = str_replace("ten", "Ten", $inf);
+	$inf = str_replace("bvi", "BVI", $inf);
         $inf = str_replace("vlan", "Vlan", $inf);
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("-802.1q Vlan subif", "", $inf);
@@ -446,6 +474,8 @@ function fixifName ($inf) {
 
 
 function fixIOSFeatures($features){
+        $features = str_replace("LANBASEK9", "Lan Base Crypto", $features);
+	$features = str_replace("LANBASE", "Lan Base", $features);
 	$features = str_replace("ADVSECURITYK9", "Advanced Security Crypto", $features);
         $features = str_replace("K91P", "Provider Crypto", $features);
 	$features = str_replace("K4P", "Provider Crypto", $features);
@@ -483,6 +513,7 @@ function fixIOSHardware($hardware){
 	$hardware = str_replace("C3550", "Cisco Catalyst 3550", $hardware);
 	$hardware = str_replace("C2950", "Cisco Catalyst 2950", $hardware);
 	$hardware = str_replace("C7301", "Cisco 7301", $hardware);
+        $hardware = str_replace("CE500", "Catalyst Express 500", $hardware);
 	return $hardware;
 
 }

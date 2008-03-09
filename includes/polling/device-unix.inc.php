@@ -58,14 +58,27 @@ $oid_ssCpuRawUser         = ".1.3.6.1.4.1.2021.11.50.0";
 $oid_ssCpuRawNice         = ".1.3.6.1.4.1.2021.11.51.0";
 $oid_ssCpuRawSystem       = ".1.3.6.1.4.1.2021.11.52.0";
 $oid_ssCpuRawIdle         = ".1.3.6.1.4.1.2021.11.53.0";
+
 $oid_hrSystemProcesses    = ".1.3.6.1.2.1.25.1.6.0";
 $oid_hrSystemNumUsers     = ".1.3.6.1.2.1.25.1.5.0";
 
+$oid_ssCpuUser		  = ".1.3.6.1.4.1.2021.11.9.0";
+$oid_ssCpuSystem	  = ".1.3.6.1.4.1.2021.11.10.0";
+
+
 $cpu_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
-$cpu_cmd .= " $oid_hrSystemNumUsers .1.3.6.1.4.1.2021.1.101.1";
+$cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem .1.3.6.1.4.1.2021.1.101.1";
 $cpu  = `$cpu_cmd`;
-list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $cputemp) = explode("\n", $cpu);
+list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $UsageSystem, $cputemp) = explode("\n", $cpu);
+
+$cpuUsage = $usageUser + $usageSystem;
+
+$update_usage = mysql_query("UPDATE devices_attribs SET attrib_value = '$cpuUsage' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'");
+
+if(mysql_affected_rows() == '0') {
+ $insert_usage = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'cpuusage', '$cpuUsage')");
+}
 
 ## Create CPU RRD if it doesn't already exist
 if (!is_file($cpurrd)) {
