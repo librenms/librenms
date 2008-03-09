@@ -1,6 +1,6 @@
 Copyright (C) 2007 Adam Armstrong <adama@project-observer.org>
 
-Released under the GNU Public License
+Please see license.txt for usage requirements and restrictions.
 
 Introduction
 ------------
@@ -20,7 +20,10 @@ Please see http://www.project-observer.org.
 Changelog
 ---------
 
+Release 0.3.1 ( 30th November 2007 )
+Fixed a great many things and made it prettier!
 
+.. This release took so long that I've largely forgotten what's been changed. Again!
 
 Release 0.3.0-pre1 ( 24th June 2007 )
 Added VLAN features for cisco devices

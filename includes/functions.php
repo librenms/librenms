@@ -10,6 +10,10 @@ include("graphing.php");
 include("print-functions.php");
 include("billing-functions.php");
 
+function rrdtool_update($rrdfile, $rrdupdate) {
+  global $rrdtool;
+  return `$rrdtool update $rrdfile $rrdupdate`;
+}
 
 function strgen ($length = 8)
 {
@@ -542,7 +546,7 @@ function createHost ($host, $community, $snmpver){
         $host_os = getHostOS($host, $community, $snmpver); 
 	global $valid_os;
         $nullhost = 1;
-        echo("$host -> $host_os<br />");
+        #echo("$host -> $host_os<br />");
         foreach($valid_os as $os) {
            if ($os == $host_os) {
               $nullhost = '0';
@@ -550,9 +554,9 @@ function createHost ($host, $community, $snmpver){
         }
         if($nullhost == '0') {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `os`, `status`) VALUES ('$host', '$community', '$host_os', '1')");
-           echo("Created host : $host\n");
+           return("Created host : $host ($host_os)");
         } else {
-	   echo("Not added bad host : $host\n");
+	   return("Not added bad host : $host");
 	}
 }
 

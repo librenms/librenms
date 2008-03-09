@@ -1,15 +1,10 @@
-#!/usr/bin/php
 <?
-
-include("config.php");
-include("includes/functions.php");
-
-if($argv[1]) { $where = "WHERE `interface_id` LIKE '%$argv[1]'"; }
 
 $interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
- $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'"));
+ if(!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'")); }
+
  unset($ifAdminStatus, $ifOperStatus, $ifAlias, $ifDescr);
 
  $interface['hostname'] = $device['hostname'];
@@ -88,6 +83,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
   if($ifOperStatus == "up") {
 
     $snmp_data_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+    $snmp_data_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifOutErrors." . $interface['ifIndex'] . " ifInUcastPkts." . $interface['ifIndex'] . " ifOutUcastPkts." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifInNUcastPkts." . $interface['ifIndex'] . " ifOutNUcastPkts." . $interface['ifIndex'];
@@ -98,9 +94,9 @@ while ($interface = mysql_fetch_array($interface_query)) {
     $snmp_data = str_replace("No Such Instance currently exists at this OID","", $snmp_data);
     list($ifHCInOctets, $ifHCOutOctets, $ifInErrors, $ifOutErrors, $ifInUcastPkts, $ifOutUcastPkts, $ifInNUcastPkts, $ifOutNUcastPkts) = explode("\n", $snmp_data);
     if($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
-      
+
       $octets_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
-      $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex']; 
+      $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex'];
       $octets = `$octets_cmd`;
       list ($ifHCInOctets, $ifHCOutOctets) = explode("\n", $octets);
     }
@@ -110,40 +106,11 @@ while ($interface = mysql_fetch_array($interface_query)) {
      echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
   }
  }
- 
+
  $rates = interface_rates ($interface);
   mysql_query("UPDATE `interfaces` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
-
- 
-
- 
-
-#  if ( $interface['ifAlias'] != $ifAlias ) {
-#     $update .= $seperator . "`ifAlias` = '$ifAlias'";
-#     $seperator = ", ";
-#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
-#  }
-#  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
-#     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
-#     $seperator = ", ";
-#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
-#  }
-#  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
-#     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
-#     $seperator = ", ";
-#     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
-#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
-#  }
-#  if ($update) {
-#     $update_query  = "UPDATE `interfaces` SET ";
-#     $update_query .= $update;
-#     $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-#     $update_result = mysql_query($update_query);
-#  }
-
 
 }
 
 ?>
-
 

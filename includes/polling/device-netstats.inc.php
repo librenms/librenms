@@ -30,7 +30,7 @@ if($device[os] != "Snom") {
     if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = ""; }
     $rrdupdate .= ":$data";
   }
-  rrd_update($rrdfile, $rrdupdate);
+  rrdtool_update($rrdfile, $rrdupdate);
 }
 
 ?>

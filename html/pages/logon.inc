@@ -23,9 +23,6 @@
             <tr>
               <td colspan=2 align='right'><input name='submit' type='submit' value='Login'></td>
             </tr>
-            <tr>
-              <td colspan=2 align='right'>Demo login : demo/demo</td>
-            </tr>
           </table>
       </form></td>
     </tr>

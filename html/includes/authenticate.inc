@@ -21,8 +21,10 @@ if($_GET['logout']) {
     $_SESSION['encrypted']=$_COOKIE['encrypted'];
   }
 
+
   $sql = "select username, level, user_id from users where username='" . $_SESSION['username'] . "' and password='" . $_SESSION['encrypted'] . "'"; 
-  $row = mysql_fetch_row(mysql_query($sql));
+  $query = mysql_query($sql);
+  $row = mysql_fetch_row($query);
 
   if ( $_SESSION['username'] != "" && $row[0] == $_SESSION['username'] ) {
     $_SESSION['userlevel'] = $row[1];
