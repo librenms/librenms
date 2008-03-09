@@ -8,6 +8,7 @@
 
   echo("<table border=0 cellspacing=0 cellpadding=2 class=devicetable width=100%>");
 
+
   while($interface = mysql_fetch_array($query)) {
     $device    = &$interface;
 
