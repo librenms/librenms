@@ -1,11 +1,11 @@
-Copyright (C) 2007 Adam Armstrong <adama@memetic.org>
+Copyright (C) 2007 Adam Armstrong <adama@project-observer.org>
 
 Released under the GNU Public License
 
 Introduction
 ------------
 
-Project Observer is an auto-discovering network monitoring system. 
+Observer is an auto-discovering network monitoring system. 
 
 It's designed to be an easily-navigable interface to the health of your network.
 
@@ -19,6 +19,8 @@ Please see http://www.project-observer.org.
 
 Changelog
 ---------
+
+
 
 Release 0.3.0-pre1 ( 24th June 2007 )
 Added VLAN features for cisco devices
