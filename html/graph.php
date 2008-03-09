@@ -10,6 +10,11 @@
   include("../includes/functions.php");
   include("includes/authenticate.inc");
 
+  if($_GET['params']) {
+    list($_GET['host'], $_GET['if'], $_GET['from'], $_GET['to'], $_GET['width'], $_GET['height'], $_GET['title'], $_GET['vertical'], $_GET['type'], $_GET['interfaces']) = explode("||", mcrypt_ecb(MCRYPT_DES, $key_value, $_GET['params'], MCRYPT_DECRYPT));
+  }
+
+
   if($_GET['host']) {
     $device_id = $_GET['host'];
   } elseif($_GET['device']) {
@@ -28,7 +33,6 @@
   $height = $_GET['height'];
   $title = $_GET['title'];
   $vertical = $_GET['vertical'];
-
   $type = $_GET['type'];
 
   $graphfile = strgen() . ".png";

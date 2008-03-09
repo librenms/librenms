@@ -23,7 +23,7 @@ while($device = mysql_fetch_array($sql)){
 }
 
 
-$sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0'");
+$sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
@@ -37,7 +37,7 @@ while($device = mysql_fetch_array($sql)){
   if(!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'");
+$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
@@ -51,7 +51,7 @@ while($device = mysql_fetch_array($sql)){
   if(!$already) { $nodes[] = $device['device_id']; }
 }
 
-$sql = mysql_query("SELECT D.device_id  FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down'");
+$sql = mysql_query("SELECT D.device_id  FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down'  AND D.ignore = '0' AND S.service_ignore = '0'");
 while($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;

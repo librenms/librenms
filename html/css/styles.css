@@ -13,12 +13,15 @@ A.green:visited, A.green, .green {color: #008C00;}
 A.blue:visited, A.blue, .blue {color: #0000ff;}
 A.orange:visited, a.orange, .orange {color: #FF7400;}
 
-
 .pinkbg { background-color: #ffbbbb; }
 .redbg { background-color: #ff8585; }
 .bluebg { background-color: #aaaaff; }
 .greenbg { background-color: #aaffaa; }
 .greybg { background-color: #dddddd; }
+
+.selector {
+        width:275px;
+}
 
 .page-h2 { 
         font-size: 14px; 

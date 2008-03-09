@@ -28,6 +28,7 @@ if($_GET[debug]) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
   <title><?php echo("$page_title"); ?></title>
+  <base href="<?php echo("$base_url"); ?>" />
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <!-- <meta http-equiv="refresh" content="300"> -->
   <link href="<?php  echo($stylesheet);  ?>" rel="stylesheet" type="text/css">

@@ -108,6 +108,9 @@ if($_SESSION['userlevel'] >= '10') {
 if($_SESSION['userlevel'] >= '5') {
   echo("<li><hr width=140 /></li>");
   if($show_if_customers) { echo("<li><a href='?page=customers'><img src='/images/16/group_link.png' border=0 align=absmiddle> Customers</a></li>"); $ifbreak = 1;}
+
+  if($show_if_bills) { echo("<li><a href='?page=bills'><img src='/images/16/money_pound.png' border=0 align=absmiddle> Traffic Bills</a></li>"); $ifbreak = 1;}
+
   if($show_if_l2tp) { echo("<li><a href='?page=iftype&type=l2tp'><img src='/images/16/user.png'border=0 align=absmiddle> L2TP</a></li>"); $ifbreak = 1; }
 
   if($show_if_transit) { echo("<li><a href='?page=iftype&type=transit'><img src='/images/16/world_link.png' border=0 align=absmiddle> Transit</a></li>");  $ifbreak = 1; }
