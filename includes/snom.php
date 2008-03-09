@@ -42,7 +42,7 @@ function pollDeviceSNOM() {
    }
 
    $rrdupdate = "N:$rxbytes:$txbytes:$rxpkts:$rxbytes:$calls:$registrations";
-   $ret = rrd_update("$rrdfile", $rrdupdate);
+   $ret = rrdtool_update("$rrdfile", $rrdupdate);
 
 }
 

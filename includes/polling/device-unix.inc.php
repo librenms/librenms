@@ -34,7 +34,7 @@ while ($dr = mysql_fetch_array($dq)) {
      RRA:MAX:0.5:24:800 \
      RRA:MAX:0.5:288:800`;
   }  
-  rrd_update($storerrd, "N:$hrStorageSize:$used:$perc");
+  rrdtool_update($storerrd, "N:$hrStorageSize:$used:$perc");
   mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
 
     if($dr['storage_perc'] < '40' && $perc >= '40') {
@@ -97,7 +97,7 @@ if (!is_file($cpurrd)) {
      RRA:MAX:0.5:24:800 \
      RRA:MAX:0.5:288:800`;
 }
-rrd_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
+rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 
 
 ## If the device isn't monowall or pfsense, monitor all the pretty things
@@ -164,9 +164,9 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
   $load_raw = `$load_cmd`;
   list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
-  rrd_update($sysrrd,  "N:$users:$procs");
-  rrd_update($loadrrd, "N:$load1:$load5:$load10");
-  rrd_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
+  rrdtool_update($sysrrd,  "N:$users:$procs");
+  rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
+  rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
 
   if($device['courier']) {
     include("includes/polling/courierstats.inc.php");

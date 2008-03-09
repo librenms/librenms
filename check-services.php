@@ -18,7 +18,6 @@ while ($service = mysql_fetch_array($query)) {
     $status = "2";
     $check = "Error : Script not found ($checker_script)";
   }
-<<<<<<< .mine
   if($service_status != $status) { 
     $updated = ", `service_changed` = '" . time() . "' "; 
     if($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
@@ -31,23 +30,6 @@ while ($service = mysql_fetch_array($query)) {
         $msg .= " at " . date('l dS F Y h:i:s A');
         mail($email, "Service Down: " . $service['service_type'] . " on " . $service['hostname'], $msg, $config['email_headers']);
     }
-
-  } else { unset($updated); }
-  mysql_query("UPDATE `services` SET `service_status` = '$status', `service_message` = '$check', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '$service[service_id]'");
-=======
-  if($service_status != $status) { 
-    $updated = ", `service_changed` = '" . time() . "' "; 
-    if($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
-    if($status == "1") {
-        $msg  = "Service Up: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date('l dS F Y h:i:s A');
-	mail($email, "Service Up: " . $service['service_type'] . " on " . $service['hostname'], $msg, $config['email_headers']);
-    } elseif ($status == "0") {
-	$msg  = "Service Down: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date('l dS F Y h:i:s A');
-        mail($email, "Service Down: " . $service['service_type'] . " on " . $service['hostname'], $msg, $config['email_headers']);
-    }
->>>>>>> .r121
 
   } else { unset($updated); }
   $update_sql = "UPDATE `services` SET `service_status` = '$status', `service_message` = '" . addslashes($check) . "', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '" . $service['service_id']. "'";

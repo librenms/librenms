@@ -258,7 +258,7 @@ while ($device = mysql_fetch_array($device_query)) {
         RRA:AVERAGE:0.5:24:775 \
         RRA:AVERAGE:0.5:288:797`;
     }
-    rrd_update($uptimerrd, "N:$uptime");
+    rrdtool_update($uptimerrd, "N:$uptime");
 
     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = '$uptime' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'");
     if(mysql_affected_rows() == '0') {

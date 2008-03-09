@@ -107,10 +107,10 @@ function pollDeviceWin() {
    $load_raw = `$load_cmd`;
    list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
-   rrd_update($sysrrd, "N:$users:$procs");
-   rrd_update($loadrrd, "N:$load1:$load5:$load10");
-   rrd_update($memrrd, "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
-   rrd_update($cpurrd, "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
+   rrdtool_update($sysrrd, "N:$users:$procs");
+   rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
+   rrdtool_update($memrrd, "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
+   rrdtool_update($cpurrd, "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 }
 
 function memgraphWin ($rrd, $graph, $from="-2d")
