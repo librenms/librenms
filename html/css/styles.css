@@ -656,7 +656,7 @@ input {
 
 
 .menu2 { float:left; width:100%; font-family: Verdana, arial, sans-serif; font-weight: bold ; font-size: 11px; border:1px solid #aaaaaa;
-background:#ddd url(images/menu2.gif) repeat-x;
+background:#ddd url(../images/menu2.gif) repeat-x;
 z-index: 9;
 }
 .menu2 ul {
@@ -673,9 +673,9 @@ float:left; display:block; text-decoration:none; color:#666; padding:0px 16px; l
 
 .menu2 ul li:hover {width:auto;}
 
-.menu2 ul li a:hover {background:#aaa url(images/sub2a.gif); color:#356AA0;}
+.menu2 ul li a:hover {background:#aaa url(../images/sub2a.gif); color:#356AA0;}
 
-.menu2 ul li:hover a {background:#aaa url(images/sub2a.gif); color:#356AA0;}
+.menu2 ul li:hover a {background:#aaa url(../images/sub2a.gif); color:#356AA0;}
 
 .menu2 ul li ul {
 display: none;
@@ -783,7 +783,7 @@ padding: 2px 7px;
 margin-right: 3px;
 border: 1px solid #aaa;
 color: #2d2b2b;
-background: white url(images/menu2.gif) top left repeat-x;
+background: white url(../images/menu2.gif) top left repeat-x;
 }
 
 .shadetabs li a:visited{
@@ -799,7 +799,7 @@ color: #cc0000;
 }
 
 .shadetabs li.selected a{ /*selected main tab style */
-  background-image: url(images/shadeactive.gif);
+  background-image: url(../images/shadeactive.gif);
   border-bottom-color: white;
 }
 
