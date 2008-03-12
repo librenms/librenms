@@ -15,6 +15,24 @@ function rrdtool_update($rrdfile, $rrdupdate) {
   return `$rrdtool update $rrdfile $rrdupdate`;
 }
 
+function getHostOS($hostname, $community, $snmpver) {
+
+    $sysDescr_cmd = "snmpget -O qv -" . $snmpver . " -c " . $community . " " . $hostname . " sysDescr.0";
+    $sysDescr = str_replace("\"", "", trim(`$sysDescr_cmd`));
+    $dir_handle = @opendir("includes/osdiscovery") or die("Unable to open $path");
+    while ($file = readdir($dir_handle)) {
+      if( preg_match("/^discover-([a-z0-9]*).php/", $file) ) {
+        include("includes/osdiscovery/" . $file);
+      }
+    }
+    closedir($dir_handle);
+
+    if($os) { return $os; } else { return FALSE; }
+
+
+}
+
+
 function strgen ($length = 8)
 {
     $entropy = array(0,1,2,3,4,5,6,7,8,9,'a','A','b','B','c','C','d','D','e',
@@ -522,23 +540,23 @@ function fixIOSHardware($hardware){
 
 }
 
-function getHostOS($host, $community, $snmpver) {
-	$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host sysDescr.0`);
-        if ($sysDescr == "") {$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host 1.3.6.1.2.1.7526.2.4`);}
-        echo("\nsnmpget -O qv -$snmpver -c $community $host sysDescr.0\n$sysDescr\n");
-	if (strstr($sysDescr, "IOS") !== false) { $os = "IOS"; }
-        if (strstr($sysDescr, "FreeBSD") !== false) { $os = "FreeBSD"; }
-	if (strstr($sysDescr, "DragonFly")) { $os = "DragonFly"; }
-        if (strstr($sysDescr, "NetBSD") !== false) { $os = "NetBSD"; }
-	if (strstr($sysDescr, "OpenBSD") !== false) { $os = "OpenBSD"; }
-        if (strstr($sysDescr, "Linux") !== false) { $os = "Linux"; }
-	if (strstr($sysDescr, "Windows")) { $os = "Windows"; }
-        if (strstr($sysDescr, "ProCurve")) { $os = "ProCurve"; }
-	if (strstr($sysDescr, "m0n0wall")) { $os = "m0n0wall"; }
-	if (strstr($sysDescr, "Voswall")) { $os = "Voswall"; }
-	if (strstr($sysDescr, "snom")) { $os = "Snom"; }
-	return $os;
-}
+#function getHostOS($host, $community, $snmpver) {
+#	$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host sysDescr.0`);
+#        if ($sysDescr == "") {$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host 1.3.6.1.2.1.7526.2.4`);}
+#        echo("\nsnmpget -O qv -$snmpver -c $community $host sysDescr.0\n$sysDescr\n");
+#	if (strstr($sysDescr, "IOS") !== false) { $os = "IOS"; }
+#        if (strstr($sysDescr, "FreeBSD") !== false) { $os = "FreeBSD"; }
+#	if (strstr($sysDescr, "DragonFly")) { $os = "DragonFly"; }
+#        if (strstr($sysDescr, "NetBSD") !== false) { $os = "NetBSD"; }
+#	if (strstr($sysDescr, "OpenBSD") !== false) { $os = "OpenBSD"; }
+#        if (strstr($sysDescr, "Linux") !== false) { $os = "Linux"; }
+#	if (strstr($sysDescr, "Windows")) { $os = "Windows"; }
+#        if (strstr($sysDescr, "ProCurve")) { $os = "ProCurve"; }
+#	if (strstr($sysDescr, "m0n0wall")) { $os = "m0n0wall"; }
+#	if (strstr($sysDescr, "Voswall")) { $os = "Voswall"; }
+#	if (strstr($sysDescr, "snom")) { $os = "Snom"; }
+#	return $os;
+#}
 
 
 function createHost ($host, $community, $snmpver){
