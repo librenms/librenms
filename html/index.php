@@ -110,7 +110,7 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
     echo("<br /> <center>Generated in $gentime seconds 
-          <br /> <a href='http://www.project-observer.org'>Project Observer " . $config['version'] . "</a> &copy; 2006-2007 Adam Armstrong");
+          <br /> <a href='http://www.project-observer.org'>Observer " . $config['version'] . "</a> &copy; 2006-2007 Adam Armstrong");
           
 ?>
 
