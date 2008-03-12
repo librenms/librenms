@@ -3,8 +3,8 @@
 // Start Graphing Functions
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
@@ -14,7 +14,7 @@ function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, 
   $points_per_sample = 3;
   $xpoints = '540';
   $step = $range*$points_per_sample/$xpoints;
-  $database = "rrd/" . $rrd . "-mailstats.rrd";
+  $database = $rrd_dir . "/" . $rrd . "-mailstats.rrd";
 
   $options .= " DEF:rejected=$database:reject:AVERAGE";
   $options .= " DEF:mrejected=$database:reject:MAX";
@@ -62,8 +62,8 @@ function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, 
 }
 
 function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
@@ -72,7 +72,7 @@ function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $points_per_sample = 3;
   $xpoints = '540';
   $step = $range*$points_per_sample/$xpoints;
-  $rrd = "rrd/" . $rrd;
+  $rrd = $rrd_dir . "/" . $rrd;
   $options .= " DEF:sent=$rrd:sent:AVERAGE";
   $options .= " DEF:msent=$rrd:sent:MAX";
   $options .= " CDEF:rsent=sent,60,*";
@@ -100,8 +100,8 @@ function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 }
 
 function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  
@@ -165,8 +165,8 @@ function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
 }
 
 function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
@@ -198,8 +198,8 @@ function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vert
 
 
 function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
@@ -217,8 +217,8 @@ function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 }
 
 function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
@@ -239,8 +239,8 @@ function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 
 
 function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
@@ -276,8 +276,8 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
 }
 
 function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
@@ -326,8 +326,8 @@ function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $v
 }
 
 function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  
@@ -343,8 +343,7 @@ function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
 }
 
 function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
@@ -360,9 +359,10 @@ function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertica
     $descr = str_pad($fs[hrStorageDescr], 14);
     $descr = substr($descr,0,14);
     $text = str_replace("/", "_", $fs['hrStorageDescr']);
-    $options .= " DEF:$fs[storage_id]=rrd/$hostname-storage-$text.rrd:used:AVERAGE";
-    $options .= " DEF:$fs[storage_id]s=rrd/$hostname-storage-$text.rrd:size:AVERAGE";
-    $options .= " DEF:$fs[storage_id]p=rrd/$hostname-storage-$text.rrd:perc:AVERAGE";
+    $rrd = $rrd_dir . "/$hostname/storage-$text.rrd";
+    $options .= " DEF:$fs[storage_id]=$rrd:used:AVERAGE";
+    $options .= " DEF:$fs[storage_id]s=$rrd:size:AVERAGE";
+    $options .= " DEF:$fs[storage_id]p=$rrd:perc:AVERAGE";
     $options .= " LINE1.25:$fs[storage_id]p#" . $colour . ":'$descr'";
     $options .= " GPRINT:$fs[storage_id]s:LAST:%6.2lf%SB";
     $options .= " GPRINT:$fs[storage_id]:LAST:%6.2lf%SB";
@@ -375,8 +375,8 @@ function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertica
 
 
 function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
@@ -391,11 +391,11 @@ function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, 
 
     $descr = str_pad($fs[hrStorageDescr], 14);
     $descr = substr($descr,0,14);
-
     $text = str_replace("/", "_", $fs['hrStorageDescr']);
-    $options .= " DEF:$fs[storage_id]=rrd/$hostname-storage-$text.rrd:used:AVERAGE";
-    $options .= " DEF:$fs[storage_id]s=rrd/$hostname-storage-$text.rrd:size:AVERAGE";
-    $options .= " DEF:$fs[storage_id]p=rrd/$hostname-storage-$text.rrd:perc:AVERAGE";
+    $rrd = $rrd_dir . "/$hostname/storage-$text.rrd";
+    $options .= " DEF:$fs[storage_id]=$rrd:used:AVERAGE";
+    $options .= " DEF:$fs[storage_id]s=$rrd:size:AVERAGE";
+    $options .= " DEF:$fs[storage_id]p=$rrd:perc:AVERAGE";
     $options .= " LINE1.25:$fs[storage_id]p#" . $colour . ":'$descr'";
     $options .= " GPRINT:$fs[storage_id]s:LAST:%6.2lf%SB";
     $options .= " GPRINT:$fs[storage_id]:LAST:%6.2lf%SB";
@@ -407,8 +407,8 @@ function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, 
 }
 
 function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
-  $database = "rrd/" . $rrd;
+  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }

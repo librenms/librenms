@@ -1,9 +1,21 @@
 <?php
 
-$loadrrd  = "rrd/" . $device['hostname'] . "-load.rrd";
-$cpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
-$memrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
-$sysrrd   = "rrd/" . $device['hostname'] . "-sys.rrd";
+$Oloadrrd  = "rrd/" . $device['hostname'] . "-load.rrd";
+$Ocpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
+$Omemrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
+$Osysrrd   = "rrd/" . $device['hostname'] . "-sys.rrd";
+
+$loadrrd  = $rrd_dir . "/" . $device['hostname'] . "/load.rrd";
+$cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/cpu.rrd";
+$memrrd   = $rrd_dir . "/" . $device['hostname'] . "/mem.rrd";
+$sysrrd   = $rrd_dir . "/" . $device['hostname'] . "/sys.rrd";
+
+if(is_file($Oloadrrd) && !is_file($loadrrd)) { rename($Oloadrrd, $loadrrd); echo("Moving $Oloadrrd to $loadrrd");  }
+if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
+if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
+if(is_file($Osysrrd) && !is_file($sysrrd)) { rename($Osysrrd, $sysrrd); echo("Moving $Osysrrd to $sysrrd");  }
+
+
 
 ## Check Disks
 $dq = mysql_query("SELECT * FROM storage WHERE host_id = '" . $device['device_id'] . "'");
@@ -18,9 +30,15 @@ while ($dr = mysql_fetch_array($dq)) {
   $perc = round($used / $hrStorageSize * 100, 2);
 
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
-  $storerrd  = "rrd/" . $device['hostname'] . "-storage-" . $filedesc . ".rrd";
-  if (!is_file($storerrd)) {
-    `rrdtool create $storerrd \
+
+  $storage_rrd  = $rrd_dir . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
+  $ostorage_rrd  = "rrd/" . $device['hostname'] . "-storage-" . $filedesc . ".rrd";
+
+  if(is_file($ostorage_rrd) && !is_file($storage_rrd)) { rename($ostorage_rrd, $storage_rrd); echo("Moving $ostorage_rrd to $storage_rrd");  }
+
+
+  if (!is_file($storage_rrd)) {
+    `rrdtool create $storage_rrd \
      --step 300 \
      DS:size:GAUGE:600:0:U \
      DS:used:GAUGE:600:0:U \
@@ -34,7 +52,7 @@ while ($dr = mysql_fetch_array($dq)) {
      RRA:MAX:0.5:24:800 \
      RRA:MAX:0.5:288:800`;
   }  
-  rrdtool_update($storerrd, "N:$hrStorageSize:$used:$perc");
+  rrdtool_update($storage_rrd, "N:$hrStorageSize:$used:$perc");
   mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
 
     if($dr['storage_perc'] < '40' && $perc >= '40') {

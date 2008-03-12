@@ -72,31 +72,31 @@
     $graph = unixfsgraph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'calls':
-    $graph = callsgraphSNOM ($hostname . "-data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'ip_graph':
-    $graph = ip_graph ($hostname . "-netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = ip_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'icmp_graph':
-    $graph = icmp_graph ($hostname . "-netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = icmp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'tcp_graph':
-    $graph = tcp_graph ($hostname . "-netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = tcp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'udp_graph':
-    $graph = udp_graph ($hostname . "-netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = udp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'cpu':
     if($os == "Linux" || $os == "NetBSD" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "Windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfSense" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = cpugraphUnix ($hostname . "-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = cpugraphUnix ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS") {
-      $graph = cpugraph ($hostname . "-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
-      $graph = cpugraphwin ($hostname . "-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = cpugraphwin ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "ProCurve") {
-      $graph = cpugraphHP ($hostname . "-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = cpugraphHP ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Snom") {
-      $graph = callsgraphSNOM ($hostname . "-data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'temp':
@@ -107,35 +107,35 @@
     break;
   case 'mem':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
-      $graph = memgraphUnix ($hostname . "-mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = memgraphUnix ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS") {
-      $graph = memgraph ($hostname . "-mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
     } elseif($os == "ProCurve") {
-      $graph = memgraphHP ($hostname . "-mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = memgraphHP ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'load':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
-      $graph = loadgraphUnix ($hostname . "-load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = loadgraphUnix ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS") {
-      $graph = loadgraph ($hostname . "-load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = loadgraph ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
-      $graph = loadgraphwin ($hostname . "-load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = loadgraphwin ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'users':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
-      $graph = usersgraphUnix ($hostname . "-sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = usersgraphUnix ($hostname . "/sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
-      $graph = usersgraphwin ($hostname . "-sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = usersgraphwin ($hostname . "/sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'procs':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
-      $graph = procsgraphUnix ($hostname . "-sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = procsgraphUnix ($hostname . "/sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
-      $graph = procsgraphwin ($hostname . "-sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = procsgraphwin ($hostname . "/sys.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'unixfs':
@@ -146,7 +146,7 @@
   case 'postfix':
   case 'mail':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = mailsgraphUnix ($hostname . "-mailstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = mailsgraphUnix ($hostname . "/mailstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'mailerrors':
@@ -157,17 +157,17 @@
     break;
   case 'courier':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = couriergraphUnix ($hostname . "-courierstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = couriergraphUnix ($hostname . "/courierstats.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'apachehits':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = apachehitsgraphUnix ($hostname . "-apache.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = apachehitsgraphUnix ($hostname . "/apache.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
   case 'apachebits':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = apachebitsgraphUnix ($hostname . "-apache.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = apachebitsgraphUnix ($hostname . "/apache.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
 

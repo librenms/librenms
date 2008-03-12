@@ -57,7 +57,7 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
     $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
     $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
-    $temprrd  = addslashes("rrd/$hostname-temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+    $temprrd  = addslashes("rrd/$hostname/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
     $temprrd  = str_replace(")", "_", $temprrd);
     $temprrd  = str_replace("(", "_", $temprrd);
     $opts[] = "DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE";
@@ -117,7 +117,7 @@ function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
     $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
     $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
-    $temprrd  = addslashes("rrd/$hostname-temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+    $temprrd  = addslashes("rrd/$hostname/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
     $temprrd  = str_replace(")", "_", $temprrd);
     $temprrd  = str_replace("(", "_", $temprrd);
     $options .= " DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE ";
