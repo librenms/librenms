@@ -4,7 +4,7 @@
   <center><br />
 <table  border='0' cellpadding='20' cellspacing='20' bgcolor='#e8e8e8'>
     <tr>
-      <td><div align='right'><img src='/images/password.png' width='128' height='128'></div></td>
+      <td><div align='right'><img src='images/password.png' width='128' height='128'></div></td>
       <td>
         <form action='". $_SERVER['REQUEST_URI'] ."' method=post>
           <h3>Please log in:</h3>

@@ -13,7 +13,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   unset($icon);
 
   $icon = geteventicon($entry['message']);
-  if($icon) {$icon = "<img src='/images/16/$icon'>"; }
+  if($icon) {$icon = "<img src='images/16/$icon'>"; }
 
 
 
