@@ -68,7 +68,7 @@ function popUp(URL) {
   <table width="100%" style="padding: 0px; margin:0px;">
     <tr>
       <td style="padding: 0px; margin:0px; border: none;">
-        <div id=logo style="padding: 10px"><a href="/"><img src="<?php echo("$title_image"); ?>" border="0" /></a></div>
+        <div id=logo style="padding: 10px"><a href="index.php"><img src="<?php echo("$title_image"); ?>" border="0" /></a></div>
       </td>
       <td align=right style="margin-right: 10px;">
         <div id="topnav" style="float: right;">
