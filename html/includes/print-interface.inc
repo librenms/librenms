@@ -22,7 +22,7 @@
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
   if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
-    $error_img = generateiflink($interface,"<img src='/images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
+    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
   } else { $error_img = ""; }
 
   $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
@@ -46,9 +46,9 @@
     $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
     $out_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
    
-    echo("<img src='/images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . 
+    echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . 
       formatRates($interface['in_rate']) . "</span><br />");
-    echo("<img align=absmiddle src='/images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . 
+    echo("<img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . 
       formatRates($interface['out_rate']) . "</span>");
     
   }

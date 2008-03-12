@@ -22,7 +22,7 @@ while($interface = mysql_fetch_array($query)) {
   $type = humanmedia($interface['ifType']);
 
     if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
-    $error_img = generateiflink($interface,"<img src='/images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
+    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
 

@@ -27,7 +27,7 @@ while($device = mysql_fetch_array($device_query)) {
      $hostalerts = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices AS D, devices_perms AS P WHERE location = '" . $device['location'] . "' AND status = '0'"),0); 
    }
 
-   if($hostalerts) { $alert = "<img src='/images/16/flag_red.png'>"; }
+   if($hostalerts) { $alert = "<img src='images/16/flag_red.png'>"; }
 
    $loc = $device[location];
 
