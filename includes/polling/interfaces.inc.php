@@ -32,7 +32,11 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $ifAlias = trim(str_replace("\"", "", $ifAlias));
   $ifAlias = trim($ifAlias);
 
-  $rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  $old_rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd";
+
+  if(is_file($old_rrdfile) && !is_file($rrdfile)) { rename($old_rrdfile, $rrdfile); echo("Moving $old_rrdfile to $rrdfile");  }
+
   if(!is_file($rrdfile)) {
     $woo = `rrdtool create $rrdfile \
       DS:INOCTETS:COUNTER:600:U:100000000000 \

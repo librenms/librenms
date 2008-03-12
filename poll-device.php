@@ -35,6 +35,10 @@ while ($device = mysql_fetch_array($device_query)) {
 
   $pingable = isPingable($device['hostname']);
 
+  $host_rrd = $rrd_dir . "/" . $device['hostname'];
+
+  if(!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
+
   if($pingable) { echo("Pings : yes :)\n"); } else { echo("Pings : no :(\n"); }
 
   $snmpable = FALSE;
@@ -249,7 +253,11 @@ while ($device = mysql_fetch_array($device_query)) {
       mail($notify_email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
     }
 
-    $uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
+    $uptime_rrd    = $rrd_dir . "/" . $device['hostname'] . "/uptime.rrd";
+
+    $old_uptime_rrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
+    if(is_file($old_uptime_rrd) && !is_file($uptimerrd)) { rename($old_uptime_rrd, $uptime_rrd); echo("Moving $old_uptime_rrd to $uptime_rrd");  }
+
     if(!is_file($uptimerrd)) {
       $woo = `rrdtool create $uptimerrd \
         DS:uptime:GAUGE:600:0:U \

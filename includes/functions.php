@@ -154,8 +154,8 @@ function truncate($substring, $max = 50, $rep = '...') {
 
 
 function interface_rates ($interface) {
-  global $config;
-  $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  global $config, $rrd_dir;
+  $rrdfile = $rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd  = $config['rrdtool']." fetch -s -600s -e now ".$rrdfile." AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
   $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
@@ -169,7 +169,7 @@ function interface_rates ($interface) {
 
 function interface_errors ($interface) {
   global $config;
-  $rrdfile = "rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+  $rrdfile = $rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
@@ -251,6 +251,7 @@ $type = strtolower($data['os']);
 
 
 function delHost($id) {
+  global $rrd_dir;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
@@ -272,7 +273,8 @@ function delHost($id) {
   mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  `rm -f rrd/$host-*.rrd`;
+  `rm -f $rrd_dir/$host-*.rrd`;
+  `rm -rf $rrd_dir/$host`;
   echo("Removed device $host<br />");
 }
 

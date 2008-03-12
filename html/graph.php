@@ -51,19 +51,19 @@
     $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;  
   case 'bits':
-    $graph = trafgraph ($hostname . ".". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = trafgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'pkts':
-    $graph = pktsgraph ($hostname . ".". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = pktsgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'errors':
-    $graph = errorgraph ($hostname . ".". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = errorgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'nupkts':
-    $graph = nucastgraph ($hostname . ".". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = nucastgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'uptime':
-    $graph = uptimegraph ($hostname . "-uptime.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = uptimegraph ($hostname . "/uptime.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'unixfs_dev':
     $graph = unixfsgraph_dev ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
