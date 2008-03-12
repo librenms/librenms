@@ -2,8 +2,8 @@
 
 ### Database config
 $config['db_host'] = "localhost";
-$config['db_user'] = "root";
-$config['db_pass'] = "katak";
+$config['db_user'] = "observer";
+$config['db_pass'] = "observer-pass";
 $config['db_name'] = "observer-demo";
 
 
@@ -11,6 +11,8 @@ $config['db_name'] = "observer-demo";
 $installdir 	= "/var/sites/observer/";
 $htmldir	= $installdir . "html";
 $rrd_dir	= $installdir . "rrd";
+
+$base_url = "http://demo.project-observer.org";
 
 ### Default community
 $community = "";
