@@ -570,7 +570,7 @@ function createHost ($host, $community, $snmpver){
               $nullhost = '0';
            }
         }
-        if($nullhost == '0') {
+        if($nullhost == '0' && $host_os) {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `os`, `status`) VALUES ('$host', '$community', '$host_os', '1')");
            return("Created host : $host ($host_os)");
         } else {
