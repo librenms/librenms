@@ -168,7 +168,7 @@ function interface_rates ($interface) {
 
 
 function interface_errors ($interface) {
-  global $config;
+  global $config, $rrd_dir;
   $rrdfile = $rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(`$cmd`);

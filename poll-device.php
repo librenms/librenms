@@ -31,7 +31,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("Polling " . $device['hostname'] . " ( ".$device['device_id']." )\n\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
-  unset($location); unset($hardware); unset($sysDescr);
+  unset($location); unset($hardware); unset($sysDescr); unse$sysContact);
 
   $pingable = isPingable($device['hostname']);
 

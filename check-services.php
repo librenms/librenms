@@ -34,6 +34,6 @@ while ($service = mysql_fetch_array($query)) {
   } else { unset($updated); }
   $update_sql = "UPDATE `services` SET `service_status` = '$status', `service_message` = '" . addslashes($check) . "', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '" . $service['service_id']. "'";
   mysql_query($update_sql);
-  echo("$update_sql " . mysql_affected_rows() . " rows updated\n");
+#  echo("$update_sql " . mysql_affected_rows() . " rows updated\n");
 }
 ?>
