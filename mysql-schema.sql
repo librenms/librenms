@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: fennel.vostron.net
--- Generation Time: Nov 30, 2007 at 02:47 PM
+-- Generation Time: Mar 12, 2008 at 09:15 AM
 -- Server version: 5.0.22
 -- PHP Version: 5.1.2
 -- 
@@ -21,7 +21,7 @@ CREATE TABLE `adjacencies` (
   `network_id` int(11) NOT NULL default '0',
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`adj_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=316 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -37,7 +37,86 @@ CREATE TABLE `alerts` (
   `time_logged` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `alerted` smallint(6) NOT NULL default '0',
   KEY `id` (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=4765 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `bgpPeers`
+-- 
+
+CREATE TABLE `bgpPeers` (
+  `bgpPeer_id` int(11) NOT NULL auto_increment,
+  `device_id` int(11) NOT NULL,
+  `bgpPeerIdentifier` text NOT NULL,
+  `bgpPeerRemoteAs` int(11) NOT NULL,
+  `bgpPeerState` text NOT NULL,
+  `bgpPeerAdminStatus` text NOT NULL,
+  `bgpPeerLocalAddr` text NOT NULL,
+  `bgpPeerRemoteAddr` text NOT NULL,
+  `bgpPeerInUpdates` int(11) NOT NULL,
+  `bgpPeerOutUpdates` int(11) NOT NULL,
+  `bgpPeerInTotalMessages` int(11) NOT NULL,
+  `bgpPeerOutTotalMessages` int(11) NOT NULL,
+  `bgpPeerFsmEstablishedTime` int(11) NOT NULL,
+  `bgpPeerInUpdateElapsedTime` int(11) NOT NULL,
+  PRIMARY KEY  (`bgpPeer_id`),
+  KEY `device_id` (`device_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `bill_data`
+-- 
+
+CREATE TABLE `bill_data` (
+  `bill_id` int(11) NOT NULL,
+  `timestamp` datetime NOT NULL,
+  `period` int(11) NOT NULL,
+  `delta` bigint(11) NOT NULL,
+  `in_delta` bigint(11) NOT NULL,
+  `out_delta` bigint(11) NOT NULL,
+  KEY `bill_id` (`bill_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `bill_perms`
+-- 
+
+CREATE TABLE `bill_perms` (
+  `user_id` int(11) NOT NULL,
+  `bill_id` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `bill_ports`
+-- 
+
+CREATE TABLE `bill_ports` (
+  `bill_id` int(11) NOT NULL,
+  `port_id` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `bills`
+-- 
+
+CREATE TABLE `bills` (
+  `bill_id` int(11) NOT NULL auto_increment,
+  `bill_name` text NOT NULL,
+  `bill_type` text NOT NULL,
+  `bill_cdr` int(11) default NULL,
+  `bill_day` int(11) NOT NULL default '1',
+  `bill_gb` int(11) default NULL,
+  UNIQUE KEY `bill_id` (`bill_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -53,7 +132,7 @@ CREATE TABLE `customers` (
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`customer_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -85,7 +164,7 @@ CREATE TABLE `devices` (
   `type` varchar(8) NOT NULL default 'other',
   PRIMARY KEY  (`device_id`),
   KEY `status` (`status`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=92 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -98,9 +177,10 @@ CREATE TABLE `devices_attribs` (
   `device_id` int(11) NOT NULL,
   `attrib_type` varchar(32) NOT NULL,
   `attrib_value` int(11) NOT NULL,
+  `updated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`attrib_id`),
   FULLTEXT KEY `attrib_type` (`attrib_type`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=78 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -137,7 +217,7 @@ CREATE TABLE `entPhysical` (
   `ifIndex` int(11) default NULL,
   PRIMARY KEY  (`entPhysical_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=931 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -190,7 +270,19 @@ CREATE TABLE `interfaces` (
   KEY `host` (`device_id`),
   KEY `snmpid` (`ifIndex`),
   KEY `if_2` (`ifDescr`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=4784 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `interfaces_perms`
+-- 
+
+CREATE TABLE `interfaces_perms` (
+  `user_id` int(11) NOT NULL,
+  `interface_id` int(11) NOT NULL,
+  `access_level` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -206,7 +298,7 @@ CREATE TABLE `ipaddr` (
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `addr` (`addr`,`cidr`,`interface_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=2578 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -221,7 +313,7 @@ CREATE TABLE `links` (
   `active` tinyint(4) NOT NULL default '1',
   `cdp` int(11) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=303 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -243,7 +335,7 @@ CREATE TABLE `logs` (
   KEY `host` (`host`),
   KEY `datetime` (`datetime`),
   KEY `seq` (`seq`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=12203343 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -256,7 +348,35 @@ CREATE TABLE `networks` (
   `cidr` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `cidr` (`cidr`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=542 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `port_in_measurements`
+-- 
+
+CREATE TABLE `port_in_measurements` (
+  `port_id` int(11) NOT NULL,
+  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `counter` bigint(11) NOT NULL,
+  `delta` bigint(11) NOT NULL,
+  KEY `port_id` (`port_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `port_out_measurements`
+-- 
+
+CREATE TABLE `port_out_measurements` (
+  `port_id` int(11) NOT NULL,
+  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  `counter` bigint(11) NOT NULL,
+  `delta` bigint(11) NOT NULL,
+  KEY `port_id` (`port_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -278,7 +398,7 @@ CREATE TABLE `services` (
   `service_message` text NOT NULL,
   PRIMARY KEY  (`service_id`),
   KEY `service_host` (`service_host`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=61 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -296,7 +416,7 @@ CREATE TABLE `storage` (
   `hrStorageUsed` int(11) NOT NULL,
   `storage_perc` text NOT NULL,
   PRIMARY KEY  (`storage_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=88 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -317,7 +437,7 @@ CREATE TABLE `syslog` (
   PRIMARY KEY  (`seq`),
   KEY `host` (`host`),
   KEY `datetime` (`datetime`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=9375565 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -335,7 +455,7 @@ CREATE TABLE `temperature` (
   `temp_limit` tinyint(4) NOT NULL default '60',
   PRIMARY KEY  (`temp_id`),
   KEY `temp_host` (`temp_host`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=2789 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -352,9 +472,7 @@ CREATE TABLE `users` (
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=16 ;
-
-INSERT into users (username, password, descr, level) values ('admin',MD5('observer'),'Admin',10);
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -370,5 +488,5 @@ CREATE TABLE `vlans` (
   `vlan_descr` text,
   PRIMARY KEY  (`vlan_id`),
   KEY `device_id` (`device_id`,`vlan_vlan`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1016 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
