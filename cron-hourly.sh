@@ -11,3 +11,4 @@
 ./discover-vlans.php
 ./update-interface.php
 ./check-errors.php
+./discover-cisco-physical.php
