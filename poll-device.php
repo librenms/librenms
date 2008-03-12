@@ -253,10 +253,10 @@ while ($device = mysql_fetch_array($device_query)) {
       mail($notify_email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
     }
 
-    $uptime_rrd    = $rrd_dir . "/" . $device['hostname'] . "/uptime.rrd";
+    $uptimerrd    = $rrd_dir . "/" . $device['hostname'] . "/uptime.rrd";
 
-    $old_uptime_rrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
-    if(is_file($old_uptime_rrd) && !is_file($uptimerrd)) { rename($old_uptime_rrd, $uptime_rrd); echo("Moving $old_uptime_rrd to $uptime_rrd");  }
+    $old_uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
+    if(is_file($old_uptimerrd) && !is_file($uptimerrd)) { rename($old_uptimerrd, $uptimerrd); echo("Moving $old_uptimerrd to $uptimerrd");  }
 
     if(!is_file($uptimerrd)) {
       $woo = `rrdtool create $uptimerrd \
