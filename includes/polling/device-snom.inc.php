@@ -24,7 +24,7 @@
    $rxbytes = 0 - $rxbytes * 8;
    echo("$rxbytes, $rxpkts, $txbytes, $txpkts, $calls, $registrations");
 
-   $rrdfile = "rrd/" . $device['hostname'] . "-data.rrd";
+   $rrdfile = $rrd_dir . "/" . $device['hostname'] . "/data.rrd";
    if(!is_file($rrdfile)) {
     $woo = `rrdtool create $rrdfile \
       DS:INOCTETS:COUNTER:600:U:100000000000 \

@@ -4,12 +4,19 @@
    $id = $device['device_id'];
    $hostname = $device['hostname'];
 
-   $temprrd  = "rrd/" . $hostname . "-temp.rrd";
-   $tempgraph = "public_html/graphs/" . $hostname . "-temp.png";
-   $cpurrd   = "rrd/" . $hostname . "-cpu.rrd";
-   $cpugraph = "public_html/graphs/" . $hostname . "-cpu.png";   
-   $memrrd   = "rrd/" . $hostname . "-mem.rrd";
-   $memgraph = "public_html/graphs/" . $hostname . "-mem.png";
+   $Otemprrd  = "rrd/" . $hostname . "-temp.rrd";
+   $Ocpurrd   = "rrd/" . $hostname . "-cpu.rrd";
+   $Omemrrd   = "rrd/" . $hostname . "-mem.rrd";
+
+   $temprrd  = $rrd_dir . "/" . $hostname . "/temp.rrd";
+   $cpurrd   = $rrd_dir . "/" . $hostname . "/cpu.rrd";
+   $memrrd   = $rrd_dir . "/" . $hostname . "/mem.rrd";
+
+   if(is_file($Otemprrd) && !is_file($temprrd)) { rename($Otemprrd, $temprrd); echo("Moving $Otemprrd to $temprrd");  }
+   if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
+   if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
+
+
    list ($cpu5m, $cpu5s) = explode("\n", `snmpget -O qv -v2c -c $community $hostname 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0`);
    $cpu5m = $cpu5m + 0;
    $cpu5s = $cpu5s + 0;

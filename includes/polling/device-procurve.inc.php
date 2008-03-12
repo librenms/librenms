@@ -1,7 +1,14 @@
 <?
 
-$cpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
-$memrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
+   $Ocpurrd   = "rrd/" . $hostname . "-cpu.rrd";
+   $Omemrrd   = "rrd/" . $hostname . "-mem.rrd";
+
+   $cpurrd   = $rrd_dir . "/" . $hostname . "/cpu.rrd";
+   $memrrd   = $rrd_dir . "/" . $hostname . "/mem.rrd";
+
+   if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
+   if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
+
 
 $cpu_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0";
 $cpu     = `$cpu_cmd`;
