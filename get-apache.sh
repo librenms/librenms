@@ -39,5 +39,3 @@ $d2 = int($d2);
 
 print "$up\n";
 print "$server";
-
-
