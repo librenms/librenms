@@ -17,7 +17,7 @@ if($_GET['type']) {
              <td><span class=list-large>" . generateiflink($interface,$interface['ifAlias']) . "</span><br /> 
             <span class=interface-desc>".generatedevicelink($interface)." ".generateiflink($interface)." </span></td></tr><tr bgcolor='$bg'><td>");
 
-if(file_exists("rrd/" . $interface['hostname'] . "." . $interface['ifIndex'] . ".rrd")) {
+if(file_exists($rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
 
     $graph_type = "bits";
     include("includes/print-interface-graphs.php");
