@@ -13,6 +13,7 @@ include("billing-functions.php");
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $rrdtool;
   return `$rrdtool update $rrdfile $rrdupdate`;
+
 }
 
 function getHostOS($hostname, $community, $snmpver) {
