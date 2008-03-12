@@ -25,7 +25,7 @@ function printEntPhysical($ent, $level, $class) {
          echo("<strong>".$ent['entPhysicalDescr']."</strong>");
        }
 
-
+       
 
        echo("<br /><div class='interface-desc' style='margin-left: 20px;'>" . $ent['entPhysicalDescr']);
 
@@ -39,7 +39,7 @@ function printEntPhysical($ent, $level, $class) {
        if($count) {
          echo("<ul>");
          printEntPhysical($ent['entPhysicalIndex'], $level+1, '');
-         echo("</ul>");
+	 echo("</ul>");
        }
        echo("</li>");
     }
@@ -59,5 +59,4 @@ function printEntPhysical($ent, $level, $class) {
 
 
 ?>
-
 

@@ -9,6 +9,7 @@ include("snom.php");
 include("graphing.php");
 include("print-functions.php");
 include("billing-functions.php");
+include("cisco-entities.php");
 
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $rrdtool;
