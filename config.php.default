@@ -58,7 +58,7 @@ $nets =  array ("192.168.0.0/24", "10.0.0.0/8");
 ### Your company domain name
 $config['mydomain'] = "project-observer.org";
 $mydomain = $config['mydomain'];
-$page_title  = "Project Observer";
+$page_title  = "Observer Demo";
 $title_image = "/images/observer-header.png";
 $stylesheet  = "/css/styles.css"; 
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";

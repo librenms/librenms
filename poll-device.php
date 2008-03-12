@@ -4,7 +4,7 @@
 include("config.php");
 include("includes/functions.php");
 
-echo("Project Observer Poller v$observer_version\n\n");
+echo("Observer Poller v$observer_version\n\n");
 
 if($argv[1] == "--device" && $argv[2]) {  
   $where = "AND `device_id` = '".$argv[2]."'";
