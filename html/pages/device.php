@@ -131,7 +131,7 @@ echo("</ul>");
 echo("
 <div class=contentstyle>");
 
-include("pages/$page/$section.inc");
+include("pages/device/$section.inc");
 
 echo("</div>
 ");
