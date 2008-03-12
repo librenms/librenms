@@ -12,7 +12,7 @@ if($device[os] != "Snom") {
                  'tcpEstabResets','tcpInSegs','tcpOutSegs','tcpRetransSegs','udpInDatagrams','udpOutDatagrams','udpInErrors',
                  'udpNoPorts');
 
-  $rrdfile = $rrd_file . "/" . $device['hostname'] . "/netinfo.rrd";
+  $rrdfile = $rrd_dir . "/" . $device['hostname'] . "/netinfo.rrd";
 
   $Orrdfile = "rrd/" . $device['hostname'] . "-netinfo.rrd";
   if(is_file($Orrdfile) && !is_file($rrdfile)) { rename($Orrdfile, $rrdfile); echo("Moving $Orrdfile to $rrdfile");  }
