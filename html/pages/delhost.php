@@ -11,7 +11,7 @@ if($_POST['id']) {
 
 ?>
 
-<form name="form1" method="post" action="/?page=delhost">
+<form name="form1" method="post" action="?page=delhost">
   <h1>Delete Host</h1>
   <br />
   <p><select name="id">
