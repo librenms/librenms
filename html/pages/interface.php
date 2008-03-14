@@ -51,7 +51,7 @@ if( !$broke)
 
 echo("<div style='clear: both;'>");
 
-if(file_exists("rrd/" . $hostname . ".". $ifIndex . ".rrd")) {
+if(file_exists("rrd/" . $hostname . "/". $ifIndex . ".rrd")) {
 
   $iid = $id;
   echo("<div class=graphhead>Interface Traffic</div>");
