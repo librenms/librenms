@@ -17,7 +17,7 @@ while ($data = mysql_fetch_array($query)) {
     $end = ip2long($broadcast);
     while($ip < $end) {
       $ipdotted = long2ip($ip);
-      if(mysql_result(mysql_query("SELECT count(id) FROM ipaddr WHERE addr = '$ipdotted'"),0) == '0' && match_network($nets, $ipdotted)) {
+      if(mysql_result(mysql_query("SELECT count(id) FROM ipaddr WHERE addr = '$ipdotted'"),0) == '0' && match_network($config['nets'], $ipdotted)) {
 	fputs($handle, $ipdotted . "\n");
       }
       $ip++;

@@ -36,6 +36,15 @@ if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id =
 </li>");
 }
 
+if($device['bgpLocalAs']) {
+  echo("
+<li class=" . $select['dev-bgp'] . ">
+  <a href='?page=device&id=" . $device['device_id'] . "&section=dev-bgp' >
+    <img src='images/16/link.png' align=absmiddle border=0> BGP
+  </a>
+</li>");
+}
+
 if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=" . $select['dev-ifs'] . ">
