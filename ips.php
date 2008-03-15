@@ -34,7 +34,7 @@ while ($device = mysql_fetch_array($q)) {
         echo("Create Subnet $network\n");
       }
      $network_id = mysql_result(mysql_query("SELECT id from `networks` WHERE `cidr` = '$network'"), 0);
-      if (match_network($nets, $address) && mysql_result(mysql_query("SELECT COUNT(*) FROM `adjacencies` WHERE `network_id` = '$network_id' AND `interface_id` = '$interface_id'"), 0) < '1') {
+      if (match_network($config['nets'], $address) && mysql_result(mysql_query("SELECT COUNT(*) FROM `adjacencies` WHERE `network_id` = '$network_id' AND `interface_id` = '$interface_id'"), 0) < '1') {
         mysql_query("INSERT INTO `adjacencies` (`network_id`, `interface_id`) VALUES ('$network_id', '$interface_id')");
         echo("Create Adjacency : $hostname, $interface_id, $network_id, $network, $ifIndex\n");
       }

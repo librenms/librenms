@@ -604,6 +604,12 @@ function getifhost($id) {
      return $result;
 }
 
+function getpeerhost($id) {
+     $sql = mysql_query("SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = '$id'");
+     $result = @mysql_result($sql, 0);
+     return $result;
+}
+
 function getifindexbyid($id) {
      $sql = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);

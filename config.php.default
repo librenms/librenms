@@ -53,16 +53,15 @@ $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 
 
 ### List of networks to allow scanning-based discovery
-$nets =  array ("192.168.0.0/24", "10.0.0.0/8");
+$config['nets'] =  array ("192.168.0.0/24", "10.0.0.0/8");
 
 ### Your company domain name
 $config['mydomain'] = "project-observer.org";
-$mydomain = $config['mydomain'];
-$page_title  = "Observer Demo";
-$title_image = "/images/observer-header.png";
-$stylesheet  = "/css/styles.css"; 
+$config['page_title']  = "Observer Demo";
+$config['title_image'] = "/images/observer-header.png";
+$config['stylesheet']  = "/css/styles.css"; 
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
-$favicon = "/favicon.ico";
+$config['favicon'] = "/favicon.ico";
 
 $config['email_default']  = "admin@project-observer.org";
 $config['email_from']     = "observer@project-observer.org";

@@ -34,15 +34,15 @@ while($loc_data = mysql_fetch_array($loc_result)) {
   while($dev_data = mysql_fetch_array($dev_result)) {
 	$host = $dev_data['hostname'];
         unset($hostinfo);	
-        if(strpos($host, "cust." . $mydomain)) { $hostinfo = "shape=egg style=filled fillcolor=pink"; }
-	elseif(strpos($host, $mydomain)) { 
+        if(strpos($host, "cust." . $config['mydomain'])) { $hostinfo = "shape=egg style=filled fillcolor=pink"; }
+	elseif(strpos($host, $config['mydomain'])) { 
           if(strpos($host, "-sw")||strpos($host, "-cs")) { $hostinfo = "shape=rectangle style=filled fillcolor=skyblue"; } 
           if(strpos($host, "-gw")||strpos($host, "-pe")||strpos($host, "-er")) { $hostinfo = "shape=ellipse style=filled fillcolor=darkolivegreen3"; }
 	  if(strpos($host, "-lns")) { $hostinfo = "shape=egg style=filled fillcolor=darkolivegreen4"; }
         } else { $hostinfo = "style=filled shape=circle fillcolor=lightgray"; }
 
         $host = $dev_data[hostname];
-	$host = str_replace("." . $mydomain,"", $host);
+	$host = str_replace("." . $config['mydomain'],"", $host);
 	echo("\"$host\" [$hostinfo]
   ");	
 
@@ -64,8 +64,8 @@ while($loc_data = mysql_fetch_array($loc_result)) {
         $src_speed = $sq[1];
         $dst_speed = $dq[1];
 
-        $src = str_replace("." . $mydomain, "", $src);
-        $dst = str_replace("." . $mydomain, "", $dst);
+        $src = str_replace("." . $config['mydomain'], "", $src);
+        $dst = str_replace("." . $config['mydomain'], "", $dst);
 
         $info = "";
 
@@ -125,8 +125,8 @@ while($link_data = mysql_fetch_array($links_result)) {
 	$src_speed = $sq[1]; 
 	$dst_speed = $dq[1];
 
-	$src = str_replace("." . $mydomain, "", $src);
-	$dst = str_replace("." . $mydomain, "", $dst);
+	$src = str_replace("." . $config['mydomain'], "", $src);
+	$dst = str_replace("." . $config['mydomain'], "", $dst);
 
 	$info = "";
 

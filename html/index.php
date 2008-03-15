@@ -28,11 +28,11 @@ if($_GET[debug]) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
   <title><?php echo("$page_title"); ?></title>
-  <base href="<?php echo("$base_url"); ?>" />
+  <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <!-- <meta http-equiv="refresh" content="300"> -->
-  <link href="<?php  echo($stylesheet);  ?>" rel="stylesheet" type="text/css">
-  <link rel="shortcut icon" href="<?php  echo($favicon);  ?>" />
+  <link href="<?php  echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css">
+  <link rel="shortcut icon" href="<?php  echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css">
 </head>
 <script type="text/javascript" src="js/mktree.js"></script>
@@ -55,7 +55,7 @@ function popUp(URL) {
 <td align=right>
   <? 
      if($_SESSION['authenticated']) { 
-       echo("Logged in as <b>$_SESSION[username]</b> (<a href='?logout=yes'>Logout</a>)"); 
+       echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='?logout=yes'>Logout</a>)"); 
      } else { 
        echo("Not logged in!"); 
      } 
@@ -68,7 +68,7 @@ function popUp(URL) {
   <table width="100%" style="padding: 0px; margin:0px;">
     <tr>
       <td style="padding: 0px; margin:0px; border: none;">
-        <div id=logo style="padding: 10px"><a href="index.php"><img src="<?php echo("$title_image"); ?>" border="0" /></a></div>
+        <div id=logo style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" border="0" /></a></div>
       </td>
       <td align=right style="margin-right: 10px;">
         <div id="topnav" style="float: right;">

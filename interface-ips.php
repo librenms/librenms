@@ -19,7 +19,7 @@ while ($device = mysql_fetch_array($q)) {
     $address = $oid;
     $cidr = netmask2cidr($netmask);
     $network = trim(`$ipcalc $address/$mask | grep Network | cut -d" " -f 4`);
-    if (match_network($nets, $address) && $network != "") {
+    if (match_network($config['nets'], $address) && $network != "") {
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `networks` WHERE `cidr` = '$network'"), 0) < '1') {
         $woo = mysql_query("INSERT INTO `networks` (`id`, `cidr`) VALUES ('', '$network')");
         echo("Create Subnet $network\n");

@@ -22,7 +22,11 @@
   } elseif($_GET['if']) {
     $device_id = getifhost($_GET['if']);
     $ifIndex = getifindexbyid($_GET['if']);
+  } elseif($_GET['peer']) {
+    $device_id = getpeerhost($_GET['peer']);
   }
+
+
   if($device_id) {
     $hostname = gethostbyid($device_id);
   }
@@ -70,6 +74,10 @@
     break;
   case 'unixfs':
     $graph = unixfsgraph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'bgpupdates':
+    $bgpPeerIdentifier = mysql_result(mysql_query("SELECT bgpPeerIdentifier FROM bgpPeers WHERE bgpPeer_id = '".$_GET['peer']."'"),0);
+    $graph = bgpupdatesgraph ($hostname . "/bgp-" . $bgpPeerIdentifier . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'calls':
     $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);

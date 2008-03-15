@@ -36,11 +36,11 @@ while ($device = mysql_fetch_array($device_query)) {
     $dst_if = strtolower($dst_if);
     $src_host = strtolower($src_host);
     $src_if = strtolower($src_if);
-    if ( isDomainResolves($dst_host . "." . $mydomain) ) { 
-      $dst_host = $dst_host . "." . $mydomain; 
+    if ( isDomainResolves($dst_host . "." . $config['mydomain']) ) { 
+      $dst_host = $dst_host . "." . $config['mydomain']; 
     }
     $ip = gethostbyname($dst_host);
-    if ( match_network($nets, $ip) ) {	   
+    if ( match_network($config['nets'], $ip) ) {	   
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$dst_host'"), 0) == '0' ) {
         createHost ($dst_host, $community, "v2c");
       } else { 
