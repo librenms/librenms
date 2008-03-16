@@ -2,21 +2,21 @@
 
 ### Database config
 $config['db_host'] = "localhost";
-$config['db_user'] = "observer";
-$config['db_pass'] = "observer-pass";
-$config['db_name'] = "observer-demo";
-
+$config['db_user'] = "observer_demo";
+$config['db_pass'] = "observer_pass";
+$config['db_name'] = "observer_demo";
 
 ### Installation Location
-$installdir 	= "/var/sites/observer/";
+$installdir 	= "/home/adama/sites/demo.project-observer.org/";
 $htmldir	= $installdir . "html";
-$rrd_dir	= $installdir . "rrd";
-
-$base_url = "http://demo.project-observer.org";
+$config['rrd_dir'] = $installdir . "rrd";
+$rrd_dir = $config['rrd_dir'];
 
 ### Default community
-$community = "";
+$config['community'] = "observer";
 $community = $config['community'];
+
+$base_url = "http://demo.project-observer.org";
 
 ### File containing syslog
 $syslogfile = "";
@@ -42,54 +42,51 @@ $snmpget = $config['snmpget'];
 
 # Set the general colours and other settings for rrdtool graphs
 
-# Set some default colors for all RRD graphs
 $config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#E5E5E5", "-c", "SHADEB#E5E5E5",
                                      "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#aaaaaa",
                                      "-c", "MGRID#FFAAAA", "-c", "FRAME#5e5e5e", "-c", "ARROW#5e5e5e",
                                      "-R", "normal");
 
-#Set some default properties for overlib popups
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 
 
 ### List of networks to allow scanning-based discovery
-$config['nets'] =  array ("192.168.0.0/24", "10.0.0.0/8");
+$config['nets'] =  array ("89.21.224.0/19", "10.0.0.0/8", "172.22.0.0/16", "213.253.1.0/24");
 
-### Your company domain name
-$config['mydomain'] = "project-observer.org";
+### Your company domain name and specifics
+$config['mydomain'] = "vostron.net";
 $config['page_title']  = "Observer Demo";
-$config['title_image'] = "/images/observer-header.png";
-$config['stylesheet']  = "/css/styles.css"; 
+$config['title_image'] = "images/observer-header.png";
+$config['stylesheet']  = "css/styles.css"; 
 $mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
-$config['favicon'] = "/favicon.ico";
+$config['favicon'] = "favicon.ico";
 
-$config['email_default']  = "admin@project-observer.org";
-$config['email_from']     = "observer@project-observer.org";
+$config['email_default']  = "adama@memetic.org";
+$config['email_from']     = "Observer demo <observer-demo@project-observer.org>";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
+
 
 ### Which interface sections should we show?
 $show_if_customers = 1;
 $show_if_transit = 0;
 $show_if_peering = 0;
 $show_if_core = 0;
-$show_if_l2tp = 0;
+$show_if_l2tp =0;
 $show_locations = 1;
-$show_if_bills = 1;
 
 $enable_syslog = 1;
 
-### Interface name strings to ignore during discovery
-
+### Interface name strings to ignore
 $bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm",
              "async", "plip", "-physical", "-signalling", "control plane",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
 
-### Mountpoints to ignore during discovery
+### Mountpoints to ignore
 
 $ignore_mount = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
 
-### List of OS strings to match during discovery
+### Valis OSes
 $valid_os = array("IOS", "Linux", "OpenBSD", "FreeBSD", "NetBSD", "ProCurve", "m0n0wall", "pfSense", "Snom", "Voswall", "DragonFly");
 
 ### entPhysicalVendorType rewrites

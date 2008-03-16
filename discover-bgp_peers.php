@@ -13,7 +13,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   $as_cmd  = $config['snmpwalk'] . " -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'] . " ";
   $as_cmd .= ".1.3.6.1.2.1.15.2";
-  $bgpLocalAs = trim(`$as_cmd`);
+  $bgpLocalAs = trim(shell_exec($as_cmd));
 
   if($bgpLocalAs) {
 
@@ -29,7 +29,7 @@ while ($device = mysql_fetch_array($device_query)) {
       if($peer) {
         list($peer_ip, $peer_as) = split(" ",  $peer);
 
-	$astext = trim(`/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | sed s/\"//g | cut -d "|" -f 5`);
+	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5")));
 
         echo(str_pad($peer_ip, 32). str_pad($astext, 32) . " $peer_as ");
 
@@ -43,7 +43,7 @@ while ($device = mysql_fetch_array($device_query)) {
         $peer_cmd  = $config['snmpget'] . " -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'] . " ";
         $peer_cmd .= "bgpPeerState.$peer_ip bgpPeerAdminStatus.$peer_ip bgpPeerInUpdates.$peer_ip bgpPeerOutUpdates.$peer_ip bgpPeerInTotalMessages.$peer_ip ";
         $peer_cmd .= "bgpPeerOutTotalMessages.$peer_ip bgpPeerFsmEstablishedTime.$peer_ip bgpPeerInUpdateElapsedTime.$peer_ip";
-	$peer_data = trim(`$peer_cmd`);
+	$peer_data = trim(shell_exec($peer_cmd));
 
 	$peerrrd    = $rrd_dir . "/" . $device['hostname'] . "/bgp-$peer_ip.rrd";
 
