@@ -4,7 +4,7 @@ if($_GET['location']) { $where = "AND location = '$_GET[location]'"; }
 if($_GET['location'] == "Unset") { $where = "AND location = ''"; }
 if($_GET['type']) { $where = "AND type = '$_GET[type]'"; }
 
-$sql = "select * from devices WHERE 1 $where ORDER BY `ignore`, `status`, `os`, `hostname`";
+$sql = "select * from devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostname`";
 if($_GET['status'] == "alerted") { 
   $sql = "select * from devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";  
 }
