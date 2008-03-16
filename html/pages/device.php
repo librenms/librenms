@@ -68,8 +68,7 @@ echo("<li class=" . $select['dev-graphs'] . ">
 
 if(@mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
 
-  echo("
-<li class=" . $select['dev-enyphysical'] . ">
+  echo("<li class=" . $select['dev-entphysical'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-entphysical'>
     <img src='images/16/bricks.png' align=absmiddle border=0> Inventory
   </a>
