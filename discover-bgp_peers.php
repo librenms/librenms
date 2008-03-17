@@ -29,6 +29,8 @@ while ($device = mysql_fetch_array($device_query)) {
       if($peer) {
         list($peer_ip, $peer_as) = split(" ",  $peer);
 
+	$peerlist[] = $device['device_id'] ." $peer_ip";
+
 	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5")));
 
         echo(str_pad($peer_ip, 32). str_pad($astext, 32) . " $peer_as ");
@@ -40,57 +42,56 @@ while ($device = mysql_fetch_array($device_query)) {
 
         ### Poll BGP Peer
 
-        $peer_cmd  = $config['snmpget'] . " -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'] . " ";
-        $peer_cmd .= "bgpPeerState.$peer_ip bgpPeerAdminStatus.$peer_ip bgpPeerInUpdates.$peer_ip bgpPeerOutUpdates.$peer_ip bgpPeerInTotalMessages.$peer_ip ";
-        $peer_cmd .= "bgpPeerOutTotalMessages.$peer_ip bgpPeerFsmEstablishedTime.$peer_ip bgpPeerInUpdateElapsedTime.$peer_ip";
-	$peer_data = trim(shell_exec($peer_cmd));
+#        $peer_cmd  = $config['snmpget'] . " -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'] . " ";
+#        $peer_cmd .= "bgpPeerState.$peer_ip bgpPeerAdminStatus.$peer_ip bgpPeerInUpdates.$peer_ip bgpPeerOutUpdates.$peer_ip bgpPeerInTotalMessages.$peer_ip ";
+#        $peer_cmd .= "bgpPeerOutTotalMessages.$peer_ip bgpPeerFsmEstablishedTime.$peer_ip bgpPeerInUpdateElapsedTime.$peer_ip";
+#	$peer_data = trim(shell_exec($peer_cmd));
 
-	$peerrrd    = $rrd_dir . "/" . $device['hostname'] . "/bgp-$peer_ip.rrd";
+#	$peerrrd    = $rrd_dir . "/" . $device['hostname'] . "/bgp-$peer_ip.rrd";
 
-        if(!is_file($peerrrd)) {
-          $woo = `rrdtool create $peerrrd \
-	    DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 \
-	    DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 \
-            DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 \
-            DS:bgpPeerInTotal:COUNTER:600:U:100000000000 \
-            DS:bgpPeerEstablished:GAUGE:600:0:U \
-            RRA:AVERAGE:0.5:1:600 \
-            RRA:AVERAGE:0.5:6:700 \
-            RRA:AVERAGE:0.5:24:775 \
-            RRA:AVERAGE:0.5:288:797`;
-        }
+#        if(!is_file($peerrrd)) {
+#          $woo = `rrdtool create $peerrrd \
+#	    DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 \
+#	    DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 \
+ #           DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 \
+  #          DS:bgpPeerInTotal:COUNTER:600:U:100000000000 \
+  #          DS:bgpPeerEstablished:GAUGE:600:0:U \
+  #          RRA:AVERAGE:0.5:1:600 \
+  #          RRA:AVERAGE:0.5:6:700 \
+  #          RRA:AVERAGE:0.5:24:775 \
+  #          RRA:AVERAGE:0.5:288:797`;
+   #     }
 
-	rrdtool_update($peerrrd, "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
+#	rrdtool_update($peerrrd, "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
-        list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime) = explode("\n", $peer_data);
+ #       list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime) = explode("\n", $peer_data);
 
-	$update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
-        $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', astext = '$astext'";
-        $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'";
+#	$update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
+ #       $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', astext = '$astext'";
+  #      $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'";
 
-	mysql_query($update);
+#	mysql_query($update);
 
       } # end if $peer 
     } # End foreach 
   } # End BGP check
 } # End While
 
-## Delete removed sensors
+## Delete removed peers
 
-$sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.temp_host = D.device_id AND D.status = '1'";
+$sql = "SELECT * FROM bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id AND D.status = '1'";
 $query = mysql_query($sql);
 
-while ($sensor = mysql_fetch_array($query)) {
+while ($entry = mysql_fetch_array($query)) {
         unset($exists);
         $i = 0;
-        while ($i < count($temp_exists) && !$exists) {
-            $thistemp = $sensor['temp_host'] . " " . $sensor['temp_oid'];
-            if ($temp_exists[$i] == $thistemp) { $exists = 1; }
+        while ($i < count($peerlist) && !$exists) {
+            $this = $entry['device_id'] . " " . $entry['bgpPeerIdentifier'];
+            if ($peerlist[$i] == $this) { $exists = 1; }
             $i++;
         }
         if(!$exists) { 
-#          echo("Deleting...\n");
-#          mysql_query("DELETE FROM temperature WHERE temp_id = '" . $sensor['temp_id'] . "'"); 
+          mysql_query("DELETE FROM bgpPeers WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'"); 
         }
 }
 

@@ -83,4 +83,7 @@
    `rrdtool update $cpurrd N:$cpu5s:$cpu5m`;
    `rrdtool update $memrrd N:$memfreeio:$memusedio:$memfreeproc:$memusedproc:$memtotal`;
 
+   include("includes/polling/bgpPeer.inc.php");
+
+
 ?>
