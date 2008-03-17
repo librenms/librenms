@@ -18,18 +18,16 @@ while ($device = mysql_fetch_array($device_query)) {
 
    echo("$hostname\n");
 
-   $status = `$fping $hostname | cut -d " " -f 3`;
+   $status = shell_exec($config['fping'] . " $hostname | cut -d ' ' -f 3");
    $status = trim($status);
 
    if(strstr($status, "alive")) {
-     $pos = `snmpget -$snmpver -c $community -t 1 $hostname sysDescr.0`;
-#     echo("pos - $pos/n");
+     $pos = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname sysDescr.0");
      if($pos == '') { 
        $status='0';
-       $posb = `snmpget -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4`;
+       $posb = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4");
        if($posb == '') { } else { 
          $status='1'; 
-#         echo("posb - $posb/n");
        }
      } else { 
        $status='1'; 
