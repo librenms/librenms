@@ -34,7 +34,7 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
   <table width='200' border='0'>
     <tr>
       <td width='300'><div align='right'>Description</div></td>
-      <td colspan='3'><input name='descr' width='50'>$descr</textarea></td>
+      <td colspan='3'><input name='descr' width='50'>$descr</input></td>
     </tr>
    <tr>
       <td>
