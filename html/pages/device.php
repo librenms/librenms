@@ -36,7 +36,7 @@ if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id =
 </li>");
 }
 
-if($device['bgpLocalAs']) {
+if($config['enable_bgp'] && $device['bgpLocalAs']) {
   echo("
 <li class=" . $select['dev-bgp'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-bgp' >

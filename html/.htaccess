@@ -8,8 +8,15 @@ RewriteCond %{REQUEST_URI} !^(.*)\.jpg$
 RewriteCond %{REQUEST_URI} !^(.*)\.gif$
 RewriteCond %{REQUEST_URI} !^(.*)\.png$
 
-RewriteRule ^([a-z]+)$	?page=$1
+## Rewrites for Devices
 
-RewriteRule ^bills/([0-9]+) ?page=bills&bill=$1
+RewriteRule ^devices/location/(.+)/ ?page=devices&location=$1
+RewriteRule ^devices/alerted/ ?page=devices&status=alerted
+RewriteRule ^devices/alerted/ ?page=devices&status=alerted
+RewriteRule ^devices/(.+)/ ?page=devices&type=$1
+
+RewriteRule ^bill/([0-9]+) ?page=bills&bill=$1
 RewriteRule ^device/([0-9]+) ?page=device&id=$1
+
+RewriteRule ^([a-z]+)/$ ?page=$1
 

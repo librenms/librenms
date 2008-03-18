@@ -1,22 +1,36 @@
 <?php
 
    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
+
+   echo("<tr><td colspan=6><h2>Local AS : " . $device['bgpLocalAs'] . "</h2></td></tr>");
+
    $i = "1";
    $peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");
    while($peer = mysql_fetch_array($peer_query)) {
 
      if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-     if($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
+     #if($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
      if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_colour = "#fcc"; }
+     if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "red"; $bg_colour = "#ccc"; }
+
+     if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
 
      $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
      if($peerhost) { $peername = generatedevicelink($peerhost); } else { unset($peername); }
 
-     echo("<tr bgcolor=$bg_colour><th>$i</td><td><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td><td>AS" . $peer['bgpPeerRemoteAs'] . "<br />" . $peer['astext'] . "</td><td><img src='$img'></td><td><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></td><td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "</td></tr>");
+     echo("<tr bgcolor=$bg_colour>
+             <td width=20><h3><center>$i</center></h3></td>
+             <td><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
+	     <td>$peer_type</td>
+             <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
+             <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
+             <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
+                 Updates <img src='images/16/arrow_down.png' align=absmiddle> " . $peer['bgpPeerInUpdates'] . " 
+                         <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td></tr>");
 
-#     if($graphs) {
+     if($graphs) {
           
        $graph_type = "bgpupdates";
  
@@ -47,7 +61,7 @@
        echo("</td></tr>");
 
 
- #    }
+     }
 
      $i++;
    }
