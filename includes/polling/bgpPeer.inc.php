@@ -2,6 +2,8 @@
 
 echo("Polling BGP peers\n");
 
+if(!$config['enable_bgp']) { echo("BGP Support Disabled\n"); } else {
+
 $query = "SELECT * FROM bgpPeers WHERE device_id = '" . $device['device_id'] . "'";
 $peers = mysql_query($query);
 while($peer = mysql_fetch_array($peers)) {
@@ -37,11 +39,12 @@ while($peer = mysql_fetch_array($peers)) {
   echo("$peerrrd N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
   $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
-  $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime'";
+  $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
   $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'";
 
   mysql_query($update);
 
-}
+} ## End While loop on peers
 
+} ## End check for BGP support
 ?>

@@ -104,10 +104,13 @@ echo("\n}\n");
 
 }
 
+echo("\"thnlon-pe01\" -> \"thelon-cs01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+echo("\"thnlon-pe01\" -> \"thelon-cs02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
 
-echo("\"Internet\" -> \"thlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"Internet\" -> \"thlon-lns01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"ADSL\" -> \"thlon-lns01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+echo("\"Internet\" -> \"thelon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+echo("\"Internet\" -> \"thelon-pe02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+echo("\"Internet\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+echo("\"ADSL\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
 
 $links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE D.hostname LIKE '%vostron.net' AND I.device_id = D.device_id AND X.device_id = Y.device_id AND D.hostname NOT LIKE '%cust%' AND L.src_if = I.interface_id AND X.interface_id = L.dst_if  AND D.location != Y.location AND D.hostname NOT LIKE '%cust.vostron.net' AND Y.hostname NOT LIKE '%cust.vostron.net' ORDER BY D.location DESC";
 $links_result = mysql_query($links_sql);
@@ -153,8 +156,8 @@ while($link_data = mysql_fetch_array($links_result)) {
 	$dif = makeshortif($link_data[dif]);
 
 	if(!$die){	
-#	echo("\"$src\" -> \"$dst\" [taillabel=\"$dif\"  headlabel=\"$sif\" arrowhead=none arrowtail=none $info];\n");
-        echo("\"$src\" -> \"$dst\" [ arrowhead=none arrowtail=none $info];\n");
+	echo("\"$src\" -> \"$dst\" [taillabel=\"$dif\"  headlabel=\"$sif\" arrowhead=none arrowtail=none $info];\n");
+#       echo("\"$src\" -> \"$dst\" [ arrowhead=none arrowtail=none $info];\n");
 	$linkdone[] = "$src $link_data[sif] $dst $link_data[dif]";
 	$x++;
         }

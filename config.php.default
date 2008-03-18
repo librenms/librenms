@@ -67,24 +67,28 @@ $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 
 ### Which interface sections should we show?
-$show_if_customers = 1;
-$show_if_transit = 0;
-$show_if_peering = 0;
-$show_if_core = 0;
-$show_if_l2tp =0;
-$show_locations = 1;
+$config['show_if_customers'] = 1;
+$config['show_if_transit'] = 0;
+$config['show_if_peering'] = 0;
+$config['show_if_core'] = 0;
+$config['show_if_l2tp'] = 0;
+$config['show_locations'] = 1;
 
-$enable_syslog = 1;
+$config['enable_syslog'] = 1;
 
 ### Interface name strings to ignore
-$bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
+$config['bif'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm",
              "async", "plip", "-physical", "-signalling", "control plane",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
 
+$bif = $config['bif']
+
 ### Mountpoints to ignore
 
-$ignore_mount = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
+$config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
+$ignore_mount = $config['ignore_mount']
+
 
 ### Valis OSes
 $valid_os = array("IOS", "Linux", "OpenBSD", "FreeBSD", "NetBSD", "ProCurve", "m0n0wall", "pfSense", "Snom", "Voswall", "DragonFly");
