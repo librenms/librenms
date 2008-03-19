@@ -141,14 +141,13 @@ while ($device = mysql_fetch_array($device_query)) {
       pollDeviceWin();
       break;
 
-    case "netscreen":
-      $version = preg_replace("/(.+)\ version\ (.+)\ (SN:\ (.+)\,\ (.+)\)/", "\\1||\\2||\\3||\\4", $sysDescr);
-      echo("$sysDescr");
-      echo("$version");
+    case "ScreenOS":
+      $version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "Juniper Netscreen \\1||\\2||\\3||\\4", $sysDescr);
+      list($hardware,$version,$serial,$features) = explode("||", $version);
+      include("includes/polling/device-screenos.inc.php");
       break;
 
     case "IOS":
-      echo("Device is Cisco! \n$sysDescr\n");
       $version = str_replace("Cisco IOS Software,", "", $sysDescr);
       $version = str_replace("IOS (tm) ", "", $version);
       $version = str_replace(",RELEASE SOFTWARE", "", $version);

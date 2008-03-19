@@ -1,0 +1,139 @@
+-- These MIBs were created on 02/04/2004
+-- This module defines enterprise  MIBs for VPN tunnel monitoring
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+--
+
+NETSCREEN-VPN-MON-SA-COUNT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    DisplayString 	FROM RFC1213-MIB 
+    netscreenVpn 	FROM NETSCREEN-SMI
+    netscreenVpnMon	FROM NETSCREEN-VPN-MON-MIB;
+   
+
+-- MODULE-IDENTITY
+--  OrgName
+--    Juniper Networks, Inc.
+--  ContactInfo
+--     Customer Support
+--     
+--     1194 North Mathilda Avenue 
+--     Sunnyvale, California 94089-1206
+--     USA
+--     
+--     Tel: 1-800-638-8296
+--     E-mail: customerservice@juniper.net
+--     HTTP://www.juniper.net"
+--
+--  Descr
+--    This module defines the object that are used to monitor SA count
+--    
+-- Last modified date: 07/08/2004
+--    Added in and out SA counters
+--
+-- Last modified date: 06/14/2004
+--    Modified copyright and contact info         
+-- 
+-- Last modified date: 02/04/2004
+-- 
+    
+          nsVpnMonSACountTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NsVpnMonSACountEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of SA count entries. "
+              ::= { netscreenVpnMon 2 }
+
+          nsVpnMonSACountEntry OBJECT-TYPE
+              SYNTAX  NsVpnMonSACountEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A SA count entry"
+              INDEX   { nsVpnMonSACountType }
+              ::= { nsVpnMonSACountTable 1 }
+
+          NsVpnMonSACountEntry ::=
+              SEQUENCE {
+                  nsVpnMonSACountType
+                      INTEGER,
+                  nsVpnMonSACountTotal
+                      Counter,
+                  nsVpnMonSACountAct
+                      Counter,
+                  nsVpnMonSACountInTotal
+                      Counter,
+                  nsVpnMonSACountInAct
+                      Counter,
+                  nsVpnMonSACountOutTotal
+                      Counter,
+                  nsVpnMonSACountOutAct
+                      Counter
+            }
+            
+          nsVpnMonSACountType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ipv4(1),
+                ipv6(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The SA Count type (ipv4(1) or ipv6(2))" 
+              ::= { nsVpnMonSACountEntry 1 }
+
+          nsVpnMonSACountTotal OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total count of SA" 
+              ::= { nsVpnMonSACountEntry 2 }
+
+          nsVpnMonSACountAct OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The active SA Count."
+              ::= { nsVpnMonSACountEntry 3 }
+
+          nsVpnMonSACountInTotal OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The in total SA count" 
+              ::= { nsVpnMonSACountEntry 4 }
+
+          nsVpnMonSACountInAct OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The in active SA Count"
+              ::= { nsVpnMonSACountEntry 5 }
+
+          nsVpnMonSACountOutTotal OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The out total SA count" 
+              ::= { nsVpnMonSACountEntry 6 }
+
+          nsVpnMonSACountOutAct OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The out active SA Count."
+              ::= { nsVpnMonSACountEntry 7 }
+
+
+           
+
+END
