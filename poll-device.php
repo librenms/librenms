@@ -28,7 +28,7 @@ echo("Starting polling run:\n\n");
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo("Polling " . $device['hostname'] . " ( ".$device['device_id']." )\n\n");
+  echo("Polling " . $device['hostname'] . " ( device_id ".$device['device_id']." )\n\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
   unset($location); unset($hardware); unset($sysDescr); unset($sysContact);
@@ -45,30 +45,34 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if($pingable) {
     $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver']);
-    if($snmpable) { echo("SNMP : yes :)"); } else { echo("SNMP : no :("); }
+    if($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
   }
 
-  echo("\n");
+  echo("blib");
 
-  if ($snmpable) {
+  if ($snmpable) { 
+
+    echo("blob");
+
     $status = '1';
-    if($device['os'] == "FreeBSD" || $device['os'] == "OpenBSD" || $device['os'] == "Linux" || $device['os'] == "Windows") { 
+    if($device['os'] == "FreeBSD" || $device['os'] == "OpenBSD" || $device['os'] == "Linux" || $device['os'] == "Windows" || $device['os'] == "Voswall") { 
       $uptimeoid = ".1.3.6.1.2.1.25.1.1.0"; 
     } else { 
       $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
     }
-      $snmp_cmd =  "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
-      $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysDescr.0";
-      $snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
+    $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+    $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysDescr.0";
+    $snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS") { 
-      $snmp_cmdb =  "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+      $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
       $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
       $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
       $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
-
     } else { unset($ciscomodel); }
 
-    $snmpdata = `$snmp_cmd`;
+    echo("command : $snmp_cmd");
+
+    $snmpdata = shell_exec($snmp_cmd);
     $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
@@ -135,6 +139,12 @@ while ($device = mysql_fetch_array($device_query)) {
       if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
       if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
       pollDeviceWin();
+      break;
+
+    case "netscreen":
+      $version = preg_replace("/(.+)\ version\ (.+)\ (SN:\ (.+)\,\ (.+)\)/", "\\1||\\2||\\3||\\4", $sysDescr);
+      echo("$sysDescr");
+      echo("$version");
       break;
 
     case "IOS":
@@ -273,7 +283,7 @@ while ($device = mysql_fetch_array($device_query)) {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'uptime', '$uptime')");
     }
 
-  }
+  } ## End if snmpable
 
 
   if ($update) {
