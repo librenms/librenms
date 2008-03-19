@@ -1,7 +1,7 @@
 <?
 
-$query = "SELECT *, DATE(datetime) AS date, TIME(datetime) AS time ";
-$query .= "FROM `syslog` WHERE `host` = '" . $_GET['id'] . "'";
+$query = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date ";
+$query .= "FROM `syslog` WHERE `device_id` = '" . $_GET['id'] . "'";
 if($search) { $query .= " AND `msg` LIKE '%" . $_POST['search'] . "%'"; }
 $query .= " ORDER BY `datetime` desc LIMIT 0,500";
 

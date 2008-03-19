@@ -1,7 +1,7 @@
 <meta http-equiv="refresh" content="60">
 <?
 
-$sql = "select * from syslog ORDER BY datetime DESC LIMIT 1000";
+$sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog ORDER BY datetime DESC LIMIT 1000";
 
 $query = mysql_query($sql);
 
