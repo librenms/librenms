@@ -1,0 +1,125 @@
+-- These MIBs were created on 07/22/2004
+-- This module defines enterprise  MIBs for VPN IAS monitoring
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+--
+
+NETSCREEN-VPN-IAS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    DisplayString 	FROM RFC1213-MIB 
+    netscreenVpn 	FROM NETSCREEN-SMI;
+   
+
+-- MODULE-IDENTITY
+--  OrgName
+--    Juniper Networks, Inc.
+--  ContactInfo
+--     Customer Support
+--     
+--     1194 North Mathilda Avenue 
+--     Sunnyvale, California 94089-1206
+--     USA
+--     
+--     Tel: 1-800-638-8296
+--     E-mail: customerservice@juniper.net
+--     HTTP://www.juniper.net"
+--
+--  Descr
+--    This module defines the object that are used to monitor VPN IAS 
+--    
+-- 
+-- Last modified date: 09/20/2004
+--     Created
+
+   nsVpnIas 	OBJECT IDENTIFIER ::= {netscreenVpn 11}
+ 
+          nsVpnIasTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NsVpnIasEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "VPN IAS entry for ipv6  and ipv4."
+              ::= { nsVpnIas 1 }
+
+          nsVpnIasEntry OBJECT-TYPE
+              SYNTAX  NsVpnIasEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "VPN IAS entry"
+              INDEX   { nsVpnIasType }
+              ::= { nsVpnIasTable 1 }
+
+          NsVpnIasEntry ::=
+              SEQUENCE {
+                  nsVpnIasType
+                      INTEGER,
+                  nsVpnIasTotal
+                      Counter
+            }
+            
+          nsVpnIasType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ipv4(1),
+                ipv6(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The IAS type (ipv4(1) or ipv6(2))" 
+              ::= { nsVpnIasEntry 1 }
+
+          nsVpnIasTotal OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total count of IAS" 
+              ::= { nsVpnIasEntry 2 }
+
+--  This table provides Xauth-ID usernames for IAS active sessions             
+
+          nsVpnIasSessTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF NsVpnIasSessEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "VPN IAS session entry."
+              ::= { nsVpnIas 2 }
+
+          nsVpnIasSessEntry OBJECT-TYPE
+              SYNTAX  NsVpnIasSessEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "VPN IAS session entry"
+              INDEX   { nsVpnIasSessIndex }
+              ::= { nsVpnIasSessTable 1 }
+
+          NsVpnIasSessEntry ::=
+              SEQUENCE {
+                  nsVpnIasSessIndex
+                      INTEGER,
+                  nsVpnIasSessXauthUserName
+                      DisplayString
+            }
+            
+          nsVpnIasSessIndex OBJECT-TYPE
+              SYNTAX  INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The internal index for this entry"
+              ::= { nsVpnIasSessEntry 1 }
+
+          nsVpnIasSessXauthUserName OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Active IAS session Xauth-ID username"
+              ::= { nsVpnIasSessEntry 2 }
+
+END

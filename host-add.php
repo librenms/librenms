@@ -1,7 +1,8 @@
 #!/usr/bin/php 
 <?
 
-include("config.php"); include("includes/functions.php");
+include("config.php"); 
+include("includes/functions.php");
 
 if($argv[1] && $argv[2] && $argv[3]) { 
   $host      = strtolower($argv[1]);
