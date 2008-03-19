@@ -7,36 +7,28 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 #    $interface = fixifname(getifbyid($entry['interface']));
 #  }
 
-  $entry['device_id'] = $entry['host'];
-  $entry['hostname'] = gethostbyid($entry['host']);
+  $entry['hostname'] = gethostbyid($entry['device_id']);
 
   unset($icon);
 
-  $icon = geteventicon($entry['message']);
-  if($icon) {$icon = "<img src='images/16/$icon'>"; }
-
-
+#  $icon = geteventicon($entry['message']);
+#  if($icon) {$icon = "<img src='images/16/$icon'>"; }
 
   echo("<tr style=\"background-color: $bg\">
-    <td width=0></td>
-    <td class=syslog width=175>");
+    <td width=0></td>");
 
-  if($page == "syslog") {
-    echo("" . generatedevicelink($entry) . "<br />");
+  echo("<td class=syslog width=150>" . $entry['date'] . "</td>");
+
+  if($_GET['page'] == "syslog") { 
+    echo("<td><strong>".generatedevicelink($entry['device_id'], $entry['hostname'])."</strong></td>"); 
   }
 
-  echo($entry['datetime'] . "
-    </td>
-    <td class=syslog width=200>
-      " . $entry['program'] . "
-    </td> 
-    <td class=syslog>
+
+  echo("  <td class=syslog>
+      <strong>" . $entry['program'] . " : </strong>
       " . htmlspecialchars($entry['msg']) . "
     </td>
     <td></td>
   </tr>");
-
-
-
 
 ?>

@@ -116,13 +116,13 @@ echo("
   </a>
 </li>");
 
-echo("
+if($config['enable_syslog']) { echo("
 <li class=" . $select['dev-syslog'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-syslog'>
     <img src='images/16/printer.png' align=absmiddle border=0> Syslog
   </a>
 </li>
-");
+"); }
 
 if($_SESSION[userlevel] >= "5") {
   echo("
