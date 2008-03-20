@@ -191,6 +191,7 @@ while ($device = mysql_fetch_array($device_query)) {
   include("includes/polling/temperatures.inc.php");
   include("includes/polling/device-netstats.inc.php");
   echo("Polling interfaces\n");
+
   $where = "WHERE device_id = '" . $device['device_id'] . "'";
   include("includes/polling/interfaces.inc.php");
 
