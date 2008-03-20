@@ -1,5 +1,7 @@
 <?php
 
+include("graphing/screenos.php");
+
 function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
   global $config, $rrdtool, $installdir, $mono_font;
   $imgfile = "graphs/" . "$graph";

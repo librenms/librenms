@@ -45,6 +45,15 @@
 
   switch ($type) {
 
+  case 'netscreen_sessions':
+    $graph = graph_netscreen_sessions ($hostname . "/netscreen-sessions.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'netscreen_cpu':
+    $graph = graph_netscreen_cpu ($hostname . "/netscreen-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'netscreen_memory':
+    $graph = graph_netscreen_memory ($hostname . "/netscreen-memory.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'multi_bits':
     $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height);
     break;
