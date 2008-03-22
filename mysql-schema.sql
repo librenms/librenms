@@ -306,28 +306,6 @@ CREATE TABLE IF NOT EXISTS `links` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `logs`
--- 
-
-CREATE TABLE IF NOT EXISTS `logs` (
-  `host` varchar(32) default NULL,
-  `facility` varchar(10) default NULL,
-  `priority` varchar(10) default NULL,
-  `level` varchar(10) default NULL,
-  `tag` varchar(10) default NULL,
-  `datetime` datetime default NULL,
-  `program` varchar(32) default NULL,
-  `msg` text,
-  `seq` bigint(20) unsigned NOT NULL auto_increment,
-  PRIMARY KEY  (`seq`),
-  KEY `host` (`host`),
-  KEY `datetime` (`datetime`),
-  KEY `seq` (`seq`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
--- 
 -- Table structure for table `networks`
 -- 
 
@@ -408,12 +386,9 @@ CREATE TABLE IF NOT EXISTS `storage` (
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `syslog`
--- 
-
 CREATE TABLE IF NOT EXISTS `syslog` (
-  `host` int(11) default NULL,
+  `host` varchar(64) NOT NULL,
+  `device_id` int(11) default NULL,
   `facility` varchar(10) default NULL,
   `priority` varchar(10) default NULL,
   `level` varchar(10) default NULL,
@@ -422,10 +397,12 @@ CREATE TABLE IF NOT EXISTS `syslog` (
   `program` varchar(32) default NULL,
   `msg` text,
   `seq` bigint(20) unsigned NOT NULL auto_increment,
+  `processed` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`seq`),
-  KEY `host` (`host`),
-  KEY `datetime` (`datetime`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  KEY `datetime` (`datetime`),
+  KEY `device_id` (`device_id`),
+  KEY `processed` (`processed`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
