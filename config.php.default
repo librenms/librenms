@@ -7,19 +7,16 @@ $config['db_pass'] = "observer_pass";
 $config['db_name'] = "observer_demo";
 
 ### Installation Location
-$installdir 	= "/home/adama/sites/demo.project-observer.org/";
-$htmldir	= $installdir . "html";
-$config['rrd_dir'] = $installdir . "rrd";
+$config['installdir'] 	= "/home/adama/sites/demo.project-observer.org/";
+$config['htmldir']	= $config['installdir'] . "html";
+$config['rrd_dir'] 	= $config['installdir'] . "rrd";
 $rrd_dir = $config['rrd_dir'];
 
 ### Default community
 $config['community'] = "observer";
 $community = $config['community'];
 
-$base_url = "http://demo.project-observer.org";
-
-### File containing syslog
-$syslogfile = "";
+$config['base_url'] = "http://demo.project-observer.org";
 
 ### Location of executables
 
@@ -58,7 +55,8 @@ $config['mydomain'] = "vostron.net";
 $config['page_title']  = "Observer Demo";
 $config['title_image'] = "images/observer-header.png";
 $config['stylesheet']  = "css/styles.css"; 
-$mono_font = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
+$config['mono_font'] = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
+$mono_font = $config['mono_font'];
 $config['favicon'] = "favicon.ico";
 
 $config['email_default']  = "adama@memetic.org";
@@ -82,16 +80,9 @@ $config['bif'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "l
              "async", "plip", "-physical", "-signalling", "control plane",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
 
-$bif = $config['bif']
-
 ### Mountpoints to ignore
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts");
-$ignore_mount = $config['ignore_mount']
-
-
-### Valis OSes
-$valid_os = array("IOS", "Linux", "OpenBSD", "FreeBSD", "NetBSD", "ProCurve", "m0n0wall", "pfSense", "Snom", "Voswall", "DragonFly");
 
 ### entPhysicalVendorType rewrites
 
@@ -115,7 +106,6 @@ $entPhysicalVendorTypes = array (
   'cevMGBIC1000BaseLX' => '1000BaseLX GBIC',
   'cevPort10GigBaseLR' => '10GigBaseLR');
 
-
 ### Style Options
 
 $list_colour_a = "#ffffff";
@@ -128,7 +118,7 @@ $warn_colour_b = "#ffcccc";
 # No changes below this line #
 ##############################
 
-$observer_version = "0.3.1";
+$config['version'] = "0.3.1";
 
 ### Connect to database
 if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
