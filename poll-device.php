@@ -46,11 +46,7 @@ while ($device = mysql_fetch_array($device_query)) {
     if($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
   }
 
-  echo("blib");
-
   if ($snmpable) { 
-
-    echo("blob");
 
     $status = '1';
     if($device['os'] == "FreeBSD" || $device['os'] == "OpenBSD" || $device['os'] == "Linux" || $device['os'] == "Windows" || $device['os'] == "Voswall") { 
@@ -67,8 +63,6 @@ while ($device = mysql_fetch_array($device_query)) {
       $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
       $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
     } else { unset($ciscomodel); }
-
-    echo("command : $snmp_cmd");
 
     $snmpdata = shell_exec($snmp_cmd);
     $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
