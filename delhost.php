@@ -15,7 +15,7 @@ if($argv[1]) {
     echo("Host doesn't exist!\n");
   }
 } else {
-    echo("Need host to remove!\n\n");
+    echo("Host Removal Tool\nUsage: ./delhost.php <hostname>\n");
 }
 
 ?>
