@@ -549,15 +549,7 @@ function fixIOSHardware($hardware){
 function createHost ($host, $community, $snmpver){
         $host = trim(strtolower($host));
         $host_os = getHostOS($host, $community, $snmpver); 
-	global $valid_os;
-        #$nullhost = 1;
-        #echo("$host -> $host_os<br />");
-        #foreach($valid_os as $os) {
-        #   if ($os == $host_os) {
-              $nullhost = '0';
-        #   }
-        #}
-        if($nullhost == '0' && $host_os) {
+        if($host_os) {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `os`, `status`) VALUES ('$host', '$community', '$host_os', '1')");
            return("Created host : $host ($host_os)");
         } else {

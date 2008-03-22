@@ -21,7 +21,7 @@ function graph_netscreen_sessions ($rrd, $graph, $from, $to, $width, $height, $t
 }
 
 function graph_netscreen_cpu ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
