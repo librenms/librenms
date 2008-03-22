@@ -137,7 +137,7 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
   $hostname = gethostbyid($device);
-  $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%'");
+  $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
   if($width <= "300") { $options .= "--font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
   $pluses = "";
   while($int = mysql_fetch_row($query)) {
