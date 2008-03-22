@@ -75,7 +75,7 @@
 }
 
 echo("</td>");
-     echo("<td valign=top class=interface-desc>");
+     echo("<td width=375 valign=top class=interface-desc>");
      if ( strpos($ifDescr, "oopback") === false && !$dographs) {
        $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
