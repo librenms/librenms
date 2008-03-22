@@ -40,8 +40,9 @@ while($entry = mysql_fetch_array($q)){
       $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
       list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
     } else {
-      $program = addslashes($entry['program']);
+      $program = preg_quote($entry['program']);
       $entry['msg'] = preg_replace("/^$program:\ /", "", $entry['msg']);
+#     $entry['msg'] = preg_replace("/^$program:\ /", "", $entry['msg']);
       if(preg_match("/^[a-zA-Z\/]+\[[0-9]+\]:/", $entry['msg'])) {
         $entry['msg'] = preg_replace("/^(.+?)\[[0-9]+\]:\ /", "\\1||", $entry['msg']);
         list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
