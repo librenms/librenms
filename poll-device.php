@@ -4,7 +4,7 @@
 include("config.php");
 include("includes/functions.php");
 
-echo("Observer Poller v$observer_version\n\n");
+echo("Observer Poller v".$config['version']."\n\n");
 
 if($argv[1] == "--device" && $argv[2]) {  
   $where = "AND `device_id` = '".$argv[2]."'";
@@ -22,8 +22,6 @@ if($argv[1] == "--device" && $argv[2]) {
 }
 
 echo("Starting polling run:\n\n");
-
-
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
@@ -252,9 +250,7 @@ while ($device = mysql_fetch_array($device_query)) {
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to $stat')");
   }
 
-
   if ($uptime) {
-
 
     $old_uptime = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
 

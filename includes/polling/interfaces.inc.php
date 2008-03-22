@@ -3,7 +3,7 @@
 $interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
- if(!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE device_id = '" . $interface['device_id'] . "'")); }
+ if(!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
 
  unset($ifAdminStatus, $ifOperStatus, $ifAlias, $ifDescr);
 
@@ -110,6 +110,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
     }
      $woo = "N:$ifHCInOctets:$ifHCOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
      $ret = rrdtool_update("$rrdfile", $woo);
+
    } else {
      echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
   }
