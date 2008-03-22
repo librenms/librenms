@@ -2,21 +2,24 @@
 
 ### Database config
 $config['db_host'] = "localhost";
-$config['db_user'] = "observer_demo";
-$config['db_pass'] = "observer_pass";
-$config['db_name'] = "observer_demo";
+$config['db_user'] = "observer";
+$config['db_pass'] = "password";
+$config['db_name'] = "observer";
 
 ### Installation Location
-$config['installdir'] 	= "/home/adama/sites/demo.project-observer.org/";
+$config['installdir'] 	= "/var/www/";
 $config['htmldir']	= $config['installdir'] . "html";
 $config['rrd_dir'] 	= $config['installdir'] . "rrd";
 $rrd_dir = $config['rrd_dir'];
 
 ### Default community
-$config['community'] = "observer";
+$config['community'] = "v05tr0n82";
 $community = $config['community'];
 
-$config['base_url'] = "http://demo.project-observer.org";
+$config['base_url'] = "http://observer.mi5.gov.uk";
+
+### File containing syslog
+$syslogfile = "";
 
 ### Location of executables
 
@@ -60,22 +63,27 @@ $mono_font = $config['mono_font'];
 $config['favicon'] = "favicon.ico";
 
 $config['email_default']  = "adama@memetic.org";
-$config['email_from']     = "Observer demo <observer-demo@project-observer.org>";
+$config['email_from']     = "Observer Dev <observer-dev@project-observer.org>";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 
 ### Which interface sections should we show?
-$config['show_if_customers'] = 1;
-$config['show_if_transit'] = 0;
-$config['show_if_peering'] = 0;
-$config['show_if_core'] = 0;
-$config['show_if_l2tp'] = 0;
-$config['show_locations'] = 1;
 
-$config['enable_syslog'] = 1;
+$config['int_customers'] = 1;   # Enable Customer Port Parsing
+$config['int_transit'] = 1;     # Enable Transit Types
+$config['int_peering'] = 1;     # Enable Peering Types
+$config['int_core'] = 1;                # Enable Core Port Types
+$config['int_l2tp'] = 1;                # Enable L2TP Port Types
+
+$config['show_locations'] = 1;  # Enable Locations on menu
+
+### Which additional features should we enable?
+
+$config['enable_bgp'] = 1; # Enable BGP session collection and display
+$config['enable_syslog'] = 1;   # Enable Syslog
 
 ### Interface name strings to ignore
-$config['bif'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
+$config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm",
              "async", "plip", "-physical", "-signalling", "control plane",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
@@ -106,6 +114,7 @@ $entPhysicalVendorTypes = array (
   'cevMGBIC1000BaseLX' => '1000BaseLX GBIC',
   'cevPort10GigBaseLR' => '10GigBaseLR');
 
+
 ### Style Options
 
 $list_colour_a = "#ffffff";
@@ -118,7 +127,7 @@ $warn_colour_b = "#ffcccc";
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.3.1";
+$config['version'] = "0.3.2-pre";
 
 ### Connect to database
 if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
