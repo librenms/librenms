@@ -169,7 +169,7 @@ if($_SESSION['userlevel'] >= '5') {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
-    "<img src='http://network.vostron.net/graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
