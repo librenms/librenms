@@ -1,7 +1,5 @@
 <?php 
 
-// Start Graphing Functions
-
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $rrdtool, $installdir, $mono_font, $rrd_dir;
   $database = $rrd_dir . "/" . $rrd;
