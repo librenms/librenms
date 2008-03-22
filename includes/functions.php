@@ -14,7 +14,6 @@ include("cisco-entities.php");
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $rrdtool;
   return `$rrdtool update $rrdfile $rrdupdate`;
-
 }
 
 function getHostOS($hostname, $community, $snmpver) {
@@ -551,9 +550,11 @@ function createHost ($host, $community, $snmpver){
         $host_os = getHostOS($host, $community, $snmpver); 
         if($host_os) {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `os`, `status`) VALUES ('$host', '$community', '$host_os', '1')");
-           return("Created host : $host ($host_os)");
+           if(mysql_affected_rows()) {
+             return("Created host : $host ($host_os)");
+           } else { return FALSE; }
         } else {
-	   return("Not added bad host : $host");
+	   return FALSE;
 	}
 }
 
