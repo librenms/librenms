@@ -416,10 +416,10 @@ function is_odd($number) {
 }
 
 function isValidInterface($if) {
+      global $config;
       $if = strtolower($if);
-      $bif = array("null", "virtual-", "unrouted", "eobc", "mpls", "aal5", "-atm layer", "dialer", "-shdsl", "-adsl", "async", "sit0", "sit1");
       $nullintf = 0;
-      foreach($bif as $bi) {
+      foreach($config['bad_if'] as $bi) {
          $pos = strpos($if, $bi);
          if ($pos !== FALSE) {
             $nullintf = 1;
@@ -545,25 +545,6 @@ function fixIOSHardware($hardware){
 	return $hardware;
 
 }
-
-#function getHostOS($host, $community, $snmpver) {
-#	$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host sysDescr.0`);
-#        if ($sysDescr == "") {$sysDescr = trim(`snmpget -O qv -$snmpver -c $community $host 1.3.6.1.2.1.7526.2.4`);}
-#        echo("\nsnmpget -O qv -$snmpver -c $community $host sysDescr.0\n$sysDescr\n");
-#	if (strstr($sysDescr, "IOS") !== false) { $os = "IOS"; }
-#        if (strstr($sysDescr, "FreeBSD") !== false) { $os = "FreeBSD"; }
-#	if (strstr($sysDescr, "DragonFly")) { $os = "DragonFly"; }
-#        if (strstr($sysDescr, "NetBSD") !== false) { $os = "NetBSD"; }
-#	if (strstr($sysDescr, "OpenBSD") !== false) { $os = "OpenBSD"; }
-#        if (strstr($sysDescr, "Linux") !== false) { $os = "Linux"; }
-#	if (strstr($sysDescr, "Windows")) { $os = "Windows"; }
-#        if (strstr($sysDescr, "ProCurve")) { $os = "ProCurve"; }
-#	if (strstr($sysDescr, "m0n0wall")) { $os = "m0n0wall"; }
-#	if (strstr($sysDescr, "Voswall")) { $os = "Voswall"; }
-#	if (strstr($sysDescr, "snom")) { $os = "Snom"; }
-#	return $os;
-#}
-
 
 function createHost ($host, $community, $snmpver){
         $host = trim(strtolower($host));

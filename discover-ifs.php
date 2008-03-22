@@ -22,7 +22,7 @@ while ($device = mysql_fetch_row($device_query)) {
       $ifName = trim(str_replace("\"", "", $ifName));
       $if = trim(strtolower($ifName));
       $nullintf = 0;
-      foreach($bif as $bi) {
+      foreach($config['bad_if'] as $bi) {
 
 #        echo("'$bi' -> '$if'\n");
 
