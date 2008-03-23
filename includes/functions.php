@@ -11,6 +11,31 @@ include("print-functions.php");
 include("billing-functions.php");
 include("cisco-entities.php");
 
+include("syslog.php");
+
+
+function shorthost($hostname, $len=16) {
+
+  list ($first, $second, $third, $fourth, $fifth) = explode(".", $hostname);
+
+  $shorthost = $first;
+  if(strlen($first.".".$second) < $len && $second) { 
+    $shorthost = $first.".".$second; 
+    if(strlen($shorthost.".".$third) < $len && $third) {
+      $shorthost = $shorthost.".".$third;
+      if(strlen($shorthost.".".$fourth) < $len && $fourth) {
+        $shorthost = $shorthost.".".$fourth;
+        if(strlen($shorthost.".".$fifth) < $len && $fifth) {
+          $shorthost = $shorthost.".".$fifth;
+        }
+      }
+    }
+  }
+  
+  return ($shorthost);
+
+}
+
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $rrdtool;
   return `$rrdtool update $rrdfile $rrdupdate`;
@@ -373,7 +398,9 @@ function cidr2netmask() {
            << (32-$netmask)));
 }
 
-function formatUptime($diff) {
+function formatUptime($diff, $format="long") {
+  $yearsDiff = floor($diff/31536000);
+  $diff -= $yearsDiff*31536000;
   $daysDiff = floor($diff/86400);
   $diff -= $daysDiff*86400;
   $hrsDiff = floor($diff/60/60);
@@ -381,10 +408,19 @@ function formatUptime($diff) {
   $minsDiff = floor($diff/60);
   $diff -= $minsDiff*60;
   $secsDiff = $diff;
-  if($daysDiff > '0'){ $uptime .= "$daysDiff days, "; }
-  if($hrsDiff > '0'){ $uptime .= $hrsDiff . "h "; }
-  if($minsDiff > '0'){ $uptime .= $minsDiff . "m "; }
-  if($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
+  if($format == "short") {
+    if($yearsDiff > '0'){ $uptime .= $yearsDiff . "y "; }
+    if($daysDiff > '0'){ $uptime .= $daysDiff . "d "; }
+    if($hrsDiff > '0'){ $uptime .= $hrsDiff . "h "; }
+    if($minsDiff > '0'){ $uptime .= $minsDiff . "m "; }
+    if($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
+  } else {
+    if($yearsDiff > '0'){ $uptime .= $yearsDiff . " years, "; }
+    if($daysDiff > '0'){ $uptime .= $daysDiff   . " days, "; }
+    if($hrsDiff > '0'){ $uptime .= $hrsDiff     . "h "; }
+    if($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
+    if($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
+  }
   return "$uptime";
 }
 
