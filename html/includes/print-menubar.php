@@ -29,6 +29,9 @@
         <table><tr><td>
         <ul>
         <li><a href="overview/"><img src='images/16/zoom.png' border=0 align=absmiddle> Overview</a></li>
+        <?php if($config['enable_map']) {
+          echo("<li><a href='map/'><img src='images/16/map.png' border=0 align=absmiddle> Network Map</a></li>");
+        } ?>
         <li><a href="eventlog/"><img src='images/16/report.png' border=0 align=absmiddle> Eventlog</a></li>
 	<?php if($config['enable_syslog']) {
   	  echo("<li><a href='syslog/'><img src='images/16/page.png' border=0 align=absmiddle> Syslog</a></li>");
@@ -138,17 +141,44 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 <li><a class="menu2four" href="?page=storage"><img src='images/16/database.png' border=0 align=absmiddle> Storage</a></li>
 
 
+<?php
+
+if($_SESSION['userlevel'] >= '5') {
+echo("
+<li><a><img src='images/16/link.png' border=0 align=absmiddle> BGP Sessions
+<!--[if IE 7]><!--></a><!--<![endif]-->
+        <table><tr><td>
+        <ul>
+        <li><a href='services/'><img src='images/16/link.png' border=0 align=absmiddle> All Sessions </a></li>
+
+        <li><hr width=140 /></li>
+        <li><a href='bgp/external/'><img src='images/16/world_link.png' border=0 align=absmiddle> External BGP</a></li>
+        <li><a href='bgp/internal/'><img src='images/16/brick_link.png' border=0 align=absmiddle> Internal BGP</a></li>
+        <li><hr width=140/></li>
+        <li><a href='bgp/alerts/'><img src='images/16/link_error.png' border=0 align=absmiddle> Alerted Sessions</a></li>
+        <li><hr /></li>
+
+
+        </ul>
+        </td></tr></table>
+<!--[if lte IE 6]></a><![endif]-->
+</li>
+");
+}
+
+?>
+
+
 <li style='float: right;'><a><img src='images/16/wrench.png' border=0 align=absmiddle> Configuration
 <!--[if IE 7]><!--></a><!--<![endif]-->
     <table><tr><td>
     <ul>
     <li><a href="?page=preferences"><img src='images/16/wrench_orange.png' border=0 align=absmiddle> My Settings</a></li>
-    <li><a href="?page=preferences"><img src='images/16/key.png' border=0 align=absmiddle> Change Password</a></li>
     <?php if($_SESSION['userlevel'] >= '10') {
       echo("
-        <li><hr /></li>
+        <li><hr width=140 /></li>
         <li><a href='?page=settings'><img src='images/16/report.png' border=0 align=absmiddle> System Settings</a></li>
-        <li><hr /></li>
+        <li><hr width=140/></li>
 	<li><a href='?page=adduser'><img src='images/16/user_add.png' border=0 align=absmiddle> Add User</a></li>
         <li><a href='?page=deluser'><img src='images/16/user_delete.png' border=0 align=absmiddle> Remove User</a></li>
         <li><a href='?page=edituser'><img src='images/16/user_edit.png' border=0 align=absmiddle> Edit User</a></li>");              

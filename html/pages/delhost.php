@@ -6,7 +6,7 @@ if($_SESSION['userlevel'] < 10) {
 }
 
 if($_POST['id']) {
-  delHost($id);
+  delHost($_POST['id']);
 }
 
 ?>

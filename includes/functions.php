@@ -254,7 +254,7 @@ $type = strtolower($data['os']);
 
 
 function delHost($id) {
-  global $rrd_dir;
+  global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
@@ -276,6 +276,7 @@ function delHost($id) {
   mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
+  $rrd_dir = $config['rrd_dir'];
   `rm -f $rrd_dir/$host-*.rrd`;
   `rm -rf $rrd_dir/$host`;
   echo("Removed device $host<br />");
