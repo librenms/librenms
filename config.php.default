@@ -18,9 +18,6 @@ $community = $config['community'];
 
 $config['base_url'] = "http://observer.mi5.gov.uk";
 
-### File containing syslog
-$syslogfile = "";
-
 ### Location of executables
 
 $config['rrdtool'] = "/usr/bin/rrdtool";
