@@ -10,9 +10,28 @@ $start = utime();
 
 echo("Observer v".$config['version']." Discovery\n\n");
 
+if($argv[1] == "--device" && $argv[2]) {
+  $where = "AND `device_id` = '".$argv[2]."'";
+} elseif ($argv[1] == "--os") {
+  $where = "AND `os` = '".$argv[2]."'";
+} elseif ($argv[1] == "--odd") {
+  $where = "AND MOD(device_id,2) = 1";
+} elseif ($argv[1] == "--even") {
+  $where = "AND MOD(device_id,2) = 0";
+} elseif ($argv[1] == "--all") {
+  $where = "";
+} else {
+  echo("--device <device id>    Poll single device\n");
+  echo("--os <os string>        Poll all devices of a given OS\n");
+  echo("--all                   Poll all devices\n\n");
+  echo("No polling type specified!\n");
+  exit;
+}
+
+
 $devices_polled = 0;
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1'");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where");
 while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] ."\n");

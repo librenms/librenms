@@ -9,7 +9,8 @@ if($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 
-echo("<table cellspacing=0 cellpadding=2>");
+echo("<div style='padding: 5px;'>
+        <table width=100% cellspacing=0 cellpadding=2>");
 
 echo("<tr class=tablehead>
         <th width=280>Device</th>
@@ -46,7 +47,7 @@ while($drive = mysql_fetch_array($query)) {
 
 }
 
-echo("</table>");
+echo("</table></div>");
 
 
 ?>

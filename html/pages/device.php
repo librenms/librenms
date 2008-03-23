@@ -82,7 +82,7 @@ if(mysql_result(mysql_query("select count(temp_id) from temperature WHERE temp_h
   echo("
 <li class=" . $select['dev-temp'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-temp'>
-    <img src='images/16/flame.png' align=absmiddle border=0> Temps
+    <img src='images/16/weather_sun.png' align=absmiddle border=0> Temps
   </a>
 </li>
 ");

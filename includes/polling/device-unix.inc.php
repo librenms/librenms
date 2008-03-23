@@ -15,8 +15,6 @@ if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Mo
 if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
 if(is_file($Osysrrd) && !is_file($sysrrd)) { rename($Osysrrd, $sysrrd); echo("Moving $Osysrrd to $sysrrd");  }
 
-
-
 ## Check Disks
 $dq = mysql_query("SELECT * FROM storage WHERE host_id = '" . $device['device_id'] . "'");
 while ($dr = mysql_fetch_array($dq)) {
@@ -90,11 +88,13 @@ $cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem .1.3.6.1.4.1
 $cpu  = `$cpu_cmd`;
 list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $UsageSystem, $cputemp) = explode("\n", $cpu);
 
-$cpuUsage = $usageUser + $usageSystem;
+$cpuUsage = $UsageUser + $UsageSystem;
 
-$update_usage = mysql_query("UPDATE devices_attribs SET attrib_value = '$cpuUsage' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'");
+echo("\n CPU : $cpuUsage = $UsageUser + $UsageSystem; \n");
 
-if(mysql_affected_rows() == '0') {
+if(mysql_result(mysql_query("SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'"),0)) {
+ $update_usage = mysql_query("UPDATE devices_attribs SET attrib_value = '$cpuUsage' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'");
+} else {
  $insert_usage = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'cpuusage', '$cpuUsage')");
 }
 
