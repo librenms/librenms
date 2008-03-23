@@ -2,7 +2,9 @@
 <table border=0 cellpadding=10 cellspacing=10 width=100%>
   <tr>
     <td bgcolor=#e5e5e5 valign=top>
-      <table width=100% border=0><tr><td><div style="margin-bottom: 5px; font-size: 18px; font-weight: bold;">Devices with Alerts</div></td><td width=35 align=center><div class=tablehead>Host</div></td><td align=center width=35><div class=tablehead>Int</div></td><td align=center width=35><div class=tablehead>Srv</div></tr>
+<?php
+#      <table width=100% border=0><tr><td><div style="margin-bottom: 5px; font-size: 18px; font-weight: bold;">Devices with Alerts</div></td><td width=35 align=center><div class=tablehead>Host</div></td><td align=center width=35><div class=tablehead>Int</div></td><td align=center width=35><div class=tablehead>Srv</div></tr>
+?>
 <?php
 
 $nodes = array();
@@ -77,7 +79,9 @@ foreach($nodes as $node) {
   $intlist = array();
   $sql = mysql_query("SELECT `ifDescr`, `ifAlias` FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `device_id` = '$node'");
 
-  $rebooted = mysql_result(mysql_query("SELECT attrib_value FROM `devices` AS D, `devices_attribs` AS A WHERE D.device_id = '$node' AND D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'"),0);
+  $uptime = mysql_result(mysql_query("SELECT attrib_value FROM `devices` AS D, `devices_attribs` AS A WHERE D.device_id = '$node' AND D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime'"),0);
+
+  if($uptime < "86000") { $rebooted = 1; } else { $rebooted = 0; }
 
   while($int = mysql_fetch_row($sql)) { $intlist[] = "<b>$int[0]</b> - $int[1]"; } 
   foreach ($intlist as $intname) { $intpop .= "$br $intname"; $br = "<br />"; }
@@ -97,35 +101,66 @@ foreach($nodes as $node) {
   $mouseover = "onmouseover=\"return overlib('<img src=\'graph.php?host=$node&from=$week&to=$now&width=400&height=120&type=cpu\'>');\"
                 onmouseout=\"return nd();\"";
 
-  if(hoststatus($node)) { $statimg = "<img align=absmiddle src=images/16/lightbulb.png alt='Host Up'>"; } 
-                   else { $statimg = "<img align=absmiddle src=images/16/lightbulb_off.png alt='Host Down'>";}
+  if(hoststatus($node)) { $statimg = "<img align=absmiddle src=images/16/lightbulb.png alt='Host Up'>"; $box_bg = "#ffffaa"; } 
+                   else { $statimg = "<img align=absmiddle src=images/16/lightbulb_off.png alt='Host Down'>"; $box_bg = "#ffaaaa"; }
+
   if($rebooted) { $statimg = "<img align=absmiddle src=images/16/lightning.png alt='Host Rebooted'>"; }
 
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
   if(devicepermitted($node)) {
 
-  echo("<tr bgcolor=$bg>
-          <td><a href='?page=device&id=$node' $mouseover>$host</a></td>
-          <td align=center>$statimg</td>
-          <td align=center><a $intpop>$ints</a></td>
-          <td align=center><a $srvpop>$services</a></td></tr>");
+  list ($first, $second, $third) = explode(".", $host);
 
+  $shorthost = $first;
+  if(strlen($first.".".$second) < 16) { $shorthost = $first.".".$second; }
+
+
+  $errorboxes .= "<div style='float: left; padding: 5px; width: 124px; height: 100px; background: $box_bg; margin: 4px;'>
+                   <center><strong>".$shorthost."</strong><br />";
+
+  if(hoststatus($node)) {$errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span> <br />";
+  } else { $errorboxes .= "  <span class=body-date-1>Unreachable</span> <br />"; }
+
+  $errorboxes .= " <img src='images/16/disconnect.png' align=absmiddle> <a $intpop><b>$ints</b></a>
+		   <img src='images/16/cog_error.png' align=absmiddle> <a $srvpop><b>$services</b></a>
+                  </center></div>";
+   
+
+#  echo("<tr bgcolor=$bg>
+#          <td><a href='?page=device&id=$node' $mouseover>$host</a></td>
+#          <td align=center>$statimg</td>
+#          <td align=center><a $intpop>$ints</a></td>
+#          <td align=center><a $srvpop>$services</a></td></tr>");
+#
   }
   unset($int, $ints, $intlist, $intpop, $srv, $srvlist, $srvname, $srvpop);
 }
 
+#echo("</table>");
+
+#echo("
+#    </td>
+#    <td bgcolor=#e5e5e5 width=400 valign=top>
+ 
+echo("
+
+	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>  ");
+
+$sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog ORDER BY datetime DESC LIMIT 20";
+$query = mysql_query($sql);
+echo("<table cellspacing=0 cellpadding=2 width=100%>");
+while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
 echo("</table>");
 
-echo("    </td>
-    <td bgcolor=#e5e5e5 width=400 valign=top>
 
+echo("</div>
 
    </td>
    <td bgcolor=#e5e5e5 width=275 valign=top>");
 
 
-/// VOSTRON
+/// this stuff can be customised to show whatever you want....
 
 if($_SESSION['userlevel'] >= '5') {
 
