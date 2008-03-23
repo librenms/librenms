@@ -14,6 +14,10 @@ if(!$config['enable_syslog']) {
   exit(); 
 }
 
+## Delete all the old old old syslogs (as per config.php variable)
+
+mysql_query("DELETE FROM `syslog` WHERE `datetime` < DATE_SUB(NOW(), INTERVAL ".$config['syslog_age'].")");
+
 $q = mysql_query("SELECT * FROM `syslog` where `processed` = '0'");
 while($entry = mysql_fetch_array($q)){
 

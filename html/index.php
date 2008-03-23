@@ -30,7 +30,9 @@ if($_GET[debug]) {
   <title><?php echo("$page_title"); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-  <!-- <meta http-equiv="refresh" content="300"> -->
+<?php
+  if($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$config['page_refresh']."'>"); }
+?>
   <link href="<?php  echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css">
   <link rel="shortcut icon" href="<?php  echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css">

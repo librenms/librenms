@@ -14,7 +14,16 @@
     $temp = trim($temp);
     list($descr, $units, $size, $type) = explode("\n", $temp);
     list($units) = explode(" ", $units);
-    if(strstr($type, "FixedDisk") && $size > '0') {
+
+    $allow = 1;
+    foreach($config['ignore_mount'] as $bi) {
+#    echo("$descr == $bi\n");
+    if($descr == $bi) {
+        $allow = 0;
+      }
+    }
+
+    if(strstr($type, "FixedDisk") && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
         $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
         $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$descr', '$size', '$units')";
@@ -30,7 +39,7 @@
         } else { echo("."); }
       }
       $storage_exists[] = $device[device_id]." $hrStorageIndex";
-    }
+    } else { echo("X"); };
   }
 
 
