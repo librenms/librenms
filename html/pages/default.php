@@ -119,20 +119,11 @@ echo("</table>");
 
 echo("    </td>
     <td bgcolor=#e5e5e5 width=400 valign=top>
-  ");
 
-  if($_SESSION['userlevel'] >= '5') {
-    echo("
-      <div style='font-size: 18px; font-weight: bold;'>Network Infrastructure Diagram</div>
-      <img style='margin-top: 10px;' src='network.png' alt='Auto-generated network diagram'>
-    ");
-  }
-?>
 
    </td>
-   <td bgcolor=#e5e5e5 width=275 valign=top>
+   <td bgcolor=#e5e5e5 width=275 valign=top>");
 
-<?php
 
 /// VOSTRON
 
