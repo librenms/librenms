@@ -57,19 +57,11 @@ if($device['disabled']) { echo("checked=checked"); }
 echo("/></td>
       <td width='300'><div align='right'>Ignore</div></td>
       <td width='300'><input name='ignore' type='checkbox' id='disable' value='1'");
-if($device['ignore']) { echo("checked=checked"); }
+      if($device['ignore']) { echo("checked=checked"); }
 echo("/></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>Apache</div></td>
-      <td width='300'><label>
-        <input name='apache' type='checkbox' id='apache' value='1'");
+    </tr>");
 
-if($device['apache']) {echo("checked=checked");}
-
-echo("/>
-      </label></td>
-    </tr>
+echo("
   </table>
   <input type='submit' name='Submit' value='Save' />
   <label><br />

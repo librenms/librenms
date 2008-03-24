@@ -61,8 +61,8 @@ $config['favicon'] = "favicon.ico";
 
 $config['page_refresh'] = "30";  ## Refresh the page every xx seconds
 
-$config['email_default']  = "adama@memetic.org";
-$config['email_from']     = "Observer Dev <observer-dev@project-observer.org>";
+$config['email_default']  = "you@yourdomain";
+$config['email_from']     = "Observer <observer@yourdomain>";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 
@@ -71,8 +71,8 @@ $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 $config['int_customers'] = 1;   # Enable Customer Port Parsing
 $config['int_transit'] = 1;     # Enable Transit Types
 $config['int_peering'] = 1;     # Enable Peering Types
-$config['int_core'] = 1;                # Enable Core Port Types
-$config['int_l2tp'] = 1;                # Enable L2TP Port Types
+$config['int_core'] = 1;        # Enable Core Port Types
+$config['int_l2tp'] = 1;        # Enable L2TP Port Types
 
 $config['show_locations'] = 1;  # Enable Locations on menu
 
@@ -88,7 +88,6 @@ $config['syslog_filter'] = array("last message repeated", "Connection from UDP: 
 $config['syslog_age']    = "1 month"; ## Time to keep syslog for in 
                                       ## MySQL DATE_SUB format (eg '1 day', '1 month')
 
-
 ### Interface name strings to ignore
 $config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm",
@@ -98,29 +97,6 @@ $config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0",
 ### Mountpoints to ignore
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/proc/bus/usb");
-
-### entPhysicalVendorType rewrites
-
-$entPhysicalVendorTypes = array (
-  'cevC7xxxIo1feTxIsl' => 'C7200-IO-FE-MII',
-  'cevChassis7140Dualfe' => 'C7140-2FE',
-  'cevChassis7204' => "C7204",
-  'cevChassis7204Vxr' => 'C7204VXR',
-  'cevChassis7206' => 'C7206',
-  'cevChassis7206Vxr' => 'C7206VXR',
-  'cevCpu7200Npe200' => 'NPE-200',
-  'cevCpu7200Npe225' => 'NPE-225',
-  'cevCpu7200Npe300' => 'NPE-300',
-  'cevCpu7200Npe400' => 'NPE-400',
-  'cevCpu7200Npeg1' => 'NPE-G1',
-  'cevCpu7200Npeg2' => 'NPE-G2',
-  'cevPa1feTxIsl' => 'PA-FE-TX-ISL',
-  'cevPa2feTxI82543' => 'PA-2FE-TX',
-  'cevPa8e' => 'PA-8E',
-  'cevPaA8tX21' => 'PA-8T-X21',
-  'cevMGBIC1000BaseLX' => '1000BaseLX GBIC',
-  'cevPort10GigBaseLR' => '10GigBaseLR');
-
 
 ### Style Options
 

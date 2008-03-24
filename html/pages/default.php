@@ -101,8 +101,17 @@ foreach($nodes as $node) {
   $mouseover = "onmouseover=\"return overlib('<img src=\'graph.php?host=$node&from=$week&to=$now&width=400&height=120&type=cpu\'>');\"
                 onmouseout=\"return nd();\"";
 
-  if(hoststatus($node)) { $statimg = "<img align=absmiddle src=images/16/lightbulb.png alt='Host Up'>"; $box_bg = "#ffffaa"; } 
-                   else { $statimg = "<img align=absmiddle src=images/16/lightbulb_off.png alt='Host Down'>"; $box_bg = "#ffaaaa"; }
+  if(hoststatus($node)) { 
+    $statimg = "<img align=absmiddle src=images/16/lightbulb.png alt='Host Up'>"; 
+    $background_image = "images/boxbgorange.png"; 
+    $background_color = "#ddffdd";
+  } else { 
+    $statimg = "<img align=absmiddle src=images/16/lightbulb_off.png alt='Host Down'>"; 
+    $background_image = "images/boxbgpink.png"; 
+    $background_color = "#ffdddd";
+  }
+
+  if($ints || $services) { $background_color = "#ffddaa"; }
 
   if($rebooted) { $statimg = "<img align=absmiddle src=images/16/lightning.png alt='Host Rebooted'>"; }
 
@@ -115,9 +124,10 @@ foreach($nodes as $node) {
   $shorthost = $first;
   if(strlen($first.".".$second) < 16) { $shorthost = $first.".".$second; }
 
+  $device['device_id'] = $node;
 
-  $errorboxes .= "<div style='float: left; padding: 5px; width: 124px; height: 100px; background: $box_bg; margin: 4px;'>
-                   <center><strong>".$shorthost."</strong><br />";
+  $errorboxes .= "<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 100px; background: $background_color; margin: 4px;'>
+                   <center><strong>".generatedevicelink($device, $shorthost)."</strong><br />";
 
   if(hoststatus($node)) {$errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span> <br />";
   } else { $errorboxes .= "  <span class=body-date-1>Unreachable</span> <br />"; }
