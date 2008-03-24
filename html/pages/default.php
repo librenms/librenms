@@ -126,15 +126,24 @@ foreach($nodes as $node) {
 
   $device['device_id'] = $node;
 
-  $errorboxes .= "<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 100px; background: $background_color; margin: 4px;'>
+  $errorboxes .= "<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 75px; background: $background_color; margin: 4px;'>
                    <center><strong>".generatedevicelink($device, $shorthost)."</strong><br />";
 
-  if(hoststatus($node)) {$errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span> <br />";
-  } else { $errorboxes .= "  <span class=body-date-1>Unreachable</span> <br />"; }
+  if(hoststatus($node)) {
+    $errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span><br />";
+    
+    if($rebooted) { $errorboxes .= "  <div style='font-size: 14px; font-weight: bold; margin: 4px; color: #2a2;'>Rebooted</div><br />"; }  
 
-  $errorboxes .= " <img src='images/16/disconnect.png' align=absmiddle> <a $intpop><b>$ints</b></a>
-		   <img src='images/16/cog_error.png' align=absmiddle> <a $srvpop><b>$services</b></a>
-                  </center></div>";
+  } else { $errorboxes .= "  <div style='font-size: 14px; font-weight: bold; margin: 5px; color: #f66;'>Device<br />Unreachable</div><br />"; }
+
+#  $errorboxes .= " <img src='images/16/disconnect.png' align=absmiddle> <a $intpop><b>$ints</b></a>
+#		   <img src='images/16/cog_error.png' align=absmiddle> <a $srvpop><b>$services</b></a>";
+
+  if($ints) { $errorboxes .= "<div style='font-size: 11px;'><a $intpop>$ints Down Interfaces</a></div>"; }
+  if($services) { $errorboxes .= "<div style='font-size: 11px;'><a $srvpop>$services Down Services</a></div>"; }
+
+
+  $errorboxes .= " </center></div>";
    
 
 #  echo("<tr bgcolor=$bg>
@@ -155,7 +164,11 @@ foreach($nodes as $node) {
  
 echo("
 
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>  ");
+	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>  
+
+<h3>Recent Syslog Messages</h3>
+
+");
 
 $sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog ORDER BY datetime DESC LIMIT 20";
 $query = mysql_query($sql);
