@@ -149,7 +149,7 @@ echo("
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-        <li><a href='services/'><img src='images/16/link.png' border=0 align=absmiddle> All Sessions </a></li>
+        <li><a href='bgp/'><img src='images/16/link.png' border=0 align=absmiddle> All Sessions </a></li>
 
         <li><hr width=140 /></li>
         <li><a href='bgp/external/'><img src='images/16/world_link.png' border=0 align=absmiddle> External BGP</a></li>

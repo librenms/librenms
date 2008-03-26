@@ -27,45 +27,52 @@ while($device = mysql_fetch_array($sql)){
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
-  unset($already);
-  $i = 0;
-  while ($i <= count($nodes)) {
-    $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) { 
-     $already = "yes"; 
-    }
-    $i++;
-  }
-  if(!$already) { $nodes[] = $device['device_id']; }
+
+      echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
+      <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
+      <span class=body-date-1>".truncate($device['location'], 20)."</span>
+      </center></div>");
+
 }
 
 $sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-while($device = mysql_fetch_array($sql)){
-  unset($already);
-  $i = 0;
-  while ($i <= count($nodes)) {
-    $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) {
-     $already = "yes";
-    }
-    $i++;
-  }
-  if(!$already) { $nodes[] = $device['device_id']; }
+while($interface = mysql_fetch_array($sql)){
+
+      echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
+      <center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span> 
+      <strong>".generateiflink($interface, makeshortif($interface['ifDescr']))."</strong> <br />
+      <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
+      </center></div>");
+
 }
 
-$sql = mysql_query("SELECT D.device_id  FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down'  AND D.ignore = '0' AND S.service_ignore = '0'");
-while($device = mysql_fetch_array($sql)){
-  unset($already);
-  $i = 0;
-  while ($i <= count($nodes)) {
-    $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) {
-     $already = "yes";
-    }
-    $i++;
-  }
-  if(!$already) { $nodes[] = $device['device_id']; }
+$sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
+while($service = mysql_fetch_array($sql)){
+
+      echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
+      <center><strong>".generatedevicelink($service, shorthost($service['hostname']))."</strong><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span> 
+      <strong>".$service['service_type']."</strong><br />
+      <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
+      </center></div>");
+
 }
+
+$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id");
+while($peer = mysql_fetch_array($sql)){
+
+      echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
+      <center><strong>".generatedevicelink($peer, shorthost($peer['hostname']))."</strong><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span> 
+      <strong>".$peer['bgpPeerIdentifier']."</strong> <br />
+      <span class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
+      </center></div>");
+
+}
+
+
 
 foreach($nodes as $node) {
 
@@ -126,8 +133,9 @@ foreach($nodes as $node) {
 
   $device['device_id'] = $node;
 
-  $errorboxes .= "<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 75px; background: $background_color; margin: 4px;'>
-                   <center><strong>".generatedevicelink($device, $shorthost)."</strong><br />";
+  $errorboxes .= "
+    <div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 75px; background: $background_color; margin: 4px;'>
+      <center><strong>".generatedevicelink($device, $shorthost)."</strong><br />";
 
   if(hoststatus($node)) {
     $errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span><br />";

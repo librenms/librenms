@@ -20,3 +20,5 @@ RewriteRule ^device/([0-9]+) ?page=device&id=$1
 
 RewriteRule ^([a-z]+)/$ ?page=$1
 
+RewriteRule ^([a-z]+)/([a-z]+)/$ ?page=$1&view=$2
+

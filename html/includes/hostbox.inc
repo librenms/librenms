@@ -12,8 +12,8 @@
 
    $image = getImage($device['device_id']);
 
-   echo("
-            <tr bgcolor='$bg'>
+   echo("  <tr bgcolor='$bg' onmouseover=\"this.style.backgroundColor='#fdd';\" onmouseout=\"this.style.backgroundColor='$bg';\" 
+             onclick=\"location.href='/device/".$device['device_id']."/'\" style='cursor: hand;'>
              <td width='40' align=center valign=middle>$image</td>
              <td width='300'><span style='font-weight: bold; font-size: 14px;'>" . generatedevicelink($device) . "</span>
              <br />$device[purpose]</td>

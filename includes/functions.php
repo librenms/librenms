@@ -118,15 +118,25 @@ function devicepermitted($device_id) {
 }
 
 function formatRates($rate) {
-  $sizes = Array('bps', 'Kbps', 'Mbps', 'Gbps', 'Tbps', 'Pbps', 'Ebps');
+   $rate = format_si($rate) . "bps";
+   return $rate;
+}
+
+function formatstorage($rate) {
+   $rate = format_bi($rate) . "B";
+   return $rate;
+}
+
+function format_si($rate) {
+  $sizes = Array('', 'K', 'M', 'G', 'T', 'P', 'E');
   $round = Array('0','0','0','2','2','2','2','2','2');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
   return round($rate, $round[$i]).$ext;
 }
 
-function formatStorage($size) {
-  $sizes = Array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB');
+function format_bi($size) {
+  $sizes = Array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
   return round($size, 2).$ext;
