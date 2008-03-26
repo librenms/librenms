@@ -7,9 +7,9 @@ $config['db_pass'] = "password";
 $config['db_name'] = "observer";
 
 ### Installation Location
-$config['installdir'] 	= "/var/www/";
-$config['htmldir']	= $config['installdir'] . "html";
-$config['rrd_dir'] 	= $config['installdir'] . "rrd";
+$config['install_dir'] 	= "/var/www/";
+$config['html_dir']	= $config['install_dir'] . "html";
+$config['rrd_dir'] 	= $config['install_dir'] . "rrd";
 $rrd_dir = $config['rrd_dir'];
 
 ### Default community
@@ -51,11 +51,11 @@ $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 $config['nets'] =  array ("89.21.224.0/19", "10.0.0.0/8", "172.22.0.0/16", "213.253.1.0/24");
 
 ### Your company domain name and specifics
-$config['mydomain'] = "vostron.net";
+$config['mydomain'] = "project-observer.net";
 $config['page_title']  = "Observer Demo";
 $config['title_image'] = "images/observer-header.png";
 $config['stylesheet']  = "css/styles.css"; 
-$config['mono_font'] = "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf";
+$config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
 $mono_font = $config['mono_font'];
 $config['favicon'] = "favicon.ico";
 
