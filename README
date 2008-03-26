@@ -20,10 +20,25 @@ Please see http://www.project-observer.org.
 Changelog
 ---------
 
+Release 0.3.2 ( 26th March 2008 ) 
+
+Added BGP peer detection and watching
+Cleaned up the front page and made it more useful
+Added better syslog support
+Added some Juniper Netscreen support 
+Wrote a better OS detection system
+Added some billing features 
+Rewrote and restructured a lot of the discovery
+Rewrote some polling stuff
+
+... This release is greatly improved, and threatens
+ to actually work properly for people other than me!
+
 Release 0.3.1 ( 30th November 2007 )
 Fixed a great many things and made it prettier!
 
-.. This release took so long that I've largely forgotten what's been changed. Again!
+.. This release took so long that I've largely forgotten 
+ what's been changed. Again!
 
 Release 0.3.0-pre1 ( 24th June 2007 )
 Added VLAN features for cisco devices
