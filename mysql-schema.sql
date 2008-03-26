@@ -1,4 +1,10 @@
 -- 
+-- Database: `observer`
+-- 
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `adjacencies`
 -- 
 
@@ -34,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `alerts` (
 CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeer_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
+  `astext` varchar(32) NOT NULL,
   `bgpPeerIdentifier` text NOT NULL,
   `bgpPeerRemoteAs` int(11) NOT NULL,
   `bgpPeerState` text NOT NULL,
@@ -46,7 +53,6 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeerOutTotalMessages` int(11) NOT NULL,
   `bgpPeerFsmEstablishedTime` int(11) NOT NULL,
   `bgpPeerInUpdateElapsedTime` int(11) NOT NULL,
-  `astext` varchar(32) NOT NULL,
   PRIMARY KEY  (`bgpPeer_id`),
   KEY `device_id` (`device_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
@@ -65,7 +71,7 @@ CREATE TABLE IF NOT EXISTS `bills` (
   `bill_day` int(11) NOT NULL default '1',
   `bill_gb` int(11) default NULL,
   UNIQUE KEY `bill_id` (`bill_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -119,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`customer_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -130,25 +136,21 @@ CREATE TABLE IF NOT EXISTS `customers` (
 CREATE TABLE IF NOT EXISTS `devices` (
   `device_id` int(11) NOT NULL auto_increment,
   `hostname` text NOT NULL,
-  `community` varchar(32) NOT NULL default 'v05tr0n82',
+  `community` varchar(32) NOT NULL,
   `snmpver` varchar(4) NOT NULL default 'v2c',
-  `bgpLocalAs` varchar(8) default NULL,
+  `bgpLocalAs` varchar(16) default NULL,
   `sysDescr` text,
   `sysContact` text NOT NULL,
-  `monowall` tinyint(4) NOT NULL default '0',
   `version` text NOT NULL,
   `hardware` text NOT NULL,
   `features` text NOT NULL,
   `location` text,
-  `os` varchar(16) NOT NULL,
+  `os` varchar(8) NOT NULL default '',
   `status` tinyint(4) NOT NULL default '0',
   `ignore` tinyint(4) NOT NULL default '0',
   `disabled` tinyint(1) NOT NULL default '0',
   `lastchange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `purpose` text NOT NULL,
-  `apache` tinyint(4) NOT NULL default '0',
-  `courier` tinyint(4) NOT NULL default '0',
-  `postfix` tinyint(4) NOT NULL default '0',
   `type` varchar(8) NOT NULL default 'other',
   PRIMARY KEY  (`device_id`),
   KEY `status` (`status`)
@@ -239,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
   `ifAdminStatus` varchar(12) default NULL,
   `ifDuplex` varchar(12) default NULL,
   `ifMtu` int(11) default NULL,
-  `ifType` varchar(32) default NULL,
+  `ifType` text,
   `ifAlias` text,
   `ifPhysAddress` text,
   `ifHardType` varchar(64) default NULL,
@@ -362,6 +364,7 @@ CREATE TABLE IF NOT EXISTS `services` (
   `service_checked` int(11) NOT NULL default '0',
   `service_changed` int(11) NOT NULL default '0',
   `service_message` text NOT NULL,
+  `service_disabled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`service_id`),
   KEY `service_host` (`service_host`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
@@ -385,6 +388,10 @@ CREATE TABLE IF NOT EXISTS `storage` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
+
+-- 
+-- Table structure for table `syslog`
+-- 
 
 CREATE TABLE IF NOT EXISTS `syslog` (
   `host` varchar(64) NOT NULL,
