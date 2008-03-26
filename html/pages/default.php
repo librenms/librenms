@@ -72,104 +72,19 @@ while($peer = mysql_fetch_array($sql)){
 
 }
 
+$sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '84600'");
+while($device = mysql_fetch_array($sql)){
 
+      echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
+      <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br /> 
+      <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
+      </center></div>");
 
-foreach($nodes as $node) {
-
-  unset($srvpop);
-
-  $host = gethostbyid($node);
-
-  $ints = mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `device_id` = '$node'"),0);
-  $services = mysql_result(mysql_query("SELECT count(service_id) FROM `services` WHERE `service_status` = '0' AND `service_host` = '$node'"),0);
-
-  $intlist = array();
-  $sql = mysql_query("SELECT `ifDescr`, `ifAlias` FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `device_id` = '$node'");
-
-  $uptime = mysql_result(mysql_query("SELECT attrib_value FROM `devices` AS D, `devices_attribs` AS A WHERE D.device_id = '$node' AND D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime'"),0);
-
-  if($uptime < "86000") { $rebooted = 1; } else { $rebooted = 0; }
-
-  while($int = mysql_fetch_row($sql)) { $intlist[] = "<b>$int[0]</b> - $int[1]"; } 
-  foreach ($intlist as $intname) { $intpop .= "$br $intname"; $br = "<br />"; }
-  unset($br);
-  if($intpop) {$intpop = "onmouseover=\"return overlib('$intpop', WIDTH, 350);\" onmouseout=\"return nd();\""; }
-
-  $srvlist = array();
-  $sql = mysql_query("SELECT `service_type`, `service_message` FROM services WHERE `service_status` = '0' AND `service_host` = '$node'");
-  while($srv = mysql_fetch_row($sql)) { $srvlist[] = "<b>$srv[0]</b> - " . trim($srv[1]); }
-  foreach ($srvlist as $srvname) { $srvpop .= "$br " . truncate($srvname, 100); $br = "<br />"; }
-  unset($br);
-  if($srvpop) {
-    $srvpop = "onmouseover=\"return overlib('$srvpop', WIDTH, 350);\" onmouseout=\"return nd();\"";
-    $srvpop = str_replace("\n", ". ", $srvpop);
-  }
-
-  $mouseover = "onmouseover=\"return overlib('<img src=\'graph.php?host=$node&from=$week&to=$now&width=400&height=120&type=cpu\'>');\"
-                onmouseout=\"return nd();\"";
-
-  if(hoststatus($node)) { 
-    $statimg = "<img align=absmiddle src=images/16/lightbulb.png alt='Host Up'>"; 
-    $background_image = "images/boxbgorange.png"; 
-    $background_color = "#ddffdd";
-  } else { 
-    $statimg = "<img align=absmiddle src=images/16/lightbulb_off.png alt='Host Down'>"; 
-    $background_image = "images/boxbgpink.png"; 
-    $background_color = "#ffdddd";
-  }
-
-  if($ints || $services) { $background_color = "#ffddaa"; }
-
-  if($rebooted) { $statimg = "<img align=absmiddle src=images/16/lightning.png alt='Host Rebooted'>"; }
-
-  if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
-
-  if(devicepermitted($node)) {
-
-  list ($first, $second, $third) = explode(".", $host);
-
-  $shorthost = $first;
-  if(strlen($first.".".$second) < 16) { $shorthost = $first.".".$second; }
-
-  $device['device_id'] = $node;
-
-  $errorboxes .= "
-    <div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 75px; background: $background_color; margin: 4px;'>
-      <center><strong>".generatedevicelink($device, $shorthost)."</strong><br />";
-
-  if(hoststatus($node)) {
-    $errorboxes .= "  <span class=body-date-1>".formatuptime($uptime, short)."</span><br />";
-    
-    if($rebooted) { $errorboxes .= "  <div style='font-size: 14px; font-weight: bold; margin: 4px; color: #2a2;'>Rebooted</div><br />"; }  
-
-  } else { $errorboxes .= "  <div style='font-size: 14px; font-weight: bold; margin: 5px; color: #f66;'>Device<br />Unreachable</div><br />"; }
-
-#  $errorboxes .= " <img src='images/16/disconnect.png' align=absmiddle> <a $intpop><b>$ints</b></a>
-#		   <img src='images/16/cog_error.png' align=absmiddle> <a $srvpop><b>$services</b></a>";
-
-  if($ints) { $errorboxes .= "<div style='font-size: 11px;'><a $intpop>$ints Down Interfaces</a></div>"; }
-  if($services) { $errorboxes .= "<div style='font-size: 11px;'><a $srvpop>$services Down Services</a></div>"; }
-
-
-  $errorboxes .= " </center></div>";
-   
-
-#  echo("<tr bgcolor=$bg>
-#          <td><a href='?page=device&id=$node' $mouseover>$host</a></td>
-#          <td align=center>$statimg</td>
-#          <td align=center><a $intpop>$ints</a></td>
-#          <td align=center><a $srvpop>$services</a></td></tr>");
-#
-  }
-  unset($int, $ints, $intlist, $intpop, $srv, $srvlist, $srvname, $srvpop);
 }
 
-#echo("</table>");
 
-#echo("
-#    </td>
-#    <td bgcolor=#e5e5e5 width=400 valign=top>
- 
+
 echo("
 
 	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>  
