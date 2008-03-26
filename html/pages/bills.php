@@ -42,7 +42,7 @@ if($_GET['bill']) {
     echo("
            <tr bgcolor='$bg'>
              <td width='7'></td>
-             <td width='250'><a href='/bills/".$bill['bill_id']."'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
+             <td width='250'><a href='/bill/".$bill['bill_id']."'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
              <td>$notes</td>
 	     <td>$type</td>
              <td>$allowed</td>

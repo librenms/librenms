@@ -82,7 +82,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $update_query  = "UPDATE `interfaces` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
+#     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");
