@@ -4,7 +4,6 @@
 
   echo("Interfaces : ");
 
-#  $cmd = $config['snmpwalk'] . " -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.2.1.2.2.1.2 | sed s/ifDescr.//g | sed s/\ \"/\|\|\"/g | sed s/\ /\|\|/g";
   $cmd = $config['snmpwalk'] . " -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.2.1.2.2.1.2";
   $interfaces = trim(shell_exec($cmd));
   $interfaces = str_replace("\"", "", $interfaces);
@@ -32,7 +31,9 @@
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('$id','$ifIndex','$ifName')");
-           echo("+");
+          echo("\n INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifName')  \n ");
+          # Add Interface
+           echo("+" . mysql_error() . mysql_affected_rows());
         } else { 
           # Interface Already Exists
           echo(".");
