@@ -30,10 +30,9 @@
       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
-          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('$id','$ifIndex','$ifName')");
-          echo("\n INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifName')  \n ");
+          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifName')");
           # Add Interface
-           echo("+" . mysql_error() . mysql_affected_rows());
+           echo("+");
         } else { 
           # Interface Already Exists
           echo(".");

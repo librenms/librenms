@@ -36,8 +36,6 @@ while($peer = mysql_fetch_array($peers)) {
 
   rrdtool_update($peerrrd, "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
-  echo("$peerrrd N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
-
   $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
   $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
   $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'";
