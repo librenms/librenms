@@ -21,7 +21,7 @@
      if($peerhost) { $peername = generatedevicelink($peerhost); } else { unset($peername); }
 
      echo("<tr bgcolor=$bg_colour>
-             <td width=20><h3><center>$i</center></h3></td>
+             <td width=20><span class=list-large>$i</span></td>
              <td><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
 	     <td>$peer_type</td>
              <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
