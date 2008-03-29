@@ -6,7 +6,7 @@ include("includes/functions.php");
 
 if($argv[1]) { $where = "WHERE `interface_id` = '$argv[1]'"; }
 
-$interface_query = mysql_query("SELECT * FROM `interfaces` $where");
+$interface_query = mysql_query("SELECT * FROM `interfaces` $where ORDER BY interface_id DESC");
 while ($interface = mysql_fetch_array($interface_query)) {
 
  unset($this);
@@ -63,7 +63,6 @@ while ($interface = mysql_fetch_array($interface_query)) {
     if($this['ifTrunk']) { echo("Interface is a " . $this['ifTrunk'] . " trunk\n"); }
     if($this['ifVlan'])   { echo("Interface is a member of vlan " . $this['ifVlan'] . " \n"); }
 
-
   }
 
   list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifDuplex, $ifType, $ifMtu, $ifPhysAddress) = explode("\n", $snmp_output);
@@ -73,6 +72,9 @@ while ($interface = mysql_fetch_array($interface_query)) {
   if ($ifAlias == " ") { $ifAlias = str_replace(" ", "", $ifAlias); }
   $ifAlias = trim(str_replace("\"", "", $ifAlias));
   $ifAlias = trim($ifAlias);
+
+  echo("\n$ifName\n");
+  $ifDescr = fixifname($ifDescr);
 
   $ifPhysAddress = strtolower(str_replace("\"", "", $ifPhysAddress));
   $ifPhysAddress = str_replace(" ", ":", $ifPhysAddress);

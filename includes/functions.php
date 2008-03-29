@@ -533,6 +533,7 @@ function fixifName ($inf) {
         $inf = str_replace("vlan", "Vlan", $inf);
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("-802.1q Vlan subif", "", $inf);
+	$inf = str_replace("tunnel", "Tunnel", $inf);
         $inf = str_replace("serial", "Serial", $inf);
         $inf = str_replace("-aal5 layer", " aal5", $inf);
 	$inf = str_replace("null", "Null", $inf);

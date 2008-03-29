@@ -4,7 +4,6 @@ function process_syslog ($entry, $update) {
 
   global $config;
 
-
   foreach($config['syslog_filter'] as $bi) {
     if (strstr($entry['msg'], $bi)) {
         $delete = 1;
