@@ -6,3 +6,4 @@
 ./cleanup.php
 ./generate-map.sh
 ./check-errors.php
+./versioncheck.php --cron

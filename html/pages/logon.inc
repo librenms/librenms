@@ -2,9 +2,9 @@
 
     echo("
   <center><br />
-<table  border='0' cellpadding='20' cellspacing='20' bgcolor='#e8e8e8'>
+<table  border='0' cellpadding='20' cellspacing='20' background='images/login.png' width=479 height=212>
     <tr>
-      <td><div align='right'><img src='images/password.png' width='128' height='128'></div></td>
+      <td width=128 height=128></td>
       <td>
         <form action='". $_SERVER['REQUEST_URI'] ."' method=post>
           <h3>Please log in:</h3>
