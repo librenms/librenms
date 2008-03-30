@@ -1,5 +1,7 @@
 <?
 
+include("common.php");
+
 include("generic.php");
 include("ios.php");
 include("unix.php");
