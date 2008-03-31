@@ -31,7 +31,7 @@ if($argv[1] == "--device" && $argv[2]) {
 
 $devices_polled = 0;
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] ."\n");

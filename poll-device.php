@@ -29,7 +29,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("Polling " . $device['hostname'] . " ( device_id ".$device['device_id']." )\n\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
-  unset($location); unset($hardware); unset($sysDescr); unset($sysContact);
+  unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact);
 
   $pingable = isPingable($device['hostname']);
 
@@ -45,6 +45,8 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver']);
     if($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
   }
+
+  unset($snmpdata);
 
   if ($snmpable) { 
 
@@ -177,7 +179,7 @@ while ($device = mysql_fetch_array($device_query)) {
     default:
       pollDevice();
     }   
-    $location = str_replace("\"","", $sysLocation); 
+    $sysLocation = str_replace("\"","", $sysLocation); 
   
   echo("Polling temperatures\n");
   include("includes/polling/temperatures.inc.php");
@@ -208,10 +210,10 @@ while ($device = mysql_fetch_array($device_query)) {
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysDescr -> $sysDescr')");
   }
 
-  if ( $location && $device['location'] != $location ) {
-    $update .= $seperator . "`location` = '$location'";
+  if ( $sysLocation && $device['location'] != $sysLocation ) {
+    $update .= $seperator . "`location` = '$sysLocation'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Location -> $location')");
+    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Location -> $sysLocation')");
   }
 
   if ( $version && $device['version'] != $version ) {

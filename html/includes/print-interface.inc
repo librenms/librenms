@@ -15,8 +15,6 @@
   $ifPhysAddress = $interface['ifPhysAddress'];
   $ifType = fixiftype($interface['ifType']);
   $ifHardType = $interface['ifHardType'];
-#  $errors = interface_errors($interface);
-#  $rates = interface_rates($interface);
   
   if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
@@ -32,12 +30,15 @@
               <span class=list-large>
                 " . generateiflink($interface, "$i. $ifDescr") . " $error_img
               </span><br /><span class=interface-desc>$ifAlias</span>");
+
+	if($ifAlias) { echo("<br />"); }
+
   unset ($break);
   if(!$dographs) {
     $ipdata = mysql_query("SELECT * FROM `ipaddr` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
     while($ip = mysql_fetch_Array($ipdata)) {
       echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[addr]')\">$ip[addr]/$ip[cidr]</a>");
-      $break = " ";
+      $break = "<br />";
     } 
   echo("</span>");
   echo("</td><td width=100>");
@@ -79,7 +80,7 @@ echo("</td>");
      if ( strpos($ifDescr, "oopback") === false && !$dographs) {
        $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
-         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link) . " on " . generatedevicelink($link) . "</a><br />");
+         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['ifDescr'])) . " on " . generatedevicelink($link) . "</a><br />");
          $br = "<br />";
        }
        unset($br);
@@ -106,7 +107,7 @@ echo("</td>");
             $wq = mysql_query("select count(*) FROM links  WHERE dst_if = '$this_ifid' AND src_if = $if_id;");
             if (@mysql_result($wq, 0) == '0' && $this_hostname != $hostname) {
               $graph_url = "graph.php?if=$this_ifid&from=$twoday&to=$now&width=400&height=120&type=bits'";
-              echo("$br &nbsp;<img src='images/16/bullet_go.png' alt='Same Subnet' align=absmiddle />" . generateiflink($new) . " on " . generatedevicelink($new));
+              echo("$br &nbsp;<img src='images/16/bullet_go.png' alt='Same Subnet' align=absmiddle />" . generateiflink($new, makeshortif($new['ifDescr'])) . " on " . generatedevicelink($new));
               $br = "<br />";
             }
           }
