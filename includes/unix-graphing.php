@@ -262,7 +262,7 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $options .= " GPRINT:nice_perc:AVERAGE:\ \ \ %5.2lf%%";
   $options .= " GPRINT:nice_perc:MAX:\ \ \ %5.2lf%%\\\\n";
   $options .= " AREA:system_perc#ea8f00:system:STACK";
-  $options .= " GPRINT:system_perc:LAST:\ \ %5.2lf%%";
+  $options .= " GPRINT:system_perc:LAST:\ \ \ %5.2lf%%";
   $options .= " GPRINT:system_perc:AVERAGE:\ \ \ %5.2lf%%";
   $options .= " GPRINT:system_perc:MAX:\ \ \ %5.2lf%%\\\\n";
   $options .= " AREA:idle_perc#f5f5e5:idle:STACK";

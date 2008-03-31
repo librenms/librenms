@@ -16,10 +16,24 @@ include("cisco-entities.php");
 include("syslog.php");
 
 
+function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
+
+  $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
+  if(mysql_result(mysql_query($count_sql),0)) {
+    $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '$device_id' AND `attrib_type` = '$attrib_type'";
+    mysql_query($update_sql);
+  } else {
+    $insert_sql = "INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('$device_id', '$attrib_type', '$attrib_value')";
+    mysql_query($insert_sql);
+  }
+  return mysql_affected_rows();
+
+}
+
+
 function shorthost($hostname, $len=16) {
 
   list ($first, $second, $third, $fourth, $fifth) = explode(".", $hostname);
-
   $shorthost = $first;
   if(strlen($first.".".$second) < $len && $second) { 
     $shorthost = $first.".".$second; 
@@ -47,8 +61,8 @@ function getHostOS($hostname, $community, $snmpver) {
 
     global $config;
 
-    $sysDescr_cmd = "snmpget -O qv -" . $snmpver . " -c " . $community . " " . $hostname . " sysDescr.0";
-    $sysDescr = str_replace("\"", "", trim(`$sysDescr_cmd`));
+    $sysDescr_cmd = $config['snmpget']." -O qv -" . $snmpver . " -c " . $community . " " . $hostname . " sysDescr.0";
+    $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
     $dir_handle = @opendir("includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
       if( preg_match("/^discover-([a-z0-9]*).php/", $file) ) {
@@ -56,14 +70,12 @@ function getHostOS($hostname, $community, $snmpver) {
       }
     }
     closedir($dir_handle);
-
     if($os) { return $os; } else { return FALSE; }
-
 
 }
 
 
-function strgen ($length = 8)
+function strgen ($length = 16)
 {
     $entropy = array(0,1,2,3,4,5,6,7,8,9,'a','A','b','B','c','C','d','D','e',
     'E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n',
@@ -72,8 +84,7 @@ function strgen ($length = 8)
     
     $string = "";
     
-    for ($i=0; $i<$length; $i++)
-    {
+    for ($i=0; $i<$length; $i++) {
         $key = mt_rand(0,61);
         $string .= $entropy[$key];
     }
