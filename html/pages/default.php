@@ -20,25 +20,7 @@ function generate_front_box ($type, $content) {
  </div>");
 }
 
-
 echo("<div style='width: 875px; float: left; padding: 3px 10px; background: #fff;'>");
-
-$nodes = array();
-
-$sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
-
-while($device = mysql_fetch_array($sql)){
-  unset($already);
-  $i = 0;
-  while ($i <= count($nodes)) {
-    $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) {
-     $already = "yes";
-    }
-    $i++;
-  }
-  if(!$already) { $nodes[] = $device['device_id']; }
-
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
@@ -96,7 +78,6 @@ while($device = mysql_fetch_array($sql)){
       </center>");
 
 }
-
 
 if($config['frontpage_display'] == 'syslog') {
 
@@ -227,6 +208,6 @@ echo("</div>
 
 /// END VOSTRON
 
-}
+#}
 
 ?>
