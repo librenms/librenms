@@ -50,7 +50,7 @@ function popUp(URL) {
 <script type="text/javascript" src="js/overlib.js"></script>
 <body topmargin=0 leftmargin=0 rightmargin=0 bottommargin=0>
 <div id="center">
-<div id="top">
+<div id="top" style='background: <?php echo($config['header_color']); ?>;'>
 <table cellpadding=0 cellspacing=0 width=100%>
 <tr>
 <td align=left></td>
