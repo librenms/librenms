@@ -28,6 +28,7 @@ while($device = mysql_fetch_array($sql)){
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
       <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
+
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center></div>");
 
@@ -39,6 +40,7 @@ while($interface = mysql_fetch_array($sql)){
 
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span>
+<!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
       <strong>".generateiflink($interface, makeshortif($interface['ifDescr']))."</strong> <br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
       </center>");
