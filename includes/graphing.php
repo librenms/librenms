@@ -6,7 +6,8 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
   global $config, $rrdtool, $installdir, $mono_font;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
-  foreach(explode("\n", $interfaces) as $ifid) {
+  if($height < "33") { $options .= " --only-graph"; }
+  foreach(explode(",", $interfaces) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");    
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
