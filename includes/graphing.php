@@ -137,6 +137,7 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
   global $config, $rrdtool, $installdir, $mono_font;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
+  if($height < "33") { $options .= " --only-graph"; }
   $hostname = gethostbyid($device);
   $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
   if($width <= "300") { $options .= "--font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
@@ -179,6 +180,7 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  if($height < "33") { $options .= " --only-graph"; }
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
   $options .= " DEF:inoctets=$database:INOCTETS:AVERAGE";
   $options .= " DEF:outoctets=$database:OUTOCTETS:AVERAGE";
@@ -316,7 +318,7 @@ function cpugraph ($rrd, $graph , $from, $to, $width, $height) {
   global $config, $rrdtool, $installdir, $mono_font;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
-  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") {$options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
   $options .= " DEF:5s=$database:LOAD5S:AVERAGE";
   $options .= " DEF:5m=$database:LOAD5M:AVERAGE";
@@ -351,7 +353,7 @@ function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
-  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 --alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
   $options .= " DEF:MEMTOTAL=$database:MEMTOTAL:AVERAGE";
   $options .= " DEF:IOFREE=$database:IOFREE:AVERAGE";
