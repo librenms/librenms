@@ -20,6 +20,15 @@ Please see http://www.project-observer.org.
 Changelog
 ---------
 
+Pre-Release 0.3.3
+
+Much prettier front page.
+
+
+Release 0.3.2.1 ( 27th March 2008 )
+
+Minor bugfix to interface discovery engine.
+
 Release 0.3.2 ( 26th March 2008 ) 
 
 Added BGP peer detection and watching
