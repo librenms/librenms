@@ -36,28 +36,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] ."\n");
 
-  ## Discover Interfaces 
-  include("includes/discovery/interfaces.php");
-
-  ## Discover IP Addresses
-  include("includes/discovery/ipaddresses.php");
-
-  ## Discover Temperatures
-  include("includes/discovery/temperatures.php");
-
-  if($device['os'] == "Linux") {
-    include("includes/discovery/storage.php");
-  }
-
-  if($device['os'] == "Netscreen") {
-
-  }
-
-  if($device['os'] == "IOS") {
-    include("includes/discovery/cisco-vlans.php");
-    include("includes/discovery/cisco-physical.php");
-    include("includes/discovery/bgp-peers.php");
-  }
+  include("includes/discovery/unix-memory.php");
 
   echo("\n"); $devices_polled++;
 }

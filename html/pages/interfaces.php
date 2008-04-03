@@ -1,10 +1,19 @@
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+#if ($_SESSION['userlevel'] >= '5') {
   $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
-} else {
-  $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
+#} else {
+#  $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
+#}
+
+
+if($_GET['type'] == "down") {
+  $where = "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down'";  
+} elseif ($_GET['type'] == "admindown") {
+  $where = "AND I.ifAdminStatus = 'down'";
 }
+
+$sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifDescr";
 
 $query = mysql_query($sql);
 
@@ -25,7 +34,8 @@ while($interface = mysql_fetch_array($query)) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-
+  if( interfacepermitted($interface['interface_id']) ) {
+  
   echo("<tr bgcolor=$row_colour>
           <td class=list-bold>" . generatedevicelink($interface) . "</td>
           <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
@@ -35,6 +45,8 @@ while($interface = mysql_fetch_array($query)) {
         </tr>\n");
 
   $row++;
+
+  }
 
 }
 

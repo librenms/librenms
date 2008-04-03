@@ -1,23 +1,28 @@
 <?php
 
 function generate_front_box ($type, $content) {
- echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
-  <b class='box-".$type."'>
-  <b class='box-".$type."1'><b></b></b>
-  <b class='box-".$type."2'><b></b></b>
-  <b class='box-".$type."3'></b>
-  <b class='box-".$type."4'></b>
-  <b class='box-".$type."5'></b></b>
-  <div class='box-".$type."fg' style='height: 90px;'>
-   ".$content."
-  </div>
-  <b class='box-".$type."'>
-  <b class='box-".$type."5'></b>
-  <b class='box-".$type."4'></b>
-  <b class='box-".$type."3'></b>
-  <b class='box-".$type."2'><b></b></b>
-  <b class='box-".$type."1'><b></b></b></b>
- </div>");
+echo("<div style='  background: transparent url(/images/box-$type.png) no-repeat; display: block; height: 84px; width: 119px; padding: 8px; margin: 5px; float: left;'>
+ $content
+</div>");
+
+
+# echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
+#  <b class='box-".$type."'>
+#  <b class='box-".$type."1'><b></b></b>
+#  <b class='box-".$type."2'><b></b></b>
+#  <b class='box-".$type."3'></b>
+#  <b class='box-".$type."4'></b>
+#  <b class='box-".$type."5'></b></b>
+#  <div class='box-".$type."fg' style='height: 90px;'>
+#   ".$content."
+#  </div>
+#  <b class='box-".$type."'>
+#  <b class='box-".$type."5'></b>
+#  <b class='box-".$type."4'></b>
+#  <b class='box-".$type."3'></b>
+#  <b class='box-".$type."2'><b></b></b>
+#  <b class='box-".$type."1'><b></b></b></b>
+# </div>");
 }
 
 echo("<div style='width: 875px; float: left; padding: 3px 10px; background: #fff;'>");
@@ -25,12 +30,10 @@ echo("<div style='width: 875px; float: left; padding: 3px 10px; background: #fff
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
 
-      echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
-      <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      generate_front_box("alert", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
-
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
-      </center></div>");
+      </center>");
 
 
 }
@@ -75,7 +78,7 @@ while($device = mysql_fetch_array($sql)){
 
 
    generate_front_box("info", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
       <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
       </center>");
 

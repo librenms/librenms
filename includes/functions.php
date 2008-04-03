@@ -111,11 +111,11 @@ function interfacepermitted($interface_id) {
 
   global $_SESSION;
   if($_SESSION['userlevel'] >= "5") { 
-    $allowed = true; 
+    $allowed = TRUE; 
   } elseif ( devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interface WHERE interface_id = '$interface_id'"),0))) {
-    $allowed = true;
+    $allowed = TRUE;
   } elseif ( @mysql_result(mysql_query("SELECT count(*) FROM interface_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0) > '0') {
-    $allowed = true;
+    $allowed = TRUE;
   } else { $allowed = FALSE; }
   return $allowed;
 }

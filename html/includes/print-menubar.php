@@ -123,13 +123,16 @@ if($_SESSION['userlevel'] >= '5') {
   if($config['int_core']) { echo("<li><a href='?page=iftype&type=core'><img src='images/16/brick_link.png' border=0 align=absmiddle> Core</a></li>"); $ifbreak = 1;}
 }
 
-if($ifbreak && $interface_alerts) { echo("<li><hr width=140 /></li>"); }
+if($ifbreak) { echo("<li><hr width=140 /></li>"); }
 
 if($interface_alerts) {
 echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png' border=0 align=absmiddle> Alerts ($interface_alerts)</a></li>");
 }
 
 ?>
+
+<li><a href='interfaces/down/'><img src='images/16/if-disconnect.png' border=0 align=absmiddle> Down Ports</a></li>
+<li><a href='interfaces/admindown/'><img src='images/16/if-disable.png' border=0 align=absmiddle> Disabled Ports</a></li>
 
 </ul></td></tr></table>
 
