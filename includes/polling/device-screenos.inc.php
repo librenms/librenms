@@ -1,6 +1,10 @@
 <?
 
-echo("Doing Juniper Netscreen ScreenOS");
+echo("Doing Juniper Netscreen (ScreenOS)");
+
+$version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "Juniper Netscreen \\1||\\2||\\3||\\4", $sysDescr);
+echo("$version\n");
+list($hardware,$version,$serial,$features) = explode("||", $version);
 
 $cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-cpu.rrd";
 $memrrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-memory.rrd";

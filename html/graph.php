@@ -44,7 +44,15 @@
   $os = gethostosbyid($device_id);
 
   switch ($type) {
-
+  case 'fortigate_sessions':
+    $graph = graph_fortigate_sessions ($hostname . "/fortigate-sessions.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'fortigate_cpu':
+    $graph = graph_fortigate_cpu ($hostname . "/fortigate-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'fortigate_memory':
+    $graph = graph_fortigate_memory ($hostname . "/fortigate-memory.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'netscreen_sessions':
     $graph = graph_netscreen_sessions ($hostname . "/netscreen-sessions.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
