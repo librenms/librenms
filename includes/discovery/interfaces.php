@@ -33,10 +33,15 @@
           mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifName')");
           # Add Interface
            echo("+");
-        } else { 
-          # Interface Already Exists
-          echo(".");
+        } else {
+          mysql_query("UPDATE `interfaces` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex' AND `deleted` = '1'"); 
+          if(mysql_affected_rows()) { 
+            echo("*"); 
+          } else {
+            echo(".");
+          }
         }
+        $int_exists[] = "$ifIndex";
       } else { 
           # Ignored ifName
           echo("X"); 
@@ -44,6 +49,25 @@
     } 
   }
 
+
+  $sql = "SELECT * FROM `interfaces` WHERE `device_id`  = '".$device['device_id']."' AND `deleted` = '0'";
+  $query = mysql_query($sql);
+
+  while ($test_if = mysql_fetch_array($query)) {
+        unset($exists);
+        $i = 0;
+        while ($i < count($int_exists) && !$exists) {
+            $this_if = $test_if['ifIndex'];
+            if ($int_exists[$i] == $this_if) { $exists = 1; }
+            $i++;
+        }
+        if(!$exists) {
+          echo("-");
+          mysql_query("UPDATE `interfaces` SET `deleted` = '1' WHERE interface_id = '" . $test_if['interface_id'] . "'");
+        }
+  }
+
+  unset($temp_exists);
   echo("\n");
 
 ?>

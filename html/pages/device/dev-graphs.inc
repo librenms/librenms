@@ -8,17 +8,22 @@ while($device = mysql_fetch_array($device_query)) {
    echo("<div style='clear: both;'>");
 
    switch ($device['os']) {
-   case "ScreenOS":
+   case "Fortigate":
+      echo("<div class=graphhead>Processor Utilisation</div>");
+      $graph_type = "fortigate_cpu";            include ("includes/print-device-graph.php");
+      echo("<div class=graphhead>Memory Usage</div>");
+      $graph_type = "fortigate_memory";         include ("includes/print-device-graph.php");
+      echo("<div class=graphhead>Firewall Sessions</div>");
+      $graph_type = "fortigate_sessions";       include ("includes/print-device-graph.php");
+      break;
 
+   case "ScreenOS":
       echo("<div class=graphhead>Processor Utilisation</div>");
       $graph_type = "netscreen_cpu";            include ("includes/print-device-graph.php");
-
       echo("<div class=graphhead>Memory Usage</div>");
       $graph_type = "netscreen_memory";        	include ("includes/print-device-graph.php");
-
       echo("<div class=graphhead>Firewall Sessions</div>");
       $graph_type = "netscreen_sessions";       include ("includes/print-device-graph.php");
-
       break;
 
    case "ProCurve":

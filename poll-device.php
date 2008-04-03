@@ -66,10 +66,7 @@ while ($device = mysql_fetch_array($device_query)) {
       $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
     } else { unset($ciscomodel); }
 
-    echo("$snmp_cmd \n");
-
     $snmpdata = shell_exec($snmp_cmd);
-    echo("completed");
     $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
@@ -139,10 +136,11 @@ while ($device = mysql_fetch_array($device_query)) {
       break;
 
     case "ScreenOS":
-      $version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "Juniper Netscreen \\1||\\2||\\3||\\4", $sysDescr);
-      echo("$version\n");
-      list($hardware,$version,$serial,$features) = explode("||", $version);
       include("includes/polling/device-screenos.inc.php");
+      break;
+
+    case "Fortigate":
+      include("includes/polling/device-fortigate.inc.php");
       break;
 
     case "IOS":
