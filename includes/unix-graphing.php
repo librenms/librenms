@@ -241,7 +241,7 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $database = $rrd_dir . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
-  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 --alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  
   $options .= " DEF:user=$database:user:AVERAGE";
   $options .= " DEF:nice=$database:nice:AVERAGE";

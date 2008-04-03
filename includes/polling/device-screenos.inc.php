@@ -1,6 +1,6 @@
 <?
 
-echo("doing SCREENOS");
+echo("Doing Juniper Netscreen ScreenOS");
 
 $cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-cpu.rrd";
 $memrrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-memory.rrd";
