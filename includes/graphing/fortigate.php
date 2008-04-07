@@ -37,7 +37,7 @@ function graph_fortigate_memory ($rrd, $graph, $from, $to, $width, $height, $tit
   global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
-  $options = "-b 1024 -l 0 -Y -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 -Y -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:mem=$database:mem:AVERAGE";
   $options .= " DEF:kcap=$database:memcapacity:AVERAGE";
