@@ -1,7 +1,7 @@
 <?php
 
 function generate_front_box ($type, $content) {
-echo("<div style='  background: transparent url(/images/box-$type.png) no-repeat; display: block; height: 84px; width: 119px; padding: 8px; margin: 5px; float: left;'>
+echo("<div style='  background: transparent url(../images/box-$type.png) no-repeat; display: block; height: 84px; width: 119px; padding: 8px; margin: 5px; float: left;'>
  $content
 </div>");
 
