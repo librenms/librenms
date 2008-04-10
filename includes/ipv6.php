@@ -1,130 +1,20 @@
 <?php
 
-/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
-
-/**
- * This file contains the implementation of the Net_IPv6 class
- *
- * PHP versions 4 and 5
- *
- * LICENSE: This source file is subject to the New BSD license, that is
- * available through the world-wide-web at http://www.opensource.org/licenses/bsd-license.php
- * If you did not receive a copy of the new BSDlicense and are unable
- * to obtain it through the world-wide-web, please send a note to
- * license@php.net so we can mail you a copy immediately
- *
- * @category Net
- * @package Net_IPv6
- * @author Alexander Merz <alexander.merz@web.de>
- * @copyright 2003-2005 The PHP Group
- * @license http://www.opensource.org/licenses/bsd-license.php
- * @version CVS: $Id: IPv6.php,v 1.15 2007/11/16 00:22:28 alexmerz Exp $
- * @link http://pear.php.net/package/Net_IPv6
- */
-
-// {{{ constants
-
-/**
- * Error message if netmask bits was not found
- * @see isInNetmask
- */
 define("NET_IPV6_NO_NETMASK_MSG", "Netmask length not found");
-
-/**
- * Error code if netmask bits was not found
- * @see isInNetmask
- */
 define("NET_IPV6_NO_NETMASK", 10);
-
-/**
- * Address Type: Unassigned (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_UNASSIGNED", 1);
-
-/**
- * Address Type: Reserved (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_RESERVED",  11);
-
-/**
- * Address Type: Reserved for NSAP Allocation (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_RESERVED_NSAP", 12);
-
-/**
- * Address Type: Reserved for IPX Allocation (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_RESERVED_IPX", 13);
-
-/**
- * Address Type: Reserved for Geographic-Based Unicast Addresses (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_RESERVED_UNICAST_GEOGRAPHIC", 14);
-
-/**
- * Address Type: Provider-Based Unicast Address (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_UNICAST_PROVIDER", 22);
-
-/**
- * Address Type: Multicast Addresses (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_MULTICAST", 31);
-
-/**
- * Address Type: Link Local Use Addresses (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_LOCAL_LINK", 42);
-
-/**
- * Address Type: Link Local Use Addresses (RFC 1884, Section 2.3)
- * @see getAddressType()
- */
 define("NET_IPV6_LOCAL_SITE", 43);
-
-/**
- * Address Type: address can not assigned to a specific type
- * @see getAddressType()
- */
 define("NET_IPV6_UNKNOWN_TYPE", 1001);
 
-// }}}
-// {{{ Net_IPv6
-
-/**
- * Class to validate and to work with IPv6 addresses.
- *
- * @category Net
- * @package Net_IPv6
- * @author Alexander Merz <alexander.merz@web.de>
- * @copyright 2003-2005 The PHP Group
- * @license http://www.opensource.org/licenses/bsd-license.php
- * @version CVS: $Id: IPv6.php,v 1.15 2007/11/16 00:22:28 alexmerz Exp $
- * @link http://pear.php.net/package/Net_IPv6
- * @author elfrink at introweb dot nl
- * @author Josh Peck <jmp at joshpeck dot org>
- */
 class Net_IPv6 {
 
-    // {{{ removeNetmaskBits()
-
-    /**
-     * Removes a possible existing netmask specification at an IP addresse.
-     *
-     * @param String $ip the (compressed) IP as Hex representation
-     * @return String the IP without netmask length
-     * @since 1.1.0
-     * @access public
-     * @static
-     */
     function removeNetmaskSpec($ip) {
         $addr = $ip;
         if(false !== strpos($ip, '/')) {
@@ -136,15 +26,6 @@ class Net_IPv6 {
         return $addr;
     }
 
-    /**
-     * Returns a possible existing netmask specification at an IP addresse.
-     *
-     * @param String $ip the (compressed) IP as Hex representation
-     * @return String the netmask spec
-     * @since 1.1.0
-     * @access public
-     * @static
-     */
     function getNetmaskSpec($ip) {
         $spec = '';
         if(false !== strpos($ip, '/')) {
@@ -159,17 +40,6 @@ class Net_IPv6 {
     // }}}
     // {{{ getNetmask()
 
-    /**
-     * Calculates the network prefix based on the netmask bits.
-     *
-     * @param String $ip the (compressed) IP in Hex format
-     * @param int $bits if the number of netmask bits is not part of the IP
-     *                  you must provide the number of bits
-     * @return String the network prefix
-     * @since 1.1.0
-     * @access public
-     * @static
-     */
     function getNetmask($ip, $bits = null) {
         if(null==$bits) {
             $elements = explode('/', $ip);
@@ -188,23 +58,6 @@ class Net_IPv6 {
         return Net_IPv6::_bin2Ip(Net_IPv6::_ip2Bin($addr) & $binNetmask);
     }
 
-    // }}}
-    // {{{ isInNetmask()
-
-    /**
-     * Checks if an (compressed) IP is in a specific address space.
-     *
-     * IF the IP does not contains the number of netmask bits (F8000::FFFF/16)
-     * then you have to use the $bits parameter.
-     *
-     * @param String $ip the IP to check (eg. F800::FFFF)
-     * @param String $netmask the netmask (eg F800::)
-     * @param int $bits the number of netmask bits to compare, if not given in $ip
-     * @return boolean true if $ip is in the netmask
-     * @since 1.1.0
-     * @access public
-     * @static
-     */
     function isInNetmask($ip, $netmask, $bits=null) {
         // try to get the bit count
         if(null == $bits) {
@@ -233,34 +86,7 @@ class Net_IPv6 {
         return false;
     }
 
-    // }}}
-    // {{{ getAddressType()
 
-    /**
-     * Returns the type of an IPv6 address.
-     *
-     * RFC 1883, Section 2.3 describes several types of addresses in
-     * the IPv6 addresse space.
-     * Several addresse types are markers for reserved spaces and as consequence
-     * a subject to change.
-     *
-     * @param String $ip the IP address in Hex format, compressed IPs are allowed
-     * @return int one of the addresse type constants
-     * @access public
-     * @since 1.1.0
-     * @static
-     *
-     * @see NET_IPV6_UNASSIGNED
-     * @see NET_IPV6_RESERVED
-     * @see NET_IPV6_RESERVED_NSAP
-     * @see NET_IPV6_RESERVED_IPX
-     * @see NET_IPV6_RESERVED_UNICAST_GEOGRAPHIC
-     * @see NET_IPV6_UNICAST_PROVIDER
-     * @see NET_IPV6_MULTICAST
-     * @see NET_IPV6_LOCAL_LINK
-     * @see NET_IPV6_LOCAL_SITE
-     * @see NET_IPV6_UNKNOWN_TYPE
-     */
     function getAddressType($ip) {
         $ip = Net_IPv6::removeNetmaskSpec($ip);
         $binip = Net_IPv6::_ip2Bin($ip);
@@ -300,25 +126,7 @@ class Net_IPv6 {
         return NET_IPV6_UNKNOWN_TYPE;
     }
 
-    // }}}
-    // {{{ Uncompress()
 
-    /**
-     * Uncompresses an IPv6 adress
-     *
-     * RFC 2373 allows you to compress zeros in an adress to '::'. This
-     * function expects an valid IPv6 adress and expands the '::' to
-     * the required zeros.
-     *
-     * Example:  FF01::101	->  FF01:0:0:0:0:0:0:101
-     *           ::1        ->  0:0:0:0:0:0:0:1
-     *
-     * @access public
-     * @see Compress()
-     * @static
-     * @param string $ip	a valid IPv6-adress (hex format)
-     * @return string	the uncompressed IPv6-adress (hex format)
-	 */
     function Uncompress($ip) {
         $netmask = Net_IPv6::getNetmaskSpec($ip);
         $uip = Net_IPv6::removeNetmaskSpec($ip);
@@ -371,26 +179,6 @@ class Net_IPv6 {
         return $uip;
     }
 
-    // }}}
-    // {{{ Compress()
-
-    /**
-     * Compresses an IPv6 adress
-     *
-     * RFC 2373 allows you to compress zeros in an adress to '::'. This
-     * function expects an valid IPv6 adress and compresses successive zeros
-     * to '::'
-     *
-     * Example:  FF01:0:0:0:0:0:0:101 	-> FF01::101
-     *           0:0:0:0:0:0:0:1        -> ::1
-     *
-     * @access public
-     * @see Uncompress()
-     * @static
-     * @param string $ip	a valid IPv6-adress (hex format)
-     * @return string	the compressed IPv6-adress (hex format)
-     * @author elfrink at introweb dot nl
-     */
     function Compress($ip)	{
 
         $netmask = Net_IPv6::getNetmaskSpec($ip);
@@ -419,23 +207,6 @@ class Net_IPv6 {
          return $cip;
     }
 
-    // }}}
-    // {{{ SplitV64()
-
-    /**
-     * Splits an IPv6 adress into the IPv6 and a possible IPv4 part
-     *
-     * RFC 2373 allows you to note the last two parts of an IPv6 adress as
-     * an IPv4 compatible adress
-     *
-     * Example:  0:0:0:0:0:0:13.1.68.3
-     *           0:0:0:0:0:FFFF:129.144.52.38
-     *
-     * @access public
-     * @static
-     * @param string $ip	a valid IPv6-adress (hex format)
-     * @return array		[0] contains the IPv6 part, [1] the IPv4 part (hex format)
-     */
     function SplitV64($ip) {
         $ip = Net_IPv6::removeNetmaskSpec($ip);
         $ip = Net_IPv6::Uncompress($ip);
@@ -449,19 +220,6 @@ class Net_IPv6 {
         }
     }
 
-    // }}}
-    // {{{ checkIPv6()
-
-    /**
-     * Checks an IPv6 adress
-     *
-     * Checks if the given IP is IPv6-compatible
-     *
-     * @access public
-     * @static
-     * @param string $ip	a valid IPv6-adress
-     * @return boolean	true if $ip is an IPv6 adress
-     */
     function checkIPv6($ip) {
         $ip = Net_IPv6::removeNetmaskSpec($ip);
         $ipPart = Net_IPv6::SplitV64($ip);
@@ -497,17 +255,6 @@ class Net_IPv6 {
         }
     }
 
-    // }}}
-    // {{{ _ip2Bin()
-
-    /**
-     * Converts an IPv6 address from Hex into Binary representation.
-     *
-     * @param String $ip the IP to convert (a:b:c:d:e:f:g:h), compressed IPs are allowed
-     * @return String the binary representation
-     * @access private
-     @ @since 1.1.0
-     */
     function _ip2Bin($ip) {
         $binstr = '';
         $ip = Net_IPv6::removeNetmaskSpec($ip);
@@ -520,17 +267,6 @@ class Net_IPv6 {
         return $binstr;
     }
 
-    // }}}
-    // {{{ _bin2Ip()
-
-    /**
-     * Converts an IPv6 address from Binary into Hex representation.
-     *
-     * @param String $ip the IP as binary
-     * @return String the uncompressed Hex representation
-     * @access private
-     @ @since 1.1.0
-     */
     function _bin2Ip($bin) {
         $ip = "";
         if(strlen($bin)<128) {
@@ -545,16 +281,6 @@ class Net_IPv6 {
         return $ip;
     }
 
-    // }}}
 }
-// }}}
-
-/*
- * Local variables:
- * tab-width: 4
- * c-basic-offset: 4
- * c-hanging-comment-ender-p: nil
- * End:
- */
 
 ?>

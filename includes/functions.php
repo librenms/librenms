@@ -1,18 +1,18 @@
 <?
 
-include("common.php");
-include("ipv6.php");
-include("generic.php");
-include("ios.php");
-include("unix.php");
-include("windows.php");
-include("procurve.php");
-include("snom.php");
-include("graphing.php");
-include("print-functions.php");
-include("billing-functions.php");
-include("cisco-entities.php");
-include("syslog.php");
+include_once("common.php");
+include_once("ipv6.php");
+include_once("generic.php");
+include_once("ios.php");
+include_once("unix.php");
+include_once("windows.php");
+include_once("procurve.php");
+include_once("snom.php");
+include_once("graphing.php");
+include_once("print-functions.php");
+include_once("billing-functions.php");
+include_once("cisco-entities.php");
+include_once("syslog.php");
 
 function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
