@@ -1,7 +1,9 @@
 <?
 
+echo("functions");
+
 include_once("common.php");
-include_once("ipv6.php");
+include_once("ipv6-functions.php");
 include_once("generic.php");
 include_once("ios.php");
 include_once("unix.php");
