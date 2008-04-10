@@ -6,13 +6,13 @@
 include("config.php");
 include("includes/functions.php");
 
-#$query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
-#          WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
+$query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
+          WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
 
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
 
-  $mask = trim(`$ipcalc $row[addr]/$row[cidr] | grep Netmask: | cut -d " " -f 4`);
+  $mask = trim(shell_exec($config['ipcalc'] . " ".$row['addr']."/".$row['cidr']." | grep Netmask: | cut -d \" \" -f 4"));
   $response = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntIfIndex.$row[addr] | cut -d " " -f 2`);
   $maskcheck = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntNetMask.$row[addr] | cut -d " " -f 2`);
   if($response == $row['ifIndex'] && $mask == $maskcheck) {
@@ -22,8 +22,8 @@ while($row = mysql_fetch_array($data)) {
   }
 }
 
-#$query = "SELECT * FROM interfaces AS I, devices as D 
-#          WHERE I.device_id = D.device_id AND D.status = '1'";
+$query = "SELECT * FROM interfaces AS I, devices as D 
+          WHERE I.device_id = D.device_id AND D.status = '1'";
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
   $index = $row[ifIndex];
@@ -40,8 +40,8 @@ while($row = mysql_fetch_array($data)) {
   }
 }
 
-#echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at start\n");
-#$interface_query = mysql_query("SELECT interface_id,device_id FROM `interfaces`");
+echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at start\n");
+$interface_query = mysql_query("SELECT interface_id,device_id FROM `interfaces`");
 while ($interface = mysql_fetch_array($interface_query)) {
   $device_id = $interface['device_id'];
   $interface_id = $interface['interface_id'];
@@ -52,8 +52,8 @@ while ($interface = mysql_fetch_array($interface_query)) {
 }
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at end\n");
 
-#echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at start\n");
-#$link_query = mysql_query("SELECT id,src_if,dst_if FROM `links`");
+echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at start\n");
+$link_query = mysql_query("SELECT id,src_if,dst_if FROM `links`");
 while ($link = mysql_fetch_array($link_query)) {
   $id = $link['id'];
   $src = $link['src_if'];

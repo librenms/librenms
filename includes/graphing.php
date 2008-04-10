@@ -2,9 +2,10 @@
 
 include("graphing/screenos.php");
 include("graphing/fortigate.php");
+include("graphing/windows.php");
 
 function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
   if($height < "33") { $options .= " --only-graph"; }
@@ -38,16 +39,16 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:outbits:LAST:%6.2lf%s";
   $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
   $options .= " GPRINT:outbits:MAX:%6.2lf%s";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal"; }
-  $thing = `$rrdtool graph $imgfile $options`;
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") {
-    $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal ";
+    $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal ";
   }
   $hostname = gethostbyid($device);
   $imgfile = "graphs/" . "$graph";
@@ -100,16 +101,16 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
     $opt = str_replace(" ","\ ", $opt);
     $options .= " $opt";
   }
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 
 function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
   $options .= " -l 0 -E -b 1024 --title '$title' ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $imgfile = "graphs/" . "$graph";
   $iter = "1";
@@ -130,18 +131,18 @@ function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $
     $options .= " GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf\°C\\\l ";
     $iter++;
   }
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
   if($height < "33") { $options .= " --only-graph"; }
   $hostname = gethostbyid($device);
   $query = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
-  if($width <= "300") { $options .= "--font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $pluses = "";
   while($int = mysql_fetch_row($query)) {
     if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . $int[0] . ".rrd")) {
@@ -171,18 +172,18 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
   $options .=  " GPRINT:outbits:LAST:%6.2lf%s ";
   $options .=  " GPRINT:outbits:AVERAGE:%6.2lf%s ";
   $options .=  " GPRINT:outbits:MAX:%6.2lf%s ";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;    
+  global $config, $installdir;    
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   if($height < "33") { $options .= " --only-graph"; }
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:inoctets=$database:INOCTETS:AVERAGE";
   $options .= " DEF:outoctets=$database:OUTOCTETS:AVERAGE";
   $options .= " CDEF:octets=inoctets,outoctets,+";
@@ -214,16 +215,16 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:totout:Out\ %6.2lf%s\)\\\\l";
   $options .= " LINE1:95thin#aa0000";
   $options .= " LINE1:d95thout#aa0000";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTUCASTPKTS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -238,16 +239,16 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:out:LAST:%6.2lf%spps";
   $options .= " GPRINT:out:AVERAGE:%6.2lf%spps";
   $options .= " GPRINT:out:MAX:%6.2lf%spps\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function errorgraph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INERRORS:AVERAGE";
   $options .= " DEF:out=$database:OUTERRORS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -262,16 +263,16 @@ function errorgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:out:LAST:%6.2lf%spps";
   $options .= " GPRINT:out:AVERAGE:%6.2lf%spps";
   $options .= " GPRINT:out:MAX:%6.2lf%spps\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function nucastgraph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INNUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTNUCASTPKTS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -286,16 +287,16 @@ function nucastgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:out:LAST:%6.2lf%spps";
   $options .= " GPRINT:out:AVERAGE:%6.2lf%spps";
   $options .= " GPRINT:out:MAX:%6.2lf%spps\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function bgpupdatesgraph ($rrd, $graph , $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") {$options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:bgpPeerInUpdates:AVERAGE";
   $options .= " DEF:out=$database:bgpPeerOutUpdates:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -310,33 +311,33 @@ function bgpupdatesgraph ($rrd, $graph , $from, $to, $width, $height) {
   $options .= " GPRINT:out:LAST:%6.2lf%sU/s";
   $options .= " GPRINT:out:AVERAGE:%6.2lf%sU/s";
   $options .= " GPRINT:out:MAX:%6.2lf%sU/s\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 
 function cpugraph ($rrd, $graph , $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") {$options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:5s=$database:LOAD5S:AVERAGE";
   $options .= " DEF:5m=$database:LOAD5M:AVERAGE";
   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
   $options .= " AREA:5m#ffee99: LINE1.25:5m#aa2200:Load\ %";
   $options .= " GPRINT:5m:LAST:%6.2lf\  GPRINT:5m:AVERAGE:%6.2lf\ ";
   $options .= " GPRINT:5m:MAX:%6.2lf\  GPRINT:5m:AVERAGE:%6.2lf\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; } 
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; } 
   $options .= " DEF:uptime=$database:uptime:AVERAGE";
   $options .= " CDEF:cuptime=uptime,86400,/";
   $options .= " COMMENT:Days\ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
@@ -344,18 +345,18 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
   $options .= " LINE1.25:cuptime#36393D:";
   $options .= " GPRINT:cuptime:LAST:%6.2lf\  GPRINT:cuptime:AVERAGE:%6.2lf\ ";
   $options .= " GPRINT:cuptime:MAX:%6.2lf\  GPRINT:cuptime:AVERAGE:%6.2lf\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 
 function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "-l 0 --alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:MEMTOTAL=$database:MEMTOTAL:AVERAGE";
   $options .= " DEF:IOFREE=$database:IOFREE:AVERAGE";
   $options .= " DEF:IOUSED=$database:IOUSED:AVERAGE";
@@ -376,17 +377,17 @@ function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical
   $options .= " GPRINT:FREE:MAX:%6.2lf%s";
   $options .= " GPRINT:FREE:AVERAGE:%6.2lf%s\\\\l";
   $options .= " LINE1:MEMTOTAL#000000:";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function ip_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:ipForwDatagrams=$database:ipForwDatagrams:AVERAGE";
   $options .= " DEF:ipInDelivers=$database:ipInDelivers:AVERAGE";
   $options .= " DEF:ipInReceives=$database:ipInReceives:AVERAGE";
@@ -423,17 +424,17 @@ function ip_graph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:ipOutNoRoutes:LAST:%6.2lf%s";
   $options .= " GPRINT:ipOutNoRoutes:AVERAGE:\ %6.2lf%s";
   $options .= " GPRINT:ipOutNoRoutes:MAX:\ %6.2lf%s\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function icmp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
   $options .= " DEF:icmpOutMsgs=$database:icmpOutMsgs:AVERAGE";
   $options .= " DEF:icmpInErrors=$database:icmpInErrors:AVERAGE";
   $options .= " DEF:icmpOutErrors=$database:icmpOutErrors:AVERAGE";
@@ -441,50 +442,50 @@ function icmp_graph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " DEF:icmpOutEchos=$database:icmpOutEchos:AVERAGE";
   $options .= " DEF:icmpInEchoReps=$database:icmpInEchoReps:AVERAGE";
   $options .= " DEF:icmpOutEchoReps=$database:icmpOutEchoReps:AVERAGE";
-  $options .= " COMMENT:Packets/sec\ \ \ \ Current\ \ \ \ Average\ \ \ Maximum\\\n";
-  $options .= " LINE1.25:icmpInMsgs#00cc00:InMsgs     ";
-  $options .= " GPRINT:icmpInMsgs:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpInMsgs:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpInMsgs:MAX:\ %6.2lf%s\\\n";
+  $options .= " COMMENT:Packets/sec\ \ \ \ Current\ \ \ \ Average\ \ \ Maximum\\\\n";
+  $options .= " LINE1.25:icmpInMsgs#00cc00:InMsgs ";
+  $options .= " GPRINT:icmpInMsgs:LAST:\ \ \ \ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInMsgs:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInMsgs:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpOutMsgs#006600:OutMsgs    ";
-  $options .= " GPRINT:icmpOutMsgs:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpOutMsgs:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpOutMsgs:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpOutMsgs:LAST:\ \ \ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutMsgs:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutMsgs:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpInErrors#cc0000:InErrors   ";
-  $options .= " GPRINT:icmpInErrors:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpInErrors:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpInErrors:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpInErrors:LAST:\ \ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInErrors:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInErrors:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpOutErrors#660000:OutErrors  ";
-  $options .= " GPRINT:icmpOutErrors:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpOutErrors:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpOutErrors:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpOutErrors:LAST:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutErrors:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutErrors:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpInEchos#0066cc:InEchos    ";
-  $options .= " GPRINT:icmpInEchos:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpInEchos:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpInEchos:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpInEchos:LAST:\ \ \ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInEchos:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInEchos:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpOutEchos#003399:OutEchos   ";
-  $options .= " GPRINT:icmpOutEchos:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpOutEchos:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpOutEchos:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpOutEchos:LAST:\ \ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutEchos:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpOutEchos:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpInEchoReps#cc00cc:InEchoReps ";
-  $options .= " GPRINT:icmpInEchoReps:LAST:%6.2lf%s";
-  $options .= " GPRINT:icmpInEchoReps:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpInEchoReps:MAX:\ %6.2lf%s\\\n";
+  $options .= " GPRINT:icmpInEchoReps:LAST:\ %6.2lf%s";
+  $options .= " GPRINT:icmpInEchoReps:AVERAGE:\ \ %6.2lf%s";
+  $options .= " GPRINT:icmpInEchoReps:MAX:\ %6.2lf%s\\\\n";
   $options .= " LINE1.25:icmpOutEchoReps#990099:OutEchoReps";
   $options .= " GPRINT:icmpOutEchoReps:LAST:%6.2lf%s";
   $options .= " GPRINT:icmpOutEchoReps:AVERAGE:\ %6.2lf%s";
-  $options .= " GPRINT:icmpOutEchoReps:MAX:\ %6.2lf%s\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $options .= " GPRINT:icmpOutEchoReps:MAX:\ %6.2lf%s\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 
 function tcp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
   $options .= " DEF:tcpActiveOpens=$database:tcpActiveOpens:AVERAGE";
   $options .= " DEF:tcpPassiveOpens=$database:tcpPassiveOpens:AVERAGE";
   $options .= " DEF:tcpAttemptFails=$database:tcpAttemptFails:AVERAGE";
@@ -521,17 +522,17 @@ function tcp_graph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:tcpRetransSegs:LAST:%6.2lf%s";
   $options .= " GPRINT:tcpRetransSegs:AVERAGE:\ %6.2lf%s";
   $options .= " GPRINT:tcpRetransSegs:MAX:\ %6.2lf%s\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;  
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");  
   return $imgfile;
 }
 
 function udp_graph ($rrd, $graph, $from, $to, $width, $height) {
-  global $config, $rrdtool, $installdir, $mono_font;
+  global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($width <= "300") { $options .= " --font LEGEND:7:$mono_font --font AXIS:6:$mono_font --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  $options .= "DEF:icmpInMsgs=$database:icmpInMsgs:AVERAGE";
   $options .= " DEF:udpInDatagrams=$database:udpInDatagrams:AVERAGE";
   $options .= " DEF:udpOutDatagrams=$database:udpOutDatagrams:AVERAGE";
   $options .= " DEF:udpInErrors=$database:udpInErrors:AVERAGE";
@@ -553,7 +554,7 @@ function udp_graph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:udpNoPorts:LAST:%6.2lf%s";
   $options .= " GPRINT:udpNoPorts:AVERAGE:\ %6.2lf%s";
   $options .= " GPRINT:udpNoPorts:MAX:\ %6.2lf%s\\\\n";
-  $thing = `$rrdtool graph $imgfile $options`;
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
 

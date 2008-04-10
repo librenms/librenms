@@ -22,10 +22,9 @@
       $old_mac = $interface['mac'];
       $old_up_admin = $interface['up_admin'];
       $snmpver = $interface['snmpver'];
-      $snmp_cmd = "snmpget -O qv -$snmpver -c $community $hostname ifDescr.$ifIndex ifAdminStatus.$ifIndex ifOperStatus.$ifIndex ";
+      $snmp_cmd = "snmpget -O qv -".$interface['snmpver']." -c ".$interface['community']." ".$interface['hostname']." ifDescr.$ifIndex ifAdminStatus.$ifIndex ifOperStatus.$ifIndex ";
       $snmp_cmd .= "ifAlias.$ifIndex 1.3.6.1.2.1.10.7.2.1.$ifIndex ifName.$ifIndex";
-      $snmp_output = `$snmp_cmd`;
-      $snmp_output = trim($snmp_output);
+      $snmp_output = trim(shell_exec($snmp_cmd));
       list($ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifDuplex, $ifName) = explode("\n", $snmp_output);
 
       $ifDescr = trim(str_replace("\"", "", $ifDescr));

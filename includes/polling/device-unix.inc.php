@@ -36,7 +36,7 @@ while ($dr = mysql_fetch_array($dq)) {
 
 
   if (!is_file($storage_rrd)) {
-    `rrdtool create $storage_rrd \
+    shell_exec($config['rrdtool'] . " create $storage_rrd \
      --step 300 \
      DS:size:GAUGE:600:0:U \
      DS:used:GAUGE:600:0:U \
@@ -48,7 +48,7 @@ while ($dr = mysql_fetch_array($dq)) {
      RRA:MAX:0.5:1:800 \
      RRA:MAX:0.5:6:800 \
      RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800`;
+     RRA:MAX:0.5:288:800");
   }  
   rrdtool_update($storage_rrd, "N:$hrStorageSize:$used:$perc");
   mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
@@ -90,8 +90,6 @@ list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $Usa
 
 $cpuUsage = $UsageUser + $UsageSystem;
 
-echo("\n CPU : $cpuUsage = $UsageUser + $UsageSystem; \n");
-
 if(mysql_result(mysql_query("SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'"),0)) {
  $update_usage = mysql_query("UPDATE devices_attribs SET attrib_value = '$cpuUsage' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'cpuusage'");
 } else {
@@ -100,7 +98,7 @@ if(mysql_result(mysql_query("SELECT COUNT(*) FROM devices_attribs WHERE `device_
 
 ## Create CPU RRD if it doesn't already exist
 if (!is_file($cpurrd)) {
-   `rrdtool create $cpurrd \
+   shell_exec($config['rrdtool'] . " create $cpurrd \
     --step 300 \
      DS:user:COUNTER:600:0:U \
      DS:system:COUNTER:600:0:U \
@@ -113,7 +111,7 @@ if (!is_file($cpurrd)) {
      RRA:MAX:0.5:1:800 \
      RRA:MAX:0.5:6:800 \
      RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800`;
+     RRA:MAX:0.5:288:800");
 }
 rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 
@@ -121,7 +119,7 @@ rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 ## If the device isn't monowall or pfsense, monitor all the pretty things
 if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSense" ) {
   if (!is_file($sysrrd)) {
-     `rrdtool create $sysrrd \
+     shell_exec($config['rrdtool'] . " create $sysrrd \
        --step 300 \
        DS:users:GAUGE:600:0:U \
        DS:procs:GAUGE:600:0:U \
@@ -132,11 +130,11 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
        RRA:MAX:0.5:1:800 \
        RRA:MAX:0.5:6:800 \
        RRA:MAX:0.5:24:800 \
-       RRA:MAX:0.5:288:800`;
+       RRA:MAX:0.5:288:800");
   }
 
   if (!is_file($memrrd)) {
-      `rrdtool create $memrrd \
+      shell_exec($config['rrdtool'] . " create $memrrd \
        --step 300 \
        DS:totalswap:GAUGE:600:0:10000000000 \
        DS:availswap:GAUGE:600:0:10000000000 \
@@ -153,11 +151,11 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
        RRA:MAX:0.5:1:800 \
        RRA:MAX:0.5:6:800 \
        RRA:MAX:0.5:24:800 \
-       RRA:MAX:0.5:288:800`;
+       RRA:MAX:0.5:288:800");
   } // end create mem rrd
 
    if(!is_file($loadrrd)) {
-    `$rrdtool create $loadrrd \
+    shell_exec($config['rrdtool'] . " create $loadrrd \
     --step 300 \
     DS:1min:GAUGE:600:0:5000 \
     DS:5min:GAUGE:600:0:5000 \
@@ -169,7 +167,7 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
     RRA:MAX:0.5:1:800 \
     RRA:MAX:0.5:6:800 \
     RRA:MAX:0.5:24:800 \
-    RRA:MAX:0.5:288:800`;
+    RRA:MAX:0.5:288:800");
   } // end create load rrd
 
   $mem_get = "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";

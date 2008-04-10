@@ -10,7 +10,7 @@
     list($oid,$ifIndex) = explode(" ", $data);
     $mask = shell_exec($config['snmpget']." -O qv -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipAdEntNetMask.$oid");
     $mask = trim($mask);
-    $network = trim(`$ipcalc $oid/$mask | grep Network | cut -d" " -f 4`);
+    $network = trim(shell_exec ($config['ipcalc'] . " $oid/$mask | grep Network | cut -d" " -f 4"));
     list($net,$cidr) = explode("/", $network);
     $cidr = trim($cidr);
     if($mask == "255.255.255.255") { $cidr = "32"; $network = "$oid/$cidr"; }
