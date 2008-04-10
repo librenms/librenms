@@ -3,7 +3,7 @@
 include("config.php");
 include("includes/functions.php");
 
-`rm ips.txt && touch ips.txt`;
+shell_exec("rm ips.txt && touch ips.txt");
 
 $handle = fopen("ips.txt", "w+");
 
@@ -12,7 +12,7 @@ while ($data = mysql_fetch_array($query)) {
   $cidr = $data['cidr'];
   list ($network, $bits) = split("/", $cidr); 
   if($bits != '32' && $bits != '32' && $bits > '22') {
-    $broadcast = trim(`$ipcalc $cidr | grep Broadcast | cut -d" " -f 2`);
+    $broadcast = trim(shell_exec($config['ipcalc']." $cidr | grep Broadcast | cut -d\" \" -f 2"));
     $ip = ip2long($network) + '1';
     $end = ip2long($broadcast);
     while($ip < $end) {

@@ -5,7 +5,6 @@ function pollDeviceIOS() {
    global $device;
    global $community;
    global $config;
-   $rrdtool = &$config['rrdtool'];
    $id = $device['device_id'];
 
    $hostname = $device['hostname'];
@@ -40,7 +39,7 @@ function pollDeviceIOS() {
    $memusedproc = $memusedproc + 0;
    $memtotal = $memfreeio + $memfreeproc + $memusedio + $memusedproc;
    if (!is_file($cpurrd)) {
-      $rrdcreate = `$rrdtool create $cpurrd --step 300 \
+      $rrdcreate = shell_exec($config['rrdtool'] . " create $cpurrd --step 300 \
                     DS:LOAD5S:GAUGE:600:-1:100 \
                     DS:LOAD5M:GAUGE:600:-1:100 \
                     RRA:AVERAGE:0.5:1:2000 \
@@ -50,10 +49,10 @@ function pollDeviceIOS() {
                     RRA:MAX:0.5:1:2000 \
                     RRA:MAX:0.5:6:2000 \
                     RRA:MAX:0.5:24:2000 \
-                    RRA:MAX:0.5:288:2000`;
+                    RRA:MAX:0.5:288:2000");
    }
    if (!is_file($temprrd)) {
-      $rrdcreate = `$rrdtool create $temprrd --step 300 \
+      $rrdcreate = shell_exec($config['rrdtool'] . " create $temprrd --step 300 \
                     DS:TEMPIN1:GAUGE:600:-25:100 \
                     DS:TEMPOUT1:GAUGE:600:-25:100 \
                     RRA:AVERAGE:0.5:1:2000 \
@@ -63,10 +62,10 @@ function pollDeviceIOS() {
                     RRA:MAX:0.5:1:2000 \
                     RRA:MAX:0.5:6:2000 \
                     RRA:MAX:0.5:24:2000 \
-                    RRA:MAX:0.5:288:2000`;
+                    RRA:MAX:0.5:288:2000");
    }
    if (!is_file($memrrd)) {
-      $rrdcreate = `$rrdtool create $memrrd --step 300 \
+      $rrdcreate = shell_exec($config['rrdtool'] . " create $memrrd --step 300 \
                     DS:IOFREE:GAUGE:600:0:U \
                     DS:IOUSED:GAUGE:600:-1:U \
                     DS:PROCFREE:GAUGE:600:0:U \
@@ -79,12 +78,12 @@ function pollDeviceIOS() {
                     RRA:MAX:0.5:1:2000 \
                     RRA:MAX:0.5:6:2000 \
                     RRA:MAX:0.5:24:2000 \
-                    RRA:MAX:0.5:288:2000`;
+                    RRA:MAX:0.5:288:2000");
 
    }
-   `$rrdtool update $temprrd N:$tempin1:$tempout1`;
-   `$rrdtool update $cpurrd N:$cpu5s:$cpu5m`;
-   `$rrdtool update $memrrd N:$memfreeio:$memusedio:$memfreeproc:$memusedproc:$memtotal`;
+   shell_exec($config['rrdtool'] . " update $temprrd N:$tempin1:$tempout1");
+   shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu5s:$cpu5m");
+   shell_exec($config['rrdtool'] . " update $memrrd N:$memfreeio:$memusedio:$memfreeproc:$memusedproc:$memtotal");
 }
 
 ?>

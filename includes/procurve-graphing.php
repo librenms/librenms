@@ -2,7 +2,7 @@
 
 function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 {
- global $config,$rrdtool, $installdir, $mono_font;
+ global $config, $installdir;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
 
@@ -18,8 +18,8 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
                  "GPRINT:load:MIN:Min\:%3.2lf",
                  "GPRINT:load:MAX:Max\:%3.2lf\\n");
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
-                                      "--font", "AXIS:6:$mono_font",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:".$config['mono_font']."",
+                                      "--font", "AXIS:6:".$config['mono_font']."",
                                       "--font-render-mode", "normal");}
   $opts = array_merge($config['rrdgraph_defaults'], $$optsa, $optsb);
 
@@ -36,7 +36,7 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 
 function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertical)
 {
- global $config,$rrdtool, $installdir, $mono_font;
+ global $config, $installdir;
     $database = "rrd/" . $rrd;
     $imgfile = "graphs/" . "$graph";
     $memrrd = $database;
@@ -49,8 +49,8 @@ function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertic
              "AREA:FREE#FAFDCE:Free:STACK",
              "LINE1.5:TOTAL#cc0000:");
 
-  if($width <= "300") {$optsb = array("--font", "LEGEND:7:$mono_font",
-                                      "--font", "AXIS:6:$mono_font",
+  if($width <= "300") {$optsb = array("--font", "LEGEND:7:".$config['mono_font']."",
+                                      "--font", "AXIS:6:".$config['mono_font']."",
                                       "--font-render-mode", "normal");}
 
   $opts = array_merge($config['rrdgraph_defaults'], $$opts, $optsb);

@@ -2,6 +2,8 @@
 
 include("common.php");
 
+include("ipv6.php");
+
 include("generic.php");
 include("ios.php");
 include("unix.php");
@@ -14,7 +16,6 @@ include("billing-functions.php");
 include("cisco-entities.php");
 
 include("syslog.php");
-
 
 function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
 
@@ -53,8 +54,8 @@ function shorthost($hostname, $len=16) {
 }
 
 function rrdtool_update($rrdfile, $rrdupdate) {
-  global $rrdtool;
-  return `$rrdtool update $rrdfile $rrdupdate`;
+  global $config;
+  return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
 }
 
 function getHostOS($hostname, $community, $snmpver) {
@@ -460,8 +461,8 @@ function isSNMPable($hostname, $community, $snmpver) {
 }
 
 function isPingable($hostname) {
-   global $fping;
-   $status = `$fping $hostname`;
+   global $config;
+   $status = shell_exec($config['fping'] . " $hostname");
    if(strstr($status, "alive")) {
      return TRUE;
    } else {
