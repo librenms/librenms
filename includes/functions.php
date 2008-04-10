@@ -1,9 +1,7 @@
 <?
 
 include("common.php");
-
 include("ipv6.php");
-
 include("generic.php");
 include("ios.php");
 include("unix.php");
@@ -14,11 +12,9 @@ include("graphing.php");
 include("print-functions.php");
 include("billing-functions.php");
 include("cisco-entities.php");
-
 include("syslog.php");
 
 function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
-
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
   if(mysql_result(mysql_query($count_sql),0)) {
     $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '$device_id' AND `attrib_type` = '$attrib_type'";
@@ -28,9 +24,7 @@ function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
     mysql_query($insert_sql);
   }
   return mysql_affected_rows();
-
 }
-
 
 function shorthost($hostname, $len=16) {
 
