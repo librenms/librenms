@@ -250,7 +250,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if ($uptime) {
 
-    $old_uptime = mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
+    $old_uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
 
     if( $uptime < $old_uptime ) {
       if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
@@ -284,7 +284,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $update_query  = "UPDATE `devices` SET ";
     $update_query .= $update;
     $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . "\n" . $update_query . "\n");
+    echo("Updating " . $device['hostname'] . "\n");
     $update_result = mysql_query($update_query);
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
