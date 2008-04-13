@@ -1,18 +1,24 @@
 <?
 
-include_once("common.php");
-include_once("ipv6-functions.php");
-include_once("generic.php");
-include_once("ios.php");
-include_once("unix.php");
-include_once("windows.php");
-include_once("procurve.php");
-include_once("snom.php");
-include_once("graphing.php");
-include_once("print-functions.php");
-include_once("billing-functions.php");
-include_once("cisco-entities.php");
-include_once("syslog.php");
+## Include from PEAR
+
+include_once("Net/IPv4.php");
+include_once("Net/IPv6.php");
+
+## Observer Includes
+
+include_once($config['install_dir'] . "/includes/common.php");
+include_once($config['install_dir'] . "/includes/generic.php");
+include_once($config['install_dir'] . "/includes/ios.php");
+include_once($config['install_dir'] . "/includes/unix.php");
+include_once($config['install_dir'] . "/includes/windows.php");
+include_once($config['install_dir'] . "/includes/procurve.php");
+include_once($config['install_dir'] . "/includes/snom.php");
+include_once($config['install_dir'] . "/includes/graphing.php");
+include_once($config['install_dir'] . "/includes/print-functions.php");
+include_once($config['install_dir'] . "/includes/billing-functions.php");
+include_once($config['install_dir'] . "/includes/cisco-entities.php");
+include_once($config['install_dir'] . "/includes/syslog.php");
 
 function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
@@ -58,10 +64,10 @@ function getHostOS($hostname, $community, $snmpver) {
 
     $sysDescr_cmd = $config['snmpget']." -O qv -" . $snmpver . " -c " . $community . " " . $hostname . " sysDescr.0";
     $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
-    $dir_handle = @opendir("includes/osdiscovery") or die("Unable to open $path");
+    $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
       if( preg_match("/^discover-([a-z0-9]*).php/", $file) ) {
-        include("includes/osdiscovery/" . $file);
+        include($config['install_dir'] . "includes/osdiscovery/" . $file);
       }
     }
     closedir($dir_handle);
@@ -327,11 +333,12 @@ function delHost($id) {
 
 
 function addHost($host, $community, $snmpver) {
+  global $config;
   list($hostshort)      = explode(".", $host);
   if ( isDomainResolves($host)){
     if ( isPingable($host)) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
-        $snmphost = trim(`snmpwalk -Oqv -$snmpver -c $community $host sysname | sed s/\"//g`);
+        $snmphost = shell_exec($config['snmpget'] ." -Oqv -$snmpver -c $community $host sysName.0");
         if ($snmphost == $host || $hostshort = $host) {
           createHost ($host, $community, $snmpver);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
@@ -443,10 +450,11 @@ function formatUptime($diff, $format="long") {
 }
 
 function isSNMPable($hostname, $community, $snmpver) {
-     $pos = `snmpget -$snmpver -c $community -t 1 $hostname sysDescr.0`;
+     global $config;
+     $pos = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname sysDescr.0");
      if($pos == '') {
        $status='0';
-       $posb = `snmpget -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4`;
+       $posb = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4");
        if($posb == '') { } else { $status='1'; }
      } else {
        $status='1';

@@ -4,11 +4,11 @@
 
    $i = "1";
 
-   if($view == "alerted") {
+   if($_GET['view'] == "alerted") {
     $where = "";
-   } elseif ($view == "external") {
+   } elseif ($_GET['view'] == "external") {
     $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
-   } elseif ($view == "internal") {
+   } elseif ($_GET['view'] == "internal") {
     $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
    }
 
@@ -18,20 +18,22 @@
 
      if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-     if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_colour = "#ffcccc"; }
-     if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "red"; $bg_colour = "#cccccc"; }
+     if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $nobg_colour = "#ffcccc"; }
+     if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "gray"; }
 
-     if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
+     if($peer['bgpPeerRemoteAs'] == $peer['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; 
+      if($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] =< '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
+     }
 
      $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
-     if($peerhost) { $peername = generatedevicelink($peerhost); } else { unset($peername); }
+     if($peerhost) { $peername = generatedevicelink($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
      echo("<tr bgcolor=$bg_colour>
-             <td width=20><span class=list-large><center>$i</center></span></td>
-             <td width=175>".generatedevicelink($peer)."</td>
-             <td width=220><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
-	     <td width=50>$peer_type</td>
+             <td width=30><span class=list-large><center>$i</center></span></td>
+             <td width=150>".generatedevicelink($peer, shorthost($peer['hostname']))."</td>
+             <td width=150><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
+	     <td width=50><b>$peer_type</b></td>
              <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
              <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
              <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
