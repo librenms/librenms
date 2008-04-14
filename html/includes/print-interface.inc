@@ -123,7 +123,7 @@ echo("</td>");
           }
         }
         unset($br);
-      }
+     # }
  
         $sql = "SELECT network_id FROM ip6addr AS A, ip6networks AS N, interfaces AS I
         WHERE A.interface_id = I.interface_id
@@ -137,8 +137,8 @@ echo("</td>");
 
         $sql = "SELECT I.interface_id FROM ip6addr AS A, ip6networks AS N, interfaces AS I, devices AS D
         WHERE A.interface_id = I.interface_id
-        AND A.network = N.cidr
-        AND N.network_id = '".$net['network_id']."' AND D.device_id = I.device_id and D.device_id != '".$device['device_id']."'";
+        AND A.network = N.cidr AND N.network_id = '".$net['network_id']."' AND D.device_id = I.device_id 
+        AND D.device_id != '".$device['device_id']."' AND A.origin != 'linklayer' AND A.origin != 'wellknown'";
 
           $new_query = mysql_query($sql);
           while($new = mysql_fetch_array($new_query)) {
@@ -173,6 +173,8 @@ echo("</td>");
      }
   
      unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
+
+     }
 
      echo("</td></tr>");
 

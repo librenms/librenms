@@ -122,7 +122,13 @@
       $graph = cpugraphHP ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Snom") {
       $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    } elseif($os == "ScreenOS") {
+      $graph = graph_netscreen_cpu ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    } elseif($os == "Fortigate") {
+      $graph = graph_fortinet_cpu ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
+
+
     break;
   case 'temp':
       $graph = temp_graph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
