@@ -263,12 +263,12 @@ while ($device = mysql_fetch_array($device_query)) {
     if(is_file($old_uptimerrd) && !is_file($uptimerrd)) { rename($old_uptimerrd, $uptimerrd); echo("Moving $old_uptimerrd to $uptimerrd");  }
 
     if(!is_file($uptimerrd)) {
-      $woo = `rrdtool create $uptimerrd \
+      $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
         DS:uptime:GAUGE:600:0:U \
         RRA:AVERAGE:0.5:1:600 \
         RRA:AVERAGE:0.5:6:700 \
         RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797`;
+        RRA:AVERAGE:0.5:288:797");
     }
     rrdtool_update($uptimerrd, "N:$uptime");
 

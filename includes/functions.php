@@ -13,7 +13,6 @@ include_once($config['install_dir'] . "/includes/ios.php");
 include_once($config['install_dir'] . "/includes/unix.php");
 include_once($config['install_dir'] . "/includes/windows.php");
 include_once($config['install_dir'] . "/includes/procurve.php");
-include_once($config['install_dir'] . "/includes/snom.php");
 include_once($config['install_dir'] . "/includes/graphing.php");
 include_once($config['install_dir'] . "/includes/print-functions.php");
 include_once($config['install_dir'] . "/includes/billing-functions.php");
