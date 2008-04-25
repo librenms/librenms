@@ -4,7 +4,7 @@ function graph_netscreen_sessions ($rrd, $graph, $from, $to, $width, $height, $t
   global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
-  $options = "-Y -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 -Y -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:alloc=$database:allocate:AVERAGE";
   $options .= " DEF:max=$database:max:AVERAGE";
@@ -25,12 +25,12 @@ function graph_netscreen_cpu ($rrd, $graph, $from, $to, $width, $height, $title,
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
-  $options = "-Y -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 -Y -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:av=$database:average:AVERAGE";
   $options .= " DEF:5m=$database:5min:AVERAGE";
   $options .= " COMMENT:Usage\ \ \ \ \ \ \ Current\ \ \ \ \ Average\ \ \ \ Maximum\\\\n";
-  $options .= " AREA:5m#eeee00";
+  $options .= " AREA:5m#ffcccc";
   $options .= " LINE1.25:5m#aa2000:5min";
   $options .= " GPRINT:5m:LAST:\ \ \ \ \ %5.2lf%%";
   $options .= " GPRINT:5m:AVERAGE:\ \ \ %5.2lf%%";
@@ -47,7 +47,7 @@ function graph_netscreen_memory ($rrd, $graph, $from, $to, $width, $height, $tit
   global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
-  $options = "-Y -E --start $from --end $to --width $width --height $height ";
+  $options = "-l 0 -Y -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:alloc=$database:allocate:AVERAGE";
   $options .= " DEF:left=$database:left:AVERAGE";
