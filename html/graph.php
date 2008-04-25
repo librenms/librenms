@@ -123,9 +123,9 @@
     } elseif($os == "Snom") {
       $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "ScreenOS") {
-      $graph = graph_netscreen_cpu ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = graph_netscreen_cpu ($hostname . "/netscreen-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Fortigate") {
-      $graph = graph_fortinet_cpu ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = graph_fortigate_cpu ($hostname . "/fortigate-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
 
 
