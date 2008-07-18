@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_ssh -H $service[hostname]`;
+$check = `scripts/services/check_ssh -H $service[hostname]`;
 
 list($check, $time) = split("\|", $check);
 
