@@ -19,6 +19,11 @@ include_once($config['install_dir'] . "/includes/billing-functions.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
 
+function mres($string) {
+ // short function wrapper because the real one is stupidly long and ugly. aestetics.
+ return mysql_real_escape_string($string);
+}
+
 function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
   if(mysql_result(mysql_query($count_sql),0)) {
