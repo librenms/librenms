@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_dns -H $service[param] -s $service[hostname]`;
+$check = `scripts/services/check_dns -H $service[param] -s $service[hostname]`;
 
 list($check, $time) = split("\|", $check);
 

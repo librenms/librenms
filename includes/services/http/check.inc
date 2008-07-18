@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_http -H $service[hostname] $service[service_param]`;
+$check = `scripts/services/check_http -H $service[hostname] $service[service_param]`;
 
 list($check, $time) = split("\|", $check);
 

@@ -79,7 +79,7 @@ while($device = mysql_fetch_array($sql)){
 
    generate_front_box("info", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
-      <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
+      <span class=body-date-1>".formatUptime($device['attrib_value'], 'short')."</span>
       </center>");
 
 }

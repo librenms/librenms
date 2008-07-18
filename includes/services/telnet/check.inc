@@ -3,7 +3,7 @@
 if($service[service_port]) { $port = $service[service_port]; } else { $port = '23'; }
 
 
-$check = `checkers/check_tcp -H $service[hostname] -p $port`;
+$check = `scripts/services/check_tcp -H $service[hostname] -p $port`;
 
 list($check, $time) = split("\|", $check);
 

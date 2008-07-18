@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_smtp -H $service[hostname]`;
+$check = `scripts/services/check_smtp -H $service[hostname]`;
 
 list($check, $time) = split("\|", $check);
 
