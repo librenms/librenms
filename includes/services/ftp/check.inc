@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_ftp -H $service[hostname]`;
+$check = `scripts/services/check_ftp -H $service[hostname]`;
 
 list($check, $time) = split("\|", $check);
 

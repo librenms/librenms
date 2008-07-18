@@ -1,6 +1,6 @@
 <?php
 
-$check = `checkers/check_mysql -H $service[hostname] $service[service_param]`;
+$check = `scripts/services/check_mysql -H $service[hostname] $service[service_param]`;
 
 echo($check);
 

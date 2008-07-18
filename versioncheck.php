@@ -26,7 +26,6 @@ if($dataHandle)
 
                 echo("Current Version $cur_major.$cur_minor.$cur_release \n");
 
-
 		if($major > $cur_major) {
 	          echo("New major release : $major.$minor.$release");
                 } elseif ($minor > $cur_minor) {

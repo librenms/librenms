@@ -29,6 +29,13 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
 
 <h4>Edit Device</h4>
 
+<h5>
+  <a href='?page=delhost&id=".$device['device_id']."'>
+    <img src='images/16/server_delete.png' align='absmiddle'>
+    Delete
+  </a>
+</h5>
+
 <form id='edit' name='edit' method='post' action=''>
   <input type=hidden name='editing' value='yes'>
   <table width='200' border='0'>
@@ -66,7 +73,9 @@ echo("
   <input type='submit' name='Submit' value='Save' />
   <label><br />
   </label>
-</form></td>
+</form>
+
+</td>
 <td width=50></td><td>");
 
   echo("</td></tr></table>");
