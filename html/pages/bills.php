@@ -4,7 +4,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%><tr><td>")
 
 if($_GET['bill']) {
 
- $bill_id = $_GET['bill'];
+ $bill_id = mres($_GET['bill']);
  include("includes/billing.php");
 
 } else {

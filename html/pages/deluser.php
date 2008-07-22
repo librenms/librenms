@@ -8,12 +8,12 @@ if($_SESSION['userlevel'] != '10') { echo("<span class=alert>You do not have the
 
   if($_GET['action'] == "del") {
 
-    $delete_username = mysql_result(mysql_query("SELECT username FROM users WHERE user_id = '" . $_GET['user_id'] . "'"),0);
+    $delete_username = mysql_result(mysql_query("SELECT username FROM users WHERE user_id = '" . mres($_GET['user_id']) . "'"),0);
 
     if($_GET['confirm'] == "yes") {
 
-      mysql_query("DELETE FROM `devices_perms` WHERE `user_id` = '" . $_GET['user_id'] . "'");
-      mysql_query("DELETE FROM `users` WHERE `user_id` = '" . $_GET['user_id'] . "'");
+      mysql_query("DELETE FROM `devices_perms` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
+      mysql_query("DELETE FROM `users` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
 
       if(mysql_affected_rows()) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
 

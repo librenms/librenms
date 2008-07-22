@@ -2,7 +2,7 @@
 <?
 
 if($_GET['del']) { 
-  $id = $_GET['del'];
+  $id = mres($_GET['del']);
   $query = "DELETE FROM `alerts` WHERE `id` = '$id'";
   mysql_query($query); 
 }

@@ -8,7 +8,7 @@ if($_SESSION['userlevel'] != '10') { echo("<span class=alert>You do not have the
 
   if($_POST['action'] == "add") {
 
-    mysql_query("INSERT INTO `users` (`username`, `realname`, `password`, `level`) VALUES ('" . $_POST['new_username'] . "', '" . $_POST['new_realname'] . "', MD5('" . $_POST['new_password'] . "'), '" . $_POST['new_level'] . "')");
+    mysql_query("INSERT INTO `users` (`username`, `realname`, `password`, `level`) VALUES ('" . mres($_POST['new_username']) . "', '" . mres($_POST['new_realname']) . "', MD5('" . mres(_POST['new_password']) . "'), '" . mres($_POST['new_level']) . "')");
 
     if(mysql_affected_rows()) { echo("<span class=info>User " . $_GET['username'] . " added!</span>"); }
 

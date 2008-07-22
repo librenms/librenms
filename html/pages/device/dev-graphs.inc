@@ -8,6 +8,12 @@ while($device = mysql_fetch_array($device_query)) {
    echo("<div style='clear: both;'>");
 
    switch ($device['os']) {
+   case "JunOS":
+      echo("<div class=graphhead>Processor Utilisation</div>");
+      $graph_type = "cpu";            include ("includes/print-device-graph.php");
+      break;
+
+
    case "Fortigate":
       echo("<div class=graphhead>Processor Utilisation</div>");
       $graph_type = "fortigate_cpu";            include ("includes/print-device-graph.php");

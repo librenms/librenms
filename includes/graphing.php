@@ -315,6 +315,21 @@ function bgpupdatesgraph ($rrd, $graph , $from, $to, $width, $height) {
   return $imgfile;
 }
 
+function graph_cpu_generic_single ($rrd, $graph , $from, $to, $width, $height) {
+  global $config;
+  $database = $config['rrd_dir'] . "/" . $rrd;
+  $imgfile = "graphs/" . "$graph";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:cpu=$database:cpu:AVERAGE";
+  $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $options .= " AREA:cpu#ffee99: LINE1.25:cpu#aa2200:Load\ %";
+  $options .= " GPRINT:cpu:LAST:%6.2lf\  GPRINT:cpu:AVERAGE:%6.2lf\ ";
+  $options .= " GPRINT:cpu:MAX:%6.2lf\  GPRINT:cpu:AVERAGE:%6.2lf\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
 
 function cpugraph ($rrd, $graph , $from, $to, $width, $height) {
   global $config, $installdir;

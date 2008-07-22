@@ -22,7 +22,7 @@ if($_GET['logout']) {
   }
 
 
-  $sql = "select username, level, user_id from users where username='" . $_SESSION['username'] . "' and password='" . $_SESSION['encrypted'] . "'"; 
+  $sql = "select username, level, user_id from users where username='" . mres($_SESSION['username']) . "' and password='" . mres($_SESSION['encrypted']) . "'"; 
   $query = mysql_query($sql);
   $row = mysql_fetch_row($query);
 
