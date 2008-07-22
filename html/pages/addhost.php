@@ -11,9 +11,9 @@ echo("<h1>Add Device</h1>");
 
 if($_POST['hostname'] && $_POST['community']) {
   if($_SESSION['userlevel'] > '5') {
-    $hostname = $_POST['hostname'];
-    $community = $_POST['community'];
-    $snmpver = $_POST['snmpver'];
+    $hostname = mres($_POST['hostname']);
+    $community = mres($_POST['community']);
+    $snmpver = mres($_POST['snmpver']);
     echo("<p class='messagebox'>");
     echo("Adding host $hostname community $community</p>");
     $result = addHost($hostname, $community, $snmpver);  

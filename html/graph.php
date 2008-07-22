@@ -126,10 +126,11 @@
       $graph = graph_netscreen_cpu ($hostname . "/netscreen-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Fortigate") {
       $graph = graph_fortigate_cpu ($hostname . "/fortigate-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    } elseif($os == "JunOS") {
+      $graph = graph_cpu_generic_single($hostname . "/junos-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
-
-
     break;
+
   case 'temp':
       $graph = temp_graph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;

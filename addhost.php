@@ -11,7 +11,7 @@ if($argv[1] && $argv[2] && $argv[3]) {
   list($hostshort) 	= explode(".", $host);
   if ( isDomainResolves($argv[1])){
     if ( isPingable($argv[1])) { 
-      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
+      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
         $snmphost = trim(`snmpget -Oqv -$snmpver -c $community $host sysName.0 | sed s/\"//g`);
         if ($snmphost == $host || $hostshort = $host) {
           $return = createHost ($host, $community, $snmpver);

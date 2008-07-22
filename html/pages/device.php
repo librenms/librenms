@@ -1,5 +1,7 @@
 <?
 
+if($_GET['id']) {$_GET['id'] = mres($_GET['id']); } 
+
 if(devicepermitted($_GET['id'])) {
 
 $selected['iface'] = "selected";
@@ -7,7 +9,8 @@ $selected['iface'] = "selected";
 if(!$_GET['section']) { 
   $_GET['section'] = "dev-overview"; 
 }
-$section = $_GET['section'];
+$section = mres($_GET['section']);
+$section = str_replace(".", "", $section);
 $select[$section] = "selected";
 
 

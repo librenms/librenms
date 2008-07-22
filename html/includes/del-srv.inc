@@ -2,7 +2,7 @@
 
   $updated = '1';
 
-  $sql = "DELETE FROM `services` WHERE service_id = '" . $_POST['service']. "'";
+  $sql = "DELETE FROM `services` WHERE service_id = '" . mres($_POST['service']). "'";
 
   $query = mysql_query($sql);
   $rows = mysql_affected_rows();

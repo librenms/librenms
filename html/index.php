@@ -94,12 +94,15 @@ function popUp(URL) {
 <div style="margin: 7px;"></div>
 <?php
   if($_SESSION['authenticated']) {
-    if($_GET['page'] && is_file("pages/" . $_GET['page'] . ".php")) {
+    ## Authenticated. Print a page.
+    if($_GET['page'] && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
     } else { 
       include("pages/default.php");
     }
+
   } else {
+    ## Not Authenticated. Print login.
     include("pages/logon.inc");
     exit;
   } 

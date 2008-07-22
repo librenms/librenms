@@ -143,6 +143,10 @@ while ($device = mysql_fetch_array($device_query)) {
       include("includes/polling/device-fortigate.inc.php");
       break;
 
+    case "JunOS":
+      include("includes/polling/device-junos.inc.php");
+      break;
+
     case "IOS":
       $version = str_replace("Cisco IOS Software,", "", $sysDescr);
       $version = str_replace("IOS (tm) ", "", $version);
