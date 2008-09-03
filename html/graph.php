@@ -65,6 +65,15 @@
   case 'multi_bits':
     $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height);
     break;
+  case 'adsl_rate':
+    $graph = graph_adsl_rate ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
+    break;
+  case 'adsl_snr':
+    $graph = graph_adsl_snr ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
+    break;
+  case 'adsl_atn':
+    $graph = graph_adsl_atn ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
+    break;
   case 'global_bits':
     $graph = graph_global_bits ("global_bits.png", $from, $to, $width, $height);
     break;

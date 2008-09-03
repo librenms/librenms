@@ -30,7 +30,7 @@ function graph_netscreen_cpu ($rrd, $graph, $from, $to, $width, $height, $title,
   $options .= " DEF:av=$database:average:AVERAGE";
   $options .= " DEF:5m=$database:5min:AVERAGE";
   $options .= " COMMENT:Usage\ \ \ \ \ \ \ Current\ \ \ \ \ Average\ \ \ \ Maximum\\\\n";
-  $options .= " AREA:5m#ffcccc";
+  $options .= " AREA:5m#ffeeaa";
   $options .= " LINE1.25:5m#aa2000:5min";
   $options .= " GPRINT:5m:LAST:\ \ \ \ \ %5.2lf%%";
   $options .= " GPRINT:5m:AVERAGE:\ \ \ %5.2lf%%";
