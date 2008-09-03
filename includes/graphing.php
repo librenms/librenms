@@ -331,6 +331,69 @@ function graph_cpu_generic_single ($rrd, $graph , $from, $to, $width, $height) {
 }
 
 
+function graph_adsl_rate ($rrd, $graph, $from, $to, $width, $height) {
+  global $config, $installdir;
+  $database = $config['rrd_dir'] . "/" . $rrd;
+  $imgfile = "graphs/" . "$graph";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:adslAtucCurrAtt=$database:adslAtucCurrAtt:AVERAGE";
+  $options .= " DEF:adslAturCurrAtt=$database:adslAturCurrAtt:AVERAGE";
+  $options .= " CDEF:dslAtucCurrAtt=adslAtucCurrAtt,1000,/";
+  $options .= " CDEF:dslAturCurrAtt=adslAturCurrAtt,1000,/";
+  $options .= " COMMENT:Bytes\ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $options .= " LINE1.25:adslAtucCurrAtt#aa2200:Up\ \ \ \ ";
+  $options .= " GPRINT:dslAtucCurrAtt:LAST:%5.0lfk\  GPRINT:dslAtucCurrAtt:AVERAGE:%5.0lfk\ ";
+  $options .= " GPRINT:dslAtucCurrAtt:MAX:%5.0lfk\  GPRINT:dslAtucCurrAtt:AVERAGE:%5.0lfk\\\\n";
+  $options .= " LINE1.25:adslAturCurrAtt#22aa00:Down\ \ ";
+  $options .= " GPRINT:dslAturCurrAtt:LAST:%5.0lfk\  GPRINT:dslAturCurrAtt:AVERAGE:%5.0lfk\ ";
+  $options .= " GPRINT:dslAturCurrAtt:MAX:%5.0lfk\  GPRINT:dslAturCurrAtt:AVERAGE:%5.0lfk\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+function graph_adsl_snr ($rrd, $graph, $from, $to, $width, $height) {
+  global $config, $installdir;
+  $database = $config['rrd_dir'] . "/" . $rrd;
+  $imgfile = "graphs/" . "$graph";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:adslAtucCurrSnr=$database:adslAtucCurrSnr:AVERAGE";
+  $options .= " DEF:adslAturCurrSnr=$database:adslAturCurrSnr:AVERAGE";
+  $options .= " CDEF:dslAtucCurrSnr=adslAtucCurrSnr,10,/";
+  $options .= " CDEF:dslAturCurrSnr=adslAturCurrSnr,10,/";
+  $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $options .= " LINE1.25:dslAtucCurrSnr#aa2200:SNR\ Up\ \ ";
+  $options .= " GPRINT:dslAtucCurrSnr:LAST:%3.1lfdB GPRINT:dslAtucCurrSnr:AVERAGE:%3.1lfdB\ ";
+  $options .= " GPRINT:dslAtucCurrSnr:MAX:%3.1lfdB GPRINT:dslAtucCurrSnr:AVERAGE:%3.1lfdB\\\\n";
+  $options .= " LINE1.25:dslAturCurrSnr#22aa00:SNR\ Down";
+  $options .= " GPRINT:dslAturCurrSnr:LAST:%3.1lfdB GPRINT:dslAturCurrSnr:AVERAGE:%3.1lfdB\ ";
+  $options .= " GPRINT:dslAturCurrSnr:MAX:%3.1lfdB GPRINT:dslAturCurrSnr:AVERAGE:%3.1lfdB\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+function graph_adsl_atn ($rrd, $graph, $from, $to, $width, $height) {
+  global $config, $installdir;
+  $database = $config['rrd_dir'] . "/" . $rrd;
+  $imgfile = "graphs/" . "$graph";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:adslAtucCurrAtn=$database:adslAtucCurrAtn:AVERAGE";
+  $options .= " DEF:adslAturCurrAtn=$database:adslAturCurrAtn:AVERAGE";
+  $options .= " CDEF:dslAtucCurrAtn=adslAtucCurrAtn,10,/";
+  $options .= " CDEF:dslAturCurrAtn=adslAturCurrAtn,10,/";
+  $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $options .= " LINE1.25:dslAtucCurrAtn#aa2200:Atten\ Up\ \ ";
+  $options .= " GPRINT:dslAtucCurrAtn:LAST:%3.1lfdB GPRINT:dslAtucCurrAtn:AVERAGE:%3.1lfdb";
+  $options .= " GPRINT:dslAtucCurrAtn:MAX:%3.1lfdB GPRINT:dslAtucCurrAtn:AVERAGE:%3.1lfdb\\\\n";
+  $options .= " LINE1.25:dslAturCurrAtn#22aa00:Atten\ Down";
+  $options .= " GPRINT:dslAturCurrAtn:LAST:%3.1lfdB GPRINT:dslAturCurrAtn:AVERAGE:%3.1lfdb";
+  $options .= " GPRINT:dslAturCurrAtn:MAX:%3.1lfdB GPRINT:dslAturCurrAtn:AVERAGE:%3.1lfdb\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
 function cpugraph ($rrd, $graph , $from, $to, $width, $height) {
   global $config, $installdir;
   $database = $config['rrd_dir'] . "/" . $rrd;

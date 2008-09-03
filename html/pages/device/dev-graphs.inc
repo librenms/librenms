@@ -16,6 +16,10 @@ while($device = mysql_fetch_array($device_query)) {
         $graph_type = "dev_temp";             include ("includes/print-device-graph.php");
         echo("<br />");
       }
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
       break;
 
 
@@ -26,6 +30,26 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "fortigate_memory";         include ("includes/print-device-graph.php");
       echo("<div class=graphhead>Firewall Sessions</div>");
       $graph_type = "fortigate_sessions";       include ("includes/print-device-graph.php");
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
+      break;
+
+   case "BCM96348":
+      echo("<div class=graphhead>ADSL Attainable Rate</div>");
+      $graph_type = "adsl_rate";            include ("includes/print-device-graph.php");
+      echo("<br />");
+      echo("<div class=graphhead>ADSL Signal-to-Noise Margin</div>");
+      $graph_type = "adsl_snr";            include ("includes/print-device-graph.php");
+      echo("<br />");
+      echo("<div class=graphhead>ADSL Attenuation</div>");
+      $graph_type = "adsl_atn";         include ("includes/print-device-graph.php");
+      echo("<br />");
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
       break;
 
    case "ScreenOS":
@@ -35,6 +59,11 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "netscreen_memory";        	include ("includes/print-device-graph.php");
       echo("<div class=graphhead>Firewall Sessions</div>");
       $graph_type = "netscreen_sessions";       include ("includes/print-device-graph.php");
+
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
       break;
 
    case "ProCurve":
@@ -99,18 +128,10 @@ while($device = mysql_fetch_array($device_query)) {
         $graph_type = "dev_temp";           include ("includes/print-device-graph.php");
         echo("<br />");
       }
-      echo("<div class=graphhead>IP Statistics</div>");
-      $graph_type = "ip_graph";           include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>TCP Statistics</div>");
-      $graph_type = "tcp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>UDP Statistics</div>");
-      $graph_type = "udp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>ICMP Statistics</div>");
-      $graph_type = "icmp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
       echo("<div class=graphhead>System Load</div>");
       $graph_type = "load";             include ("includes/print-device-graph.php");
       echo("<br />");
@@ -141,9 +162,6 @@ while($device = mysql_fetch_array($device_query)) {
         $graph_type = "apachebits";     include ("includes/print-device-graph.php");
         echo("<br />");
       }
-      echo("<div class=graphhead>Device Uptime</div>");
-      $graph_type = "uptime"; include ("includes/print-device-graph.php");
-      echo("<br />");
       break;
    case "IOS":
       echo("<div class=graphhead>CPU Usage</div>");
@@ -157,21 +175,10 @@ while($device = mysql_fetch_array($device_query)) {
         $graph_type = "dev_temp";             include ("includes/print-device-graph.php");
         echo("<br />");
       }
-      echo("<div class=graphhead>IP Statistics</div>");
-      $graph_type = "ip_graph";           include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>TCP Statistics</div>");
-      $graph_type = "tcp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>UDP Statistics</div>");
-      $graph_type = "udp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>ICMP Statistics</div>");
-      $graph_type = "icmp_graph";          include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>Uptime</div>");
-      $graph_type = "uptime";           include ("includes/print-device-graph.php");
-      break;
+
+      include("blocks/netstats.inc.php");
+      include("blocks/uptime.inc.php");
+
     case "Snom":
       echo("<div class=graphhead>Calls</div>");
       $graph_type = "calls";              include ("includes/print-device-graph.php");
