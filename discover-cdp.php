@@ -1,6 +1,12 @@
 #!/usr/bin/php
 <?
 
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+
+
 include("config.php");
 include("includes/functions.php");
 include("includes/cdp.inc.php");
@@ -12,7 +18,7 @@ while ($device = mysql_fetch_array($device_query)) {
   $hostname = $device['hostname'];
   $community = $device['community'];
   echo("Discovering $hostname \n");
-  $id = $device['id'];
+  $id = $device['device_id'];
   $host = $id;
 
   echo("Detecting CDP neighbours on $device[1]...\n");
