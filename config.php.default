@@ -58,6 +58,7 @@ $config['stylesheet']  = "css/styles.css";
 $config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
 $mono_font = $config['mono_font'];
 $config['favicon'] = "favicon.ico";
+$config['header_color'] = "#1F334E";
 
 $config['page_refresh'] = "30";  ## Refresh the page every xx seconds
 
