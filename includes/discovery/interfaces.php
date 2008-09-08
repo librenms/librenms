@@ -43,7 +43,8 @@
         }
         $int_exists[] = "$ifIndex";
       } else { 
-          # Ignored ifName
+          # Ignored Interface
+	  echo("$if \n");
           echo("X"); 
       }
     } 
