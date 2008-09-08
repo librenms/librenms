@@ -15,21 +15,16 @@ $linkdone = array();
 
 $x = 1;
 
-$loc_sql = "SELECT * FROM links AS L, interfaces AS I, interfaces AS X, devices as D WHERE I.device_id = D.device_id AND L.src_if = I.interface_id AND D.hostname LIKE '%vostron.net' AND D.hostname NOT LIKE 'cust.vostron.net' GROUP BY D.location ORDER BY D.device_id ASC";
+$loc_sql = "SELECT * FROM links AS L, interfaces AS I, interfaces AS X, devices as D WHERE I.device_id = D.device_id AND L.src_if = I.interface_id GROUP BY D.location ORDER BY D.device_id ASC";
 $loc_result = mysql_query($loc_sql);
 while($loc_data = mysql_fetch_array($loc_result)) {
 
-   echo("subgraph \"". $loc_data['location']  ."\" {\n
+  echo("subgraph \"". $loc_data['location']  ."\" {\n
   label = \"". $loc_data['location']  ."\"; 
   style=filled;
   color=lightgrey;\n\n");
     
-  if($loc_data['location'] == "TFM3, Telehouse North, London") {
-    echo("  \"Internet\" [shape=tripleoctagon style=filled fillcolor=crimson]\n"); 
-    echo("  \"ADSL\" [shape=tripleoctagon style=filled fillcolor=orange]\n");
-  }
-
-  $dev_sql = "SELECT * FROM links AS L, interfaces AS I, interfaces AS X, devices as D WHERE D.location = '" . $loc_data['location'] . "' AND I.device_id = D.device_id AND L.src_if = I.interface_id AND D.hostname LIKE '%vostron.net' AND D.hostname NOT LIKE '%cust.vostron.net' GROUP BY D.hostname";
+  $dev_sql = "SELECT * FROM links AS L, interfaces AS I, interfaces AS X, devices as D WHERE D.location = '" . $loc_data['location'] . "' AND I.device_id = D.device_id AND L.src_if = I.interface_id GROUP BY D.hostname";
   $dev_result = mysql_query($dev_sql);
   while($dev_data = mysql_fetch_array($dev_result)) {
 	$host = $dev_data['hostname'];
@@ -48,7 +43,7 @@ while($loc_data = mysql_fetch_array($loc_result)) {
 
   }
 
-  $links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE D.hostname LIKE '%vostron.net' AND I.device_id = D.device_id AND X.device_id = Y.device_id AND D.hostname NOT LIKE '%cust%' AND Y.hostname NOT LIKE '%cust%' AND L.src_if = I.interface_id AND X.interface_id = L.dst_if  AND D.location = '" . $loc_data['location'] . "' AND  D.location = Y.location ORDER BY D.location DESC";
+  $links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y  WHERE I.device_id = D.device_id AND X.device_id = Y.device_id AND L.src_if = I.interface_id AND X.interface_id = L.dst_if  AND D.location = '" . $loc_data['location'] . "' AND  D.location = Y.location ORDER BY D.location DESC";
   $links_result = mysql_query($links_sql);
   while($link_data = mysql_fetch_array($links_result)) {
 
@@ -104,13 +99,13 @@ echo("\n}\n");
 
 }
 
-echo("\"thnlon-pe01\" -> \"thelon-cs01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"thnlon-pe01\" -> \"thelon-cs02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"thnlon-pe01\" -> \"thelon-cs01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"thnlon-pe01\" -> \"thelon-cs02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
 
-echo("\"Internet\" -> \"thelon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"Internet\" -> \"thelon-pe02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"Internet\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-echo("\"ADSL\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"Internet\" -> \"thelon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"Internet\" -> \"thelon-pe02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"Internet\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
+#echo("\"ADSL\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
 
 $links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE D.hostname LIKE '%vostron.net' AND I.device_id = D.device_id AND X.device_id = Y.device_id AND D.hostname NOT LIKE '%cust%' AND L.src_if = I.interface_id AND X.interface_id = L.dst_if  AND D.location != Y.location AND D.hostname NOT LIKE '%cust.vostron.net' AND Y.hostname NOT LIKE '%cust.vostron.net' ORDER BY D.location DESC";
 $links_result = mysql_query($links_sql);
