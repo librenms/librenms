@@ -1,6 +1,6 @@
 <?php
 
-   echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
+   echo("<div style='margin: 5px;'><table border=0 cellspacing=1 cellpadding=5 width=100%>");
 
    echo("<tr><td colspan=6><h2>Local AS : " . $device['bgpLocalAs'] . "</h2></td></tr>");
 

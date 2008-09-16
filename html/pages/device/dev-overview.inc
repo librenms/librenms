@@ -23,7 +23,6 @@ echo("
 <table width=100% cellspacing=0 cellpadding=0>
   <tr><td width=50% valign=top>");
 
-
 #if(file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 #  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
