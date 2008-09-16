@@ -22,7 +22,7 @@
      if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "gray"; }
 
      if($peer['bgpPeerRemoteAs'] == $peer['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; 
-      if($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] =< '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
+      if($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
      }
 
      $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
