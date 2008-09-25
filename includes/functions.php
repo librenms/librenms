@@ -395,29 +395,30 @@ function humanmedia($media) {
 
 
 function humanspeed($speed) {
-        $speed = preg_replace("/^0$/", "-", $speed);
-        $speed = preg_replace("/^9000$/", "9Kbps", $speed);
-	$speed = preg_replace("/^48000$/", "48Kbps", $speed);
-	$speed = preg_replace("/^56000$/", "56Kbps", $speed);
-        $speed = preg_replace("/^64000$/", "64Kbps", $speed);
-        $speed = preg_replace("/^128000$/", "128Kbps", $speed);
-        $speed = preg_replace("/^256000$/", "256Kbps", $speed);
-	$speed = preg_replace("/^448000$/", "448Kbps", $speed);
-        $speed = preg_replace("/^512000$/", "512Kbps", $speed);
-	$speed = preg_replace("/^768000$/", "768Kbps", $speed);
-        $speed = preg_replace("/^1024000$/", "1Mbps", $speed);
-        $speed = preg_replace("/^2048000$/", "2Mbps", $speed);
-        $speed = preg_replace("/^4192000$/", "4Mbps", $speed);
-	$speed = preg_replace("/^10000000$/", "10Mbps", $speed);
-	$speed = preg_replace("/^34000000$/", "34Mbps", $speed);
-        $speed = preg_replace("/^45000000$/", "45Mbps", $speed);
-        $speed = preg_replace("/^54000000$/", "54Mbps", $speed);
-        $speed = preg_replace("/^100000000$/", "100Mbps", $speed);
- 	$speed = preg_replace("/^155000000$/", "155Mbps", $speed);
-        $speed = preg_replace("/^622000000$/", "622Mbps", $speed);
-        $speed = preg_replace("/^1000000000$/", "1Gbps", $speed);
-        $speed = preg_replace("/^10000000000$/", "10Gbps", $speed);
-	$speed = preg_replace("/^4294967295$/", "", $speed);
+#        $speed = preg_replace("/^0$/", "-", $speed);
+#        $speed = preg_replace("/^9000$/", "9Kbps", $speed);
+#	$speed = preg_replace("/^48000$/", "48Kbps", $speed);
+#	$speed = preg_replace("/^56000$/", "56Kbps", $speed);
+#        $speed = preg_replace("/^64000$/", "64Kbps", $speed);
+#        $speed = preg_replace("/^128000$/", "128Kbps", $speed);
+#        $speed = preg_replace("/^256000$/", "256Kbps", $speed);
+#	$speed = preg_replace("/^448000$/", "448Kbps", $speed);
+#        $speed = preg_replace("/^512000$/", "512Kbps", $speed);
+#	$speed = preg_replace("/^768000$/", "768Kbps", $speed);
+#        $speed = preg_replace("/^1024000$/", "1Mbps", $speed);
+#        $speed = preg_replace("/^2048000$/", "2Mbps", $speed);
+#        $speed = preg_replace("/^4192000$/", "4Mbps", $speed);
+#	$speed = preg_replace("/^10000000$/", "10Mbps", $speed);
+#	$speed = preg_replace("/^34000000$/", "34Mbps", $speed);
+#        $speed = preg_replace("/^45000000$/", "45Mbps", $speed);
+#        $speed = preg_replace("/^54000000$/", "54Mbps", $speed);
+#        $speed = preg_replace("/^100000000$/", "100Mbps", $speed);
+# 	$speed = preg_replace("/^155000000$/", "155Mbps", $speed);
+#        $speed = preg_replace("/^622000000$/", "622Mbps", $speed);
+#        $speed = preg_replace("/^1000000000$/", "1Gbps", $speed);
+#        $speed = preg_replace("/^10000000000$/", "10Gbps", $speed);
+#	$speed = preg_replace("/^4294967295$/", "", $speed);
+	$speed = formatRates($speed);
         if($speed == "") { $speed = "-"; }
 	return $speed;
 }
@@ -559,6 +560,7 @@ function fixifName ($inf) {
         $inf = str_replace("vlan", "Vlan", $inf);
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("-802.1q Vlan subif", "", $inf);
+	$inf = str_replace("-802.1q", "", $inf);
 	$inf = str_replace("tunnel", "Tunnel", $inf);
         $inf = str_replace("serial", "Serial", $inf);
         $inf = str_replace("-aal5 layer", " aal5", $inf);
@@ -575,8 +577,10 @@ function fixifName ($inf) {
 
 
 function fixIOSFeatures($features){
+	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);
         $features = str_replace("LANBASEK9", "Lan Base Crypto", $features);
 	$features = str_replace("LANBASE", "Lan Base", $features);
+	$features = str_replace("ADVENTERPRISEK9", "Advanced Enterprise Crypto", $features);
 	$features = str_replace("ADVSECURITYK9", "Advanced Security Crypto", $features);
         $features = str_replace("K91P", "Provider Crypto", $features);
 	$features = str_replace("K4P", "Provider Crypto", $features);
@@ -584,13 +588,15 @@ function fixIOSFeatures($features){
         $features = str_replace("ADVIPSERVICES", "Adv IP Services", $features);
         $features = str_replace("IK9P", "IP Plus Crypto", $features);
         $features = str_replace("SPSERVICESK9", "SP Services Crypto", $features);
-        $features = str_replace("PK9SV", "Provider Crypto", $features);
+        $features = preg_replace("/^PK9SV$/", "IP MPLS/IPV6 W/SSH + BGP", $features);
         $features = str_replace("IS", "IP Plus", $features);
         $features = str_replace("IPSERVICESK9", "IP Services Crypto", $features);
         $features = str_replace("BROADBAND", "Broadband", $features);
         $features = str_replace("IPBASE", "IP Base", $features);
         $features = str_replace("IPSERVICE", "IP Services", $features);
         $features = preg_replace("/^P$/", "Service Provider", $features);
+	$features = preg_replace("/^P11$/", "Broadband Router", $features);
+	$features = preg_replace("/^G4P5$/", "NRP", $features);
         $features = str_replace("JK9S", "Enterprise Plus Crypto", $features);
         $features = str_replace("IK9S", "IP Plus Crypto", $features);
 	$features = str_replace("I6Q4L2", "Layer 2", $features);

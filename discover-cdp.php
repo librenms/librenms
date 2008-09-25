@@ -26,7 +26,7 @@ while ($device = mysql_fetch_array($device_query)) {
   $ports = $snmp->getports();
   $cdp = $snmp->explore_cdp($ports);
 
-  unset($cdp_links);
+  $cdp_links = "";
 
   foreach (array_keys($cdp) as $key) {
     $port = $ports[$key];

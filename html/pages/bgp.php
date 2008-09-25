@@ -30,8 +30,9 @@
      if($peerhost) { $peername = generatedevicelink($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
      echo("<tr bgcolor=$bg_colour>
-             <td width=30><span class=list-large><center>$i</center></span></td>
-             <td width=150>".generatedevicelink($peer, shorthost($peer['hostname']))."</td>
+	     <td width=10></td>
+             <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generatedevicelink($peer, shorthost($peer['hostname']))."</td>
+	     <td width=30>-></td>
              <td width=150><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
 	     <td width=50><b>$peer_type</b></td>
              <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>

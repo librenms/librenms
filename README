@@ -9,6 +9,16 @@ Observer is an auto-discovering network monitoring system.
 
 It's designed to be an easily-navigable interface to the health of your network.
 
+Planned Features
+----------------
+
+* Full IPv6 capabilities
+* Pseudowire (MPLS/L2TP) tracking
+* MPLS IP-VPN tracking
+* 6500/7600 non-MSFC CPU tracking (pfc/dfc et al)
+* 6500/7600 non-MSFC memory tracking
+* 95th and metered usage tracking
+
 Installation
 ------------
 

@@ -47,7 +47,7 @@
     }
  
   echo("</span>");
-  echo("</td><td width=100>");
+  echo("</td><td width=120>");
   if($interface['ifOperStatus'] == "up") {
 
     $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
