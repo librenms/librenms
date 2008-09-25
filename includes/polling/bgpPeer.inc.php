@@ -14,10 +14,11 @@ while($peer = mysql_fetch_array($peers)) {
 
   $peer_cmd  = $config['snmpget'] . " -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'] . " ";
   $peer_cmd .= "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
-  $peer_cmd .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . "";
+  $peer_cmd .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
+  $peer_cmd .= "bgpPeerLocalAddr." . $peer['bgpPeerIdentifier'] . "";
   $peer_data = trim(`$peer_cmd`);
 
-  list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime) = explode("\n", $peer_data);
+  list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
 
   $peerrrd    = $rrd_dir . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
 
@@ -37,7 +38,7 @@ while($peer = mysql_fetch_array($peers)) {
   rrdtool_update($peerrrd, "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
   $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
-  $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
+  $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpLocalAddr = '$bgpLocalAddr' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
   $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'";
 
   mysql_query($update);

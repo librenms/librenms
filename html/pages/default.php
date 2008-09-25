@@ -154,8 +154,7 @@ if($_SESSION['userlevel'] >= '5') {
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-  $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
+  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
@@ -172,6 +171,9 @@ if($_SESSION['userlevel'] >= '5') {
     $seperator = ",";
   }
 
+  $interfaces['broadband'] = "2490,2509";
+  $interfaces['wave_broadband'] = "2098";
+
   if($interfaces['transit']) {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
@@ -180,19 +182,19 @@ if($_SESSION['userlevel'] >= '5') {
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['l2tp']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['l2tp'].
+  if($interfaces['broadband']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['l2tp'].
+    "<div style='font-size: 18px; font-weight: bold;'>Broadband</div>".
+    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['voip']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['voip'].
+  if($interfaces['wave_broadband']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['voip'].
+    "<div style='font-size: 18px; font-weight: bold;'>Wave Broadhand</div>".
+    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 

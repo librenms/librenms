@@ -4,7 +4,15 @@
 
   $uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
 
-    echo("
+  if(is_file("images/devices/" . $device['hardware'] . ".gif")) {
+    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".gif' align=absmiddle></img></div>";
+  } elseif (is_file("images/devices/" . $device['hardware'] . ".jpg")) {
+    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".jpg' align=absmiddle></img></div>";
+  } else { unset($dev_img); }
+
+  
+
+    echo("$ddev_img
       <table width=100%>
         <tr>
           <td class=list-bold>Operating System</td>
