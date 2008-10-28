@@ -39,6 +39,16 @@ if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id =
 </li>");
 }
 
+if(@mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+  echo("
+<li class=" . $select['dev-vrfs'] . ">
+  <a href='?page=device&id=" . $device['device_id'] . "&section=dev-vrfs' >
+    <img src='images/16/layers.png' align=absmiddle border=0> VRFs
+  </a>
+</li>");
+}
+
+
 if($config['enable_bgp'] && $device['bgpLocalAs']) {
   echo("
 <li class=" . $select['dev-bgp'] . ">
