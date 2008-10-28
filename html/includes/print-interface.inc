@@ -69,7 +69,12 @@
   if($device['os'] == "IOS") {
 
     if($interface['ifTrunk']) { echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>"); 
-    } elseif ($interface['ifVlan']) { echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"); }
+    } elseif ($interface['ifVlan']) { echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"); 
+    } elseif ($interface['ifVrf']) {
+      $vrf = mysql_fetch_array(mysql_query("SELECT * FROM vrfs WHERE vrf_id = '".$interface['ifVrf']."'"));
+      echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
+    }
+   
 
   }
 
