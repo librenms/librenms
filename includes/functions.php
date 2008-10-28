@@ -273,7 +273,7 @@ function generatedevicelink($device, $text=0, $start=0, $end=0) {
   if(!$end) { $end = $now; }
   $class = devclass($device);
   if(!$text) { $text = $device['hostname']; }
-  $graph_url = "graph.php?host=" . $device[device_id] . "&from=$start&to=$end&width=400&height=120&type=cpu";
+  $graph_url = "graph.php?host=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=cpu";
   $link  = "<a class=$class href='?page=device&id=" . $device['device_id'] . "' ";
   $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU Load</div>";
   $link .= "<img src=\'$graph_url\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">$text</a>";
@@ -551,7 +551,7 @@ function fixiftype ($type) {
 }
 
 function fixifName ($inf) {
-        if(strstr($inf, "oopback")) { $inf = "loopback"; }
+        #if(strstr($inf, "oopback")) { $inf = "loopback"; }
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("gig", "Gig", $inf);
         $inf = str_replace("fast", "Fast", $inf);
