@@ -25,13 +25,15 @@
 
   $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
 
+  
   echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
-           <td valign=top width=300>
-              <span class=list-large>
+           <td valign=top width=300>");
+
+  echo("        <span class=list-large>
                 " . generateiflink($interface, "$i. $ifDescr") . " $error_img
               </span><br /><span class=interface-desc>$ifAlias</span>");
 
-	if($ifAlias) { echo("<br />"); }
+  if($ifAlias) { echo("<br />"); }
 
   unset ($break);
   if(!$dographs) {
@@ -175,6 +177,17 @@ echo("</td>");
      unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
      }
+
+  $pseudowires = mysql_query("SELECT * FROM `pseudowires` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
+  while($pseudowire = mysql_fetch_array($pseudowires)) {
+  #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
+    $pw_peer_dev = mysql_fetch_array(mysql_query("SELECT * from `devices` WHERE `device_id` = '" . $pseudowire['peer_device_id'] . "'"));
+    $pw_peer_int = mysql_fetch_array(mysql_query("SELECT * from `interfaces` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
+                                                                                                          P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
+                                                                                                          P.interface_id = I.interface_id"));
+    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['ifDescr'])) ." on ". generatedevicelink($pw_peer_dev) . "</b>");
+  }
+
 
      echo("</td></tr>");
 
