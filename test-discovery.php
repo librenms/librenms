@@ -38,9 +38,9 @@ while ($device = mysql_fetch_array($device_query)) {
 
 #  include("includes/discovery/unix-memory.php");
 
-   include("cisco-pw.php");
+#   include("cisco-pw.php");
 
-#   include("cisco-vrf.php");
+   include("includes/discovery/cisco-vrf.php");
 
   echo("\n"); $devices_polled++;
 }
