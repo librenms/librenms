@@ -599,6 +599,7 @@ function fixIOSFeatures($features){
 	$features = preg_replace("/^G4P5$/", "NRP", $features);
         $features = str_replace("JK9S", "Enterprise Plus Crypto", $features);
         $features = str_replace("IK9S", "IP Plus Crypto", $features);
+        $features = preg_replace("/^JK$/", "Enterprise Plus", $features);
 	$features = str_replace("I6Q4L2", "Layer 2", $features);
         $features = str_replace("I6K2L2Q4", "Layer 2 Crypto", $features);
 	$features = str_replace("C3H2S", "Layer 2 SI/EI", $features);
