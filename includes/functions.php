@@ -551,7 +551,6 @@ function fixiftype ($type) {
 }
 
 function fixifName ($inf) {
-        #if(strstr($inf, "oopback")) { $inf = "loopback"; }
         $inf = str_replace("ether", "Ether", $inf);
         $inf = str_replace("gig", "Gig", $inf);
         $inf = str_replace("fast", "Fast", $inf);
