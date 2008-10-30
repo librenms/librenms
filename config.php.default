@@ -47,13 +47,13 @@ $config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#E5E5E5",
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 
 
-### List of networks to allow scanning-based discovery
-$config['nets'] =  array ("89.21.224.0/19", "10.0.0.0/8", "172.22.0.0/16", "213.253.1.0/24");
+### List of networks to allow scanning-based discovery.
+$config['nets'] =  array ("10.0.0.0/8", "172.22.0.0/16");
 
 ### Your company domain name and specifics
 $config['mydomain'] = "project-observer.net";
-$config['page_title']  = "Observer Demo";
-$config['title_image'] = "images/observer-header.png";
+$config['page_title']  = "Project Observer";
+$config['title_image'] = "images/observer-logo.jpg";
 $config['stylesheet']  = "css/styles.css"; 
 $config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
 $mono_font = $config['mono_font'];
