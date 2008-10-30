@@ -45,7 +45,7 @@ while ($device = mysql_fetch_array($device_query)) {
   ## Discover Temperatures
   include("includes/discovery/temperatures.php");
 
-  if($device['os'] == "Linux") {
+  if($device['os'] == "Linux" || $device['os'] == "FreeBSD") {
     include("includes/discovery/storage.php");
   }
 
