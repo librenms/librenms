@@ -1,14 +1,28 @@
--- 
+-- phpMyAdmin SQL Dump
+-- version 2.11.3deb1ubuntu1.1
+-- http://www.phpmyadmin.net
+--
+-- Host: localhost
+-- Generation Time: Oct 30, 2008 at 09:09 PM
+-- Server version: 5.0.51
+-- PHP Version: 5.2.4-2ubuntu5.3
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+--
 -- Database: `observer`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `adjacencies`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 07:10 PM
+--
 
-CREATE TABLE IF NOT EXISTS `adjacencies` (
+CREATE TABLE `adjacencies` (
   `adj_id` int(11) NOT NULL auto_increment,
   `network_id` int(11) NOT NULL default '0',
   `interface_id` int(11) NOT NULL default '0',
@@ -17,11 +31,14 @@ CREATE TABLE IF NOT EXISTS `adjacencies` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `alerts`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 29, 2008 at 03:46 PM
+--
 
-CREATE TABLE IF NOT EXISTS `alerts` (
+CREATE TABLE `alerts` (
   `id` int(11) NOT NULL auto_increment,
   `importance` int(11) NOT NULL default '0',
   `device_id` int(11) NOT NULL,
@@ -33,11 +50,15 @@ CREATE TABLE IF NOT EXISTS `alerts` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `bgpPeers`
--- 
+--
+-- Creation: Sep 16, 2008 at 12:51 PM
+-- Last update: Oct 30, 2008 at 09:08 PM
+-- Last check: Sep 16, 2008 at 12:51 PM
+--
 
-CREATE TABLE IF NOT EXISTS `bgpPeers` (
+CREATE TABLE `bgpPeers` (
   `bgpPeer_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
   `astext` varchar(32) NOT NULL,
@@ -45,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeerRemoteAs` int(11) NOT NULL,
   `bgpPeerState` text NOT NULL,
   `bgpPeerAdminStatus` text NOT NULL,
-  `bgpPeerLocalAddr` text NOT NULL,
+  `bgpLocalAddr` text NOT NULL,
   `bgpPeerRemoteAddr` text NOT NULL,
   `bgpPeerInUpdates` int(11) NOT NULL,
   `bgpPeerOutUpdates` int(11) NOT NULL,
@@ -59,11 +80,14 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `bills`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `bills` (
+CREATE TABLE `bills` (
   `bill_id` int(11) NOT NULL auto_increment,
   `bill_name` text NOT NULL,
   `bill_type` text NOT NULL,
@@ -71,15 +95,18 @@ CREATE TABLE IF NOT EXISTS `bills` (
   `bill_day` int(11) NOT NULL default '1',
   `bill_gb` int(11) default NULL,
   UNIQUE KEY `bill_id` (`bill_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `bill_data`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `bill_data` (
+CREATE TABLE `bill_data` (
   `bill_id` int(11) NOT NULL,
   `timestamp` datetime NOT NULL,
   `period` int(11) NOT NULL,
@@ -91,33 +118,42 @@ CREATE TABLE IF NOT EXISTS `bill_data` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `bill_perms`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `bill_perms` (
+CREATE TABLE `bill_perms` (
   `user_id` int(11) NOT NULL,
   `bill_id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `bill_ports`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `bill_ports` (
+CREATE TABLE `bill_ports` (
   `bill_id` int(11) NOT NULL,
   `port_id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `customers`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `customers` (
+CREATE TABLE `customers` (
   `customer_id` int(11) NOT NULL auto_increment,
   `username` char(64) NOT NULL,
   `password` char(32) NOT NULL,
@@ -125,15 +161,18 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`customer_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `devices`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 29, 2008 at 03:46 PM
+--
 
-CREATE TABLE IF NOT EXISTS `devices` (
+CREATE TABLE `devices` (
   `device_id` int(11) NOT NULL auto_increment,
   `hostname` text NOT NULL,
   `community` varchar(32) NOT NULL,
@@ -158,11 +197,14 @@ CREATE TABLE IF NOT EXISTS `devices` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `devices_attribs`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 09:08 PM
+--
 
-CREATE TABLE IF NOT EXISTS `devices_attribs` (
+CREATE TABLE `devices_attribs` (
   `attrib_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
   `attrib_type` varchar(32) NOT NULL,
@@ -174,11 +216,14 @@ CREATE TABLE IF NOT EXISTS `devices_attribs` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `devices_perms`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `devices_perms` (
+CREATE TABLE `devices_perms` (
   `user_id` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
   `access_level` int(4) NOT NULL default '0',
@@ -187,11 +232,14 @@ CREATE TABLE IF NOT EXISTS `devices_perms` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `entPhysical`
--- 
+--
+-- Creation: Sep 07, 2008 at 10:26 PM
+-- Last update: Oct 29, 2008 at 06:50 PM
+--
 
-CREATE TABLE IF NOT EXISTS `entPhysical` (
+CREATE TABLE `entPhysical` (
   `entPhysical_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
   `entPhysicalIndex` int(11) NOT NULL,
@@ -211,11 +259,14 @@ CREATE TABLE IF NOT EXISTS `entPhysical` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `eventlog`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 06:51 PM
+--
 
-CREATE TABLE IF NOT EXISTS `eventlog` (
+CREATE TABLE `eventlog` (
   `id` int(11) NOT NULL default '0',
   `host` int(11) NOT NULL default '0',
   `interface` int(11) default NULL,
@@ -227,18 +278,22 @@ CREATE TABLE IF NOT EXISTS `eventlog` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `interfaces`
--- 
+--
+-- Creation: Sep 21, 2008 at 05:22 PM
+-- Last update: Oct 30, 2008 at 09:08 PM
+-- Last check: Sep 21, 2008 at 05:22 PM
+--
 
-CREATE TABLE IF NOT EXISTS `interfaces` (
+CREATE TABLE `interfaces` (
   `interface_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL default '0',
   `ifDescr` varchar(64) NOT NULL,
   `ifIndex` int(11) default '0',
   `ifSpeed` text,
-  `ifOperStatus` varchar(12) default NULL,
-  `ifAdminStatus` varchar(12) default NULL,
+  `ifOperStatus` varchar(16) default NULL,
+  `ifAdminStatus` varchar(16) default NULL,
   `ifDuplex` varchar(12) default NULL,
   `ifMtu` int(11) default NULL,
   `ifType` text,
@@ -248,6 +303,7 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
   `ifLastChange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `ifVlan` varchar(8) NOT NULL default '',
   `ifTrunk` varchar(8) default '',
+  `ifVrf` int(11) NOT NULL,
   `in_rate` int(11) NOT NULL,
   `out_rate` int(11) NOT NULL,
   `counter_in` int(11) default NULL,
@@ -256,6 +312,7 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
   `out_errors` int(11) NOT NULL,
   `ignore` tinyint(1) NOT NULL default '0',
   `detailed` tinyint(1) NOT NULL default '0',
+  `deleted` int(11) NOT NULL default '0',
   PRIMARY KEY  (`interface_id`),
   KEY `host` (`device_id`),
   KEY `snmpid` (`ifIndex`),
@@ -264,11 +321,14 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `interfaces_perms`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `interfaces_perms` (
+CREATE TABLE `interfaces_perms` (
   `user_id` int(11) NOT NULL,
   `interface_id` int(11) NOT NULL,
   `access_level` int(11) NOT NULL
@@ -276,11 +336,14 @@ CREATE TABLE IF NOT EXISTS `interfaces_perms` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `ipaddr`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 29, 2008 at 07:09 PM
+--
 
-CREATE TABLE IF NOT EXISTS `ipaddr` (
+CREATE TABLE `ipaddr` (
   `id` int(11) NOT NULL auto_increment,
   `addr` varchar(32) NOT NULL default '',
   `cidr` smallint(6) NOT NULL default '0',
@@ -292,11 +355,14 @@ CREATE TABLE IF NOT EXISTS `ipaddr` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `links`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 12:55 AM
+--
 
-CREATE TABLE IF NOT EXISTS `links` (
+CREATE TABLE `links` (
   `id` int(11) NOT NULL auto_increment,
   `src_if` int(11) default NULL,
   `dst_if` int(11) default NULL,
@@ -307,11 +373,14 @@ CREATE TABLE IF NOT EXISTS `links` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `networks`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 27, 2008 at 12:47 PM
+--
 
-CREATE TABLE IF NOT EXISTS `networks` (
+CREATE TABLE `networks` (
   `id` int(11) NOT NULL auto_increment,
   `cidr` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`),
@@ -320,11 +389,14 @@ CREATE TABLE IF NOT EXISTS `networks` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `port_in_measurements`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `port_in_measurements` (
+CREATE TABLE `port_in_measurements` (
   `port_id` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `counter` bigint(11) NOT NULL,
@@ -334,11 +406,14 @@ CREATE TABLE IF NOT EXISTS `port_in_measurements` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `port_out_measurements`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
 
-CREATE TABLE IF NOT EXISTS `port_out_measurements` (
+CREATE TABLE `port_out_measurements` (
   `port_id` int(11) NOT NULL,
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `counter` bigint(11) NOT NULL,
@@ -348,11 +423,33 @@ CREATE TABLE IF NOT EXISTS `port_out_measurements` (
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `services`
--- 
+--
+-- Table structure for table `pseudowires`
+--
+-- Creation: Oct 28, 2008 at 03:44 PM
+-- Last update: Oct 29, 2008 at 12:52 PM
+--
 
-CREATE TABLE IF NOT EXISTS `services` (
+CREATE TABLE `pseudowires` (
+  `pseudowire_id` int(11) NOT NULL auto_increment,
+  `interface_id` int(11) NOT NULL,
+  `peer_device_id` int(11) NOT NULL,
+  `peer_ldp_id` int(11) NOT NULL,
+  `cpwVcID` int(11) NOT NULL,
+  `cpwOid` int(11) NOT NULL,
+  PRIMARY KEY  (`pseudowire_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `services`
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 03, 2008 at 08:42 PM
+--
+
+CREATE TABLE `services` (
   `service_id` int(11) NOT NULL auto_increment,
   `service_host` int(11) NOT NULL,
   `service_ip` text NOT NULL,
@@ -367,15 +464,18 @@ CREATE TABLE IF NOT EXISTS `services` (
   `service_disabled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`service_id`),
   KEY `service_host` (`service_host`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `storage`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 09:07 PM
+--
 
-CREATE TABLE IF NOT EXISTS `storage` (
+CREATE TABLE `storage` (
   `storage_id` int(11) NOT NULL auto_increment,
   `host_id` int(11) NOT NULL,
   `hrStorageIndex` int(11) NOT NULL,
@@ -389,11 +489,14 @@ CREATE TABLE IF NOT EXISTS `storage` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `syslog`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 11:46 AM
+--
 
-CREATE TABLE IF NOT EXISTS `syslog` (
+CREATE TABLE `syslog` (
   `host` varchar(64) NOT NULL,
   `device_id` int(11) default NULL,
   `facility` varchar(10) default NULL,
@@ -413,11 +516,14 @@ CREATE TABLE IF NOT EXISTS `syslog` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `temperature`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Oct 30, 2008 at 09:08 PM
+--
 
-CREATE TABLE IF NOT EXISTS `temperature` (
+CREATE TABLE `temperature` (
   `temp_id` int(11) NOT NULL auto_increment,
   `temp_host` int(11) NOT NULL default '0',
   `temp_oid` varchar(64) NOT NULL,
@@ -431,11 +537,14 @@ CREATE TABLE IF NOT EXISTS `temperature` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `users`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 22, 2008 at 03:46 PM
+--
 
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
   `user_id` int(11) NOT NULL auto_increment,
   `username` char(30) NOT NULL,
   `password` char(32) NOT NULL,
@@ -448,11 +557,14 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `vlans`
--- 
+--
+-- Creation: Sep 03, 2008 at 08:42 PM
+-- Last update: Sep 08, 2008 at 06:39 PM
+--
 
-CREATE TABLE IF NOT EXISTS `vlans` (
+CREATE TABLE `vlans` (
   `vlan_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) default NULL,
   `vlan_vlan` int(11) default NULL,
@@ -460,5 +572,24 @@ CREATE TABLE IF NOT EXISTS `vlans` (
   `vlan_descr` text,
   PRIMARY KEY  (`vlan_id`),
   KEY `device_id` (`device_id`,`vlan_vlan`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vrfs`
+--
+-- Creation: Oct 28, 2008 at 09:44 PM
+-- Last update: Oct 29, 2008 at 06:50 PM
+--
+
+CREATE TABLE `vrfs` (
+  `vrf_id` int(11) NOT NULL auto_increment,
+  `vrf_oid` varchar(64) NOT NULL,
+  `vrf_name` varchar(32) NOT NULL,
+  `mplsVpnVrfRouteDistinguisher` varchar(16) NOT NULL,
+  `device_id` int(11) NOT NULL,
+  PRIMARY KEY  (`vrf_id`),
+  KEY `device_id` (`device_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
