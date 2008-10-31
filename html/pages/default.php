@@ -122,11 +122,7 @@ while($entry = mysql_fetch_array($data)) {
 }
 
 echo("</table>");
- 
-
   echo("</div>"); ## Close Syslog Div
-
-
 }
 
 echo("</div>");
@@ -145,12 +141,11 @@ echo("<div style='width: 290px; margin: 7px; float: right;'>
 
 if($_SESSION['userlevel'] >= '5') {
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-  $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
+  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['l2tp'] .= $seperator . $interface['interface_id'];
+    $interfaces['peering'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
@@ -162,17 +157,13 @@ if($_SESSION['userlevel'] >= '5') {
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
-  $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
+  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Core: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['voip'] .= $seperator . $interface['interface_id'];
+    $interfaces['core'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
-
-  $interfaces['broadband'] = "2490,2509";
-  $interfaces['wave_broadband'] = "2098";
 
   if($interfaces['transit']) {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
@@ -182,19 +173,19 @@ if($_SESSION['userlevel'] >= '5') {
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['broadband']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
+  if($interfaces['peering']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>Broadband</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
+    "<div style='font-size: 18px; font-weight: bold;'>Internet Peering</div>".
+    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['wave_broadband']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
+  if($interfaces['core']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>Wave Broadhand</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
+    "<div style='font-size: 18px; font-weight: bold;'>Core Links</div>".
+    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['core'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
