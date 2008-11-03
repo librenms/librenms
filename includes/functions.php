@@ -18,6 +18,7 @@ include_once($config['install_dir'] . "/includes/print-functions.php");
 include_once($config['install_dir'] . "/includes/billing-functions.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
+#include_once($config['install_dir'] . "/includes/ipv6-functions.php");
 
 function mres($string) {
  // short function wrapper because the real one is stupidly long and ugly. aestetics.
@@ -25,8 +26,6 @@ function mres($string) {
 }
 
 function validate_hostip($host) {
-
-
 
 }
 
