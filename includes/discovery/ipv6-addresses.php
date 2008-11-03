@@ -1,8 +1,12 @@
 <?php
 
-  echo("IPv6 Addresses : ");
+echo("IPv6 Addresses : ");
 
-  $oids = trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq"));
+$ipv6interfaces = shell_exec($config['snmpget']." -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipv6Interfaces.0");
+
+if($ipv6interfaces){
+
+  $oids = trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq | grep -v No"));
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
@@ -44,5 +48,7 @@
       }
     } else { echo("."); }
   }
+} else { echo("None configured"); }
+
 ?>
 
