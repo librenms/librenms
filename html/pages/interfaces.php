@@ -7,13 +7,17 @@
 #}
 
 
+
 if($_GET['type'] == "down") {
   $where = "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down'";  
 } elseif ($_GET['type'] == "admindown") {
   $where = "AND I.ifAdminStatus = 'down'";
+} elseif ($_GET['type'] == "errors") {
+  $where = "AND ( I.`out_errors` > '0' OR I.`in_errors` > '0' )";
 }
 
 $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifDescr";
+
 
 $query = mysql_query($sql);
 
