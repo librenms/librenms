@@ -39,8 +39,11 @@ while ($device = mysql_fetch_array($device_query)) {
   ## Discover Interfaces 
   include("includes/discovery/interfaces.php");
 
-  ## Discover IP Addresses
+  ## Discover IPv4 Addresses
   include("includes/discovery/ipaddresses.php");
+
+  ## Discovery IPv6 Addresses
+  include("includes/discovery/ipv6-addresses.php");
 
   ## Discover Temperatures
   include("includes/discovery/temperatures.php");

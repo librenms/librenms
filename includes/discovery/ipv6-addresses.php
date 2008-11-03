@@ -1,13 +1,6 @@
-#!/usr/bin/php
 <?php
-include("config.php");
-include("includes/functions.php");
 
-$sql = "SELECT * FROM devices WHERE device_id LIKE '%$argv[1]' AND status = '1' AND os != 'Snom' order by device_id DESC";
-$q = mysql_query($sql);
-while ($device = mysql_fetch_array($q)) {
-
-  echo("\n" . $device['hostname'] . " : ");
+  echo("IPv6 Addresses : ");
 
   $oids = trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq"));
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
@@ -21,10 +14,10 @@ while ($device = mysql_fetch_array($q)) {
     foreach(explode(":", $ipv6addr) as $part) {
       $n = hexdec($part);
       $oid = "$oid" . "$sep" . "$n";
-      $sep = ".";               
+      $sep = ".";
       $address = $address . "$adsep" . $part;
       $do++;
-      if($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}      
+      if($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
     }
 
     $cidr = trim(shell_exec($config['snmpget']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." .1.3.6.1.2.1.4.34.1.5.2.16.$oid | sed 's/.*\.//'"));
@@ -51,5 +44,5 @@ while ($device = mysql_fetch_array($q)) {
       }
     } else { echo("."); }
   }
-}
 ?>
+
