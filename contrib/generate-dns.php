@@ -5,8 +5,8 @@ include("config.php");
 include("includes/functions.php");
 
 
-$dnsdblink = mysql_connect('localhost', 'adama', 'balr0g');
-$dnsdb = mysql_select_db('vostron_vegadns', $dnsdblink);
+$dnsdblink = mysql_connect('localhost', 'user', 'pass');
+$dnsdb = mysql_select_db('tinydns', $dnsdblink);
 
 $link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
 $db = mysql_select_db($config['db_name'], $link);
