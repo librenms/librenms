@@ -4,7 +4,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%><tr><td>")
 
 if($_GET['bill']) {
 
- $bill_id = mres($_GET['bill']);
+ $bill_id = $_GET['bill'];
  include("includes/billing.php");
 
 } else {
@@ -29,16 +29,13 @@ if($_GET['bill']) {
        $allowed = formatRates($bill['bill_cdr'] * 1000);
        $used    = formatRates($rate_data['rate_95th'] * 1000);
        $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
-
     } elseif ($bill['bill_type'] == "quota") { 
        $type = "Quota"; 
        $allowed = formatStorage($bill['bill_gb']* 1024 * 1024 * 1024);
        $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);
        $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
-
     }
 
-  
     echo("
            <tr bgcolor='$bg'>
              <td width='7'></td>
