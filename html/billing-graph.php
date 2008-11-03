@@ -7,7 +7,6 @@
 
 include("../config.php");
 include("../includes/functions.php");
-#include("chart.php");
 require("includes/jpgraph/jpgraph.php");
 include("includes/jpgraph/jpgraph_line.php");
 include("includes/jpgraph/jpgraph_utils.inc.php");
@@ -52,7 +51,7 @@ $bi_q 		= mysql_query("SELECT * FROM bills WHERE bill_id = $bill_id");
 $bi_a 		= mysql_fetch_array($bi_q);
 $bill_name  	= $bi_a['bill_name'];
 
-$countsql = mysql_query("SELECT count(delta) FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto");
+$countsql = mysql_query("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = '$bill_id' AND `timestamp` >= '$datefrom' AND `timestamp` <= '$dateto'");
 $counttot = mysql_result($countsql,0);
 
 $count = round($counttot / (($ysize - 100) * 2), 0);
@@ -78,6 +77,7 @@ $sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHE
 $data = mysql_query($sql);
 while($row = mysql_fetch_array($data)) 
 { 
+
 	@$timestamp = $row['formatted_date'];
 	if (!$first) { $first = $timestamp; }
 	@$delta = $row['delta'];
