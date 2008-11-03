@@ -9,7 +9,7 @@ while ($device = mysql_fetch_array($q)) {
 
   echo("\n" . $device['hostname'] . " : ");
 
-  $oids = shell_exec($config['snmpwalk']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq");
+  $oids = trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq"));
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
