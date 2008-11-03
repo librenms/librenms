@@ -114,6 +114,11 @@ if($config['show_locations']) { echo("<li><a class='menu2four' href='locations/'
 
 <?php
 
+$errored = mysql_result(mysql_query("SELECT COUNT(*) FROM interfaces WHERE (in_errors > '0' OR out_errors > '0')"),0);
+if($errored) {
+  echo("<li><a href='interfaces/errors/'><img src='images/16/chart_curve_error.png' border=0 align=absmiddle> Errored Ports ($errored)</a></li>");
+}
+
 if($_SESSION['userlevel'] >= '5') {
   echo("<li><hr width=140 /></li>");
   if($config['int_customers']) { echo("<li><a href='customers/'><img src='images/16/group_link.png' border=0 align=absmiddle> Customers</a></li>"); $ifbreak = 1;}
