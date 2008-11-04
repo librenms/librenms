@@ -13,7 +13,7 @@
   $oids = trim($oids);
   foreach ( explode("\n", $oids) as $oid ) {
    if($oid) {
-    list($vrf['oid'], $vrf['RouteDistinguisher']) = explode("||", $oid);
+    list($vrf['oid'], $vrf['MplsVpnVrfRouteDistinguisher']) = explode("||", $oid);
     $vrf['name'] = shell_exec($config['snmpget'] . " -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']);
     list(,$vrf['name'], $vrf['MplsVpnVrfRouteDistinguisher']) = explode("\"", $vrf['name']);
     echo($vrf['name']);
