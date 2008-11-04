@@ -188,7 +188,6 @@ if($_SESSION['userlevel'] >= '5') {
     "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['core'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
-
 }
 
 echo("</div>
