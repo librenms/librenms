@@ -585,6 +585,7 @@ function fixIOSFeatures($features){
         $features = str_replace("ADVIPSERVICESK9", "Adv IP Services Crypto", $features);
         $features = str_replace("ADVIPSERVICES", "Adv IP Services", $features);
         $features = str_replace("IK9P", "IP Plus Crypto", $features);
+	$features = str_replace("K9O3SY7", "IP ADSL FW IDS Plus IPSEC 3DES", $features);
         $features = str_replace("SPSERVICESK9", "SP Services Crypto", $features);
         $features = preg_replace("/^PK9SV$/", "IP MPLS/IPV6 W/SSH + BGP", $features);
         $features = str_replace("IS", "IP Plus", $features);
