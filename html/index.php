@@ -98,7 +98,11 @@ function popUp(URL) {
     if($_GET['page'] && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
     } else { 
-      include("pages/default.php");
+      if($config['front_page']) {
+        include($config['front_page']);
+      } else {
+        include("pages/front/default.php");
+      }
     }
 
   } else {
