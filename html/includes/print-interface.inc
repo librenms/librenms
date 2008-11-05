@@ -8,6 +8,8 @@
   if(!$_GET['type']) { $_GET['type'] = "bits"; }
 
   $if_id = $interface['interface_id'];
+
+
   $ifDescr = fixifName($interface['ifDescr']);
   $ifIndex = $interface['ifIndex'];
   $ifAlias = $interface['ifAlias'];
@@ -23,7 +25,7 @@
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
   } else { $error_img = ""; }
 
-  $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
+#  $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
 
   
   echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
@@ -31,7 +33,8 @@
 
   echo("        <span class=list-large>
                 " . generateiflink($interface, "$i. $ifDescr") . " $error_img
-              </span><br /><span class=interface-desc>$ifAlias</span>");
+
+             </span><br /><span class=interface-desc>$ifAlias</span>");
 
   if($ifAlias) { echo("<br />"); }
 
@@ -93,7 +96,7 @@ echo("</td>");
      if ( strpos($ifDescr, "oopback") === false && !$dographs) {
        $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
-#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['ifDescr'])) . " on " . generatedevicelink($link) . "</a><br />");
+#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['ifDescr'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
           $int_links[$link['interface_id']] = $link['interface_id'];
           $int_links_phys[$link['interface_id']] = 1;    
@@ -165,14 +168,14 @@ echo("</td>");
 
      foreach($int_links as $int_link) {
 
-       $interface = mysql_fetch_array(mysql_query("SELECT * from interfaces AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = '".$int_link."'"));
+       $link_if = mysql_fetch_array(mysql_query("SELECT * from interfaces AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = '".$int_link."'"));
 
        echo("$br");
 
        if($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
                                         echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
 
-       echo("<b>" . generateiflink($interface, makeshortif($interface['ifDescr'])) . " on " . generatedevicelink($interface) );
+       echo("<b>" . generateiflink($link_if, makeshortif($link_if['ifDescr'])) . " on " . generatedevicelink($link_if, shorthost($link_if['hostname'])) );
 
        if($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
        if($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }
@@ -190,7 +193,7 @@ echo("</td>");
     $pw_peer_int = mysql_fetch_array(mysql_query("SELECT * from `interfaces` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
                                                                                                           P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
-    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['ifDescr'])) ." on ". generatedevicelink($pw_peer_dev) . "</b>");
+    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['ifDescr'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
   }
 
 
@@ -223,8 +226,6 @@ echo("</td>");
         onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
   echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
-
-
 
   echo("</td></tr>");
 

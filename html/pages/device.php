@@ -62,7 +62,7 @@ if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE d
   echo("
 <li class=" . $select['dev-ifs'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-ifs' >
-    <img src='images/16/server_link.png' align=absmiddle border=0> Port Details
+    <img src='images/16/server_link.png' align=absmiddle border=0> Ports
   </a>
 </li>
 <li class=" . $select['dev-ifgraphs'] . ">
@@ -125,7 +125,7 @@ if(mysql_result(mysql_query("select count(service_id) from services WHERE servic
 echo("
 <li class=" . $select['dev-events'] . ">
   <a href='?page=device&id=" . $device['device_id'] . "&section=dev-events'>
-    <img src='images/16/report_magnify.png' align=absmiddle border=0> Eventlog
+    <img src='images/16/report_magnify.png' align=absmiddle border=0> Events
   </a>
 </li>");
 

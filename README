@@ -34,6 +34,13 @@ Pre-Release 0.3.3
 
 Much prettier front page
 Tidied up service checking layout
+Added MPLS VRF tracking
+Added Pseudowire/X-Connect tracking
+Basic front page customisation
+Fixed aggregate graphs
+IPv6 address tracking
+View for ports with errors
+Added some JunOS support
 
 Release 0.3.2.1 ( 27th March 2008 )
 
