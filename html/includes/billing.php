@@ -174,7 +174,7 @@ echo("
 
 
 
-if($_GET['bill'] && billpermitted($_GET['id'])){
+if($_GET['bill'] && billpermitted($_GET['bill'])){
 
 	        $bill_id = $_GET['bill'];
 		printReport($bill_id);	
