@@ -136,10 +136,10 @@ echo("<table width=100%><tr><td valign=top width=33%>");
   echo("</td><td valign=top width=33%>");
   echo("<h3>Bill Access</h3>");
 
-  $bill_perm_data = mysql_query("SELECT * from bills AS B, bill_perms AS P WHERE `P.user_id` = '" . $_GET['user_id'] .
+  $bill_perm_data = mysql_query("SELECT * from bills AS B, bill_perms AS P WHERE P.user_id = '" . $_GET['user_id'] .
                                      "' AND P.bill_id = B.bill_id");
-  while($bill_perm = mysql_fetch_array($bill_perm_data)) {
 
+  while($bill_perm = mysql_fetch_array($bill_perm_data)) {
    echo("<table><tr><td><strong>".$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='?page=edituser&action=delifperm&user_id=" .
     $_GET['user_id'] . "&interface_id=" . $bill_perm['interface_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></td></tr></table>");
     $bill_access_list[] = $bill_perm['bill_id'];
@@ -155,7 +155,7 @@ echo("<table width=100%><tr><td valign=top width=33%>");
           <input type='hidden' value='" . $_GET['user_id'] . "' name='user_id'>
           <input type='hidden' value='edituser' name='page'>
           <input type='hidden' value='addbillperm' name='action'>
-          <select name='bill' class=selector>");
+          <select name='bill_id' class=selector>");
 
   $bills = mysql_query("SELECT * FROM `bills` ORDER BY `bill_name`");
   while($bill = mysql_fetch_array($bills)) {
