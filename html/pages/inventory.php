@@ -4,7 +4,9 @@ $sql = "SELECT * from entPhysical AS E, devices AS D WHERE E.device_id = D.devic
 
 if($_POST['search']) { $sstring = $_POST['search']; $sql = "SELECT * from entPhysical AS E, devices AS D WHERE E.entPhysicalModelName LIKE '$sstring' AND E.device_id = D.device_id"; }
 
-echo("<div style='align: right;'><form method=post>Search <input name=search>$sstring</input><submit></form></div>");
+echo("<div style='float: right;'><form method=post><b>Search</b> 
+                                   <input name=search>$sstring</input>
+                                   <input type=submit name=submit value=Search></form></div>");
 
 
 $query = mysql_query($sql);
