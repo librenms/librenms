@@ -11,15 +11,12 @@
       if(mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_host = '$device[id]'"),0)) { $this_alert = "1"; }
       if(mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device[device_id] . "'"),0)) { $this_alert = "1"; }
     }
-
     if($this_alert) { 
      $device_alerts++;
      $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'"; 
     }    
     unset($this_alert);
   }
-
-
 ?>
 
 <div class="menu2">
