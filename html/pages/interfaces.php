@@ -38,9 +38,9 @@ while($interface = mysql_fetch_array($query)) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-  if( interfacepermitted($interface['interface_id']) ) {
-  
-  echo("<tr bgcolor=$row_colour>
+  if( interfacepermitted($interface['interface_id']) ) 
+  {
+    echo("<tr bgcolor=$row_colour>
           <td class=list-bold>" . generatedevicelink($interface) . "</td>
           <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
           <td>$speed</td>
@@ -48,7 +48,7 @@ while($interface = mysql_fetch_array($query)) {
           <td>" . $interface[ifAlias] . "</td>
         </tr>\n");
 
-  $row++;
+    $row++;
 
   }
 

@@ -117,20 +117,21 @@ function billpermitted($bill_id) {
 }
 
 
-function interfacepermitted($interface_id) {
-
+function interfacepermitted($interface_id) 
+{
   global $_SESSION;
   if($_SESSION['userlevel'] >= "5") { 
     $allowed = TRUE; 
   } elseif ( devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interface WHERE interface_id = '$interface_id'"),0))) {
     $allowed = TRUE;
-  } elseif ( @mysql_result(mysql_query("SELECT count(*) FROM interface_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0) > '0') {
+  } elseif ( @mysql_result(mysql_query("SELECT interface_id FROM interfaces_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0)) {
     $allowed = TRUE;
   } else { $allowed = FALSE; }
   return $allowed;
 }
 
-function devicepermitted($device_id) {
+function devicepermitted($device_id) 
+{
   global $_SESSION;
   if($_SESSION['userlevel'] >= "5") { $allowed = true; 
   } elseif ( @mysql_result(mysql_query("SELECT * FROM devices_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `device_id` = $device_id"), 0) > '0' ) {
@@ -140,17 +141,20 @@ function devicepermitted($device_id) {
 
 }
 
-function formatRates($rate) {
+function formatRates($rate) 
+{
    $rate = format_si($rate) . "bps";
    return $rate;
 }
 
-function formatstorage($rate) {
+function formatstorage($rate) 
+{
    $rate = format_bi($rate) . "B";
    return $rate;
 }
 
-function format_si($rate) {
+function format_si($rate) 
+{
   $sizes = Array('', 'K', 'M', 'G', 'T', 'P', 'E');
   $round = Array('0','0','0','2','2','2','2','2','2');
   $ext = $sizes[0];
