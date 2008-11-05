@@ -116,7 +116,7 @@ if($config['show_locations']) { echo("<li><a class='menu2four' href='locations/'
 
 $errored = mysql_result(mysql_query("SELECT COUNT(*) FROM interfaces WHERE (in_errors > '0' OR out_errors > '0')"),0);
 if($errored) {
-  echo("<li><a href='interfaces/errors/'><img src='images/16/chart_curve_error.png' border=0 align=absmiddle> Errored Ports ($errored)</a></li>");
+  echo("<li><a href='interfaces/errors/'><img src='images/16/chart_curve_error.png' border=0 align=absmiddle> Errored ($errored)</a></li>");
 }
 
 if($_SESSION['userlevel'] >= '5') {
@@ -137,18 +137,19 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 
 ?>
 
-<li><a href='interfaces/down/'><img src='images/16/if-disconnect.png' border=0 align=absmiddle> Down Ports</a></li>
-<li><a href='interfaces/admindown/'><img src='images/16/if-disable.png' border=0 align=absmiddle> Disabled Ports</a></li>
+<li><a href='interfaces/down/'><img src='images/16/if-disconnect.png' border=0 align=absmiddle> Down</a></li>
+<li><a href='interfaces/admindown/'><img src='images/16/if-disable.png' border=0 align=absmiddle> Disabled</a></li>
 
 </ul></td></tr></table>
 
 <!--[if lte IE 6]></a><![endif]-->
 </li>
 
-<li><a class="menu2four" href="?page=temperatures"><img src='images/16/weather_sun.png' border=0 align=absmiddle> Temperatures</a></li>
+<li><a class="menu2four" href="?page=temperatures"><img src='images/16/weather_sun.png' border=0 align=absmiddle> Temps</a></li>
 
 <li><a class="menu2four" href="?page=storage"><img src='images/16/database.png' border=0 align=absmiddle> Storage</a></li>
 
+<!-- <li><a class="menu2four" href="?page=inventory"><img src='images/16/bricks.png' border=0 align=absmiddle> Inventory</a></li> -->
 
 <?php
 

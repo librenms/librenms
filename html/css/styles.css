@@ -477,7 +477,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 #text { width: 1100px; }
 
 #menubar ul { margin: 0px 10px; padding: 0px; }
-#menubar ul li { list-style: none; display: inline; text-indent: 0px; text-align: left; padding-right: 15px; }
+#menubar ul li { list-style: none; display: inline; text-indent: 0px; text-align: left; padding-right: 10px; }
 #menubar a { color: #666; }
 
 #popupmenu a { color: #aaa; }
@@ -492,7 +492,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
     position: absolute;
     top: 10px;
     left: 5px;
-    width: 150px;
+    width: 175px;
     margin-top: 10px;
     border-top: 1px solid #888;
     border-bottom: 1px solid #888;
@@ -553,214 +553,6 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
         color: #999999;
 }
 
-
-### Stuff for DNS
-
-td {
-  text-decoration: none;
-  font-family: Verdana,Helvetica,sans-serif;
-  font-size: 12px;
-  font-weight: normal;
-}
-
-.left {
-  text-align: left;
-  margin: 1px;
-}
-
-.error {
-  text-decoration: none;
-  font-family: Verdana,Helvetica,sans-serif;
-  font-size: 12px;
-  color: red;
-  font-weight: normal;
-}
-
-select {
-    color: black;
-    text-decoration: none;
-    font-family: Verdana,Helvetica,sans-serif;
-    font-size: 10px;
-    font-weight: normal;
-}
-input {
-    color: black;
-    text-decoration: none;
-    font-family: Verdana,Helvetica,sans-serif;
-    font-size: 10px;
-    font-weight: bold;
-}
-
-## For Mail Admin
-
-.button {
-    border: 1px solid #aaaaaa;
-    color: #777777;
-    background: #dddddd;
-    padding: 3px 3px 3px 3px;
-    font-size: 11px;
-}
-
-.flat {
-        border: 1px solid #888888;
-}
-
-.error_msg {
-        color: #d01313;
-}
-
-.standout {
-    color: maroon;
-    padding: 3px 3px 3px 3px;
-    text-align: center;
-}
-
-.button:hover {
-    background: #A10925;
-    color: #FFFFFF;
-}
-
-#menu {
-    text-align: center;
-    width: 100%;
-    margin: 5px auto;
-    padding-top: 10px;
-}
-
-#menu ul li {
-    display: inline;
-    background: #efefef;
-    padding: 10px 5px 5px 5px;
-    margin-right: 3px;
-    border-top: 4px solid #aaaaaa;
-}
-
-#menu ul li:hover {
-    background:  #A10925; 
-    color: white;
-}
-
-#menu ul li a {
-    color: #888888;
-}
-
-#menu ul li a:hover {
-    color: #FFFFFF;
-}
-
-
-#main_menu, #edit_form {
-     width: 850px;
-     margin: 0px auto;
-
-}
-
-#main_menu table {
-    margin: 0 auto;
-    text-align: left;
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-
-#main_menu table td {
-    padding-left: 30px;
-    padding-bottom: 5px;
-}
-
-#main_menu a {
-    color: #888888;
-    padding-left: 8px;
-}
-
-#main_menu a:hover {
-    color: #CD6A6A;
-    text-decoration: none;
-    padding-left: 4px;
-    border-bottom: 1px solid #40B33C;
-    border-left: 4px solid #40B33C;
-}
-
-#edit_form table {
-    margin: 0 auto;
-    padding-top: 10px;
-    text-align: left;
-    width: 100%;
-    border: 1px solid #efefef;
-}
-
-#edit_form h3  {
-    text-align: center;
-    font-size: 12px;
-    margin: 0;
-    background: #cdcdcd;
-    border: 1px solid #bbb;
-    line-height: 25px;
-    color: #555555;
-}
-
-.hlp_center {
-    text-align: center;
-}
-
-.help_text{
-    background: #efefef;
-    border-left: 1px solid #bbbbbb;
-    border-right: 1px solid #bbbbbb;
-    text-align: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
-}
-
-#overview, #admin_domains, #admin_virtual {
-    margin: auto;
-    background: #cdcdcd;
-    border: 0px solid #bbb;
-    padding: 0px 8px;
-
-}
-
-#overview h4, #overview P, #overview FORM, #admin_virtual h4, #admin_virtual P, #admin_virtual FORM {
-    display: inline;
-    padding-right: 20px;
-    line-height: 30px;
-}
-
-#nav_bar {
-    text-align: right;
-    width: 750px;
-    margin: 0 auto;
-}
-
-#alias_table, #mailbox_table, #overview_table, #log_table, #admin_table {
-    width: 100%;
-    margin: 0px auto;
-    border: 1px solid #efefef;
-}
-
-#alias_table .header, #mailbox_table .header, #overview_table .header, #log_table .header, #admin_table .header {
-    line-height: 20px;
-    background: #efefef;
-    color: black;
-}
-
-#alias_table .hilightoff, #mailbox_table .hilightoff, #overview_table .hilightoff, #log_table .hilightoff, #admin_table .hilighoff {
-    background: white;
-}
-
-#alias_table .hilighton, #mailbox_table .hilighton, #overview_table .hilighton, #log_table .hilighton, #admin_table .hilighton {
-    background: #ffdddd;
-}
-
-#alias_table h3, #mailbox_table h3, #overview_table h3, #log_table h3, #admin_table h3 {
-    background: silver;
-    text-align: left;
-    font-size: 12px;
-    font-weight: bold;
-    padding-left: 20px;
-    line-height: 25px;
-    margin: 0;
-}
-
 #top{
                 height:17px;
                 padding:2px 21px 0px 21px;
@@ -803,7 +595,6 @@ input {
 
 /* Fancy menu */
 
-
 .menu2 { float:left; width:100%; font-family: Verdana, arial, sans-serif; font-weight: bold ; font-size: 11px; border:1px solid #aaaaaa;
 background:#ddd url(../images/menu2.gif) repeat-x;
 z-index: 9;
@@ -814,7 +605,7 @@ padding:0;margin:0;list-style-type:none;
 .menu2 ul li {
 float:left; position:relative;
 }
-.menu2 ul li.group {display:block; text-indent:10px; background:#666; color:#cc0000; width:152px; padding:4px 0;}
+.menu2 ul li.group {display:block; text-indent:10px; background:#666; color:#cc0000; width:150px; padding:4px 0;}
 
 .menu2 ul li a, .menu2 ul li a:visited {
 float:left; display:block; text-decoration:none; color:#666; padding:0px 16px; line-height:25px; height:25px;
