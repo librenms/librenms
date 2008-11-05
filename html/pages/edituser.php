@@ -12,7 +12,7 @@ function getInterfaceList(sel)
                 var index = ajax.length;
                 ajax[index] = new sack();
 
-                ajax[index].requestFile = 'test_interfaces.php?device_id='+deviceId;    // Specifying which file to get
+                ajax[index].requestFile = 'list_interfaces.php?device_id='+deviceId;    // Specifying which file to get
                 ajax[index].onCompletion = function(){ createInterfaces(index) };       // Specify function that will be executed after file has been found
                 ajax[index].runAJAX();          // Execute AJAX function
         }
