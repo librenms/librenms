@@ -151,14 +151,7 @@ while ($i < count($zoneupdated)) {
  # echo("$sSQL\n");
 #  $result = mysql_query($sSQL, $dnsdblink);
 
-
-
-
-
   $i++;
 }
-
-
-
 
 ?>
