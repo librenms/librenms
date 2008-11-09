@@ -13,6 +13,8 @@ $interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS
 $interfaces['down'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
 $interfaces['shutdown'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
 $interfaces['ignored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '1' OR D.ignore = '1')"),0);
+$interfaces['errored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '0' OR D.ignore = '0') AND (I.in_errors > '0' OR I.out_errors > '0')"),0);
+
 
 $services['count'] = mysql_result(mysql_query("SELECT count(service_id) FROM services"),0);
 $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'"),0);
@@ -31,6 +33,7 @@ $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM 
   $interfaces['up']       = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'up'"),0);
   $interfaces['down']     = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
   $interfaces['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND ifAdminStatus = 'down'"),0);
+  $interfaces['errored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND I.device_id = D.device_id AND (I.in_errors > '0' OR I.out_errors > '0')"),0);
 
   $services['count']      = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id"),0);
   $services['up']         = mysql_result(mysql_query("SELECT count(service_id) FROM services AS S, devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND S.service_host = D.device_id AND service_status = '1' AND service_ignore ='0'"),0);

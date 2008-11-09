@@ -111,9 +111,9 @@ if($config['show_locations']) { echo("<li><a class='menu2four' href='locations/'
 
 <?php
 
-$errored = mysql_result(mysql_query("SELECT COUNT(*) FROM interfaces WHERE (in_errors > '0' OR out_errors > '0')"),0);
-if($errored) {
-  echo("<li><a href='interfaces/errors/'><img src='images/16/chart_curve_error.png' border=0 align=absmiddle> Errored ($errored)</a></li>");
+#$errored = mysql_result(mysql_query("SELECT COUNT(*) FROM interfaces WHERE (in_errors > '0' OR out_errors > '0')"),0);
+if($interfaces['errored']) {
+  echo("<li><a href='interfaces/errors/'><img src='images/16/chart_curve_error.png' border=0 align=absmiddle> Errored (".$interfaces['errored'].")</a></li>");
 }
 
 if($config['enable_billing']) { echo("<li><a href='bills/'><img src='images/16/money_pound.png' border=0 align=absmiddle> Traffic Bills</a></li>"); $ifbreak = 1;}
