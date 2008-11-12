@@ -1,0 +1,252 @@
+-- *****************************************************************
+-- MPLS-LSR-MIB-CAPABILITY.my: MPLS-LSR-MIB AGENT-CAPABILITIES
+--
+-- September 2001, Thomas D. Nadeau
+--
+-- Copyright (c) 2001 Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+MPLS-LSR-MIB-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        ciscoAgentCapability
+                FROM CISCO-SMI;
+
+mplsLsrMibCapability MODULE-IDENTITY
+                LAST-UPDATED    "200109011200Z" 
+                ORGANIZATION    "Cisco Systems, Inc."
+                CONTACT-INFO
+                        "        Cisco Systems
+                                 Customer Service
+
+                        Postal:  170 West Tasman Drive
+                                 San Jose, CA  95134
+                                 USA
+
+                           Tel:  +1 800 553-NETS
+
+                        E-mail:  mpls-mib@cisco.com"
+
+                DESCRIPTION
+                        "Agent capabilities for MPLS-LSR-MIB"
+                LAST-UPDATED    "200109011200Z" 
+                DESCRIPTION
+                        "Initial version of this MIB module."
+
+        ::= { ciscoAgentCapability 303 }
+
+
+mplsLsrMibCapabilityV12R0 AGENT-CAPABILITIES
+
+PRODUCT-RELEASE "Cisco IOS 12.0(14)ST 12.2(1)T"
+STATUS          current
+DESCRIPTION     "MPLS Label Switch Router MIB capabilities
+                 for draft-mpls-lsr-mib-04.txt"
+
+SUPPORTS        MPLS-LSR-MIB
+INCLUDES        { mplsInSegmentGroup,
+                  mplsOutSegmentGroup,
+                  mplsXCGroup,
+                  mplsInterfaceGroup,
+                  mplsPerfGroup,
+                  mplsHCInSegmentPerfGroup,
+                  mplsHCOutSegmentPerfGroup
+                }
+
+-- InSegment Group
+
+VARIATION   mplsInSegmentNPop
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentAddrFamily
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentXCIndex
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentOctets
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentDiscards
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentOwner
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+             
+VARIATION   mplsInSegmentAdminStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+            
+VARIATION    mplsInSegmentOperStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+             
+VARIATION   mplsInSegmentRowStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+             
+VARIATION   mplsInSegmentTrapEnable
+ACCESS      read-only
+DESCRIPTION "read-only."
+             
+VARIATION   mplsInSegmentStorageType
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsInSegmentTrafficParamPtr
+ACCESS      read-only
+DESCRIPTION "read-only. This 
+             value will always be set to 0."
+
+-- OutSegment Group  
+
+VARIATION   mplsOutSegmentIndexNext
+ACCESS      read-only
+DESCRIPTION "read-only. This value will
+             always be reported as 0."
+
+VARIATION   mplsOutSegmentIfIndex
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentNextHopIpAddrType
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentNextHopIpv4Addr
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentNextHopIpv6Addr
+ACCESS      read-only
+DESCRIPTION "read-only. This value will always 
+             be 0; IPv6 is unsupported in this 
+             MPLS release."
+
+VARIATION   mplsOutSegmentXCIndex
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentOwner
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentOctets
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentDiscards
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentErrors
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentAdminStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentRowStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+            
+VARIATION   mplsOutSegmentTrapEnable
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentStorageType
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsOutSegmentTrafficParamPtr
+ACCESS      read-only
+DESCRIPTION "read-only. This value
+             will always be set to 0."
+
+-- XC Group
+
+VARIATION   mplsXCIndexNext
+DESCRIPTION "This value will always be set to 0 as
+             all entries in table are supported as
+             read-only."
+
+VARIATION   mplsXCLspId
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsXCLabelStackIndex
+ACCESS      read-only
+DESCRIPTION "read-only. This value will be set 
+             to 0 as XCLabelStack is unsupported
+             in this release."
+
+VARIATION   mplsXCOwner
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsXCAdminStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsXCRowStatus
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+VARIATION   mplsXCTrapEnable
+ACCESS      read-only
+DESCRIPTION "read-only. This value will never be
+             true as traps are unsupported in 
+             this release."
+
+VARIATION   mplsXCStorageType
+ACCESS      read-only
+DESCRIPTION "read-only."
+
+-- Interface Group
+
+VARIATION    mplsInterfaceConfStorageType
+ACCESS       read-only
+DESCRIPTION  "read-only."
+
+
+-- Perf Group
+
+VARIATION   mplsInSegmentPackets
+ACCESS      not-implemented
+DESCRIPTION "Unsupported."
+
+VARIATION   mplsOutSegmentPackets
+ACCESS      not-implemented
+DESCRIPTION "Unsupported."
+
+VARIATION   mplsInterfaceInPackets
+ACCESS      not-implemented
+DESCRIPTION "Unsupported."
+
+VARIATION   mplsInterfaceOutLabelsUsed
+ACCESS      not-implemented
+DESCRIPTION "Unsupported."
+
+VARIATION   mplsInterfaceOutFragments
+ACCESS      not-implemented
+DESCRIPTION "Unsupported."
+
+::= { mplsLsrMibCapability 1 }
+
+END
+
+

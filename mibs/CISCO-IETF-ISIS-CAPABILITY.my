@@ -1,0 +1,406 @@
+-- ****************************************************************
+-- CISCO-IETF-ISIS-CAPABILITY.my: ISIS MIB AGENT-CAPABILITIES
+--
+-- August 2005, Sundar Ramchandran
+--
+-- Copyright (c) 2005 by cisco Systems, Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+CISCO-IETF-ISIS-CAPABILITY DEFINITIONS ::=BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        ciscoAgentCapability
+                FROM CISCO-SMI;
+
+ciscoIetfIsisCapability MODULE-IDENTITY
+        LAST-UPDATED    "200508180000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 West Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                        Tel: +1 800 553-NETS
+
+                E-mail: cs-clns@cisco.com"
+        DESCRIPTION
+                "Agent capabilities for CISCO-IETF-ISIS-MIB"
+        REVISION        "200508180000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+
+        ::= { ciscoAgentCapability 446 }
+
+ciscoIetfIsisCapV12R0225SG AGENT-CAPABILITIES
+
+PRODUCT-RELEASE "Cisco IOS 12.2(25)SG"
+  STATUS          current
+  DESCRIPTION     "Cisco IS-IS MIB Agent Capabilities for IOS 12.2S"
+
+  SUPPORTS        CISCO-IETF-ISIS-MIB
+    INCLUDES      {
+                    ciscoIetfIsisSystemGroup,
+                    ciscoIetfIsisCircuitGroup,
+                    ciscoIetfIsisISAdjGroup,
+                    ciscoIetfIsisNotifObjectGroup,
+                    ciscoIetfIsisNotificationGroup,
+                    ciscoIetfIsisISPDUCounterGroup,
+                    ciscoIetfIsisRATableGroup,
+                    ciscoIetfIsisISIPRADestGroup,
+                    ciscoIetfIsisLSPGroup
+                  } 
+-- Table objects
+  VARIATION       ciiSysType
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysID
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysMaxPathSplits
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysMaxLSPGenInt
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysPollESHelloRate
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysWaitTime
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since 'waiting' state
+                   is not supported."
+
+  VARIATION       ciiSysAdminState
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysL2toL1Leaking
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysMaxAge
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysReceiveLSPBufferSize
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiManAreaAddrExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiSysProtSuppExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiSummAddrExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiSummAddrMetric
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiSummAddrFullMetric
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRedistributeAddrExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiSysLevelOrigLSPBuffSize
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelMinLSPGenInt
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelOverloadState
+    SYNTAX        INTEGER { off (1), on (2), overloaded (4) }
+-- subset of CiiLevelState
+-- no             { waiting (3) }
+    DESCRIPTION   "Unable to detect all states. The 'waiting'
+                   state of the Intermediate System is not
+                   supported."
+
+  VARIATION       ciiSysLevelSetOverload
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelSetOverloadUntil
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelMetricStyle
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelSPFConsiders
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysLevelTEEnabled
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiNextCircIndex
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since row creation using
+                   SET is not supported."
+
+  VARIATION       ciiCircIfIndex
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircIfSubIndex
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircAdminState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircExtDomain
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since externalDomain
+                   linkage is not supported."
+
+  VARIATION       ciiCircType
+    SYNTAX        INTEGER { broadcast(1), ptToPt(2) }
+-- no             { staticIn(3), staticOut(4), dA(5) }
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented.
+                   Unable to detect all circuit types. Only
+                   broadcast and point-to-point types are
+                   supported. There is no support for
+                   static (staticIn, staticOut), and
+                   dynamically assigned (dA) circuit
+                   types."
+
+  VARIATION       ciiCircLevel
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircPassiveCircuit
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircMeshGroupEnabled
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircMeshGroup
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircSmallHellos
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCirc3WayEnabled
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiCircExtendedCircID
+    ACCESS        read-only
+    DESCRIPTION	  "Create/write access not implemented"
+
+  VARIATION       ciiCircLevelMetric
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelWideMetric
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelISPriority
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelIDOctet
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelHelloMultiplier
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelHelloTimer
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelDRHelloTimer
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelLSPThrottle
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelMinLSPRetransInt
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelCSNPInterval
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiCircLevelPartSNPInterval
+    ACCESS        read-only
+    DESCRIPTION   "Write access is not implemented."
+
+  VARIATION       ciiSysStatPartChanges
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since partition changes
+                   are not supported."
+
+  VARIATION       ciiCircInitFails
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since circuit initialization
+                   failures are not supported."
+
+  VARIATION       ciiPacketCountISHellos
+    DESCRIPTION   "Number of ES-IS PDUs not supported at
+                   levels enabled for this circuit. This
+                   is implemented as a system-wide variable."
+
+  VARIATION       ciiPacketCountESHellos
+    DESCRIPTION   "Number of ES PDUs not supported at
+                   levels enabled for this circuit. This is
+                   is implemented as a system-wide variable."
+
+  VARIATION       ciiPacketCountUnknowns
+    DESCRIPTION   "Number of unknown IS-IS PDUs sent not
+                   supported for levels enabled. Only
+                   implemented for number of PDUs received."
+                   
+  VARIATION       ciiRAExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRAAdminState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRAAddrPrefix
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRAMapType
+    SYNTAX        INTEGER { none(1), explicit(2) }
+--  no            { extractIDI(3), extractDSP(4) }
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented.
+                   Unable to detect all SNPA mapping types.
+                   Only implicit (none) and explicit mapping
+                   types are supported. There is no support
+                   for extractIDI and extractDSP mapping
+                   types."
+
+  VARIATION       ciiRAMetric
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRAMetricType
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRASNPAAddress
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiRASNPAMask
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since extractIDI and
+                   extractDSP are not supported."
+ 
+  VARIATION       ciiRASNPAPrefix
+    ACCESS        not-implemented
+    DESCRIPTION   "Not implemented since extractIDI and
+                   extractDSP are not supported."
+
+  VARIATION       ciiRAType
+    SYNTAX        INTEGER { automatic(2) }
+--  no            { manual(1) }
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented.
+                   The 'manual' reachable address type is
+                   is not implemented since SET is not
+                   supported. Only 'automatic' reachable
+                   address type is supported."
+
+  VARIATION       ciiIPRANextHopType
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRANextHop
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRAType
+    SYNTAX        INTEGER { automatic(2) }
+--  no            { manual(1) }
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented.
+                   The 'manual' reachable address type is
+                   is not implemented since SET is not
+                   supported. Only 'automatic' reachable
+                   address type is supported."
+
+  VARIATION       ciiIPRAExistState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRAAdminState
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRAMetric
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRAMetricType
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+  VARIATION       ciiIPRAFullMetric
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+ 
+  VARIATION       ciiIPRASNPAAddress
+    ACCESS        read-only
+    DESCRIPTION   "Create/write access is not implemented."
+
+-- Notification objects
+--
+  VARIATION       ciiLSPTooLargeToPropagate  -- NOTIFICATION-TYPE
+    ACCESS        not-implemented
+    DESCRIPTION   "Trap not supported."
+
+  VARIATION       ciiOrigLSPBuffSizeMismatch -- NOTIFICATION-TYPE
+    ACCESS        not-implemented
+    DESCRIPTION   "Trap not supported."
+
+  ::= { ciscoIetfIsisCapability 1 }
+
+END

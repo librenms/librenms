@@ -1,0 +1,100 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-ENET-CAPABILITY.my:  Capability statement for 
+--	Cisco's implementation of the IETF PW-ENET-MIB
+--
+-- November 29, 2004 - Tim Swanson
+--
+-- Copyright (c) 2004 by Cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+CISCO-IETF-PW-ENET-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY
+      FROM SNMPv2-SMI
+
+   AGENT-CAPABILITIES 
+      FROM SNMPv2-CONF
+
+   ciscoAgentCapability
+      FROM CISCO-SMI;
+
+   
+ciscoIetfPwEnetCapability MODULE-IDENTITY
+        LAST-UPDATED        "200411291200Z" -- 29 Nov 2004 12:00:00
+        ORGANIZATION        "Cisco Systems, Inc."
+        CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+
+                Postal: 170 W Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                   Tel: +1 800 553-NETS
+
+                E-mail: mpls-mib@cisco.com"
+        DESCRIPTION
+                "Agent capabilities for CISCO-IETF-PW-ENET-MIB"
+        REVISION        "200411291200Z" -- 29 Nov 2004 12:00:00
+        DESCRIPTION
+                "Initial version:  ciscoIetfPwEnetCapabilityV12R00
+                "
+        ::= {  ciscoAgentCapability 428 }
+
+ciscoIetfPwEnetCapabilityV12R00 AGENT-CAPABILITIES
+
+	PRODUCT-RELEASE "Cisco IOS 12.0(28)S, Cisco IOS 12.2"
+	STATUS      current
+	DESCRIPTION "Pseudowire Ethernet MIB capabilities"
+
+	SUPPORTS    CISCO-IETF-PW-ENET-MIB
+	INCLUDES    { 
+                      cpwVcEnetGroup
+	            }
+
+        -- cpwVcEnetGroup Variations 
+        VARIATION   cpwVcEnetVlanMode
+        ACCESS      read-only
+        DESCRIPTION
+            "The implementation does not allow set operation 
+             on this object."
+
+        VARIATION   cpwVcEnetPortVlan
+        ACCESS      read-only
+        DESCRIPTION
+            "The implementation does not allow set operation 
+             on this object."
+
+        VARIATION   cpwVcEnetVcIfIndex
+        ACCESS      read-only
+        DESCRIPTION
+            "The implementation does not allow set operation 
+             on this object."
+
+        VARIATION   cpwVcEnetPortIfIndex
+        ACCESS      read-only
+        DESCRIPTION
+            "The implementation does not allow set operation 
+             on this object."
+
+        VARIATION   cpwVcEnetRowStatus
+        ACCESS      read-only
+        DESCRIPTION 
+            "The implementation of the cpwVcEnetTable is read-only 
+             and does not allow dynamic creation of rows via 
+             RowStatus.  This object will always be set to 
+             active(1)."
+
+        VARIATION   cpwVcEnetStorageType
+        ACCESS      read-only
+        DESCRIPTION 
+            "The implementation of the cpwVcEnetTable is 
+             read-only.  This object will always be set to
+             volatile(2)."
+
+        ::= { ciscoIetfPwEnetCapability 1 }
+
+END
