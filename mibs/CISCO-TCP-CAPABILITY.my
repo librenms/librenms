@@ -1,0 +1,56 @@
+-- *****************************************************************
+-- CISCO-TCP-CAPABILITY.my:
+--      CISCO-TCP-MIB AGENT-CAPABILITIES
+--
+--  January 2006, Sreenivasulu Chalamcharla
+--
+-- Copyright (c) 2006 by cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+CISCO-TCP-CAPABILITY DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        ciscoAgentCapability
+                FROM CISCO-SMI;
+
+ciscoTcpCapability MODULE-IDENTITY
+        LAST-UPDATED    "200601180000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO
+                "       Cisco Systems
+                        Customer Service
+                Postal: 170 West Tasman Drive
+                        San Jose, CA  95134
+                        USA
+
+                        Tel: +1 800 553-NETS
+
+                E-mail: cs-snmp@cisco.com
+                        cs-lan-switch-snmp@cisco.com"
+        DESCRIPTION
+                "Agent capabilities for
+                 CISCO-TCP-MIB"
+
+        REVISION        "200601180000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+
+        ::= { ciscoAgentCapability 26 }
+
+cTcpCapabilityIOSXRV2R0CRS1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "Cisco IOS XR 2.0 for CRS-1"
+        STATUS          current
+        DESCRIPTION     "CISCO-TCP-MIB capabilities
+                         for IOS XR release 2.0"
+
+        SUPPORTS        CISCO-TCP-MIB
+        INCLUDES        { ciscoTcpMIBGroupRev1 }
+
+        ::= { ciscoTcpCapability 1 }
+END
