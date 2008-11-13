@@ -7,33 +7,25 @@ $config['db_pass'] = "password";
 $config['db_name'] = "observer";
 
 ### Installation Location
-$config['install_dir'] 	= "/var/www/";
+$config['install_dir'] 	= "/opt/observer/";
 $config['html_dir']	= $config['install_dir'] . "html";
 $config['rrd_dir'] 	= $config['install_dir'] . "rrd";
 $rrd_dir = $config['rrd_dir'];
 
 ### Default community
-$config['community'] = "v05tr0n82";
+$config['community'] = "observer";
 $community = $config['community'];
 
-$config['base_url'] = "http://observer.mi5.gov.uk";
+$config['base_url'] = "http://observer";
 
 ### Location of executables
 
+$config['sipcalc'] = "/usr/bin/sipcalc";
 $config['rrdtool'] = "/usr/bin/rrdtool";
-$rrdtool = $config['rrdtool'];
-
 $config['fping'] = "/usr/sbin/fping";
-$fping = $config['fping'];
-
 $config['ipcalc'] = "/usr/bin/ipcalc";
-$ipcalc = $config['ipcalc'];
-
 $config['snmpwalk'] = "/usr/bin/snmpwalk";
-$snmpwalk = $config['snmpwalk'];
-
 $config['snmpget'] = "/usr/bin/snmpget";
-$snmpget = $config['snmpget'];
 
 ### RRDGraph Settings
 
