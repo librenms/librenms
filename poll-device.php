@@ -196,7 +196,7 @@ while ($device = mysql_fetch_array($device_query)) {
   include("includes/polling/device-netstats.inc.php");
   echo("Polling interfaces\n");
 
-  $where = "WHERE device_id = '" . $device['device_id'] . "'";
+  $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
   include("includes/polling/interfaces.inc.php");
 
   } else {

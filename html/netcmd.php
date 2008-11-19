@@ -17,7 +17,7 @@ include("includes/authenticate.inc");
 
 if($_GET['query'] && $_GET['cmd']) {
   $host = $_GET['query'];
-  if(Net_IPv6::checkIPv6($host)||Net_IPv4::validateip($host)||preg_match("/^[a-zA-Z0-9.]*$/", $host)) {
+  if(Net_IPv6::checkIPv6($host)||Net_IPv4::validateip($host)||preg_match("/^[a-zA-Z0-9.-]*$/", $host)) {
     switch ($_GET['cmd']) {
       case 'whois':
         $output = `/usr/bin/whois $host | grep -v \%`;

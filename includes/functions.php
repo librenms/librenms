@@ -315,6 +315,14 @@ $type = strtolower($data['os']);
 }
 
 
+function renamehost($id, $new) {
+  global $config;
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  shell_exec("mv ".$config['rrd_dir']."/$host ".$config['rrd_dir']."/$new");
+  mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
+    mysql_query("INSERT INTO eventlog (host, datetime, message) VALUES ('" . $id . "', NULL, NOW(), 'Hostname changed -> $new (console)')");
+}
+
 function delHost($id) {
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
@@ -388,11 +396,21 @@ function scanUDP ($host, $port, $timeout) {
 
 function humanmedia($media) {
         $media = preg_replace("/^ethernetCsmacd$/", "Ethernet", $media);
-        $media = preg_replace("/^softwareLoopback$/", "Software Loopback", $media);
+        $media = preg_replace("/^softwareLoopback$/", "Loopback", $media);
         $media = preg_replace("/^tunnel$/", "Tunnel", $media);
-	$media = preg_replace("/^propVirtual$/", "Ethernet VLAN", $media);
+	$media = preg_replace("/^propVirtual$/", "Virtual Int", $media);
 	$media = preg_replace("/^ppp$/", "PPP", $media);
+	$media = preg_replace("/^ds1$/", "DS1", $media);
+	$media = preg_replace("/^pos$/", "POS", $media);
+	$media = preg_replace("/^sonet$/", "SONET", $media);
 	$media = preg_replace("/^slip$/", "SLIP", $media);
+	$media = preg_replace("/^mpls$/", "MPLS Layer", $media);
+	$media = preg_replace("/^l2vlan$/", "VLAN Subif", $media);
+	$media = preg_replace("/^atm$/", "ATM", $media);
+	$media = preg_replace("/^aal5$/", "ATM AAL5", $media);
+	$media = preg_replace("/^atmSubInterface$/", "ATM Subif", $media);
+        $media = preg_replace("/^propPointToPointSerial$/", "PtP Serial", $media);
+
         return $media;
 }
 
@@ -576,7 +594,6 @@ function fixifName ($inf) {
         $inf = preg_replace("/^([0-9]+)$/", "Interface \\0", $inf);
 	return $inf;
 }
-
 
 function fixIOSFeatures($features){
 	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);

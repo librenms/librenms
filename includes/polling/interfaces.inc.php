@@ -18,7 +18,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
-   $snmp_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+   $snmp_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
    $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'];
 
    $snmp_output = trim(`$snmp_cmd`);
