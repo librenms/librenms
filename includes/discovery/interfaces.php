@@ -17,6 +17,10 @@
 
     $entry = trim($entry);
     list($ifIndex, $ifName) = explode("||", $entry);
+    $ifDescr = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifAlias.$ifIndex";
+    $ifDescr = str_replace("No Such Object available on this agent at this OID", "", $ifDescr);
+    $ifDescr = str_replace("No Such Instance currently exists at this OID", "", $ifDescr);
+
     if(!strstr($entry, "irtual")) {
       $ifName = trim(str_replace("\"", "", $ifName));
       $if = trim(strtolower($ifName));
@@ -30,7 +34,7 @@
       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
-          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifName')");
+          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
           # Add Interface
            echo("+");
         } else {
@@ -43,9 +47,15 @@
         }
         $int_exists[] = "$ifIndex";
       } else { 
-          # Ignored Interface
-	  echo("$if \n");
-          echo("X"); 
+        # Ignored Interface
+	#echo("$if \n");
+	if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
+          mysql_query("UPDATE `interfaces` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+          # Delete Interface
+          echo("-"); ## Deleted Interface
+        } else {
+          echo("X"); ## Ignored Interface
+        }
       }
     } 
   }

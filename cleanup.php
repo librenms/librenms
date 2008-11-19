@@ -6,21 +6,21 @@
 include("config.php");
 include("includes/functions.php");
 
-#$query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
-#          WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
+$query = "SELECT *,A.id as id FROM ipaddr AS A, interfaces as I, devices as D 
+          WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
 
-#$data = mysql_query($query);
-#while($row = mysql_fetch_array($data)) {
+$data = mysql_query($query);
+while($row = mysql_fetch_array($data)) {
 
-#  $mask = trim(shell_exec($config['ipcalc'] . " ".$row['addr']."/".$row['cidr']." | grep Netmask: | cut -d \" \" -f 4"));
-#  $response = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntIfIndex.$row[addr] | cut -d " " -f 2`);
-#  $maskcheck = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntNetMask.$row[addr] | cut -d " " -f 2`);
-#  if($response == $row['ifIndex'] && $mask == $maskcheck) {
-#  } else {
-#    mysql_query("delete from ipaddr where id = '$row[id]'");
-#    echo("Deleted $row[addr] from $row[hostname]\n");
-#  }
-#}
+  $mask = trim(shell_exec($config['ipcalc'] . " ".$row['addr']."/".$row['cidr']." | grep Netmask: | cut -d \" \" -f 4"));
+  $response = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntIfIndex.$row[addr] | cut -d " " -f 2`);
+  $maskcheck = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntNetMask.$row[addr] | cut -d " " -f 2`);
+  if($response == $row['ifIndex'] && $mask == $maskcheck) {
+  } else {
+    mysql_query("delete from ipaddr where id = '$row[id]'");
+    echo("Deleted $row[addr] from $row[hostname]\n");
+  }
+}
 
 $sql = "SELECT * FROM devices WHERE status = '1'";
 $query = mysql_query($sql);
