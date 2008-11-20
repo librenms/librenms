@@ -20,11 +20,11 @@ while($ip = mysql_fetch_array($data)) {
   $hostname = str_replace(".wtibs.net", "", $hostname);
   $hostname = str_replace(".jerseytelecom.net", "", $hostname);
 
-  list($loc, $host) = explode("-", $hostname);
+  list($cc, $loc, $host) = explode(".", $hostname);
   if($host) {
-    $hostname = "$host.$loc.v4.jerseytelecom.net";
+    $hostname = "$host.$loc.$cc.v4.jerseytelecom.net";
   } else {
-    $host = $loc; unset ($loc);
+    $host = $cc; unset ($cc);
     $hostname = "$host.v4.jerseytelecom.net";
   }
 
@@ -47,8 +47,21 @@ while($ip = mysql_fetch_array($data)) {
   $reverse = "$fourth.$revzone";
   $dnsname = "$interface.$hostname";
 
-  echo(str_pad($reverse, 35)."IN ADDR  ".str_pad($dnsname, 30)." $real_hostname\n");
+  $dns_list[] = str_pad($revzone, 24) . "|" . str_pad($reverse, 30)."IN ADDR  ".str_pad($dnsname, 30);
 
+}
+
+sort ($dns_list);
+
+foreach ($dns_list as $entry) {
+  list($zone, $entry) = explode("|", $entry);
+  $zone = trim($zone);
+
+  if($zone != $oldzone) { echo("\n$$zone\n------------------------------\n"); }
+
+  echo("$entry \n");
+
+  $oldzone = $zone;
 
 }
 

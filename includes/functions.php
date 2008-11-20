@@ -7,7 +7,6 @@ include_once("Net/IPv6.php");
 
 ## Observer Includes
 
-include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/generic.php");
 include_once($config['install_dir'] . "/includes/ios.php");
 include_once($config['install_dir'] . "/includes/unix.php");

@@ -32,21 +32,24 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifAlias = trim(str_replace("\"", "", $ifAlias));
    $ifAlias = trim($ifAlias);
 
-   $old_rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
+   $older_rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
    $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd"; 
 
-   if(is_file($old_rrdfile) && !is_file($rrdfile)) { rename($old_rrdfile, $rrdfile); echo("Moving $old_rrdfile to $rrdfile");  }
+   if(is_file($older_rrdfile) && !is_file($rrdfile)) { rename($older_rrdfile, $rrdfile); echo("Moving $older_rrdfile to $rrdfile");  }
+
+
+
 
    if(!is_file($rrdfile)) {
      $woo = `rrdtool create $rrdfile \
-      DS:INOCTETS:COUNTER:600:0:18446744073709551615 \
-      DS:OUTOCTETS:COUNTER:600:0:18446744073709551615 \
-      DS:INERRORS:COUNTER:600:0:18446744073709551615 \
-      DS:OUTERRORS:COUNTER:600:0:18446744073709551615 \
-      DS:INUCASTPKTS:COUNTER:600:0:18446744073709551615 \
-      DS:OUTUCASTPKTS:COUNTER:600:0:18446744073709551615 \
-      DS:INNUCASTPKTS:COUNTER:600:0:18446744073709551615 \
-      DS:OUTNUCASTPKTS:COUNTER:600:0:18446744073709551615 \
+      DS:INOCTETS:COUNTER:600:0:12500000000 \
+      DS:OUTOCTETS:COUNTER:600:0:12500000000 \
+      DS:INERRORS:COUNTER:600:0:12500000000 \
+      DS:OUTERRORS:COUNTER:600:0:12500000000 \
+      DS:INUCASTPKTS:COUNTER:600:0:12500000000 \
+      DS:OUTUCASTPKTS:COUNTER:600:0:12500000000 \
+      DS:INNUCASTPKTS:COUNTER:600:0:12500000000 \
+      DS:OUTNUCASTPKTS:COUNTER:600:0:12500000000 \
       RRA:AVERAGE:0.5:1:600 \
       RRA:AVERAGE:0.5:6:700 \
       RRA:AVERAGE:0.5:24:775 \
