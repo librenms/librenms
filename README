@@ -30,7 +30,15 @@ Please see http://www.project-observer.org.
 Changelog
 ---------
 
-Pre-Release 0.3.3
+Release 0.4.0.1 ( 20th Nov 2008 )
+
+Cleaned up some configuration settings
+Added more connection type rewrites
+Added ability to change device names
+Cleaned up IPv6 and CDP discovery
+Security fixes
+
+Release 0.4.0 ( 11th Nov 2008 )
 
 Much prettier front page
 Tidied up service checking layout
