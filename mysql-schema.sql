@@ -3,14 +3,14 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 12, 2008 at 12:53 PM
+-- Generation Time: Nov 20, 2008 at 03:39 PM
 -- Server version: 5.0.51
 -- PHP Version: 5.2.4-2ubuntu5.3
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
--- Database: `observer-demo`
+-- Database: `observer`
 --
 
 -- --------------------------------------------------------
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS `adjacencies` (
 CREATE TABLE IF NOT EXISTS `alerts` (
   `id` int(11) NOT NULL auto_increment,
   `importance` int(11) NOT NULL default '0',
-  `device_id` int(11) NOT NULL default '0',
+  `device_id` int(11) NOT NULL,
   `message` text NOT NULL,
   `time_logged` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `alerted` smallint(6) NOT NULL default '0',
@@ -51,11 +51,12 @@ CREATE TABLE IF NOT EXISTS `alerts` (
 CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeer_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
+  `astext` varchar(32) NOT NULL,
   `bgpPeerIdentifier` text NOT NULL,
   `bgpPeerRemoteAs` int(11) NOT NULL,
   `bgpPeerState` text NOT NULL,
   `bgpPeerAdminStatus` text NOT NULL,
-  `bgpPeerLocalAddr` text NOT NULL,
+  `bgpLocalAddr` text NOT NULL,
   `bgpPeerRemoteAddr` text NOT NULL,
   `bgpPeerInUpdates` int(11) NOT NULL,
   `bgpPeerOutUpdates` int(11) NOT NULL,
@@ -63,10 +64,9 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeerOutTotalMessages` int(11) NOT NULL,
   `bgpPeerFsmEstablishedTime` int(11) NOT NULL,
   `bgpPeerInUpdateElapsedTime` int(11) NOT NULL,
-  `astext` varchar(32) NOT NULL,
   PRIMARY KEY  (`bgpPeer_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -129,10 +129,12 @@ CREATE TABLE IF NOT EXISTS `bill_ports` (
 --
 
 CREATE TABLE IF NOT EXISTS `customers` (
-  `username` char(64) NOT NULL default '',
-  `password` char(32) NOT NULL default '',
-  `string` char(64) NOT NULL default '',
+  `customer_id` int(11) NOT NULL auto_increment,
+  `username` char(64) NOT NULL,
+  `password` char(32) NOT NULL,
+  `string` char(64) NOT NULL,
   `level` tinyint(4) NOT NULL default '0',
+  PRIMARY KEY  (`customer_id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -144,24 +146,25 @@ CREATE TABLE IF NOT EXISTS `customers` (
 
 CREATE TABLE IF NOT EXISTS `devices` (
   `device_id` int(11) NOT NULL auto_increment,
-  `hostname` text character set utf8 collate utf8_unicode_ci NOT NULL,
-  `community` text character set utf8 collate utf8_unicode_ci,
-  `snmpver` char(3) NOT NULL default 'v2c',
-  `bgpLocalAs` varchar(8) default NULL,
-  `monowall` tinyint(4) NOT NULL default '0',
+  `hostname` text NOT NULL,
+  `community` varchar(32) NOT NULL,
+  `snmpver` varchar(4) NOT NULL default 'v2c',
+  `bgpLocalAs` varchar(16) default NULL,
+  `sysDescr` text,
+  `sysContact` text NOT NULL,
   `version` text NOT NULL,
   `hardware` text NOT NULL,
   `features` text NOT NULL,
-  `sysDescr` text,
-  `sysContact` varchar(64) NOT NULL,
   `location` text,
-  `os` text character set utf8 collate utf8_unicode_ci NOT NULL,
+  `os` varchar(8) NOT NULL default '',
   `status` tinyint(4) NOT NULL default '0',
   `ignore` tinyint(4) NOT NULL default '0',
+  `disabled` tinyint(1) NOT NULL default '0',
   `lastchange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `purpose` text NOT NULL,
-  `type` varchar(16) character set utf8 collate utf8_unicode_ci NOT NULL default 'Unknown',
-  PRIMARY KEY  (`device_id`)
+  `type` varchar(8) NOT NULL default 'other',
+  PRIMARY KEY  (`device_id`),
+  KEY `status` (`status`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -172,11 +175,12 @@ CREATE TABLE IF NOT EXISTS `devices` (
 
 CREATE TABLE IF NOT EXISTS `devices_attribs` (
   `attrib_id` int(11) NOT NULL auto_increment,
-  `device_id` int(11) NOT NULL default '0',
-  `attrib_type` varchar(32) NOT NULL default '',
-  `attrib_value` int(16) NOT NULL,
+  `device_id` int(11) NOT NULL,
+  `attrib_type` varchar(32) NOT NULL,
+  `attrib_value` int(11) NOT NULL,
   `updated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`attrib_id`)
+  PRIMARY KEY  (`attrib_id`),
+  FULLTEXT KEY `attrib_type` (`attrib_type`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -188,7 +192,8 @@ CREATE TABLE IF NOT EXISTS `devices_attribs` (
 CREATE TABLE IF NOT EXISTS `devices_perms` (
   `user_id` int(11) NOT NULL,
   `device_id` int(11) NOT NULL,
-  `access_level` int(4) NOT NULL default '0'
+  `access_level` int(4) NOT NULL default '0',
+  KEY `user_id` (`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -227,7 +232,8 @@ CREATE TABLE IF NOT EXISTS `eventlog` (
   `interface` int(11) default NULL,
   `datetime` datetime NOT NULL default '0000-00-00 00:00:00',
   `message` text NOT NULL,
-  `type` int(11) NOT NULL default '0'
+  `type` int(11) NOT NULL,
+  KEY `host` (`host`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -239,11 +245,11 @@ CREATE TABLE IF NOT EXISTS `eventlog` (
 CREATE TABLE IF NOT EXISTS `interfaces` (
   `interface_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL default '0',
-  `ifDescr` varchar(64) NOT NULL default '',
-  `ifIndex` int(11) NOT NULL default '0',
+  `ifDescr` varchar(128) NOT NULL,
+  `ifIndex` int(11) default '0',
   `ifSpeed` text,
-  `ifOperStatus` varchar(12) NOT NULL default '',
-  `ifAdminStatus` varchar(12) default NULL,
+  `ifOperStatus` varchar(16) default NULL,
+  `ifAdminStatus` varchar(16) default NULL,
   `ifDuplex` varchar(12) default NULL,
   `ifMtu` int(11) default NULL,
   `ifType` text,
@@ -251,17 +257,18 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
   `ifPhysAddress` text,
   `ifHardType` varchar(64) default NULL,
   `ifLastChange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `ignore` tinyint(1) NOT NULL default '0',
-  `ifVlan` int(11) NOT NULL,
-  `ifTrunk` varchar(8) NOT NULL,
+  `ifVlan` varchar(8) NOT NULL default '',
+  `ifTrunk` varchar(8) default '',
+  `ifVrf` int(11) NOT NULL,
   `in_rate` int(11) NOT NULL,
   `out_rate` int(11) NOT NULL,
-  `counter_in` int(11) NOT NULL,
-  `counter_out` int(11) NOT NULL,
+  `counter_in` int(11) default NULL,
+  `counter_out` int(11) default NULL,
   `in_errors` int(11) NOT NULL,
   `out_errors` int(11) NOT NULL,
+  `ignore` tinyint(1) NOT NULL default '0',
   `detailed` tinyint(1) NOT NULL default '0',
-  `deleted` tinyint(1) NOT NULL,
+  `deleted` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`interface_id`),
   KEY `host` (`device_id`),
   KEY `snmpid` (`ifIndex`),
@@ -353,7 +360,7 @@ CREATE TABLE IF NOT EXISTS `links` (
   `active` tinyint(4) NOT NULL default '1',
   `cdp` int(11) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -399,24 +406,41 @@ CREATE TABLE IF NOT EXISTS `port_out_measurements` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pseudowires`
+--
+
+CREATE TABLE IF NOT EXISTS `pseudowires` (
+  `pseudowire_id` int(11) NOT NULL auto_increment,
+  `interface_id` int(11) NOT NULL,
+  `peer_device_id` int(11) NOT NULL,
+  `peer_ldp_id` int(11) NOT NULL,
+  `cpwVcID` int(11) NOT NULL,
+  `cpwOid` int(11) NOT NULL,
+  PRIMARY KEY  (`pseudowire_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `services`
 --
 
 CREATE TABLE IF NOT EXISTS `services` (
   `service_id` int(11) NOT NULL auto_increment,
-  `service_host` int(11) NOT NULL default '0',
-  `service_ip` text,
-  `service_type` text NOT NULL,
+  `service_host` int(11) NOT NULL,
+  `service_ip` text NOT NULL,
+  `service_type` varchar(16) NOT NULL,
   `service_desc` text NOT NULL,
   `service_param` text NOT NULL,
-  `service_status` tinyint(4) NOT NULL default '2',
-  `service_message` text NOT NULL,
-  `service_changed` int(11) NOT NULL default '0',
+  `service_ignore` tinyint(1) NOT NULL,
+  `service_status` tinyint(4) NOT NULL default '0',
   `service_checked` int(11) NOT NULL default '0',
-  `service_ignore` tinyint(4) NOT NULL default '0',
+  `service_changed` int(11) NOT NULL default '0',
+  `service_message` text NOT NULL,
+  `service_disabled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`service_id`),
   KEY `service_host` (`service_host`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -426,11 +450,11 @@ CREATE TABLE IF NOT EXISTS `services` (
 
 CREATE TABLE IF NOT EXISTS `storage` (
   `storage_id` int(11) NOT NULL auto_increment,
-  `host_id` int(11) NOT NULL default '0',
-  `hrStorageIndex` int(11) NOT NULL default '0',
+  `host_id` int(11) NOT NULL,
+  `hrStorageIndex` int(11) NOT NULL,
   `hrStorageDescr` text NOT NULL,
-  `hrStorageSize` int(11) NOT NULL default '0',
-  `hrStorageAllocationUnits` int(11) NOT NULL default '0',
+  `hrStorageSize` int(11) NOT NULL,
+  `hrStorageAllocationUnits` int(11) NOT NULL,
   `hrStorageUsed` int(11) NOT NULL,
   `storage_perc` text NOT NULL,
   PRIMARY KEY  (`storage_id`)
@@ -443,7 +467,8 @@ CREATE TABLE IF NOT EXISTS `storage` (
 --
 
 CREATE TABLE IF NOT EXISTS `syslog` (
-  `host` int(11) default NULL,
+  `host` varchar(64) NOT NULL,
+  `device_id` int(11) default NULL,
   `facility` varchar(10) default NULL,
   `priority` varchar(10) default NULL,
   `level` varchar(10) default NULL,
@@ -454,9 +479,10 @@ CREATE TABLE IF NOT EXISTS `syslog` (
   `seq` bigint(20) unsigned NOT NULL auto_increment,
   `processed` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`seq`),
-  KEY `host` (`host`),
-  KEY `datetime` (`datetime`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  KEY `datetime` (`datetime`),
+  KEY `device_id` (`device_id`),
+  KEY `processed` (`processed`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -469,10 +495,11 @@ CREATE TABLE IF NOT EXISTS `temperature` (
   `temp_host` int(11) NOT NULL default '0',
   `temp_oid` varchar(64) NOT NULL,
   `temp_descr` varchar(32) NOT NULL default '',
-  `temp_tenths` tinyint(1) NOT NULL default '0',
+  `temp_tenths` int(1) NOT NULL default '0',
   `temp_current` tinyint(4) NOT NULL default '0',
-  `temp_limit` tinyint(4) NOT NULL default '70',
-  PRIMARY KEY  (`temp_id`)
+  `temp_limit` tinyint(4) NOT NULL default '60',
+  PRIMARY KEY  (`temp_id`),
+  KEY `temp_host` (`temp_host`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -484,8 +511,9 @@ CREATE TABLE IF NOT EXISTS `temperature` (
 CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int(11) NOT NULL auto_increment,
   `username` char(30) NOT NULL,
-  `password` char(32) NOT NULL default '',
-  `descr` char(30) NOT NULL default '',
+  `password` char(32) NOT NULL,
+  `realname` text NOT NULL,
+  `descr` char(30) NOT NULL,
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `username` (`username`)
@@ -507,3 +535,19 @@ CREATE TABLE IF NOT EXISTS `vlans` (
   KEY `device_id` (`device_id`,`vlan_vlan`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vrfs`
+--
+
+CREATE TABLE IF NOT EXISTS `vrfs` (
+  `vrf_id` int(11) NOT NULL auto_increment,
+  `vrf_oid` varchar(64) NOT NULL,
+  `vrf_name` varchar(32) NOT NULL,
+  `mplsVpnVrfRouteDistinguisher` varchar(16) NOT NULL,
+  `mplsVpnVrfDescription` text NOT NULL,
+  `device_id` int(11) NOT NULL,
+  PRIMARY KEY  (`vrf_id`),
+  KEY `device_id` (`device_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
