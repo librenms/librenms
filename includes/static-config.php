@@ -4,7 +4,7 @@
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.4.0";
+$config['version'] = "0.4.1";
 
 ### Connect to database
 if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
