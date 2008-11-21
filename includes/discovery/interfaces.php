@@ -22,11 +22,11 @@
       $ifDescr = shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifDescr.$ifIndex");
       $ifDescr = str_replace("No Such Object available on this agent at this OID", "", $ifDescr);
       $ifDescr = str_replace("No Such Instance currently exists at this OID", "", $ifDescr);
+      $ifDescr = trim(str_replace("\"", "", $ifDescr));
     } else { $ifDescr = trim(str_replace("\"", "", $ifName)); }
 
     if(!strstr($entry, "irtual")) {
-      $ifName = trim(str_replace("\"", "", $ifName));
-      $if = trim(strtolower($ifName));
+      $if = trim(strtolower($ifDescr));
       $nullintf = 0;
       foreach($config['bad_if'] as $bi) {
       if (strstr($if, $bi)) {
@@ -41,7 +41,7 @@
           # Add Interface
            echo("+");
         } else {
-          mysql_query("UPDATE `interfaces` SET `deleted` = '0', `ifDescr` = '$ifDescr' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex' AND `deleted` = '1'"); 
+          mysql_query("UPDATE `interfaces` SET `deleted` = '0', `ifDescr` = '$ifDescr' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
           if(mysql_affected_rows()) { 
             echo("*"); 
           } else {
