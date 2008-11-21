@@ -17,9 +17,13 @@
 
     $entry = trim($entry);
     list($ifIndex, $ifName) = explode("||", $entry);
-    $ifDescr = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifAlias.$ifIndex";
-    $ifDescr = str_replace("No Such Object available on this agent at this OID", "", $ifDescr);
-    $ifDescr = str_replace("No Such Instance currently exists at this OID", "", $ifDescr);
+
+    if($config['ifdescr'][$device['os']]) {
+      $ifDescr = shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifAlias.$ifIndex");
+      $ifDescr = str_replace("No Such Object available on this agent at this OID", "", $ifDescr);
+      $ifDescr = str_replace("No Such Instance currently exists at this OID", "", $ifDescr);
+    } else { $ifDescr = trim(str_replace("\"", "", $ifName)); }
+
 
     if(!strstr($entry, "irtual")) {
       $ifName = trim(str_replace("\"", "", $ifName));
