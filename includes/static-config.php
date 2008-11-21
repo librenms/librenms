@@ -1,5 +1,8 @@
 <?php
 
+## ifDescr whitelist (used instead of ifName)
+$config['ifdescr']['IOS'] = true;
+
 ##############################
 # No changes below this line #
 ##############################
