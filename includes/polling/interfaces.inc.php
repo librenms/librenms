@@ -19,14 +19,14 @@ while ($interface = mysql_fetch_array($interface_query)) {
    echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
    $snmp_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
-   $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'] . " ifName." . $interface['ifIndex'];
+   $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'];
 
    $snmp_output = trim(`$snmp_cmd`);
    $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);
    $snmp_output = str_replace("No Such Instance currently exists at this OID", "", $snmp_output);
    $snmp_output = str_replace("\"", "", $snmp_output);
 
-   list($ifAdminStatus, $ifOperStatus, $ifAlias, $ifName) = explode("\n", $snmp_output);
+   list($ifAdminStatus, $ifOperStatus, $ifAlias) = explode("\n", $snmp_output);
 
    if ($ifAlias == " ") { $ifAlias = str_replace(" ", "", $ifAlias); }
    $ifAlias = trim(str_replace("\"", "", $ifAlias));
