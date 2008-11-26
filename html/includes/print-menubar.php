@@ -35,6 +35,13 @@
 	} ?>
         <li><a href="alerts/"><img src='images/16/exclamation.png' border=0 align=absmiddle> Alerts</a></li>
         <li><a href="inventory/"><img src='images/16/bricks.png' border=0 align=absmiddle> Inventory</a></li>
+<?php
+if($_SESSION['userlevel'] >= '10') {
+  echo("
+
+        <li><a href='authlog/'><img src='images/16/lock.png' border=0 align=absmiddle> Authlog</a></li>");
+}
+?>
         </ul>
         </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->

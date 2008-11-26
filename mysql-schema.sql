@@ -10,6 +10,19 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
 --
+-- Table structure for table `authlog`
+--
+
+CREATE TABLE IF NOT EXISTS `authlog` (
+  `id` int(11) NOT NULL auto_increment,
+  `datetime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `user` text NOT NULL,
+  `address` text NOT NULL,
+  `result` text NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+--
 -- Database: `observer`
 --
 

@@ -30,8 +30,9 @@ if($_GET['logout']) {
     if($userlevel) {
       $_SESSION['userlevel'] = $userlevel;
       $_SESSION['authenticated'] = true;
-      $_SESSION['username'] = $_POST['username'];
+      $_SESSION['username'] = $username;
       mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'logged in')");
+      header("Location: ".$_SERVER['REQUEST_URI']);
     } else { 
       $auth_message = "Authentication Failed"; 
       mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");

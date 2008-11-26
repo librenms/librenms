@@ -36,9 +36,9 @@ while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] ."\n");
 
-#  include("includes/discovery/unix-memory.php");
+  include("includes/discovery/cisco-physical.php");
 
-   include("includes/discovery/ipv6-addresses.php");
+#   include("includes/discovery/ipv6-addresses.php");
 
 #   include("includes/discovery/cisco-pw.php");
 
