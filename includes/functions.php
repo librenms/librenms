@@ -8,11 +8,10 @@ include_once("Net/IPv6.php");
 ## Observer Includes
 
 include_once($config['install_dir'] . "/includes/generic.php");
-include_once($config['install_dir'] . "/includes/unix.php");
 include_once($config['install_dir'] . "/includes/procurve.php");
 include_once($config['install_dir'] . "/includes/graphing.php");
 include_once($config['install_dir'] . "/includes/print-functions.php");
-include_once($config['install_dir'] . "/includes/billing-functions.php");
+include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
 
