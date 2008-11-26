@@ -1,5 +1,7 @@
 <?php
 
+
+
 $Oloadrrd  = "rrd/" . $device['hostname'] . "-load.rrd";
 $Ocpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
 $Omemrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
@@ -14,6 +16,42 @@ if(is_file($Oloadrrd) && !is_file($loadrrd)) { rename($Oloadrrd, $loadrrd); echo
 if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
 if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
 if(is_file($Osysrrd) && !is_file($sysrrd)) { rename($Osysrrd, $sysrrd); echo("Moving $Osysrrd to $sysrrd");  }
+
+      if ($device['os'] == "FreeBSD") {
+        $sysDescr = str_replace(" 0 ", " ", $sysDescr);
+        list(,,$version) = explode (" ", $sysDescr);
+        $hardware = "i386";
+        $features = "GENERIC";
+      } elseif ($device['os'] == "DragonFly") {
+        list(,,$version,,,$features,,$hardware) = explode (" ", $sysDescr);
+      } elseif ($device['os'] == "NetBSD") {
+        list(,,$version,,,$features) = explode (" ", $sysDescr);
+        $features = str_replace("(", "", $features);
+        $features = str_replace(")", "", $features);
+        list(,,$hardware) = explode ("$features", $sysDescr);
+      } elseif ($device['os'] == "OpenBSD") {
+        list(,,$version,$features,$hardware) = explode (" ", $sysDescr);
+        $features = str_replace("(", "", $features);
+        $features = str_replace(")", "", $features);
+      } elseif ($device['os'] == "m0n0wall" || $device['os'] == "Voswall") {
+        list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = split(" ", $sysDescr);
+        $features = $freebsda . " " . $freebsdb;
+        $hardware = "$hardware ($arch)";
+        $hardware = str_replace("\"", "", $hardware);
+      } elseif ($device['os'] == "Linux") {
+        list(,,$version) = explode (" ", $sysDescr);
+        if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
+        if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
+        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.2021.7890.1.101.1";
+        $features = trim(`$cmd`);
+        $features = str_replace("No Such Object available on this agent at this OID", "", $features);
+        $features = str_replace("\"", "", $features);
+        // Detect Dell hardware via OpenManage SNMP
+        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
+        $hw = trim(str_replace("\"", "", `$cmd`));
+        if(strstr($hw, "No")) { unset($hw); } else { $hardware = "Dell " . $hw; }
+      }
+
 
 ## Check Disks
 $dq = mysql_query("SELECT * FROM storage WHERE host_id = '" . $device['device_id'] . "'");

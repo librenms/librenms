@@ -16,6 +16,24 @@
    if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
    if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
 
+      $version = str_replace("Cisco IOS Software,", "", $sysDescr);
+      $version = str_replace("IOS (tm) ", "", $version);
+      $version = str_replace(",RELEASE SOFTWARE", "", $version);
+      $version = str_replace(",MAINTENANCE INTERIM SOFTWARE", "", $version);
+      $version = str_replace("Version ","", $version);
+      $version = str_replace("Cisco Internetwork Operating System Software", "", $version);
+      $version = trim($version);
+      list($version) = explode("\n", $version);
+      $version = preg_replace("/^[A-Za-z0-9\ \_]*\(([A-Za-z0-9\-\_]*)\), (.+), .*/", "\\1|\\2", $version);
+      $version = str_replace("-M|", "|", $version);
+      $version = str_replace("-", "|", $version);
+      list($hardware, $features, $version) = explode("|", $version);
+      $features = fixIOSFeatures($features);
+      #$hardware = fixIOSHardware($hardware);
+      if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
+      if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
+        $hardware = $ciscomodel;
+      }
 
    list ($cpu5m, $cpu5s) = explode("\n", `snmpget -O qv -v2c -c $community $hostname 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0`);
    $cpu5m = $cpu5m + 0;
