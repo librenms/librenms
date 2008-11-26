@@ -1,37 +1,42 @@
 <?php 
 
+function check_auth($username, $password) {
+  $encrypted = md5($password);
+  $sql = "select username, level, user_id from users where username='$username' and password='$encrypted'";
+  $query = mysql_query($sql);
+  $row = mysql_fetch_row($query);
+
+  if ($row[0] == $username) { return $row[1]; } else { return FALSE; }
+
+}
+
 if($_GET['logout']) {
   session_start();
+  $olduser = $_SESSION['username'];
   session_destroy();
   header('Location: /');
   setcookie ("username", "", time() - 3600);
   setcookie ("encrypted", "", time() - 3600);
-  echo("$_COOKIE[username]");
-
+  mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$olduser', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
+  $auth_message = "Logged Out";
 } else {
 
   session_start();  
 
-  if($_POST['username'] && $_POST['password']){ 
-    $_SESSION['username']=$_POST['username']; 
-    $_SESSION['password']=$_POST['password'];   
-    $_SESSION['encrypted'] = md5($_SESSION['password']);
-  } elseif($_COOKIE['username'] && $_COOKIE['encrypted'] && !$_SESSION['authenticated']) {
-    $_SESSION['username']=$_COOKIE['username'];
-    $_SESSION['encrypted']=$_COOKIE['encrypted'];
-  }
+  if($_POST['username'] && $_POST['password']){
+    $username = mres($_POST['username']);
+    $password = mres($_POST['password']);
+    $userlevel = check_auth($username,$password);
+    if($userlevel) {
+      $_SESSION['userlevel'] = $userlevel;
+      $_SESSION['authenticated'] = true;
+      $_SESSION['username'] = $_POST['username'];
+      mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'logged in')");
+    } else { 
+      $auth_message = "Authentication Failed"; 
+      mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
+    } 
 
-
-  $sql = "select username, level, user_id from users where username='" . mres($_SESSION['username']) . "' and password='" . mres($_SESSION['encrypted']) . "'"; 
-  $query = mysql_query($sql);
-  $row = mysql_fetch_row($query);
-
-  if ( $_SESSION['username'] != "" && $row[0] == $_SESSION['username'] ) {
-    $_SESSION['userlevel'] = $row[1];
-    $_SESSION['authenticated'] = true;
-    $_SESSION['user_id'] = $row[2];
-    setcookie("username", $username);
-    setcookie("encrypted", $encrypted);
   }
 }
 
