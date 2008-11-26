@@ -22,11 +22,17 @@
             </tr>
             <tr>
               <td colspan=2 align='right'><input name='submit' type='submit' value='Login'></td>
-            </tr>
-          </table>
+            </tr>");
+
+if($auth_message) {
+
+echo("<tr><td colspan=2><span style='font-weight: bold; color: #cc0000;'>$auth_message</span></td></tr>");
+
+}
+
+echo("          </table>
       </form></td>
     </tr>
   </table>
 </center>");
-
 ?>
