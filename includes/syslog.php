@@ -24,10 +24,13 @@ function process_syslog ($entry, $update) {
   if($device_id && !$delete) {
     $entry['device_id'] = $device_id;
     if(mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$device_id'"),0) == "IOS") {
-      list(,$entry[msg]) = split(": %", $entry['msg']);
-      $entry['msg'] = "%" . $entry['msg'];
-      $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
+      if(strstr($entry[msg], "%")) {
+        list(,$entry[msg]) = split(": %", $entry['msg']);
+        $entry['msg'] = "%" . $entry['msg'];
+        $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);      
+      } else { $entry['msg'] = "||" . $entry['msg']; }
       list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
+      $entry['msg'] = preg_replace("/^[0-9]+:/", "", $entry['msg']);
     } else {
       $program = preg_quote($entry['program'],'/');
       $entry['msg'] = preg_replace("/^$program:\ /", "", $entry['msg']);
@@ -36,7 +39,6 @@ function process_syslog ($entry, $update) {
         list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
       }
     }
-
     $x  = "UPDATE `syslog` set `device_id` = '$device_id', `program` = '".$entry['program']."', `msg` = '" . mysql_real_escape_string($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
     $entry['processed'] = 1;
     if($update) { mysql_query($x); }
