@@ -1,8 +1,10 @@
 <?
 
-function pollDeviceWin() {
+   if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
+   if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }
+   if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
+   if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
 
-   global $device;
    $hostname = $device['hostname'];
    $hardware = $device['hardware'];
    $version = $device['version'];
@@ -108,6 +110,5 @@ function pollDeviceWin() {
    rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
    rrdtool_update($memrrd, "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
    rrdtool_update($cpurrd, "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
-}
 
 ?>

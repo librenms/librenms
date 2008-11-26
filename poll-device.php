@@ -91,49 +91,11 @@ while ($device = mysql_fetch_array($device_query)) {
     case "Voswall":
     case "NetBSD":
     case "pfSense":
-      if ($device['os'] == "FreeBSD") {
-        $sysDescr = str_replace(" 0 ", " ", $sysDescr);
-        list(,,$version) = explode (" ", $sysDescr);
-        $hardware = "i386";
-        $features = "GENERIC";
-      } elseif ($device['os'] == "DragonFly") {
-        list(,,$version,,,$features,,$hardware) = explode (" ", $sysDescr);
-      } elseif ($device['os'] == "NetBSD") {
-        list(,,$version,,,$features) = explode (" ", $sysDescr);
-        $features = str_replace("(", "", $features);
-        $features = str_replace(")", "", $features);
-        list(,,$hardware) = explode ("$features", $sysDescr);
-      } elseif ($device['os'] == "OpenBSD") {
-        list(,,$version,$features,$hardware) = explode (" ", $sysDescr);
-        $features = str_replace("(", "", $features);
-        $features = str_replace(")", "", $features);
-      } elseif ($device['os'] == "m0n0wall" || $device['os'] == "Voswall") { 
-	list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = split(" ", $sysDescr);
-	$features = $freebsda . " " . $freebsdb;
-	$hardware = "$hardware ($arch)";	
-        $hardware = str_replace("\"", "", $hardware);
-      } elseif ($device['os'] == "Linux") {
-        list(,,$version) = explode (" ", $sysDescr);
-        if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
-        if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
-        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.2021.7890.1.101.1";
-        $features = trim(`$cmd`);
-        $features = str_replace("No Such Object available on this agent at this OID", "", $features);
-        $features = str_replace("\"", "", $features);
-        // Detect Dell hardware via OpenManage SNMP
-        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
-        $hw = trim(str_replace("\"", "", `$cmd`));      
-        if(strstr($hw, "No")) { unset($hw); } else { $hardware = "Dell " . $hw; }
-      }
-
       include("includes/polling/device-unix.inc.php");
       break;
+
     case "Windows":
-      if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
-      if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }
-      if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
-      if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
-      pollDeviceWin();
+      include("includes/polling/device-windows.inc.php");
       break;
 
     case "ScreenOS":
@@ -149,25 +111,6 @@ while ($device = mysql_fetch_array($device_query)) {
       break;
 
     case "IOS":
-      $version = str_replace("Cisco IOS Software,", "", $sysDescr);
-      $version = str_replace("IOS (tm) ", "", $version);
-      $version = str_replace(",RELEASE SOFTWARE", "", $version);
-      $version = str_replace(",MAINTENANCE INTERIM SOFTWARE", "", $version);
-      $version = str_replace("Version ","", $version);
-      $version = str_replace("Cisco Internetwork Operating System Software", "", $version);
-      $version = trim($version);
-      list($version) = explode("\n", $version);
-      $version = preg_replace("/^[A-Za-z0-9\ \_]*\(([A-Za-z0-9\-\_]*)\), (.+), .*/", "\\1|\\2", $version);
-      $version = str_replace("-M|", "|", $version);
-      $version = str_replace("-", "|", $version);
-      list($hardware, $features, $version) = explode("|", $version);
-      $features = fixIOSFeatures($features);
-      #$hardware = fixIOSHardware($hardware);
-
-      if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
-      if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
-        $hardware = $ciscomodel;
-      }
       include("includes/polling/device-ios.inc.php");
       break;
 
@@ -198,6 +141,15 @@ while ($device = mysql_fetch_array($device_query)) {
 
   $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
   include("includes/polling/interfaces.inc.php");
+
+
+    $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
+    if(mysql_affected_rows() == '0') {
+      $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'polled', NOW())");
+    }
+
+
+
 
   } else {
     $status = '0';
