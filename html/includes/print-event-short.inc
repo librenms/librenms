@@ -3,9 +3,6 @@
 
 if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
-  $hostname = gethostbyid($entry['host']);
-  $interface = fixifname(getifbyid($entry['interface']));
-
   unset($icon);
 
   $icon = geteventicon($entry['message']);
@@ -17,10 +14,11 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     <td class=syslog width=140>
       ".$entry['humandate']."
     </td>");
-  $if['interface_id'] = $entry['interface'];
-  $if['ifDescr'] = makeshortif($interface);
+
+  $if = mysql_fetch_array(mysql_query("SELECT * from interfaces AS I, devices as D where I.device_id = D.device_id AND I.interface_id = '".$entry['interface']."'"));
+
     echo("<td class=list-bold width=75>
-      "  . generateiflink($if) . "
+      "  . generateiflink($if, makeshortif($if['ifDescr'])) . "
     </td>
     <td class=syslog>" . 
       htmlspecialchars(truncate($entry['message'], 45))

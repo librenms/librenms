@@ -18,6 +18,8 @@ RewriteRule ^devices/(.+)/ ?page=devices&type=$1
 RewriteRule ^interfaces/(.+)/ ?page=interfaces&type=$1
 
 RewriteRule ^bill/([0-9]+) ?page=bills&bill=$1
+
+RewriteRule ^device/([0-9]+)/([a-z]+)/ ?page=device&id=$1&section=$2
 RewriteRule ^device/([0-9]+) ?page=device&id=$1
 
 RewriteRule ^([a-z]+)/$ ?page=$1
