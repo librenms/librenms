@@ -11,7 +11,7 @@
      if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
      #if($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
      if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_colour = "#ffcccc"; }
-     if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "red"; $bg_colour = "#ccc"; }
+     if($peer['bgpPeerAdminStatus'] == "start") { $admin_col = "green"; } else { $admin_col = "red"; $bg_colour = "#cccccc"; }
 
      if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
