@@ -25,6 +25,7 @@
       $ifDescr = trim(str_replace("\"", "", $ifDescr));
     } else { $ifDescr = trim(str_replace("\"", "", $ifName)); }
 
+
     if(!strstr($entry, "irtual")) {
       $if = trim(strtolower($ifDescr));
       $nullintf = 0;
@@ -33,6 +34,7 @@
           $nullintf = 1;
         }
       }
+      $ifDescr = fixifName($ifDescr);
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
       if ($nullintf == 0) {

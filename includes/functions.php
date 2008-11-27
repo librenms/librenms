@@ -14,10 +14,11 @@ include_once($config['install_dir'] . "/includes/print-functions.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
+include_once($config['install_dir'] . "/includes/rewrites.php");
 
-function mres($string) {
- // short function wrapper because the real one is stupidly long and ugly. aestetics.
- return mysql_real_escape_string($string);
+
+function mres($string) { // short function wrapper because the real one is stupidly long and ugly. aestetics.
+  return mysql_real_escape_string($string);
 }
 
 function validate_hostip($host) {
@@ -37,7 +38,6 @@ function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
 }
 
 function shorthost($hostname, $len=16) {
-
   list ($first, $second, $third, $fourth, $fifth) = explode(".", $hostname);
   $shorthost = $first;
   if(strlen($first.".".$second) < $len && $second) { 
@@ -52,9 +52,7 @@ function shorthost($hostname, $len=16) {
       }
     }
   }
-  
   return ($shorthost);
-
 }
 
 function rrdtool_update($rrdfile, $rrdupdate) {
@@ -86,14 +84,11 @@ function strgen ($length = 16)
     'E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n',
     'N','o','O','p','P','q','Q','r','R','s','S','t','T','u','U','v','V','w',
     'W','x','X','y','Y','z','Z');
-    
-    $string = "";
-    
+    $string = "";    
     for ($i=0; $i<$length; $i++) {
         $key = mt_rand(0,61);
         $string .= $entropy[$key];
     }
-    
     return $string;
 }
 
@@ -157,14 +152,16 @@ function format_si($rate)
   return round($rate, $round[$i]).$ext;
 }
 
-function format_bi($size) {
+function format_bi($size) 
+{
   $sizes = Array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
   return round($size, 2).$ext;
 }
 
-function arguments($argv) {
+function arguments($argv) 
+{
     $_ARG = array();
     foreach ($argv as $arg) {
       if (ereg('--([^=]+)=(.*)',$arg,$reg)) {
@@ -185,7 +182,8 @@ function percent_colour($perc)
  return sprintf('#%02x%02x%02x', $r, $b, $b);
 } 
 
-function percent_colour_old($perc) {
+function percent_colour_old($perc) 
+{
   $red = round(5 * $perc);
   $blue = round(255 - (5 * $perc));
   if($red > '255') { $red = "255"; } 
@@ -198,22 +196,26 @@ function percent_colour_old($perc) {
   return $colour;
 }
 
-function print_error($text){
+function print_error($text)
+{
   echo("<table class=errorbox cellpadding=3><tr><td><img src='/images/15/exclamation.png' align=absmiddle> $text</td></tr></table>");
 }
 
-function print_message($text){
+function print_message($text)
+{
   echo("<table class=messagebox cellpadding=3><tr><td><img src='/images/16/tick.png' align=absmiddle> $text</td></tr></table>");
 }
 
-function truncate($substring, $max = 50, $rep = '...') {
+function truncate($substring, $max = 50, $rep = '...') 
+{
   if(strlen($substring) < 1){ $string = $rep; } else { $string = $substring; }
   $leave = $max - strlen ($rep);      
   if(strlen($string) > $max){ return substr_replace($string, $rep, $leave); } else { return $string; }      
 }
 
 
-function interface_rates ($interface) {
+function interface_rates ($interface) 
+{
   global $config, $rrd_dir;
   $rrdfile = $rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd  = $config['rrdtool']." fetch -s -600s -e now ".$rrdfile." AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
@@ -227,7 +229,8 @@ function interface_rates ($interface) {
 }
 
 
-function interface_errors ($interface) {
+function interface_errors ($interface) 
+{
   global $config, $rrd_dir;
   $rrdfile = $rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d\" \" -f 4,5";
@@ -243,7 +246,8 @@ function interface_errors ($interface) {
 }
 
 
-function geteventicon ($message) {
+function geteventicon ($message) 
+{
   if($message == "Device status changed to Down") { $icon = "server_connect.png"; }
   if($message == "Device status changed to Up") { $icon = "server_go.png"; }
   if($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
@@ -253,19 +257,21 @@ function geteventicon ($message) {
   if($icon) { return $icon; } else { return false; }
 }
 
-function generateiflink($interface, $text=0,$type=bits) {
+function generateiflink($interface, $text=0,$type=bits) 
+{
   global $twoday; global $now; global $config; global $day;
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
   $link  = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  ";
-  $link .= "onmouseover=\"return overlib('<div class=list-large>" . $interface['hostname'] . " - " . $interface['ifDescr'] . "</div><div>";
+  $link .= "onmouseover=\"return overlib('<div class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</div><div>";
   $link .= $interface['ifAlias'] . "</div><img src=\'$graph_url\'>'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">$text</a>";
   return $link;
 }
 
-function generatedevicelink($device, $text=0, $start=0, $end=0) {
+function generatedevicelink($device, $text=0, $start=0, $end=0) 
+{
   global $twoday; global $day; global $now; global $config;
   if(!$start) { $start = $day; }
   if(!$end) { $end = $now; }
@@ -279,7 +285,8 @@ function generatedevicelink($device, $text=0, $start=0, $end=0) {
 }
 
 
-function device_traffic_image($device, $width, $height, $from, $to) {
+function device_traffic_image($device, $width, $height, $from, $to) 
+{
   return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "' />";
 }
 
@@ -293,7 +300,8 @@ function devclass($device) {
 }
 
 
-function getImage($host) {
+function getImage($host) 
+{
 $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
 $data = mysql_fetch_array(mysql_query($sql));
 $type = strtolower($data['os']);
@@ -310,7 +318,8 @@ $type = strtolower($data['os']);
 }
 
 
-function renamehost($id, $new) {
+function renamehost($id, $new) 
+{
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   shell_exec("mv ".$config['rrd_dir']."/$host ".$config['rrd_dir']."/$new");
@@ -318,7 +327,8 @@ function renamehost($id, $new) {
     mysql_query("INSERT INTO eventlog (host, datetime, message) VALUES ('" . $id . "', NULL, NOW(), 'Hostname changed -> $new (console)')");
 }
 
-function delHost($id) {
+function delHost($id) 
+{
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
@@ -348,7 +358,8 @@ function delHost($id) {
 }
 
 
-function addHost($host, $community, $snmpver) {
+function addHost($host, $community, $snmpver) 
+{
   global $config;
   list($hostshort)      = explode(".", $host);
   if ( isDomainResolves($host)){
@@ -367,7 +378,8 @@ function overlibprint($text) {
 	return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
 }
 
-function scanUDP ($host, $port, $timeout) { 
+function scanUDP ($host, $port, $timeout) 
+{ 
   $handle = fsockopen($host, $port, &$errno, &$errstr, 2); 
   if (!$handle) { 
   } 
@@ -389,23 +401,9 @@ function scanUDP ($host, $port, $timeout) {
   } 
 }
 
-function humanmedia($media) {
-        $media = preg_replace("/^ethernetCsmacd$/", "Ethernet", $media);
-        $media = preg_replace("/^softwareLoopback$/", "Loopback", $media);
-        $media = preg_replace("/^tunnel$/", "Tunnel", $media);
-	$media = preg_replace("/^propVirtual$/", "Virtual Int", $media);
-	$media = preg_replace("/^ppp$/", "PPP", $media);
-	$media = preg_replace("/^ds1$/", "DS1", $media);
-	$media = preg_replace("/^pos$/", "POS", $media);
-	$media = preg_replace("/^sonet$/", "SONET", $media);
-	$media = preg_replace("/^slip$/", "SLIP", $media);
-	$media = preg_replace("/^mpls$/", "MPLS Layer", $media);
-	$media = preg_replace("/^l2vlan$/", "VLAN Subif", $media);
-	$media = preg_replace("/^atm$/", "ATM", $media);
-	$media = preg_replace("/^aal5$/", "ATM AAL5", $media);
-	$media = preg_replace("/^atmSubInterface$/", "ATM Subif", $media);
-        $media = preg_replace("/^propPointToPointSerial$/", "PtP Serial", $media);
-
+function humanmedia($media) 
+{
+	array_preg_replace($rewrite_iftype, $media);	
         return $media;
 }
 
@@ -440,17 +438,20 @@ function humanspeed($speed) {
 }
 
 
-function netmask2cidr($netmask) {
+function netmask2cidr($netmask) 
+{
  list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
  return $cidr;
 }
 
-function cidr2netmask() {
+function cidr2netmask() 
+{
    return (long2ip(ip2long("255.255.255.255")
            << (32-$netmask)));
 }
 
-function formatUptime($diff, $format="long") {
+function formatUptime($diff, $format="long") 
+{
   $yearsDiff = floor($diff/31536000);
   $diff -= $yearsDiff*31536000;
   $daysDiff = floor($diff/86400);
@@ -476,7 +477,8 @@ function formatUptime($diff, $format="long") {
   return "$uptime";
 }
 
-function isSNMPable($hostname, $community, $snmpver) {
+function isSNMPable($hostname, $community, $snmpver) 
+{
      global $config;
      $pos = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname sysDescr.0");
      if($pos == '') {
@@ -489,7 +491,8 @@ function isSNMPable($hostname, $community, $snmpver) {
      return $status;
 }
 
-function isPingable($hostname) {
+function isPingable($hostname) 
+{
    global $config;
    $status = shell_exec($config['fping'] . " $hostname");
    if(strstr($status, "alive")) {
@@ -500,11 +503,13 @@ function isPingable($hostname) {
 }
 
 
-function is_odd($number) {
+function is_odd($number) 
+{
    return $number & 1; // 0 = even, 1 = odd
 }
 
-function isValidInterface($if) {
+function isValidInterface($if) 
+{
       global $config;
       $if = strtolower($if);
       $nullintf = 0;
@@ -521,7 +526,8 @@ function isValidInterface($if) {
       }  else { return 0; }
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus) {
+function ifclass($ifOperStatus, $ifAdminStatus) 
+{
         $ifclass = "interface-upup";
         if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
         if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
@@ -529,68 +535,16 @@ function ifclass($ifOperStatus, $ifAdminStatus) {
 	return $ifclass;
 }
 
-function makeshortif($if) {
-	$if = strtolower($if);
-	$if = str_replace("tengigabitethernet","Te", $if);
-	$if = str_replace("gigabitethernet","Gi", $if);
-	$if = str_replace("fastethernet","Fa", $if);
-	$if = str_replace("ethernet","Et", $if);
-        $if = str_replace("serial","Se", $if);
-        $if = str_replace("pos","Pos", $if);
-	$if = str_replace("port-channel","Po", $if);
-        $if = str_replace("atm","Atm", $if);
-	$if = str_replace("null", "Null", $if);
-	$if = str_replace("loopback","Lo", $if);        
-	$if = str_replace("dialer","Di", $if);
-	$if = str_replace("vlan","Vlan", $if);
-        $if = str_replace("tunnel","Tunnel", $if);
-	return $if;
-}
-
-function utime() {
+function utime() 
+{
         $time = explode( " ", microtime());
         $usec = (double)$time[0];
         $sec = (double)$time[1];
         return $sec + $usec;
 }
 
-function fixiftype ($type) {
-	$type = str_replace("ethernetCsmacd", "Ethernet", $type);
-        $type = str_replace("tunnel", "Tunnel", $type);
-        $type = str_replace("softwareLoopback", "Software Loopback", $type);
-        $type = str_replace("propVirtual", "Ethernet VLAN", $type);
-        $type = str_replace("ethernetCsmacd", "Ethernet", $type);
-        $type = str_replace("l2vlan", "Ethernet VLAN", $type);       
-	$type = str_replace("frameRelay", "Frame Relay", $type);
-	$type = str_replace("propPointToPointSerial", "PointToPoint Serial", $type);
-	return ($type);
-}
-
-function fixifName ($inf) {
-        $inf = str_replace("ether", "Ether", $inf);
-        $inf = str_replace("gig", "Gig", $inf);
-        $inf = str_replace("fast", "Fast", $inf);
-        $inf = str_replace("ten", "Ten", $inf);
-	$inf = str_replace("bvi", "BVI", $inf);
-        $inf = str_replace("vlan", "Vlan", $inf);
-        $inf = str_replace("ether", "Ether", $inf);
-        $inf = str_replace("-802.1q Vlan subif", "", $inf);
-	$inf = str_replace("-802.1q", "", $inf);
-	$inf = str_replace("tunnel", "Tunnel", $inf);
-        $inf = str_replace("serial", "Serial", $inf);
-        $inf = str_replace("-aal5 layer", " aal5", $inf);
-	$inf = str_replace("null", "Null", $inf);
-        $inf = str_replace("atm", "ATM", $inf);
-        $inf = str_replace("port-channel", "Port-Channel", $inf);
-        $inf = str_replace("dial", "Dial", $inf);
-        $inf = str_replace("hp procurve switch software loopback interface", "Loopback Interface", $inf);
-        $inf = str_replace("control plane interface", "Control Plane", $inf);
-        $inf = str_replace("loop", "Loop", $inf);
-        $inf = preg_replace("/^([0-9]+)$/", "Interface \\0", $inf);
-	return $inf;
-}
-
-function fixIOSFeatures($features){
+function fixIOSFeatures($features)
+{
 	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);
         $features = str_replace("LANBASEK9", "Lan Base Crypto", $features);
 	$features = str_replace("LANBASE", "Lan Base", $features);
