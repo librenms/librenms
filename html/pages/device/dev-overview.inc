@@ -48,7 +48,6 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
     $total = formatStorage($total);
     $used = formatStorage($used);
 
-
     $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
