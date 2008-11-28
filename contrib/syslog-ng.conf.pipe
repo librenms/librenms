@@ -1,0 +1,37 @@
+options {
+        chain_hostnames(0);
+        time_reopen(10);
+        time_reap(360);
+        #sync(0);
+        log_fifo_size(2048);
+        create_dirs(yes);
+        #owner(root);
+        group(adm);
+        perm(0640);
+        #dir_owner(root);
+        #dir_group(root);
+        dir_perm(0755);
+        use_dns(no);
+        #dns_cache(yes);
+        #log_msg_size(2048);
+	stats_freq(0);
+	bad_hostname("^gconfd$");
+};
+
+
+source s_net {
+	udp();
+};
+
+destination d_mysql {
+	pipe("/var/log/observer-mysql.pipe"
+	template("INSERT INTO syslog
+	(host, facility, priority, level, tag, datetime, program, msg)
+	VALUES ( '$HOST', '$FACILITY', '$PRIORITY', '$LEVEL', '$TAG', '$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC','$PROGRAM', '$MSG' );\n") template-escape(yes));
+}; 
+
+log {
+	source(s_net);
+	destination(d_mysql);
+}; 
+
