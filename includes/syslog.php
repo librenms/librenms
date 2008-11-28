@@ -29,8 +29,21 @@ function process_syslog ($entry, $update) {
         $entry['msg'] = "%" . $entry['msg'];
         $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);      
       } else { $entry['msg'] = "||" . $entry['msg']; }
+      $entry['msg'] = preg_replace("/^.+\.[0-9]{3}:/", "", $entry['msg']);
+      $entry['msg'] = preg_replace("/^.+-Traceback=/", "Traceback||", $entry['msg']);
+
       list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
       $entry['msg'] = preg_replace("/^[0-9]+:/", "", $entry['msg']);
+
+      if(!$entry['program']) {
+         $entry['msg'] = preg_replace("/^([0-9A-Z\-]+?):\ /", "\\1||", $entry['msg']);
+	 list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
+      }
+
+      if(!$entry['msg']) { $entry['msg'] = $entry['program']; }
+
+
+
     } else {
       $program = preg_quote($entry['program'],'/');
       $entry['msg'] = preg_replace("/^$program:\ /", "", $entry['msg']);
