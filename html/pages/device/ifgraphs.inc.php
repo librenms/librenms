@@ -11,6 +11,6 @@ $dographs = 1;
 
 if(!$_GET['type']) { $_GET['type'] = "bits"; }
 
-include("pages/device/dev-ifs.inc");
+include("pages/device/ifs.inc.php");
 
 ?>

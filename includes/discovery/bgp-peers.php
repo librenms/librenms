@@ -24,7 +24,7 @@
 
 	$peerlist[] = $device['device_id'] ." $peer_ip";
 
-	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5")));
+	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5 | sed s/\\\"//g")));
 
         #echo(str_pad($peer_ip, 32). str_pad($astext, 32) . " $peer_as ");
 

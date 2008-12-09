@@ -264,9 +264,10 @@ function generateiflink($interface, $text=0,$type=bits)
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
-  $link  = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "'  ";
-  $link .= "onmouseover=\"return overlib('<div class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</div><div>";
-  $link .= $interface['ifAlias'] . "</div><img src=\'$graph_url\'>'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">$text</a>";
+  $link = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "' ";
+  $link .= "onmouseover=\" return overlib('<img src=\'$graph_url\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</span>' ";
+  $link .= $config['overlib_defaults'].");\" onmouseout=\"return nd();\" >$text</a>";
+
   return $link;
 }
 
