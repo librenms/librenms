@@ -5,6 +5,8 @@
   $device_alerts = "0"; 
   $device_alert_sql = "WHERE 0";
 
+  $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where bgpPeerAdminStatus = 'start' AND bgpPeerState != 'established'"), 0);
+
   $query_a = mysql_query("SELECT * FROM `devices`");
   while($device = mysql_fetch_array($query_a)) {
     if($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif($device['ignore'] == '0') {
@@ -169,10 +171,14 @@ echo("
 
         <li><hr width=140 /></li>
         <li><a href='bgp/external/'><img src='images/16/world_link.png' border=0 align=absmiddle> External BGP</a></li>
-        <li><a href='bgp/internal/'><img src='images/16/brick_link.png' border=0 align=absmiddle> Internal BGP</a></li>
+        <li><a href='bgp/internal/'><img src='images/16/brick_link.png' border=0 align=absmiddle> Internal BGP</a></li>");
+
+if($bgp_alerts) { echo("
         <li><hr width=140/></li>
-        <li><a href='bgp/alerts/'><img src='images/16/link_error.png' border=0 align=absmiddle> Alerted Sessions</a></li>
-        <li><hr /></li>
+        <li><a href='bgp/alerts/'><img src='images/16/link_error.png' border=0 align=absmiddle> Alerted ($bgp_alerts)</a></li>
+"); } 
+
+echo("        <li><hr /></li>
 
 
         </ul>
