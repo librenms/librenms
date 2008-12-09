@@ -56,7 +56,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   }
 
-  if($device['os'] == "IOS") {
+  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
     include("includes/discovery/cisco-vlans.php");
     include("includes/discovery/cisco-physical.php");
     include("includes/discovery/bgp-peers.php");

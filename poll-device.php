@@ -59,7 +59,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
     $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0";
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
-    if($device['os'] == "IOS") {       
+    if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
       $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
       $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
       $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
@@ -111,6 +111,7 @@ while ($device = mysql_fetch_array($device_query)) {
       break;
 
     case "IOS":
+    case "IOS XE":
       include("includes/polling/device-ios.inc.php");
       break;
 
