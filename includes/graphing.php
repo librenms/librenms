@@ -5,7 +5,7 @@ include("graphing/fortigate.php");
 include("graphing/windows.php");
 include("graphing/unix.php");
 
-function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
+function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $legend = '0') {
   global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
@@ -31,17 +31,24 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height) {
   $options .= " CDEF:inbits=inoctets,8,*";
   $options .= " CDEF:outbits=outoctets,8,*";
   $options .= " CDEF:doutbits=doutoctets,8,*";
-  $options .= " AREA:inbits#CDEB8B:";
-  $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\\\\n";
-  $options .= " LINE1.25:inbits#006600:In\ ";
-  $options .= " GPRINT:inbits:LAST:%6.2lf%s";
-  $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
-  $options .= " GPRINT:inbits:MAX:%6.2lf%s\\\\l";
-  $options .= " AREA:doutbits#C3D9FF:";
-  $options .= " LINE1.25:doutbits#000099:Out";
-  $options .= " GPRINT:outbits:LAST:%6.2lf%s";
-  $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-  $options .= " GPRINT:outbits:MAX:%6.2lf%s";
+  if($legend) {
+   $options .= " AREA:inbits#CDEB8B:";
+   $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\\\\n";
+   $options .= " LINE1.25:inbits#006600:In\ ";
+   $options .= " GPRINT:inbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbits:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbits#C3D9FF:";
+   $options .= " LINE1.25:doutbits#000099:Out";
+   $options .= " GPRINT:outbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbits:MAX:%6.2lf%s";
+  } else {
+   $options .= " AREA:inbits#CDEB8B:";
+   $options .= " LINE1.25:inbits#006600:";
+   $options .= " AREA:doutbits#C3D9FF:";
+   $options .= " LINE1.25:doutbits#000099:";
+  }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
   $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
