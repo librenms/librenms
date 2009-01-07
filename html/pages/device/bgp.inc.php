@@ -1,5 +1,18 @@
 <?php
 
+if($_GET['opta'] == "graphs" || $_GET['opta'] == "graphs") {
+  $graphs = 1;
+} else {
+  $graphs = 0;
+}
+
+echo("
+<div style='float: right; text-align: right;'>
+<a href='/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
+<a href='/device/" . $_GET['id'] . "/bgp/graphs/'>Graphs</a> 
+</div>");
+
+
    echo("<div style='margin: 5px;'><table border=0 cellspacing=1 cellpadding=5 width=100%>");
 
    echo("<tr><td colspan=6><h2>Local AS : " . $device['bgpLocalAs'] . "</h2></td></tr>");
@@ -30,22 +43,18 @@
                          <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td></tr>");
 
 
-     $graphs=1;
      if($graphs) {
           
        $graph_type = "bgpupdates";
  
-         $daily_traffic   = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=209&height=100";
-  $daily_url       = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
-
-  $weekly_traffic  = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=209&height=100";
-  $weekly_url      = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
-
-  $monthly_traffic = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=209&height=100";
-  $monthly_url     = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
-
-  $yearly_traffic  = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=209&height=100";
-  $yearly_url  = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
+        $daily_traffic   = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=209&height=100";
+  	$daily_url       = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
+  	$weekly_traffic  = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=209&height=100";
+  	$weekly_url      = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
+  	$monthly_traffic = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=209&height=100";
+  	$monthly_url     = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
+  	$yearly_traffic  = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=209&height=100";
+  	$yearly_url      = "graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
 
   echo("<tr><td colspan=6>");
 

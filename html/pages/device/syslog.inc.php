@@ -1,26 +1,45 @@
-<?
-
-$query = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date ";
-$query .= "FROM `syslog` WHERE `device_id` = '" . $_GET['id'] . "'";
-if($search) { $query .= " AND `msg` LIKE '%" . $_POST['search'] . "%'"; }
-$query .= " ORDER BY `datetime` desc LIMIT 0,500";
-
-$data = mysql_query($query);
-
-
-echo("<div align=right><form id='form1' name='form1' method='post' action='" . $_SERVER['REQUEST_URI'] . "'>
-  <label>
-  <input type='text' name='search' id='search' />
-  <input type='submit' name='button' id='button' value='Search' />
+<div style="background-color: #eeeeee; padding: 10px;">
+<form method="post" action="">
+  <label><strong>Search</strong>
+    <input type="text" name="string" id="string" value="<?php  echo($_POST['string']); ?>" />
   </label>
-</form></div>");
+  <label>
+    <strong>Program</strong>
+    <select name="program" id="program">
+      <option value="">All Programs</option>
+      <?php
+        $query = mysql_query("SELECT `program` FROM `syslog` WHERE device_id = '" . $_GET['id'] . "' GROUP BY `program` ORDER BY `program`");
+        while($data = mysql_fetch_array($query)) {
+          echo("<option value='".$data['program']."'");
+          if($data['program'] == $_POST['program']) { echo("selected"); }
+          echo(">".$data['program']."</option>");
+        }
+      ?>
+    </select>
+  </label>
 
-echo("<table cellspacing=0 cellpadding=2 width=100%>");
+  <input type=submit value=Search>
 
-while($entry = mysql_fetch_array($data)) {
-  include("includes/print-syslog.inc");
+</form>
+</div>
+
+
+<?php
+
+if($_POST['string']) {
+  $where = " AND S.msg LIKE '%".$_POST['string']."%'";
 }
 
+if($_POST['program']) {
+  $where .= " AND S.program = '".$_POST['program']."'";
+}
+
+$sql =  "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
+$sql .= " ORDER BY datetime DESC LIMIT 1000";
+$query = mysql_query($sql);
+echo("<table cellspacing=0 cellpadding=2 width=100%>");
+while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
 echo("</table>");
+
 
 ?>
