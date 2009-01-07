@@ -56,7 +56,7 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $le
 
 function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;
-  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options = " -l 0 -E --start $from --end $to --width $width --height $height ";
   if($width <= "300") {
     $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal ";
   }
@@ -65,48 +65,22 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
   $iter = "1";
   $sql = mysql_query("SELECT * FROM temperature where temp_id = '$temp'");
   $opts[] = "COMMENT:                                  Cur    Max";
-  while($temperature = mysql_fetch_array($sql)) {
-    $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['temp_host'] . "'"),0);
-    if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
-    } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
-    } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
-    $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
-    $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
-    $temprrd  = addslashes("rrd/$hostname/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
-    $temprrd  = str_replace(")", "_", $temprrd);
-    $temprrd  = str_replace("(", "_", $temprrd);
-    $opts[] = "DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE";
-    $opts[] = "CDEF:tempf" . $temperature[temp_id] . "=temp" . $temperature[temp_id] . ",UN,0,temp" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-80=tempf" . $temperature[temp_id] . ",80,GT,80,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-70=tempf" . $temperature[temp_id] . ",70,GT,70,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-60=tempf" . $temperature[temp_id] . ",60,GT,60,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-50=tempf" . $temperature[temp_id] . ",50,GT,50,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-40=tempf" . $temperature[temp_id] . ",40,GT,40,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-30=tempf" . $temperature[temp_id] . ",30,GT,30,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-25=tempf" . $temperature[temp_id] . ",25,GT,25,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-20=tempf" . $temperature[temp_id] . ",20,GT,20,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-15=tempf" . $temperature[temp_id] . ",15,GT,15,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-10=tempf" . $temperature[temp_id] . ",10,GT,10,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-5=tempf" . $temperature[temp_id] . ",5,GT,5,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "CDEF:temp" . $temperature[temp_id] . "-0=tempf" . $temperature[temp_id] . ",0,GT,0,tempf" . $temperature[temp_id] . ",IF";
-    $opts[] = "AREA:temp" . $temperature[temp_id] .    "#ff0000:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-80#ee0000:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-70#dd0000:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-60#cc0033:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-50#aa0033:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-40#990033:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-30#800033:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-25#660066:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-20#490066:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-15#330066:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-10#160099:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-5#000099:";
-    $opts[] = "AREA:temp" . $temperature[temp_id] . "-0#000000:";
-    $opts[] = "LINE1.5:temp" . $temperature[temp_id] . "#" . $colour . ":" . $temperature[temp_descr_fixed];
-    $opts[] = "GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lf°C";
-    $opts[] = "GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lf°C\\\l";
-    $iter++;
-  }
+  $temperature = mysql_fetch_array(mysql_query("SELECT * FROM temperature where temp_id = '$temp'"));
+  $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['temp_host'] . "'"),0);
+
+  $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
+  $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
+
+  $temprrd  = addslashes("rrd/$hostname/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+  $temprrd  = str_replace(")", "_", $temprrd);
+  $temprrd  = str_replace("(", "_", $temprrd);
+  $opts[] = "DEF:temp=$temprrd:temp:AVERAGE";
+  $opts[] = "CDEF:tempwarm=temp,".$temperature[temp_limit].",GT,temp,UNKN,IF";
+  $opts[] = "LINE1.5:temp#006600:" . $temperature[temp_descr_fixed];
+  $opts[] = "LINE1.5:tempwarm#cc0000";
+  $opts[] = "GPRINT:temp:LAST:%3.0lf°C";
+  $opts[] = "GPRINT:temp:MAX:%3.0lf°C\\\l";
+  
   foreach($opts as $opt) {
     $opt = str_replace(" ","\ ", $opt);
     $options .= " $opt";
