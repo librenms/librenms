@@ -72,8 +72,10 @@ $config['show_locations'] = 1;  # Enable Locations on menu
 ### Which additional features should we enable?
 
 $config['enable_bgp'] 		= 1; # Enable BGP session collection and display
-$config['enable_syslog'] 	= 1;   # Enable Syslog
+$config['enable_syslog'] 	= 1; # Enable Syslog
 $config['enable_billing']	= 1; # Enable BGP session collection and display
+$config['enable_inventory']     = 1; # Enable Inventory
+
 
 ## If a syslog entry contails these strings it is deleted from the database
 $config['syslog_filter'] = array("last message repeated", "Connection from UDP: [127.0.0.1]:"); 
