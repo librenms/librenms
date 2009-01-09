@@ -27,11 +27,11 @@
 <?php
 
 if($_POST['string']) {
-  $where = " AND S.msg LIKE '%".$_POST['string']."%'";
+  $where = " AND msg LIKE '%".$_POST['string']."%'";
 }
 
 if($_POST['program']) {
-  $where .= " AND S.program = '".$_POST['program']."'";
+  $where .= " AND program = '".$_POST['program']."'";
 }
 
 $sql =  "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";

@@ -1,13 +1,15 @@
 <?php
 
-  echo("Physical Inventory : ");
+ echo("Physical Inventory : ");
+
+ if($config['enable_inventory']) {
 
   $ents_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ";
   $ents_cmd .= "1.3.6.1.2.1.47.1.1.1.1.2 | sed s/.1.3.6.1.2.1.47.1.1.1.1.2.//g | cut -f 1 -d\" \"";
 
   $ents  = trim(`$ents_cmd | grep -v o`);
 
-  foreach(explode("\n", $ents) as $entPhysicalIndex) {
+ foreach(explode("\n", $ents) as $entPhysicalIndex) {
 
     $ent_data  = "snmpget -Ovqs -"; 
     $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
@@ -55,6 +57,8 @@
 
   }
 
-  echo("\n");
+ } else { echo("Disabled!"); }
+
+ echo("\n");
 
 ?>
