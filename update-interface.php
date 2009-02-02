@@ -20,7 +20,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
-  $snmp_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ifName." . $interface['ifIndex'];
+  $snmp_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ifName." . $interface['ifIndex'];
   $snmp_cmd .= " ifDescr." . $interface['ifIndex'] . " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ";
   $snmp_cmd .= "ifAlias." . $interface['ifIndex'] . " ifSpeed." . $interface['ifIndex'] . " 1.3.6.1.2.1.10.7.2.1." . $interface['ifIndex'];
   $snmp_cmd .= " ifType." . $interface['ifIndex'] . " ifMtu." . $interface['ifIndex'] . " ifPhysAddress." . $interface['ifIndex'];
@@ -32,7 +32,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   if($device['os'] == "IOS") {
 
-    $snmp_cmdb  = "snmpget -M /usr/share/snmp/mibs/ -m CISCO-VLAN-MEMBERSHIP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+    $snmp_cmdb  = "snmpget -M /usr/share/snmp/mibs/ -m CISCO-VLAN-MEMBERSHIP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.2.2.1.1.1." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.68.1.2.2.1.2." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.46.1.6.1.1.16." . $interface['ifIndex'];

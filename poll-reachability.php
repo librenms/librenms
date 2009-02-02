@@ -15,6 +15,7 @@ while ($device = mysql_fetch_array($device_query)) {
    $old_status = $device['status'];
    $community = $device['community'];
    $snmpver = $device['snmpver'];
+   $port = $device['port'];
 
    echo("$hostname\n");
 
@@ -22,10 +23,10 @@ while ($device = mysql_fetch_array($device_query)) {
    $status = trim($status);
 
    if(strstr($status, "alive")) {
-     $pos = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname sysDescr.0");
+     $pos = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
      if($pos == '') { 
        $status='0';
-       $posb = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4");
+       $posb = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname:$port 1.3.6.1.2.1.7526.2.4");
        if($posb == '') { } else { 
          $status='1'; 
        }
@@ -35,6 +36,7 @@ while ($device = mysql_fetch_array($device_query)) {
    } else {
      $status='0';
    }
+
 
    if($status != $device['status']) {
 

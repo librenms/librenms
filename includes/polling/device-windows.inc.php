@@ -22,7 +22,7 @@
    $oid_hrSystemProcesses    = ".1.3.6.1.2.1.25.1.6.0";
    $oid_hrSystemNumUsers     = ".1.3.6.1.2.1.25.1.5.0";
 
-   $s_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+   $s_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
    $s_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses $oid_hrSystemNumUsers";
    $s      = `$s_cmd`; 
    list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users) = explode("\n", $s);
@@ -97,12 +97,12 @@
    }
 
    $mem_get = "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
-   $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " " . $mem_get;
+   $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $mem_get;
    $mem_raw = `$mem_cmd`;
    list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", $mem_raw); 
 
    $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-   $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " " . $load_get;
+   $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
    $load_raw = `$load_cmd`;
    list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 

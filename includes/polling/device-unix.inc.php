@@ -42,12 +42,12 @@ if(is_file($Osysrrd) && !is_file($sysrrd)) { rename($Osysrrd, $sysrrd); echo("Mo
         list(,,$version) = explode (" ", $sysDescr);
         if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
         if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
-        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.2021.7890.1.101.1";
+        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port']. " .1.3.6.1.4.1.2021.7890.1.101.1";
         $features = trim(`$cmd`);
         $features = str_replace("No Such Object available on this agent at this OID", "", $features);
         $features = str_replace("\"", "", $features);
         // Detect Dell hardware via OpenManage SNMP
-        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
+        $cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
         $hw = trim(str_replace("\"", "", `$cmd`));
         if(strstr($hw, "No")) { unset($hw); } else { $hardware = "Dell " . $hw; }
       }
@@ -60,7 +60,7 @@ while ($dr = mysql_fetch_array($dq)) {
   $hrStorageAllocationUnits = $dr['hrStorageAllocationUnits'];
   $hrStorageSize = $dr['hrStorageAllocationUnits'] * $dr['hrStorageSize']; 
   $hrStorageDescr = $dr['hrStorageDescr'];
-  $cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " hrStorageUsed.$hrStorageIndex";
+  $cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageUsed.$hrStorageIndex";
   $used_units = trim(`$cmd`);
   $used = $used_units * $hrStorageAllocationUnits;
   $perc = round($used / $hrStorageSize * 100, 2);
@@ -120,7 +120,7 @@ $oid_ssCpuUser		  = ".1.3.6.1.4.1.2021.11.9.0";
 $oid_ssCpuSystem	  = ".1.3.6.1.4.1.2021.11.10.0";
 
 
-$cpu_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+$cpu_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
 $cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem .1.3.6.1.4.1.2021.1.101.1";
 $cpu  = `$cpu_cmd`;
@@ -209,12 +209,12 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
   } // end create load rrd
 
   $mem_get = "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
-  $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " " . $mem_get;
+  $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $mem_get;
   $mem_raw = `$mem_cmd`;
   list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", $mem_raw); 
 
   $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-  $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " " . $load_get;
+  $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
   $load_raw = `$load_cmd`;
   list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 

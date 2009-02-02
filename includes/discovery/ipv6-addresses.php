@@ -2,11 +2,11 @@
 
 echo("IPv6 Addresses : ");
 
-$ipv6interfaces = shell_exec($config['snmpget']." -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipv6Interfaces.0");
+$ipv6interfaces = shell_exec($config['snmpget']." -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipv6Interfaces.0");
 
 if($ipv6interfaces){
 
-  $oids = trim(trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq | grep -v No")));
+  $oids = trim(trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAddressIfIndex.ipv6 -Osq | grep -v No")));
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
   foreach(explode("\n", $oids) as $data) {
    if($data) {
@@ -25,8 +25,8 @@ if($ipv6interfaces){
       if($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
     }
 
-    $cidr = trim(shell_exec($config['snmpget']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." .1.3.6.1.2.1.4.34.1.5.2.16.$oid | sed 's/.*\.//'"));
-    $origin = trim(shell_exec($config['snmpget']." -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." .1.3.6.1.2.1.4.34.1.6.2.16.$oid"));
+    $cidr = trim(shell_exec($config['snmpget']." -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.5.2.16.$oid | sed 's/.*\.//'"));
+    $origin = trim(shell_exec($config['snmpget']." -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.6.2.16.$oid"));
 
     $network = trim(shell_exec($config['sipcalc']." $address/$cidr | grep Subnet | cut -f 2 -d '-'"));
     $comp    = trim(shell_exec($config['sipcalc']." $address/$cidr | grep Compressed | cut -f 2 -d '-'"));

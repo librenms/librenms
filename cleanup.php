@@ -13,8 +13,8 @@ $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
 
   $mask = trim(shell_exec($config['ipcalc'] . " ".$row['addr']."/".$row['cidr']." | grep Netmask: | cut -d \" \" -f 4"));
-  $response = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntIfIndex.$row[addr] | cut -d " " -f 2`);
-  $maskcheck = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname] ipAdEntNetMask.$row[addr] | cut -d " " -f 2`);
+  $response = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname]:$row[port] ipAdEntIfIndex.$row[addr] | cut -d " " -f 2`);
+  $maskcheck = trim(`snmpget -v2c -Osq -c $row[community] $row[hostname]:$row[port] ipAdEntNetMask.$row[addr] | cut -d " " -f 2`);
   if($response == $row['ifIndex'] && $mask == $maskcheck) {
   } else {
     mysql_query("delete from ipaddr where id = '$row[id]'");
@@ -26,7 +26,7 @@ $sql = "SELECT * FROM devices WHERE status = '1'";
 $query = mysql_query($sql);
 while($device = mysql_fetch_array($query)) {
   echo($device['hostname'] . " \n\n");
-  $oids = shell_exec("snmpwalk -v2c -c ".$device['community']." ".$device['hostname']." ipAddressIfIndex.ipv6 -Osq");
+  $oids = shell_exec("snmpwalk -v2c -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAddressIfIndex.ipv6 -Osq");
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
   unset($valid_ips);
   foreach(explode("\n", $oids) as $data) {
@@ -52,8 +52,9 @@ $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
   $index = $row[ifIndex];
   $hostname = $row['hostname'];
-  $community = $row['community'];
-  $response = trim(`snmpget -v2c -Osq -c $community $hostname ifIndex.$index | cut -d " " -f 2`);
+  $community = $row['community']; 
+  $port = $row['port'];
+  $response = trim(`snmpget -v2c -Osq -c $community $hostname:$port ifIndex.$index | cut -d " " -f 2`);
   if($response != $index) {
     mysql_query("DELETE from interfaces where interface_id = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '" . $row['interface_id'] . "'");

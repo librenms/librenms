@@ -60,11 +60,11 @@ function rrdtool_update($rrdfile, $rrdupdate) {
   return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
 }
 
-function getHostOS($hostname, $community, $snmpver) {
+function getHostOS($hostname, $community, $snmpver, $port) {
 
     global $config;
 
-    $sysDescr_cmd = $config['snmpget']." -O qv -" . $snmpver . " -c " . $community . " " . $hostname . " sysDescr.0";
+    $sysDescr_cmd = $config['snmpget']." -O qv -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " sysDescr.0";
     $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
     $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
@@ -362,16 +362,16 @@ function delHost($id)
 }
 
 
-function addHost($host, $community, $snmpver) 
+function addHost($host, $community, $snmpver, $port = 161) 
 {
   global $config;
   list($hostshort)      = explode(".", $host);
   if ( isDomainResolves($host)){
     if ( isPingable($host)) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
-        $snmphost = shell_exec($config['snmpget'] ." -Oqv -$snmpver -c $community $host sysName.0");
+        $snmphost = shell_exec($config['snmpget'] ." -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host) {
-          createHost ($host, $community, $snmpver);
+          createHost ($host, $community, $snmpver, $port);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
       } else { echo("Already got host $host\n"); }
     } else { echo("Could not ping $host\n"); }
@@ -481,13 +481,13 @@ function formatUptime($diff, $format="long")
   return "$uptime";
 }
 
-function isSNMPable($hostname, $community, $snmpver) 
+function isSNMPable($hostname, $community, $snmpver, $port) 
 {
      global $config;
-     $pos = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname sysDescr.0");
+     $pos = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
      if($pos == '') {
        $status='0';
-       $posb = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname 1.3.6.1.2.1.7526.2.4");
+       $posb = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname:$port 1.3.6.1.2.1.7526.2.4");
        if($posb == '') { } else { $status='1'; }
      } else {
        $status='1';
@@ -599,11 +599,11 @@ function fixIOSHardware($hardware){
 
 }
 
-function createHost ($host, $community, $snmpver){
+function createHost ($host, $community, $snmpver, $port = 161){
         $host = trim(strtolower($host));
-        $host_os = getHostOS($host, $community, $snmpver); 
+        $host_os = getHostOS($host, $community, $snmpver, $port); 
         if($host_os) {
-           $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `os`, `status`) VALUES ('$host', '$community', '$host_os', '1')");
+           $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `port`, `os`, `status`) VALUES ('$host', '$community', '$port', '$host_os', '1')");
            if(mysql_affected_rows()) {
              return("Created host : $host ($host_os)");
            } else { return FALSE; }

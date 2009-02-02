@@ -2,8 +2,8 @@
 
 echo("Fortinet Fortigate Poller\n");
 
-$fnSysVersion = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname']." fnSysVersion.0");
-$serial       = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname']." fnSysSerial.0");
+$fnSysVersion = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysVersion.0");
+$serial       = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysSerial.0");
 
 $version = preg_replace("/(.+)\ (.+),(.+),(.+)/", "Fortinet \\1||\\2||\\3||\\4", $fnSysVersion);
 list($hardware,$version,$features) = explode("||", $version);
