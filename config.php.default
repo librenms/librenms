@@ -53,7 +53,7 @@ $config['favicon'] = "favicon.ico";
 $config['header_color'] = "#1F334E";
 
 $config['page_refresh'] = "30";  ## Refresh the page every xx seconds
-$config['front_page'] = "pages/front/jt.php";
+$config['front_page'] = "pages/front/default.php";
 
 $config['email_default']  = "you@yourdomain";
 $config['email_from']     = "Observer <observer@yourdomain>";
