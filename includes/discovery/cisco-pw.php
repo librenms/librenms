@@ -5,7 +5,7 @@
 
   echo("PW : ");
 
-  $oids = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " cpwVcID");
+  $oids = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcID");
 
   $oids = str_replace(".1.3.6.1.4.1.9.10.106.1.2.1.10.", "", $oids);
 
@@ -14,8 +14,8 @@
    if($oid) {
     list($cpwOid, $cpwVcID) = explode(" ", $oid);
     if($cpwOid) {
-      list($cpw_remote_id) = split(":", shell_exec($config['snmpget'] . " -Ln -Osqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " cpwVcMplsPeerLdpID." . $cpwOid));
-      $interface_descr = trim(shell_exec("snmpwalk -Oqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " cpwVcName." . $cpwOid));
+      list($cpw_remote_id) = split(":", shell_exec($config['snmpget'] . " -Ln -Osqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcMplsPeerLdpID." . $cpwOid));
+      $interface_descr = trim(shell_exec("snmpwalk -Oqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcName." . $cpwOid));
       $cpw_remote_device = @mysql_result(mysql_query("SELECT device_id FROM ipaddr AS A, interfaces AS I WHERE A.addr = '".$cpw_remote_id."' AND A.interface_id = I.interface_id"),0);
       $if_id = @mysql_result(mysql_query("SELECT `interface_id` FROM `interfaces` WHERE `ifDescr` = '$interface_descr' AND `device_id` = '".$device['device_id']."'"),0);
       if($cpw_remote_device && $if_id) {

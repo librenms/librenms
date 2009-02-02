@@ -42,7 +42,7 @@ while ($device = mysql_fetch_array($device_query)) {
   $snmpable = FALSE;
 
   if($pingable) {
-    $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver']);
+    $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
     if($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
   }
 
@@ -56,11 +56,11 @@ while ($device = mysql_fetch_array($device_query)) {
     } else { 
       $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
     }
-    $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+    $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0";
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
-      $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'];
+      $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
       $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
       $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
       $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
@@ -71,7 +71,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
     list($sysUptime, $sysLocation, $sysContact) = explode("\n", $snmpdata);
-    $sysDescr = trim(shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'] . " sysDescr.0"));
+    $sysDescr = trim(shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
     list($days, $hours, $mins, $secs) = explode(":", $sysUptime);

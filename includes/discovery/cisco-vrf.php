@@ -4,7 +4,7 @@
 
   echo("VRF : ");
 
-  $oids = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " mplsVpnVrfRouteDistinguisher");
+  $oids = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher");
 
   $oids = str_replace(".1.3.6.1.3.118.1.2.2.1.3.", "", $oids);
   $oids = str_replace(" \"", "||", $oids);
@@ -14,9 +14,9 @@
   foreach ( explode("\n", $oids) as $oid ) {
    if($oid) {
     list($vrf['oid'], $vrf['mplsVpnVrfRouteDistinguisher']) = explode("||", $oid);
-    $vrf['name'] = shell_exec($config['snmpget'] . " -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']);
+    $vrf['name'] = shell_exec($config['snmpget'] . " -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']);
     list(,$vrf['name'],, $vrf['mplsVpnVrfRouteDistinguisher']) = explode("\"", $vrf['name']);
-    $vrf['mplsVpnVrfDescription'] = trim(shell_exec($config['snmpget'] . " -Ln -Osqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " mplsVpnVrfDescription.".$vrf['oid']));
+    $vrf['mplsVpnVrfDescription'] = trim(shell_exec($config['snmpget'] . " -Ln -Osqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfDescription.".$vrf['oid']));
 
     if(@mysql_result(mysql_query("SELECT count(*) FROM vrfs WHERE `device_id` = '".$device['device_id']."'
                                  AND `vrf_oid`='".$vrf['oid']."'"),0)) {
@@ -31,7 +31,7 @@
     $vrf_id = mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='".$vrf['oid']."'"),0);
     echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." Id: ($vrf_id) Descr: ".$vrf['mplsVpnVrfDescription']." ");
     $interfaces_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
-    $interfaces = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " $interfaces_oid");
+    $interfaces = shell_exec($config['snmpwalk'] . " -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $interfaces_oid");
     $interfaces = trim(str_replace($interfaces_oid . ".", "", $interfaces));
 #    list($interfaces) = explode(" ", $interfaces);
     echo(" ( ");

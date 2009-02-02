@@ -4,7 +4,7 @@
 
  if($config['enable_inventory']) {
 
-  $ents_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ";
+  $ents_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['$port'] . " ";
   $ents_cmd .= "1.3.6.1.2.1.47.1.1.1.1.2 | sed s/.1.3.6.1.2.1.47.1.1.1.1.2.//g | cut -f 1 -d\" \"";
 
   $ents  = trim(`$ents_cmd | grep -v o`);
@@ -12,7 +12,7 @@
  foreach(explode("\n", $ents) as $entPhysicalIndex) {
 
     $ent_data  = "snmpget -Ovqs -"; 
-    $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+    $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
     $ent_data .= " entPhysicalDescr." . $entPhysicalIndex;
     $ent_data .= " entPhysicalContainedIn." . $entPhysicalIndex;
     $ent_data .= " entPhysicalClass." . $entPhysicalIndex;

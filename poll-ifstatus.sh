@@ -1,6 +1,6 @@
-#!/usr/local/bin/bash
+#!/bin/bash
 
-cd /usr/local/network
+cd /opt/observer/
 ./poll-ifstatus.php 1 &
 ./poll-ifstatus.php 2 &
 ./poll-ifstatus.php 3 &

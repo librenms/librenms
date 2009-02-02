@@ -1,13 +1,15 @@
-#!/usr/local/bin/php
+#!/usr/bin/php
 <?php
   //
   // Interface Status Poller
   //
   
   include("config.php");
-  include("functions.php");
-  
-  $interface_query = mysql_query("SELECT *, I.id AS sqlid FROM `interfaces` AS I, `devices` AS D where I.host = D.id AND D.status = '1' AND I.id LIKE '%" . $argv[1] . "' ORDER BY I.id DESC");
+  include("includes/functions.php");
+
+  $interface_query = mysql_query("SELECT *, I.interface_id AS sqlid FROM `interfaces` AS I, `devices` AS D where I.device_id = D.device_id AND D.status = '1' AND I.device_id LIKE '%" . $argv[1] . "' ORDER BY I.device_id DESC");
+
+  var_dump($interface_query);
   while ($interface = mysql_fetch_array($interface_query)) {
       $hostname = $interface['hostname'];
       $host = $interface['host'];
@@ -22,7 +24,7 @@
       $old_mac = $interface['mac'];
       $old_up_admin = $interface['up_admin'];
       $snmpver = $interface['snmpver'];
-      $snmp_cmd = "snmpget -O qv -".$interface['snmpver']." -c ".$interface['community']." ".$interface['hostname']." ifDescr.$ifIndex ifAdminStatus.$ifIndex ifOperStatus.$ifIndex ";
+      $snmp_cmd = "snmpget -O qv -".$interface['snmpver']." -c ".$interface['community']." ".$interface['hostname'].":".$interface['port']." ifDescr.$ifIndex ifAdminStatus.$ifIndex ifOperStatus.$ifIndex ";
       $snmp_cmd .= "ifAlias.$ifIndex 1.3.6.1.2.1.10.7.2.1.$ifIndex ifName.$ifIndex";
       $snmp_output = trim(shell_exec($snmp_cmd));
       list($ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifDuplex, $ifName) = explode("\n", $snmp_output);

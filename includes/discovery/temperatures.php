@@ -3,13 +3,14 @@
   $hostname = $device['hostname'];
   $community = $device['community'];
   $snmpver = $device['snmpver'];
+  $port = $device['port'];
 
   echo("Temperatures : ");
 
   ## JunOS Temperatures
   if($device['os'] == "JunOS") {
     echo("JunOS ");
-    $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname 1.3.6.1.4.1.2636.3.1.13.1.7");
+    $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.2636.3.1.13.1.7");
     $oids = trim($oids);
     foreach(explode("\n", $oids) as $data) {
      $data = trim($data);
@@ -18,10 +19,10 @@
       list($oid) = explode(" ", $data);
       $temp_oid  = "1.3.6.1.4.1.2636.3.1.13.1.7.$oid";
       $descr_oid = "1.3.6.1.4.1.2636.3.1.13.1.5.$oid";
-      $descr = trim(shell_exec("snmpget -O qv -v2c -c $community $hostname $descr_oid"));
-      $temp = trim(shell_exec("snmpget -O qv -v2c -c $community $hostname $temp_oid"));
+      $descr = trim(shell_exec("snmpget -O qv -v2c -c $community $hostname:$port $descr_oid"));
+      $temp = trim(shell_exec("snmpget -O qv -v2c -c $community $hostname:$port $temp_oid"));
       if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") {
-        $descr = `snmpget -O qv -v2c -c $community $hostname $descr_oid`;
+        $descr = `snmpget -O qv -v2c -c $community $hostname:$port $descr_oid`;
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
@@ -40,12 +41,12 @@
   ## Begin Observer-Style
   if($device['os'] == "Linux") {
     echo("Observer-Style ");
-    $oids = `snmpwalk -$snmpver -Osqn -CI -c $community $hostname .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep ".1.1 " | grep -v ".101." | cut -d"." -f 1`;
+    $oids = `snmpwalk -$snmpver -Osqn -CI -c $community $hostname:$port .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep ".1.1 " | grep -v ".101." | cut -d"." -f 1`;
     $oids = trim($oids);
     foreach(explode("\n",$oids) as $oid) {
       $oid = trim($oid);
       if($oid != "") {
-        $descr = trim(str_replace("\"", "", `snmpget -v2c -Osqn -c $community $hostname .1.3.6.1.4.1.2021.7891.$oid.2.1 | sed s/.1.3.6.1.4.1.2021.7891.$oid.2.1\ //`));
+        $descr = trim(str_replace("\"", "", `snmpget -v2c -Osqn -c $community $hostname:$port .1.3.6.1.4.1.2021.7891.$oid.2.1 | sed s/.1.3.6.1.4.1.2021.7891.$oid.2.1\ //`));
         $fulloid = ".1.3.6.1.4.1.2021.7891.$oid.101.1";
         if(!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0)) {
           echo("+");
@@ -64,13 +65,13 @@
   ## Dell Temperatures
   if(strstr($device['hardware'], "Dell")) {
     echo("Dell OMSA ");
-    $oids = `snmpwalk -$snmpver -CI -Osqn -c $community $hostname .1.3.6.1.4.1.674.10892.1.700.20.1.8`;
+    $oids = `snmpwalk -$snmpver -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8`;
     $oids = trim($oids);
     foreach(explode("\n",$oids) as $oid) {
       $oid = substr(trim($oid), 36);
       list($oid) = explode(" ", $oid);
       if($oid != "") {
-        $descr = trim(str_replace("\"", "", `snmpget -v2c -Onvq -c $community $hostname .1.3.6.1.4.1.674.10892.1.700.20.1.8.$oid`));
+        $descr = trim(str_replace("\"", "", `snmpget -v2c -Onvq -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8.$oid`));
         $fulloid = ".1.3.6.1.4.1.674.10892.1.700.20.1.6.$oid";
         if(!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0)) {
           mysql_query("INSERT INTO `temperature` (`temp_host`,`temp_oid`,`temp_descr`, `temp_tenths`) VALUES ('$id', '$fulloid', '$descr', '1');");
@@ -90,7 +91,7 @@
   ## Cisco Temperatures
   if($device['os'] == "IOS") {
     echo("Cisco ");
-    $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname .1.3.6.1.4.1.9.9.13.1.3.1.2 | sed s/.1.3.6.1.4.1.9.9.13.1.3.1.2.//g");
+    $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.9.9.13.1.3.1.2 | sed s/.1.3.6.1.4.1.9.9.13.1.3.1.2.//g");
     $oids = trim($oids);
     foreach(explode("\n", $oids) as $data) {
      $data = trim($data);
@@ -98,10 +99,10 @@
       list($oid) = explode(" ", $data);
       $temp_oid  = ".1.3.6.1.4.1.9.9.13.1.3.1.3.$oid";
       $descr_oid = ".1.3.6.1.4.1.9.9.13.1.3.1.2.$oid";
-      $descr = `snmpget -O qv -v2c -c $community $hostname $descr_oid`;
-      $temp = `snmpget -O qv -v2c -c $community $hostname $temp_oid`;
+      $descr = `snmpget -O qv -v2c -c $community $hostname:$port $descr_oid`;
+      $temp = `snmpget -O qv -v2c -c $community $hostname:$port $temp_oid`;
       if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" ) {
-        $descr = `snmpget -O qv -v2c -c $community $hostname $descr_oid`;
+        $descr = `snmpget -O qv -v2c -c $community $hostname:$port $descr_oid`;
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);

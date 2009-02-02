@@ -27,7 +27,7 @@ if($device[os] != "Snom") {
   }
 
   if(!file_exists($rrdfile)) { `$rrd_create`; }
-  $snmpdata_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " $snmpstring";
+  $snmpdata_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
   $snmpdata     = trim(`$snmpdata_cmd`);
   $rrdupdate = "N";
   foreach(explode("\n", $snmpdata) as $data) {

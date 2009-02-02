@@ -4,7 +4,7 @@
 
    // Get SNOM specific version string from silly SNOM location. Silly SNOM!
 
-   $cmd      = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.2.1.7526.2.4";
+   $cmd      = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.2.1.7526.2.4";
    $sysDescr = `$cmd`;
    $sysDescr = str_replace("-", " ", $sysDescr);
    $sysDescr = str_replace("\"", "", $sysDescr);
@@ -12,8 +12,8 @@
 
    // Get data for calls and network from SNOM specific SNMP OIDs.
 
-   $cmda = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.2.1.7526.2.1.1 1.3.6.1.2.1.7526.2.1.2 1.3.6.1.2.1.7526.2.2.1 1.3.6.1.2.1.7526.2.2.2";
-   $cmdb = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " 1.3.6.1.2.1.7526.2.5 1.3.6.1.2.1.7526.2.6";
+   $cmda = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.2.1.7526.2.1.1 1.3.6.1.2.1.7526.2.1.2 1.3.6.1.2.1.7526.2.2.1 1.3.6.1.2.1.7526.2.2.2";
+   $cmdb = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.2.1.7526.2.5 1.3.6.1.2.1.7526.2.6";
    echo($cmda);
    $snmpdata = `$cmda`;
    $snmpdatab = `$cmdb`;

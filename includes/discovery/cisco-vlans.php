@@ -2,24 +2,24 @@
 
   echo("Cisco VLANs : ");
 
-  $vtpversion_cmd = $config['snmpget'] . " -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.9.9.46.1.1.1.0";
+  $vtpversion_cmd = $config['snmpget'] . " -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.1.1.0";
   $vtpversion = trim(`$vtpversion_cmd 2>/dev/null`);  
 
   if($vtpversion == '1' || $vtpversion == '2') { 
 
-    $vtp_domain_cmd = "snmpget -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " .1.3.6.1.4.1.9.9.46.1.2.1.1.2.1";
+    $vtp_domain_cmd = "snmpget -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.2.1.1.2.1";
     $vtp_domain = trim(str_replace("\"", "", `$vtp_domain_cmd 2>/dev/null`));
 
     echo("VTP v$vtpversion $vtp_domain ");
 
-    $vlans_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " ";
+    $vlans_cmd  = "snmpwalk -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $vlans_cmd .= "1.3.6.1.4.1.9.9.46.1.3.1.1.2.1 | sed s/.1.3.6.1.4.1.9.9.46.1.3.1.1.2.1.//g | cut -f 1 -d\" \"";
 
     $vlans  = trim(`$vlans_cmd | grep -v o`);
 
     foreach(explode("\n", $vlans) as $vlan) {
 
-      $vlan_descr_cmd  = "snmpget -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] . " "; 
+      $vlan_descr_cmd  = "snmpget -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " "; 
       $vlan_descr_cmd .= ".1.3.6.1.4.1.9.9.46.1.3.1.1.4.1." . $vlan;
       $vlan_descr = `$vlan_descr_cmd`;
 
