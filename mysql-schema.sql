@@ -564,3 +564,20 @@ CREATE TABLE IF NOT EXISTS `vrfs` (
   PRIMARY KEY  (`vrf_id`),
   KEY `device_id` (`device_id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `mac_accounting`
+--
+
+CREATE TABLE IF NOT EXISTS `mac_accounting` (
+  `ma_id` int(11) NOT NULL auto_increment,
+  `interface_id` int(11) NOT NULL,
+  `peer_ip` varchar(32) NOT NULL,
+  `peer_desc` varchar(64) NOT NULL,
+  `peer_asn` int(11) NOT NULL,
+  `peer_mac` varchar(32) NOT NULL,
+  `in_oid` varchar(128) NOT NULL,
+  `out_oid` varchar(128) NOT NULL,
+  PRIMARY KEY  (`ma_id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=703 ;
+
