@@ -52,6 +52,13 @@
     }
  
   echo("</span>");
+
+  echo("</td><td width=100>");
+
+  if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
+    echo("<a href='/?page=mac-accounting&id=".$interface['interface_id']."'><img src='/images/16/chart_curve.png' align='absmiddle'> Mac Acc</a>");
+  }
+
   echo("</td><td width=120>");
   if($interface['ifOperStatus'] == "up") {
 
