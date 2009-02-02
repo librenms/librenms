@@ -15,7 +15,14 @@ if($_GET['type']) {
     if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
     echo("<tr bgcolor='$bg'>
              <td><span class=list-large>" . generateiflink($interface,$interface['ifAlias']) . "</span><br /> 
-            <span class=interface-desc>".generatedevicelink($interface)." ".generateiflink($interface)." </span></td></tr><tr bgcolor='$bg'><td>");
+            <span class=interface-desc style='float: left;'>".generatedevicelink($interface)." ".generateiflink($interface)." </span>");
+
+    if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
+      echo("<span style='float: right;'><a href='/?page=mac-accounting&id=".$interface['interface_id']."'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");
+    }
+
+
+    echo("</td></tr><tr bgcolor='$bg'><td>");
 
 if(file_exists($rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
 

@@ -77,6 +77,12 @@
   case 'global_bits':
     $graph = graph_global_bits ("global_bits.png", $from, $to, $width, $height);
     break;
+  case 'mac_acc_int':
+    $graph = graph_mac_acc_interface ($_GET['if'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'mac_acc':
+    $graph = graph_mac_acc ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'device_bits':
     $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;  

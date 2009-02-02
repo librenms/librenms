@@ -89,7 +89,6 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
   return $imgfile;
 }
 
-
 function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
@@ -159,6 +158,101 @@ function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
   $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
+
+function graph_mac_acc ($id, $graph, $from, $to, $width, $height) {
+  global $config;
+  $imgfile = "graphs/" . "$graph";
+  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.ma_id = '".$id."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
+  $acc = mysql_fetch_array($query);
+
+  $database = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['peer_ip'] . ".rrd";  
+
+
+  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
+  if($height < "33") { $options .= " --only-graph"; }
+  $period = $to - $from;
+  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  if($height < "33") { $options .= " --only-graph"; }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:inoctets=$database:IN:AVERAGE";
+  $options .= " DEF:outoctets=$database:OUT:AVERAGE";
+  $options .= " CDEF:octets=inoctets,outoctets,+";
+  $options .= " CDEF:doutoctets=outoctets,-1,*";
+  $options .= " CDEF:inbits=inoctets,8,*";
+  $options .= " CDEF:outbits=outoctets,8,*";
+  $options .= " CDEF:doutbits=doutoctets,8,*";
+  $options .= " VDEF:totin=inoctets,TOTAL";
+  $options .= " VDEF:totout=outoctets,TOTAL";
+  $options .= " VDEF:tot=octets,TOTAL";
+  $options .= " VDEF:95thin=inbits,95,PERCENT";
+  $options .= " VDEF:95thout=outbits,95,PERCENT";
+  $options .= " VDEF:d95thout=doutbits,5,PERCENT";
+  $options .= " AREA:inbits#CDEB8B:";
+  $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\ \ \ 95th\ %\\\\n";
+  $options .= " LINE1.25:inbits#006600:In\ ";
+  $options .= " GPRINT:inbits:LAST:%6.2lf%s";
+  $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
+  $options .= " GPRINT:inbits:MAX:%6.2lf%s";
+  $options .= " GPRINT:95thin:%6.2lf%s\\\\n";
+  $options .= " AREA:doutbits#C3D9FF:";
+  $options .= " LINE1.25:doutbits#000099:Out";
+  $options .= " GPRINT:outbits:LAST:%6.2lf%s";
+  $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
+  $options .= " GPRINT:outbits:MAX:%6.2lf%s";
+  $options .= " GPRINT:95thout:%6.2lf%s\\\\n";
+  $options .= " GPRINT:tot:Total\ %6.2lf%s";
+  $options .= " GPRINT:totin:\(In\ %6.2lf%s";
+  $options .= " GPRINT:totout:Out\ %6.2lf%s\)\\\\l";
+  $options .= " LINE1:95thin#aa0000";
+  $options .= " LINE1:d95thout#aa0000";
+
+  #echo($config['rrdtool'] . " graph $imgfile $options");
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+
+
+function graph_mac_acc_interface ($interface, $graph, $from, $to, $width, $height) {
+  global $config, $installdir;
+  $imgfile = "graphs/" . "$graph";
+  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
+  if($height < "33") { $options .= " --only-graph"; }
+  $hostname = gethostbyid($device);
+  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '$interface' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
+  if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $pluses = "";
+  $options .= " COMMENT:'                                             In                    Out\\\\n'";
+  while($acc = mysql_fetch_array($query)) {
+   $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['peer_ip'] . ".rrd";
+   if(is_file($this_rrd)) { 
+    $this_id = str_replace(".", "", $acc['peer_ip']);
+    if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
+    } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
+    } elseif($iter=="7") {$colour="FF0084"; unset($iter); } else {$colour="C600C6";}
+    $descr = str_pad($acc['peer_desc'], 36);
+    $descr = substr($descr,0,36);
+    $options .= " DEF:in".$this_id."=$this_rrd:IN:AVERAGE ";
+    $options .= " DEF:out".$this_id."temp=$this_rrd:OUT:AVERAGE ";
+    $options .= " CDEF:out".$this_id."=out".$this_id."temp,-1,* ";
+    $options .= " CDEF:octets".$this_id."=in".$this_id.",out".$this_id."temp,+";
+    $options .= " VDEF:totin".$this_id."=in".$this_id.",TOTAL";
+    $options .= " VDEF:totout".$this_id."=out".$this_id."temp,TOTAL";
+    $options .= " VDEF:tot".$this_id."=octets".$this_id.",TOTAL";
+    $options .= " LINE1.25:in".$this_id."#" . $colour . ":'" . $descr . "'";
+    $options .= " LINE1.25:out".$this_id."#" . $colour . "::";
+    $options .= " GPRINT:in".$this_id.":LAST:%6.2lf%sbps";
+    $options .= " GPRINT:totin".$this_id.":\(%6.2lf%sB\)";
+    $options .= " GPRINT:out".$this_id."temp:LAST:%6.2lf%sbps";
+    $options .= " GPRINT:totout".$this_id.":\(%6.2lf%sB\)\\\\n";
+    $iter++;
+   }
+  }
+  #echo($config['rrdtool'] . " graph $imgfile $options");
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
 
 function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   global $config, $installdir;    
