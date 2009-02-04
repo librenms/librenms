@@ -137,6 +137,16 @@ if($config['enable_syslog']) { echo("
 </li>
 "); }
 
+if($_SESSION[userlevel] >= "5" && is_file($config['rancid_configs'] . $device['hostname'])) {
+  echo("
+<li class=" . $select['showconfig'] . ">
+  <a href='/device/" . $device['device_id'] . "/showconfig/'>
+    <img src='images/16/page_white_text.png' align=absmiddle border=0> Config
+  </a>
+</li>
+");
+}
+
 if($_SESSION[userlevel] >= "5") {
   echo("
 <li class=" . $select['edit'] . ">
