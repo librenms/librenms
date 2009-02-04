@@ -5,7 +5,7 @@ include("graphing/fortigate.php");
 include("graphing/windows.php");
 include("graphing/unix.php");
 
-function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $legend = '0') {
+function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '0') {
   global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
@@ -25,12 +25,16 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $le
       $i++;
     }
   }
-  $options .= " CDEF:inoctets=" . $in_thing . $pluses;
-  $options .= " CDEF:outoctets=" . $out_thing . $pluses;
+
+  if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+  
+  $options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
+  $options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
   $options .= " CDEF:doutoctets=outoctets,-1,*";
   $options .= " CDEF:inbits=inoctets,8,*";
   $options .= " CDEF:outbits=outoctets,8,*";
   $options .= " CDEF:doutbits=doutoctets,8,*";
+
   if($legend) {
    $options .= " AREA:inbits#CDEB8B:";
    $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\\\\n";
@@ -118,7 +122,7 @@ function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $
   return $imgfile;
 }
 
-function graph_device_bits ($device, $graph, $from, $to, $width, $height) {
+function graph_device_bits ($device, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
   global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
@@ -254,7 +258,7 @@ function graph_mac_acc_interface ($interface, $graph, $from, $to, $width, $heigh
 }
 
 
-function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
+function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertical, $inverse = '0', $legend = '1') {
   global $config, $installdir;    
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
@@ -262,8 +266,13 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   if($height < "33") { $options .= " --only-graph"; }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
-  $options .= " DEF:inoctets=$database:INOCTETS:AVERAGE";
-  $options .= " DEF:outoctets=$database:OUTOCTETS:AVERAGE";
+  if($inverse) {
+   $options .= " DEF:inoctets=$database:OUTOCTETS:AVERAGE";
+   $options .= " DEF:outoctets=$database:INOCTETS:AVERAGE";
+  } else {
+   $options .= " DEF:inoctets=$database:INOCTETS:AVERAGE";
+   $options .= " DEF:outoctets=$database:OUTOCTETS:AVERAGE";
+  }
   $options .= " CDEF:octets=inoctets,outoctets,+";
   $options .= " CDEF:doutoctets=outoctets,-1,*";
   $options .= " CDEF:inbits=inoctets,8,*";
@@ -275,6 +284,7 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " VDEF:95thin=inbits,95,PERCENT";
   $options .= " VDEF:95thout=outbits,95,PERCENT";
   $options .= " VDEF:d95thout=doutbits,5,PERCENT";
+  if ($legend) {
   $options .= " AREA:inbits#CDEB8B:";
   $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\ \ \ 95th\ %\\\\n";
   $options .= " LINE1.25:inbits#006600:In\ ";
@@ -293,6 +303,14 @@ function trafgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= " GPRINT:totout:Out\ %6.2lf%s\)\\\\l";
   $options .= " LINE1:95thin#aa0000";
   $options .= " LINE1:d95thout#aa0000";
+  } else {
+  $options .= " AREA:inbits#CDEB8B";
+  $options .= " LINE1.25:inbits#006600";
+  $options .= " AREA:doutbits#C3D9FF";
+  $options .= " LINE1.25:doutbits#000099";
+  $options .= " LINE1:95thin#aa0000";
+  $options .= " LINE1:d95thout#aa0000";
+  }
   $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }

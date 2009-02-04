@@ -26,6 +26,12 @@
     $device_id = getpeerhost($_GET['peer']);
   }
 
+  if($_GET['legend']) {
+    $legend = $_GET['legend'];
+  }
+  if($_GET['inverse']) {
+    $inverse = $_GET['inverse'];  
+  }
 
   if($device_id) {
     $hostname = gethostbyid($device_id);
@@ -63,7 +69,7 @@
     $graph = graph_netscreen_memory ($hostname . "/netscreen-memory.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'multi_bits':
-    $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height);
+    $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;
   case 'adsl_rate':
     $graph = graph_adsl_rate ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
@@ -87,7 +93,7 @@
     $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;  
   case 'bits':
-    $graph = trafgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = graph_bits ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;
   case 'pkts':
     $graph = pktsgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
