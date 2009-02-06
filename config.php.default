@@ -43,7 +43,7 @@ $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 $config['nets'] =  array ("10.0.0.0/8", "172.22.0.0/16");
 
 ### Your company domain name and specifics
-$config['mydomain'] = "project-observer.net";
+$config['mydomain'] = "observernms.net";
 $config['page_title']  = "Project Observer";
 $config['title_image'] = "images/observer-logo.jpg";
 $config['stylesheet']  = "css/styles.css"; 

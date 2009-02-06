@@ -4,7 +4,7 @@
 include("config.php");
 include("includes/functions.php");
 
-$dataHandle = fopen("http://www.project-observer.org/latest.php", r);
+$dataHandle = fopen("http://www.observernms.org/latest.php", r);
 
 if($dataHandle)
 {
