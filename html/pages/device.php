@@ -164,6 +164,7 @@ echo("
 
 include("pages/device/".mres($section).".inc.php");
 
+
 echo("</div>
 ");
 }

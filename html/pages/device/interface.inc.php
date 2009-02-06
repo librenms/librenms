@@ -1,10 +1,7 @@
 <?
 
-$interface_query = mysql_query("select * from interfaces WHERE interface_id = '$_GET[opta]'");
+$interface_query = mysql_query("select * from interfaces WHERE interface_id = '".$_GET['idb']."'");
 $interface = mysql_fetch_array($interface_query);
-
- $device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'");
- $device = mysql_fetch_array($device_query);
 
  $hostname = $device['hostname'];
  $hostid   = $device['interface_id'];
@@ -25,13 +22,13 @@ $interface = mysql_fetch_array($interface_query);
  $inf = fixifName($ifname);
 
  $bg="#ffffff";
- echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
- include("includes/device-header.inc");
- echo("</table>");
+# echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
+# include("includes/device-header.inc");
+# echo("</table>");
 
  $show_all = 1;
 
- echo("<div class=ifcell style='margin: 5px;'><table width=100% cellpadding=10 border=0 cellspacing=0>");
+ echo("<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>");
 
    include("includes/print-interface.inc");
 
