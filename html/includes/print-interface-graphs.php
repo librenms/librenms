@@ -4,6 +4,8 @@
 
   if(!$graph_type) { $graph_type = $_GET['type']; }
 
+  if(!$device) { $device['device_id'] = getifhost($interface['interface_id']); }
+
   $daily_traffic   = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=215&height=100";
   $daily_url       = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
 
