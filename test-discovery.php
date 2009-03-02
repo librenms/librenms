@@ -38,7 +38,10 @@ while ($device = mysql_fetch_array($device_query)) {
 
 #  include("includes/discovery/cisco-physical.php");
 #   include("includes/discovery/ipv6-addresses.php");
-   include("includes/discovery/cisco-pw.php");
+#   include("includes/discovery/cisco-pw.php");
+
+  include("includes/discovery/host-physical.php");
+
 
   echo("\n"); $devices_polled++;
 }

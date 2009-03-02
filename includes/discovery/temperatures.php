@@ -65,7 +65,7 @@
   ## Dell Temperatures
   if(strstr($device['hardware'], "Dell")) {
     echo("Dell OMSA ");
-    $oids = `snmpwalk -$snmpver -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8`;
+    $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8");
     $oids = trim($oids);
     foreach(explode("\n",$oids) as $oid) {
       $oid = substr(trim($oid), 36);

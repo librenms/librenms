@@ -57,7 +57,7 @@ while ($device = mysql_fetch_array($device_query)) {
       $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
     }
     $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0";
+    $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysName.0";
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
       $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
@@ -70,7 +70,7 @@ while ($device = mysql_fetch_array($device_query)) {
 #    $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
-    list($sysUptime, $sysLocation, $sysContact) = explode("\n", $snmpdata);
+    list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
     $sysDescr = trim(shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
@@ -166,6 +166,14 @@ while ($device = mysql_fetch_array($device_query)) {
   }
 
   echo("$update\n");
+
+  $sysName = strtolower($sysName);
+
+  if ( $sysName && $sysName != $device['sysName'] ) {
+    $update .= $seperator . "`sysName` = '$sysName'";
+    $seperator = ", ";
+    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysName -> $sysName')");
+  }
 
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
     $update .= $seperator . "`sysDescr` = '$sysDescr'";
