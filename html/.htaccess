@@ -19,8 +19,8 @@ RewriteRule ^interfaces/(.+)/ ?page=interfaces&type=$1
 
 RewriteRule ^bill/([0-9]+) ?page=bills&bill=$1
 
-RewriteRule ^device/([0-9]+)/([a-z]+)/([a-z]+)/([a-z]+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4
-RewriteRule ^device/([0-9]+)/([a-z]+)/([a-z]+)/ ?page=device&id=$1&section=$2&opta=$3
+RewriteRule ^device/([0-9]+)/([a-z]+)/([a-z]+)/([a-z|0-9]+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4
+RewriteRule ^device/([0-9]+)/([a-z]+)/([a-z|0-9]+)/ ?page=device&id=$1&section=$2&idb=$3
 RewriteRule ^device/([0-9]+)/([a-z]+)/ ?page=device&id=$1&section=$2
 RewriteRule ^device/([0-9]+) ?page=device&id=$1
 

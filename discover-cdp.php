@@ -4,24 +4,22 @@
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
   ini_set('log_errors', 1);
-  ini_set('error_reporting', E_ALL);
-
+  ini_set('error_reporting', E_WARNING);
 
 include("config.php");
 include("includes/functions.php");
 include("includes/cdp.inc.php");
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') ORDER BY `device_id` DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%bar%' ORDER BY `device_id` DESC");
 
 while ($device = mysql_fetch_array($device_query)) {
 
   $hostname = $device['hostname'];
   $community = $device['community'];
-  echo("Discovering $hostname \n");
   $id = $device['device_id'];
   $host = $id;
 
-  echo("Detecting CDP neighbours on $device[1]...\n");
+  echo("\nDetecting CDP neighbours on $device[1]...\n");
   $snmp = new snmpCDP($hostname, $community);
   $ports = $snmp->getports();
   $cdp = $snmp->explore_cdp($ports);
@@ -35,6 +33,9 @@ while ($device = mysql_fetch_array($device_query)) {
   }
         
   $cdp_links = trim($cdp_links);
+
+  echo("\n$cdp_links\n\n");
+
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
     list($src_host,$src_if, $dst_host, $dst_if) = explode(",", $link);
@@ -42,33 +43,39 @@ while ($device = mysql_fetch_array($device_query)) {
     $dst_if = strtolower($dst_if);
     $src_host = strtolower($src_host);
     $src_if = strtolower($src_if);
-    if ( isDomainResolves($dst_host . "." . $config['mydomain']) ) { 
-      $dst_host = $dst_host . "." . $config['mydomain']; 
-    }
+#    if ( isDomainResolves($dst_host . "." . $config['mydomain']) ) { 
+#      $dst_host = $dst_host . "." . $config['mydomain']; 
+#    }
     $ip = gethostbyname($dst_host);
     if ( match_network($config['nets'], $ip) ) {	   
-      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$dst_host'"), 0) == '0' ) {
-        createHost ($dst_host, $community, "v2c");
+      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '0' ) {
+        echo("++ Creating: $dst_host \n");
+        #createHost ($dst_host, $community, "v2c");
       } else { 
-        #echo("Already got host $dst_host\n"); 
+        echo(".. Already got host $dst_host\n"); 
       }
-    } else { echo("Bad DNS for $dst_host\n"); }
-    if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$dst_host'"), 0) == '1' && 
+    } else { 
+      #echo("!! Bad DNS for $dst_host\n"); 
+    }
+
+    if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '1' && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$src_host'"), 0) == '1' &&
-      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND hostname = '$dst_host' AND D.device_id = I.device_id"), 0) == '1' && 
+      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0) == '1' && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
-   {
-      $dst_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND hostname = '$dst_host' AND D.device_id = I.device_id"), 0);
+    {
+      $dst_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
       $src_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0);
       $linkalive[] = $src_if_id . "," . $dst_if_id;
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `dst_if` = '$dst_if_id' AND `src_if` = '$src_if_id'"),0) == '0') 
       { 
         $sql = "INSERT INTO `links` (`src_if`, `dst_if`, `cdp`) VALUES ('$src_if_id', '$dst_if_id', '1')";
         mysql_query($sql);
-        echo("Creating Link : $src_host $src_if -> $dst_host $dst_if\n");
+        echo("++ Creating Link : $src_host $src_if -> $dst_host $dst_if\n");
       } else { 
-        #echo("Link already exists : $src_host $src_if -> $dst_host $dst_if\n "); 
+        echo(".. Existing Link : $src_host $src_if -> $dst_host $dst_if\n "); 
       }
+    } else {
+
     } 
   }
 }

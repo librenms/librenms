@@ -71,20 +71,21 @@
       formatRates($interface['out_rate']) . "</span>");
     
   }
-  echo("</td><td width=70>");
+  echo("</td><td width=75Barbuda>");
   if($ifSpeed && $ifSpeed != "") { echo("<span class=box-desc>$ifSpeed</span>"); }
   echo("<br />");
 #  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 
-  if($device['os'] == "IOS") {
+  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
 
-    if($interface['ifTrunk']) { echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>"); 
-    } elseif ($interface['ifVlan']) { echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"); 
+    if($interface['ifTrunk']) { 
+      echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>"); 
+    } elseif ($interface['ifVlan']) { 
+      echo("<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"); 
     } elseif ($interface['ifVrf']) {
       $vrf = mysql_fetch_array(mysql_query("SELECT * FROM vrfs WHERE vrf_id = '".$interface['ifVrf']."'"));
       echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
-    }
-   
+    }   
 
   }
 

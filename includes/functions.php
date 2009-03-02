@@ -264,7 +264,8 @@ function generateiflink($interface, $text=0,$type=bits)
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
-  $link = "<a class=$class href='?page=interface&id=" . $interface['interface_id'] . "' ";
+  $device_id = getifhost($interface['interface_id']);
+  $link = "<a class=$class href='/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
   $link .= "<img src=\'$graph_url\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</span>";
   if($interface['ifAlias']) { $link .= "<br />" . $interface['ifAlias']; }
@@ -282,7 +283,7 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   $class = devclass($device);
   if(!$text) { $text = $device['hostname']; }
   $graph_url = "graph.php?host=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=cpu";
-  $link  = "<a class=$class href='?page=device&id=" . $device['device_id'] . "' ";
+  $link  = "<a class=$class href='/device/" . $device['device_id'] . "/' ";
   $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU Load</div>";
   $link .= "<img src=\'$graph_url\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">$text</a>";
   return $link;
@@ -603,7 +604,7 @@ function createHost ($host, $community, $snmpver, $port = 161){
         $host = trim(strtolower($host));
         $host_os = getHostOS($host, $community, $snmpver, $port); 
         if($host_os) {
-           $sql = mysql_query("INSERT INTO `devices` (`hostname`, `community`, `port`, `os`, `status`) VALUES ('$host', '$community', '$port', '$host_os', '1')");
+           $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1')");
            if(mysql_affected_rows()) {
              return("Created host : $host ($host_os)");
            } else { return FALSE; }
