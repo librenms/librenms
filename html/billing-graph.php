@@ -7,6 +7,8 @@
 
 include("../config.php");
 include("../includes/functions.php");
+include("includes/authenticate.inc");
+if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 require("includes/jpgraph/jpgraph.php");
 include("includes/jpgraph/jpgraph_line.php");
 include("includes/jpgraph/jpgraph_utils.inc.php");

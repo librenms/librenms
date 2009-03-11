@@ -9,8 +9,6 @@
   include("../config.php");
   include("../includes/functions.php");
   include("includes/authenticate.inc");
-
-
   if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   
 

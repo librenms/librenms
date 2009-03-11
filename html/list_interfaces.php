@@ -3,11 +3,7 @@
   include("../config.php");
   include("../includes/functions.php");
   include("includes/authenticate.inc");
-
-#  ini_set('display_errors', 1);
-#  ini_set('display_startup_errors', 1);
-#  ini_set('log_errors', 1);
-#  ini_set('error_reporting', E_ALL);
+  if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
 if(isset($_GET['device_id'])){
 
