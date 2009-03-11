@@ -1,21 +1,22 @@
 <?php
 
-if($_GET['opta'] == "graphs" || $_GET['opta'] == "graphs") {
+if($_GET['optb'] == "graphs" || $_GET['idb'] == "graphs") {
   $graphs = 1;
 } else {
   $graphs = 0;
 }
 
 echo("
-<div style='float: right; text-align: right;'>
-<a href='/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
-<a href='/device/" . $_GET['id'] . "/bgp/graphs/'>Graphs</a> 
+<div style='padding: 5px; height: 20px; clear: both; display: block;'>
+  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : " . $device['bgpLocalAs'] . "</div>
+  <div style='float: right; text-align: right;'>
+  <a href='/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
+  <a href='/device/" . $_GET['id'] . "/bgp/graphs/'>Graphs</a> 
+ </div>
 </div>");
 
 
    echo("<div style='margin: 5px;'><table border=0 cellspacing=1 cellpadding=5 width=100%>");
-
-   echo("<tr><td colspan=6><h2>Local AS : " . $device['bgpLocalAs'] . "</h2></td></tr>");
 
    $i = "1";
    $peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");

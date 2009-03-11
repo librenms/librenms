@@ -30,6 +30,13 @@ echo("
   </a>
 </li>");
 
+echo("<li class=" . $select['graphs'] . ">
+  <a href='/device/" . $device['device_id'] . "/graphs/'>
+    <img src='images/16/server_chart.png' align=absmiddle border=0> Graphs
+  </a>
+</li>
+");
+
 if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=" . $select['vlans'] . ">
@@ -76,18 +83,11 @@ if($_SESSION[userlevel] >= "5") {
   echo("
 <li class=" . $select['map'] . ">
   <a href='/device/" . $device['device_id'] . "/map/'>
-    <img src='images/16/chart_organisation.png' align=absmiddle border=0> Port Map
+    <img src='images/16/chart_organisation.png' align=absmiddle border=0> Map
   </a>
 </li>
 ");
 }
-
-echo("<li class=" . $select['graphs'] . ">
-  <a href='/device/" . $device['device_id'] . "/graphs/'>
-    <img src='images/16/server_chart.png' align=absmiddle border=0> Host Graphs
-  </a>
-</li>
-");
 
 if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
 
