@@ -3,7 +3,6 @@
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
-
 if($_GET[debug]) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
@@ -14,6 +13,8 @@ if($_GET[debug]) {
 include("../config.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc");
+if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
+
 
 if($_GET['query'] && $_GET['cmd']) {
   $host = $_GET['query'];
