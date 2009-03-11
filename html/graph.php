@@ -10,6 +10,10 @@
   include("../includes/functions.php");
   include("includes/authenticate.inc");
 
+
+  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+  
+
   if($_GET['params']) {
     list($_GET['host'], $_GET['if'], $_GET['from'], $_GET['to'], $_GET['width'], $_GET['height'], $_GET['title'], $_GET['vertical'], $_GET['type'], $_GET['interfaces']) = explode("||", mcrypt_ecb(MCRYPT_DES, $key_value, $_GET['params'], MCRYPT_DECRYPT));
   }
