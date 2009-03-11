@@ -28,7 +28,7 @@ echo("</div>");
 echo("<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>");
 
 
-echo("<h4>Device Permissions</h4>");
+echo("<h3>Device Permissions</h3>");
 
 if($_SESSION['userlevel'] == '10') { echo("<strong>Global Administrative Access</strong>"); }
 if($_SESSION['userlevel'] == '5')  { echo("<strong>Global Viewing Access</strong>"); }

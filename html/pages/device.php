@@ -72,6 +72,16 @@ if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE d
 </li>");
 }
 
+if($_SESSION[userlevel] >= "5") {
+  echo("
+<li class=" . $select['map'] . ">
+  <a href='/device/" . $device['device_id'] . "/map/'>
+    <img src='images/16/chart_organisation.png' align=absmiddle border=0> Port Map
+  </a>
+</li>
+");
+}
+
 echo("<li class=" . $select['graphs'] . ">
   <a href='/device/" . $device['device_id'] . "/graphs/'>
     <img src='images/16/server_chart.png' align=absmiddle border=0> Host Graphs
