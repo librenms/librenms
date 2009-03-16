@@ -8,9 +8,9 @@ $serial       = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c 
 $version = preg_replace("/(.+)\ (.+),(.+),(.+)/", "Fortinet \\1||\\2||\\3||\\4", $fnSysVersion);
 list($hardware,$version,$features) = explode("||", $version);
 
-$cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/fortigate-cpu.rrd";
-$memrrd   = $rrd_dir . "/" . $device['hostname'] . "/fortigate-memory.rrd";
-$sessrrd  = $rrd_dir . "/" . $device['hostname'] . "/fortigate-sessions.rrd";
+$cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-cpu.rrd";
+$memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-memory.rrd";
+$sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-sessions.rrd";
 
 $cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $cmd .= " fnSysCpuUsage.0 fnSysMemUsage.0 fnSysSesCount.0 fnSysMemCapacity.0";

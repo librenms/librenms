@@ -12,10 +12,7 @@ if($device[os] != "Snom") {
                  'tcpEstabResets','tcpInSegs','tcpOutSegs','tcpRetransSegs','udpInDatagrams','udpOutDatagrams','udpInErrors',
                  'udpNoPorts');
 
-  $rrdfile = $rrd_dir . "/" . $device['hostname'] . "/netinfo.rrd";
-
-  $Orrdfile = "rrd/" . $device['hostname'] . "-netinfo.rrd";
-  if(is_file($Orrdfile) && !is_file($rrdfile)) { rename($Orrdfile, $rrdfile); echo("Moving $Orrdfile to $rrdfile");  }
+  $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/netinfo.rrd";
 
   $rrd_create = "rrdtool create $rrdfile ";
   $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \

@@ -33,7 +33,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   $pingable = isPingable($device['hostname']);
 
-  $host_rrd = $rrd_dir . "/" . $device['hostname'];
+  $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
 
   if(!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
@@ -226,7 +226,7 @@ while ($device = mysql_fetch_array($device_query)) {
       mail($notify_email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
     }
 
-    $uptimerrd    = $rrd_dir . "/" . $device['hostname'] . "/uptime.rrd";
+    $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
 
     $old_uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
     if(is_file($old_uptimerrd) && !is_file($uptimerrd)) { rename($old_uptimerrd, $uptimerrd); echo("Moving $old_uptimerrd to $uptimerrd");  }

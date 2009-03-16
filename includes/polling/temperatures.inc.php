@@ -13,12 +13,6 @@ while($temperature = mysql_fetch_array($temp_data)) {
   $temprrd  = str_replace(")", "_", $temprrd);
   $temprrd  = str_replace("(", "_", $temprrd);
 
-  $otemprrd  = addslashes("rrd/" . $device['hostname'] . "-temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
-  $otemprrd  = str_replace(")", "_", $otemprrd);
-  $otemprrd  = str_replace("(", "_", $otemprrd);
-
-  if(is_file($otemprrd) && !is_file($temprrd)) { rename($otemprrd, $temprrd); echo("Moving $otemprrd to $temprrd");  }
-
   if (!is_file($temprrd)) {
     `rrdtool create $temprrd \
      --step 300 \

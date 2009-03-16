@@ -1,21 +1,9 @@
 <?php
 
-
-
-$Oloadrrd  = "rrd/" . $device['hostname'] . "-load.rrd";
-$Ocpurrd   = "rrd/" . $device['hostname'] . "-cpu.rrd";
-$Omemrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
-$Osysrrd   = "rrd/" . $device['hostname'] . "-sys.rrd";
-
-$loadrrd  = $rrd_dir . "/" . $device['hostname'] . "/load.rrd";
-$cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/cpu.rrd";
-$memrrd   = $rrd_dir . "/" . $device['hostname'] . "/mem.rrd";
-$sysrrd   = $rrd_dir . "/" . $device['hostname'] . "/sys.rrd";
-
-if(is_file($Oloadrrd) && !is_file($loadrrd)) { rename($Oloadrrd, $loadrrd); echo("Moving $Oloadrrd to $loadrrd");  }
-if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
-if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
-if(is_file($Osysrrd) && !is_file($sysrrd)) { rename($Osysrrd, $sysrrd); echo("Moving $Osysrrd to $sysrrd");  }
+$loadrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/load.rrd";
+$cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/cpu.rrd";
+$memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/mem.rrd";
+$sysrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/sys.rrd";
 
       if ($device['os'] == "FreeBSD") {
         $sysDescr = str_replace(" 0 ", " ", $sysDescr);
@@ -67,11 +55,7 @@ while ($dr = mysql_fetch_array($dq)) {
 
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
 
-  $storage_rrd  = $rrd_dir . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
-  $ostorage_rrd  = "rrd/" . $device['hostname'] . "-storage-" . $filedesc . ".rrd";
-
-  if(is_file($ostorage_rrd) && !is_file($storage_rrd)) { rename($ostorage_rrd, $storage_rrd); echo("Moving $ostorage_rrd to $storage_rrd");  }
-
+  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
 
   if (!is_file($storage_rrd)) {
     shell_exec($config['rrdtool'] . " create $storage_rrd \
