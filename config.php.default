@@ -10,11 +10,9 @@ $config['db_name'] = "observer";
 $config['install_dir'] 	= "/opt/observer/";
 $config['html_dir']	= $config['install_dir'] . "html";
 $config['rrd_dir'] 	= $config['install_dir'] . "rrd";
-$rrd_dir = $config['rrd_dir'];
 
 ### Default community
 $config['community'] = "observer";
-$community = $config['community'];
 
 $config['base_url'] = "http://observer";
 
@@ -39,16 +37,15 @@ $config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#E5E5E5",
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 
 
-### List of networks to allow scanning-based discovery.
+## List of networks to allow scanning-based discovery.
 $config['nets'] =  array ("10.0.0.0/8", "172.22.0.0/16");
 
-### Your company domain name and specifics
+## Your company domain name and specifics
 $config['mydomain'] = "observernms.net";
 $config['page_title']  = "Project Observer";
 $config['title_image'] = "images/observer-logo.jpg";
 $config['stylesheet']  = "css/styles.css"; 
 $config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
-$mono_font = $config['mono_font'];
 $config['favicon'] = "favicon.ico";
 $config['header_color'] = "#1F334E";
 
@@ -78,6 +75,8 @@ $config['enable_inventory']     = 1; # Enable Inventory
 
 ## Uncomment this to enable display of rancid-collected configs
 #$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
+$config['cdp_autocreate'] = false;    # Should we autocreate hosts we see via CDP?
+$config['snmp_autodiscovery'] = false;
 
 ## If a syslog entry contails these strings it is deleted from the database
 $config['syslog_filter'] = array("last message repeated", "Connection from UDP: [127.0.0.1]:"); 

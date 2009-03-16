@@ -208,7 +208,7 @@ echo("</td>");
      echo("</td></tr>");
 
      // If we're showing graphs, generate the graph and print the img tags
-     if($dographs && is_file($rrd_dir . "/" . $hostname . "/". $ifIndex . ".rrd")) {
+     if($dographs && is_file($config['rrd_dir'] . "/" . $hostname . "/". $ifIndex . ".rrd")) {
  
           $type = $_GET['type'];
 

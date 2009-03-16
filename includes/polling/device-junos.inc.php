@@ -11,7 +11,7 @@ $features = preg_replace("/.+\ \((.+)\)$/", "\\1", $jun_ver);
 
 echo("$hardware - $version - $features - $serial\n");
 
-$cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/junos-cpu.rrd";
+$cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junos-cpu.rrd";
 
 $cpu_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";

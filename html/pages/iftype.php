@@ -24,7 +24,7 @@ if($_GET['type']) {
 
     echo("</td></tr><tr bgcolor='$bg'><td>");
 
-if(file_exists($rrd_dir . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
+if(file_exists($config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
 
     $graph_type = "bits";
     include("includes/print-interface-graphs.php");

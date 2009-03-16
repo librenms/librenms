@@ -34,7 +34,7 @@ while ($device = mysql_fetch_array($device_query)) {
         
   $cdp_links = trim($cdp_links);
 
-  echo("\n$cdp_links\n\n");
+#  echo("\n$cdp_links\n\n");
 
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
@@ -49,8 +49,10 @@ while ($device = mysql_fetch_array($device_query)) {
     $ip = gethostbyname($dst_host);
     if ( match_network($config['nets'], $ip) ) {	   
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '0' ) {
-        echo("++ Creating: $dst_host \n");
-        #createHost ($dst_host, $community, "v2c");
+        if($config['cdp_autocreate']) {
+          echo("++ Creating: $dst_host \n");
+          createHost ($dst_host, $community, "v2c");
+        }
       } else { 
         echo(".. Already got host $dst_host\n"); 
       }
@@ -96,9 +98,9 @@ while($entry = mysql_fetch_array($query)) {
   }
   if (!$alive) { 
     mysql_query("DELETE FROM `links` WHERE `src_if` = '$entry[src_if]' AND `dst_if` = '$entry[dst_if]'"); 
-    echo("$src_if_id -> $dst_if_id REMOVED \n");
+#    echo("$src_if_id -> $dst_if_id REMOVED \n");
   } else {
-    echo("$src_if_id -> $dst_if_id VALID \n");
+#    echo("$src_if_id -> $dst_if_id VALID \n");
   }
 }
 

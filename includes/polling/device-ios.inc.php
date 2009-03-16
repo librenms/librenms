@@ -5,17 +5,9 @@
    $hostname = $device['hostname'];
    $port = $device['port'];
 
-   $Otemprrd  = "rrd/" . $hostname . "-temp.rrd";
-   $Ocpurrd   = "rrd/" . $hostname . "-cpu.rrd";
-   $Omemrrd   = "rrd/" . $hostname . "-mem.rrd";
-
-   $temprrd  = $rrd_dir . "/" . $hostname . "/temp.rrd";
-   $cpurrd   = $rrd_dir . "/" . $hostname . "/cpu.rrd";
-   $memrrd   = $rrd_dir . "/" . $hostname . "/mem.rrd";
-
-   if(is_file($Otemprrd) && !is_file($temprrd)) { rename($Otemprrd, $temprrd); echo("Moving $Otemprrd to $temprrd");  }
-   if(is_file($Ocpurrd) && !is_file($cpurrd)) { rename($Ocpurrd, $cpurrd); echo("Moving $Ocpurrd to $cpurrd");  }
-   if(is_file($Omemrrd) && !is_file($memrrd)) { rename($Omemrrd, $memrrd); echo("Moving $Omemrrd to $memrrd");  }
+   $temprrd  = $config['rrd_dir'] . "/" . $hostname . "/temp.rrd";
+   $cpurrd   = $config['rrd_dir'] . "/" . $hostname . "/cpu.rrd";
+   $memrrd   = $config['rrd_dir'] . "/" . $hostname . "/mem.rrd";
 
    $version = str_replace("Cisco IOS Software,", "", $sysDescr);
    $version = str_replace("IOS (tm) ", "", $version);

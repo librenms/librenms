@@ -20,7 +20,7 @@ while($peer = mysql_fetch_array($peers)) {
 
   list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
 
-  $peerrrd    = $rrd_dir . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
+  $peerrrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
 
   if(!is_file($peerrrd)) {
     $woo = `rrdtool create $peerrrd \
