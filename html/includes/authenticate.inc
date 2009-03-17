@@ -1,17 +1,8 @@
 <?php 
 
-function check_auth($username, $password) {
-  $encrypted = md5($password);
-  $sql = "select username, level, user_id from users where username='$username' and password='$encrypted'";
-  $query = mysql_query($sql);
-  $row = mysql_fetch_row($query);
-
-  if ($row[0] == $username) { return $row[1]; } else { return FALSE; }
-
-}
+session_start();
 
 if($_GET['logout']) {
-  session_start();
   $olduser = $_SESSION['username'];
   session_destroy();
   header('Location: /');
@@ -20,15 +11,16 @@ if($_GET['logout']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$olduser', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   $auth_message = "Logged Out";
 } else {
-
-  session_start();  
-
   if($_POST['username'] && $_POST['password']){
     $username = mres($_POST['username']);
     $password = mres($_POST['password']);
-    $userlevel = check_auth($username,$password);
-    if($userlevel) {
-      $_SESSION['userlevel'] = $userlevel;
+    $encrypted = md5($password);
+    $sql = "SELECT * FROM `users` WHERE `username`='$username' AND `password`='$encrypted'";
+    $query = mysql_query($sql);
+    $row = @mysql_fetch_array($query);
+    if($row['level']) {
+      $_SESSION['userlevel'] = $row['level'];
+      $_SESSION['user_id'] = $row['user_id'];
       $_SESSION['authenticated'] = true;
       $_SESSION['username'] = $username;
       mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'logged in')");
@@ -37,7 +29,6 @@ if($_GET['logout']) {
       $auth_message = "Authentication Failed"; 
       mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$username', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
     } 
-
   }
 }
 

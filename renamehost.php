@@ -15,7 +15,7 @@ if($argv[1] && $argv[2]) {
     echo("Host doesn't exist!\n");
   }
 } else {
-    echo("Host Rename Tool\nUsage: ./delhost.php <old hostname> <new hostname>\n");
+    echo("Host Rename Tool\nUsage: ./renamehost.php <old hostname> <new hostname>\n");
 }
 
 ?>

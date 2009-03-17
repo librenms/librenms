@@ -7,7 +7,7 @@
 include("config.php");
 include("includes/functions.php");
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` LIKE '%" . $argv[1] . "' ORDER BY `device_id` DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` LIKE '%" . $argv[1] . "' AND disabled = '0' ORDER BY `device_id` DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
    $id = $device['device_id'];
