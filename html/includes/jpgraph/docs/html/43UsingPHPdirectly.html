@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="421UsingtheJpGraphlibrarytosendbackimages.html">
+<LINK REL="Next" HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="421UsingtheJpGraphlibrarytosendbackimages.html">Previous</A>
+<A HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="4_3">4.3 Using PHP directly</A></H2>
+<P> It is also possible to generate images directly using the command
+ line version of PHP. This works the same way as the normal &quot;through the
+ browser&quot; generation with the exception that no HTTP headers will be
+ generated. Only the binary image data.</P>
+<P> Please make sure that you run the command line version of PHP (cli).
+ Using the CGI SAPI version will not work since then the HTTP headers
+ will be generated. Note: If the CGI version is used the generation of
+ headers may be suppressed by the '-q' option.</P>
+<P> You can easily check the version installed by running</P>
+<PRE>php --version</PRE>
+<P> you should then get a response with something like</P>
+<PRE>
+PHP 4.3.8 (cli) (built: Aug 29 2004 22:48:10)
+Copyright (c) 1997-2004 The PHP Group
+Zend Engine v1.3.0, Copyright (c) 1998-2004 Zend Technologies
+</PRE>
+<P> The important thing here is the</P>
+<PRE>(cli)</PRE>
+<P> marker. The JpGraph library check from what SAPI API it is invoked
+ from and adjusts the header generation accordingly.</P>
+<P> If all the above requirements are met then images can be generated
+ directly on the command line and stored in a suitable file. For example
+ by</P>
+<PRE>
+$&gt; php myimage.php &gt; image.png
+</PRE>
+<P> Please note that the file extension on the image file must match the
+ format in which the image is generated.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="421UsingtheJpGraphlibrarytosendbackimages.html">Previous</A>
+<A HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">Next</A>
+</BODY>
+</HTML>

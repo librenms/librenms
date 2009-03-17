@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="719Formattingtheaxis.html">
+<LINK REL="Next" HREF="7192Scientificstyleaxis.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="719Formattingtheaxis.html">Previous</A>
+<A HREF="7192Scientificstyleaxis.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_19_1">7.19.1  Standard two axis graphs</A></H3>
+<P> Assuming we start with the traditional two axis graph, one X and one
+ Y axis. You may then change the position of each axis by calling <A href="../ref/Axis.html#_AXIS_SETPOS">
+ Axis::SetPos($aPosition)</A> You have to remember that you need to
+ specify the position on the other axis. SO you need to specify the
+ world-coordinate for the position. By default the axis are each
+ positioned at the 0-point on the other axis, i.e. the axis will cross
+ at the 0,0 point in the graph.</P>
+<P> In addition to the standard positioning you may also use the two
+ special position markers &quot;min&quot; and &quot;max&quot;. This will position the axis
+ at the minimum (or maximum) position of the other axis.</P>
+<P> For example, to make sure that the X-axis is always at the bottom of
+ the graph (at lowest possible Y-value) you would have to add the line</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetPos</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;min&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> To change the color and width of the axis you have to make use of
+ the <A href="../ref/Axis.html#_AXIS_SETCOLOR"> Axis::SetColor()</A> and
+ <A href="../ref/Axis.html#_AXIS_SETWEIGHT"> Axis::SetWeight()</A>
+ methods.</P>
+<HR> <SMALL><STRONG> Invisible axis</STRONG> Even though JpGraph (1.7)
+ doesn't directly support &quot;hidden&quot; axis where the labels are still drawn
+ it is very easy to achieve this effect by setting the colors of the
+ axis to be the same as the background. See the example barintex2.php in
+ the Example directory. To completely hide an axis you can make use of
+ the <A href="../ref/Axis.html#_AXIS_HIDE"> Hide()</A></SMALL>
+<HR>
+<P> You might also want to add titles to the axis. This is done through
+ the <A href="../ref/Axis.html#_AXIS_SETTITLE"> Axis::SetTitle()</A>
+ method. This is actually just a shortcut for accessing the title
+ property direct. Axis::title::Set() which also allow you to set the
+ alignment in one call.</P>
+<P> By default the position of the title is to the far right for the
+ X-axis and in the middle (and 90 degrees rotated) for the Y-axis.</P>
+<P> You can adjust the position of the title with the help of the second
+ argument to the <A href="../ref/Axis.html#_AXIS_SETTITLE">
+ Axis::SetTitle()</A> method.</P>
+<P> The possible positions are &quot;high&quot;,&quot;middle&quot; and &quot;low&quot; which refers to
+ the scale values on the axis.</P>
+<P> One common modification you might want to do to the title is to
+ increase the margin between the axis and the actual title. This is
+ often necessary to do for the Y-axis if the values displayed are large.
+ You may adjust the distance (in pixels) between the axis and the title
+ by using the method <A href="../ref/Axis.html#_AXIS_SETTITLEMARGIN">
+ Axis::SetTitleMargin()</A></P>
+<P> So for example to increase the margin on the Y-axis you might add
+ the line</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">yaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetTitleMargin</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">40</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> to your code.</P>
+<P> Finally we mention something about the positioning of tick marks and
+ labels on the axis. You have the possibility to choose what side of the
+ axis the tick marks and the labels should be at. For the X-axis this
+ can be specified as either on the the top (inside the plot area) or at
+ bottom (outside of the plotarea). In the same way you can specify for
+ the Y-axis if the labels ( or ticks) should be on the left or right
+ side.</P>
+<P> To adjust the label positioning you have to use the method <A href="../ref/Axis.html#_AXIS_SETTITLESIDE">
+ Axis::SetTitleSide()</A> and to adjust the position of the tick mark
+ you have to use the method <A href="../ref/Axis.html#_AXIS_SETTICKSIDE">
+ SetTickSide()</A><DIV class="note"><B>Note:</B> There is also an alias
+ for this method, SetTickDirection() which is deprecated from version
+ 1.7 but kept for backwards compatibility.</DIV> Valid arguments for
+ these methods are</P>
+<UL>
+<LI> SIDE_UP</LI>
+<LI> SIDE_DOWN</LI>
+<LI> SIDE_LEFT</LI>
+<LI> SIDE_RIGHT</LI>
+</UL>
+<P> For example, the following lines added to a script would change side
+ of the labels and tickmarks for the X-axis.</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetLabelPos</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">SIDE_UP</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTickSide</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+SIDE_DOWN</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P> This technique is for example used if you position the X-axis at the
+ top of the graph as the following example shows.<DIV class="example">
+<BR> <A href="exframes/frame_topxaxisex1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/topxaxisex1.png" WIDTH="400"></A>
+<BR><B>Figure 97:</B> Example of both how to adjust the position of the
+ X-axis as well as adjusting the side for the tick and axis title <A href="exframes/frame_topxaxisex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="719Formattingtheaxis.html">Previous</A>
+<A HREF="7192Scientificstyleaxis.html">Next</A>
+</BODY>
+</HTML>

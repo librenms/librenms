@@ -1,0 +1,161 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_CANVASSCALE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>CanvasScale</b></div>
+<i>(Defined in: jpgraph_canvtools.php : 24)</i><table border=1><tr><td>&nbsp;<a href="CanvasScale.html" style="font-family:arial;font-weight:bold;color:darkblue;">CanvasScale</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="CanvasScale.html#_CANVASSCALE_CANVASSCALE">CanvasScale()</a>&nbsp;<br>
+&nbsp;<a href="CanvasScale.html#_CANVASSCALE_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="CanvasScale.html#_CANVASSCALE_TRANSLATE">Translate()</a>&nbsp;<br>
+&nbsp;<a href="CanvasScale.html#_CANVASSCALE_TRANSLATEX">TranslateX()</a>&nbsp;<br>
+&nbsp;<a href="CanvasScale.html#_CANVASSCALE_TRANSLATEY">TranslateY()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class defines a scale which is meant to be used with canvas graphs to make it possibles to pecify a more convinient scale compared to absoilute pixels coordinates. 
+<br>
+This will also let you scale the canvas without any coordinate changes. <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_CANVASSCALE_CANVASSCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;CanvasScale(&amp;$graph,$xmin,$xmax,$ymin,$ymax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Define a scale for canvas  graphs</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$graph</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Canvas graph</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xmin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Min X-value for scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xmax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Max X-value for scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ymin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Min Y-value for scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ymax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Max Y-value for scale</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Define a scale for canvas graphs. Note the scale values is optionally in this call. The may be later set witha  call to the Set() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="CanvasScale.html#_CANVASSCALE_SET">CanvasScale::Set</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_CANVASSCALE_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($xmin,$xmax,$ymin,$ymax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify scale to use</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xmin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Min X value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xmax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Max X-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ymin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Min Y-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ymax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Max Y-value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>SPecify min/max values for scale.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas&nbsp;we&nbsp;can&nbsp;work&nbsp;<br />$g&nbsp;=&nbsp;new&nbsp;CanvasGraph(400,200,'auto');<br />$g-&gt;SetMargin(5,11,6,11);<br />$g-&gt;SetShadow();<br />$g-&gt;SetMarginColor("teal");<br /><br />//&nbsp;We&nbsp;need&nbsp;to&nbsp;stroke&nbsp;the&nbsp;plotarea&nbsp;and&nbsp;margin&nbsp;before&nbsp;we&nbsp;add&nbsp;the<br />//&nbsp;text&nbsp;since&nbsp;we&nbsp;otherwise&nbsp;would&nbsp;overwrite&nbsp;the&nbsp;text.<br />$g-&gt;InitFrame();<br /><br />//&nbsp;Create&nbsp;a&nbsp;new&nbsp;scale<br />$scale&nbsp;=&nbsp;new&nbsp;CanvasScale($g);<br />$scale-&gt;Set(0,$xmax,0,$ymax);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_CANVASSCALE_TRANSLATE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Translate($x,$y)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Translate a point to absolute screen coordinates</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Translate a point to absolute screen coordinates&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="CanvasScale.html#_CANVASSCALE_TRANSLATEX">CanvasScale::TranslateX</a> and <a href="CanvasScale.html#_CANVASSCALE_TRANSLATEY">CanvasScale::TranslateY</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+list($xt,$yt)&nbsp;=&nbsp;$scale-&gt;Translate($x,$y);<br />$graph-&gt;img-&gt;Point($xt,$yt);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_CANVASSCALE_TRANSLATEX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;TranslateX($x)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Translate X-coordinate</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Translate X-value into absolute screen coordinates&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="CanvasScale.html#_CANVASSCALE_TRANSLATE">CanvasScale::Translate</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_CANVASSCALE_TRANSLATEY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;TranslateY($y)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Translate Y-value to absolute screen coordinates</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Translate Y-value to absolute screen coordinates&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="CanvasScale.html#_CANVASSCALE_TRANSLATE">CanvasScale::Translate</a><p> <hr> <p>

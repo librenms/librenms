@@ -1,0 +1,135 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_STOCKPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>StockPlot</b> EXTENDS <a href="Plot .html#_C_PLOT " style="font-face:arial;font-weight:bold;">Plot </a></div>
+<i>(Defined in: jpgraph_stock.php : 15)</i><table border=1><tr><td>&nbsp;<a href="StockPlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">StockPlot</a>&nbsp;</td><td>&nbsp;<a href="Plot .html" style="font-family:arial;font-weight:bold;color:darkblue;">Plot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="StockPlot.html#_STOCKPLOT_HIDEENDLINES">HideEndLines()</a>&nbsp;<br>
+&nbsp;<a href="StockPlot.html#_STOCKPLOT_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="StockPlot.html#_STOCKPLOT_SETWIDTH">SetWidth()</a>&nbsp;<br>
+&nbsp;<a href="StockPlot.html#_STOCKPLOT_STOCKPLOT">StockPlot()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Create a stock chart graph, aka Candle-chart, aka Box-graph. 
+Each data point is represented by four values
+(open,close,min,max)
+
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_STOCKPLOT_HIDEENDLINES"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;HideEndLines($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Show horizontal mark lines at the end of min/max lines</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Flag true=show end lines</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Show horizontal mark lines at the end of min/max lines. This is enabled by default.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$stock-&gt;HideEndLines();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_STOCKPLOT_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor,$aColor1,$aColor2,$aColor3)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify colors for the stock plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Line color for positive bars</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'white'</font>
+</td><td>Fill color for positive bars</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'darkred'</font>
+</td><td>Line color for negative bars</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor3</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'darkred'</font>
+</td><td>Fill color for negative bars</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the colros for a stock chart. A positive bar is defined as a bar where close > open. A negative bar is defined as a bar where close < open.
+
+The positive line color is always used for the min/max lines.
+
+By default positve colors are black and white. Negative colors are 'red' and 'red'.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$stockplot-&gt;SetColor('black','white','red','red');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_STOCKPLOT_SETWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWidth($aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify width for stock bars in pixels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify width for stock bars in pixels&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$stockplot-&gt;SetWidth(8);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_STOCKPLOT_STOCKPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;StockPlot(&amp;$datay,$datax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor for Stock plots</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$datay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y data array</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>X data array</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new Stock data plot. Each data value consists of 4 data points. (open,close,min,max)
+
+If the $ydata isn't an even number of data quadruples an error message will result.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ydata&nbsp;=&nbsp;array(&nbsp;....&nbsp;)<br />$stockplot&nbsp;=&nbsp;new&nbsp;StockPlot($ydata);<br /></font>
+</span><br>
+<p> <hr> <p>

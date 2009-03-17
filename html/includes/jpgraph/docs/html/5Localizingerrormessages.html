@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="483Themecolorsforpies.html">
+<LINK REL="Next" HREF="51Thespecialprodlocale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="483Themecolorsforpies.html">Previous</A>
+<A HREF="51Thespecialprodlocale.html">Next</A>
+<HR NOSHADE>
+<H1><A NAME="5">5 Localizing error messages</A></H1>
+<P> The library has a quite extensive set of error messages to give
+ hints and catch erroneous input to many of the controlling methods and
+ also do sanity check on the data to be plotted.</P>
+<P> All error messages are collected in resource files which are
+ localized to a specific language. All resource files are located under
+ the &quot;lang/&quot; directory in the JpGraph installation directory. The
+ deafult locale to be used is defined in the configuration file with the
+ setting DEFAULT_ERR_LOCALE in the distribution this is set to English
+ locale.</P>
+<P> The chosen locale is specified in the beginning of the script with a
+ call to the static method<I> JpGraphError::SetErrLocale()</I>. The
+ argument to this method is the ISO naming of the country/language to be
+ selected. For example to enable the special production locale the
+ following line should be added in the beginning of the script</P>
+<PRE>
+JpGraphError::SetErrLocale('prod');
+</PRE>
+ If an unknown or unsupported locale is given the error message will
+ default to English.<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="483Themecolorsforpies.html">Previous</A>
+<A HREF="51Thespecialprodlocale.html">Next</A>
+</BODY>
+</HTML>

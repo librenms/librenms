@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="48SpecifyingcolorsinJpGraph.html">
+<LINK REL="Next" HREF="482Availablenamedcolors.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="48SpecifyingcolorsinJpGraph.html">Previous</A>
+<A HREF="482Availablenamedcolors.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="4_8_1">4.8.1 Adjusting the transparency</A></H3>
+<P> From version 1.10 JpGraph also supports the use of Alpha Blending
+ together with GD2.x This lets you specify how much of the underlying
+ color should be visible. You specify the amount of transparency for a
+ color by adding an extra parameter to the color specification separated
+ by an '@' (at) character.</P>
+<P> For example to specify a red color which is 40% transparent you
+ write<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;red@0.4&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> or to specify 90% transparancy you write<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;red@0.9&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> Below is an example of how a bar graph with a background image can
+ make use of transparency
+<!--?
+Example('alphabarex1','Using alpha blending in a bar graph');
+?-->
+</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="48SpecifyingcolorsinJpGraph.html">Previous</A>
+<A HREF="482Availablenamedcolors.html">Next</A>
+</BODY>
+</HTML>

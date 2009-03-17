@@ -1,0 +1,117 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_ICONIMAGE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>IconImage</b></div>
+<i>(Defined in: jpgraph_gantt.php : 1434)</i><table border=1><tr><td>&nbsp;<a href="IconImage.html" style="font-family:arial;font-weight:bold;color:darkblue;">IconImage</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="IconImage.html#_ICONIMAGE_ICONIMAGE">IconImage()</a>&nbsp;<br>
+&nbsp;<a href="IconImage.html#_ICONIMAGE_SETALIGN">SetAlign()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Icon object to be used in a title for a Gantt plot object, e.g. bar or milestones.
+<p>
+The icons are then used exactly as you would use text strings when specifying a title for the gantt object. For example:
+<code>
+$icon = new IconImage(GICON_WARNING,0.7);
+$titles = array($icon,'65 days','3 Aug','5 sep');
+$bar = new GanttBar(0,$titles,$startdat,$enddate);
+...
+</code>
+<p>
+<b>Hint:</b> When using icons togehter with titles the height of each bar is not affected (by design!) of the icons height. If you are using icons in several rows it might therefore be usefull to increase the vertical margin factor between each row. This is done by a call to the method GanttGarph::SetVMarginFactor() <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ICONIMAGE_ICONIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;IconImage($aIcon,$aScale)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new icon for use in Gantt title columns</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aIcon</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Icon specification. Either an image file or one of the builtin icons</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Scale of icon</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new icon object to be used in a title for a Gantt plot object, e.g. bar or milestones.
+<p>
+An icon can either be created from an arbitrary image file (type is determined by the file extension) or it can also be one of the builtin icons. The builtin icons are:
+<ul>
+<li>GICON_WARNINGRED
+<li>GICON_TEXT
+<li>GICON_ENDCONS
+<li>GICON_MAIL
+<li>GICON_STARTCONS
+<li>GICON_CALC
+<li>GICON_MAGNIFIER
+<li>GICON_LOCK
+<li>GICON_STOP
+<li>GICON_WARNINGYELLOW
+<li>GICON_FOLDEROPEN
+<li>GICON_FOLDER
+<li>GICON_TEXTIMPORTANT
+</ul>
+<p>
+A graphic illustration of the differenmt icons can be found in the manual.
+<p>
+The second argument specifies an optional scaling factor for the image/builtin icon.
+<p>
+The icons are then used exactly as you would use text strings when specifying a title for the gantt object. For example:
+<code>
+$icon = new IconImage(GICON_WARNING,0.7);
+$titles = array($icon,'65 days','3 Aug','5 sep');
+$bar = new GanttBar(0,$titles,$startdat,$enddate);
+...
+</code>
+<p>
+<b>Hint:</b> When using icons togehter with titles the height of each bar is not affected (by design!) of the icons height. If you are using icons in several rows it might therefore be usefull to increase the vertical margin factor between each row. This is done by a call to the method GanttGarph::SetVMarginFactor()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttGraph.html#_GANTTGRAPH_SETVMARGINFACTOR">GanttGraph::SetVMarginFactor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Creating&nbsp;an&nbsp;icon&nbsp;from&nbsp;an&nbsp;image&nbsp;file&nbsp;and&nbsp;scaling&nbsp;it&nbsp;to&nbsp;70%<br />//&nbsp;of&nbsp;original&nbsp;size<br />$icon&nbsp;=&nbsp;new&nbsp;IconImage("smiley.png",0.7);<br /><br />//&nbsp;Using&nbsp;on&nbsp;of&nbsp;the&nbsp;bultin&nbsp;icons<br />$icon&nbsp;=&nbsp;new&nbsp;IconImage(GICON_TEXT,0.8);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ICONIMAGE_SETALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlign($aX,$aY)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify anchor point for icon</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aX</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'left'</font>
+</td><td>Horizontal anchor point</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Vertical anchor point</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify where the anchor point for the icon should be. valid anchor points (for both hor and ver - directions) are:
+<ul>
+<li>"left"
+<li>"center"
+<li>"right"
+</ul>
+The anchor points determines what position on the icon shoudl be aligned with the specifed x,y position for the icon.
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$icon&nbsp;=&nbsp;new&nbsp;IconImage("../smiley.png",0.7);<br />$icon-&gt;SetAlign('center','center');<br /></font>
+</span><br>
+<p> <hr> <p>

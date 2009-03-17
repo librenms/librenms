@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="81Radarplots.html">
+<LINK REL="Next" HREF="812Specifyingtitlesfortheaxisandlegendsfortheplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="81Radarplots.html">Previous</A>
+<A HREF="812Specifyingtitlesfortheaxisandlegendsfortheplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_1">8.1.1 Simple radar plots</A></H3>
+<P> Let's start by creating a very simple radar plot based on 5 data
+ points using mostly default values.</P>
+<P> As the first thing you must remember to include the extension module
+ that contains the radar plot. &quot;jpgraph_radar.php&quot;.</P>
+<P> A very simple radar plot is created by the code<DIV class="phpscript">
+(File: radarex1.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#007700">include&nbsp;(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>include&nbsp;(</FONT><FONT color="#DD0000">&quot;../jpgraph_radar.php&quot;</FONT><FONT
+color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;
+<BR></FONT><FONT color="#FF8000">//&nbsp;Some&nbsp;data&nbsp;to&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$data&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array(</FONT><FONT color="#0000BB">55</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">80</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+46</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">71</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">95</FONT><FONT color="#007700">
+);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;graph&nbsp;and&nbsp;the&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">RadarGraph</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">250</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">200</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;auto&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">RadarPlot</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$data</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;the&nbsp;plot&nbsp;and&nbsp;display&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$plot</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">?&gt;</FONT></FONT></CODE></DIV></P>
+<P> and would give the result<DIV class="example">
+<BR> <A href="exframes/frame_radarex1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/radarex1.png" WIDTH="250"></A>
+<BR><B>Figure 115:</B> A first very simple radar plot using default
+ settings <A href="exframes/frame_radarex1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P> To change the size and position of the radar graph is similar to the
+ pie plot and you do it by using the methods <A href="../ref/SpiderGraph.html#_SPIDERGRAPH_SETSIZE">
+ SetSize()</A> and <A href="../ref/SpiderGraph.html#_SPIDERGRAPH_SETCENTER">
+ SetCenter()</A></P>
+<P> If you want a filled radar plot you need to specify the fill color
+ with the method <A href="../ref/SpiderPlot.html#_SPIDERPLOT_SETFILLCOLOR">
+ SetFillColor()</A> The following example shows these methods in action<DIV
+class="example">
+<BR> <A href="exframes/frame_radarex2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/radarex2.png" WIDTH="300"></A>
+<BR><B>Figure 116:</B> Changing size, position and adding fill color to
+ the radar plot. <A href="exframes/frame_radarex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="81Radarplots.html">Previous</A>
+<A HREF="812Specifyingtitlesfortheaxisandlegendsfortheplots.html">Next</A>
+</BODY>
+</HTML>

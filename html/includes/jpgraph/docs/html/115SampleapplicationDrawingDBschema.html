@@ -1,0 +1,432 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="114Usingacanvasscale.html">
+<LINK REL="Next" HREF="12AntiSpamChallenges.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="114Usingacanvasscale.html">Previous</A>
+<A HREF="12AntiSpamChallenges.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="11_5">11.5 Sample application: Drawing DB schema</A></H2>
+<P> As a final example we shortly discuss how the canvas type of graph
+ was used to generate the DB schema for the DDDA architecture.</P>
+<P> The library php file &quot;utils/misc/imgdbschema.php&quot; included in the
+ distribution contains some utility classes to make the drawing of table
+ schemes easier. It contains two basic classes, Class ImgDBTable and
+ Class ImgDBSchema. The first class understand how to draw an image
+ illustrating a single table. The second class is responsible for
+ automatically extract all the relevant information from a DB to draw a
+ complete DB Schema.</P>
+<P> Before going into this a little bit more we show what an example of
+ this might look like.<DIV class="example">
+<BR> <A href="exframes/frame_dbschemaex1.html" target="blank"><IMG border="0"
+HEIGHT="750"  src="img/dbschemaex1.png" WIDTH="600"></A>
+<BR><B>Figure 190:</B> Example of using the canvas graph style together
+ with the imgdbschema.php library to semi-automatically generate a DB
+ schema <A href="exframes/frame_dbschemaex1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Before going on it should be noted that the ImgDBSchema assumes that
+ the DB can be accessed through a DB abstraction layer modeled after the
+ abstraction layer available in the 'jpdb.php' file in the DDDA
+ architecture. This abstraction layer assumes a MySQL database in the
+ bottom. This specific dependency of this particular abstraction layer
+ is the reason why these classes is not included in the generic canvas
+ tools file.</P>
+<P> The second thing to note is that this library does not contain a
+ complete automatic-layout engine but rather a very simple automatic
+ system which, if nothing else is specified, just puts the table in a
+ rectangular grid. A complete graph layout engine would simple be to
+ much to write in this context. This is also a very difficult
+ optimization problem and sofar not even any of the available research
+ programs that tries this can achieve a satisfactory layout without
+ manual intervention.</P>
+<P> The critical lines in the code to generate the above graph is<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$tblposadj</FONT><FONT
+color="#007700">=array(</FONT><FONT color="#0000BB">$tlo</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">
+$tlo</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">2</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">*</FONT><FONT
+color="#0000BB">$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">
+$tlo</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">4</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,-</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">16</FONT><FONT color="#007700">,-</FONT><FONT color="#0000BB">
+1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">16</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$dbschema&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">ImgDBSchema</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;jpgraph_doc&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;FormatTblName&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;FormatFldName&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$leftm</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$topm</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetTableWidth</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$tblwidth</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+img</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$tblposadj</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> The rest of the code in the file is just to setup the canvas, add an
+ indented rectangle to group some tables and generate a footer with the
+ date and time this image was generated.</P>
+<P> The first line instantiates a new ImgDBSCheme layout engine asking
+ it to draw an image for the database 'jpgraph_doc'. The following two
+ arguments specify two callback functions for formatting the text for
+ header and each field in a table.</P>
+<P> The next line specify the top left margin where the drawing of the
+ tables should be started.</P>
+<P> The third line specify the width of a single table. The final lines
+ starts the engine and draws all tables in the database to the canvas.
+ The final argument requires some further explanation. This is an offset
+ (x,y) from the top left corner how each individual table should be
+ positioned. If the value is -1 indicates that the default value should
+ be used. If this array is not specified then the tables will simple
+ arranged line by line.</P>
+<P> The full source code for drawing this DB schema example is shown
+ below.</P>
+<P><DIV class="phpscript">(File: dbschemaex1.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#FF8000">
+/*=======================================================================
+<BR>//&nbsp;File:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DBSCHEMAEX1.PHP
+<BR>//&nbsp;Description:&nbsp;&nbsp;&nbsp;&nbsp;Draw&nbsp;a&nbsp;DB&nbsp;schema&nbsp;of&nbsp;the&nbsp;DDDA&nbsp;architecture
+<BR>//&nbsp;Created:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2002-08-25
+<BR>
+//&nbsp;Ver:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$Id:&nbsp;dbschemaex1.php,v&nbsp;1.1&nbsp;2002/08/27&nbsp;20:08:57&nbsp;aditus&nbsp;Exp&nbsp;$
+<BR>//
+<BR>//&nbsp;License:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;This&nbsp;code&nbsp;is&nbsp;released&nbsp;under&nbsp;QPL
+<BR>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Copyright&nbsp;(C)&nbsp;2001,2002&nbsp;Johan&nbsp;Persson
+<BR>
+//&nbsp;Note:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The&nbsp;actual&nbsp;drawing&nbsp;of&nbsp;the&nbsp;tables&nbsp;are&nbsp;semi-automatically
+<BR>
+//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;but&nbsp;you&nbsp;can&nbsp;easily&nbsp;adjust&nbsp;the&nbsp;individual&nbsp;tables&nbsp;position
+<BR>//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;with&nbsp;the&nbsp;'tblposadj'&nbsp;array.&nbsp;
+<BR>//
+<BR>
+//========================================================================
+<BR>*/
+<BR></FONT><FONT color="#007700">include&nbsp;</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvas.php&quot;</FONT><FONT
+color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvtools.php&quot;</FONT><FONT
+color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../imgdbschema.inc&quot;</FONT><FONT
+color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpdb.php&quot;</FONT><FONT color="#007700">
+;
+<BR>
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Global&nbsp;callback&nbsp;to&nbsp;format&nbsp;the&nbsp;table&nbsp;header&nbsp;names
+<BR></FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+FormatTblName</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aName</FONT><FONT color="#007700">)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;We&nbsp;want&nbsp;to&nbsp;replace&nbsp;any&nbsp;specifi&nbsp;references&nbsp;to&nbsp;the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;'JpGraph'&nbsp;project&nbsp;with&nbsp;the&nbsp;generic&nbsp;'&lt;project&gt;'
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#007700">return&nbsp;</FONT><FONT color="#0000BB">
+str_replace</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'JpGraph'</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+'&lt;project&gt;'</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+$aName</FONT><FONT color="#007700">);
+<BR>}
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Global&nbsp;callback&nbsp;to&nbsp;format&nbsp;each&nbsp;field&nbsp;name&nbsp;in&nbsp;the&nbsp;table
+<BR></FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+FormatFldName</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aName</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$aTable</FONT><FONT
+color="#007700">)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</FONT><FONT color="#0000BB">$aName</FONT><FONT color="#007700">
+;
+<BR>}
+<BR>
+<BR>
+<BR>class&nbsp;</FONT><FONT color="#0000BB">Driver&nbsp;</FONT><FONT color="#007700">
+{
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</FONT><FONT color="#0000BB">$ig</FONT><FONT color="#007700">
+,&nbsp;</FONT><FONT color="#0000BB">$img</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">$iscale</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+$ishape</FONT><FONT color="#007700">;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</FONT><FONT color="#0000BB">$iymax</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$ixmax</FONT><FONT color="#007700">;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;var&nbsp;</FONT><FONT color="#0000BB">$iwidth</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$iheight</FONT><FONT color="#007700">;
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</FONT><FONT color="#0000BB">Driver</FONT><FONT color="#007700">
+()&nbsp;{
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Define&nbsp;Image&nbsp;size&nbsp;and&nbsp;coordinate&nbsp;grid&nbsp;space&nbsp;to&nbsp;work&nbsp;within
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iwidth&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">600</FONT><FONT color="#007700">;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iheight</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">750</FONT><FONT color="#007700">;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iymax&nbsp;&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">50</FONT><FONT color="#007700">;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ixmax&nbsp;&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">55</FONT><FONT color="#007700">;
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ig&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">CanvasGraph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">iwidth</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iheight</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">'auto'</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">img&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+ig</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">img</FONT><FONT
+color="#007700">;
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;Define&nbsp;the&nbsp;scale&nbsp;to&nbsp;be&nbsp;used
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iscale&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">CanvasScale</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">ig</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">ixmax</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+iymax</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ishape&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Shape</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+ig</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">
+);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;A&nbsp;small&nbsp;frame&nbsp;around&nbsp;the&nbsp;canvas
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ig</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">3</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ig</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMarginColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;teal&quot;</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ig</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">InitFrame</FONT><FONT color="#007700">();
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;}
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;function&nbsp;</FONT><FONT color="#0000BB">Run</FONT><FONT color="#007700">
+()&nbsp;{
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$leftm</FONT><FONT color="#007700">
+=</FONT><FONT color="#0000BB">1.5</FONT><FONT color="#007700">;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#FF8000">//&nbsp;Left&nbsp;margin&nbsp;(for&nbsp;table&nbsp;schemes)&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$topm</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">5</FONT><FONT color="#007700">;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Top&nbsp;margin&nbsp;(for&nbsp;table&nbsp;schemes)&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tblwidth</FONT><FONT color="#007700">
+=</FONT><FONT color="#0000BB">15</FONT><FONT color="#007700">;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#FF8000">//&nbsp;Individual&nbsp;table&nbsp;width
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tlo</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">1</FONT><FONT color="#007700">;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Offset&nbsp;for&nbsp;top&nbsp;line
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Add&nbsp;the&nbsp;background&nbsp;color&nbsp;for&nbsp;the&nbsp;project&nbsp;specific&nbsp;tables
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ishape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">IndentedRectangle</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$leftm</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$topm</FONT><FONT color="#007700">-</FONT><FONT color="#0000BB">1</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">
+*</FONT><FONT color="#0000BB">$tblwidth</FONT><FONT color="#007700">+</FONT><FONT
+color="#0000BB">$tlo</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">
+6</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">45</FONT><FONT
+color="#007700">,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tlo</FONT><FONT color="#007700">
++</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">*</FONT><FONT
+color="#0000BB">$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">
+2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">30</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">CORNER_BOTTOMLEFT</FONT><FONT
+color="#007700">,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#DD0000">'lightblue'</FONT><FONT
+color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Stroke&nbsp;the&nbsp;tables&nbsp;(series&nbsp;of&nbsp;x,y&nbsp;offsets,&nbsp;If&nbsp;=-1&nbsp;then&nbsp;use&nbsp;the
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;automtic&nbsp;positioning
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tblposadj</FONT><FONT color="#007700">
+=array(</FONT><FONT color="#0000BB">$tlo</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">$tlo</FONT><FONT
+color="#007700">+</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">2</FONT><FONT color="#007700">*</FONT><FONT color="#0000BB">
+$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">$tlo</FONT><FONT
+color="#007700">+</FONT><FONT color="#0000BB">4</FONT><FONT color="#007700">
+,
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,-</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">16</FONT><FONT color="#007700">,-</FONT><FONT color="#0000BB">
+1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">16</FONT><FONT
+color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$dbschema&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">ImgDBSchema</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'jpgraph_doc'</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">'FormatTblName'</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">'FormatFldName'</FONT><FONT color="#007700">
+);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$leftm</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$topm</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetTableWidth</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$tblwidth</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$dbschema</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+img</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$tblposadj</FONT><FONT color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">CanvasRectangleText</FONT><FONT color="#007700">
+();
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+''</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+''</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFontColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'navy'</FONT><FONT color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;explanation
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_NORMAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">12</FONT><FONT
+color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'Project&nbsp;specific&nbsp;tables'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$tblwidth</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">
+$leftm</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">3</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">16</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">15</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">img</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;title
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+''</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_VERDANA</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">26</FONT><FONT
+color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'DDDA&nbsp;-&nbsp;DB&nbsp;Schema'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+9</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0.5</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">30</FONT><FONT color="#007700">
+);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">img</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;a&nbsp;version&nbsp;and&nbsp;date
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'yellow'</FONT><FONT color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_NORMAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">);
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Generated:&nbsp;&quot;</FONT><FONT color="#007700">.</FONT><FONT color="#0000BB">
+date</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">&quot;ymd&nbsp;H:i&quot;</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">time</FONT><FONT color="#007700">
+()),</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+iymax</FONT><FONT color="#007700">*</FONT><FONT color="#0000BB">0.96</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">15</FONT><FONT color="#007700">
+);&nbsp;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$tt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">img</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">iscale</FONT><FONT color="#007700">);
+<BR>
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ig</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;}
+<BR>}
+<BR>
+<BR></FONT><FONT color="#0000BB">$driver&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Driver</FONT><FONT color="#007700">
+();
+<BR></FONT><FONT color="#0000BB">$driver</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Run</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT>
+<BR></FONT></CODE></DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="114Usingacanvasscale.html">Previous</A>
+<A HREF="12AntiSpamChallenges.html">Next</A>
+</BODY>
+</HTML>

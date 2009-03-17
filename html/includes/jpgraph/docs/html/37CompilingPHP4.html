@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="36Troubleshootingyourinstallation.html">
+<LINK REL="Next" HREF="4QuickStartDynamicImageGeneration.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="36Troubleshootingyourinstallation.html">Previous</A>
+<A HREF="4QuickStartDynamicImageGeneration.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="3_7">3.7 Compiling PHP 4</A></H2>
+<P><I> This is not meant to be a complete discussion about configuring
+ or compiling PHP. It is meant as an example of a configuration of PHP
+ that is known to work well with JpGraph.</I></P>
+<P> Below is an example of a standard configuration that can be used to
+ configure and compile PHP for use with the JpGraph Library</P>
+<P> Please note that depending on the specific installation requirements
+ other options might have to be specified, specifically the paths to
+ external libraries might need to be adjusted.</P>
+<PRE>
+./configure --prefix=/usr/share \
+--datadir=/usr/share/php \
+--with-apxs=/usr/sbin/apxs \
+--libdir=/usr/share \
+--includedir=/usr/include \
+--bindir=/usr/bin \
+--with-config-file-path=/etc \
+--enable-mbstring --enable-mbregex \
+--with-pdflib=/usr \
+--with-mysql  \
+--with-ttf-dir=/usr/lib \
+--with-freetype-dir=/usr/lib \
+--with-gd --enable-gd-imgstrttf --enable-gd-native-ttf \
+--with-zlib-dir=/usr/lib \
+--with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib --with-xpm-dir=/usr/X11R6 \
+--with-tiff-dir=/usr/lib \
+--enable-ftp \
+--enable-memory-limit --enable-safe-mode \
+--bindir=/usr/bin \
+--enable-bcmath -enable-calendar \
+--enable-ctype --with-ftp \
+--enable-magic-quotes \
+--enable-inline-optimization \
+--with-bz2 \
+--with-iconv
+</PRE>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="36Troubleshootingyourinstallation.html">Previous</A>
+<A HREF="4QuickStartDynamicImageGeneration.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,190 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_SUPERSCRIPTTEXT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>SuperScriptText</b> EXTENDS <a href="Text .html#_C_TEXT " style="font-face:arial;font-weight:bold;">Text </a></div>
+<i>(Defined in: jpgraph.php : 3155)</i><table border=1><tr><td>&nbsp;<a href="SuperScriptText.html" style="font-family:arial;font-weight:bold;color:darkblue;">SuperScriptText</a>&nbsp;</td><td>&nbsp;<a href="Text .html" style="font-family:arial;font-weight:bold;color:darkblue;">Text </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_FROMREAL">FromReal()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETFONTHEIGHT">GetFontHeight()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETTEXTHEIGHT">GetTextHeight()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETWIDTH">GetWidth()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SETSUPERFONT">SetSuperFont()</a>&nbsp;<br>
+&nbsp;<a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SUPERSCRIPTTEXT">SuperScriptText()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class is responsible for formatting a text string which have a superscript at the end. This is used to generate scientific numbers.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Text.html">Text</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_FROMREAL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FromReal($aVal,$aPrecision)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a scientific representation for a number </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVal</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Real value to be used</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPrecision</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+2</font>
+</td><td>Precision (number of digits) to be printed</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Initialized the class from a real value to be used to present a scientific text string.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SET">SuperScriptText::Set</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$t&nbsp;=&nbsp;new&nbsp;SuperScriptText();<br />$t-&gt;FromReal(12341.56);<br /><br />//&nbsp;Will&nbsp;print&nbsp;1.23*10^4<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_GETFONTHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetFontHeight(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hight of font (approximate the height of the text)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image context</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return height of text.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETTEXTHEIGHT">SuperScriptText::GetTextHeight</a> and <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETWIDTH">SuperScriptText::GetWidth</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_GETTEXTHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetTextHeight(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hight of text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image context</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hight of text&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_GETWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetWidth(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Total width of text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image context</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Total width of text&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aTxt,$aSuper)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Convert a floating point number to scientific notation</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Mantissa</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSuper</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Exponent</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the string manuall by specifyin mantissa and exponent.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="SuperScriptText.html#_SUPERSCRIPTTEXT_FROMREAL">SuperScriptText::FromReal</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$t&nbsp;=&nbsp;new&nbsp;SuperScriptText();<br />$t-&gt;Set("1.34&nbsp;10","5");<br />//&nbsp;Will&nbsp;generate&nbsp;"1.34&nbsp;10^5"<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_SETSUPERFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSuperFont($aFontFam,$aFontStyle,$aFontSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Manually set font to be used for superscript</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontFam</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+8</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Used to manually specify font to be used for superscript. If not specified it will be detemined automatically based on the font used for the mantissa. The font for the superscript will be roughly 70% of the size of the base font. &nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SUPERSCRIPTTEXT_SUPERSCRIPTTEXT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SuperScriptText($aTxt,$aSuper,$aXAbsPos,$aYAbsPos)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Mantissa text</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSuper</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Suoerscript text</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>X-position (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Y-position (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Creates a new SUperSCriptClass&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_TEXT">Text::Text</a><p> <hr> <p>

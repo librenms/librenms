@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="817Usingthestepstyletorenderlineplots.html">
+<LINK REL="Next" HREF="819Moreonscales.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="817Usingthestepstyletorenderlineplots.html">Previous</A>
+<A HREF="819Moreonscales.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_8">8.1.8 Using logarithmic scale</A></H3>
+<P> Using a logarithmic scale requires you to include the logarithmic
+ add on module in &quot;jpgraph_log.php&quot;. So you must have the line<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">
+include(</FONT><FONT color="#DD0000">&quot;jpgraph_log.php&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P>on the top of your code. To Illustrate how to use a logarithmic scale
+ let's make the right Y scale in the previous example a logarithmic
+ scale. This is done by the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetY2Scale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;log&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P>This will then give the following result<DIV class="example">
+<BR> <A href="exframes/frame_example7.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example7.png" WIDTH="350"></A>
+<BR><B>Figure 15:</B> Using a logarithmic scale for both the Y2 axis <A href="exframes/frame_example7.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> You can of course also use a logarithmic X-scale as well. The
+ following example shows this.<DIV class="example">
+<BR> <A href="exframes/frame_loglogex1.html" target="blank"><IMG border="0"
+HEIGHT="300"  src="img/loglogex1.png" WIDTH="500"></A>
+<BR><B>Figure 16:</B> Example of using log scale on both X and Y axis
+ together with a linear Y2 scale <A href="exframes/frame_loglogex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> Even though we have so far only shown line graphs logarithmic scale
+ can also be used for bar, error, scatter plots as well. Even radar
+ plots supports the use of logarithmic plots. The following example
+ shows how to use a logarithmic scale for a bar graph.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_logbarex1.html" target="blank"><IMG border="0"
+HEIGHT="220"  src="img/logbarex1.png" WIDTH="400"></A>
+<BR><B>Figure 17:</B> Example of using logarithmic scale togther with
+ bar plots <A href="exframes/frame_logbarex1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="817Usingthestepstyletorenderlineplots.html">Previous</A>
+<A HREF="819Moreonscales.html">Next</A>
+</BODY>
+</HTML>

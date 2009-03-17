@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="811Adjustinglabelsonatextscale.html">
+<LINK REL="Next" HREF="813AddingtitlesandfooterstotheGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="811Adjustinglabelsonatextscale.html">Previous</A>
+<A HREF="813AddingtitlesandfooterstotheGraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="8_12">8.12 Adding arbitrary text strings to the graph</A></H2>
+<P> To add clarification or other information text strings to the graph
+ you can add arbitrary lines of text anywhere you like onto the graph.
+ The text might have multiple lines and you can choose the paragraph
+ alignment.</P>
+<P> To add text you have to create one or more instances of the <A href="../ref/Text.html#_C_TEXT">
+ Text()</A> object and then add the text object to the graph with the <A href="../ref/Graph.html#_GRAPH_ADDTEXT">
+ AddText()</A> method.</P>
+<P> The position of these text boxes are given as fraction of the width
+ and height of the graph. When you are positioning these text boxes you
+ might also choose what part of the text box should be considered the
+ anchor point for the position you specify.</P>
+<P> By default the anchor point is the upper left corner of the bounding
+ box for the text.</P>
+<P> To show some ways of positioning the text we use a very simple bar
+ graph not to distract from the text. We first just add a single text
+ line with most of the settings their default value by adding the
+ following lines to the graph<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$txt</FONT><FONT color="#007700">=new&nbsp;</FONT><FONT
+color="#0000BB">Text</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;This&nbsp;is&nbsp;a&nbsp;text&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$txt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Pos</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$txt</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;red&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">AddText</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$txt</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> The result is shown below.<DIV class="example">
+<BR> <A href="exframes/frame_example25.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example25.png" WIDTH="300"></A>
+<BR><B>Figure 85:</B> Adding a single text string in the upper left
+ corner <A href="exframes/frame_example25.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P>Not too exiting. Let's make it more interesting by having a
+ background color, using larger fonts and framing the text box and
+ adding a drop shadow to the text box by using the methods <A href="../ref/Text.html#_TEXT_SETBOX">
+ SetBox()</A> and <A href="../ref/Text.html#_TEXT_SETSHADOW"> SetBox()</A><DIV
+class="example">
+<BR> <A href="exframes/frame_example25.1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example25.1.png" WIDTH="300"></A>
+<BR><B>Figure 86:</B> Making the text more interesting <A href="exframes/frame_example25.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> That's better. Now we get some attention. If you want to add a text
+ with several lines you just need to separate the lines with a newline
+ ('\n' character). The default paragraph alignment is left edge but you
+ can also use right and center alignment.</P>
+<P> As an illustration let's add a couple of more lines to the previous
+ text, center the text box in the middle of the graph and also use
+ centered paragraph alignment for the text. To adjust the paragraph
+ alignment of the text you have to use the <A href="../ref/Text.html#_TEXT_PARAGRAPHALIGN">
+ Text::ParagraphAlign()</A><DIV class="example">
+<BR> <A href="exframes/frame_example25.2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example25.2.png" WIDTH="300"></A>
+<BR><B>Figure 87:</B> Text with multiple lines and centered paragraph
+ alignment <A href="exframes/frame_example25.2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> Of course there is no limit to the number of text string you can add
+ to the graph.</P>
+<P> From version 1.12 it is also possible to add text strings to a graph
+ using the scale coordinates instead. This is accomplished by using the <A
+href="../ref/Text.html#_TEXT_SETSCALEPOS"> Text::SetScalePos()</A> Which
+ is completely analog to SetPos() with the only difference that the
+ positions given are interpretated as scale values instead of fractions
+ of the width and height.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="811Adjustinglabelsonatextscale.html">Previous</A>
+<A HREF="813AddingtitlesandfooterstotheGraph.html">Next</A>
+</BODY>
+</HTML>

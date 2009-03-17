@@ -1,0 +1,257 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_POLARGRAPH"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PolarGraph</b> EXTENDS <a href="Graph .html#_C_GRAPH " style="font-face:arial;font-weight:bold;">Graph </a></div>
+<i>(Defined in: jpgraph_polar.php : 639)</i><table border=1><tr><td>&nbsp;<a href="PolarGraph.html" style="font-family:arial;font-weight:bold;color:darkblue;">PolarGraph</a>&nbsp;</td><td>&nbsp;<a href="Graph .html" style="font-family:arial;font-weight:bold;color:darkblue;">Graph </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PolarGraph.html#_POLARGRAPH_POLARGRAPH">PolarGraph()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_SET90ANDMARGIN">Set90AndMargin()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_SETDENSITY">SetDensity()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_SETPLOTSIZE">SetPlotSize()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_SETSCALE">SetScale()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_SETTYPE">SetType()</a>&nbsp;<br>
+&nbsp;<a href="PolarGraph.html#_POLARGRAPH_STROKE">Stroke()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Represent a polar graph. Accessible properties are
+
+<ul>
+<li> <b>axis</b>, An instance of PolarAxis() use to manipulate apperance of both radius and angle axis in the graph.
+</ul> <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="PolarAxis.html">PolarAxis</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_POLARGRAPH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;PolarGraph($aWidth,$aHeight,$aCachedName,$aTimeOut,$aInline)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Construct a new graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+300</font>
+</td><td>Width (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+200</font>
+</td><td>Height (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCachedName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Cache name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTimeOut</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Cache timeout</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aInline</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Inline flag (DEPRECATED)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Construct a new Polar Graph. This is completely analog to the standard Graph() creation and follows the exactly same pattern. &nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$polargraph&nbsp;=&nbsp;new&nbsp;PolarGraph(300,500);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_SET90ANDMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set90AndMargin($lm,$rm,$tm,$bm)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Rotate the polar graph 90 degrees</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$lm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Left margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$rm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Right Margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$tm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Top margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$bm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Bottom margin</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Rotate the polar graph 90 degrees&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$polargraph-&gt;Set90AndMargin(40,40,40,40);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_SETDENSITY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDensity($aDense)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify density for the radius axis</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDense</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Density</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This is analog to the density specification for the X, and Y-scale s for the standard X-Y-plots. 
+This specifies how close the autoscaling algorithm will place the tick marks to each other.
+
+The tick density can be one of
+
+<ul>
+<li> TICKD_DENSE, Dense tick layout
+<li> TICKD_NORMAL, Normal tick layout
+<li> TICKD_SPARSE, Sparse tick layout (few tick marks)
+<li> TICKD_VERYSPARSE, Very Sparse tick layout (very few tick marks)
+</ul>
+
+By default the radius density os set to TICKD_DENSE
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Slightly&nbsp;fewer&nbsp;ticks&nbsp;than&nbsp;default<br />$polargraph-&gt;SetDensity(TICKD_NORMAL);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_SETPLOTSIZE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetPlotSize($w,$h)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Alternative way to specify size of the plot area </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$w</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$h</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Height</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>You can specify the plot area size an posiion in the graph in two ways. The frst is the standard way of specifying the margins on the sides with SetMargins() method.
+
+This method centers  a plot area with the specified width and height inthe middle of the graph, it is basically a short form for
+
+SetMargins(
+$graphwidth-($w/2),$graphwidth-($w/2),
+$graphheight-($h/2),$graphheight-($h/2));
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$polargraph-&gt;SetPlotSize(200,250);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_SETSCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetScale($aScale,$rmax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify scale type (linear or log)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Linear "lin" or logarithmic "log" scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$rmax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Manual maximum value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify scale type (linear or log) for the radius scale. A linear scale is specified as 'lin' and a logarithmic scale is specified as 'log'&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Specify&nbsp;a&nbsp;logarithmic&nbsp;scale&nbsp;for&nbsp;the&nbsp;radius<br />$polargraph-&gt;SetScale('log');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_SETTYPE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetType($aType)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify if the graphs should be 360 or 180</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Type</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the polargraph should be a full 360 degrees or just 180 degrees. The possible values for type are
+
+<ul>
+<li> POLAR_360, A full 360 polar plot
+<li> POLAR_180, A half 180 polar plot
+</ul>
+
+By default the graph is a full 260 degrees.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$polargraph-&gt;SetType(POLAR_360);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_POLARGRAPH_STROKE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Stroke($aStrokeFileName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Send graph back to browser or file</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStrokeFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>File name</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Send a graph back to browser or to a file. This must be the last call in your script.
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$polargraph-&gt;Stroke();</font>
+</span><br>
+<p> <hr> <p>

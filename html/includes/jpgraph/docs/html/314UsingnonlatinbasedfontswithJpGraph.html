@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="313PreparingTrueTypeFontFiles.html">
+<LINK REL="Next" HREF="32Customizingtheinstallation.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="313PreparingTrueTypeFontFiles.html">Previous</A>
+<A HREF="32Customizingtheinstallation.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="3_1_4">3.1.4 Using non-latin based fonts with JpGraph</A></H3>
+<P> In addition to European font it is also possible to use non-latin
+ based fonts such as Cyrillic, Japanese and Chinese.</P>
+<P> In all cases a suitable TTF font that supports the non-latin based
+ language must be available.</P>
+<P> For Cyrillic support the define LANGUAGE_CYRILLIC in jpg-config.php
+ must be set to true. It is then possible to use a suitable Cyrillic
+ font as replacement for the ordinary fonts.</P>
+<P> For Chinese character set JpGraph supports both BIG5 and GB2312
+ encoding. For BIG5 encoding the PHP installation must have support for
+ the &quot;iconv()&quot; function. Furthermore the define CHINESE_TTF_FONT must be
+ set to the name of the Chinese BIG5 font that is to be used. By default
+ this is set to &quot;bkai00mp.ttf&quot;. To use the Chinese BIG5 font in the
+ scripts one must then specify the font family as FF_CHINESE.</P>
+<P> To use the alternative font files &quot;simsun.ttc&quot; and &quot;simhei.ttf&quot;
+ (which uses the GB2312 encoding) the only step needed is to install
+ those fonts in the normal TTF font directory and then specify the font
+ family as FF_SIMSUN, the &quot;simhei.ttf&quot; is used when the font style is
+ specified as FS_BOLD.</P>
+<H4>3.1.4.1 Japanese character support</H4>
+ Using Japanese fonts are supported by the pre-defined font families
+<UL>
+<LI>FF_MINCHO</LI>
+<LI>FF_PMINCHO</LI>
+<LI>FF_GOTHIC</LI>
+<LI>FF_PGOTHIC</LI>
+</UL>
+ Please note that the actual font files is not included in the library.
+ The exact name of the font files to use for these families are defined
+ in the the configuration file &quot;jpg-config.inc.php.php&quot;.
+<P> Some care must be taken due to the encoding that the library
+ expects. The library TTF handling expects the fonts to be encoded in
+ UTF8 encoding. Since the most commonly used Japanese encoding is EUC-JP
+ some conversion must be done. The best way to do this is by using the<I>
+ mbstring</I> extension to PHP to handle the encoding. By default this
+ module is not included and to compile PHP with support for mbstring the
+ option &quot;--enable-mbstring&quot; must be given when compiling PHP. Your
+ installation of PHP might also provide mbstring as a PHP module that is
+ loaded at runtime.</P>
+<P> To convert from EUC-JP the function<I> mb_convert_encoding()</I> is
+ used as the following example shows.</P>
+<PRE>
+$utf8-encoded-text = mb_convert_encoding($eucjp-encoded-txt, 'UTF-8','EUC-JP');
+</PRE>
+ By enabling the define &quot;ASSUME_EUCJP_ENCODING&quot; (in
+ jpg-config.inc.php.php) this encoding is done automatically in the
+ library when one of the Japanese fonts have been enabled. By default
+ this automatic conversion is disabled.
+<P> If this define is false then it is up to the client to make sure
+ that the proper utf8 encoded text is passed on to all the methods that
+ are use to specify text in the library given that one of the Japanese
+ fonts have been selected.</P>
+<P> A different method also exists when it comes to Japanese font
+ support. By compiling PHP with the option &quot;--enable-gd-jis-conv&quot; this
+ will automatically convert Japanese characters to UTF8 when using the
+ FreeType libraries. However the method with the mbstring module is
+ preferred since the automatic conversion might on occasion fail to
+ detect the proper encoding.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="313PreparingTrueTypeFontFiles.html">Previous</A>
+<A HREF="32Customizingtheinstallation.html">Next</A>
+</BODY>
+</HTML>

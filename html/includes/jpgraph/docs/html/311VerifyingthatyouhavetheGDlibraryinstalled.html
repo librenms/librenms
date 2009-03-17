@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="31Preparation.html">
+<LINK REL="Next" HREF="312VerifyingthatyouhaveGD2installed.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="31Preparation.html">Previous</A>
+<A HREF="312VerifyingthatyouhaveGD2installed.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="3_1_1">3.1.1 Verifying that you have the GD library
+ installed</A></H3>
+<P> In order to make sure that the GD installed the following example
+ would be run. The example creates a very simple image using just pure
+ GD calls and outputs an image in PNG format. This could be considered a
+ smoke-test to see that the GD library is available from PHP. Please
+ note that this is an<B> absolute</B> pre-requisite in order for the
+ JpGraph library to work at all.</P>
+<P> Store the code snippet below somewhere in the document root and make
+ sure it runs correctly.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$im&nbsp;</FONT><FONT color="#007700">=&nbsp;@</FONT><FONT color="#0000BB">
+ImageCreate&nbsp;</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+150</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">100</FONT><FONT
+color="#007700">)
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;or&nbsp;die&nbsp;(</FONT><FONT color="#DD0000">
+&quot;Cannot&nbsp;create&nbsp;a&nbsp;new&nbsp;GD&nbsp;image.&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$background_color&nbsp;</FONT><FONT color="#007700">
+=&nbsp;</FONT><FONT color="#0000BB">ImageColorAllocate&nbsp;</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">255</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+255</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">255</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$text_color&nbsp;</FONT><FONT color="#007700">
+=&nbsp;</FONT><FONT color="#0000BB">ImageColorAllocate&nbsp;</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">233</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+14</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">91</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">ImageString&nbsp;</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">1</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+5</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">5</FONT><FONT
+color="#007700">,&nbsp;&nbsp;</FONT><FONT color="#DD0000">&quot;A&nbsp;Simple&nbsp;Text&nbsp;String&quot;</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">$text_color</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">header&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;Content-type:&nbsp;image/png&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">ImagePng&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> If the above script does not work or some error or warnings are
+ printed on the screen then it is necessary to correct those problems
+ before proceeding with the installation.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="31Preparation.html">Previous</A>
+<A HREF="312VerifyingthatyouhaveGD2installed.html">Next</A>
+</BODY>
+</HTML>

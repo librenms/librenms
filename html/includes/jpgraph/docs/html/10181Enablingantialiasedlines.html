@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1018AntialiasinginJpGraph.html">
+<LINK REL="Next" HREF="1019Rotatingthegraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1018AntialiasinginJpGraph.html">Previous</A>
+<A HREF="1019Rotatingthegraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_18_1">10.18.1 Enabling anti-aliased lines</A></H3>
+<P> Anti-aliased lines are enabled by calling the method <A href="../ref/Image.html#_IMAGE_SETANTIALIASING">
+ SetAntiAliasing()</A> in the <A href="../ref/Image.html#_C_IMAGE">
+ Image class</A> in the script where you want to use anti-aliasing.</P>
+<P> The anti-aliasing for lines works by &quot;smoothing&quot; out the edges on
+ the line by using a progressive scale of colors interpolated between
+ the background color and the line color.</P>
+<P><DIV class="note"><B>Note:</B> The algorithm used for anti-aliasing
+ of lines is quite simple. It would be possible to achieve even better
+ result by doing some real 2D signal processing. However, doing real
+ time 2D signal processing on a HTTP server would be foolish so the
+ design is deliberately kept simple. To achieve best visual result
+ always use a dark line color on a light background.</DIV></P>
+<P> An example will show that this, quite simple algorithm, gives a
+ reasonable good result. The figures below shows a radar plot with and
+ without anti-aliasing.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_radarex8.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/radarex8.png" WIDTH="300"></A>
+<BR><B>Figure 170:</B> Spiderplot without anti-aliasing <A href="exframes/frame_radarex8.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_radarex8.1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/radarex8.1.png" WIDTH="300"></A>
+<BR><B>Figure 171:</B> Spiderplot with anti-aliasing <A href="exframes/frame_radarex8.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> One thing you need to keep in mind when deciding to use
+ anti-aliasing is that it could have potentially a dramatic effect on
+ the time it takes to generate the image. Line drawing with
+ anti-aliasing turned on is roughly 8 times slower than the normal line
+ drawing so treat this feature wisely.</P>
+<P> Furthermore there are a couple of &quot;gotchas&quot; you should be aware of
+ when using anti-aliasing.</P>
+<OL>
+<LI> Anti-aliased lines uses up more of the available color-palette. The
+ exact number of colors used is dependent on the line-angle, a near
+ horizontal or near vertical line uses more colors (number of lines with
+ different angles uses more colors). Hence it might not be possible to
+ use anti-aliasing with color-gradient fill since the number of
+ available colors in the palette might not be enough. A normal palette
+ can keep around 256 colors. This means that you are advised to use a
+ true-color image when using anti-aliasing.</LI>
+<LI> Anti-aliasing does not work very well together with background
+ images since it assumes a the same solid color on each side of the
+ line. Doing a more advanced anti-aliasing algorithm would simple take
+ to much processing power.</LI>
+<LI>Anti-aliased lines will ignore the line width specified. They will
+ always have a width of roughly 1.</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1018AntialiasinginJpGraph.html">Previous</A>
+<A HREF="1019Rotatingthegraphs.html">Next</A>
+</BODY>
+</HTML>

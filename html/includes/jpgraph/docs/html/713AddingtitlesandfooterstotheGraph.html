@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="712Addingarbitrarytextstringstothegraph.html">
+<LINK REL="Next" HREF="714Addingatabtitle.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="712Addingarbitrarytextstringstothegraph.html">Previous</A>
+<A HREF="714Addingatabtitle.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_13">7.13 Adding titles and footers to the Graph</A></H2>
+<P> Each graph can have up to three different titles accessed by the
+ three properties</P>
+<OL>
+<LI> title</LI>
+<LI> subtitle</LI>
+<LI> subsubtitle</LI>
+</OL>
+<P> All of these three properties is a standard text object which means
+ that you can have individual font, colors, margins and sizes of these
+ tree titles.</P>
+<P> The only thing you need to think of is that you probably want to add
+ some extra margin to make room for the titles (using <A href="../ref/Graph.html#_GRAPH_SETMARGIN">
+ Graph::SetMargin()</A> )</P>
+<P> The individual positioning of these titles are done automatically
+ and will adjust to the font size being used.</P>
+<P> If you for, esthetic reasons, would like increase the distance from
+ the top where the title is positioned (or the intra distance between
+ title and sub title) you can use the <A href="../ref/Text.html#_TEXT_SETMARGIN">
+ Text::SetMargin()</A> method. For example the line</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">title</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetMargin</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">20</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P>will set the distance between the top of the title string and the top
+ of the graph to 20 pixels. If you instead call the SetMargin() method
+ for the subtitle it will adjust the distance between the top of the
+ subtitle and the bottom of the title.</P>
+<P> The titles will be positioned at the top and be centered in the
+ graph. Each of these titles may have multiple lines each separated by a
+ &quot;\n&quot; (newline) character. By default the paragraph alignment for each
+ title is centered but may of course be changed (using the
+ ParagraphAlign()) method.</P>
+<P> Each graph can also have a footer. This footer is actually three
+ footers. Left, center and right. The 'left' footer is aligned to the
+ left, the 'center' at the bottom center and the right to the right.</P>
+<P> Each of these three positions is a standard Text object which means
+ you can change color, font and size as you please individually on each
+ of these footer positions.</P>
+<P> You access the footer through the Graph::footer property as the
+ following example shows</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+footer</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">left</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;(C)&nbsp;2002&nbsp;KXY&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">footer</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+center</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;CONFIDENTIAL&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">footer</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+center</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">&quot;red&quot;</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">footer</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+center</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">footer</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+right</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;19&nbsp;Aug&nbsp;2002&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P><DIV class="note"><B>Note:</B> If you enable the brand timing
+ argument you should leave the left footer empty.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="712Addingarbitrarytextstringstothegraph.html">Previous</A>
+<A HREF="714Addingatabtitle.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="311VerifyingthatyouhavetheGDlibraryinstalled.html">
+<LINK REL="Next" HREF="313PreparingTrueTypeFontFiles.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="311VerifyingthatyouhavetheGDlibraryinstalled.html">Previous</A>
+<A HREF="313PreparingTrueTypeFontFiles.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="3_1_2">3.1.2 Verifying that you have GD2 installed</A></H3>
+<P> To access the more advanced features of JpGraph needs the GD 2.x
+ library. This will allow the use of features such as alpha-blending and
+ trucolor images.</P>
+<P> The GD 2.x library is included in all standard PHP versions from
+ 4.2.x and above. To make sure that the GD 2.x library is installed the
+ following script must be working.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$im&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT color="#0000BB">
+imagecreatetruecolor&nbsp;</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+300</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">200</FONT><FONT
+color="#007700">);&nbsp;
+<BR></FONT><FONT color="#0000BB">$black&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">imagecolorallocate&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+);&nbsp;
+<BR></FONT><FONT color="#0000BB">$white&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">imagecolorallocate&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+255</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">255</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">255</FONT><FONT color="#007700">
+);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">imagefilledrectangle</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">399</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">99</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$white</FONT><FONT color="#007700">);&nbsp;
+<BR></FONT><FONT color="#0000BB">imagerectangle</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">20</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+20</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">250</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">190</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$black</FONT><FONT color="#007700">);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">header&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;Content-type:&nbsp;image/png&quot;</FONT><FONT color="#007700">
+);&nbsp;
+<BR></FONT><FONT color="#0000BB">imagepng&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> After running this script you should now see a black rectangle in
+ your browser.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="311VerifyingthatyouhavetheGDlibraryinstalled.html">Previous</A>
+<A HREF="313PreparingTrueTypeFontFiles.html">Next</A>
+</BODY>
+</HTML>

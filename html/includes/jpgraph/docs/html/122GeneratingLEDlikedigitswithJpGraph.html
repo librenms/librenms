@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="121GeneratingAntiSpamchallenge.html">
+<LINK REL="Next" HREF="1221AdjustingthesizeoftheLEDdigits.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="121GeneratingAntiSpamchallenge.html">Previous</A>
+<A HREF="1221AdjustingthesizeoftheLEDdigits.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="12_2">12.2 Generating LED-like digits with JpGraph</A></H2>
+ Starting with v1.21 it is possible to generate LED like digits with
+ JpGraph. This is accomplished by the usage of the &quot;jpgraph_led.php&quot;
+ module.
+<P> The creation of LED digits and letters are extremely simple. The
+ following complete example demonstrates the creation of a LED display<DIV
+class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;
+<BR>
+<BR></FONT><FONT color="#007700">include&nbsp;</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_led.php&quot;</FONT><FONT
+color="#007700">;
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;By&nbsp;default&nbsp;each&nbsp;&quot;LED&quot;&nbsp;circle&nbsp;has&nbsp;a&nbsp;radius&nbsp;of&nbsp;3&nbsp;pixels
+<BR></FONT><FONT color="#0000BB">$led&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">DigitalLED74</FONT><FONT color="#007700">
+();
+<BR></FONT><FONT color="#0000BB">$led</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'0123456789.&nbsp;ABCDEFGHIJKL'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+LEDC_GREEN</FONT><FONT color="#007700">);&nbsp;
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The result of running this script can be seen by running the
+ &quot;Examples/ledex1.php&quot; Example in the example directory. As can be seen
+ from the above example the color to be used for the LED digits is
+ specified as the second argument to the DigitalLED74::Stroke() method.
+ Available color for LED digits is given by the table below</P>
+<TABLE>
+<TR><TD>Symbolic name</TD><TD>Color</TD></TR>
+<TR><TD>LEDC_RED</TD><TD>Red</TD></TR>
+<TR><TD>LEDC_GREEN</TD><TD>Green</TD></TR>
+<TR><TD>LEDC_BLUE</TD><TD>Blue</TD></TR>
+<TR><TD>LEDC_YELLOW</TD><TD>Yellow</TD></TR>
+<TR><TD>GREY</TD><TD>Grey</TD></TR>
+</TABLE>
+ Since the standard LED matrix of 7x4 dots does not lend itself to
+ accurately represent all normal ASCII characters only the following
+ numbers and letters can be displayed.
+<TABLE>
+<TR><TD>All digits, 0-9</TD></TR>
+<TR><TD>Capital Letters, A-L</TD></TR>
+</TABLE>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="121GeneratingAntiSpamchallenge.html">Previous</A>
+<A HREF="1221AdjustingthesizeoftheLEDdigits.html">Next</A>
+</BODY>
+</HTML>

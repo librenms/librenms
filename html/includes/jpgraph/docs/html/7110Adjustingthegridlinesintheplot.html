@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="719Moreonscales.html">
+<LINK REL="Next" HREF="7111Usingfilledgridlines.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="719Moreonscales.html">Previous</A>
+<A HREF="7111Usingfilledgridlines.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_1_10">7.1.10 Adjusting the grid lines in the plot</A></H3>
+<P> By default only the Y-axis have grid lines and then only on major
+ ticks, i.e. ticks which have a label. It is of course possible to
+ change this. Both the X , Y and Y2 can have grid lines. It is also
+ possible to let the gridlines also be drawn on the minor tick marks,
+ i.e. ticks without a label. Lets see how we can apply this to the graph
+ above.</P>
+<P> The grid is modified by accessing the xgrid (or ygrid) component of
+ the graph. So to display minor grid lines for the Y graph we make the
+ call<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">ygrid</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Show</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">true</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">true</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> The first parameter determines if the grid should be displayed at
+ all and the second parameter determines whether or not the minor grid
+ lines should be displayed.</P>
+<P> If you also wanted the grid lines to be displayed for the Y2 axis
+ you would call<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+y2grid</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Show</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">true</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">true</FONT><FONT color="#007700">)</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P><STRONG> Note.</STRONG> In general it is not a good idea to display
+ both the Y and Y2 grid lines since the resulting image becomes
+ difficult to read for a viewer.</P>
+<P> We can also enable the X-grid lines with the call<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">xgrid</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Show</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+true</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P></P>
+<P> In the above line we will of course only just enable the major grid
+ lines.</P>
+<P> To bring all this together we will display a graph with grid lines
+ for both Y and X axis enabled.<DIV class="example">
+<BR> <A href="exframes/frame_example8.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example8.png" WIDTH="350"></A>
+<BR><B>Figure 20:</B> Enabling major and minor gridlines for Y-axis and
+ major grid lines for the X-axis <A href="exframes/frame_example8.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> If you think the first value of the
+ Y-axis is to close to the first label of the X-axis you have the option
+ of either increasing the margin (with a call to <A href="../ref/Axis.html#_AXIS_SETLABELMARGIN">
+ SetLabelMargin()</A> ) or to hide the first label (with a call to <A href="../ref/Axis.html#_AXIS_HIDEFIRSTTICKLABEL">
+ HideFirstTickLabel()</A> )</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="719Moreonscales.html">Previous</A>
+<A HREF="7111Usingfilledgridlines.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="813Addingseveralplotstothesamegraph.html">
+<LINK REL="Next" HREF="815Addingalegendtothegraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="813Addingseveralplotstothesamegraph.html">Previous</A>
+<A HREF="815Addingalegendtothegraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_4">8.1.4 Adding a second Y-scale</A></H3>
+<P> As you saw in the preceding example you could add multiple plots to
+ the same graph and Y-axis. However what if the two plots you want to
+ display in the graph has very different ranges. One might for example
+ have Y-values like above but the other might have Y-values in the
+ 100:s. Even though it is perfectly possible to add them as above the
+ graph with the smallest values will have a very low dynamic range since
+ the scale must accomplish the bigger dynamic range of the second plot.</P>
+<P> The solution to this is to use a second Y-axis with a different
+ scale and add the second plot to this Y-axis instead. Let's take a look
+ at how that is accomplished.</P>
+<P> First we need to create a new data array with large values and
+ secondly we need to specify a scale for the Y2 axis. This is done by
+ the lines<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$y2data&nbsp;</FONT><FONT color="#007700">=&nbsp;array(</FONT><FONT color="#0000BB">
+354</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">265</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">99</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">111</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+91</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">198</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">225</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">293</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">251</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetY2Scale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;lin&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> and finally we create a new line plot and add that to the second
+ Y-axis. Note that we here use a new method, AddY2(), since we want this
+ plot to be added to the second Y-axis. Note that JpGraph will only
+ support two different Y-axis. This is not considered a limitation since
+ using more than two scales in the same graph would make it very
+ difficult to interpret the meaning of the graph.</P>
+<P> To make the graph a little bit more esthetic pleasing we use
+ different colors for the different plots and let the two different
+ Y-axis get the same colors as the plots.</P>
+<P> The resulting graph is shown below. source)<DIV class="example">
+<BR> <A href="exframes/frame_example5.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example5.png" WIDTH="300"></A>
+<BR><B>Figure 10:</B> Adding a second Y-scale plot to the same graph <A href="exframes/frame_example5.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="813Addingseveralplotstothesamegraph.html">Previous</A>
+<A HREF="815Addingalegendtothegraph.html">Next</A>
+</BODY>
+</HTML>

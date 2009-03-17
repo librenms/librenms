@@ -1,0 +1,72 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_ACCBARPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>AccBarPlot</b> EXTENDS <a href="BarPlot .html#_C_BARPLOT " style="font-face:arial;font-weight:bold;">BarPlot </a></div>
+<i>(Defined in: jpgraph_bar.php : 642)</i><table border=1><tr><td>&nbsp;<a href="AccBarPlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">AccBarPlot</a>&nbsp;</td><td>&nbsp;<a href="BarPlot .html" style="font-family:arial;font-weight:bold;color:darkblue;">BarPlot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="AccBarPlot.html#_ACCBARPLOT_ACCBARPLOT">AccBarPlot()</a>&nbsp;<br>
+&nbsp;<a href="AccBarPlot.html#_ACCBARPLOT_MAX">Max()</a>&nbsp;<br>
+&nbsp;<a href="AccBarPlot.html#_ACCBARPLOT_MIN">Min()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Accumulated bar plot. <br>
+Used to create bars where the data series are stacked on top of each other.
+<p>
+Features:
+<ol>
+<li>Can be combined with Image maps for each series. 
+<li>Values for each series can be displayed when the pointer is hovering over the corresponding part of the bar
+<li>Unlimited number of series
+</ol>
+<p>
+Examples:
+<ul>
+<li> [TBC]
+</ul> <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="BarPlot.html">BarPlot</a>, <a href="GroupBarPlot.html">GroupBarPlot</a> and <a href="AccLinePlot.html">AccLinePlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCBARPLOT_ACCBARPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AccBarPlot($plots)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Construct a new accumulated bar graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$plots</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of bar plots</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new accumulated bar plot based on the given array of ordinary bar plots.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="BarPlot.html#_BARPLOT_BARPLOT">BarPlot::BarPlot</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$b1&nbsp;=&nbsp;new&nbsp;BarPlot($y1data);<br />$b2&nbsp;=&nbsp;new&nbsp;BarPlot($y2data);<br />$accbar&nbsp;=&nbsp;new&nbsp;AccBarPlot(array($b1,$b2));<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCBARPLOT_MAX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Max()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the maximum value of the bars</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return the maximum value of the bars&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+list($xmin,$ymin)&nbsp;=&nbsp;$accbar-&gt;Max();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCBARPLOT_MIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Min()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return minimum data values for the bars</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return minimum data values for the bars&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+list($xmin,$ymin)&nbsp;=&nbsp;$accbar-&gt;Min();</font>
+</span><br>
+<p> <hr> <p>

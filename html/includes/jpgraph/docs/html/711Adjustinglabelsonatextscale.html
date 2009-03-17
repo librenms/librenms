@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7102Specifyingadatetimescalewithamanualcallback.html">
+<LINK REL="Next" HREF="712Addingarbitrarytextstringstothegraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7102Specifyingadatetimescalewithamanualcallback.html">Previous</A>
+<A HREF="712Addingarbitrarytextstringstothegraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_11">7.11 Adjusting labels on a text scale</A></H2>
+<P> In the following section we will work through an number of examples
+ on how to manipulate labels on a text scale. Primarily we will
+ investigate how to best handle the case where you have a large number
+ of values.</P>
+<P> As a remainder; Text scale is meant to be used on the X-axis when
+ the X-axis doesn't have a numeric value, i.e you are only interested in
+ linear ordering of the data. If you don't specify the labels manually
+ they will be set automatically starting from 1 as the example below
+ shows.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bartutex1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex1.png" WIDTH="300"></A>
+<BR><B>Figure 83:</B> A simple bar plot using an automatic text scale <A href="exframes/frame_bartutex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> To specify the labels on the X-axis as suitable text strings you
+ call the method <A href="../ref/Axis.html#_AXIS_SETTICKLABELS">
+ Axis::SetTickLabels()</A> with an array containing the text-labels. If
+ there are more data points than labels the non-specified labels will be
+ given their ordinal number. If we augment the previous example with the
+ name of the month we get the following new example</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bartutex2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex2.png" WIDTH="300"></A>
+<BR><B>Figure 84:</B> Manually specifying the text scale labels <A href="exframes/frame_bartutex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P></P>
+<HR> <SMALL><STRONG> Tip:</STRONG> To get hold of localized version of
+ the month names (or weekdays) you can use the <A href="../ref/DateLocale.html#_C_DATELOCALE">
+ DateLocal</A> class available in the global variable $gDateLocale If no
+ locale has been specified the default locale for the installation will
+ be used.</SMALL>
+<HR>
+<P> What happen now if we have a larger number of bars? Let's try with
+ 25 bars and see what result we get.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bartutex3.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex3.png" WIDTH="300"></A>
+<BR><B>Figure 85:</B> A larger data set <A href="exframes/frame_bartutex3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Not all to impressive. The labels are to close and they overlap.
+ Hence it is not a good idea to display every label. To adjust what
+ labels are to be displayed you use the <A href="../ref/Axis.html#_AXIS_SETTEXTLABELINTERVAL">
+ SetTextLabelInterval()</A> method. The argument to this method is the
+ interval between text labels. So to display only every 3 month you
+ would add the line</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetTextLabelIntervall</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">
+)</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> Which would give the result shown below<DIV class="example">
+<BR> <A href="exframes/frame_bartutex4.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex4.png" WIDTH="300"></A>
+<BR><B>Figure 86:</B> Displaying only every third label <A href="exframes/frame_bartutex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Much better, quite readable.</P>
+<P> If we have an even larger data set it might not longer be meaningful
+ to display all the tick marks since they would simple become to close.
+ In JpGraph there is a possibility to specify that you only would like
+ every<I> n</I>:th tick mark to be visible ( <A href="../ref/Axis.html#_AXIS_SETTEXTTICKINTERVAL">
+ SetTextTickIntervall()</A> ). For bar graphs using text scale however,
+ that might not be such a good idea since the tick marks are between the
+ bars and the labels centered under the bars. If we only were to
+ display, say, every 3 tick mark it wouldn't look to good. Not that we
+ can't do it, as the example below shows, but it just doesn't look very
+ good.<DIV class="example">
+<BR> <A href="exframes/frame_bartutex5.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex5.png" WIDTH="300"></A>
+<BR><B>Figure 87:</B> Displaying just every third tick mark. <A href="exframes/frame_bartutex5.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> A better way to handle large data set is simply to hide the tick
+ marks all together. Tick marks may be hidden by calling the method <A href="../ref/Axis.html#_AXIS_HIDETICKS">
+ Axis::HideTicks(); <A> If we hide all the ticks on the X-axis we will
+ get the result shown below<DIV class="example">
+<BR> <A href="exframes/frame_bartutex6.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/bartutex6.png" WIDTH="300"></A>
+<BR><B>Figure 88:</B> Hiding all tick mark. <A href="exframes/frame_bartutex6.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></A></A></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7102Specifyingadatetimescalewithamanualcallback.html">Previous</A>
+<A HREF="712Addingarbitrarytextstringstothegraph.html">Next</A>
+</BODY>
+</HTML>

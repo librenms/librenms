@@ -1,0 +1,326 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_LINEPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>LinePlot</b> EXTENDS <a href="Plot.html#_C_PLOT" style="font-face:arial;font-weight:bold;">Plot</a></div>
+<i>(Defined in: jpgraph_line.php : 24)</i><table border=1><tr><td>&nbsp;<a href="LinePlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">LinePlot</a>&nbsp;</td><td>&nbsp;<a href="Plot.html" style="font-family:arial;font-weight:bold;color:darkblue;">Plot</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="LinePlot.html#_LINEPLOT_ADDAREA">AddArea()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_LINEPLOT">LinePlot()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETBARCENTER">SetBarCenter()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETFASTSTROKE">SetFastStroke()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETFILLCOLOR">SetFillColor()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETFILLFROMYMIN">SetFillFromYMin()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETFILLGRADIENT">SetFillGradient()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETSTEPSTYLE">SetStepStyle()</a>&nbsp;<br>
+&nbsp;<a href="LinePlot.html#_LINEPLOT_SETSTYLE">SetStyle()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;<a href="Plot.html#_PLOT_HIDELEGEND">HideLegend()</a>&nbsp;<br>
+&nbsp;<a href="Plot.html#_PLOT_SETCENTER">SetCenter()</a>&nbsp;<br>
+<a href="Plot.html#_PLOT_SETCOLOR" style="color:darkgrey;">SetColor()&nbsp;</a><br>
+&nbsp;<a href="Plot.html#_PLOT_SETCSIMTARGETS">SetCSIMTargets()</a>&nbsp;<br>
+&nbsp;<a href="Plot.html#_PLOT_SETLEGEND">SetLegend()</a>&nbsp;<br>
+&nbsp;<a href="Plot.html#_PLOT_SETLINEWEIGHT">SetLineWeight()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class is used to creat line graph plots. Line graph plots are used to draw standard lineplots where datapoints are connected by lines. Each data point can also be marked by a plotmark.
+<p>
+A line plot can only be added to a Graph() image.
+
+<b>Public properties:</b>
+<table width=80%>
+<tr><th width=20%> Name </th><th width=20%> Type </th><th> Description </th></tr>
+
+<tr><td> mark </td> PlotMark <td></td><td> Mark at each data point </td></tr>
+
+<tr><td> value </td> DisplayValue <td></td><td> Determine if and hhow each data value should be displayed in the plot </td></tr>
+
+
+</table> <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="AccLinePlot.html">AccLinePlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_ADDAREA"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddArea($aMin,$aMax,$aFilled,$aColor,$aBorder)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a colored area under part of the lien graph.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Start X-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>End X-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFilled</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+LP_AREA_NOT_FILLED</font>
+</td><td>Fill area or not (true/false)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"gray9"</font>
+</td><td>Color of fill</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorder</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+LP_AREA_BORDER</font>
+</td><td>Use a border (true/false)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a vertical colored area under the line between two X-values and to the top of the line.
+<p>
+Predefined values for $aFilled are:<br>
+LP_AREA_FILLED<br>
+LP_AREA_NOT_FILLED<br>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;AddArea(2,5,LP_AREA_FILLED,"indianred1");</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_LINEPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;LinePlot(&amp;$datay,$datax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Public Constructor for LinePlot
+</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$datay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-data</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>X-data</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new LinePlot which later can be added to the graph with the Graph::Add() or Graph::AddY2() method.
+<p>
+A plot can be specified with either only Y-values or both Y-and X-values. If both X and Y values are specified they should have the same number of elements.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_ADD">Graph::Add</a> and <a href="Graph.html#_GRAPH_ADDY2">Graph::AddY2</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+<br />$lineplot&nbsp;=&nbsp;new&nbsp;LinePlot($ydata);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETBARCENTER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBarCenter($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Adjust the positioning of line plots when combined with a bar plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE = Align line points to center of bars</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>By default the lineplots gets aligned to the left side of the bars when using a text X-scale. By calling this method the line points instead gets aligned to the center of the bars.
+<p>
+This method is only to be used in the case where line and bar plots are combined. Any other use is undefined.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ydata&nbsp;=&nbsp;array(12,15,22,19,5);<br />$graph&nbsp;=&nbsp;new&nbsp;Graph(400,200);<br />$graph-&gt;SetScale("textlin");<br />$line&nbsp;=&nbsp;new&nbsp;LinePlot($ydata);<br />$line-&gt;SetBarCenter();<br />$bar&nbsp;=&nbsp;new&nbsp;BarPlot($ydata);<br />$graph-&gt;Add($bar);<br />$graph-&gt;Add($line);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set color for the line plot.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color for line.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lp&nbsp;=&nbsp;new&nbsp;LinePlot($ydata);<br /><br />//&nbsp;Set&nbsp;full&nbsp;blue<br />$lp-&gt;SetColor('#0000FF');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETFASTSTROKE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFastStroke($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Use Fast version of Stroke()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Use fast stroke</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Use Fast version of Stroke(). This is useful for line plots which have many thousand points. This method is a lot faster than the usual Stroke() but also have a lot less functionality and puts restriction on the complexity of the line. The lines can have no plotmarks, must be solid and have a line width of 1&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;SetFastStroke()</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillColor($aColor,$aFilled)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify fill color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFilled</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Flag. Filled or not</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify that a lineplot should be filled as well as the fill color.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="LinePlot.html#_LINEPLOT_SETCOLOR">LinePlot::SetColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lp-&gt;SetFillColor('green');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETFILLFROMYMIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillFromYMin($f)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Fill line not from 0 but from the minimum Y value</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$f</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=fill from minimum</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Fill line not from 0 (as default) but from the minimum Y value. This is mostly usefull when a plot have the negative value and the X-axis is placed at the minimum Y-alue (at the bottom)&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;SetFillFromYMin();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETFILLGRADIENT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillGradient($aFromColor,$aToColor,$aNumColors,$aFilled)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a gradient fill for the line plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFromColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aToColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>End color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aNumColors</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Number of colors to use in transition</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFilled</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Enable gradient fill</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a gradient fill for the line plot. Currently only vertical gradient fill is supported, i.e. the transiiton from color 1 to color 2 is vertical.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p1&nbsp;=&nbsp;new&nbsp;LinePlot($datay);<br />$p1-&gt;SetFillGradient('white','darkgreen');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETSTEPSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStepStyle($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Use step style for line graph.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Flag. true to use step style.</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>If the step style is enabled then each point will be connected not with a straight line between the points but with one horizontal and one vertical line. This makes the graph look like a stair where the next data point indicates if the stair is going up or down.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lp-&gt;SetStepStyle();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEPLOT_SETSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStyle($aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify line style.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text string to specify line</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Linestyle for lines. Valid linestyles are:<br>
+'solid', 'dotted', 'dashed'
+<p>
+The default line style is 'solid'
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_SETLINESTYLE">Image::SetLineStyle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lp-&gt;SetStyle('dotted');<br /></font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7113Adjustingtheticksonatextscale.html">
+<LINK REL="Next" HREF="7115Usingaccumulatedlinegraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7113Adjustingtheticksonatextscale.html">Previous</A>
+<A HREF="7115Usingaccumulatedlinegraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_1_14">7.1.14 Using filled line graphs</A></H3>
+<P> Using a filled line plot is not much different from using a normal
+ line plot, in fact the only difference is that you must call the method
+ <A href="../ref/LinePlot.html#_LINEPLOT_SETFILLCOLOR"> SetFillColor()</A>
+ on a normal line plot. This will then fill the area under the line
+ graph with the chosen color.</P>
+<P> In the example below we have also, as an example, specified plot
+ marks (see previous sections).<DIV class="example">
+<BR> <A href="exframes/frame_filledlineex01.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/filledlineex01.png" WIDTH="300"></A>
+<BR><B>Figure 25:</B> Filled line graph with plot marks <A href="exframes/frame_filledlineex01.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><STRONG> Note 1.</STRONG> If you add multiple filled line plots to
+ one graph make sure you add the one with the highest Y-values first
+ since it will otherwise overwrite the other plots and they will not be
+ visible. Plots are stroked in the order they are added to the graph, so
+ the graph you want front-most must be added last.</P>
+<P><STRONG> Note 2.</STRONG> When using legends with filled line plot
+ the legend will show the fill color and not the bounding line color.</P>
+<P><STRONG> Note 3.</STRONG> Filled line plots is only supposed to be
+ used with positive values. Filling line plots which have negative data
+ values will probably not have the appearance you expect.</P>
+<P> As you can see from the graph above the grid lines are below the
+ filled line graph. If you want the grid lines in front of the graph you
+ can adjust the depth with call to <A href="../ref/Graph.html#_GRAPH_SETGRIDDEPTH">
+ Graph::SetGridDepth()</A> As the following example shows<DIV class="example">
+<BR> <A href="exframes/frame_filledlineex01.1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/filledlineex01.1.png" WIDTH="300"></A>
+<BR><B>Figure 26:</B> Adjusting the depth of the gridlines <A href="exframes/frame_filledlineex01.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7113Adjustingtheticksonatextscale.html">Previous</A>
+<A HREF="7115Usingaccumulatedlinegraphs.html">Next</A>
+</BODY>
+</HTML>

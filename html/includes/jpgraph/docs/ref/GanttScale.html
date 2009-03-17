@@ -1,0 +1,167 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GANTTSCALE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GanttScale</b></div>
+<i>(Defined in: jpgraph_gantt.php : 1834)</i><table border=1><tr><td>&nbsp;<a href="GanttScale.html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttScale</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GanttScale.html#_GANTTSCALE_SETDATELOCALE">SetDateLocale()</a>&nbsp;<br>
+&nbsp;<a href="GanttScale.html#_GANTTSCALE_SETRANGE">SetRange()</a>&nbsp;<br>
+&nbsp;<a href="GanttScale.html#_GANTTSCALE_SETTABLETITLEBACKGROUND">SetTableTitleBackground()</a>&nbsp;<br>
+&nbsp;<a href="GanttScale.html#_GANTTSCALE_SETVERTLAYOUT">SetVertLayout()</a>&nbsp;<br>
+&nbsp;<a href="GanttScale.html#_GANTTSCALE_SETWEEKSTART">SetWeekStart()</a>&nbsp;<br>
+&nbsp;<a href="GanttScale.html#_GANTTSCALE_USEWEEKENDBACKGROUND">UseWeekendBackground()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Internal class to represent the scale used for Gantt graphs.
+
+The scale is accessible as GanttGraph::scale
+
+The following public available subobjects are available
+
+<ul>
+<li> tableTitle (Instance of class TextProperty)
+<li> divider (Instance of class LineProperty)
+<li> actinfo (Instance of class GanttActivityInfo)
+<li> year (Instance of HeaderProperty)
+<li> month (Instance of HeaderProperty)
+<li> week (Instance of HeaderProperty)
+<li> day (Instance of HeaderProperty)
+<li> hour (Instance of HeaderProperty)
+<li> minute (Instance of HeaderProperty)
+</ul> <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="GanttGraph.html">GanttGraph</a>, <a href="HeaderProperty.html">HeaderProperty</a>, <a href="GanttActivityInfo.html">GanttActivityInfo</a> and <a href="TextProperty.html">TextProperty</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_SETDATELOCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDateLocale($aLocale)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify locale to use for scale.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLocale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>String to specify locale</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify locale to use for scale. If no locale is specified then the default locale for the installed system will be used.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateLocale.html#_DATELOCALE_DATELOCALE">DateLocale::DateLocale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;SetDateLocale('US_en');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_SETRANGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRange($aMin,$aMax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify date range for scale.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Min date</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Max date</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify scale min and max date either as timestamp or as date strings. Always round to the nearest week boundary&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;SetRange("2002-11-23",&nbsp;"2003-03-31");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_SETTABLETITLEBACKGROUND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTableTitleBackground($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background for the table title area.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background for the table title area (upper left corner of the table).&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;SetTableTitleBackground('lightblue');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_SETVERTLAYOUT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetVertLayout($aLayout)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify the vertical layout fro rows.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLayout</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Vertical layout parameter</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Should the layout be from top or even. Valid parameters are
+<ul>
+<li> GANTT_EVEN, Spread out the rows even over the whole height of the plot.
+<li> GANTT_FROMTOP, Use the minimum height required for the rows starting from top.
+</ul>
+
+Note that if you use auto-sizing of the Gantt chart these parameters have little effect since the total height of the image will always be so that all rows fit exactly.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$granntgraph-&gt;scale-&gt;SetVertLayout(GANTT_FROMTOP);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_SETWEEKSTART"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWeekStart($aStartDay)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify which weekday should start the week</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStartDay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Weekday, (0-6)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Which day should the week start?
+0==Sun, 1==Monday, 2==Tuesday etc
+
+By default weeks start on Mondays.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttScale.html#_GANTTSCALE_SETRANGE">GanttScale::SetRange</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$granttgraph-&gt;SetWeekStart(1);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTSCALE_USEWEEKENDBACKGROUND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;UseWeekendBackground($aShow)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Determine if the background color for weekends in the scale should extend down in the plot area.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>True=Use the weekend background color in the ganttgraph</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Determine if the background color for weekends in the scale should extend down in the plot area.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;USeWeekendBackground();<br /></font>
+</span><br>
+<p> <hr> <p>

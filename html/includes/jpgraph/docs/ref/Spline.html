@@ -1,0 +1,70 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_SPLINE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Spline</b></div>
+<i>(Defined in: jpgraph_regstat.php : 17)</i><table border=1><tr><td>&nbsp;<a href="Spline.html" style="font-family:arial;font-weight:bold;color:darkblue;">Spline</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Spline.html#_SPLINE_GET">Get()</a>&nbsp;<br>
+&nbsp;<a href="Spline.html#_SPLINE_SPLINE">Spline()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Utility class to help construct an interpolated data points given an arbitrary number of data points.
+<p>
+This class doesn't draw any graphs by itself it is only used to generate a new set of data points representing the smooth line from the input which are the control lines for the cubic spline.
+<p>
+The principle of using this class is that you first create an instance of this class and giving it the X,Y values for your control points.
+<p>
+You can then get back an interpolated smooth dataset by calling the Get() method. This method takeas as argument how many data points you want the interpolated graph to have.
+<p>
+Technical note: The spline is constructed with natural 2:nd derivates at the start and end points of the line.
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SPLINE_GET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Get($num)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the two new data vectors</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$num</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+50</font>
+</td><td>Number of data points</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return a data set representing the interpolated smooth curve passing through all the specified control points.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$spline&nbsp;=&nbsp;new&nbsp;Spline($xcontrol_points,&nbsp;$ycontrol_points);<br />list&nbsp;($xdata,&nbsp;$ydata)&nbsp;=&nbsp;$spline-&gt;Get(100);<br />$lp&nbsp;=&nbsp;new&nbsp;LinePlot($ydata,&nbsp;$xdata);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SPLINE_SPLINE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Spline($xdata,$ydata)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor. Create a new Spline object</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xdata</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Control points. X-coordinates</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ydata</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Control points. Y-coordinates</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Constructor. Create a new Spline object. The spline is determined by it's control points which are given with it's X and Y coordinates as arguments.
+<p>
+Technical note: The spline is constructed with natural 2:nd derivates at the start and end point.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$spline&nbsp;=&nbsp;new&nbsp;Spline($xcontrol_points,&nbsp;$ycontrol_points);<br />list&nbsp;($xdata,&nbsp;$ydata)&nbsp;=&nbsp;$spline-&gt;Get(100);<br />$lp&nbsp;=&nbsp;new&nbsp;LinePlot($ydata,&nbsp;$xdata);<br /></font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,279 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_PIEPLOT3D"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PiePlot3D</b> EXTENDS <a href="PiePlot .html#_C_PIEPLOT " style="font-face:arial;font-weight:bold;">PiePlot </a></div>
+<i>(Defined in: jpgraph_pie3d.php : 17)</i><table border=1><tr><td>&nbsp;<a href="PiePlot3D.html" style="font-family:arial;font-weight:bold;color:darkblue;">PiePlot3D</a>&nbsp;</td><td>&nbsp;<a href="PiePlot .html" style="font-family:arial;font-weight:bold;color:darkblue;">PiePlot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_PIEPLOT3D">PiePlot3d()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETANGLE">SetAngle()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETCSIMTARGETS">SetCSIMTargets()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETEDGE">SetEdge()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETHEIGHT">SetHeight()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETLABELMARGIN">SetLabelMargin()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETLABELS">SetLabels()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETLEGENDS">SetLegends()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETSLICECOLORS">SetSliceColors()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SETSTARTANGLE">SetStartAngle()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot3D.html#_PIEPLOT3D_SHOWBORDER">ShowBorder()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>A 3D pie plot is much like a normal pie plot but in a 3D setting. You can control the apperance by specifying the angle of attack for the pie. A small angle show a very "flat" pie while a large angle shows almost a 2D pie.
+
+Please note that a 3D pie is <b>much</b> more CPU intensive to draw then the normal pie. To reduce the time you might want to keep the height of the pie as small as you think looks good.  The height has a direct linear impact on how long it takes to draw a 3D pie. (See SetHeight()).
+
+To view a 3D pieplot you start by constructing a PieGraph() and then adding a numerb of constructed PiePlot3D to this graph.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="PieGraph.html">PieGraph</a> and <a href="PiePlot.html">PiePlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_PIEPLOT3D"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;PiePlot3d(&amp;$data)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Construct a new 3D pie plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$data</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Data array for slices</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This creates a new pie plot using the data supplied. This plot can then be added to the pie graph.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot3d&nbsp;=&nbsp;new&nbsp;PiePlot3d($ydata);<br /><br />$piegraph-&gt;Add($pieplot3d);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAngle($a)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify projection angle for 3D in degrees.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$a</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Projection angle in degrees</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify projection angle for 3D in degrees. Must be between 10 and 80 degrees. A small angle will make the pie very flat and a large angle will make it present much more of pie circle.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetAngle(45);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETCSIMTARGETS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMTargets($targets,$alts)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify URL for each slice for the image map</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$targets</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of URL targets</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$alts</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Array of Alt texts</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify URL for each slice for the image map&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$targets&nbsp;=&nbsp;array('nextimage.php?1',&nbsp;'nextimage.php?2',&nbsp;'nextimage.php?3');<br />//&nbsp;Show&nbsp;the&nbsp;actual&nbsp;value&nbsp;in&nbsp;the&nbsp;alt&nbsp;text&nbsp;when&nbsp;user&nbsp;hovers&nbsp;the<br />//&nbsp;cursor&nbsp;over&nbsp;the&nbsp;slice<br />$alts&nbsp;=&nbsp;array('More&nbsp;details..(%.1f)',&nbsp;'More&nbsp;details..(%.1f)',&nbsp;'More&nbsp;details..(%.1f)'&nbsp;);<br />$pie-&gt;SetCSIMTargets($targets,$alts);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETEDGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetEdge($aColor,$aWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add a line around pie slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color for line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width of line</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the slices should be separated by a line? If color is specified as "" no line will be used to separate pie slices.
+
+Default is to not show any lines.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot3d-&gt;SetEdge('blue',1);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetHeight($aHeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify thickness of the 3D pie plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Height in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify thickness of 3D pie plot. To minimize CPU usuage you should try to keep the thickness to the visual accepatble minimum.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetHeight(20);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETLABELMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelMargin($m)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify the distance from the pie to the labels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$m</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the distance from the pie to the labels&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot3d-&gt;SetLabelMargin(20);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETLABELS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabels($aLabels,$aLblPosAdj)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify slice labels for 3D pies</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLabels</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Label arrays</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLblPosAdj</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"auto"</font>
+</td><td>Label position [0.2- 1]</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify slice labels for 3D pies. Positoin specify the fraction of the radius wher the labels should be positoined. A values of 1 will position the labels outside the pie.
+<p>
+The labels may include an optional sprintf() formatting string. Before stroking the label to the graph it will be formatted with the actual value (absolute or percentage)  depending on what has been specified with the SetLabelType() method.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETLABELTYPE">PiePlot::SetLabelType</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Specify&nbsp;explicit&nbsp;labels&nbsp;and&nbsp;position&nbsp;them&nbsp;outside&nbsp;the&nbsp;pie<br />$p1-&gt;SetLabels(array("Jan\n%.1f%%","Feb\n%.1f%%","Mar\n%.1f%%","Apr\n%.1f%%"),1);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETLEGENDS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLegends($aLegend)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set legends for slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLegend</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of legends</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set legends for slices&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$plot-&gt;SetLegends(array('Jan','Feb','Mar','Apr');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETSLICECOLORS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSliceColors($aColors)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color of the individual slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColors</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of colors</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color of the individual slices. If there are more slices than colors then the colors will wrap around.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetSliceColors(array('red','blue','green','navy','orange'));</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SETSTARTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStartAngle($aStart)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify start angle for first slice in the Pie</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStart</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start angle (in degrees)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the start angle in degrees for the first slice in the Pie. Angles are counted counter-clockwise starting at "3'clock".&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetStartAngle(45);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT3D_SHOWBORDER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ShowBorder($exterior,$interior)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Select which borders on the pie should be displayed</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$exterior</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Display interior borders</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$interior</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Display exterior borders</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Select which borders should be displayed. Note that when anti-aliasing is enabled no borders can be shown.&nbsp;<br>
+<p> <hr> <p>

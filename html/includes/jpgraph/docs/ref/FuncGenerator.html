@@ -1,0 +1,85 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_FUNCGENERATOR"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>FuncGenerator</b></div>
+<i>(Defined in: jpgraph.php : 676)</i><table border=1><tr><td>&nbsp;<a href="FuncGenerator.html" style="font-family:arial;font-weight:bold;color:darkblue;">FuncGenerator</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="FuncGenerator.html#_FUNCGENERATOR_E">E()</a>&nbsp;<br>
+&nbsp;<a href="FuncGenerator.html#_FUNCGENERATOR_FUNCGENERATOR">FuncGenerator()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>A utility class to help with function plots. This class supprots both ordinary one-variable plots with one dependent variable as well as polar plots.
+
+Basically you create an instance of this class with the function you want to plot as a string argument. The function should be created using 'x' as the independent variable. You then invoke its evaluation method 'E()' with the range for the independent variable and possibly a step size. The method then returns an array of X, and Y values that represents the plot.
+
+Please remember that the string should be specified with single quotes since otherwise PHP will try to interpret the variable in the string.
+
+For example, to specify a simple cos() plot you specify:
+
+$f = new FuncGenerator('cos($x)';
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_FUNCGENERATOR_E"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;E($aXMin,$aXMax,$aSteps)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Evaluate a X-Y function</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Min x-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Max x-value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSteps</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+50</font>
+</td><td>Number of steps</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Evaluate the previous specified function between the specified values. The return two arrays representing the X and Y coordinates for the function.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Create&nbsp;a&nbsp;simple&nbsp;linear&nbsp;plot<br />$f&nbsp;=&nbsp;new&nbsp;FuncGenerator('cos($x)&nbsp;*&nbsp;sin($x)');<br />list($xdata,$ydata)&nbsp;=&nbsp;$f-&gt;E(-2*M_PI,&nbsp;2*M_PI);<br /><br />$lp1&nbsp;=&nbsp;new&nbsp;LinePlot($ydata,$xdata);<br /><br />//&nbsp;Create&nbsp;a&nbsp;simple&nbsp;polar&nbsp;plot&nbsp;(a&nbsp;circle)<br />$p&nbsp;=&nbsp;new&nbsp;FuncGenerator('cos($i)',&nbsp;'sin($i)');<br />list($x2data,$y2data)&nbsp;=&nbsp;$f-&gt;E(-2*M_PI,&nbsp;2*M_PI);<br /><br />$lp2&nbsp;=&nbsp;new&nbsp;LinePlot($y2data,$x2data);<br /><br />//...</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_FUNCGENERATOR_FUNCGENERATOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FuncGenerator($aFunc,$aXFunc)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new function generator.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFunc</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Function</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXFunc</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>X-Function</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Creates a new funciton generator. You can create both a linear plot as well as polar plot.
+
+For linear, one-variable plots, you must use '$x' as the independent variable.
+
+For polar plots you should use the index '$i' for the generating functions.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Create&nbsp;a&nbsp;simple&nbsp;linear&nbsp;plot<br />$f&nbsp;=&nbsp;new&nbsp;FuncGenerator('cos($x)&nbsp;*&nbsp;sin($x)');<br />list($xdata,$ydata)&nbsp;=&nbsp;$f-&gt;E(-2*M_PI,&nbsp;2*M_PI);<br /><br />$lp1&nbsp;=&nbsp;new&nbsp;LinePlot($ydata,$xdata);<br /><br />//&nbsp;Create&nbsp;a&nbsp;simple&nbsp;polar&nbsp;plot&nbsp;(a&nbsp;circle)<br />$p&nbsp;=&nbsp;new&nbsp;FuncGenerator('cos($i)',&nbsp;'sin($i)');<br />list($x2data,$y2data)&nbsp;=&nbsp;$f-&gt;E(-2*M_PI,&nbsp;2*M_PI);<br /><br />$lp2&nbsp;=&nbsp;new&nbsp;LinePlot($y2data,$x2data);<br /><br />//...<br /></font>
+</span><br>
+<p> <hr> <p>

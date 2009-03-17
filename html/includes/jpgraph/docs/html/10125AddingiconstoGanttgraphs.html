@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="10124Horizontalgridsandalternatinglinecolors.html">
+<LINK REL="Next" HREF="10126Adjustingthemarginswithautosizing.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="10124Horizontalgridsandalternatinglinecolors.html">Previous</A>
+<A HREF="10126Adjustingthemarginswithautosizing.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_12_5">10.12.5 Adding icons to Gantt graphs</A></H3>
+ As is illustrated in the image above it is also possible (just like for
+ normal Graph) to add small images (or icons) to a Gantt graph by
+ creating an IconPlot() instance and then adding it to the graph. In the
+ image above the following lines were used to add the small image of
+ &quot;tux&quot; in the left lower corner<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$icon&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">IconPlot</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'penguin.png'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+0.01</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0.95</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">15</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$icon</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetAnchor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'left'</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+'bottom'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$icon</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="10124Horizontalgridsandalternatinglinecolors.html">Previous</A>
+<A HREF="10126Adjustingthemarginswithautosizing.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="712Displayingthevaluesforeachdatapoint.html">
+<LINK REL="Next" HREF="714AddingasecondYscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="712Displayingthevaluesforeachdatapoint.html">Previous</A>
+<A HREF="714AddingasecondYscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_1_3">7.1.3 Adding several plots to the same graph</A></H3>
+<P> What if we want to add a second plot to the graph we just produced?
+ Well, this is quite straightforward and just requires two simple step:</P>
+<OL>
+<LI>Create the second plot</LI>
+<LI>Add it to the graph</LI>
+</OL>
+<P> To create the second plot we need some data (we could of course use
+ the same data as for the first plot but then we wouldn't be able to see
+ the new plot!)</P>
+<P> The following lines show how to create the new plot and add it to
+ the graph (we only show the new lines - not the full script)<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$ydata2&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array(</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">19</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+15</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">7</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">22</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">14</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">5</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+9</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">21</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">13</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$lineplot2</FONT><FONT color="#007700">
+=new&nbsp;</FONT><FONT color="#0000BB">LinePlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$ydata2</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot2</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;orange&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot2</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetWeight</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">2</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$lineplot2</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> Making these changes to the previous graph script would generate a
+ new graph as illustrated below.<DIV class="example">
+<BR> <A href="exframes/frame_example4.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example4.png" WIDTH="300"></A>
+<BR><B>Figure 10:</B> Adding a second plot to the previous graph <A href="exframes/frame_example4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> There is a few things worth noting here</P>
+<UL>
+<LI>The Y-scale has changed to accommodate the larger range of Y-values
+ for the second graph.</LI>
+<LI>If you add several plots to the same graph they should contain the
+ same number of data points. This is not a requirement (the graph will
+ be automatically scaled to accommodate the plot with the largest number
+ of points) but it will not look very good since one of the plot end in
+ the middle of the graph.</LI>
+</UL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="712Displayingthevaluesforeachdatapoint.html">Previous</A>
+<A HREF="714AddingasecondYscale.html">Next</A>
+</BODY>
+</HTML>

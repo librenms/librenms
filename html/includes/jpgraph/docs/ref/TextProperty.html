@@ -1,0 +1,189 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_TEXTPROPERTY"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>TextProperty</b></div>
+<i>(Defined in: jpgraph_gantt.php : 1501)</i><table border=1><tr><td>&nbsp;<a href="TextProperty.html" style="font-family:arial;font-weight:bold;color:darkblue;">TextProperty</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_ALIGN">Align()</a>&nbsp;<br>
+&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_SETALIGN">SetAlign()</a>&nbsp;<br>
+&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="TextProperty.html#_TEXTPROPERTY_SHOW">Show()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This is very similair to Text but this is only used as an internal helper class in Gantt chart. In comparison with text it has the added funtionality that it can handle tabs.
+
+In the next version of JpGraph the extra functionality that this class has should be added to the real class Text() to make the class more orthogonal. 
+
+Since this is just an internal helper class it has its justified  position though. This was oroginally considered a very experimental text class and it made sence to compartmetn thath functionlity in a separate class to the stnadard Text() class.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Text.html">Text</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_ALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Align($aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify vertical and horizontal alignment</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"bottom"</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the anchor point fo the text. The anchor point determines how the texts x,y positions should be interpretated.
+&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aTxt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify text string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify text string&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;title-&gt;Set("Overview&nbsp;for&nbsp;year&nbsp;2002");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_SETALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlign($aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify alignment for text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"bottom"</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify alignment for text. Same as TextProperty::Align()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="TextProperty.html#_TEXTPROPERTY_ALIGN">TextProperty::Align</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set text color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify text color&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+SetColor('red:0.6');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($aFFamily,$aFStyle,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFFamily</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font family, size and style. Two major types of font families can be used, builtin bitmnapped fonts or TTF fonts. The builtin fonts have a fixed size which can't be altered.
+
+Valid styles are
+<ul>
+<li> FS_NORMAL
+<li> FS_BOLD
+<li> FS_ITALIC
+<li> FS_BOLDITALIC
+</ul>
+
+Valid values for the internal font families are
+<ul>
+<li> FF_FONT0, Internal font 1 (small font)
+<li> FF_FONT1, Internal font 2, (Medium size)
+<li> FF_FONT2, Internal font 3, (large size)
+</ul>
+
+Note: FF_FONT0 only suppor font style FS_NORMAL
+
+The available TTF are by default
+<ul>
+<li> FF_ARIAL
+<li> FF_TIMES, (Times Roman)
+<li> FF_COURIER, (Courier new)
+<li> FF_VERDANA, (Verdana)
+<li> FF_BOOK, (Bookman)
+<li> FF_HANDWRT, (Handwriting)
+<li> FF_COMIC, (Sans Comic)
+</ul>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_STROKETEXT">Image::StrokeText</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+SetFont(FF_ARIAL,FS_NORMAL,12)</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXTPROPERTY_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aShow)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Unhide/hide the text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Show text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the text should be displayed or hidden&nbsp;<br>
+<p> <hr> <p>

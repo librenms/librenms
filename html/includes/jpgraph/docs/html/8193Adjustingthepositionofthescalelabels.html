@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8192Scientificstyleaxis.html">
+<LINK REL="Next" HREF="8194Formattingthescalelabels.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8192Scientificstyleaxis.html">Previous</A>
+<A HREF="8194Formattingthescalelabels.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_19_3">8.19.3  Adjusting the position of the scale labels</A>
+</H3>
+<P> How to adjust the actual labels are discussed elsewhere in this
+ manual (see ???,???). However we like to mention here that you can
+ adjust the label margin (distance between the axis and the labels) with
+ the method <A href="../ref/Axis.html#_AXIS_SETLABELMARGIN">
+ Axis::SetLabelMargin()</A></P>
+<P> to adjust the actual label format (like font, color, angle) you need
+ to access the <A href="../ref/Axis.html#_AXIS_SETFONT"> Axis::SetFont()</A>
+ and the <A href="../ref/Axis.html#_AXIS_SETCOLOR"> Axis::SetColor()</A>
+ methods. If you investigate the <A href="../ref/Axis.html#_C_AXIS">
+ Axis</A> class you will discover more methods to adjust the many
+ aspects of the axis layout.</P>
+<P> As a final note we also mention the methods <A href="../ref/Axis.html#_AXIS_SETLABELALIGN">
+ Axis::SetLabelAlign()</A> and <A href="../ref/Axis.html#_AXIS_SETLABELANGLE">
+ Axis::SetLabelAngle()</A> This first method is really only mentioned
+ here for completeness since it is mostly used for internal purposes.
+ However on some occasion you might want to adjust the alignment of the
+ labels. By default they are centered in respect to the tick mark. By
+ using the method you might override this positioning should you choose
+ to do so.</P>
+<P> The second of these methods adjusts the angle of the label in
+ regards to the axis. This is very useful for X-axis that have long
+ labels.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8192Scientificstyleaxis.html">Previous</A>
+<A HREF="8194Formattingthescalelabels.html">Next</A>
+</BODY>
+</HTML>

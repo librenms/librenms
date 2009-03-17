@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">
+<LINK REL="Next" HREF="82Bargraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">Previous</A>
+<A HREF="82Bargraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_17">8.1.17 Adding plot marks to a line plot</A></H3>
+<P> To emphasize the specific data points it is possible to add plot
+ marks at each data point. Plot marks can be either</P>
+<UL>
+<LI> Simple shapes, (e.g. square, circle, cross, etc)</LI>
+<LI> Arbitrary images loaded from a file</LI>
+<LI> One of the built-in images</LI>
+</UL>
+<P> You access the plot mark through the &quot;mark&quot; instance variable in the
+ plot, as in<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$lineplot</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+mark</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;red&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> To choose between the different plot marks you call the <A href="../ref/PlotMark.html#_PLOTMARK_SETTYPE">
+PlotMark::SetType()</A> method with the correct define to choose the
+ plot type you want to use.</P>
+<P> The simple shape type of plot marks are</P>
+<UL>
+<LI> MARK_SQUARE</LI>
+<LI> MARK_UTRIANGLE</LI>
+<LI> MARK_DTRIANGLE</LI>
+<LI> MARK_DIAMOND</LI>
+<LI> MARK_CIRCLE</LI>
+<LI> MARK_FILLEDCIRCLE</LI>
+<LI> MARK_CROSS</LI>
+<LI> MARK_STAR</LI>
+<LI> MARK_X</LI>
+<LI> MARK_LEFTTRIANGLE</LI>
+<LI> MARK_RIGHTTRIANGLE</LI>
+<LI> MARK_FLASH</LI>
+</UL>
+<P> To specify an arbitrary image you use the special define</P>
+<UL>
+<LI> MARK_IMG</LI>
+</UL>
+<P> In this case you must also specify a image file name and an optional
+ scaling constant. For example as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$lineplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">mark</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTYPE</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MARK_IMG</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;myimage.jpg&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+1.5</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P></P>
+<P> If you want to use one of the built-in images the following images
+ are available. Please note that not all images are available in all
+ possible colors. The available colors for each image is listed below.</P>
+<P> The following shape (the first class) plot marks are available</P>
+<OL>
+<LI>MARK_SQUARE, A filled square</LI>
+<LI>MARK_UTRIANGLE, A triangle pointed upwards</LI>
+<LI>MARK_DTRIANGLE, A triangle pointed downwards</LI>
+<LI>MARK_DIAMOND, A diamond</LI>
+<LI>MARK_CIRCLE, A circle</LI>
+<LI>MARK_FILLEDCIRCLE, A filled circle</LI>
+<LI>MARK_CROSS, A cross</LI>
+<LI>MARK_STAR, A star</LI>
+<LI>MARK_X, An 'X'</LI>
+<LI>MARK_FLASH, A &quot;flash&quot; shape</LI>
+<LI>MARK_IMAGE, Use the image specified with the filename and scale as
+ the second and third argument as the mark.</LI>
+</OL>
+<P></P>
+<P> For the second class (built-in images) the following table list the
+ different images as well as what color they are available in. For the
+ built-in images you specify the color with the second argument.</P>
+<P> Note that some of the images are available in different sizes. The
+ reason is that even though you can scale them by the third argument
+ there is a visual degradation to scale an image larger than it's
+ original size since some pixels needs to be interpolated. Reducing the
+ size with a scale &lt; 1.0 gives much better visual apperance.</P>
+<P> The scaling works with both GD 1 and GD 2 but with GD 2 the quality
+ of the scaling is much better.</P>
+<P> Built-in images and available colors:</P>
+<TABLE border="1">
+<TR><TH>Type</TH><TH>Description</TH><TH>Colors</TH></TR>
+<TR><TD>MARK_IMG_PUSHPIN, MARK_IMG_SPUSHPIN</TD><TD> Push-pin image</TD><TD>
+'red','blue','green','pink','orange'</TD></TR>
+<TR><TD>MARK_IMG_LPUSHPIN</TD><TD> A larger Push-pin image</TD><TD>
+'red','blue','green','pink','orange'</TD></TR>
+<TR><TD>MARK_IMG_BALL, MARK_IMAGE_SBALL</TD><TD>A round 3D rendered ball</TD><TD>
+'bluegreen','cyan','darkgray','greengray',
+ 'gray','graypurple','green','greenblue','lightblue',
+ 'lightred','navy','orange','purple','red','yellow'</TD></TR>
+<TR><TD>MARK_IMAGE_MBALL</TD><TD>A medium sized round 3D rendered ball</TD><TD>
+ 'blue','bluegreen','brown','cyan',
+ 'darkgray','greengray','gray','green',
+ 'greenblue','lightblue','lightred', 'purple','red','white','yellow'</TD>
+</TR>
+<TR><TD>MARK_IMAGE_LBALL</TD><TD>A large sized round 3D rendered ball</TD><TD>
+ 'blue','lightblue','brown','darkgreen',
+ 'green','purple','red','gray','yellow','silver','gray'</TD></TR>
+<TR><TD>MARK_IMAGE_SQUARE</TD><TD>A 3D rendered square</TD><TD>
+'bluegreen','blue','green', 'lightblue','orange','purple','red','yellow'</TD>
+</TR>
+<TR><TD>MARK_IMG_STAR</TD><TD>A 3D rendered star image</TD><TD>
+'bluegreen','lightblue','purple','blue','green','pink','red','yellow'</TD>
+</TR>
+<TR><TD>MARK_IMG_DIAMOND</TD><TD>A 3D rendered diamond</TD><TD>
+'lightblue','darkblue','gray', 'blue','pink','purple','red','yellow'</TD>
+</TR>
+<TR><TD>MARK_IMG_BEVEL</TD><TD>A 3D rendered bevel style round ring</TD><TD>
+'green','purple','orange','red','yellow'</TD></TR>
+</TABLE>
+ Below we give two examples of images using these features.<DIV class="example">
+<BR> <A href="exframes/frame_imgmarkerex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/imgmarkerex1.png" WIDTH="300"></A>
+<BR><B>Figure 27:</B> Using an arbitrary image as plot mark <A href="exframes/frame_imgmarkerex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_builtinplotmarksex1.html" target="blank"><IMG
+border="0" HEIGHT="200"  src="img/builtinplotmarksex1.png" WIDTH="350"></A>
+<BR><B>Figure 28:</B> Using the built-in images <A href="exframes/frame_builtinplotmarksex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">Previous</A>
+<A HREF="82Bargraphs.html">Next</A>
+</BODY>
+</HTML>

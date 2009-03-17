@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7210Creatingsemifilledbargraphs.html">
+<LINK REL="Next" HREF="731Usinglineerrorplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7210Creatingsemifilledbargraphs.html">Previous</A>
+<A HREF="731Usinglineerrorplots.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_3">7.3 Error plots</A></H2>
+<P> Error plots are used to visually indicate uncertainty in data
+ points. This is done by for each X value by giving both a minimum and a
+ maximum Y-value.</P>
+<P> Before you can use error plots you must remember to include the file
+ &quot;jpgraph_error.php&quot; in your script.</P>
+<P> The following example illustrates a simple error bar. We will have 5
+ points, so we need 10 Y-values. We also would like the error bars to be
+ red and 2 pixels wide. All this is accomplished by creating an <A href="../ref/ErrorPlot.html#_C_ERRORPLOT">
+ ErrorPlot()</A> in much the same way as, for example, a normal line
+ plot. Doing this would now give the example shown below.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example13.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example13.png" WIDTH="300"></A>
+<BR><B>Figure 57:</B> A simple error bar <A href="exframes/frame_example13.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> You might notice that there is one displeasing esthetic quality of
+ this graph. The X-scale is just wide enough to just accompany the
+ number of error bars and hence the first bar is drawn on the Y-axis and
+ the and last bar just at the edge of the plot area. To adjust this you
+ might call the <A href="../ref/Plot.html#_PLOT_SETCENTER"> SetCenter()</A>
+ method which will adjust the X-scale so it does not use the full width
+ of the X-axis.</P>
+<P> The following example illustrates the use of this feature by
+ applying this technique to the previous example<DIV class="example">
+<BR> <A href="exframes/frame_example14.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example14.png" WIDTH="300"></A>
+<BR><B>Figure 58:</B> Adjusting the X-scale not to use the full width of
+ the X-axis. <A href="exframes/frame_example14.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7210Creatingsemifilledbargraphs.html">Previous</A>
+<A HREF="731Usinglineerrorplots.html">Next</A>
+</BODY>
+</HTML>

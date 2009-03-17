@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="43UsingPHPdirectly.html">
+<LINK REL="Next" HREF="45ChoosingtheimageformatforJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="43UsingPHPdirectly.html">Previous</A>
+<A HREF="45ChoosingtheimageformatforJpGraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="4_4">4.4 The basic principle of JpGraph and the creation of
+ images</A></H2>
+<P> The common pattern for creating graphs is</P>
+<OL>
+<LI> Create a script that constructs the image, type, colors size and so
+ on.</LI>
+<LI> A wrapper script which contains one or more &lt;IMG&gt; tags to position
+ the graphs on the proper HTML page.</LI>
+</OL>
+<P> Of course it is of perfectly possible to call the image script
+ directly in the browser to just display the generated image in the
+ browser.</P>
+<P> You should remember that it is also possible to pass arguments to
+ the image script via the normal HTTP GET/POST arguments. For example<DIV
+class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT
+color="#007700">&lt;</FONT><FONT color="#0000BB">img&nbsp;src</FONT><FONT color="#007700">
+=</FONT><FONT color="#DD0000">&quot;showgraph.php?a=1&amp;b=2&quot;</FONT><FONT color="#007700">
+&gt;</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> This could for example be used to control the appearance of the
+ image or perhaps send data to the image which will be displayed. Note
+ that this is probably not the best way to send large amount of data to
+ plot. Instead the only practical way, for large data sizes, is to get
+ all the data in the image script, perhaps from a DB. Another
+ alternative for large amount of data to be sent to the image script is
+ by creating a POST request to the image script.<DIV class="note"><B>
+Note:</B><B> Forcing the browser to update your image</B> Some browser
+ may not send back a request to the web browser unless the user presses
+ &quot;Refresh&quot; (F5 - in most browsers). This can lead to problems that the
+ user is seeing old data. A simple trick is to add a dummy time argument
+ which is not used in the script. For example
+<PRE>
+echo '&lt;img src=&quot;myimagescript.php?dummy='.now().'&quot;&gt;';
+</PRE>
+ It is also important to be aware of any internal caching the browser
+ might do. The general problem with dynamically generated images is that
+ the image generating script (file) remains the same. This makes the
+ browser believe that the data hasn't changed and if the browser already
+ has issues a previous GET request and has the data cached it will not
+ send a new GET if the timestamp on the file is the same since it then
+ believes it my use the old cached version.</DIV></P>
+<P> When it comes to the structure of your imaging script they will
+ generally have the structure<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;...&nbsp;Include&nbsp;necessary&nbsp;headers
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Graph</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$width</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$height</FONT><FONT color="#007700">,&nbsp;...);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;...&nbsp;code&nbsp;to&nbsp;construct&nbsp;the&nbsp;graph&nbsp;details
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> JpGraph is completely Object oriented so all calls will be action on
+ specific instances of classes. One of the fundamental classes is the
+ Graph() class which represents the entire graph.</P>
+<P> After the creation of the Graph() object all the code lines to
+ construct the details of the graph are added.</P>
+<P> The final method called in an image script will most likely be the<I>
+ Graph::Stroke()</I> method. This will send the constructed image back
+ to the browser. A variation of this is used if the graph are supposed
+ to have image maps. In that case the final method will be<I>
+ Graph::StrokeCSIM()</I></P>
+<P> In addition to this standard usage pattern you can also choose to</P>
+<UL>
+<LI> ... send the graph directly to a file</LI>
+<LI> ... access the GD image handler for further image processing (also
+ needed to include the image in an PDF file)</LI>
+<LI> ... make use of the builtin cache system to send back a previously
+ generated image</LI>
+</UL>
+<P> The cache system, which lessens the burden of the PHP server, works
+ by avoiding o run all the code that follows the initial Graph() call by
+ checking if the image has already been created and in that case
+ directly send back the previously created (and stored in a file) image
+ to the browser. When using the cache system a filename must be
+ specified in the initial Graph() call which is used to store the image
+ in the cache system and possibly also a timeout value to indicate how
+ long the image in the cache directory should be valid.</P>
+<P> In many of the examples in this manual the following pattern will be
+ used<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+Graph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">300</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;auto&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The two first parameters specify the width and height of the graph
+ and the third parameter the name of the image file in the cache
+ directory. The special name<I> 'auto'</I> indicates that the image file
+ will be given the same name as the image script but with the extension
+ changed to indicate the graphic format used, i.e '.jpg', '.png' and so
+ on.</P>
+<P> Please note that the cache system by default is disabled and must be
+ enabled by setting the proper define in the file &quot;jpg-config.inc.php&quot;</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="43UsingPHPdirectly.html">Previous</A>
+<A HREF="45ChoosingtheimageformatforJpGraph.html">Next</A>
+</BODY>
+</HTML>

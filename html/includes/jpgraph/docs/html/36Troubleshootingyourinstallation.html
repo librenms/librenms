@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="35DetailedstepstoinstallJpGraph.html">
+<LINK REL="Next" HREF="37CompilingPHP4.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="35DetailedstepstoinstallJpGraph.html">Previous</A>
+<A HREF="37CompilingPHP4.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="3_6">3.6 Troubleshooting your installation</A></H2>
+<P> For 99% of the users this library will work directly with a recent
+ installation of PHP without any problem.</P>
+<P> Experience shows that most of the trouble are caused by either an
+ old buggy version of the free-type TTF library or using an old
+ antiquated version of the GD library. In order to narrow it down the
+ problem the following steps is helpful.</P>
+<OL>
+<LI> If no background images are displayed (instead a solid black box
+ are displayed) chances are that GD 2.x is available but the
+ jpg-config.inc.php has been changed so that true color images are
+ disabled. Correct this by enabling the USE_TRUECOLOR define.</LI>
+<LI> If background images does not work make sure the settings of
+ USE_GD2_LIBRARY corresponds to the actual installation, i.e. If the GD2
+ library is not available then this define must be false!</LI>
+<LI> If you are running IIS and Win2k and get the error &quot;Can't find
+ font&quot; when trying to use TTF fonts then try to change the paths to UNIX
+ style, i.e. &quot;/usr/local/fonts/ttf/&quot;. Remember that the path is absolute
+ and not relative to the htdocs catalogue.</LI>
+<LI> If no images and no error messages gets sent back to the browser
+ then there is a big chance that HTTP-Server PHP module (e.g.
+ Apache-PHP) has crashed. This is often due to a broken PHP installation
+ and more than often a problem with the True Type libraries. The best
+ way to track these types of problem down is to investigate the
+ HTTP-Server logs or the general system logs for evidence of a PHP
+ crash. The other reasons is that in some rare cases the auto detection
+ of the GD library could fail. If only the GD1 library is available and
+ the JpGraph library mistakenly detects the GD2 this could in rare cases
+ cause PHP to crash. Please try re-run the example by setting the DEFINE
+ USE_GD2_LIBRARY to &quot;false&quot;.</LI>
+<LI> If the system is running IIS on Windows and some images which uses
+ TTF fonts just return an empty page then try to set the TTF_DIR path
+ manually (in jpg-config.php) to the directory where all the TTF fonts
+ are stored (normally c:/WINDOWS/fonts)</LI>
+<LI> If the cache is enabled please make sure that the permissions are
+ correctly set for the cache directory so that the process running
+ Apache/PHP has write access to the cache directory.</LI>
+<LI> If the TTF fonts only shows up as yellow then you have a buggy
+ installation of the freetype font library and the only thing to do is
+ to re-install and setup PHP+GD again.</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="35DetailedstepstoinstallJpGraph.html">Previous</A>
+<A HREF="37CompilingPHP4.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,618 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><a href=projinfo.html target=classdetail style='font-size:120%;'>JpGraph</a><p>
+<table width=100%><tr><td valign=top width=100%><b><font face='arial'>1.</font> <a href="AccBarPlot.html#_C_ACCBARPLOT"  target=classdetail>AccBarPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 1.1</span> <a href="AccBarPlot.html#_ACCBARPLOT_ACCBARPLOT"  target=classdetail>AccBarPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 1.2</span> <a href="AccBarPlot.html#_ACCBARPLOT_MAX"  target=classdetail>Max</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 1.3</span> <a href="AccBarPlot.html#_ACCBARPLOT_MIN"  target=classdetail>Min</a><br>
+<b><font face='arial'>2.</font> <a href="AccLinePlot.html#_C_ACCLINEPLOT"  target=classdetail>AccLinePlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 2.1</span> <a href="AccLinePlot.html#_ACCLINEPLOT_ACCLINEPLOT"  target=classdetail>AccLinePlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 2.2</span> <a href="AccLinePlot.html#_ACCLINEPLOT_MAX"  target=classdetail>Max</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 2.3</span> <a href="AccLinePlot.html#_ACCLINEPLOT_MIN"  target=classdetail>Min</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 2.4</span> <a href="AccLinePlot.html#_ACCLINEPLOT_SETINTERPOLATEMODE"  target=classdetail>SetInterpolateMode</a><br>
+<b><font face='arial'>3.</font> <a href="AntiSpam.html#_C_ANTISPAM"  target=classdetail>AntiSpam</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 3.1</span> <a href="AntiSpam.html#_ANTISPAM_ANTISPAM"  target=classdetail>AntiSpam</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 3.2</span> <a href="AntiSpam.html#_ANTISPAM_RAND"  target=classdetail>Rand</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 3.3</span> <a href="AntiSpam.html#_ANTISPAM_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 3.4</span> <a href="AntiSpam.html#_ANTISPAM_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>4.</font> <a href="Axis.html#_C_AXIS"  target=classdetail>Axis</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.1</span> <a href="Axis.html#_AXIS_HIDE"  target=classdetail>Hide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.2</span> <a href="Axis.html#_AXIS_HIDEFIRSTLASTLABEL"  target=classdetail>HideFirstLastLabel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.3</span> <a href="Axis.html#_AXIS_HIDEFIRSTTICKLABEL"  target=classdetail>HideFirstTickLabel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.4</span> <a href="Axis.html#_AXIS_HIDELABELS"  target=classdetail>HideLabels</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.5</span> <a href="Axis.html#_AXIS_HIDELASTTICKLABEL"  target=classdetail>HideLastTickLabel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.6</span> <a href="Axis.html#_AXIS_HIDELINE"  target=classdetail>HideLine</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.7</span> <a href="Axis.html#_AXIS_HIDETICKS"  target=classdetail>HideTicks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.8</span> <a href="Axis.html#_AXIS_HIDEZEROLABEL"  target=classdetail>HideZeroLabel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.9</span> <a href="Axis.html#_AXIS_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.10</span> <a href="Axis.html#_AXIS_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.11</span> <a href="Axis.html#_AXIS_SETLABELALIGN"  target=classdetail>SetLabelAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.12</span> <a href="Axis.html#_AXIS_SETLABELANGLE"  target=classdetail>SetLabelAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.13</span> <a href="Axis.html#_AXIS_SETLABELFORMAT"  target=classdetail>SetLabelFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.14</span> <a href="Axis.html#_AXIS_SETLABELFORMATCALLBACK"  target=classdetail>SetLabelFormatCallback</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.15</span> <a href="Axis.html#_AXIS_SETLABELFORMATSTRING"  target=classdetail>SetLabelFormatString</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.16</span> <a href="Axis.html#_AXIS_SETLABELMARGIN"  target=classdetail>SetLabelMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.17</span> <a href="Axis.html#_AXIS_SETLABELPOS"  target=classdetail>SetLabelPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.18</span> <a href="Axis.html#_AXIS_SETLABELSIDE"  target=classdetail>SetLabelSide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.19</span> <a href="Axis.html#_AXIS_SETMAJTICKPOSITIONS"  target=classdetail>SetMajTickPositions</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.20</span> <a href="Axis.html#_AXIS_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.21</span> <a href="Axis.html#_AXIS_SETPOSABSDELTA"  target=classdetail>SetPosAbsDelta</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.22</span> <a href="Axis.html#_AXIS_SETTEXTLABELINTERVAL"  target=classdetail>SetTextLabelInterval</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.23</span> <a href="Axis.html#_AXIS_SETTEXTTICKINTERVAL"  target=classdetail>SetTextTickInterval</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.24</span> <a href="Axis.html#_AXIS_SETTEXTTICKS"  target=classdetail>SetTextTicks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.25</span> <a href="Axis.html#_AXIS_SETTICKDIRECTION"  target=classdetail>SetTickDirection</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.26</span> <a href="Axis.html#_AXIS_SETTICKLABELMARGIN"  target=classdetail>SetTickLabelMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.27</span> <a href="Axis.html#_AXIS_SETTICKLABELS"  target=classdetail>SetTickLabels</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.28</span> <a href="Axis.html#_AXIS_SETTICKPOSITIONS"  target=classdetail>SetTickPositions</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.29</span> <a href="Axis.html#_AXIS_SETTICKSIDE"  target=classdetail>SetTickSide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.30</span> <a href="Axis.html#_AXIS_SETTITLE"  target=classdetail>SetTitle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.31</span> <a href="Axis.html#_AXIS_SETTITLEMARGIN"  target=classdetail>SetTitleMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.32</span> <a href="Axis.html#_AXIS_SETTITLESIDE"  target=classdetail>SetTitleSide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 4.33</span> <a href="Axis.html#_AXIS_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+<b><font face='arial'>5.</font> <a href="BarPlot.html#_C_BARPLOT"  target=classdetail>BarPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.1</span> <a href="BarPlot.html#_BARPLOT_BARPLOT"  target=classdetail>BarPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.2</span> <a href="BarPlot.html#_BARPLOT_SETABSWIDTH"  target=classdetail>SetAbsWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.3</span> <a href="BarPlot.html#_BARPLOT_SETALIGN"  target=classdetail>SetAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.4</span> <a href="BarPlot.html#_BARPLOT_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.5</span> <a href="BarPlot.html#_BARPLOT_SETFILLGRADIENT"  target=classdetail>SetFillGradient</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.6</span> <a href="BarPlot.html#_BARPLOT_SETNOFILL"  target=classdetail>SetNoFill</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.7</span> <a href="BarPlot.html#_BARPLOT_SETPATTERN"  target=classdetail>SetPattern</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.8</span> <a href="BarPlot.html#_BARPLOT_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.9</span> <a href="BarPlot.html#_BARPLOT_SETVALUEPOS"  target=classdetail>SetValuePos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.10</span> <a href="BarPlot.html#_BARPLOT_SETWIDTH"  target=classdetail>SetWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.11</span> <a href="BarPlot.html#_BARPLOT_SETYBASE"  target=classdetail>SetYBase</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 5.12</span> <a href="BarPlot.html#_BARPLOT_SETYMIN"  target=classdetail>SetYMin</a><br>
+<b><font face='arial'>6.</font> <a href="Bezier.html#_C_BEZIER"  target=classdetail>Bezier</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 6.1</span> <a href="Bezier.html#_BEZIER_BEZIER"  target=classdetail>Bezier</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 6.2</span> <a href="Bezier.html#_BEZIER_GET"  target=classdetail>Get</a><br>
+<b><font face='arial'>7.</font> <a href="BoxPlot.html#_C_BOXPLOT"  target=classdetail>BoxPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 7.1</span> <a href="BoxPlot.html#_BOXPLOT_BOXPLOT"  target=classdetail>BoxPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 7.2</span> <a href="BoxPlot.html#_BOXPLOT_SETMEDIANCOLOR"  target=classdetail>SetMedianColor</a><br>
+<b><font face='arial'>8.</font> <a href="CanvasGraph.html#_C_CANVASGRAPH"  target=classdetail>CanvasGraph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 8.1</span> <a href="CanvasGraph.html#_CANVASGRAPH_CANVASGRAPH"  target=classdetail>CanvasGraph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 8.2</span> <a href="CanvasGraph.html#_CANVASGRAPH_INITFRAME"  target=classdetail>InitFrame</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 8.3</span> <a href="CanvasGraph.html#_CANVASGRAPH_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>9.</font> <a href="CanvasRectangleText.html#_C_CANVASRECTANGLETEXT"  target=classdetail>CanvasRectangleText</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.1</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_CANVASRECTANGLETEXT"  target=classdetail>CanvasRectangleText</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.2</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_PARAGRAPHALIGN"  target=classdetail>ParagraphAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.3</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_POS"  target=classdetail>Pos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.4</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.5</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETAUTOMARGIN"  target=classdetail>SetAutoMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.6</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.7</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETCORNERRADIUS"  target=classdetail>SetCornerRadius</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.8</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.9</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.10</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETFONTCOLOR"  target=classdetail>SetFontColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.11</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.12</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.13</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_SETTXT"  target=classdetail>SetTxt</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 9.14</span> <a href="CanvasRectangleText.html#_CANVASRECTANGLETEXT_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>10.</font> <a href="CanvasScale.html#_C_CANVASSCALE"  target=classdetail>CanvasScale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 10.1</span> <a href="CanvasScale.html#_CANVASSCALE_CANVASSCALE"  target=classdetail>CanvasScale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 10.2</span> <a href="CanvasScale.html#_CANVASSCALE_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 10.3</span> <a href="CanvasScale.html#_CANVASSCALE_TRANSLATE"  target=classdetail>Translate</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 10.4</span> <a href="CanvasScale.html#_CANVASSCALE_TRANSLATEX"  target=classdetail>TranslateX</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 10.5</span> <a href="CanvasScale.html#_CANVASSCALE_TRANSLATEY"  target=classdetail>TranslateY</a><br>
+<b><font face='arial'>11.</font> <a href="DateLocale.html#_C_DATELOCALE"  target=classdetail>DateLocale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.1</span> <a href="DateLocale.html#_DATELOCALE_DATELOCALE"  target=classdetail>DateLocale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.2</span> <a href="DateLocale.html#_DATELOCALE_GETDAYABB"  target=classdetail>GetDayAbb</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.3</span> <a href="DateLocale.html#_DATELOCALE_GETLONGMONTHNAME"  target=classdetail>GetLongMonthName</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.4</span> <a href="DateLocale.html#_DATELOCALE_GETMONTH"  target=classdetail>GetMonth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.5</span> <a href="DateLocale.html#_DATELOCALE_GETSHORTDAY"  target=classdetail>GetShortDay</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.6</span> <a href="DateLocale.html#_DATELOCALE_GETSHORTMONTH"  target=classdetail>GetShortMonth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.7</span> <a href="DateLocale.html#_DATELOCALE_GETSHORTMONTHNAME"  target=classdetail>GetShortMonthName</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 11.8</span> <a href="DateLocale.html#_DATELOCALE_SET"  target=classdetail>Set</a><br>
+<b><font face='arial'>12.</font> <a href="DateScale.html#_C_DATESCALE"  target=classdetail>DateScale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 12.1</span> <a href="DateScale.html#_DATESCALE_ADJUSTFORDST"  target=classdetail>AdjustForDST</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 12.2</span> <a href="DateScale.html#_DATESCALE_SETDATEALIGN"  target=classdetail>SetDateAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 12.3</span> <a href="DateScale.html#_DATESCALE_SETDATEFORMAT"  target=classdetail>SetDateFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 12.4</span> <a href="DateScale.html#_DATESCALE_SETTIMEALIGN"  target=classdetail>SetTimeAlign</a><br>
+<b><font face='arial'>13.</font> <a href="DigitalLED74.html#_C_DIGITALLED74"  target=classdetail>DigitalLED74</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 13.1</span> <a href="DigitalLED74.html#_DIGITALLED74_DIGITALLED74"  target=classdetail>DigitalLED74</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 13.2</span> <a href="DigitalLED74.html#_DIGITALLED74_SETSUPERSAMPLING"  target=classdetail>SetSupersampling</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 13.3</span> <a href="DigitalLED74.html#_DIGITALLED74_STROKENUMBER"  target=classdetail>StrokeNumber</a><br>
+<b><font face='arial'>14.</font> <a href="DisplayValue.html#_C_DISPLAYVALUE"  target=classdetail>DisplayValue</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.1</span> <a href="DisplayValue.html#_DISPLAYVALUE_HIDEZERO"  target=classdetail>HideZero</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.2</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETALIGN"  target=classdetail>SetAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.3</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETANGLE"  target=classdetail>SetAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.4</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.5</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.6</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETFORMAT"  target=classdetail>SetFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.7</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETFORMATCALLBACK"  target=classdetail>SetFormatCallback</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.8</span> <a href="DisplayValue.html#_DISPLAYVALUE_SETMARGIN"  target=classdetail>SetMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 14.9</span> <a href="DisplayValue.html#_DISPLAYVALUE_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>15.</font> <a href="ErrMsgText.html#_C_ERRMSGTEXT"  target=classdetail>ErrMsgText</a></b><br>
+<b><font face='arial'>16.</font> <a href="ErrorLinePlot.html#_C_ERRORLINEPLOT"  target=classdetail>ErrorLinePlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 16.1</span> <a href="ErrorLinePlot.html#_ERRORLINEPLOT_ERRORLINEPLOT"  target=classdetail>ErrorLinePlot</a><br>
+<b><font face='arial'>17.</font> <a href="ErrorPlot.html#_C_ERRORPLOT"  target=classdetail>ErrorPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 17.1</span> <a href="ErrorPlot.html#_ERRORPLOT_ERRORPLOT"  target=classdetail>ErrorPlot</a><br>
+<b><font face='arial'>18.</font> <a href="FieldArrow.html#_C_FIELDARROW"  target=classdetail>FieldArrow</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 18.1</span> <a href="FieldArrow.html#_FIELDARROW_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 18.2</span> <a href="FieldArrow.html#_FIELDARROW_SETSIZE"  target=classdetail>SetSize</a><br>
+<b><font face='arial'>19.</font> <a href="FieldPlot.html#_C_FIELDPLOT"  target=classdetail>FieldPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 19.1</span> <a href="FieldPlot.html#_FIELDPLOT_FIELDPLOT"  target=classdetail>FieldPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 19.2</span> <a href="FieldPlot.html#_FIELDPLOT_SETCALLBACK"  target=classdetail>SetCallback</a><br>
+<b><font face='arial'>20.</font> <a href="Footer.html#_C_FOOTER"  target=classdetail>Footer</a></b><br>
+<b><font face='arial'>21.</font> <a href="FuncGenerator.html#_C_FUNCGENERATOR"  target=classdetail>FuncGenerator</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 21.1</span> <a href="FuncGenerator.html#_FUNCGENERATOR_E"  target=classdetail>E</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 21.2</span> <a href="FuncGenerator.html#_FUNCGENERATOR_FUNCGENERATOR"  target=classdetail>FuncGenerator</a><br>
+<b><font face='arial'>22.</font> <a href="GanttActivityInfo.html#_C_GANTTACTIVITYINFO"  target=classdetail>GanttActivityInfo</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.1</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_HIDE"  target=classdetail>Hide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.2</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETBACKGROUNDCOLOR"  target=classdetail>SetBackgroundColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.3</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.4</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLTITLES"  target=classdetail>SetColTitles</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.5</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLUMNMARGIN"  target=classdetail>SetColumnMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.6</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.7</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETFONTCOLOR"  target=classdetail>SetFontColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.8</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETHEADERALIGN"  target=classdetail>SetHeaderAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.9</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETSTYLE"  target=classdetail>SetStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 22.10</span> <a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>23.</font> <a href="GanttBar.html#_C_GANTTBAR"  target=classdetail>GanttBar</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.1</span> <a href="GanttBar.html#_GANTTBAR_GANTTBAR"  target=classdetail>GanttBar</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.2</span> <a href="GanttBar.html#_GANTTBAR_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.3</span> <a href="GanttBar.html#_GANTTBAR_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.4</span> <a href="GanttBar.html#_GANTTBAR_SETHEIGHT"  target=classdetail>SetHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.5</span> <a href="GanttBar.html#_GANTTBAR_SETPATTERN"  target=classdetail>SetPattern</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 23.6</span> <a href="GanttBar.html#_GANTTBAR_SETSHADOW"  target=classdetail>SetShadow</a><br>
+<b><font face='arial'>24.</font> <a href="GanttGraph.html#_C_GANTTGRAPH"  target=classdetail>GanttGraph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.1</span> <a href="GanttGraph.html#_GANTTGRAPH_ADD"  target=classdetail>Add</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.2</span> <a href="GanttGraph.html#_GANTTGRAPH_CREATESIMPLE"  target=classdetail>CreateSimple</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.3</span> <a href="GanttGraph.html#_GANTTGRAPH_GANTTGRAPH"  target=classdetail>GanttGraph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.4</span> <a href="GanttGraph.html#_GANTTGRAPH_SETDATERANGE"  target=classdetail>SetDateRange</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.5</span> <a href="GanttGraph.html#_GANTTGRAPH_SETLABELVMARGINFACTOR"  target=classdetail>SetLabelVMarginFactor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.6</span> <a href="GanttGraph.html#_GANTTGRAPH_SETSIMPLEFONT"  target=classdetail>SetSimpleFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.7</span> <a href="GanttGraph.html#_GANTTGRAPH_SETSIMPLESTYLE"  target=classdetail>SetSimpleStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.8</span> <a href="GanttGraph.html#_GANTTGRAPH_SETVMARGINFACTOR"  target=classdetail>SetVMarginFactor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.9</span> <a href="GanttGraph.html#_GANTTGRAPH_SHOWHEADERS"  target=classdetail>ShowHeaders</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 24.10</span> <a href="GanttGraph.html#_GANTTGRAPH_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>25.</font> <a href="GanttPlotObject.html#_C_GANTTPLOTOBJECT"  target=classdetail>GanttPlotObject</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 25.1</span> <a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCAPTIONMARGIN"  target=classdetail>SetCaptionMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 25.2</span> <a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCONSTRAIN"  target=classdetail>SetConstrain</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 25.3</span> <a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMALT"  target=classdetail>SetCSIMAlt</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 25.4</span> <a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMTARGET"  target=classdetail>SetCSIMTarget</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 25.5</span> <a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETLABELLEFTMARGIN"  target=classdetail>SetLabelLeftMargin</a><br>
+<b><font face='arial'>26.</font> <a href="GanttScale.html#_C_GANTTSCALE"  target=classdetail>GanttScale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.1</span> <a href="GanttScale.html#_GANTTSCALE_SETDATELOCALE"  target=classdetail>SetDateLocale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.2</span> <a href="GanttScale.html#_GANTTSCALE_SETRANGE"  target=classdetail>SetRange</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.3</span> <a href="GanttScale.html#_GANTTSCALE_SETTABLETITLEBACKGROUND"  target=classdetail>SetTableTitleBackground</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.4</span> <a href="GanttScale.html#_GANTTSCALE_SETVERTLAYOUT"  target=classdetail>SetVertLayout</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.5</span> <a href="GanttScale.html#_GANTTSCALE_SETWEEKSTART"  target=classdetail>SetWeekStart</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 26.6</span> <a href="GanttScale.html#_GANTTSCALE_USEWEEKENDBACKGROUND"  target=classdetail>UseWeekendBackground</a><br>
+<b><font face='arial'>27.</font> <a href="GanttVLine.html#_C_GANTTVLINE"  target=classdetail>GanttVLine</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 27.1</span> <a href="GanttVLine.html#_GANTTVLINE_GANTTVLINE"  target=classdetail>GanttVLine</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 27.2</span> <a href="GanttVLine.html#_GANTTVLINE_SETDAYOFFSET"  target=classdetail>SetDayOffset</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 27.3</span> <a href="GanttVLine.html#_GANTTVLINE_SETTITLEMARGIN"  target=classdetail>SetTitleMargin</a><br>
+<b><font face='arial'>28.</font> <a href="Graph.html#_C_GRAPH"  target=classdetail>Graph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.1</span> <a href="Graph.html#_GRAPH_ADD"  target=classdetail>Add</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.2</span> <a href="Graph.html#_GRAPH_ADDBAND"  target=classdetail>AddBand</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.3</span> <a href="Graph.html#_GRAPH_ADDLINE"  target=classdetail>AddLine</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.4</span> <a href="Graph.html#_GRAPH_ADDTEXT"  target=classdetail>AddText</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.5</span> <a href="Graph.html#_GRAPH_ADDY"  target=classdetail>AddY</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.6</span> <a href="Graph.html#_GRAPH_ADDY2"  target=classdetail>AddY2</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.7</span> <a href="Graph.html#_GRAPH_CHECKCSIMCACHE"  target=classdetail>CheckCSIMCache</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.8</span> <a href="Graph.html#_GRAPH_GETHTMLIMAGEMAP"  target=classdetail>GetHTMLImageMap</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.9</span> <a href="Graph.html#_GRAPH_GRAPH"  target=classdetail>Graph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.10</span> <a href="Graph.html#_GRAPH_SET3DPERSPECTIVE"  target=classdetail>Set3DPerspective</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.11</span> <a href="Graph.html#_GRAPH_SET90ANDMARGIN"  target=classdetail>Set90AndMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.12</span> <a href="Graph.html#_GRAPH_SETALPHABLENDING"  target=classdetail>SetAlphaBlending</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.13</span> <a href="Graph.html#_GRAPH_SETANGLE"  target=classdetail>SetAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.14</span> <a href="Graph.html#_GRAPH_SETAXISLABELBACKGROUND"  target=classdetail>SetAxisLabelBackground</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.15</span> <a href="Graph.html#_GRAPH_SETAXISSTYLE"  target=classdetail>SetAxisStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.16</span> <a href="Graph.html#_GRAPH_SETBACKGROUNDCFLAG"  target=classdetail>SetBackgroundCFlag</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.17</span> <a href="Graph.html#_GRAPH_SETBACKGROUNDCOUNTRYFLAG"  target=classdetail>SetBackgroundCountryFlag</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.18</span> <a href="Graph.html#_GRAPH_SETBACKGROUNDGRADIENT"  target=classdetail>SetBackgroundGradient</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.19</span> <a href="Graph.html#_GRAPH_SETBACKGROUNDIMAGE"  target=classdetail>SetBackgroundImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.20</span> <a href="Graph.html#_GRAPH_SETBACKGROUNDIMAGEMIX"  target=classdetail>SetBackgroundImageMix</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.21</span> <a href="Graph.html#_GRAPH_SETBOX"  target=classdetail>SetBox</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.22</span> <a href="Graph.html#_GRAPH_SETCLIPPING"  target=classdetail>SetClipping</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.23</span> <a href="Graph.html#_GRAPH_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.24</span> <a href="Graph.html#_GRAPH_SETCSIMIMGALT"  target=classdetail>SetCSIMImgAlt</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.25</span> <a href="Graph.html#_GRAPH_SETFRAME"  target=classdetail>SetFrame</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.26</span> <a href="Graph.html#_GRAPH_SETFRAMEBEVEL"  target=classdetail>SetFrameBevel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.27</span> <a href="Graph.html#_GRAPH_SETGRIDDEPTH"  target=classdetail>SetGridDepth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.28</span> <a href="Graph.html#_GRAPH_SETICONDEPTH"  target=classdetail>SetIconDepth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.29</span> <a href="Graph.html#_GRAPH_SETIMGFORMAT"  target=classdetail>SetImgFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.30</span> <a href="Graph.html#_GRAPH_SETMARGIN"  target=classdetail>SetMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.31</span> <a href="Graph.html#_GRAPH_SETMARGINCOLOR"  target=classdetail>SetMarginColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.32</span> <a href="Graph.html#_GRAPH_SETSCALE"  target=classdetail>SetScale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.33</span> <a href="Graph.html#_GRAPH_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.34</span> <a href="Graph.html#_GRAPH_SETTEXTSCALEABSCENTEROFF"  target=classdetail>SetTextScaleAbsCenterOff</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.35</span> <a href="Graph.html#_GRAPH_SETTICKDENSITY"  target=classdetail>SetTickDensity</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.36</span> <a href="Graph.html#_GRAPH_SETTITLEBACKGROUND"  target=classdetail>SetTitleBackground</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.37</span> <a href="Graph.html#_GRAPH_SETTITLEBACKGROUNDFILLSTYLE"  target=classdetail>SetTitleBackgroundFillStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.38</span> <a href="Graph.html#_GRAPH_SETY2ORDERBACK"  target=classdetail>SetY2OrderBack</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.39</span> <a href="Graph.html#_GRAPH_SETY2SCALE"  target=classdetail>SetY2Scale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.40</span> <a href="Graph.html#_GRAPH_SETYDELTADIST"  target=classdetail>SetYDeltaDist</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.41</span> <a href="Graph.html#_GRAPH_SETYSCALE"  target=classdetail>SetYScale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.42</span> <a href="Graph.html#_GRAPH_STROKE"  target=classdetail>Stroke</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.43</span> <a href="Graph.html#_GRAPH_STROKECSIM"  target=classdetail>StrokeCSIM</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 28.44</span> <a href="Graph.html#_GRAPH_STROKEFRAMEBACKGROUND"  target=classdetail>StrokeFrameBackground</a><br>
+<b><font face='arial'>29.</font> <a href="GraphTabTitle.html#_C_GRAPHTABTITLE"  target=classdetail>GraphTabTitle</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.1</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.2</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.3</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETCORNER"  target=classdetail>SetCorner</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.4</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.5</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.6</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETTABALIGN"  target=classdetail>SetTabAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 29.7</span> <a href="GraphTabTitle.html#_GRAPHTABTITLE_SETWIDTH"  target=classdetail>SetWidth</a><br>
+<b><font face='arial'>30.</font> <a href="Grid.html#_C_GRID"  target=classdetail>Grid</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 30.1</span> <a href="Grid.html#_GRID_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 30.2</span> <a href="Grid.html#_GRID_SETFILL"  target=classdetail>SetFill</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 30.3</span> <a href="Grid.html#_GRID_SETLINESTYLE"  target=classdetail>SetLineStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 30.4</span> <a href="Grid.html#_GRID_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 30.5</span> <a href="Grid.html#_GRID_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>31.</font> <a href="GroupBarPlot.html#_C_GROUPBARPLOT"  target=classdetail>GroupBarPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 31.1</span> <a href="GroupBarPlot.html#_GROUPBARPLOT_GROUPBARPLOT"  target=classdetail>GroupBarPlot</a><br>
+<b><font face='arial'>32.</font> <a href="GTextTable.html#_C_GTEXTTABLE"  target=classdetail>GTextTable</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.1</span> <a href="GTextTable.html#_GTEXTTABLE_GTEXTTABLE"  target=classdetail>GTextTable</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.2</span> <a href="GTextTable.html#_GTEXTTABLE_INIT"  target=classdetail>Init</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.3</span> <a href="GTextTable.html#_GTEXTTABLE_MERGECELLS"  target=classdetail>MergeCells</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.4</span> <a href="GTextTable.html#_GTEXTTABLE_MERGECOL"  target=classdetail>MergeCol</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.5</span> <a href="GTextTable.html#_GTEXTTABLE_MERGEROW"  target=classdetail>MergeRow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.6</span> <a href="GTextTable.html#_GTEXTTABLE_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.7</span> <a href="GTextTable.html#_GTEXTTABLE_SETALIGN"  target=classdetail>SetAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.8</span> <a href="GTextTable.html#_GTEXTTABLE_SETANCHORPOS"  target=classdetail>SetAnchorPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.9</span> <a href="GTextTable.html#_GTEXTTABLE_SETBORDER"  target=classdetail>SetBorder</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.10</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLALIGN"  target=classdetail>SetCellAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.11</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLCOLOR"  target=classdetail>SetCellColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.12</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLCOUNTRYFLAG"  target=classdetail>SetCellCountryFlag</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.13</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLCSIMTARGET"  target=classdetail>SetCellCSIMTarget</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.14</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLFILLCOLOR"  target=classdetail>SetCellFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.15</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLFONT"  target=classdetail>SetCellFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.16</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE"  target=classdetail>SetCellImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.17</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGECONSTRAIN"  target=classdetail>SetCellImageConstrain</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.18</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT"  target=classdetail>SetCellNumberFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.19</span> <a href="GTextTable.html#_GTEXTTABLE_SETCELLPADDING"  target=classdetail>SetCellPadding</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.20</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLALIGN"  target=classdetail>SetColAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.21</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLCOLOR"  target=classdetail>SetColColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.22</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLFILLCOLOR"  target=classdetail>SetColFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.23</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLFONT"  target=classdetail>SetColFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.24</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLGRID"  target=classdetail>SetColGrid</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.25</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLIMAGE"  target=classdetail>SetColImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.26</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLNUMBERFORMAT"  target=classdetail>SetColNumberFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.27</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.28</span> <a href="GTextTable.html#_GTEXTTABLE_SETCOLPADDING"  target=classdetail>SetColPadding</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.29</span> <a href="GTextTable.html#_GTEXTTABLE_SETCSIMTARGET"  target=classdetail>SetCSIMTarget</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.30</span> <a href="GTextTable.html#_GTEXTTABLE_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.31</span> <a href="GTextTable.html#_GTEXTTABLE_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.32</span> <a href="GTextTable.html#_GTEXTTABLE_SETGRID"  target=classdetail>SetGrid</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.33</span> <a href="GTextTable.html#_GTEXTTABLE_SETIMAGE"  target=classdetail>SetImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.34</span> <a href="GTextTable.html#_GTEXTTABLE_SETMINCOLWIDTH"  target=classdetail>SetMinColWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.35</span> <a href="GTextTable.html#_GTEXTTABLE_SETMINROWHEIGHT"  target=classdetail>SetMinRowHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.36</span> <a href="GTextTable.html#_GTEXTTABLE_SETNUMBERFORMAT"  target=classdetail>SetNumberFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.37</span> <a href="GTextTable.html#_GTEXTTABLE_SETPADDING"  target=classdetail>SetPadding</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.38</span> <a href="GTextTable.html#_GTEXTTABLE_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.39</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWALIGN"  target=classdetail>SetRowAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.40</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWCOLOR"  target=classdetail>SetRowColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.41</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWFILLCOLOR"  target=classdetail>SetRowFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.42</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWFONT"  target=classdetail>SetRowFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.43</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWGRID"  target=classdetail>SetRowGrid</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.44</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWIMAGE"  target=classdetail>SetRowImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.45</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWNUMBERFORMAT"  target=classdetail>SetRowNumberFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.46</span> <a href="GTextTable.html#_GTEXTTABLE_SETROWPADDING"  target=classdetail>SetRowPadding</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.47</span> <a href="GTextTable.html#_GTEXTTABLE_SETSCALEPOS"  target=classdetail>SetScalePos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 32.48</span> <a href="GTextTable.html#_GTEXTTABLE_TOSTRING"  target=classdetail>toString</a><br>
+<b><font face='arial'>33.</font> <a href="HeaderProperty.html#_C_HEADERPROPERTY"  target=classdetail>HeaderProperty</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.1</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETBACKGROUNDCOLOR"  target=classdetail>SetBackgroundColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.2</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.3</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETFONTCOLOR"  target=classdetail>SetFontColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.4</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETFORMATSTRING"  target=classdetail>SetFormatString</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.5</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETFRAMECOLOR"  target=classdetail>SetFrameColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.6</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETFRAMEWEIGHT"  target=classdetail>SetFrameWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.7</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETINTERVALL"  target=classdetail>SetIntervall</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.8</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETLABELFORMATSTRING"  target=classdetail>SetLabelFormatString</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.9</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETSTYLE"  target=classdetail>SetStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.10</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETSUNDAYFONTCOLOR"  target=classdetail>SetSundayFontColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.11</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETTITLEVERTMARGIN"  target=classdetail>SetTitleVertMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 33.12</span> <a href="HeaderProperty.html#_HEADERPROPERTY_SETWEEKENDCOLOR"  target=classdetail>SetWeekendColor</a><br>
+<b><font face='arial'>34.</font> <a href="HorizontalGridLine.html#_C_HORIZONTALGRIDLINE"  target=classdetail>HorizontalGridLine</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 34.1</span> <a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SETROWFILLCOLOR"  target=classdetail>SetRowFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 34.2</span> <a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SETSTART"  target=classdetail>SetStart</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 34.3</span> <a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>35.</font> <a href="IconImage.html#_C_ICONIMAGE"  target=classdetail>IconImage</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 35.1</span> <a href="IconImage.html#_ICONIMAGE_ICONIMAGE"  target=classdetail>IconImage</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 35.2</span> <a href="IconImage.html#_ICONIMAGE_SETALIGN"  target=classdetail>SetAlign</a><br>
+<b><font face='arial'>36.</font> <a href="IconPlot.html#_C_ICONPLOT"  target=classdetail>IconPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.1</span> <a href="IconPlot.html#_ICONPLOT_ICONPLOT"  target=classdetail>IconPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.2</span> <a href="IconPlot.html#_ICONPLOT_SETANCHOR"  target=classdetail>SetAnchor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.3</span> <a href="IconPlot.html#_ICONPLOT_SETCOUNTRYFLAG"  target=classdetail>SetCountryFlag</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.4</span> <a href="IconPlot.html#_ICONPLOT_SETMIX"  target=classdetail>SetMix</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.5</span> <a href="IconPlot.html#_ICONPLOT_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 36.6</span> <a href="IconPlot.html#_ICONPLOT_SETSCALE"  target=classdetail>SetScale</a><br>
+<b><font face='arial'>37.</font> <a href="Image.html#_C_IMAGE"  target=classdetail>Image</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.1</span> <a href="Image.html#_IMAGE_ROUNDEDRECTANGLE"  target=classdetail>RoundedRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.2</span> <a href="Image.html#_IMAGE_SETALPHABLENDING"  target=classdetail>SetAlphaBlending</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.3</span> <a href="Image.html#_IMAGE_SETANTIALIASING"  target=classdetail>SetAntiAliasing</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.4</span> <a href="Image.html#_IMAGE_SETCANVASCOLOR"  target=classdetail>SetCanvasColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.5</span> <a href="Image.html#_IMAGE_SETEXPIRED"  target=classdetail>SetExpired</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.6</span> <a href="Image.html#_IMAGE_SETIMGFORMAT"  target=classdetail>SetImgFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.7</span> <a href="Image.html#_IMAGE_SETMARGIN"  target=classdetail>SetMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.8</span> <a href="Image.html#_IMAGE_SETQUALITY"  target=classdetail>SetQuality</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 37.9</span> <a href="Image.html#_IMAGE_SETTRANSPARENT"  target=classdetail>SetTransparent</a><br>
+<b><font face='arial'>38.</font> <a href="Legend.html#_C_LEGEND"  target=classdetail>Legend</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.1</span> <a href="Legend.html#_LEGEND_HIDE"  target=classdetail>Hide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.2</span> <a href="Legend.html#_LEGEND_POS"  target=classdetail>Pos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.3</span> <a href="Legend.html#_LEGEND_SETABSPOS"  target=classdetail>SetAbsPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.4</span> <a href="Legend.html#_LEGEND_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.5</span> <a href="Legend.html#_LEGEND_SETCOLUMNS"  target=classdetail>SetColumns</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.6</span> <a href="Legend.html#_LEGEND_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.7</span> <a href="Legend.html#_LEGEND_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.8</span> <a href="Legend.html#_LEGEND_SETFRAMEWEIGHT"  target=classdetail>SetFrameWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.9</span> <a href="Legend.html#_LEGEND_SETHCOLMARGIN"  target=classdetail>SetHColMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.10</span> <a href="Legend.html#_LEGEND_SETLAYOUT"  target=classdetail>SetLayout</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.11</span> <a href="Legend.html#_LEGEND_SETLEFTMARGIN"  target=classdetail>SetLeftMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.12</span> <a href="Legend.html#_LEGEND_SETLINESPACING"  target=classdetail>SetLineSpacing</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.13</span> <a href="Legend.html#_LEGEND_SETLINEWEIGHT"  target=classdetail>SetLineWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.14</span> <a href="Legend.html#_LEGEND_SETMARKABSHSIZE"  target=classdetail>SetMarkAbsHSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.15</span> <a href="Legend.html#_LEGEND_SETMARKABSSIZE"  target=classdetail>SetMarkAbsSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.16</span> <a href="Legend.html#_LEGEND_SETMARKABSVSIZE"  target=classdetail>SetMarkAbsVSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.17</span> <a href="Legend.html#_LEGEND_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.18</span> <a href="Legend.html#_LEGEND_SETREVERSE"  target=classdetail>SetReverse</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.19</span> <a href="Legend.html#_LEGEND_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 38.20</span> <a href="Legend.html#_LEGEND_SETVCOLMARGIN"  target=classdetail>SetVColMargin</a><br>
+<b><font face='arial'>39.</font> <a href="LinearScale.html#_C_LINEARSCALE"  target=classdetail>LinearScale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 39.1</span> <a href="LinearScale.html#_LINEARSCALE_SETAUTOMAX"  target=classdetail>SetAutoMax</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 39.2</span> <a href="LinearScale.html#_LINEARSCALE_SETAUTOMIN"  target=classdetail>SetAutoMin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 39.3</span> <a href="LinearScale.html#_LINEARSCALE_SETAUTOTICKS"  target=classdetail>SetAutoTicks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 39.4</span> <a href="LinearScale.html#_LINEARSCALE_SETGRACE"  target=classdetail>SetGrace</a><br>
+<b><font face='arial'>40.</font> <a href="LinearTicks.html#_C_LINEARTICKS"  target=classdetail>LinearTicks</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.1</span> <a href="LinearTicks.html#_LINEARTICKS_ADJUSTFORDST"  target=classdetail>AdjustForDST</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.2</span> <a href="LinearTicks.html#_LINEARTICKS_GETMAJOR"  target=classdetail>GetMajor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.3</span> <a href="LinearTicks.html#_LINEARTICKS_GETMINOR"  target=classdetail>GetMinor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.4</span> <a href="LinearTicks.html#_LINEARTICKS_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.5</span> <a href="LinearTicks.html#_LINEARTICKS_SETMAJTICKPOSITIONS"  target=classdetail>SetMajTickPositions</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.6</span> <a href="LinearTicks.html#_LINEARTICKS_SETTEXTLABELSTART"  target=classdetail>SetTextLabelStart</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 40.7</span> <a href="LinearTicks.html#_LINEARTICKS_SETTICKPOSITIONS"  target=classdetail>SetTickPositions</a><br>
+<b><font face='arial'>41.</font> <a href="LineErrorPlot.html#_C_LINEERRORPLOT"  target=classdetail>LineErrorPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 41.1</span> <a href="LineErrorPlot.html#_LINEERRORPLOT_LINEERRORPLOT"  target=classdetail>LineErrorPlot</a><br>
+<b><font face='arial'>42.</font> <a href="LinePlot.html#_C_LINEPLOT"  target=classdetail>LinePlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.1</span> <a href="LinePlot.html#_LINEPLOT_ADDAREA"  target=classdetail>AddArea</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.2</span> <a href="LinePlot.html#_LINEPLOT_LINEPLOT"  target=classdetail>LinePlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.3</span> <a href="LinePlot.html#_LINEPLOT_SETBARCENTER"  target=classdetail>SetBarCenter</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.4</span> <a href="LinePlot.html#_LINEPLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.5</span> <a href="LinePlot.html#_LINEPLOT_SETFASTSTROKE"  target=classdetail>SetFastStroke</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.6</span> <a href="LinePlot.html#_LINEPLOT_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.7</span> <a href="LinePlot.html#_LINEPLOT_SETFILLFROMYMIN"  target=classdetail>SetFillFromYMin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.8</span> <a href="LinePlot.html#_LINEPLOT_SETFILLGRADIENT"  target=classdetail>SetFillGradient</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.9</span> <a href="LinePlot.html#_LINEPLOT_SETSTEPSTYLE"  target=classdetail>SetStepStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 42.10</span> <a href="LinePlot.html#_LINEPLOT_SETSTYLE"  target=classdetail>SetStyle</a><br>
+<b><font face='arial'>43.</font> <a href="LineProperty.html#_C_LINEPROPERTY"  target=classdetail>LineProperty</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 43.1</span> <a href="LineProperty.html#_LINEPROPERTY_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 43.2</span> <a href="LineProperty.html#_LINEPROPERTY_SETSTYLE"  target=classdetail>SetStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 43.3</span> <a href="LineProperty.html#_LINEPROPERTY_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 43.4</span> <a href="LineProperty.html#_LINEPROPERTY_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>44.</font> <a href="LogScale.html#_C_LOGSCALE"  target=classdetail>LogScale</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 44.1</span> <a href="LogScale.html#_LOGSCALE_GETMAXVAL"  target=classdetail>GetMaxVal</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 44.2</span> <a href="LogScale.html#_LOGSCALE_GETMINVAL"  target=classdetail>GetMinVal</a><br>
+<b><font face='arial'>45.</font> <a href="LogTicks.html#_C_LOGTICKS"  target=classdetail>LogTicks</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 45.1</span> <a href="LogTicks.html#_LOGTICKS_SETLABELLOGTYPE"  target=classdetail>SetLabelLogType</a><br>
+<b><font face='arial'>46.</font> <a href="MileStone.html#_C_MILESTONE"  target=classdetail>MileStone</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 46.1</span> <a href="MileStone.html#_MILESTONE_MILESTONE"  target=classdetail>MileStone</a><br>
+<b><font face='arial'>47.</font> <a href="PieGraph.html#_C_PIEGRAPH"  target=classdetail>PieGraph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 47.1</span> <a href="PieGraph.html#_PIEGRAPH_ADD"  target=classdetail>Add</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 47.2</span> <a href="PieGraph.html#_PIEGRAPH_PIEGRAPH"  target=classdetail>PieGraph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 47.3</span> <a href="PieGraph.html#_PIEGRAPH_SETANTIALIASING"  target=classdetail>SetAntiAliasing</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 47.4</span> <a href="PieGraph.html#_PIEGRAPH_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 47.5</span> <a href="PieGraph.html#_PIEGRAPH_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>48.</font> <a href="PiePlot.html#_C_PIEPLOT"  target=classdetail>PiePlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.1</span> <a href="PiePlot.html#_PIEPLOT_EXPLODE"  target=classdetail>Explode</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.2</span> <a href="PiePlot.html#_PIEPLOT_EXPLODEALL"  target=classdetail>ExplodeAll</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.3</span> <a href="PiePlot.html#_PIEPLOT_EXPLODESLICE"  target=classdetail>ExplodeSlice</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.4</span> <a href="PiePlot.html#_PIEPLOT_PIEPLOT"  target=classdetail>PiePlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.5</span> <a href="PiePlot.html#_PIEPLOT_SETCENTER"  target=classdetail>SetCenter</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.6</span> <a href="PiePlot.html#_PIEPLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.7</span> <a href="PiePlot.html#_PIEPLOT_SETCSIMTARGETS"  target=classdetail>SetCSIMTargets</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.8</span> <a href="PiePlot.html#_PIEPLOT_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.9</span> <a href="PiePlot.html#_PIEPLOT_SETFONTCOLOR"  target=classdetail>SetFontColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.10</span> <a href="PiePlot.html#_PIEPLOT_SETGUIDELINES"  target=classdetail>SetGuideLines</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.11</span> <a href="PiePlot.html#_PIEPLOT_SETGUIDELINESADJUST"  target=classdetail>SetGuideLinesAdjust</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.12</span> <a href="PiePlot.html#_PIEPLOT_SETLABELPOS"  target=classdetail>SetLabelPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.13</span> <a href="PiePlot.html#_PIEPLOT_SETLABELS"  target=classdetail>SetLabels</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.14</span> <a href="PiePlot.html#_PIEPLOT_SETLABELTYPE"  target=classdetail>SetLabelType</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.15</span> <a href="PiePlot.html#_PIEPLOT_SETLEGENDS"  target=classdetail>SetLegends</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.16</span> <a href="PiePlot.html#_PIEPLOT_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.17</span> <a href="PiePlot.html#_PIEPLOT_SETSIZE"  target=classdetail>SetSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.18</span> <a href="PiePlot.html#_PIEPLOT_SETSLICECOLORS"  target=classdetail>SetSliceColors</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.19</span> <a href="PiePlot.html#_PIEPLOT_SETSTARTANGLE"  target=classdetail>SetStartAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.20</span> <a href="PiePlot.html#_PIEPLOT_SETTHEME"  target=classdetail>SetTheme</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.21</span> <a href="PiePlot.html#_PIEPLOT_SETVALUETYPE"  target=classdetail>SetValueType</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 48.22</span> <a href="PiePlot.html#_PIEPLOT_SHOWBORDER"  target=classdetail>ShowBorder</a><br>
+<b><font face='arial'>49.</font> <a href="PiePlot3D.html#_C_PIEPLOT3D"  target=classdetail>PiePlot3D</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.1</span> <a href="PiePlot3D.html#_PIEPLOT3D_PIEPLOT3D"  target=classdetail>PiePlot3d</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.2</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETANGLE"  target=classdetail>SetAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.3</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETCSIMTARGETS"  target=classdetail>SetCSIMTargets</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.4</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETEDGE"  target=classdetail>SetEdge</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.5</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETHEIGHT"  target=classdetail>SetHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.6</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETLABELMARGIN"  target=classdetail>SetLabelMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.7</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETLABELS"  target=classdetail>SetLabels</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.8</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETLEGENDS"  target=classdetail>SetLegends</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.9</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETSLICECOLORS"  target=classdetail>SetSliceColors</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.10</span> <a href="PiePlot3D.html#_PIEPLOT3D_SETSTARTANGLE"  target=classdetail>SetStartAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 49.11</span> <a href="PiePlot3D.html#_PIEPLOT3D_SHOWBORDER"  target=classdetail>ShowBorder</a><br>
+<b><font face='arial'>50.</font> <a href="PiePlotC.html#_C_PIEPLOTC"  target=classdetail>PiePlotC</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.1</span> <a href="PiePlotC.html#_PIEPLOTC_PIEPLOTC"  target=classdetail>PiePlotC</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.2</span> <a href="PiePlotC.html#_PIEPLOTC_SETMID"  target=classdetail>SetMid</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.3</span> <a href="PiePlotC.html#_PIEPLOTC_SETMIDCOLOR"  target=classdetail>SetMidColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.4</span> <a href="PiePlotC.html#_PIEPLOTC_SETMIDCSIM"  target=classdetail>SetMidCSIM</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.5</span> <a href="PiePlotC.html#_PIEPLOTC_SETMIDSIZE"  target=classdetail>SetMidSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 50.6</span> <a href="PiePlotC.html#_PIEPLOTC_SETMIDTITLE"  target=classdetail>SetMidTitle</a><br>
+<b><font face='arial'>51.</font> <a href="Plot.html#_C_PLOT"  target=classdetail>Plot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.1</span> <a href="Plot.html#_PLOT_HIDELEGEND"  target=classdetail>HideLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.2</span> <a href="Plot.html#_PLOT_SETCENTER"  target=classdetail>SetCenter</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.3</span> <a href="Plot.html#_PLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.4</span> <a href="Plot.html#_PLOT_SETCSIMTARGETS"  target=classdetail>SetCSIMTargets</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.5</span> <a href="Plot.html#_PLOT_SETLEGEND"  target=classdetail>SetLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 51.6</span> <a href="Plot.html#_PLOT_SETLINEWEIGHT"  target=classdetail>SetLineWeight</a><br>
+<b><font face='arial'>52.</font> <a href="PlotBand.html#_C_PLOTBAND"  target=classdetail>PlotBand</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 52.1</span> <a href="PlotBand.html#_PLOTBAND_PLOTBAND"  target=classdetail>PlotBand</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 52.2</span> <a href="PlotBand.html#_PLOTBAND_SETDENSITY"  target=classdetail>SetDensity</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 52.3</span> <a href="PlotBand.html#_PLOTBAND_SETORDER"  target=classdetail>SetOrder</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 52.4</span> <a href="PlotBand.html#_PLOTBAND_SHOWFRAME"  target=classdetail>ShowFrame</a><br>
+<b><font face='arial'>53.</font> <a href="PlotLine.html#_C_PLOTLINE"  target=classdetail>PlotLine</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.1</span> <a href="PlotLine.html#_PLOTLINE_HIDELEGEND"  target=classdetail>HideLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.2</span> <a href="PlotLine.html#_PLOTLINE_PLOTLINE"  target=classdetail>PlotLine</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.3</span> <a href="PlotLine.html#_PLOTLINE_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.4</span> <a href="PlotLine.html#_PLOTLINE_SETDIRECTION"  target=classdetail>SetDirection</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.5</span> <a href="PlotLine.html#_PLOTLINE_SETLEGEND"  target=classdetail>SetLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.6</span> <a href="PlotLine.html#_PLOTLINE_SETPOSITION"  target=classdetail>SetPosition</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 53.7</span> <a href="PlotLine.html#_PLOTLINE_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+<b><font face='arial'>54.</font> <a href="PlotMark.html#_C_PLOTMARK"  target=classdetail>PlotMark</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.1</span> <a href="PlotMark.html#_PLOTMARK_HIDE"  target=classdetail>Hide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.2</span> <a href="PlotMark.html#_PLOTMARK_SETCALLBACK"  target=classdetail>SetCallback</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.3</span> <a href="PlotMark.html#_PLOTMARK_SETCALLBACKYX"  target=classdetail>SetCallbackYX</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.4</span> <a href="PlotMark.html#_PLOTMARK_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.5</span> <a href="PlotMark.html#_PLOTMARK_SETDEFAULTWIDTH"  target=classdetail>SetDefaultWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.6</span> <a href="PlotMark.html#_PLOTMARK_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.7</span> <a href="PlotMark.html#_PLOTMARK_SETSIZE"  target=classdetail>SetSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.8</span> <a href="PlotMark.html#_PLOTMARK_SETTYPE"  target=classdetail>SetType</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.9</span> <a href="PlotMark.html#_PLOTMARK_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.10</span> <a href="PlotMark.html#_PLOTMARK_SETWIDTH"  target=classdetail>SetWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 54.11</span> <a href="PlotMark.html#_PLOTMARK_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>55.</font> <a href="PolarAxis.html#_C_POLARAXIS"  target=classdetail>PolarAxis</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.1</span> <a href="PolarAxis.html#_POLARAXIS_HIDETICKS"  target=classdetail>HideTicks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.2</span> <a href="PolarAxis.html#_POLARAXIS_SETANGLEFONT"  target=classdetail>SetAngleFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.3</span> <a href="PolarAxis.html#_POLARAXIS_SETANGLESTEP"  target=classdetail>SetAngleStep</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.4</span> <a href="PolarAxis.html#_POLARAXIS_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.5</span> <a href="PolarAxis.html#_POLARAXIS_SETGRIDCOLOR"  target=classdetail>SetGridColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.6</span> <a href="PolarAxis.html#_POLARAXIS_SETTICKCOLORS"  target=classdetail>SetTickColors</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.7</span> <a href="PolarAxis.html#_POLARAXIS_SHOWANGLEDEGREEMARK"  target=classdetail>ShowAngleDegreeMark</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.8</span> <a href="PolarAxis.html#_POLARAXIS_SHOWANGLELABEL"  target=classdetail>ShowAngleLabel</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 55.9</span> <a href="PolarAxis.html#_POLARAXIS_SHOWGRID"  target=classdetail>ShowGrid</a><br>
+<b><font face='arial'>56.</font> <a href="PolarGraph.html#_C_POLARGRAPH"  target=classdetail>PolarGraph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.1</span> <a href="PolarGraph.html#_POLARGRAPH_POLARGRAPH"  target=classdetail>PolarGraph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.2</span> <a href="PolarGraph.html#_POLARGRAPH_SET90ANDMARGIN"  target=classdetail>Set90AndMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.3</span> <a href="PolarGraph.html#_POLARGRAPH_SETDENSITY"  target=classdetail>SetDensity</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.4</span> <a href="PolarGraph.html#_POLARGRAPH_SETPLOTSIZE"  target=classdetail>SetPlotSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.5</span> <a href="PolarGraph.html#_POLARGRAPH_SETSCALE"  target=classdetail>SetScale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.6</span> <a href="PolarGraph.html#_POLARGRAPH_SETTYPE"  target=classdetail>SetType</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 56.7</span> <a href="PolarGraph.html#_POLARGRAPH_STROKE"  target=classdetail>Stroke</a><br>
+<b><font face='arial'>57.</font> <a href="PolarPlot.html#_C_POLARPLOT"  target=classdetail>PolarPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.1</span> <a href="PolarPlot.html#_POLARPLOT_POLARPLOT"  target=classdetail>PolarPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.2</span> <a href="PolarPlot.html#_POLARPLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.3</span> <a href="PolarPlot.html#_POLARPLOT_SETCSIMTARGETS"  target=classdetail>SetCSIMTargets</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.4</span> <a href="PolarPlot.html#_POLARPLOT_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.5</span> <a href="PolarPlot.html#_POLARPLOT_SETLEGEND"  target=classdetail>SetLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 57.6</span> <a href="PolarPlot.html#_POLARPLOT_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+<b><font face='arial'>58.</font> <a href="Progress.html#_C_PROGRESS"  target=classdetail>Progress</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 58.1</span> <a href="Progress.html#_PROGRESS_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 58.2</span> <a href="Progress.html#_PROGRESS_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 58.3</span> <a href="Progress.html#_PROGRESS_SETPATTERN"  target=classdetail>SetPattern</a><br>
+<b><font face='arial'>59.</font> <a href="RadarAxis.html#_C_RADARAXIS"  target=classdetail>RadarAxis</a></b><br>
+<b><font face='arial'>60.</font> <a href="RadarGraph.html#_C_RADARGRAPH"  target=classdetail>RadarGraph</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.1</span> <a href="RadarGraph.html#_RADARGRAPH_ADD"  target=classdetail>Add</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.2</span> <a href="RadarGraph.html#_RADARGRAPH_HIDETICKMARKS"  target=classdetail>HideTickMarks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.3</span> <a href="RadarGraph.html#_RADARGRAPH_RADARGRAPH"  target=classdetail>RadarGraph</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.4</span> <a href="RadarGraph.html#_RADARGRAPH_SETCENTER"  target=classdetail>SetCenter</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.5</span> <a href="RadarGraph.html#_RADARGRAPH_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.6</span> <a href="RadarGraph.html#_RADARGRAPH_SETPLOTSIZE"  target=classdetail>SetPlotSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.7</span> <a href="RadarGraph.html#_RADARGRAPH_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.8</span> <a href="RadarGraph.html#_RADARGRAPH_SETSCALE"  target=classdetail>SetScale</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.9</span> <a href="RadarGraph.html#_RADARGRAPH_SETSIZE"  target=classdetail>SetSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.10</span> <a href="RadarGraph.html#_RADARGRAPH_SETTICKDENSITY"  target=classdetail>SetTickDensity</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.11</span> <a href="RadarGraph.html#_RADARGRAPH_SETTITLES"  target=classdetail>SetTitles</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.12</span> <a href="RadarGraph.html#_RADARGRAPH_SHOWMINORTICKMARKS"  target=classdetail>ShowMinorTickmarks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.13</span> <a href="RadarGraph.html#_RADARGRAPH_STROKE"  target=classdetail>Stroke</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 60.14</span> <a href="RadarGraph.html#_RADARGRAPH_SUPRESSTICKMARKS"  target=classdetail>SupressTickMarks</a><br>
+<b><font face='arial'>61.</font> <a href="RadarGrid.html#_C_RADARGRID"  target=classdetail>RadarGrid</a></b><br>
+<b><font face='arial'>62.</font> <a href="RadarLinearTicks.html#_C_RADARLINEARTICKS"  target=classdetail>RadarLinearTicks</a></b><br>
+<b><font face='arial'>63.</font> <a href="RadarLogTicks.html#_C_RADARLOGTICKS"  target=classdetail>RadarLogTicks</a></b><br>
+<b><font face='arial'>64.</font> <a href="RadarPlot.html#_C_RADARPLOT"  target=classdetail>RadarPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.1</span> <a href="RadarPlot.html#_RADARPLOT_RADARPLOT"  target=classdetail>RadarPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.2</span> <a href="RadarPlot.html#_RADARPLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.3</span> <a href="RadarPlot.html#_RADARPLOT_SETFILL"  target=classdetail>SetFill</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.4</span> <a href="RadarPlot.html#_RADARPLOT_SETFILLCOLOR"  target=classdetail>SetFillColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.5</span> <a href="RadarPlot.html#_RADARPLOT_SETLEGEND"  target=classdetail>SetLegend</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.6</span> <a href="RadarPlot.html#_RADARPLOT_SETLINESTYLE"  target=classdetail>SetLineStyle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 64.7</span> <a href="RadarPlot.html#_RADARPLOT_SETLINEWEIGHT"  target=classdetail>SetLineWeight</a><br>
+<b><font face='arial'>65.</font> <a href="RotImage.html#_C_ROTIMAGE"  target=classdetail>RotImage</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 65.1</span> <a href="RotImage.html#_ROTIMAGE_SETANGLE"  target=classdetail>SetAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 65.2</span> <a href="RotImage.html#_ROTIMAGE_SETCENTER"  target=classdetail>SetCenter</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 65.3</span> <a href="RotImage.html#_ROTIMAGE_SETMARGIN"  target=classdetail>SetMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 65.4</span> <a href="RotImage.html#_ROTIMAGE_SETTRANSLATION"  target=classdetail>SetTranslation</a><br>
+<b><font face='arial'>66.</font> <a href="ScatterPlot.html#_C_SCATTERPLOT"  target=classdetail>ScatterPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 66.1</span> <a href="ScatterPlot.html#_SCATTERPLOT_SCATTERPLOT"  target=classdetail>ScatterPlot</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 66.2</span> <a href="ScatterPlot.html#_SCATTERPLOT_SETIMPULS"  target=classdetail>SetImpuls</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 66.3</span> <a href="ScatterPlot.html#_SCATTERPLOT_SETLINKPOINTS"  target=classdetail>SetLinkPoints</a><br>
+<b><font face='arial'>67.</font> <a href="Shape.html#_C_SHAPE"  target=classdetail>Shape</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.1</span> <a href="Shape.html#_SHAPE_BEZIER"  target=classdetail>Bezier</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.2</span> <a href="Shape.html#_SHAPE_CIRCLE"  target=classdetail>Circle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.3</span> <a href="Shape.html#_SHAPE_FILLEDCIRCLE"  target=classdetail>FilledCircle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.4</span> <a href="Shape.html#_SHAPE_FILLEDPOLYGON"  target=classdetail>FilledPolygon</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.5</span> <a href="Shape.html#_SHAPE_FILLEDRECTANGLE"  target=classdetail>FilledRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.6</span> <a href="Shape.html#_SHAPE_FILLEDROUNDEDRECTANGLE"  target=classdetail>FilledRoundedRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.7</span> <a href="Shape.html#_SHAPE_INDENTEDRECTANGLE"  target=classdetail>IndentedRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.8</span> <a href="Shape.html#_SHAPE_LINE"  target=classdetail>Line</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.9</span> <a href="Shape.html#_SHAPE_POLYGON"  target=classdetail>Polygon</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.10</span> <a href="Shape.html#_SHAPE_RECTANGLE"  target=classdetail>Rectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.11</span> <a href="Shape.html#_SHAPE_ROUNDEDRECTANGLE"  target=classdetail>RoundedRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.12</span> <a href="Shape.html#_SHAPE_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.13</span> <a href="Shape.html#_SHAPE_SETTEXTALIGN"  target=classdetail>SetTextAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.14</span> <a href="Shape.html#_SHAPE_SHADOWRECTANGLE"  target=classdetail>ShadowRectangle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 67.15</span> <a href="Shape.html#_SHAPE_SHAPE"  target=classdetail>Shape</a><br>
+<b><font face='arial'>68.</font> <a href="Spline.html#_C_SPLINE"  target=classdetail>Spline</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 68.1</span> <a href="Spline.html#_SPLINE_GET"  target=classdetail>Get</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 68.2</span> <a href="Spline.html#_SPLINE_SPLINE"  target=classdetail>Spline</a><br>
+<b><font face='arial'>69.</font> <a href="StockPlot.html#_C_STOCKPLOT"  target=classdetail>StockPlot</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 69.1</span> <a href="StockPlot.html#_STOCKPLOT_HIDEENDLINES"  target=classdetail>HideEndLines</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 69.2</span> <a href="StockPlot.html#_STOCKPLOT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 69.3</span> <a href="StockPlot.html#_STOCKPLOT_SETWIDTH"  target=classdetail>SetWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 69.4</span> <a href="StockPlot.html#_STOCKPLOT_STOCKPLOT"  target=classdetail>StockPlot</a><br>
+<b><font face='arial'>70.</font> <a href="SuperScriptText.html#_C_SUPERSCRIPTTEXT"  target=classdetail>SuperScriptText</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.1</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_FROMREAL"  target=classdetail>FromReal</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.2</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETFONTHEIGHT"  target=classdetail>GetFontHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.3</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETTEXTHEIGHT"  target=classdetail>GetTextHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.4</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_GETWIDTH"  target=classdetail>GetWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.5</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.6</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SETSUPERFONT"  target=classdetail>SetSuperFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 70.7</span> <a href="SuperScriptText.html#_SUPERSCRIPTTEXT_SUPERSCRIPTTEXT"  target=classdetail>SuperScriptText</a><br>
+<b><font face='arial'>71.</font> <a href="Text.html#_C_TEXT"  target=classdetail>Text</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.1</span> <a href="Text.html#_TEXT_ALIGN"  target=classdetail>Align</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.2</span> <a href="Text.html#_TEXT_CENTER"  target=classdetail>Center</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.3</span> <a href="Text.html#_TEXT_GETFONTHEIGHT"  target=classdetail>GetFontHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.4</span> <a href="Text.html#_TEXT_GETTEXTHEIGHT"  target=classdetail>GetTextHeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.5</span> <a href="Text.html#_TEXT_GETWIDTH"  target=classdetail>GetWidth</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.6</span> <a href="Text.html#_TEXT_HIDE"  target=classdetail>Hide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.7</span> <a href="Text.html#_TEXT_PARAGRAPHALIGN"  target=classdetail>ParagraphAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.8</span> <a href="Text.html#_TEXT_POS"  target=classdetail>Pos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.9</span> <a href="Text.html#_TEXT_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.10</span> <a href="Text.html#_TEXT_SETALIGN"  target=classdetail>SetAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.11</span> <a href="Text.html#_TEXT_SETANGLE"  target=classdetail>SetAngle</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.12</span> <a href="Text.html#_TEXT_SETBOX"  target=classdetail>SetBox</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.13</span> <a href="Text.html#_TEXT_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.14</span> <a href="Text.html#_TEXT_SETCSIMTARGET"  target=classdetail>SetCSIMTarget</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.15</span> <a href="Text.html#_TEXT_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.16</span> <a href="Text.html#_TEXT_SETMARGIN"  target=classdetail>SetMargin</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.17</span> <a href="Text.html#_TEXT_SETORIENTATION"  target=classdetail>SetOrientation</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.18</span> <a href="Text.html#_TEXT_SETPARAGRAPHALIGN"  target=classdetail>SetParagraphAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.19</span> <a href="Text.html#_TEXT_SETPOS"  target=classdetail>SetPos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.20</span> <a href="Text.html#_TEXT_SETSCALEPOS"  target=classdetail>SetScalePos</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.21</span> <a href="Text.html#_TEXT_SETSHADOW"  target=classdetail>SetShadow</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.22</span> <a href="Text.html#_TEXT_SETWORDWRAP"  target=classdetail>SetWordWrap</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.23</span> <a href="Text.html#_TEXT_SHOW"  target=classdetail>Show</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 71.24</span> <a href="Text.html#_TEXT_TEXT"  target=classdetail>Text</a><br>
+<b><font face='arial'>72.</font> <a href="TextProperty.html#_C_TEXTPROPERTY"  target=classdetail>TextProperty</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.1</span> <a href="TextProperty.html#_TEXTPROPERTY_ALIGN"  target=classdetail>Align</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.2</span> <a href="TextProperty.html#_TEXTPROPERTY_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.3</span> <a href="TextProperty.html#_TEXTPROPERTY_SETALIGN"  target=classdetail>SetAlign</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.4</span> <a href="TextProperty.html#_TEXTPROPERTY_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.5</span> <a href="TextProperty.html#_TEXTPROPERTY_SETFONT"  target=classdetail>SetFont</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 72.6</span> <a href="TextProperty.html#_TEXTPROPERTY_SHOW"  target=classdetail>Show</a><br>
+<b><font face='arial'>73.</font> <a href="Ticks.html#_C_TICKS"  target=classdetail>Ticks</a></b><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.1</span> <a href="Ticks.html#_TICKS_SET"  target=classdetail>Set</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.2</span> <a href="Ticks.html#_TICKS_SETCOLOR"  target=classdetail>SetColor</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.3</span> <a href="Ticks.html#_TICKS_SETFORMATCALLBACK"  target=classdetail>SetFormatCallback</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.4</span> <a href="Ticks.html#_TICKS_SETLABELFORMAT"  target=classdetail>SetLabelFormat</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.5</span> <a href="Ticks.html#_TICKS_SETSIDE"  target=classdetail>SetSide</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.6</span> <a href="Ticks.html#_TICKS_SETSIZE"  target=classdetail>SetSize</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.7</span> <a href="Ticks.html#_TICKS_SETWEIGHT"  target=classdetail>SetWeight</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.8</span> <a href="Ticks.html#_TICKS_SUPRESSFIRST"  target=classdetail>SupressFirst</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.9</span> <a href="Ticks.html#_TICKS_SUPRESSLAST"  target=classdetail>SupressLast</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.10</span> <a href="Ticks.html#_TICKS_SUPRESSMINORTICKMARKS"  target=classdetail>SupressMinorTickMarks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.11</span> <a href="Ticks.html#_TICKS_SUPRESSTICKMARKS"  target=classdetail>SupressTickMarks</a><br>
+&nbsp;&nbsp;&nbsp;<span style='font-family:arial;font-size:x-small;'> 73.12</span> <a href="Ticks.html#_TICKS_SUPRESSZEROLABEL"  target=classdetail>SupressZeroLabel</a><br>
+</td></tr></table><p>

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1083Dayscale.html">
+<LINK REL="Next" HREF="1085Monthscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1083Dayscale.html">Previous</A>
+<A HREF="1085Monthscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_8_4">10.8.4 Week scale</A></H3>
+<P> Week scales, if enabled, by default shows the week number in range 1
+ to 53 (as defined by ISO-8601, see the reference section).</P>
+<P> It might be worth pointing out here that the week number calculation
+ is carried out within JpGraph and does not rely on the underlying OS
+ date libraries. This makes the behavior consistent over several OS:s
+ (at least M$ Windows does<B> not</B> comply to ISO-8601 or supply any
+ way of doing this through the normal libraries, e.g. strftime())</P>
+<P> You may modify the week behavior in three ways. You can specify
+ (with SetStyle()) a different date format using the constants</P>
+<UL>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;WEEKSTYLE_WNBR</FONT></FONT></CODE></DIV>
+<P> Show week number To further modify the formatting of the actual week
+ number you can optionally supply a format string with a call to<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;SetLabelFormatString</FONT><FONT
+color="#007700">()</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> The format of the string should be a standard sprintf() syntax
+ expecting an integer (the week number). By default a 'W' is prefixed to
+ the number.</P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;WEEKSTYLE_FIRSTDAY</FONT></FONT></CODE></DIV>
+<P> Show date of first day in week.</P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;WEEKSTYLE_FIRSTDAY2</FONT></FONT></CODE></DIV>
+<P> Show date of first day in week and short month</P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;WEEKSTYLE_FIRSTDAYWNBR</FONT></FONT></CODE></DIV>
+<P> Show weeknumber of first day in week.</P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;WEEKSTYLE_FIRSTDAY2WNBR</FONT></FONT></CODE></DIV>
+<P> Show weeknumber of first day in week and month</P>
+</LI>
+</UL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1083Dayscale.html">Previous</A>
+<A HREF="1085Monthscale.html">Next</A>
+</BODY>
+</HTML>

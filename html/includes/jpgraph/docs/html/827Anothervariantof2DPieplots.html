@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="826Addingdropshadowstotheslices.html">
+<LINK REL="Next" HREF="83Polarplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="826Addingdropshadowstotheslices.html">Previous</A>
+<A HREF="83Polarplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_2_7">8.2.7 Another variant of 2D Pie plots</A></H3>
+<P> As mentioned in the beginning there are two versions of the 2D pie
+ plots. The normal pie plot created as an instance of <A href="../ref/PiePlot.html#_C_PIEPLOT">
+ class PiePlot</A> and a variant created as an instance of <A href="../ref/PiePlot.html#_C_PIEPLOTC">
+ class PiePlotC</A></P>
+<P> This variant is an extension of the standard PiePlot in the sense
+ that it also have a filled circle in the center. The following example
+ illustrates this</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_piecex1.html" target="blank"><IMG border="0"
+HEIGHT="300"       src="img/img/img/img/img/img/piecex1.png" WIDTH="300"></A>
+<BR><B>Figure 137:</B> Example of the variant of pie plot with a filled
+ center circle <A href="exframes/frame_piecex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Since the PiePlotC is an extension to the basic pie plot all the
+ normal formatting you can do for pie plots you can also do for the
+ PiePlotC .</P>
+<P> The additional formatting only concerns the filled middle circle.
+ You have the option of adjusting size, fill color and all font
+ properties. You perform these operations with the methods</P>
+<P></P>
+<TABLE>
+<TR><TD><A href="../ref/PiePlotC.html#_PIEPLOTC_SETMIDCOLOR">
+PiePlotC::SetMidColor()</A></TD><TD>Set fill color of mid circle</TD></TR>
+<TR><TD><A href="../ref/PiePlotC.html#_PIEPLOTC_SETMIDSIZE">
+PiePlotC::SetMidSize()</A></TD><TD>Set size (fraction of radius)</TD></TR>
+<TR><TD><A href="../ref/PiePlotC.html#_PIEPLOTC_SETMIDTITLE">
+PiePlotC::SetMidTitle()</A></TD><TD>Set title string (may be
+ multi-lined)</TD></TR>
+<TR><TD><A href="../ref/PiePlotC.html#_PIEPLOTC_SETMID">
+PiePlotC::SetMid()</A></TD><TD>Set all parameters in a single method
+ call</TD></TR>
+</TABLE>
+<P> In addition to the normal CSIM for PiePlot:s the center area is also
+ a CSIM hotspot. You specify the target CSIM with a call to <A href="../ref/PiePlotC.html#_PIEPLOTC_SETMIDCSIM">
+ PiePlotC::SetMidCSIM()</A></P>
+<P> The next example shows an example with some more innovative
+ formatting. In this example we have :</P>
+<UL>
+<LI> hidden the frame around the pie graph</LI>
+<LI> exploded all the slices</LI>
+<LI> added drop shadow to the individual slices (and the center filled
+ circle)</LI>
+<LI> specified individual multi line labels.</LI>
+<LI> changed the font for the title to a TTF font.</LI>
+</UL>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_piecex2.html" target="blank"><IMG border="0"
+HEIGHT="400"       src="img/img/img/img/img/img/piecex2.png" WIDTH="400"></A>
+<BR><B>Figure 138:</B> PiePlotC with some more innovative formatting to
+ make it more interesting. <A href="exframes/frame_piecex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="826Addingdropshadowstotheslices.html">Previous</A>
+<A HREF="83Polarplots.html">Next</A>
+</BODY>
+</HTML>

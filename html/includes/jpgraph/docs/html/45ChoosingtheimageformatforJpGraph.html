@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">
+<LINK REL="Next" HREF="46Alternativestostreamingbacktheimage.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">Previous</A>
+<A HREF="46Alternativestostreamingbacktheimage.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="4_5">4.5  Choosing the image format for JpGraph</A></H2>
+<P> By default JpGraph automatically chooses the image format to use in
+ the order PNG, JPEG and GIF. The exact format depends on what is
+ available on your system. There are two ways you can influence the way
+ the graphic format is chosen.</P>
+<OL>
+<LI> Change the default graphic format by changing the DEFINE<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;DEFINE</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;DEFAULT_GFORMAT&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;auto&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI> Set the graphic format in your script by calling the method <A href="../ref/Image.html#_IMAGE_SETIMGFORMAT">
+ SetImgFormat()</A> For example, to force your script to use JPEG in one
+ specific image use<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetImgFormat</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;jpeg&quot;</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV>
+<P></P>
+</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html">Previous</A>
+<A HREF="46Alternativestostreamingbacktheimage.html">Next</A>
+</BODY>
+</HTML>

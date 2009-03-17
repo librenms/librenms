@@ -1,0 +1,45 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GROUPBARPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GroupBarPlot</b> EXTENDS <a href="BarPlot .html#_C_BARPLOT " style="font-face:arial;font-weight:bold;">BarPlot </a></div>
+<i>(Defined in: jpgraph_bar.php : 552)</i><table border=1><tr><td>&nbsp;<a href="GroupBarPlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">GroupBarPlot</a>&nbsp;</td><td>&nbsp;<a href="BarPlot .html" style="font-family:arial;font-weight:bold;color:darkblue;">BarPlot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GroupBarPlot.html#_GROUPBARPLOT_GROUPBARPLOT">GroupBarPlot()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>A group bar plot has several bars side by side for each X-label. The group bar is constructed from any number of ordinary bar graphs.
+
+For example:
+<code>
+$b1 = new BarPlot(...);
+$b2 = new BarPlot(...);
+
+$gb = new GroupBarPlot(array($b1,$b2));
+...
+$graph->Add($gb);
+...
+</code>
+
+Each individual bar can be either a BarPlor or an AccBarPlot.
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GROUPBARPLOT_GROUPBARPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GroupBarPlot($plots)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new Group bar plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$plots</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of individual plots</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new Group bar plot from a number of BarPlot or AccBarPlot plots.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="AccBarPlot.html#_ACCBARPLOT_ACCBARPLOT">AccBarPlot::AccBarPlot</a> and <a href="BarPlot.html#_BARPLOT_BARPLOT">BarPlot::BarPlot</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$b1&nbsp;=&nbsp;new&nbsp;BarPlot(...);<br />$b2&nbsp;=&nbsp;new&nbsp;BarPlot(...);<br /><br />$gb&nbsp;=&nbsp;new&nbsp;GroupBarPlot(array($b1,$b2));<br />...<br />$graph-&gt;Add($gb);</font>
+</span><br>
+<p> <hr> <p>

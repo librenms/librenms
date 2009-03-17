@@ -1,0 +1,164 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_PLOTBAND"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PlotBand</b></div>
+<i>(Defined in: jpgraph_plotband.php : 541)</i><table border=1><tr><td>&nbsp;<a href="PlotBand.html" style="font-family:arial;font-weight:bold;color:darkblue;">PlotBand</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PlotBand.html#_PLOTBAND_PLOTBAND">PlotBand()</a>&nbsp;<br>
+&nbsp;<a href="PlotBand.html#_PLOTBAND_SETDENSITY">SetDensity()</a>&nbsp;<br>
+&nbsp;<a href="PlotBand.html#_PLOTBAND_SETORDER">SetOrder()</a>&nbsp;<br>
+&nbsp;<a href="PlotBand.html#_PLOTBAND_SHOWFRAME">ShowFrame()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>A "Plotband" repesent a rectangualr area in the graph that can be given a specific pattern ranging from 3D grid to simple horizntal grid lines.
+<p>
+A Plot band is then added to the graph via the Graph::AddBand() method.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Graph.html">Graph</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTBAND_PLOTBAND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;PlotBand($aDir,$aPattern,$aMin,$aMax,$aColor,$aWeight,$aDepth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new Plot band of the specified type</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDir</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Direction of plot band</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPattern</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Type of pattern</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Min value for plot area</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Max value for plot area</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"black"</font>
+</td><td>Color of pattern</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Line weight</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDepth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+DEPTH_BACK</font>
+</td><td>Depth. Over or under the plot.</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new Plot band that later on can be added to the graph. The following pattern types are supported
+
+<ul>
+<li>BAND_RDIAG, Right diagonal lines
+<li>BAND_LDIAG, Left diagonal lines
+<li>BAND_SOLID, Solid one color
+<li>BAND_LVERT, Vertical lines
+<li>BAND_LHOR, Horizontal lines
+<li>BAND_VLINE, Vertical lines
+<li>BAND_HLINE, Horizontal lines
+<li>BAND_3DPLANE, "3D" Plane
+<lI>BAND_HVCROSS, Vertical/Hor crosses
+<li>BAND_DIAGCROSS, Diagonal crosses
+</ul>
+
+A plotband extends completely along one of the axis in the graph. This axis is determined by the first argument, the direction.
+
+Valid directions are
+<ol>
+<li> HORIZONTAL
+<li> VERTICAL
+</ol>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$uband=new&nbsp;PlotBand(HORIZONTAL,BAND_RDIAG,0,"max","green");<br />$uband-&gt;ShowFrame(false);<br />$uband-&gt;SetDensity(50);&nbsp;//&nbsp;50%&nbsp;line&nbsp;density<br />$lband=new&nbsp;PlotBand(HORIZONTAL,BAND_LDIAG,"min",0,"red");<br />$lband-&gt;ShowFrame(false);<br />$lband-&gt;SetDensity(20);&nbsp;//&nbsp;20%&nbsp;line&nbsp;density<br /><br />$graph-&gt;AddBand($uband);<br />$graph-&gt;AddBand($lband);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTBAND_SETDENSITY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDensity($aDens)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify density for pattern</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDens</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Density [1,100]</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify density for pattern as an integer value between 1 and 100, 100 being very dense and 1 being very sparse.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$uband=new&nbsp;PlotBand(HORIZONTAL,BAND_RDIAG,0,"max","green");<br />$uband-&gt;ShowFrame(false);<br />$uband-&gt;SetDensity(50);&nbsp;//&nbsp;50%&nbsp;line&nbsp;density<br />$lband=new&nbsp;PlotBand(HORIZONTAL,BAND_LDIAG,"min",0,"red");<br />$lband-&gt;ShowFrame(false);<br />$lband-&gt;SetDensity(20);&nbsp;//&nbsp;20%&nbsp;line&nbsp;density<br /><br />$graph-&gt;AddBand($uband);<br />$graph-&gt;AddBand($lband);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTBAND_SETORDER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetOrder($aDepth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify z-order parameter for plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDepth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Pattern Z-order parameter</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the pattern should be in front of plot or behind the plot. Valid parameters are
+
+<ul>
+<li>DEPTH_BACK, Behind the plot
+<li>DEPTH_FRONT, In front of the plot
+</ul>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$band=new&nbsp;PlotBand(HORIZONTAL,BAND_RDIAG,0,"max","green");<br />$band-&gt;ShowFrame(false);<br />$band-&gt;SetOrder(DEPTH_BACK);<br />$graph-&gt;AddBand($band);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTBAND_SHOWFRAME"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ShowFrame($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Display frame around pattern</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Display border</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Display frame around pattern&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$band=new&nbsp;PlotBand(HORIZONTAL,BAND_RDIAG,0,"max","green");<br />$band-&gt;ShowFrame(false);<br />$band-&gt;SetOrder(DEPTH_BACK);<br />$graph-&gt;AddBand($band);<br /></font>
+</span><br>
+<p> <hr> <p>

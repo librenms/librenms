@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1022Usingcountryflagsinvariouscontext.html">
+<LINK REL="Next" HREF="11Workingwithcanvasgraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1022Usingcountryflagsinvariouscontext.html">Previous</A>
+<A HREF="11Workingwithcanvasgraphs.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_23">10.23 Adding icons onto the graph</A></H2>
+<P> In addition to the standard background image you can also add an
+ arbitrary number of icons onto the background of the graph. These icons
+ are created with a call to the special Plot class<I> IconPlot</I>.</P>
+<P> The image from icons are taken from a file or as one of the builtin
+ country flags.</P>
+<P> You may control how much of the icon should be blended into the
+ background by specifying a percentage (1-100). The example below shows
+ how to mix in the picture of &quot;Tux&quot; into the background of a filled line
+ graph. Note: This example uses alpha blending and will therefore
+ require GD2.<DIV class="example">
+<BR> <A href="exframes/frame_lineiconex1.html" target="blank"><IMG border="0"
+HEIGHT="250"  src="img/lineiconex1.png" WIDTH="400"></A>
+<BR><B>Figure 180:</B> Adding an icon into the background <A href="exframes/frame_lineiconex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To specify any of the roughly 200 country flags as an icon you first
+ create an empty Icon and then call the IconPlot::SetCountryFlag() with
+ the appropriate parameters. (See the class reference). This is
+ illustrated below by adding the Icelandic flag into the background as
+ an icon<DIV class="example">
+<BR> <A href="exframes/frame_lineiconex2.html" target="blank"><IMG border="0"
+HEIGHT="250"  src="img/lineiconex2.png" WIDTH="400"></A>
+<BR><B>Figure 181:</B> Adding an icon flag into the background <A href="exframes/frame_lineiconex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> Some older versions of PHP pre-4.3.3
+ using the builtin GD have problems rendering blended images. If you
+ have this problem then you need to upgrade to a more recent version of
+ PHP.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1022Usingcountryflagsinvariouscontext.html">Previous</A>
+<A HREF="11Workingwithcanvasgraphs.html">Next</A>
+</BODY>
+</HTML>

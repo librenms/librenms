@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="312VerifyingthatyouhaveGD2installed.html">
+<LINK REL="Next" HREF="314UsingnonlatinbasedfontswithJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="312VerifyingthatyouhaveGD2installed.html">Previous</A>
+<A HREF="314UsingnonlatinbasedfontswithJpGraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="3_1_3">3.1.3 Preparing True Type Font Files</A></H3>
+<P> JpGraph contains as default a standard set of bitmap fonts which
+ only supports the standard ASCII 7-bit character set. In order to use
+ accented characters, UTF-8, Chinese, Japanese, etc You need to download
+ TTF fonts. Due to various legal issues no TTF fonts are supplied in the
+ JpGraph package. To enable TTF fonts there are three alternatives:</P>
+<OL>
+<LI>If you are on a Windows platform you can just point to the TTF
+ directory in JpGraph to the standard fonts directory (e.g
+ C:\windows\fonts\)</LI>
+<LI>If you are on a Unix platform you can download and install the core
+ MS WEB-initiative fonts from <A href="http://corefonts.sourceforge.net/">
+http://corefonts.sourceforge.net/</A></LI>
+<LI>It is also possible to use the Vera Bitstream TTF fonts available
+ from <A href="http://www.gnome.org/fonts/">http://www.gnome.org/fonts/</A>
+</LI>
+</OL>
+<P> It is also necessary to make sure that the PHP installation supports
+ TTF fonts (either through FreeType 1 or FreeType 2 libraries). I n
+ addition some suitable TTF font files must also be available. To make
+ the font files available for the library the directory path to the
+ location of the font files must be specified in the configuration file,
+ jpg-config.inc.php</P>
+<P> JpGraph uses a standard naming convention for the TTF font files in
+ order to be able to find the correct font files. This naming convention
+ follows the standard naming of the available font files.</P>
+<P> If the installation of the library is made on a computer running MS
+ Windows then it is recommended to use the already available font files
+ in Windows (usually located in C:\WINDOWS\FONTS).</P>
+<P> If the installation is made on a UNIX derivate running X11 then the
+ font location can differ between versions and UNIX brands. One commonly
+ used path is &quot;/usr/X11R6/lib/X11/fonts/truetype/&quot;.</P>
+<P> Finally we note that it is possible to install additional fonts not
+ natively supported by the library. Since this requires augmenting the
+ library files this is considered advanced use and not further discussed
+ in this introduction.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="312VerifyingthatyouhaveGD2installed.html">Previous</A>
+<A HREF="314UsingnonlatinbasedfontswithJpGraph.html">Next</A>
+</BODY>
+</HTML>

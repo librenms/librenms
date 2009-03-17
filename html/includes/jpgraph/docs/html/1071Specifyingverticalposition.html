@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="107Ganttbars.html">
+<LINK REL="Next" HREF="1072Specifyingstartandendpositionforabar.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="107Ganttbars.html">Previous</A>
+<A HREF="1072Specifyingstartandendpositionforabar.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_7_1">10.7.1 Specifying vertical position</A></H3>
+<P> As described above vertical positions are specified as a numeric
+ value [0..n] where 'n' is an arbitrary constant. (For practical
+ purposes n is most likely &lt; 100)</P>
+<P> Using our previous example we will illustrate this parameter by
+ changing the position of our 'Project' activity to position 7. Therefor
+ we change the call to GanttBar() to<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$activity&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">GanttBar</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+7</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">&quot;Project&quot;</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;2001-12-21&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;2002-02-20&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> and we then get the chart as shown below in Figure 146.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_ganttex03.html" target="blank"><IMG border="0"
+HEIGHT="280"  src="img/ganttex03.png" WIDTH="486"></A>
+<BR><B>Figure 146:</B> Changing the vertical position to 7 <A href="exframes/frame_ganttex03.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> Note that the height of each position (vertical position) will
+ depend on the actual height of the bar.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="107Ganttbars.html">Previous</A>
+<A HREF="1072Specifyingstartandendpositionforabar.html">Next</A>
+</BODY>
+</HTML>

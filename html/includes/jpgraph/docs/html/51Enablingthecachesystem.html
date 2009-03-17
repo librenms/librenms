@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="5UnderstandingtheJpGraphcachingsystem.html">
+<LINK REL="Next" HREF="52Usingthecacheinyourscript.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="5UnderstandingtheJpGraphcachingsystem.html">Previous</A>
+<A HREF="52Usingthecacheinyourscript.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="5_1">5.1 Enabling the cache system</A></H2>
+<P> The enabling disabling of the cache system is controlled by two
+ defines (in jpg-config.php)</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;DEFINE</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;USE_CACHE&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+true</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">DEFINE</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;READ_CACHE&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+true</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P></P>
+<P> The first of these, USE_CACHE, is the master-switch which must be
+ set to true to enable the caching system. The second switch READ_CACHE
+ very seldom needs to be changed.</P>
+<P> This second switch basically tells whether or not JpGraph should
+ ever look in the cache. Setting this to false and the master-switch to
+ true would then always generate an new updated image file in the cache
+ and this new image would be send back to the browser. The main use for
+ this (admittedly) strange setting is if you like to have the side
+ effect of the script that a fresh image is always stored in the cache
+ directory.</P>
+<P> Once you have enabled the cache you must also make sure that a valid
+ cache directory is setup. The cache directory is specified with the
+ define</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;DEFINE</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;CACHE_DIR&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;/tmp/jpgraph_cache/&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> You can of course change the default directory to whatever directory
+ you fancy. But, you must remember one important thing.<STRONG> The
+ cache directory must be writable for the user running Apache/PHP</STRONG>
+.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="5UnderstandingtheJpGraphcachingsystem.html">Previous</A>
+<A HREF="52Usingthecacheinyourscript.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,40 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_LINEERRORPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>LineErrorPlot</b> EXTENDS <a href="ErrorPlot .html#_C_ERRORPLOT " style="font-face:arial;font-weight:bold;">ErrorPlot </a></div>
+<i>(Defined in: jpgraph_error.php : 119)</i><table border=1><tr><td>&nbsp;<a href="LineErrorPlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">LineErrorPlot</a>&nbsp;</td><td>&nbsp;<a href="ErrorPlot .html" style="font-family:arial;font-weight:bold;color:darkblue;">ErrorPlot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="LineErrorPlot.html#_LINEERRORPLOT_LINEERRORPLOT">LineErrorPlot()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>A line error plot is in principle a line plot but with the added feature that each point also have a two error values. Low and high error.
+
+This means that data array must be an even number of three values. <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="LinePlot.html">LinePlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEERRORPLOT_LINEERRORPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;LineErrorPlot(&amp;$datay,$datax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor for a line plot with error bars</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$datay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-Data</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>X-Data [optional]</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Same as a line plot but each data point has three values, the value, and error min, and error max. The error bars are then drawn as vertical lines at each data point.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$leplot&nbsp;=&nbsp;new&nbsp;LineErrorPlot($ydata);</font>
+</span><br>
+<p> <hr> <p>

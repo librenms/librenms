@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1221AdjustingthesizeoftheLEDdigits.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1221AdjustingthesizeoftheLEDdigits.html">Previous</A>
+<HR NOSHADE>
+
+<H1><A NAME="13">13 Code defines in JpGraph</A></H1>
+<P> Various settings in JpGraph are controlled by overall DEFINEs in the
+ configuration file &quot;jpg-config.inc.php&quot;. Most of these defines have
+ default values that should be valid for most usage.</P>
+<P> In the rest of this chapter all constants are described with default
+ value and usage.</P>
+<P></P>
+<TABLE cellpadding="3" cellspacing="0" class="codedefines">
+<TR><TH>Define, default value</TH><TH>Comment</TH></TR>
+<TR><TD valign="top">&quot;CACHE_DIR&quot;, &quot;/tmp/jpgraph_cache/&quot;</TD><TD>The full
+ absolute name of directory to be used as a cache. This directory<STRONG>
+ must</STRONG> be readable and writable for PHP. Must end with '/'</TD></TR>
+<TR><TD valign="top">&quot;TTF_DIR&quot;, &quot;/usr/local/fonts/ttf/&quot;</TD><TD>
+Directory for JpGraph TTF fonts. Must end with '/' The fonts must follow
+ the naming conventions as used by the supplied TTF fonts in JpGraph.</TD>
+</TR>
+<TR><TD valign="top">&quot;CSIMCACHE_DIR&quot;, &quot;csimcache/&quot;</TD><TD>Directory for
+ cache directory for CSIM graphs. Must end with '/' Cache directory
+ specification for use with CSIM graphs that are using the cache. The
+ directory must be the filesystem name as seen by PHP and the 'http'
+ version must be the same directory but as seen by the HTTP server
+ relative to the 'htdocs' directory. If a relative path is specified it
+ is taken to be relative from where the image script is executed. Note:
+ The default setting is to create a subdirectory in the directory from
+ where the image script is executed and store all files there. As usual
+ this directory must be writable by the PHP process.</TD></TR>
+<TR><TD valign="top">&quot;CSIMCACHE_HTTP_DIR&quot;, &quot;csimcache&quot;</TD><TD>Directory
+ for JpGraph TTF fonts. Must end with '/' Cache directory specification
+ for use with CSIM graphs that are using the cache. The directory must
+ be the filesystem name as seen by PHP and the 'http' version must be
+ the same directory but as seen by the HTTP server relative to the
+ 'htdocs' directory. If a relative path is specified it is taken to be
+ relative from where the image script is executed. Note: The default
+ setting is to create a subdirectory in the directory from where the
+ image script is executed and store all files there. As usual this
+ directory must be writable by the PHP process.</TD></TR>
+<TR><TD valign="top">&quot;CHINESE_TTF_FONT&quot;, &quot;bkai00mp.ttf&quot;</TD><TD> Actual
+ name of the TTF file used together with FF_CHINESE aka FF_BIG5 This is
+ the TTF file being used when the font family is specified as either
+ FF_CHINESE or FF_BIG5</TD></TR>
+<TR><TD valign="top">&quot;LANGUAGE_CYRILLIC&quot;, false</TD><TD> Special unicode
+ Cyrillic language support.</TD></TR>
+<TR><TD valign="top">&quot;CYRILLIC_FROM_WINDOWS&quot;, false</TD><TD> If you are
+ setting this config to true the conversion will assume that the input
+ text is windows 1251, if false it will assume koi8-r</TD></TR>
+<TR><TD valign="top">'MINCHO_TTF_FONT', 'ipam.ttf'</TD><TD> Japanese
+ TrueType font used with FF_MINCHO</TD></TR>
+<TR><TD valign="top">'PMINCHO_TTF_FONT', 'ipamp.ttf'</TD><TD> Japanese
+ TrueType font used with FF_PMINCHO</TD></TR>
+<TR><TD valign="top">'GOTHIC_TTF_FONT', 'ipag.ttf'</TD><TD> Japanese
+ TrueType font used with FF_GOTHIC</TD></TR>
+<TR><TD valign="top">'PGOTHIC_TTF_FONT', 'ipagp.ttf'</TD><TD> Japanese
+ TrueType font used with FF_PGOTHIC</TD></TR>
+<TR><TD valign="top">&quot;INSTALL_PHP_ERR_HANDLER&quot;, false</TD><TD> Determine
+ if the library should also setup the default PHP error handler to
+ generate a graphic error message. This is useful during development to
+ be able to see the error message as an image instead as a &quot;red-cross&quot;
+ in a page where an image is expected.</TD></TR>
+<TR><TD valign="top">&quot;CATCH_PHPERRMSG&quot;, true</TD><TD> Should the library
+ examine the global php_errmsg string and convert any error in it to a
+ graphical representation. This is handy for the occasions when, for
+ example, header files cannot be found and this results in the graph not
+ being created and just a &quot;red-cross&quot; image would be seen. This should
+ be turned off for a production site.</TD></TR>
+<TR><TD valign="top">&quot;USE_LIBRARY_GD2&quot;,false</TD><TD>Specify if we
+ should use GD 2.x or GD 1.x If you have GD 2.x installed it is
+ recommended that you use it since it will give a slightly, slightly
+ better visual appearance for arcs. If you don't have GD2 installed this
+ must be set to false!</TD></TR>
+<TR><TD valign="top">'USE_TRUECOLOR',true</TD><TD>Should the image be a
+ truecolor image? Note 1: Can only be used with GD 2.0.2 and above. Note
+ 2: GD 2.0.1 + PHP 4.0.6 on Win32 crashes when trying to use truecolor.
+ Truecolor support is to be considered alpha since GD 2.x is still not
+ considered stable (especially on Win32). Note 3: MUST be enabled to get
+ background images working with GD2 Note 4: If enabled then truetype
+ fonts will look very ugly =&gt; You can't have both background images and
+ truetype fonts in the same image until these bugs has been fixed in GD
+ 2.01</TD></TR>
+<TR><TD valign="top">&quot;USE_CACHE&quot;,false</TD><TD>Should the cache be used
+ at all? By setting this to false no files will be generated in the
+ cache directory. The difference from READ_CACHE being that setting
+ READ_CACHE to false will still create the image in the cache directory
+ just not use it. By setting USE_CACHE=false no files will even be
+ generated in the cache directory.</TD></TR>
+<TR><TD valign="top">&quot;READ_CACHE&quot;,true</TD><TD>Should we try to find an
+ image in the cache before generating it? Set this define to false to
+ bypass the reading of the cache and always regenerate the image. Note
+ that even if reading the cache is disabled the cached will still be
+ updated with the newly generated image. Set also &quot;USE_CACHE&quot; below.</TD>
+</TR>
+<TR><TD valign="top">&quot;DEFAULT_GFORMAT&quot;,&quot;auto&quot;</TD><TD>Default graphic
+ format set to &quot;auto&quot; which will automatically choose the best available
+ format in the order png,gif,jpg (The supported format depends on what
+ your PHP installation supports)</TD></TR>
+<TR><TD valign="top">&quot;USE_IMAGE_ERROR_HANDLER&quot;,true</TD><TD> Determine
+ if the error handler should be image based or purely text based. Image
+ based makes it easier since the script will always return an image even
+ in case of errors.</TD></TR>
+<TR><TD valign="top">&quot;USE_APPROX_COLORS&quot;,true</TD><TD>If the color
+ palette is full should JpGraph try to allocate the closest match? If
+ you plan on using background image or gradient fills it might be a good
+ idea to enable this. If not you will otherwise get an error saying that
+ the color palette is exhausted. The drawback of using approximations is
+ that the colors might not be exactly what you specified. Note1: This
+ does only apply to a palette image, not true color images since they
+ don't have the limitations of maximum number of colors.</TD></TR>
+<TR><TD valign="top">&quot;ERR_DEPRECATED&quot;,false</TD><TD>Should usage of
+ deprecated functions and parameters give a fatal error? (Useful to
+ check if code is future proof.)</TD></TR>
+<TR><TD valign="top">&quot;BRAND_TIMING&quot;,false</TD><TD>Should the time taken
+ to generate each picture be branded to the lower left in corner in each
+ generated image? Useful for performance measurements generating graphs</TD>
+</TR>
+<TR><TD valign="top">&quot;BRAND_TIME_FORMAT&quot;,&quot;Generated in: %01.3fs&quot;</TD><TD>
+What format should be used for the timing string?</TD></TR>
+</TABLE>
+<P> The following defines should very rarely need to be changed</P>
+<P></P>
+<TABLE cellpadding="3" cellspacing="0" class="codedefines">
+<TR><TH>Define, default value</TH><TH>Comment</TH></TR>
+<TR><TD valign="top">&quot;CACHE_FILE_GROUP&quot;,&quot;wwwadmin&quot;</TD><TD>What group
+ should the cached file belong to (Set to &quot;&quot; will give the default group
+ for the &quot;PHP-user&quot;) Please note that the Apache user must be a member
+ of the specified group since otherwise it is impossible for Apache to
+ set the specified group.</TD></TR>
+<TR><TD valign="top">&quot;CACHE_FILE_MOD&quot;,0664</TD><TD>What permissions
+ should the cached file have (Set to &quot;&quot; will give the default
+ permissions for the &quot;PHP-user&quot;)</TD></TR>
+<TR><TD valign="top">&quot;USE_BRESENHAM&quot;,false</TD><TD>Decide if we should
+ use the Bresenham circle algorithm or the built in Arc(). Bresenham
+ gives better visual appearance of circles but is more CPU intensive and
+ slower then the built in Arc() function in GD. Turned off by default
+ for speed</TD></TR>
+<TR><TD valign="top">&quot;_CSIM_SPECIALFILE&quot;,&quot;_csim_special_&quot;</TD><TD>
+Special file name to indicate that we only want to calc the image map in
+ the call to Graph::Stroke() used internally from the GetHTMLCSIM()
+ method.</TD></TR>
+<TR><TD valign="top">&quot;_CSIM_DISPLAY&quot;,&quot;_jpg_csimd&quot;</TD><TD>HTTP GET
+ argument that is used with image map to indicate to the script to just
+ generate the image and not the full CSIM HTML page.</TD></TR>
+</TABLE>
+ &nbsp;
+<P>&nbsp;</P>
+<P>&amp;nbsp</P>
+</DIV><HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1221AdjustingthesizeoftheLEDdigits.html">Previous</A>
+</BODY>
+</HTML>

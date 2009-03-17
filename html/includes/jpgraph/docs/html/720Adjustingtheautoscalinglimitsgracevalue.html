@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7195InvertingtheYaxis.html">
+<LINK REL="Next" HREF="721Addingbandsofpatternandcolortographs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7195InvertingtheYaxis.html">Previous</A>
+<A HREF="721Addingbandsofpatternandcolortographs.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_20">7.20 Adjusting the auto-scaling limits - grace value</A>
+</H2>
+<P> By default the auto-scaling algorithm tries to make best possible
+ use of screen estate by making the scale as large as possible, i.e. the
+ extreme values (min/max) will be on the top and bottom of the scale if
+ they happen to fall on a scale-tick. So for example doing a simple line
+ plot could look like the plot shown in the below.<DIV class="example">
+<BR> <A href="exframes/frame_example3.2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example3.2.png" WIDTH="300"></A>
+<BR><B>Figure 100:</B> A typical graph with autoscaling and grace=0 <A href="exframes/frame_example3.2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> However you might sometime want to add some extra to the minimum and
+ maximum values so that there is some &quot;air&quot; in the graph between the end
+ of the scale values and the extreme points in the graphs. This can be
+ done by adding a &quot;grace&quot; percentage to the scale. So for example adding
+ 10% to the y-scale in the image above is done by calling the <A href="../ref/LinearScale.html#_LINEARSCALE_SETGRACE">
+ SetGrace()</A> method on the yscale as in</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">yaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetGrace</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">10</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+10</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> These lines add a minimum of 10% to the top and bottom values of the
+ scale. Note that we say &quot;minimum&quot; since depending on the specific tick
+ values choose this might be a little bit more to make the end of the
+ scale fall on an even tick mark.</P>
+<P> Adding this line to the previous graph will result in the following
+ example</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example3.2.1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example3.2.1.png" WIDTH="300"></A>
+<BR><B>Figure 101:</B> Adding 10% grace value to top and bottom of the
+ Y-scale <A href="exframes/frame_example3.2.1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P> Since we haven't adjusted the position of the X-axis it will remain
+ at Y=0 which might not necessary be what we would like so we therefor
+ also add the line</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetPos</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;min&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> So that the X-axis always will remain at the lowest possible
+ Y-value. Doing this will then result in the example below</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example3.2.2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example3.2.2.png" WIDTH="300"></A>
+<BR><B>Figure 102:</B> Using grace but also adjusting the position of
+ the X-axis <A href="exframes/frame_example3.2.2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7195InvertingtheYaxis.html">Previous</A>
+<A HREF="721Addingbandsofpatternandcolortographs.html">Next</A>
+</BODY>
+</HTML>

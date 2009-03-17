@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="115SampleapplicationDrawingDBschema.html">
+<LINK REL="Next" HREF="121GeneratingAntiSpamchallenge.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="115SampleapplicationDrawingDBschema.html">Previous</A>
+<A HREF="121GeneratingAntiSpamchallenge.html">Next</A>
+<HR NOSHADE>
+<H1><A NAME="12">12 Anti-Spam Challenges</A></H1>
+<P> JpGraph includes a module to easily generate Anti-Spam challenges.
+ With this we mean an image consisting of numbers and letters which are
+ very hard to read for an OCR program. This is often used to secure sign
+ up for bulletin boards, on-line mail system or mailing lists since this
+ very effectively prevent automatic sign up by robots (spam-bots).</P>
+<P> The module in JpGraph responsible for this is<I>
+ jpgraph_antispam.php</I> and behaves as a simplified plot module.</P>
+<P> The example below illustrates how such an image can look like<DIV class="example">
+<BR> <A href="exframes/frame_antispamex01.html" target="blank"><IMG border="0"
+HEIGHT="34"  src="img/antispamex01.png" WIDTH="101"></A>
+<BR><B>Figure 191:</B> Simple illustration of spam challenge image <A href="exframes/frame_antispamex01.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P>Anti spam images have less functionality then the usual images
+ generated with JpGraph in order to keep this utility reasonable small.
+ The primary limitation is that there are now additional formatting
+ options for the images and the image generated will always use the<I>
+ JPEG</I> image format. Hence it is not possible to change this to use,
+ for example, PNG.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="115SampleapplicationDrawingDBschema.html">Previous</A>
+<A HREF="121GeneratingAntiSpamchallenge.html">Next</A>
+</BODY>
+</HTML>

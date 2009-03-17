@@ -1,0 +1,159 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_PIEGRAPH"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PieGraph</b> EXTENDS <a href="Graph .html#_C_GRAPH " style="font-face:arial;font-weight:bold;">Graph </a></div>
+<i>(Defined in: jpgraph_pie.php : 1117)</i><table border=1><tr><td>&nbsp;<a href="PieGraph.html" style="font-family:arial;font-weight:bold;color:darkblue;">PieGraph</a>&nbsp;</td><td>&nbsp;<a href="Graph .html" style="font-family:arial;font-weight:bold;color:darkblue;">Graph </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PieGraph.html#_PIEGRAPH_ADD">Add()</a>&nbsp;<br>
+&nbsp;<a href="PieGraph.html#_PIEGRAPH_PIEGRAPH">PieGraph()</a>&nbsp;<br>
+&nbsp;<a href="PieGraph.html#_PIEGRAPH_SETANTIALIASING">SetAntiAliasing()</a>&nbsp;<br>
+&nbsp;<a href="PieGraph.html#_PIEGRAPH_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="PieGraph.html#_PIEGRAPH_STROKE">Stroke()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>The canvas for use with PiePlots. You add pie plots by calling the Add() method. 
+<p>
+You can add several PiePlots by adjusting their size and positioning each PiePlot so it doesn't overlap eachother.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="PiePlot.html">PiePlot</a> and <a href="PiePlot3D.html">PiePlot3D</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEGRAPH_ADD"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Add($aObj)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add object to the pie graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aObj</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Object to add</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Add a pieplots or text object to the pie graph. You can specify either a single object or an array. If you specify an array all object in the array must be of the same type. &nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$piegraph&nbsp;=&nbsp;new&nbsp;PieGraph(300,400);<br />$pieplot&nbsp;=&nbsp;new&nbsp;PiePlot($ydata);<br />$piegraph-&gt;Add($pieplot);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEGRAPH_PIEGRAPH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;PieGraph($width,$height,$cachedName,$timeout,$inline)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>//---------------// CONSTRUCTOR
+</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$width</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+300</font>
+</td><td>Width of graph</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$height</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+200</font>
+</td><td>Height of graph</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$cachedName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Cache file name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$timeout</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Cache timeout in s</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$inline</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Should the image be inline.</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>See Graph::Graph()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_GRAPH">Graph::Graph</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$piegraph&nbsp;=&nbsp;new&nbsp;PieGraph(300,400);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEGRAPH_SETANTIALIASING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAntiAliasing($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable/disable anti-alias for Pie Graphs</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>true=enable anti-aliasing</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable/disable anti-alias for Pie Graphs. This makes for much nicer looking PieGraphs. Please note that enabling anti-alias imposes some restrictions:
+<ul>
+<li> Enabling anti-alias will severely impact performance. As a rule of thumb you can expect drawing to take 5-8 times longer !
+<li> You can't use background images or gradient backgrounds together with anti-alias
+</ul>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$piegraph-&gt;SetAntiAlias();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEGRAPH_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($c)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the background color. Synonym to SetMarginColor()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$c</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the background color. Synonym to SetMarginColor()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_GRAPH">Graph::Graph</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$piegraph-&gt;SetColor('gray');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEGRAPH_STROKE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Stroke($aStrokeFileName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Method description</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStrokeFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Filename</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Stroke the piegraph to the browser or to a specified file if specified. Works exactly the same as Graph::Stroke()
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+...<br />$piegraph-&gt;Stroke()<br /></font>
+</span><br>
+<p> <hr> <p>

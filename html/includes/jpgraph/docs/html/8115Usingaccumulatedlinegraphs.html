@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8114Usingfilledlinegraphs.html">
+<LINK REL="Next" HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8114Usingfilledlinegraphs.html">Previous</A>
+<A HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_15">8.1.15 Using accumulated line graphs</A></H3>
+<P> Accumulated line graphs are line graphs that are &quot;stacked&quot; on top of
+ each other. That is, the values in the supplied data for the Y-axis is
+ not the absolute value but rather the relative value from graph below.
+ For example if you have two line graphs with three points each, say
+ [3,7,5] and [6,9,7]. The first graph will be plotted on the absolute
+ Y-values [3,7,5] the second plot will be plotted at [3+6, 7+9, 5+7],
+ hence the values of the previous graphs will be used as offsets.</P>
+<P> You may add any number of ordinary line graphs together. If you want
+ to use three line plots in an accumulated line plot graph you write the
+ following code</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;</FONT><FONT color="#FF8000">//&nbsp;First&nbsp;create&nbsp;the&nbsp;individual&nbsp;plots
+<BR></FONT><FONT color="#0000BB">$p1&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">LinePlot</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$datay_1</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$p2&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">LinePlot</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$datay_2</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$p3&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">LinePlot</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$datay_3</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Then&nbsp;add&nbsp;them&nbsp;together&nbsp;to&nbsp;form&nbsp;a&nbsp;accumulated&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$ap&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">AccLinePlot</FONT><FONT color="#007700">(array(</FONT><FONT
+color="#0000BB">$p1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$p2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$p3</FONT><FONT
+color="#007700">));
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Add&nbsp;the&nbsp;accumulated&nbsp;line&nbsp;plot&nbsp;to&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$ap</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> You might of course also fill each line plot by adding the lines<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$p1</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetFillColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;red&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$p2</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$p3</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;green&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> Using some appropriate data this might then give a graph perhaps
+ like the one showed in the figure below<DIV class="example">
+<BR> <A href="exframes/frame_example17.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example17.png" WIDTH="300"></A>
+<BR><B>Figure 25:</B> Accumulated filled line graph <A href="exframes/frame_example17.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8114Usingfilledlinegraphs.html">Previous</A>
+<A HREF="8116ConstructingsmoothlineplotswithCubicSplines.html">Next</A>
+</BODY>
+</HTML>

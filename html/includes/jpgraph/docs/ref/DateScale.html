@@ -1,0 +1,154 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_DATESCALE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>DateScale</b> EXTENDS <a href="LinearScale .html#_C_LINEARSCALE " style="font-face:arial;font-weight:bold;">LinearScale </a></div>
+<i>(Defined in: jpgraph_date.php : 49)</i><table border=1><tr><td>&nbsp;<a href="DateScale.html" style="font-family:arial;font-weight:bold;color:darkblue;">DateScale</a>&nbsp;</td><td>&nbsp;<a href="LinearScale .html" style="font-family:arial;font-weight:bold;color:darkblue;">LinearScale </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="DateScale.html#_DATESCALE_ADJUSTFORDST">AdjustForDST()</a>&nbsp;<br>
+&nbsp;<a href="DateScale.html#_DATESCALE_SETDATEALIGN">SetDateAlign()</a>&nbsp;<br>
+&nbsp;<a href="DateScale.html#_DATESCALE_SETDATEFORMAT">SetDateFormat()</a>&nbsp;<br>
+&nbsp;<a href="DateScale.html#_DATESCALE_SETTIMEALIGN">SetTimeAlign()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Module used to create a date/time X-axis scale <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATESCALE_ADJUSTFORDST"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AdjustForDST($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i></i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>No description available.<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATESCALE_SETDATEALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDateAlign($aStartAlign,$aEndAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify start and end date alignment for the scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStartAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aEndAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>End alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify start and end date alignment for the scale
+Possible values are
+<ol>
+<li> Alignment on a day basis
+<ul>
+<li> DAYADJ_1, Align on the start of a day
+<li> DAYADJ_7, Align on the start of a week
+<li> DAYADJ_WEEK, Synonym to DAYADJ_7
+</ul>
+
+<li> Alignment on a monthly basis
+<ul>
+<li> MONTHADJ_1, Align on a month start
+<li> MONTHADJ_6, Align on the start of halfyear
+</ul>
+
+<li> Alignment on a yearly basis
+<ul>
+<li> YEARADJ_1, Align on a year
+<li> YEARADJ_2, Align on a bi-yearly basis
+<li> YEARADJ_5, Align on a 5 year basis
+</ul>
+</ol>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateScale.html#_DATESCALE_SETTIMEALIGN">DateScale::SetTimeAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;SetDateAlign(DAYADJ_1);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATESCALE_SETDATEFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDateFormat($aFormat)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Overrides the automatic determined date format. Must be a valid date() format string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>No description available.<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATESCALE_SETTIMEALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTimeAlign($aStartAlign,$aEndAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify start and end date alignment for the scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStartAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start time alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aEndAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>End time alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the start and end alignment with the time granularity. For date granularity see SetDateAlign(). Note that only one of SetDateAlign() and SetTimeAlign() can be used.
+
+For start and end alignment the following values are valid
+
+<ol>
+<li> Alignment on seconds
+<ul>
+<li> MINADJ_1, Align on a single second (This is the lowest resolution)
+<li> MINADJ_5, Align on the nearest 5 seconds
+<li> MINADJ_10, Align on the nearest 10 seconds
+<li> MINADJ_15, Align on the nearest 15 seconds
+<li> MINADJ_30, Align on the nearest 30 seconds
+</ul>
+<li> Alignment on minutes
+<ul>
+<li> MINADJ_1, Align to the nearest minute
+<li> MINADJ_5, Align on the nearest 5 minutes
+<li> MINADJ_10, Align on the nearest 10 minutes
+<li> MINADJ_15, Align on the nearest 15 minutes
+<li> MINADJ_30, Align on the nearest 30 minutes
+</ul>
+<li> Alignment on hours
+<ul>
+<li> HOURADJ_1, Align to the nearest hour
+<li> HOURADJ_2, Align to the nearest two hour
+<li> HOURADJ_3, Align to the nearest three hour
+<li> HOURADJ_4, Align to the nearest four hour
+<li> HOURADJ_6, Align to the nearest six hour
+<li> HOURADJ_12, Align to the nearest tolw hour
+</ul>
+</ol>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateScale.html#_DATESCALE_SETDATEALIGN">DateScale::SetDateAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;SetTimeAlign(MINADJ_15);</font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,91 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_BEZIER"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Bezier</b></div>
+<i>(Defined in: jpgraph_regstat.php : 112)</i><table border=1><tr><td>&nbsp;<a href="Bezier.html" style="font-family:arial;font-weight:bold;color:darkblue;">Bezier</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Bezier.html#_BEZIER_BEZIER">Bezier()</a>&nbsp;<br>
+&nbsp;<a href="Bezier.html#_BEZIER_GET">Get()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Utility class to help construct an interpolated data points given an arbitrary number of data points.
+<p>
+This class doesn't draw any graphs by itself it is only used to generate a new set of data points representing the smooth line from the input which are the control lines for a bezier interpolated curve.
+<p>
+The principle of using this class is that you first create an instance of this class and giving it the X,Y values for your control points.
+<p>
+You can then get back an interpolated smooth dataset by calling the Get() method. This method takeas as argument how many data points you want the interpolated graph to have.
+<p>
+In order to use this method the file jpgraph_regstat.php must be included.
+<p>
+Technical note: The control points for a bezier curve does not necessary lie on the curve. Using the alternative method of spline interpolation guarantees that the specified control point lie on the generated curve.
+<p>
+Technical note 2: An alternmative Bezier curve is also availabe in the Canvas tools (jpgraph_canvtools.php). The difference is that that method will not return any data points it will directly draw an interpolate bezier curve on the canvas.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Spline.html">Spline</a> and <a href="Shape.html">Shape</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_BEZIER_BEZIER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Bezier($datax,$datay,$attraction_factor,,)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new bezier object</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-coordinates for control points</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-coordinates for control points</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$attraction_factor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Attraction factor</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Creates a new Bezier interpoaltion object. The arguments specifies the X, and Y coordinate sof the control points to be used. 
+
+The attraction factor is an integer >1 and determines how much "gracity" each control point should have. A higher value makes the resulting curve bend much more sharper against the control points. The default value is 1.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Control&nbsp;points<br />$xdata&nbsp;=&nbsp;array(1,3,12,15);<br />$ydata&nbsp;=&nbsp;array(5,15,2,19);<br /><br />//&nbsp;Get&nbsp;the&nbsp;interpolated&nbsp;values&nbsp;by&nbsp;creating<br />//&nbsp;a&nbsp;new&nbsp;bezier&nbsp;object.<br />$bez&nbsp;=&nbsp;new&nbsp;Bezier($xdata,$ydata);<br /><br />//&nbsp;For&nbsp;the&nbsp;new&nbsp;data&nbsp;set&nbsp;we&nbsp;want&nbsp;50&nbsp;points&nbsp;to<br />//&nbsp;get&nbsp;a&nbsp;smooth&nbsp;curve.<br />list($newx,$newy)&nbsp;=&nbsp;$bez-&gt;Get(50);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_BEZIER_GET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Get($steps)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return two arrays of X and Y coordinates that represents the curve</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$steps</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Number of data points</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return a data set representing the interpolated smooth curve passing through all the specified control points.&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>array($datax,$datay)<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Control&nbsp;points&nbsp;for&nbsp;bezier&nbsp;curve<br />$xdata&nbsp;=&nbsp;array(1,3,12,15);<br />$ydata&nbsp;=&nbsp;array(5,15,2,19);<br /><br />//&nbsp;Get&nbsp;the&nbsp;interpolated&nbsp;values&nbsp;by&nbsp;creating<br />//&nbsp;a&nbsp;new&nbsp;Spline&nbsp;object.<br />$bez&nbsp;=&nbsp;new&nbsp;Bezier($xdata,$ydata);<br /><br />//&nbsp;For&nbsp;the&nbsp;new&nbsp;data&nbsp;set&nbsp;we&nbsp;want&nbsp;50&nbsp;points&nbsp;to<br />//&nbsp;get&nbsp;a&nbsp;smooth&nbsp;curve.<br />list($newx,$newy)&nbsp;=&nbsp;$bez-&gt;Get(50);<br /></font>
+</span><br>
+<p> <hr> <p>

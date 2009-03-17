@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="95CreatingaGanttChart.html">
+<LINK REL="Next" HREF="97Ganttbars.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="95CreatingaGanttChart.html">Previous</A>
+<A HREF="97Ganttbars.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_6">9.6 Positioning objects in the Gantt plot</A></H2>
+<P> Bars and Milestones need both a vertical position and a horizontal
+ position. The horizontal start position is specified as a date, e.g.
+ &quot;2001-06-23&quot;, and the vertical positions are specified as a number
+ [0,1,2,3,...]. This vertical number indicates the position from the top
+ where the object should be placed. To understand this you might imagine
+ a number of &quot;invisible&quot; horizontal bands with a certain height. If you
+ specify 0 as the vertical position the bar will be placed in the first
+ band, specify 3 and the bar will be placed in the fourth band and so
+ on.</P>
+<P> It is perfectly legal, and perhaps even desirable to leave &quot;gaps&quot;
+ when laying out bands to group related activities. So, for example you
+ could have three activities/bars at positions 1,2,3 and then another 2
+ bars at position 6,7 leaving band 0,4,5 empty.</P>
+<P> All these &quot;invisible bands&quot; have the same height (equ-spaced). The
+ height of each band is automatically determined and depends on both the
+ method of layout ( as specified by (GanttChart::SetLayout()) and the
+ individual heights of the individual bars and titles. The rules are
+ quite simple:</P>
+<UL>
+<LI> If you use layout=GANTT_FROMTOP (the default and most common) the
+ height will equal the height (+ a margin) of the highest gantt bar. The
+ height calculation of each bar takes into account both the actual bar,
+ the title, and any left- right-marks (more about that later) that may
+ be present. The name &quot;fromtop&quot; refers to that when you have explicitly
+ specified a height the bars will usually be added from band 0 and
+ onwards and hence being added from the top. (This might leave empty
+ space at the bottom of the plot area in the graph if the height of the
+ graph has been explicitly specified).</LI>
+<LI> If you use layout=GANTT_EVEN the bars are evenly (hence the name)
+ spread out over the available height in the gantt chart and no
+ consideration is taken of the individual bars heights. Note that if you
+ use automatic sizing you cant use even layout. It just doesn't make
+ sense. Even layout is for those cases when you deliberately specify a
+ very large image and want the bars evenly distributed using the full
+ height.</LI>
+</UL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="95CreatingaGanttChart.html">Previous</A>
+<A HREF="97Ganttbars.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,126 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_LINEARSCALE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>LinearScale</b></div>
+<i>(Defined in: jpgraph.php : 4429)</i><table border=1><tr><td>&nbsp;<a href="LinearScale.html" style="font-family:arial;font-weight:bold;color:darkblue;">LinearScale</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="LinearScale.html#_LINEARSCALE_SETAUTOMAX">SetAutoMax()</a>&nbsp;<br>
+&nbsp;<a href="LinearScale.html#_LINEARSCALE_SETAUTOMIN">SetAutoMin()</a>&nbsp;<br>
+&nbsp;<a href="LinearScale.html#_LINEARSCALE_SETAUTOTICKS">SetAutoTicks()</a>&nbsp;<br>
+&nbsp;<a href="LinearScale.html#_LINEARSCALE_SETGRACE">SetGrace()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class is the main scale class and implements the linear and integer scale for the axis. <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Axis.html">Axis</a> and <a href="LogScale.html">LogScale</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEARSCALE_SETAUTOMAX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAutoMax($aMax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Fix the maximum value for a scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Maximum value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Fix a maximum value for a scale eventhough autoscaling is used for the min value.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;For&nbsp;a&nbsp;negative&nbsp;scale&nbsp;we&nbsp;might&nbsp;want&nbsp;to&nbsp;make&nbsp;sure&nbsp;it<br />//&nbsp;always&nbsp;start&nbsp;at&nbsp;the&nbsp;top&nbsp;from&nbsp;0<br />$graph-&gt;y2scale-&gt;SetAutoMax(0);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEARSCALE_SETAUTOMIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAutoMin($aMin)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the minimum data value when the autoscaling is used.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Min value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the minimum data value when the autoscaling is used. Usefull if you want a fix minimum (like 0) but automtic maximum value.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Just&nbsp;let&nbsp;the&nbsp;maximum&nbsp;be&nbsp;autoscaled<br />$graph-&gt;yaxis-&gt;scale-&gt;SetAutoMin(0);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEARSCALE_SETAUTOTICKS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAutoTicks($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Determine ticks automtically with manual scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE = determine ticks automatically</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This is used in conjunction when a manual scale is specified. In normall cases one has also to specify major and minor tick steps.
+<p>
+For example:<br>
+
+$graph->SetScale("textlin",0,70);<br>
+$graph->yscale->ticks->Set(10,2); 
+<p>
+However by instead using
+<p>
+$graph->SetScale("textlin",0,70);<br>
+$graph->yscale->SetAutoTicks();
+<p>
+The major and minor ticks are determined automatically.
+<p>
+The thing you have to be aware of is that the specified min and max values might be slightly modified so that the end/beginning of the scale will fall on a major tick step. 
+<p>
+By default the auto ticks are off.
+
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETSCALE">Graph::SetScale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Manually&nbsp;set&nbsp;Y-scale&nbsp;min=30,&nbsp;max=90<br />$graph-&gt;SetScale('textlin',30,90);<br /><br />//&nbsp;Let&nbsp;JpGraph&nbsp;figure&nbsp;out&nbsp;suitable&nbsp;tick&nbsp;marks<br />$graph-&gt;yscale-&gt;SetAutoTicks();<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_LINEARSCALE_SETGRACE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetGrace($aGraceTop,$aGraceBottom)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Specify scale "grace" value (top and bottom)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aGraceTop</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top grace value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aGraceBottom</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Bottom grace value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>By default the autoscaling determines the minimum and maximum as close to the plots min and max values as possible. Sometimes this might not be suitable and you need some more "air". For example if you plot a bar plot with values on top of the bar. If the bar reaces the max value (which is also the scale end point) the value on top of the bar might be out in the margin.)
+<p>
+By specifyin the grace you get added space. The value specified is interpretated as extra percentage of the total scale range.
+<p>
+For example if the scale range (without grace) is (0,100) and you add 10% top grace (with SetGrace(10)) the modified scale will be (0,110) and if you use a 100% top grace the scale will be (0,200) and so on.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;SetGrace(50);</font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="724Adjustingthealignmentofbarsonatextscale.html">
+<LINK REL="Next" HREF="726Usingaccumulatedbarplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="724Adjustingthealignmentofbarsonatextscale.html">Previous</A>
+<A HREF="726Usingaccumulatedbarplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_2_5">7.2.5 Using grouped bar plots</A></H3>
+<P> These types of bar graph is used to easy group two or more bars
+ together around each tick (X-value). The bars will be placed
+ immediately beside each other and as a group centered on each tick
+ mark. A grouped bar is created by aggregating two or more ordinary bar
+ graphs and creating a <A href="../ref/GroupBarPlot.html#_C_GROUPBARPLOT">
+ GroupBarPlot()</A> From two ordinary bar graphs along the lines of<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Create&nbsp;the&nbsp;bar&nbsp;plots
+<BR></FONT><FONT color="#0000BB">$b1plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data1y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b1plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;orange&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$b2plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data2y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b2plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;grouped&nbsp;bar&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$gbplot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GroupBarPlot</FONT><FONT color="#007700">
+(array(</FONT><FONT color="#0000BB">$b1plot</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$b2plot</FONT><FONT color="#007700">));
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;...and&nbsp;add&nbsp;it&nbsp;to&nbsp;the&nbsp;graPH
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$gbplot</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The following example illustrates this type of graph<DIV class="example">
+<BR> <A href="exframes/frame_example21.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example21.png" WIDTH="310"></A>
+<BR><B>Figure 40:</B> A grouped bar plot <A href="exframes/frame_example21.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> There is no limit on the number of plots you may group together.</P>
+<P> If you use the SetWidth() method on the GroupBarPlot() this will
+ affect the total width used by all the added plots. Each individual bar
+ width will be the same for all added bars. The default width for
+ grouped bar is 70%.</P>
+<P> Setting the grouped with to 0.9 would result in the image below.<DIV class="example">
+<BR> <A href="exframes/frame_example22.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example22.png" WIDTH="310"></A>
+<BR><B>Figure 41:</B> Adjusting the width for a gropued bar plot. <A href="exframes/frame_example22.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="724Adjustingthealignmentofbarsonatextscale.html">Previous</A>
+<A HREF="726Usingaccumulatedbarplots.html">Next</A>
+</BODY>
+</HTML>

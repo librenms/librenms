@@ -1,0 +1,562 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_SHAPE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Shape</b></div>
+<i>(Defined in: jpgraph_canvtools.php : 69)</i><table border=1><tr><td>&nbsp;<a href="Shape.html" style="font-family:arial;font-weight:bold;color:darkblue;">Shape</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Shape.html#_SHAPE_BEZIER">Bezier()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_CIRCLE">Circle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_FILLEDCIRCLE">FilledCircle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_FILLEDPOLYGON">FilledPolygon()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_FILLEDRECTANGLE">FilledRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_FILLEDROUNDEDRECTANGLE">FilledRoundedRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_INDENTEDRECTANGLE">IndentedRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_LINE">Line()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_POLYGON">Polygon()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_RECTANGLE">Rectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_ROUNDEDRECTANGLE">RoundedRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_SETTEXTALIGN">SetTextAlign()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_SHADOWRECTANGLE">ShadowRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Shape.html#_SHAPE_SHAPE">Shape()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This is mainly awrapper class around thye current image class used. It is meant to make it easier to work with a Canvas graph and a Canvas scale. Basically the class uses the specified scale to trasnalte coordinates which is then passed on to the standard Image routines.
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="CanvasScale.html">CanvasScale</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_BEZIER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Bezier($p,$aSteps)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a bezier curve </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$p</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array with control points</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSteps</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+40</font>
+</td><td>Number of line segments in curve</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a Bezier line with specified in the $p array. The points are specified according to the current scale. The positions in the array has the following meaning
+<p>
+(0,1) x0,y0 (First point on curver)<br>
+(2,3) x,y, (Control point 1)<br>
+(4,5) x,y, (Control point 2)<br>
+(6,7) x,y, (End point of curve)<br>
+<p>
+See example in canvasbezierex1.php
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p&nbsp;=&nbsp;array(3,6,6,9,5,3,7,4);<br /><br />$shape-&gt;SetColor('black');<br />$shape-&gt;Bezier($p);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_CIRCLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Circle($x1,$y1,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a circle</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Center X-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Center Y-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a circle onto the canvas
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_CIRCLE">Image::Circle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;The&nbsp;shape&nbsp;class&nbsp;is&nbsp;wrapper&nbsp;around&nbsp;the&nbsp;Imgae&nbsp;class&nbsp;which&nbsp;translates<br />//&nbsp;the&nbsp;coordinates&nbsp;for&nbsp;us<br />$shape&nbsp;=&nbsp;new&nbsp;Shape($g,$scale);<br />$shape-&gt;SetColor('black');<br /><br /><br />//&nbsp;..&nbsp;and&nbsp;a&nbsp;circle&nbsp;(x,y,diameter)<br />$shape-&gt;Circle(5,14,2);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_FILLEDCIRCLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FilledCircle($x1,$y1,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a filled circle to a canvas</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Center X-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Center Y-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a filled circle on the canvas using the specified scale.
+<p>
+Note: If you are using GD1.xx you will see moire-patterns in large circles. This is due to the lack of a proper filled circle function in GD 1.xx. Using GD 2.xx will avoid this problem. 
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_FILLEDCIRCLE">Image::FilledCircle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;The&nbsp;shape&nbsp;class&nbsp;is&nbsp;wrapper&nbsp;around&nbsp;the&nbsp;Imgae&nbsp;class&nbsp;which&nbsp;translates<br />//&nbsp;the&nbsp;coordinates&nbsp;for&nbsp;us<br />$shape&nbsp;=&nbsp;new&nbsp;Shape($g,$scale);<br />$shape-&gt;SetColor('black');<br /><br /><br />//&nbsp;..&nbsp;and&nbsp;a&nbsp;circle&nbsp;(x,y,diameter)<br />$shape-&gt;FilledCircle(5,14,2);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_FILLEDPOLYGON"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FilledPolygon($p)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a filled polygon</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$p</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Polygon array</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a filled polygon&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_FILLEDRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FilledRectangle($x1,$y1,$x2,$y2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a filled rectangle on the canvas</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a filled rectangle on the canvas using the current sclae.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+<br />//&nbsp;..&nbsp;add&nbsp;a&nbsp;rectangle<br />$shape-&gt;SetColor('green');<br />$shape-&gt;FilledRectangle(15,8,19,14);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_FILLEDROUNDEDRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;FilledRoundedRectangle($x1,$y1,$x2,$y2,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a filled rectangle with rounded corners</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Corner radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a filled rectangle with rounded corners&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_INDENTEDRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;IndentedRectangle($xt,$yt,$w,$h,$iw,$ih,$aCorner,$aFillColor,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>A filled rectangle with one corner 'indented'</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$yt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$w</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$h</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Height</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$iw</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Indented width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$ih</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Indeted height</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCorner</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Corner to indent</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Fill color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+4</font>
+</td><td>Corner radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>A rounded rectangle where one of the corner has been moved "into" the rectangle. The indention is determined by the two argument
+'iw' width and 'ih' height. 
+<p>
+The corners (as used in the $aCorner) are numbered as 
+0=Top left, 1=top right, 2=bottom right, 3=bottom left
+&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_LINE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Line($x1,$y1,$x2,$y2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a line between</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X1</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y1</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X2</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y2</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a line between two points in the canvas using the current scale.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_LINE">Image::Line</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+<br />//&nbsp;Add&nbsp;a&nbsp;black&nbsp;line<br />$shape-&gt;SetColor('black');<br />$shape-&gt;Line(0,0,20,20);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_POLYGON"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Polygon($p,$aClosed)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a closed polygon</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$p</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of points in polygon</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aClosed</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a closed polygon&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p&nbsp;=&nbsp;array(3,6,6,9,5,3,7,4);<br />$shape-&gt;SetColor('blue:0.35');<br />$shape-&gt;Polygon($p);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_RECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Rectangle($x1,$y1,$x2,$y2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a rectangle on the canvas</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a rectangle on the canvas using the current scale.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;..&nbsp;add&nbsp;a&nbsp;rectangle<br />$shape-&gt;SetColor('green');<br />$shape-&gt;Rectangle(15,8,19,14);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_ROUNDEDRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;RoundedRectangle($x1,$y1,$x2,$y2,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a rectangle with rounded corners</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Corner radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a rectangle with rounded corners&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color to use when drawing shapes</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color to use when drawing shapes&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="RGB.html#_RGB_COLOR">RGB::Color</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Add&nbsp;a&nbsp;black&nbsp;line<br />$shape-&gt;SetColor('black');<br />$shape-&gt;Line(0,0,20,20);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_SETTEXTALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTextAlign($halign,$valign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify bae point for StrokeText()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$halign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal position for basepoint</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$valign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"bottom"</font>
+</td><td>Vertical position for base point</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies how the coordinate for the text should be interpretated. Possible values for horizontal base-position are
+
+<ul>
+<li> "left"
+<li> "center"
+<li> "right"
+</ul>
+
+and for vertical
+
+
+<ul>
+<li> "top"
+<li> "center"
+<li> "bottom"
+</ul>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Interpret&nbsp;the&nbsp;text&nbsp;coordinate&nbsp;as&nbsp;beeing&nbsp;the<br />//&nbsp;top&nbsp;left&nbsp;corner&nbsp;of&nbsp;the&nbsp;bounding&nbsp;box&nbsp;for&nbsp;the&nbsp;text<br />$shape-&gt;SetTextAlign('left','top');<br /><br />$shape-&gt;StrokeText(....)<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_SHADOWRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ShadowRectangle($x1,$y1,$x2,$y2,$fcolor,$shadow_width,$shadow_color)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a filled rectangle with a drop shadow</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$fcolor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Fill color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$shadow_width</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Shadow width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$shadow_color</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(102,102,102)</font>
+</td><td>Shadow color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a filled rectangle with a drop shadow&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_SHAPE_SHAPE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Shape(&amp;$aGraph,&amp;$scale)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Methods to draw shapes on canvas</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aGraph</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Canvas graph</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$scale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Canvas scale</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new shape class used to draw siple shape onto a canvas using the specified scale.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="CanvasGraph.html#_CANVASGRAPH_CANVASGRAPH">CanvasGraph::CanvasGraph</a> and <a href="CanvasScale.html#_CANVASSCALE_CANVASSCALE">CanvasScale::CanvasScale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas&nbsp;we&nbsp;can&nbsp;work&nbsp;<br />$g&nbsp;=&nbsp;new&nbsp;CanvasGraph(400,200,'auto');<br />$g-&gt;SetMargin(5,11,6,11);<br />$g-&gt;SetShadow();<br />$g-&gt;SetMarginColor("teal");<br /><br />//&nbsp;We&nbsp;need&nbsp;to&nbsp;stroke&nbsp;the&nbsp;plotarea&nbsp;and&nbsp;margin&nbsp;before&nbsp;we&nbsp;add&nbsp;the<br />//&nbsp;text&nbsp;since&nbsp;we&nbsp;otherwise&nbsp;would&nbsp;overwrite&nbsp;the&nbsp;text.<br />$g-&gt;InitFrame();<br /><br />//&nbsp;Create&nbsp;a&nbsp;new&nbsp;scale<br />$scale&nbsp;=&nbsp;new&nbsp;CanvasScale($g);<br />$scale-&gt;Set(0,$xmax,0,$ymax);<br /><br />//&nbsp;The&nbsp;shape&nbsp;class&nbsp;is&nbsp;wrapper&nbsp;around&nbsp;the&nbsp;Imgae&nbsp;class&nbsp;which&nbsp;translates<br />//&nbsp;the&nbsp;coordinates&nbsp;for&nbsp;us<br />$shape&nbsp;=&nbsp;new&nbsp;Shape($g,$scale);<br /></font>
+</span><br>
+<p> <hr> <p>

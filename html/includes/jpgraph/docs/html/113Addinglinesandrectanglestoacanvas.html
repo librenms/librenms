@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="112Creatingasimplecanvas.html">
+<LINK REL="Next" HREF="114Usingacanvasscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="112Creatingasimplecanvas.html">Previous</A>
+<A HREF="114Usingacanvasscale.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="11_3">11.3 Adding lines and rectangles to a canvas</A></H2>
+<P> A canvas also makes a good background for using standard graphic
+ primitives, for example circles and lines. What you first have to
+ remember is that you are (so far) working with absolute screen
+ coordinates and secondly all drawing primitives are found in the <A href="../ref/Image.html#_C_IMAGE">
+ Image Class</A> accessible as a property of the Graph class. So for
+ example to draw a line between coordinate (0,0) and (100,100) you would
+ have to add the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Line</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">100</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> To your code. The following example shows some of the graphic
+ primitives you have access to in the Image class<DIV class="phpscript">
+(File: canvasex02.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;$Id:&nbsp;canvasex02.php,v&nbsp;1.1&nbsp;2002/08/27&nbsp;20:08:57&nbsp;aditus&nbsp;Exp&nbsp;$
+<BR></FONT><FONT color="#007700">include&nbsp;</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvas.php&quot;</FONT><FONT
+color="#007700">;
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas&nbsp;we&nbsp;can&nbsp;work&nbsp;
+<BR></FONT><FONT color="#0000BB">$g&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">CanvasGraph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+400</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">'auto'</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+5</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">11</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">6</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">11</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetShadow</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMarginColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;teal&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;We&nbsp;need&nbsp;to&nbsp;stroke&nbsp;the&nbsp;plotarea&nbsp;and&nbsp;margin&nbsp;before&nbsp;we&nbsp;add&nbsp;the
+<BR>//&nbsp;text&nbsp;since&nbsp;we&nbsp;otherwise&nbsp;would&nbsp;overwrite&nbsp;the&nbsp;text.
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">InitFrame</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;a&nbsp;black&nbsp;line
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'black'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Line</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">100</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;and&nbsp;a&nbsp;circle&nbsp;(x,y,diameter)
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Circle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">100</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;..&nbsp;and&nbsp;a&nbsp;filled&nbsp;circle&nbsp;(x,y,diameter)
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">'red'</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+FilledCircle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+200</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;add&nbsp;a&nbsp;rectangle
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'green'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+FilledRectangle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+10</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;add&nbsp;a&nbsp;filled&nbsp;rounded&nbsp;rectangle
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'green'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+FilledRoundedRectangle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+300</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">30</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">350</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">80</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">10</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;with&nbsp;a&nbsp;darker&nbsp;border
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'darkgreen'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+RoundedRectangle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+300</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">30</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">350</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">80</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">10</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Stroke&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT>
+<BR></FONT></CODE></DIV></P>
+<P> Pleas note the way to access these routines through the img property
+ of the Graph class. Please also keep in mind that the coordinates are
+ absolute.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_canvasex02.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/canvasex02.png" WIDTH="400"></A>
+<BR><B>Figure 185:</B> Example of graphic primitives <A href="exframes/frame_canvasex02.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P></P>
+<HR> <SMALL>
+<P><STRONG> A note on GD</STRONG> For those of you using GD 1.xx you
+ might notice that the large &quot;filled circle&quot; isn't completely filled.
+ This is because in GD 1.xx there are no low level primitives to fill an
+ ellipse or circle so JpGraph tries to make the best out of a bad
+ situation and manually fake a filled circle. For interest of speed
+ JpGraph does not contain a complete (for example) Bresenham-circle fill
+ but cheats by using some existing GD routines. This is not a perfect
+ solution and for large filled circles like this you get some
+ moire-patterns in the circle. If you upgrade to GD 2.x JpGraph will be
+ able to make full use of those new existing methods and the fill will
+ be perfect.</P>
+</SMALL>
+<HR>
+<P> We refer you to the class reference to find out what other graphic
+ primitives are available for use.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="112Creatingasimplecanvas.html">Previous</A>
+<A HREF="114Usingacanvasscale.html">Next</A>
+</BODY>
+</HTML>

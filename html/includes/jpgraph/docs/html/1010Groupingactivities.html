@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1092Addingprogressindicatorstobars.html">
+<LINK REL="Next" HREF="1011Usingmultiplecolumnsastitles.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1092Addingprogressindicatorstobars.html">Previous</A>
+<A HREF="1011Usingmultiplecolumnsastitles.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_10">10.10 Grouping activities</A></H2>
+<P> It is common to group activities. We have used this feature in the
+ examples of constrains. There is no special type for activity bars that
+ are used to illustrate grouping. The common way of illustrating this
+ (as have been used above) is to add &quot;half&quot; a triangle marker at both
+ ends of the bar. The special provision that JpGraph does is that if you
+ add a left or right marker of type MARK_LEFTTRIANGLE or
+ MARK_RIGHTTRIANGLE those triangles will be drawn under the bars to give
+ the effect as show in the examples above. In the example above we also
+ have made the grouping bars have slightly less heigh since the end
+ triangles will visually &quot;grow&quot; the bar.</P>
+<P> So to get the effect we want for a group bar we have to use the two
+ lines:<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$groupbar</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+leftMark</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetType</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;MARK_LEFTTRIANGLE&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$groupbar</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetType</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;MARK_RIGHTTRIANGLE&quot;</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> As of the current version There is not yet any formatting support to
+ accomplish the effect of indentation for the titles so this is
+ accomplished by using a fixed width font and adding spaces in front of
+ the title.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1092Addingprogressindicatorstobars.html">Previous</A>
+<A HREF="1011Usingmultiplecolumnsastitles.html">Next</A>
+</BODY>
+</HTML>

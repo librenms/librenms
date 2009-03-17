@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="816Usingabackgroundgradient.html">
+<LINK REL="Next" HREF="818Rotatinggraphs90degrees.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="816Usingabackgroundgradient.html">Previous</A>
+<A HREF="818Rotatinggraphs90degrees.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="8_17">8.17 Using callbacks for Plot marks</A></H2>
+<P> An interesting enhancement when using Plotmarks is the possibility
+ to add a callback function to control the size and color of the
+ plotmarks.</P>
+<P> This callback function will get called with the current Y-value (for
+ the plotmark) as it's argument. As return value the callback function
+ must return an array containing three (possible null) values. The
+ values returned must be</P>
+<OL>
+<LI> Plot mark Weight</LI>
+<LI> Plot mark Color</LI>
+<LI> Plot mark Fill color</LI>
+</OL>
+<P> The exact meaning of the parameters will of course depend on the
+ type of plot marks being used.</P>
+<P> The callback must be a global function and is installed with a call
+ to <A href="../ref/PlotMark.html#_PLOTMARK_SETCALLBACK">
+ PlotMark::SetCallback()</A></P>
+<P> So for example to install a callback that changes the fill color for
+ all marks with a (Y) value higher than 90 you could add the lines</P>
+<P>
+<!--?
+$t='function MarkCallback($aVal) {
+    if( $aVal -->
+ 90) $fcolor=&quot;red&quot; else $fcolor=&quot;&quot;; return array(&quot;&quot;,&quot;&quot;,$fcolor); } ...
+ $plot-&gt;mark-&gt;SetCallback(&quot;MarkCallback&quot;); ...'; ShowCodeSnippet($t); ?&gt;</P>
+<P> As you can see in the above example we have left some of the return
+ values blank. Doing this will just ignore any change of these value and
+ use the global settings for the plotmarks.</P>
+<P> If you also let the (Y) value affect the size of the plot marks you
+ can get what is sometimes known as a &quot;balloon plot&quot;. The example below
+ is basically a scatter plot that uses filled circles to mark the
+ points. A format callback is then used to change the color and size
+ depending on the Y-value for each plot.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_balloonex1.html" target="blank"><IMG border="0"
+HEIGHT="300"  src="img/balloonex1.png" WIDTH="400"></A>
+<BR><B>Figure 92:</B> Creating a balloon plot by using plot mark
+ callback function <A href="exframes/frame_balloonex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="816Usingabackgroundgradient.html">Previous</A>
+<A HREF="818Rotatinggraphs90degrees.html">Next</A>
+</BODY>
+</HTML>

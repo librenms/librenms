@@ -1,0 +1,777 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_TEXT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Text</b></div>
+<i>(Defined in: jpgraph.php : 2778)</i><table border=1><tr><td>&nbsp;<a href="Text.html" style="font-family:arial;font-weight:bold;color:darkblue;">Text</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Text.html#_TEXT_ALIGN">Align()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_CENTER">Center()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETFONTHEIGHT">GetFontHeight()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETTEXTHEIGHT">GetTextHeight()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETWIDTH">GetWidth()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_HIDE">Hide()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_PARAGRAPHALIGN">ParagraphAlign()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_POS">Pos()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETALIGN">SetAlign()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETANGLE">SetAngle()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETBOX">SetBox()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETCSIMTARGET">SetCSIMTarget()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETMARGIN">SetMargin()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETORIENTATION">SetOrientation()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETPARAGRAPHALIGN">SetParagraphAlign()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETPOS">SetPos()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETSCALEPOS">SetScalePos()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETSHADOW">SetShadow()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETWORDWRAP">SetWordWrap()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SHOW">Show()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_TEXT">Text()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>All text that is to be draw onto any graph is handled by this class. You create each text you want printed as an instance of this class.
+
+It is possible to adjust both font, color, alignment and paragraph alignment.
+
+If the text contains multiple lines (separated by "\n") the paragraph alignment determines how each line is formatted (i.e. left,center or right)
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_ALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Align($aHAlign,$aVAlign,$aParagraphAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify alignment for the text in relation to the x,y position for text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"top"</font>
+</td><td>Vertical alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aParagraphAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Paragraph alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This determines how the text's x,y position is to be interpretated. 
+
+Valid horizontal alignments are 
+<ul>
+<li> 'left'
+<li> 'center'
+<li> 'right'
+</ul>
+
+Valid vertical position are
+<ul>
+<li> 'top'
+<li> 'middle' or 'center'
+<li> 'bottom'
+</ul>
+
+Valid paragraph alignment
+<ul>
+<li> 'left'
+<li> 'center'
+<li> 'right'
+</ul>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_PARAGRAPHALIGN">Text::ParagraphAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$text&nbsp;=&nbsp;new&nbsp;Text();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_CENTER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Center($aLeft,$aRight,$aYAbsPos)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Center the text between left and right coordinates</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLeft</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Left corner X-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Right corner X-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>The common Y-coodinate</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Center the text between left and right coordinates on the same Y-coordinate&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_POS">Text::Pos</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Center(50,150,75);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_GETFONTHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetFontHeight(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Height of font</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return the height of the font used in the text.
+
+The difference between this method and the GetTextHeight() is that this method uses a predefined character to determine the height while GetTextHeight() uses the actual text in the string.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_GETTEXTHEIGHT">Text::GetTextHeight</a> and <a href="Text.html#_TEXT_GETWIDTH">Text::GetWidth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$height&nbsp;=&nbsp;$txt-&gt;GetFontHeight($graph-&gt;img)</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_GETTEXTHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetTextHeight(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the height of the actual text in the text object</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return the height of the text in this object.
+
+The difference between this method and the GetFontHeight() is that that method uses a predefined character to determine the height while GetTextHeight() uses the actual text in the string.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_GETFONTHEIGHT">Text::GetFontHeight</a> and <a href="Text.html#_TEXT_GETWIDTH">Text::GetWidth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$height&nbsp;=&nbsp;$txt-&gt;GetTextHeight($graph-&gt;img);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_GETWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetWidth(&amp;$aImg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Get total width of text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aImg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Get total width of text&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_GETTEXTHEIGHT">Text::GetTextHeight</a> and <a href="Text.html#_TEXT_GETFONTHEIGHT">Text::GetFontHeight</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$width&nbsp;=&nbsp;$txt-&gt;GetWidth($graph-&gt;img);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_HIDE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Hide($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide the text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The opposite of Show()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_SHOW">Text::Show</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Hide();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_PARAGRAPHALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ParagraphAlign($aAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specifies the alignment for a multi line text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Alignment for a multiline text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the paragraph alignment for a multi line text. Each text line is separated by a "\n" character.
+
+Valid alignments are:
+<ul>
+<li> 'left'
+<li> 'center'
+<li> 'right'
+</ul>&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_ALIGN">Text::Align</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Set("The&nbsp;first&nbsp;line\nSec&nbsp;line\nThird&nbsp;line");<br />$txt-&gt;ParagraphAlign('center');<br /><br />//&nbsp;Will&nbsp;give&nbsp;the&nbsp;result:<br />//<br />//&nbsp;&nbsp;The&nbsp;first&nbsp;line<br />//&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sec&nbsp;line<br />//&nbsp;&nbsp;&nbsp;&nbsp;Third&nbsp;line<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_POS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Pos($aXAbsPos,$aYAbsPos,$aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify the position and alignment for the text object</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>X-position absolute position</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Y-position absolute position</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"left"</font>
+</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"top"</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the position text to be displayed. As a convinience the horizontal alignment may also be set in this call. 
+
+If you need to specify vertical position you have to use the Align() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_ALIGN">Text::Align</a>, <a href="Text.html#_TEXT_SET">Text::Set</a> and <a href="Text.html#_TEXT_PARAGRAPHALIGN">Text::ParagraphAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Pos(100,150,'center');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aTxt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set text to be displayed</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set text to be displayed&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Set('Hello&nbsp;world');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlign($aHAlign,$aVAlign,$aParagraphAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Alias for Align()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal anchor point</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"top"</font>
+</td><td>Vertical anchor point</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aParagraphAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Paragraph alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>See Align&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_ALIGN">Text::Align</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAngle($aAngle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify text angle</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAngle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Angle in degrees</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify Orientation of text. If TTF fonts are used then the orientation can be a arbitrary angle. If the builtin fonts are used then only horizontal and vertical position can be used, i.e 0 or 90 degrees,&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;SetAngle(45);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETBOX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBox($aFrameColor,$aBorderColor,$aShadowColor,$aCornerRadius,$aShadowWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set parameters for poossible frame around text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFrameColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(255,255,255)</font>
+</td><td>Color for text background</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorderColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(0,0,0)</font>
+</td><td>Color for border around text</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Color for shadow</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCornerRadius</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+4</font>
+</td><td>Corner radius for rectangle</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Drop shadow width</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify parameters for background color, border and possible text drop shadow.
+<br>
+If no shadow color is specified then no shadow will appear.
+<p>
+To use the old style of stright corners specify a corner radius of 0.
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_SETSHADOW">Text::SetShadow</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt&nbsp;=&nbsp;new&nbsp;Text("Note:&nbsp;Simple&nbsp;textnote.\nWIth&nbsp;two&nbsp;lines");<br />$txt-&gt;SetFont(FF_FONT1,FS_BOLD);<br />$txt-&gt;Pos(0.5,0.97,'center','bottom');<br />$txt-&gt;SetBox('yellow','black');<br />$graph-&gt;AddText($txt);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set text color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color for text&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;SetColor('darkblue');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETCSIMTARGET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMTarget($aTarget,$aAlt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify CSIM Target for text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTarget</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Target URL</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Alt-tag text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify Client Side Image Target for text&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;title-&gt;SetCSIMTarget('mainpage.html','Go&nbsp;to&nbsp;main&nbsp;page');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($aFamily,$aStyle,$aSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFamily</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font family, size and style. Two major types of font families can be used, builtin bitmnapped fonts or TTF fonts. The builtin fonts have a fixed size which can't be altered.
+
+Valid styles are
+<ul>
+<li> FS_NORMAL
+<li> FS_BOLD
+<li> FS_ITALIC
+<li> FS_BOLDITALIC
+</ul>
+
+Valid values for the internal font families are
+<ul>
+<li> FF_FONT0, Internal font 1 (small font)
+<li> FF_FONT1, Internal font 2, (Medium size)
+<li> FF_FONT2, Internal font 3, (large size)
+</ul>
+
+Note: FF_FONT0 only suppor font style FS_NORMAL
+
+The available TTF are by default
+<ul>
+<li> FF_ARIAL
+<li> FF_TIMES, (Times Roman)
+<li> FF_COURIER, (Courier new)
+<li> FF_VERDANA, (Verdana)
+<li> FF_BOOK, (Bookman)
+<li> FF_HANDWRT, (Handwriting)
+<li> FF_COMIC, (Sans Comic)
+</ul>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_STROKETEXT">Image::StrokeText</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;SetFont(FF_ARIAL,&nbsp;FS_BOLD,&nbsp;14);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMargin($aMarg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the contect sensiive margin</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMarg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a context sensitive margin for the text. Depending on in which context the text is used the margin will be interpretated accordingly.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Start&nbsp;further&nbsp;away&nbsp;from&nbsp;the&nbsp;top&nbsp;of&nbsp;graph<br />$graph-&gt;title-&gt;SetMargin(15);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETORIENTATION"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetOrientation($aDirection)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Deprecated. Use SetAngle instead. Specify text angle </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDirection</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Orientation of text in degrees</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Deprecated. Use SetAngle() instead.
+Specify Orientation of text. If TTF fonts are used then the orientation can be a arbitrary angle. If the builtin fonts are used then only horizontal and vertical position can be used, i.e 0 or 90 degrees,&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;SetOrientation(90);&nbsp;//&nbsp;Vertical&nbsp;text</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETPARAGRAPHALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetParagraphAlign($aAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specifies the alignment for a multi line text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Determines how a multi-line text paragraph will be formatted. Each line in the paragraph will be treated individually. Allowed values are
+<ol>
+<li> "center"
+<li> "left"
+<li> "right"
+</ol>
+
+Note: Paragraph alignment is only applicable to horizontal text, i.e. angle = 0 . For paragraphs at an angle the alignbment will always be "left".
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;title-&gt;Set("Multi&nbsp;line\ntext&nbsp;!");<br />$graph-&gt;title-&gt;SetParagraphAlign('right');<br /><br />//&nbsp;Default&nbsp;for&nbsp;title&nbsp;is&nbsp;"center"<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetPos($aXAbsPos,$aYAbsPos,$aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Alias for Pos()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>X position</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Y position</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"left"</font>
+</td><td>Horizontal align</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"top"</font>
+</td><td>Vertical align</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Alias for Pos()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_POS">Text::Pos</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Pos(100,150,'center');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETSCALEPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetScalePos($aX,$aY)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify the position of the text using the plot scale positions</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aX</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-position</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-position</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the position of the text using the plot scale positions. The Y position is taken to be the Y axis. It is not possible to use Y2 scale to specify the position.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt&nbsp;=&nbsp;new&nbsp;Text();<br />$txt-&gt;SetScalePos(27.3,&nbsp;278.9);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETSHADOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetShadow($aShadowColor,$aShadowWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add a drop shadow to boxed text</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'darkgray'</font>
+</td><td>Shadow color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Shadow width (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>If the text has been boxed (by  call to SetBox()) then you can easily add a drop shadow by just calling this method.
+<p>
+Note: You can also specify the shadow directly in the SetBox() call. This method was added to make Text more like other graph objects which have a SetShadow() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_SETBOX">Text::SetBox</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt&nbsp;=&nbsp;new&nbsp;Text("Note:&nbsp;Simple&nbsp;textnote.\nWIth&nbsp;two&nbsp;lines");<br />$txt-&gt;SetFont(FF_FONT1,FS_BOLD);<br />$txt-&gt;Pos(0.5,0.97,'center','bottom');<br />$txt-&gt;SetBox('yellow','black');<br />$txt-&gt;SetShadow();<br />$graph-&gt;AddText($txt);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SETWORDWRAP"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWordWrap($aCol)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a maximum line length</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Number of chars in column</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a maximum line length. This method will insert suitable line breaks to ensure thateach line never exeeds the specified number of characters. The method will not break words.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt&nbsp;=&nbsp;new&nbsp;Text('A&nbsp;suitable&nbsp;long&nbsp;text&nbsp;which&nbsp;will&nbsp;be&nbsp;broken');<br />$txt-&gt;SetWordWrap(15);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aShow)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Show or hide the text string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Display text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Show or hide the text string. By default the text string is turned off. So a call to Show() is becessary for the text string to be displayed in the graph.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$txt-&gt;Show();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TEXT_TEXT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Text($aTxt,$aXAbsPos,$aYAbsPos)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor. Create new text at absolute pixel coordinates</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Text string</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>X-coordinate</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAbsPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Y-coordinate</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new object to repesent a text string that is to be displayed on the graph.
+
+If the position is not specified when the object is created it can later be specified with a call to the Pos() method.
+
+The default alignment is to interpret the x,y coordinate as being the lower left corner of the bounding box for the text string.
+
+Note. The texts are hidden by default and you must remember toi call Show() to make the text appear in the image.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_POS">Text::Pos</a>, <a href="Text.html#_TEXT_SET">Text::Set</a>, <a href="Text.html#_TEXT_PARAGRAPHALIGN">Text::ParagraphAlign</a> and <a href="Text.html#_TEXT_SHOW">Text::Show</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Possible&nbsp;creations&nbsp;of&nbsp;text&nbsp;objects<br /><br />//&nbsp;Case&nbsp;1.&nbsp;Text&nbsp;and&nbsp;position&nbsp;is&nbsp;specified&nbsp;later<br />$txt&nbsp;=&nbsp;new&nbsp;Text();<br /><br />//&nbsp;Case&nbsp;2.&nbsp;Position&nbsp;is&nbsp;specified&nbsp;later<br />$txt&nbsp;=&nbsp;new&nbsp;Text('Hello&nbsp;world');<br /><br />//&nbsp;Case&nbsp;3.&nbsp;Full&nbsp;specification<br />$txt&nbsp;=&nbsp;new&nbsp;Text('Hello&nbsp;world',100,150);<br /><br />//&nbsp;A&nbsp;more&nbsp;real&nbsp;life&nbsp;example<br />$txt&nbsp;=&nbsp;new&nbsp;Text("Note:&nbsp;Simple&nbsp;textnote.\nWIth&nbsp;two&nbsp;lines");<br />$txt-&gt;SetFont(FF_FONT1,FS_BOLD);<br />$txt-&gt;Pos(0.5,0.97,'center','bottom');<br />$txt-&gt;SetBox('yellow','black');<br />$graph-&gt;AddText($txt);<br /><br /><br /><br /></font>
+</span><br>
+<p> <hr> <p>

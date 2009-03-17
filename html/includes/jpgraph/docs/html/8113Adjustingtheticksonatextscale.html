@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8112SpecifyingtextlabelsfortheXaxis.html">
+<LINK REL="Next" HREF="8114Usingfilledlinegraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8112SpecifyingtextlabelsfortheXaxis.html">Previous</A>
+<A HREF="8114Usingfilledlinegraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_13">8.1.13 Adjusting the ticks on a text scale</A></H3>
+<P> As can be seen in the previous example the X-axis is slightly
+ cluttered with the labels very close to each other. We might rectify
+ this by either enlarging the image or just displaying fewer tick label
+ on the x-axis.</P>
+<P> Specifying that we only want, for example, to print every second
+ label on the axis is done by a call to the method <A href="../ref/Axis.html#_AXIS_SETTEXTLABELINTERVAL">
+ SetTextLabelInterval()</A> Which would result in the graph<DIV class="example">
+<BR> <A href="exframes/frame_example9.1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example9.1.png" WIDTH="350"></A>
+<BR><B>Figure 21:</B> Just printing every second label on the X-axis <A href="exframes/frame_example9.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> If the text labels are long (for example full dates) then another
+ way might be to adjust the angle of the text. We could for example
+ choose to rotate the labels on the X-axis by 90 degrees. With the help
+ of the <A href="../ref/Axis.html#_AXIS_SETLABELANGLE"> SetLabelAngle()</A>
+</P>
+<P> Which would then result in the image below<DIV class="example">
+<BR> <A href="exframes/frame_example9.2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example9.2.png" WIDTH="350"></A>
+<BR><B>Figure 22:</B> Rotating the X-labels 90 degrees <A href="exframes/frame_example9.2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> The internal fonts which we have been
+ using so only supports 0 or 90 degrees rotation. To use arbitrary
+ angles you must specify TTF fonts. More on fonts later.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8112SpecifyingtextlabelsfortheXaxis.html">Previous</A>
+<A HREF="8114Usingfilledlinegraphs.html">Next</A>
+</BODY>
+</HTML>

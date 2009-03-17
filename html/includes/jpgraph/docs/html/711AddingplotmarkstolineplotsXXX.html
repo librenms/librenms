@@ -1,0 +1,61 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="71Lineplots.html">
+<LINK REL="Next" HREF="712Displayingthevaluesforeachdatapoint.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="71Lineplots.html">Previous</A>
+<A HREF="712Displayingthevaluesforeachdatapoint.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_1_1">7.1.1 Adding plot marks to line-plots XXX</A></H3>
+<P> It might sometimes be desirable to highlight the data-points with
+ marks in the intersection between the given x and Y-coordinates. This
+ is accomplished by specifying the wanted plot mark type for the &quot;mark&quot;
+ property of the line graph. A full list of all available marks is given
+ in the class reference <A href="../ref/PlotMark.html#_PLOTMARK_SETTYPE">
+PlotMarks</A></P>
+<P> For now let's just add a triangle shape marker to our previous graph
+ by adding the line<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$lineplot</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+mark</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetType</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">MARK_UTRIANGLE</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> This will give the graph as shown below<DIV class="example">
+<BR> <A href="exframes/frame_example3.1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example3.1.png" WIDTH="300"></A>
+<BR><B>Figure 7:</B> Adding markers to the previous example <A href="exframes/frame_example3.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> If you like you can of course both change the size, fill-color and
+ frame color of the chosen plot mark.</P>
+<P> The colors of the marks will, if you don't specify them explicitly,
+ follow the line color. Please note that if you want different colors
+ for the marks and the line the call to SetColor() for the marks must be
+ done after the call to the line since the marks color will always be
+ reset to the lines color when you set the line.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="71Lineplots.html">Previous</A>
+<A HREF="712Displayingthevaluesforeachdatapoint.html">Next</A>
+</BODY>
+</HTML>

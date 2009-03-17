@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="727Usinggroupedaccumulatedbargraphs.html">
+<LINK REL="Next" HREF="729Usinggradientfillforbargraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="727Usinggroupedaccumulatedbargraphs.html">Previous</A>
+<A HREF="729Usinggradientfillforbargraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_2_8">7.2.8 Horizontal bar graphs</A></H3>
+<P> It can often come in handy to have horizontal bar graphs especially
+ if you have a large number of values to display. Even though JpGraph
+ doesn't directly support horizontal bar graphs this is easy achieved by
+ constructing a normal vertical bar graph which is then rotated 90
+ degrees.</P>
+<P> The example below shows a simple example of this<DIV class="example">
+<BR> <A href="exframes/frame_horizbarex3.html" target="blank"><IMG border="0"
+HEIGHT="500"       src="img/img/img/img/img/img/horizbarex3.png" WIDTH="400"></A>
+<BR><B>Figure 44:</B> A typical horizontal bar graph with the Y-axis at
+ the bottom <A href="exframes/frame_horizbarex3.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> In order to achieve this effect you should study the above example
+ carefully and you might notice two things</P>
+<UL>
+<LI> We don't simply rotate the graph we also specify that we want the
+ rotation center to be the middle of the entire image. The reason for
+ this is that by default (See the section on rotating plots) the pivot
+ point for rotation is the center of<STRONG> the plot area</STRONG>.
+ Since the center of the plot area is not necessary the center of the
+ entire image the rotation might be a little bit difficult to predict
+ since it will depend on the margins specified. &lt;</LI>
+<LI> The size of the plot area is determined from the original width and
+ height of the image taking the specified margin into account. When the
+ the plot area is rotated 90 degrees clockwise what was the left margin
+ now in effect become the upper margin and so on. This is a small nuance
+ since we conceptually want to specify the margins directly in the
+ rotated plot.
+<BR> In order to more easily handle the margin with rotated images it is
+ recommended that the method &quot;Set90AndMargin()&quot; is used. This allows the
+ image to be rotated as well as specifying the margins in an obvious
+ way.</LI>
+</UL>
+<P> We finally show three more examples of horizontal bar plots. In the
+ first plot we have hidden the Y-axis and in the second we have
+ positioned the Y - axis at top as opposed to the bottom as the first
+ example shows.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_horizbarex1.html" target="blank"><IMG border="0"
+HEIGHT="500"       src="img/img/img/img/img/img/horizbarex1.png" WIDTH="400"></A>
+<BR><B>Figure 45:</B> Horizontal bar graph with hidden Y axis <A href="exframes/frame_horizbarex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_horizbarex2.html" target="blank"><IMG border="0"
+HEIGHT="500"       src="img/img/img/img/img/img/horizbarex2.png" WIDTH="400"></A>
+<BR><B>Figure 46:</B> Horizontal bar graph with Y axis at the top <A href="exframes/frame_horizbarex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> In the final example which is almost similar to the two first we
+ illustrate the use of labels with more than one line.<DIV class="example">
+<BR> <A href="exframes/frame_horizbarex4.html" target="blank"><IMG border="0"
+HEIGHT="500"       src="img/img/img/img/img/img/horizbarex4.png" WIDTH="400"></A>
+<BR><B>Figure 47:</B> Horizontal bar graph with manual integer scale as
+ well as multiple line labels <A href="exframes/frame_horizbarex4.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="727Usinggroupedaccumulatedbargraphs.html">Previous</A>
+<A HREF="729Usinggradientfillforbargraphs.html">Next</A>
+</BODY>
+</HTML>

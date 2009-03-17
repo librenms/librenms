@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="109Moreformattingforbars.html">
+<LINK REL="Next" HREF="1092Addingprogressindicatorstobars.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="109Moreformattingforbars.html">Previous</A>
+<A HREF="1092Addingprogressindicatorstobars.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_9_1">10.9.1 Adding caption to bars</A></H3>
+<P> Caption for bars are placed at the far right side of the bars. They
+ can for example be used to indicate the resources assigned to a task,
+ the duration of the task or the progress of the activity.</P>
+<P> Caption text for a bar is specified either when creating a bar or
+ later by accessing the 'caption' property of bars. So the two lines<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$activity&nbsp;</FONT><FONT
+color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttBar</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;Activity&nbsp;1&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-11-21&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-12-20&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;[BS,ER]&quot;</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> and<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$activity</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+caption</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;[BS,ER]&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> are both ways of specifying the caption &quot;[BS,ER]&quot; for the activity.
+ Since activity is a standard JpGraph text object you can easily modify
+ font, color and size with calls to SetFont() and SetColor(), (e.g.<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$activity</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">caption</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FF_BOLD</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">9</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P></P>
+<P> The figure below illustrates the use of caption<DIV class="example">
+<BR> <A href="exframes/frame_ganttex13.html" target="blank"><IMG border="0"
+HEIGHT="186"  src="img/ganttex13.png" WIDTH="409"></A>
+<BR><B>Figure 157:</B> Illustration of the use of captions <A href="exframes/frame_ganttex13.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="109Moreformattingforbars.html">Previous</A>
+<A HREF="1092Addingprogressindicatorstobars.html">Next</A>
+</BODY>
+</HTML>

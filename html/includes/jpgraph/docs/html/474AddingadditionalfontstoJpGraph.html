@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="473Specifyingfonts.html">
+<LINK REL="Next" HREF="475UnderstandingtextalignmentinJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="473Specifyingfonts.html">Previous</A>
+<A HREF="475UnderstandingtextalignmentinJpGraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="4_7_4">4.7.4 Adding additional fonts to JpGraph</A></H3>
+<P><STRONG> Note:</STRONG> This information is only given here for very
+ advanced users. No free support will be given in the case you run into
+ difficulties trying to add new fonts. At the moment adding new fonts
+ require code modifications as outlined below.</P>
+<P> In order to add you favorite fonts there are three steps you need to
+ follow :</P>
+<OL>
+<LI> Define a new &quot;FF_&quot; constant naming your font family with a suitable
+ high index number</LI>
+<LI>Get the TTF file(s) and add it to your font directory. You need
+ separate files for each of the styles you want to support. You then
+ need to add the file names of the font as definitions in the class TTF.
+ Use the previous defined &quot;FF_&quot; name as index in the font specification
+ array.</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="473Specifyingfonts.html">Previous</A>
+<A HREF="475UnderstandingtextalignmentinJpGraph.html">Next</A>
+</BODY>
+</HTML>

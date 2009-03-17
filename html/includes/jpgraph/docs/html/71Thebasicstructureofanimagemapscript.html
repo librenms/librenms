@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7UsingimagemapswithJpGraph.html">
+<LINK REL="Next" HREF="72Specifyingtargetsforimagemapplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7UsingimagemapswithJpGraph.html">Previous</A>
+<A HREF="72Specifyingtargetsforimagemapplots.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_1">7.1 The basic structure of an image map script</A></H2>
+<P> The standard structure for an HTML page using client side image maps
+ would be something along the lines of</P>
+<P></P>
+<PRE>
+// Image map specification with name &quot;mapname&quot;
+&lt;MAP NAME=...&gt;
+... specification ...
+&lt;/MAP&gt;
+
+// Image tag
+&lt;img src=&quot;...&quot; ISMAP USEMAP=&quot;mapname&quot;&gt;
+</PRE>
+<P> This poses an interesting question.</P>
+<P> Since we normally call the graphing script directly in the &lt;img&gt; tag
+ how do we get hold of the image map (which is available only in the
+ image script) in this &quot;HTML wrapper&quot; script?</P>
+<P> In JpGraph there is actually two ways of solving this.</P>
+<OL>
+<LI> Use the preferred &quot;builtin&quot; way using the modified Stroke() method
+ Graph::StrokeCSIM() instead of the standard Graph::Stroke() method.</LI>
+<LI> Directly use the Graph::GetHTMLImageMap() which gives you fine
+ control at the expense of more complex coding.</LI>
+</OL>
+<P> The first (and preferred) way modifies the stroke method so that
+ instead of returning an image (like the standard Stroke() method)
+ StrokeCSIM() actually returns an HTML page containing both the image
+ map specification and the correct &lt;IMG&gt; tag.</P>
+<P> This of course means that it is necessary to treat an image map
+ returning image script differently from a non-CSIM image script, for
+ example you can't use it directly as the target for the &quot;src&quot; attribute
+ of the &lt;IMG&gt; tag since it sends back an actual HTML page containing
+ both an image tag together with an image map.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7UsingimagemapswithJpGraph.html">Previous</A>
+<A HREF="72Specifyingtargetsforimagemapplots.html">Next</A>
+</BODY>
+</HTML>

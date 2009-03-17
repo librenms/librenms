@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="77Combiningdifferentgraphtypes.html">
+<LINK REL="Next" HREF="79Adjustingtheautomatictickmarks.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="77Combiningdifferentgraphtypes.html">Previous</A>
+<A HREF="79Adjustingtheautomatictickmarks.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_8">7.8 Specifying the scale manually</A></H2>
+<P> Normally the automatic scaling should be doing an adequate job in
+ most circumstances but there might be cases where you like to manually
+ set the scale. For example if you have several graphs where you like to
+ be able to easily compare them and therefore want them all to have the
+ same scale.</P>
+<P> To specify a manual scale you have to add arguments to the standard <A
+href="../ref/Graph.html#_GRAPH_SETSCALE"> Graph::SetScale()</A> method.
+ So to specify that you want an Y-scale between 0 and 100 you need to
+ write<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetScale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;textlin&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P>When you specify a scale manually there is one additional thing you
+ need to decide. How the tick marks should be positioned. You have three
+ choices</P>
+<OL>
+<LI> Let JpGraph decide suitable tick marks honoring the exact scale you
+ specified.<B> This is the default behavior</B> if you don't do anything
+ else.</LI>
+<LI> Allow JpGraph to slightly adjust your specified min and max values.
+ With the default method, depending on the min and max values, the end
+ and start of the scale might not fall on an exact tick mark. For
+ esthetic reasons you might still want the last/first tick mark to fall
+ on the edges of the scale. By calling <A href="../ref/LinearScale.html#_LINEARSCALE_SETAUTOTICKS">
+ LinearScale::SetAutoTicks()</A> you tell JpGraph to make the smallest
+ necessary adjustment of the end/start points so that they fall on an
+ exact tick mark.</LI>
+<LI> Manually specify the tick marks with a call to <A href="../ref/LinearTicks.html#_LINEARTICKS_SET">
+ LinearTicks::Set()</A> For example<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetScale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;textlin&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">yscale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+ticks</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">10</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">5</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV>
+<P>Will set the major tick marks every at 0,10,20,.. And every minor
+ tick mark in between (0,5,10,15,20,25,...).</P>
+</LI>
+</OL>
+<P> The three images below illustrates the difference between the
+ possibilities of ticks for a manual scale.<DIV class="example">
+<BR> <A href="exframes/frame_manscaleex1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/manscaleex1.png" WIDTH="220"></A>
+<BR><B>Figure 76:</B> Manual scale, manual ticks major=7 minor=2 <A href="exframes/frame_manscaleex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_manscaleex4.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/manscaleex4.png" WIDTH="220"></A>
+<BR><B>Figure 77:</B> Manual scale, automatic ticks with exact limits <A href="exframes/frame_manscaleex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_manscaleex2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/manscaleex2.png" WIDTH="220"></A>
+<BR><B>Figure 78:</B> Manual scale, automatic ticks where we allow
+ adjustments of the limits <A href="exframes/frame_manscaleex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="77Combiningdifferentgraphtypes.html">Previous</A>
+<A HREF="79Adjustingtheautomatictickmarks.html">Next</A>
+</BODY>
+</HTML>

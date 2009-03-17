@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="65HowdoesStrokeCSIMwork.html">
+<LINK REL="Next" HREF="67Imagemapsandthecachesystem.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="65HowdoesStrokeCSIMwork.html">Previous</A>
+<A HREF="67Imagemapsandthecachesystem.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="6_6">6.6 Getting hold of the image map</A></H2>
+<P> In the case where you want to store the image on disk and later use
+ it in an img-tag you need to get hold of the image map. For this you
+ will have to use the function <A href="../ref/Graph.html#_GRAPH_GETHTMLIMAGEMAP">
+ Graph::GetHTMLImageMap()</A></P>
+<P> An example of the use of this is shown below. With these lines the
+ image will be written to a file. The script then returns a HTML page
+ which contains the Client side image map and an img-tag which will
+ retrieve the previously stored file.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;/usr/local/httpd/htdocs/img/image001.png&quot;</FONT><FONT color="#007700">
+);
+<BR>echo&nbsp;</FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">GetHTMLImageMap</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;myimagemap001&quot;</FONT><FONT color="#007700">
+);
+<BR>echo&nbsp;</FONT><FONT color="#DD0000">
+&quot;&lt;img&nbsp;src=\&quot;img/image001.png\&quot;&nbsp;ISMAP&nbsp;USEMAP=\&quot;#myimagemap001\&quot;&nbsp;border=0&gt;&quot;
+</FONT><FONT color="#007700">;</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="65HowdoesStrokeCSIMwork.html">Previous</A>
+<A HREF="67Imagemapsandthecachesystem.html">Next</A>
+</BODY>
+</HTML>

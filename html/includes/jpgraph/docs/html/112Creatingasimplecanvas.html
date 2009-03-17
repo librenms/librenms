@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="111Introduction.html">
+<LINK REL="Next" HREF="113Addinglinesandrectanglestoacanvas.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="111Introduction.html">Previous</A>
+<A HREF="113Addinglinesandrectanglestoacanvas.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="11_2">11.2 Creating a simple canvas</A></H2>
+<P> In order to create a canvas graph you need to include the file
+ &quot;jpgraph_canvas.php&quot; in addition to the standard &quot;jpgraph.php&quot; file.
+ You might also want to include the &quot;jpgraph_canvtools.php&quot; to get
+ access to some supporting classes that may (or not) come in handy.</P>
+<P> Creating a canvas gives you the opportunity draw arbitrary shapes on
+ a &quot;white&quot; piece of paper. Let's first show a simple example were we
+ just draw a text box. We first show you the code which we will walk
+ through<DIV class="phpscript">(File: canvasex01.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;$Id:&nbsp;canvasex01.php,v&nbsp;1.3&nbsp;2002/10/23&nbsp;08:17:23&nbsp;aditus&nbsp;Exp&nbsp;$
+<BR></FONT><FONT color="#007700">include&nbsp;</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvas.php&quot;</FONT><FONT
+color="#007700">;
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas&nbsp;we&nbsp;can&nbsp;work&nbsp;
+<BR></FONT><FONT color="#0000BB">$g&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">CanvasGraph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+400</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">300</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">'auto'</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+5</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">11</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">6</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">11</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetShadow</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMarginColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;teal&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;We&nbsp;need&nbsp;to&nbsp;stroke&nbsp;the&nbsp;plotarea&nbsp;and&nbsp;margin&nbsp;before&nbsp;we&nbsp;add&nbsp;the
+<BR>//&nbsp;text&nbsp;since&nbsp;we&nbsp;otherwise&nbsp;would&nbsp;overwrite&nbsp;the&nbsp;text.
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">InitFrame</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Draw&nbsp;a&nbsp;text&nbsp;box&nbsp;in&nbsp;the&nbsp;middle
+<BR></FONT><FONT color="#0000BB">$txt</FONT><FONT color="#007700">=</FONT><FONT
+color="#DD0000">&quot;This\nis\na&nbsp;TEXT!!!&quot;</FONT><FONT color="#007700">;
+<BR></FONT><FONT color="#0000BB">$t&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">Text</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$txt</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">10</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$t</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">40</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;How&nbsp;should&nbsp;the&nbsp;text&nbsp;box&nbsp;interpret&nbsp;the&nbsp;coordinates?
+<BR></FONT><FONT color="#0000BB">$t</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Align</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'center'</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">'top'</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;How&nbsp;should&nbsp;the&nbsp;paragraph&nbsp;be&nbsp;aligned?
+<BR></FONT><FONT color="#0000BB">$t</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">ParagraphAlign</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'center'</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Add&nbsp;a&nbsp;box&nbsp;around&nbsp;the&nbsp;text,&nbsp;white&nbsp;fill,&nbsp;black&nbsp;border&nbsp;and&nbsp;gray&nbsp;shadow
+<BR></FONT><FONT color="#0000BB">$t</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetBox</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;white&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;black&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">&quot;gray&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Stroke&nbsp;the&nbsp;text
+<BR></FONT><FONT color="#0000BB">$t</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$g</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">img</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Stroke&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT>
+<BR></FONT></CODE></DIV></P>
+<P> The example above starts by creating a (400x200) sized image. We set
+ the margins to get a nice frame around the image. For canvases the
+ margins has no effect in the way you enter coordinates. Top left is
+ (0,0) and bottom right (including any potential margin and shadow) is
+ the maximum. In this case the coordinates are X:0-399, and Y:0-199</P>
+<P> We then call the <A href="../ref/CanvasGraph.html#_CANVASGRAPH_INITFRAME">
+ InitFrame()</A> method which actually strokes the margin and plotarea
+ to the graph. Since everything is stroked in the order you issue the
+ commands you must make sure that the graphical objects you want on top
+ is stroked last. This is different from the way you normally work with
+ JpGraph since it queues up all you addition and then makes sure they
+ are stroked in the correct order.</P>
+<P> We then create a <A href="../ref/Text.html#_C_TEXT">Text</A> object,
+ setup it's properties, including the absolute screen position where we
+ want the text, and then stroke it. Her it might be a need for a closer
+ explanation of the, perhaps misnamed, method <A href="../ref/Text.html#_TEXT_ALIGN">
+Text::Align()</A> This method states<STRONG> how the text coordinates
+ should be interpreted</STRONG> , i.e when we specify (200,10) as the
+ coordinates for the text paragraph should that be interpreted as the
+ top left corner, bottom-left corner or something else (of the bounding
+ box)? In the code above we have chosen to interpret the X-coordinate as
+ being the center of the bounding box and the Y-coordinate as the top.
+ Hence the text will be aligned so that the (200,100) point in the graph
+ is aligned with the middle of the top line of the paragraphs bounding
+ box.</P>
+<P> We also specify that the lines within the paragraph should be
+ centered with a call to <A href="../ref/Text.html#_TEXT_PARAGRAPHALIGN">
+ Text::ParagraphAlign()</A> Since we also choose to have a box around
+ the text we have to make use of the method <A href="../ref/Text.html#_TEXT_SETBOX">
+ Text::SetBox()</A> which is used to specify the fill color, the border
+ color and the shadow color (if you leave out shadow color or set it to
+ '', no shadow will be used).</P>
+<P> Now we are ready to stroke the text onto the canvas. In order to do
+ so we must specify the basic Image drawing class we want to use.
+ Without discussing this further we just state that a suitable image
+ class can always be found as the<STRONG> img</STRONG> property of the
+ Graph class.</P>
+<P> Finally we are ready to stroke the entire graph, which in effect
+ sends the canvas back to the browser. Below you can see the effect of
+ all this code</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_canvasex01.html" target="blank"><IMG border="0"
+HEIGHT="300"  src="img/canvasex01.png" WIDTH="400"></A>
+<BR><B>Figure 184:</B> A simple canvas drawing with a text box in the
+ middle <A href="exframes/frame_canvasex01.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="111Introduction.html">Previous</A>
+<A HREF="113Addinglinesandrectanglestoacanvas.html">Next</A>
+</BODY>
+</HTML>

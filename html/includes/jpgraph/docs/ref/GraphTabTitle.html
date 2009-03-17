@@ -1,0 +1,202 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GRAPHTABTITLE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GraphTabTitle</b> EXTENDS <a href="Text.html#_C_TEXT" style="font-face:arial;font-weight:bold;">Text</a></div>
+<i>(Defined in: jpgraph.php : 3027)</i><table border=1><tr><td>&nbsp;<a href="GraphTabTitle.html" style="font-family:arial;font-weight:bold;color:darkblue;">GraphTabTitle</a>&nbsp;</td><td>&nbsp;<a href="Text.html" style="font-family:arial;font-weight:bold;color:darkblue;">Text</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETCORNER">SetCorner()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETFILLCOLOR">SetFillColor()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETPOS">SetPos()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETTABALIGN">SetTabAlign()</a>&nbsp;<br>
+&nbsp;<a href="GraphTabTitle.html#_GRAPHTABTITLE_SETWIDTH">SetWidth()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;<a href="Text.html#_TEXT_ALIGN">Align()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_CENTER">Center()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETFONTHEIGHT">GetFontHeight()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETTEXTHEIGHT">GetTextHeight()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_GETWIDTH">GetWidth()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_HIDE">Hide()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_PARAGRAPHALIGN">ParagraphAlign()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_POS">Pos()</a>&nbsp;<br>
+<a href="Text.html#_TEXT_SET" style="color:darkgrey;">Set()&nbsp;</a><br>
+&nbsp;<a href="Text.html#_TEXT_SETALIGN">SetAlign()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETANGLE">SetAngle()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETBOX">SetBox()</a>&nbsp;<br>
+<a href="Text.html#_TEXT_SETCOLOR" style="color:darkgrey;">SetColor()&nbsp;</a><br>
+&nbsp;<a href="Text.html#_TEXT_SETCSIMTARGET">SetCSIMTarget()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETMARGIN">SetMargin()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETORIENTATION">SetOrientation()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETPARAGRAPHALIGN">SetParagraphAlign()</a>&nbsp;<br>
+<a href="Text.html#_TEXT_SETPOS" style="color:darkgrey;">SetPos()&nbsp;</a><br>
+&nbsp;<a href="Text.html#_TEXT_SETSCALEPOS">SetScalePos()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETSHADOW">SetShadow()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SETWORDWRAP">SetWordWrap()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_SHOW">Show()</a>&nbsp;<br>
+&nbsp;<a href="Text.html#_TEXT_TEXT">Text()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Represents the tab that can be placed on top of the graph <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($t)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify text string for tabbed title</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$t</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify text string for tabbed title&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;Set('First&nbsp;Quarter');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aTxtColor,$aFillColor,$aBorderColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for tab</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTxtColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'lightyellow'</font>
+</td><td>Background fill color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorderColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Border color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify all the possible colors for the tab&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;SetColor('navy','lightyellow','navy');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETCORNER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCorner($aD)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify size (in pixels) of the cut in the upper left and right corner</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aD</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Cut in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify size (in pixels) of the cut in the upper left and right corner&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;SetCorner(8);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillColor($aFillColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background color for tab title</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Fill color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background color for tab title&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;SetFillColor('darkgreen');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetPos($aAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify position for tab title</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>'left', 'center' or 'right' alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify position for tab title, left, rigth or center.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;SetPos('center');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETTABALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTabAlign($aAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify position of the tab</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Left right or center position</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Teh tab can be positioned at the left edge on top of the plot area, center or at the right.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;tabtitle-&gt;SetTabAlign('right');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPHTABTITLE_SETWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWidth($aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify width for tab title</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width of tab (see below)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The width of the tab title can be specified in either absolute pixels or as the two special values 'TABTITLE_WIDTHFIT' and  'TABTITLE_WIDTHFULL'.
+<p>
+The TABTITLE_WIDTHFIT will make the tab just wide enough to hold the text in the tab and the TABTITLE_WIDTHFULL will extend the tab across the entire plot area.
+<p>
+By default the tab will be formatted as it had been specified as TABTITLE_WIDTHFIT
+
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Specify&nbsp;the&nbsp;tab&nbsp;title&nbsp;width&nbsp;in&nbsp;absolute&nbsp;pixels<br />$graph-&gt;tabtitle-&gt;SetWidth(120);</font>
+</span><br>
+<p> <hr> <p>

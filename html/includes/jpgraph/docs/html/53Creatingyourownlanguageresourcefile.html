@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="52Includedlocalizederrormessages.html">
+<LINK REL="Next" HREF="6UnderstandingtheJpGraphcachingsystem.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="52Includedlocalizederrormessages.html">Previous</A>
+<A HREF="6UnderstandingtheJpGraphcachingsystem.html">Next</A>
+<HR NOSHADE>
+
+<H2><A NAME="5_3">5.3 Creating your own language resource file</A></H2>
+ All error messages are stored in an array with a specific index that
+ cannot be changed. This index is used in the library to reference a
+ specific error message. Since error messages can also have additional
+ parameters the error messages also includes count that specifies how
+ many arguments can be handled.
+<P> The arguments are formatted in the error text in the same way as
+ parameters in the printf() family of functions.</P>
+<P> To create your own localized error resource file You should copy the
+ &quot;en.inc.php&quot; to a temporary file, rename it for localem and then
+ translate each error message to Your language of choice. Make sure the
+ file is stored under the lang/ catalogue and You are ready to use your
+ new locale.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="52Includedlocalizederrormessages.html">Previous</A>
+<A HREF="6UnderstandingtheJpGraphcachingsystem.html">Next</A>
+</BODY>
+</HTML>

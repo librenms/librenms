@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="9181Enablingantialiasedlines.html">
+<LINK REL="Next" HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="9181Enablingantialiasedlines.html">Previous</A>
+<A HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_19">9.19 Rotating the graphs</A></H2>
+<P> JpGraph provide the possibility for you to rotate the generated
+ graph an arbitrary angle. This will only affect the actual graph (axis,
+ axis titles, labels and so on) and not fixed elements on the graph like
+ title or footer.</P>
+<P> Rotation is probably most used to rotate a graph 90 degrees, for
+ example a bar graph to get the effect of horizontal bars.</P>
+<P></P>
+<HR> <SMALL>
+<P><STRONG> Performance note:</STRONG> Adding a rotation transformation
+ will make the graph generation slightly slower since each point of the
+ graph as to go through a transformation step before being stroked on to
+ the image. JpGraph optimizes this by using a pre-calculated
+ transformation matric and also optimizes the special case 90 degrees.</P>
+</SMALL>
+<HR>
+<P> By default the center of the rotation will be the center of the plot
+ area, which may or may not coincide with the center of the entire
+ image.</P>
+<P> To control the rotation you use the two methods</P>
+<UL>
+<LI> <A href="../ref/RotImage.html#_ROTIMAGE_SETANGLE">
+Graph::image::SetAngle()</A>, Specify rotation angle in degrees.</LI>
+<LI> <A href="../ref/RotImage.html#_ROTIMAGE_SETCENTER">
+Graph::image::SetCenter()</A>, Specify center of rotation in absolute
+ image pixels</LI>
+</UL>
+<P> For example<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">image</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetAngle</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">45</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> There is actually a third method that you could use, adding a
+ translation to the graph<STRONG> after</STRONG> the rotation. Since
+ this probably a very little used method we don't discuss it further but
+ refer the reader to the class reference instead <A href="../ref/RotImage.html#_ROTIMAGE_SETTRANSLATION">
+ Graph:image::SetTranslation()</A></P>
+<P> When you rotate an image you should be aware of that the individual
+ labels on the axis are not rotated. The design decision behind this is
+<BR><STRONG> a)</STRONG> Bit mapped font can't be rotated
+<BR><STRONG> b)</STRONG> Maintain readability</P>
+<P> Please remember that you may still rotate the labels by calling the <A
+href="../ref/Axis.html#_AXIS_SETLABELANGLE"> Axis::SetLabelAngle()</A>
+ method.</P>
+<P> Since the anchor point for labels is by default the optimum for
+ graph at 0 degree you might want to adjust the anchor point and
+ alignment for the labels on the axis to get a better visual appearance
+ on you rotated graph. This is accomplished by the method <A href="../ref/Axis.html#_AXIS_SETLABELALIGN">
+ Axis::SetLabelAlign()</A> For a detailed discussion on how to do this
+ please see the section on horizontal bar graphs, ( <A href="3030barplot.html">
+Working with bar plots</A> )</P>
+<P> The table below shows some examples on different kinds of rotation
+ to give you an idea of how changing the angle and rotation center may
+ be used to generate different effects. The top left graph is the
+ original image. The point of rotation has been marked with a red-cross
+ in each of the images.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex0.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex0.png" WIDTH="270"></A>
+<BR><B>Figure 176:</B> Original image <A href="exframes/frame_rotex0.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex1.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex1.png" WIDTH="270"></A>
+<BR><B>Figure 177:</B> Rotated 45 degrees around center of plot area <A href="exframes/frame_rotex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex2.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex2.png" WIDTH="270"></A>
+<BR><B>Figure 178:</B> Rotated 90 degrees around center of plot area <A href="exframes/frame_rotex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex3.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex3.png" WIDTH="270"></A>
+<BR><B>Figure 179:</B> Rotated 45 degrees around center of the image <A href="exframes/frame_rotex3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex4.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex4.png" WIDTH="270"></A>
+<BR><B>Figure 180:</B> Rotated 90 degrees around center of the image <A href="exframes/frame_rotex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_rotex5.html" target="blank"><IMG border="0" HEIGHT="170"
+      src="img/img/img/img/img/img/rotex5.png" WIDTH="270"></A>
+<BR><B>Figure 181:</B> Rotated -30 degrees around the lower left point
+ of the plot area <A href="exframes/frame_rotex5.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> As you can see from the images above if you rotate about any other
+ point than the center of the plot area the plot can be placed outside
+ the image after rotation.</P>
+<P> Since the rotation, by design, only affects the plot area it is
+ often most effective to use when the color of the margin is the same as
+ the background color.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="9181Enablingantialiasedlines.html">Previous</A>
+<A HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">Next</A>
+</BODY>
+</HTML>

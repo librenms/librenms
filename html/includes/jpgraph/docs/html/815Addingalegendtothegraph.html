@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="814AddingasecondYscale.html">
+<LINK REL="Next" HREF="816Handlingnullvaluesinlineplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="814AddingasecondYscale.html">Previous</A>
+<A HREF="816Handlingnullvaluesinlineplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_5">8.1.5 Adding a legend to the graph</A></H3>
+<P> With more than one plot on the same graph it is necessary to somehow
+ indicate which plot is which. This is normally done by adding a legend
+ to the graph.</P>
+<P> You will see that each plot type has a 'SetLegend()' method which is
+ used to name that plot in the legend. SO to name the two plots in the
+ example we have been working with so far we need to add the lines<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$lineplot</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetLegend</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;Plot&nbsp;1&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot2</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetLegend</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;Plot&nbsp;2&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> to the previous code. The resulting graph is shown below
+<!--?
+Example('example5.1','Adding a legend to the graph');
+?-->
+ As you can see the legend gets automatically sized depending on how
+ many plots there are that have legend texts to display. By default it
+ is placed with it's top right corner close to the upper right edge of
+ the image. Depending on the image you might want to adjust this or you
+ might want to add a larger margin which is big enough to accompany the
+ legend. Let's do both.</P>
+<P> First we increase the right margin and then we place the legend so
+ that it is roughly centered. We will also enlarge the overall image so
+ the plot area doesn't get too squeezed.</P>
+<P> To modify the legend you access the 'legend' property of the graph.
+ For a full reference on all the possibilities (changing colors, layout,
+ etc) see <A href="../ref/Legend.html#_C_LEGEND/">class legend</A> in
+ the class reference</P>
+<P> For this we use the legends 'SetPos()' method as in<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">legend</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Pos</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0.05</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0.5</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;right&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;center&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> Doing this small modification will give the result shown below<DIV class="example">
+<BR> <A href="exframes/frame_example6.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example6.png" WIDTH="400"></A>
+<BR><B>Figure 11:</B> Adjusting the layout to give more rooms for the
+ legend <A href="exframes/frame_example6.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> The above method 'SetPos()' deserves some explanation since it might
+ not be obvious. You specify the position as a fraction of the overall
+ width and height of the entire image. This makes it possible for you to
+ resize the image within disturbing the relative position of the legend.
+ We will later see that the same method is just to place arbitrary text
+ in the image.</P>
+<P> To give added flexibility one must also specify to what edge of the
+ legend the position given should be relative to. In the example above
+ we have specified &quot;right&quot; edge on the legend for the for the horizontal
+ positioning and &quot;center&quot; for the vertical position.</P>
+<P> This means that the right edge of the legend should be position 5 %
+ of the image width from the right. If you had specified &quot;left&quot; the the
+ legends left edge would be positioned 5 % of the image width from the
+ image left side.</P>
+<P> By default the legends in the legend box gets stacked on top of each
+ other. The other possibility is to have them sideways. To adjust this
+ you use the <A href="../ref/Legend.html#_LEGEND_SETLAYOUT">SetLayout()</A>
+ method. Using a horizontal layout with the previous example give the
+ following result.<DIV class="example">
+<BR> <A href="exframes/frame_example6.1.html" target="blank"><IMG border="0"
+HEIGHT="240"  src="img/example6.1.png" WIDTH="300"></A>
+<BR><B>Figure 12:</B> Using a horizontal layout for the legends <A href="exframes/frame_example6.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<H4>8.1.5.1 Adjusting the layout of the legend</H4>
+<P> For more advanced fomatting of the legend it is possible to adjust</P>
+<UL>
+<LI> The number of columns in the legend</LI>
+<LI> Specify vertical / horizontal margins for legend columns</LI>
+</UL>
+<P> In order to adjust the number of columns used in the legend the
+ method<I> Legend::SetColumns</I> is used. So for example to have the
+ legend lined up using three columns the follwing lines have to be added
+ to teh script<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+legend</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColumns</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">3</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="814AddingasecondYscale.html">Previous</A>
+<A HREF="816Handlingnullvaluesinlineplots.html">Next</A>
+</BODY>
+</HTML>

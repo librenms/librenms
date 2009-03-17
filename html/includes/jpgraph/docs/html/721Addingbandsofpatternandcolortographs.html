@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="720Adjustingtheautoscalinglimitsgracevalue.html">
+<LINK REL="Next" HREF="7211Customizingthepatterns.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="720Adjustingtheautoscalinglimitsgracevalue.html">Previous</A>
+<A HREF="7211Customizingthepatterns.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_21">7.21 Adding bands of pattern and color to graphs</A></H2>
+<P> As an additional way of emphasizing certain areas of the graph it is
+ possible to add bands (either vertical or horizontal) to any one of the
+ standard X-Y coordinate system based graphs. A band is a rectangular
+ area that stretches one entire axis. This means that if you define a
+ band between X-coordinates 3 and 5 the band area will occupy an area
+ between the X-coordinates and the entire Y-range.</P>
+<P> In order to access this functionality you must first make sure that
+ you include the additional library file<I> jpgraph_plotband.php</I></P>
+<P> At the time of this writing (current as of JpGraph 1.8) the table
+ below illustrates the 8 basic types of patterns available. We will
+ shortly show you how you can customize these patterns, To keep these
+ examples clear we have only used one pattern in each figure.</P>
+<P></P>
+<TABLE style="margin-left:-4em;">
+<TR><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex1.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex1.png" WIDTH="200"></A>
+<BR><B>Figure 103:</B> <A href="exframes/frame_smallstaticbandsex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex2.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex2.png" WIDTH="200"></A>
+<BR><B>Figure 104:</B> <A href="exframes/frame_smallstaticbandsex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD></TR>
+<TR><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex7.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex7.png" WIDTH="200"></A>
+<BR><B>Figure 105:</B> <A href="exframes/frame_smallstaticbandsex7.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex6.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex6.png" WIDTH="200"></A>
+<BR><B>Figure 106:</B> <A href="exframes/frame_smallstaticbandsex6.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD></TR>
+<TR><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex9.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex9.png" WIDTH="200"></A>
+<BR><B>Figure 107:</B> <A href="exframes/frame_smallstaticbandsex9.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex10.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex10.png" WIDTH="200"></A>
+<BR><B>Figure 108:</B> <A href="exframes/frame_smallstaticbandsex10.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD></TR>
+<TR><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex3.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex3.png" WIDTH="200"></A>
+<BR><B>Figure 109:</B> <A href="exframes/frame_smallstaticbandsex3.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD><TD><DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex8.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex8.png" WIDTH="200"></A>
+<BR><B>Figure 110:</B> <A href="exframes/frame_smallstaticbandsex8.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</TD></TR>
+</TABLE>
+<P> To add a one of these patterns to your graph you need to call the
+ method <A href="../ref/PlotBand.html#_PLOTBAND_PLOTBAND">
+ PlotBand::PlotBand()</A> The arguments is fairly easy to understand.
+ The pattern you would like to use is specified by using the correct
+ constant. You can see the name of the correct constants in the figures
+ above. You also need to specify if the band should stretch along the
+ vertical or horizontal axis as well as the min and max coordinates for
+ the band. As coordinates you may also use the special values &quot;min&quot; and
+ &quot;max&quot; which automatically sets the value to the minimum/maximum value
+ of the scale. The specified numeric value will be automatically
+ truncated to fit within the plot area.</P>
+<P> We don't discuss the other arguments further here, instead we refer
+ you to the class reference.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="720Adjustingtheautoscalinglimitsgracevalue.html">Previous</A>
+<A HREF="7211Customizingthepatterns.html">Next</A>
+</BODY>
+</HTML>

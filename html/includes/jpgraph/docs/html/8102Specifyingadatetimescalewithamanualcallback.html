@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8101Usingtheautomaticdatetimescale.html">
+<LINK REL="Next" HREF="811Adjustinglabelsonatextscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8101Usingtheautomaticdatetimescale.html">Previous</A>
+<A HREF="811Adjustinglabelsonatextscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_10_2">8.10.2 Specifying a date/time scale with a manual
+ call-back</A></H3>
+<P> In the following we will assume that all data points are specified
+ by a tuple where the date/time is specified as a timestamp in second in
+ the same format as is returned by the PHP function time().</P>
+<P> The trick here is to use a label formatting callback routine which
+ gets called to format each label on the scale.</P>
+<P> What we do is that we specify that the X-scale should be an ordinary
+ &quot;int&quot; scale (remember that the data values are timestamps which are
+ integers). We then install our custom label callback (with a call to <A href="../ref/Axis.html#_AXIS_SETLABELFORMATCALLBACK">
+ SetLabelFormatCallback()</A>) which given a timestamp formats it to a
+ suitable human readable form. In our example we will use the PHP
+ function Date() for this purpose.</P>
+<P> The callback we use will be<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;The&nbsp;callback&nbsp;that&nbsp;converts&nbsp;timestamp&nbsp;to&nbsp;minutes&nbsp;and&nbsp;seconds
+<BR></FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+TimeCallback</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aVal</FONT><FONT color="#007700">)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</FONT><FONT color="#0000BB">Date</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'H:i:s'</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$aVal</FONT><FONT color="#007700">);
+<BR>}</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> Using some random data we can now generate the following graph<DIV class="example">
+<BR> <A href="exframes/frame_dateaxisex1.html" target="blank"><IMG border="0"
+HEIGHT="250"  src="img/dateaxisex1.png" WIDTH="324"></A>
+<BR><B>Figure 78:</B> Example on how to format an axis to hold a
+ date/time scale using and integer scale and a callback routine <A href="exframes/frame_dateaxisex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> In the above example we have specified the X-scale manually to make
+ sure that the min/max values on the X-axis exactly matches the min/max
+ x-data values.</P>
+<P> SetLabelFormatCallback() will be called for each of the displayed
+ labels and the argument passed on to the supplied function is the
+ default label that the library is assigning that specific label.</P>
+<P> This means that if the data to be displayed is based on, for
+ example, timestamps which are given in seconds the displayed value
+ might not be aligned to how time/date values normally should be
+ displayed.</P>
+<P> Using integer scales this will not work very well since the library
+ determines label positions to be at even positions (e.g. every 2,5,10,
+ 20,50,100 etc) to suit the auto-scaling since the library will assume
+ that the data is integers and not timestamp values.</P>
+<P> The best way to solve this is to use an integer X-scale together
+ with a a callback function with a manually specified scale. In order to
+ setup the scale a bit of manually work is needed. Depending on the data
+ to be displayed one should ensure that the scale starts and ends at
+ suitable times and that the tick interval chosen fits with an even
+ multiple of minutes, hours, days or what is best suited for the time
+ range that is to be displayed.</P>
+<P> The following code example illustrates this. It creates some &quot;fake&quot;
+ data that is assumed to be sampled time based data and sets up some
+ suitable scales and tick interval. This script may be used as a basis
+ for more advanced handling of the time data.<DIV class="phpscript">
+(File: timestampex01.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Example&nbsp;on&nbsp;how&nbsp;to&nbsp;treat&nbsp;and&nbsp;format&nbsp;timestamp&nbsp;as&nbsp;human&nbsp;readable&nbsp;labels
+<BR></FONT><FONT color="#007700">require_once(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>require_once(</FONT><FONT color="#DD0000">&quot;../jpgraph_line.php&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Number&nbsp;of&nbsp;&quot;fake&quot;&nbsp;data&nbsp;points
+<BR></FONT><FONT color="#0000BB">DEFINE</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">'NDATAPOINTS'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+500</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Assume&nbsp;data&nbsp;points&nbsp;are&nbsp;sample&nbsp;every&nbsp;10th&nbsp;second
+<BR></FONT><FONT color="#0000BB">DEFINE</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">'SAMPLERATE'</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+10</FONT><FONT color="#007700">);&nbsp;
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Callback&nbsp;formatting&nbsp;function&nbsp;for&nbsp;the&nbsp;X-scale&nbsp;to&nbsp;convert&nbsp;timestamps
+<BR>//&nbsp;to&nbsp;hour&nbsp;and&nbsp;minutes.
+<BR></FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+TimeCallback</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aVal</FONT><FONT color="#007700">)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;</FONT><FONT color="#0000BB">Date</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'H:i'</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">$aVal</FONT><FONT color="#007700">);
+<BR>}
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Get&nbsp;start&nbsp;time
+<BR></FONT><FONT color="#0000BB">$start&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">time</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Set&nbsp;the&nbsp;start&nbsp;time&nbsp;to&nbsp;be&nbsp;on&nbsp;the&nbsp;closest&nbsp;minute&nbsp;just&nbsp;before&nbsp;the&nbsp;&quot;start&quot;&nbsp;timestamp
+<BR></FONT><FONT color="#0000BB">$adjstart&nbsp;</FONT><FONT color="#007700">
+=&nbsp;</FONT><FONT color="#0000BB">floor</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$start&nbsp;</FONT><FONT color="#007700">/&nbsp;</FONT><FONT color="#0000BB">
+60</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Create&nbsp;a&nbsp;data&nbsp;set&nbsp;in&nbsp;range&nbsp;(20,100)&nbsp;and&nbsp;X-positions
+<BR>
+//&nbsp;We&nbsp;also&nbsp;apply&nbsp;a&nbsp;simple&nbsp;low&nbsp;pass&nbsp;filter&nbsp;on&nbsp;the&nbsp;data&nbsp;to&nbsp;make&nbsp;it&nbsp;less
+<BR>//&nbsp;random&nbsp;and&nbsp;a&nbsp;little&nbsp;smoother
+<BR></FONT><FONT color="#0000BB">$data&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array();
+<BR></FONT><FONT color="#0000BB">$xdata&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array();
+<BR></FONT><FONT color="#0000BB">$data</FONT><FONT color="#007700">[</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">]&nbsp;=&nbsp;</FONT><FONT color="#0000BB">
+rand</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">20</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$xdata</FONT><FONT color="#007700">[</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">]&nbsp;=&nbsp;</FONT><FONT color="#0000BB">
+$adjstart</FONT><FONT color="#007700">;
+<BR>for(&nbsp;</FONT><FONT color="#0000BB">$i</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">1</FONT><FONT color="#007700">;&nbsp;</FONT><FONT color="#0000BB">
+$i&nbsp;</FONT><FONT color="#007700">&lt;&nbsp;</FONT><FONT color="#0000BB">
+NDATAPOINTS</FONT><FONT color="#007700">;&nbsp;++</FONT><FONT color="#0000BB">
+$i&nbsp;</FONT><FONT color="#007700">)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$data</FONT><FONT color="#007700">[</FONT><FONT
+color="#0000BB">$i</FONT><FONT color="#007700">]&nbsp;=&nbsp;</FONT><FONT color="#0000BB">
+rand</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">20</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT color="#007700">
+)*</FONT><FONT color="#0000BB">0.2&nbsp;</FONT><FONT color="#007700">+&nbsp;</FONT><FONT
+color="#0000BB">$data</FONT><FONT color="#007700">[</FONT><FONT color="#0000BB">
+$i</FONT><FONT color="#007700">-</FONT><FONT color="#0000BB">1</FONT><FONT
+color="#007700">]*</FONT><FONT color="#0000BB">0.8</FONT><FONT color="#007700">
+;
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT color="#0000BB">$xdata</FONT><FONT color="#007700">
+[</FONT><FONT color="#0000BB">$i</FONT><FONT color="#007700">]&nbsp;=&nbsp;</FONT><FONT
+color="#0000BB">$adjstart&nbsp;</FONT><FONT color="#007700">+&nbsp;</FONT><FONT color="#0000BB">
+$i&nbsp;</FONT><FONT color="#007700">*&nbsp;</FONT><FONT color="#0000BB">
+SAMPLERATE</FONT><FONT color="#007700">;
+<BR>}
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Assume&nbsp;that&nbsp;the&nbsp;data&nbsp;points&nbsp;represents&nbsp;data&nbsp;that&nbsp;is&nbsp;sampled&nbsp;every&nbsp;10s
+<BR>//&nbsp;when&nbsp;determing&nbsp;the&nbsp;end&nbsp;value&nbsp;on&nbsp;the&nbsp;scale.&nbsp;We&nbsp;also&nbsp;add&nbsp;some&nbsp;extra
+<BR>//&nbsp;length&nbsp;to&nbsp;end&nbsp;on&nbsp;an&nbsp;even&nbsp;label&nbsp;tick.
+<BR></FONT><FONT color="#0000BB">$adjend&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">$adjstart&nbsp;&nbsp;</FONT><FONT color="#007700">+&nbsp;(</FONT><FONT color="#0000BB">
+NDATAPOINTS</FONT><FONT color="#007700">+</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">)*</FONT><FONT color="#0000BB">10</FONT><FONT color="#007700">
+;
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Graph</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">500</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+250</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+40</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">20</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">30</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Now&nbsp;specify&nbsp;the&nbsp;X-scale&nbsp;explicit&nbsp;but&nbsp;let&nbsp;the&nbsp;Y-scale&nbsp;be&nbsp;auto-scaled
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetScale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;intlin&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$adjstart</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$adjend</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Example&nbsp;on&nbsp;TimeStamp&nbsp;Callback&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Setup&nbsp;the&nbsp;callback&nbsp;and&nbsp;adjust&nbsp;the&nbsp;angle&nbsp;of&nbsp;the&nbsp;labels
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetLabelFormatCallback</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'TimeCallback'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetLabelAngle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+90</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Set&nbsp;the&nbsp;labels&nbsp;every&nbsp;5min&nbsp;(i.e.&nbsp;300seconds)&nbsp;and&nbsp;minor&nbsp;ticks&nbsp;every&nbsp;minute
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">ticks</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">300</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">60</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$line&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">LinePlot</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$data</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$xdata</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$line</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'lightblue'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$line</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT></FONT></CODE></DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8101Usingtheautomaticdatetimescale.html">Previous</A>
+<A HREF="811Adjustinglabelsonatextscale.html">Next</A>
+</BODY>
+</HTML>

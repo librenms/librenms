@@ -1,0 +1,1748 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GRAPH"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Graph</b></div>
+<i>(Defined in: jpgraph.php : 457)</i><table border=1><tr><td>&nbsp;<a href="Graph.html" style="font-family:arial;font-weight:bold;color:darkblue;">Graph</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Graph.html#_GRAPH_ADD">Add()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_ADDBAND">AddBand()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_ADDLINE">AddLine()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_ADDTEXT">AddText()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_ADDY">AddY()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_ADDY2">AddY2()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_CHECKCSIMCACHE">CheckCSIMCache()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_GETHTMLIMAGEMAP">GetHTMLImageMap()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_GRAPH">Graph()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SET3DPERSPECTIVE">Set3DPerspective()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SET90ANDMARGIN">Set90AndMargin()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETALPHABLENDING">SetAlphaBlending()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETANGLE">SetAngle()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETAXISLABELBACKGROUND">SetAxisLabelBackground()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETAXISSTYLE">SetAxisStyle()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBACKGROUNDCFLAG">SetBackgroundCFlag()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBACKGROUNDCOUNTRYFLAG">SetBackgroundCountryFlag()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBACKGROUNDGRADIENT">SetBackgroundGradient()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBACKGROUNDIMAGE">SetBackgroundImage()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBACKGROUNDIMAGEMIX">SetBackgroundImageMix()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETBOX">SetBox()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETCLIPPING">SetClipping()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETCSIMIMGALT">SetCSIMImgAlt()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETFRAME">SetFrame()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETFRAMEBEVEL">SetFrameBevel()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETGRIDDEPTH">SetGridDepth()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETICONDEPTH">SetIconDepth()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETIMGFORMAT">SetImgFormat()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETMARGIN">SetMargin()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETMARGINCOLOR">SetMarginColor()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETSCALE">SetScale()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETSHADOW">SetShadow()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETTEXTSCALEABSCENTEROFF">SetTextScaleAbsCenterOff()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETTICKDENSITY">SetTickDensity()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETTITLEBACKGROUND">SetTitleBackground()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETTITLEBACKGROUNDFILLSTYLE">SetTitleBackgroundFillStyle()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETY2ORDERBACK">SetY2OrderBack()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETY2SCALE">SetY2Scale()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETYDELTADIST">SetYDeltaDist()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_SETYSCALE">SetYScale()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_STROKE">Stroke()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_STROKECSIM">StrokeCSIM()</a>&nbsp;<br>
+&nbsp;<a href="Graph.html#_GRAPH_STROKEFRAMEBACKGROUND">StrokeFrameBackground()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>The Graph class is the main container class for all x,y-axis based plots which controls the creation of the entire graph. You must always instantiate one instance to create a graph. Through this class one controls many overall settings of the image displayed.
+<p>
+Please note that to create Pie, Gantt, Canvas and Spider charts you have to use their respective creation classes.
+<p>
+Public properties:
+<table width=80% border=1>
+<tr><th width=20%>Name</th><th width=20%>Type</th><th>Description</th></tr>
+<tr>
+<td>xaxis</td>
+<td>Axis</td>
+<td>X-axis</td>
+</tr>
+<tr>
+<td>yaxis</td>
+<td>Axis</td>
+<td>Y-axis</td>
+</tr>
+<tr>
+<td>xgrid</td>
+<td>Grid</td>
+<td>Grid lines for X-axis</td>
+</tr>
+<tr>
+<td>ygrid</td>
+<td>Grid</td>
+<td>Grid lines for Y-axis</td>
+</tr>
+<tr>
+<td>legend</td>
+<td>Legend</td>
+<td>Properties for legend box</td>
+</tr>
+<tr>
+<td>title</td>
+<td>Text</td>
+<td>Graph main title</td>
+</tr>
+<tr>
+<td>subtitle</td>
+<td>Text</td>
+<td>Sub title</td>
+</tr>
+<tr>
+<td>subsubtitle</td>
+<td>Text</td>
+<td>Sub title</td>
+<tr>
+<tr>
+<td>tabtitle</td>
+<td>GraphTabTitle</td>
+<td>Option Tab title for graph</td>
+</tr>
+
+<tr>
+<td>img</td>
+<td>RotImage</td>
+<td>The image canvas</td>
+</tr>
+</table>
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="Axis.html">Axis</a>, <a href="Grid.html">Grid</a>, <a href="Text.html">Text</a> and <a href="Image.html">Image</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADD"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Add(&amp;$aPlot)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add any plot object to the graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aPlot</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Plot object</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Each plot that should be displayed within the graph has to be added to the graph. This is the main method to add object. You can use this method to add
+<ul>
+<li> Plots
+<li> Texts
+<li> Plot lines
+<li> Plot bands
+</ul>
+
+This method will add a plopt for use with the ?Left? Y-scale, (the normal Y scale). To add a plot to the second Y scale you should use AddY2().
+<p>
+Note that since the plot is added as a reference any changes you make to the original plot will also happen to the plot you have added to the graph.
+<p>
+Add() will always add plots to the first Y-scale. If you are using two Y-axis then you must use AddY2() to add plots to the second Y-scale.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_ADDY2">Graph::AddY2</a> and <a href="Graph.html#_GRAPH_SETSCALE">Graph::SetScale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200,"auto");&nbsp;&nbsp;&nbsp;&nbsp;<br />$graph-&gt;img-&gt;SetMargin(40,30,20,40);<br />$graph-&gt;SetScale("textlin");<br />$graph-&gt;SetShadow();<br /><br />//&nbsp;Create&nbsp;a&nbsp;bar&nbsp;pot<br />$bplot&nbsp;=&nbsp;new&nbsp;BarPlot($datay);<br />$bplot-&gt;SetFillColor("orange");<br />$graph-&gt;Add($bplot);<br /><br />//&nbsp;Display&nbsp;the&nbsp;graph<br />$graph-&gt;Stroke();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADDBAND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddBand(&amp;$aBand,$aToY2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add vertical or horizontal band</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aBand</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Band object</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aToY2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Add object to Y2 axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>A plot may have one or several filled horizontal or vertical "bands" to emphasise certain scale areas.
+<p>
+Each band is an instance of the PlotBand class. For types of plot band see the documentation of class PlotBand
+<p>
+Note: You can alos use the standard method Add() to add bands.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotBand.html#_PLOTBAND_PLOTBAND">PlotBand::PlotBand</a> and <a href="Graph.html#_GRAPH_ADD">Graph::Add</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;AddBand(new&nbsp;PlotBand(HORIZONTAL,BAND_RDIAG,0,&nbsp;"max",&nbsp;"red",&nbsp;2));</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADDLINE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddLine(&amp;$aLine,$aToY2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add a line object (class PlotLine) to the graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aLine</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Line object to add</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aToY2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Add line to Y2 axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Add a vertical or horizontal line to the graph. The line will extend over the entire length of the plot. The plot object is an instance of the PlotLine class
+<p>
+Note: You can alos use the standard method Add() to add lines.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotLine.html#_PLOTLINE_PLOTLINE">PlotLine::PlotLine</a> and <a href="Graph.html#_GRAPH_ADD">Graph::Add</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Add&nbsp;mark&nbsp;graph&nbsp;with&nbsp;static&nbsp;lines<br />$graph-&gt;AddLine(new&nbsp;PlotLine(HORIZONTAL,0,"black",2));<br />$graph-&gt;AddLine(new&nbsp;PlotLine(VERTICAL,3,"black",2));</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADDTEXT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddText(&amp;$aTxt,$aToY2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add text object to the graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aTxt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Text object to add</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aToY2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Add text to Y2 axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Adds an instance of the Text class to the graph, allowing arbitrary text to be placed anywhere in the graph.
+<p>
+Note: You can alos use the standard method Add() to add bands.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Text.html#_TEXT_TEXT">Text::Text</a> and <a href="Graph.html#_GRAPH_ADD">Graph::Add</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;You&nbsp;can&nbsp;specify&nbsp;the&nbsp;position&nbsp;as&nbsp;fraction&nbsp;of&nbsp;the<br />//&nbsp;image&nbsp;width&nbsp;and&nbsp;height<br />$caption=new&nbsp;Text(?Figure&nbsp;1.&nbsp;Temperature&nbsp;over&nbsp;time?,0.1,0.8);<br />$caption-&gt;SetFont(FONT1_BOLD);<br />$graph-&gt;AddText($caption);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADDY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddY($aN,&amp;$aPlot)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add plot to second Y-axis n</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aN</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Number of axis to add data to</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aPlot</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>The plot to be added</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method is used to add a plot in the case the graph has multiple Y-axis. The first argument should be the index of the  Y-axis.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+<font color="#0000BB">php<br /></font><font color="#007700">include&nbsp;(</font><font color="#DD0000">"../jpgraph.php"</font><font color="#007700">);<br />include&nbsp;(</font><font color="#DD0000">"../jpgraph_line.php"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$datay&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">5</font><font color="#007700">,</font><font color="#0000BB">3</font><font color="#007700">,</font><font color="#0000BB">7</font><font color="#007700">,</font><font color="#0000BB">2</font><font color="#007700">);<br /></font><font color="#0000BB">$datay2&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">88</font><font color="#007700">,</font><font color="#0000BB">10</font><font color="#007700">,</font><font color="#0000BB">55</font><font color="#007700">,</font><font color="#0000BB">42</font><font color="#007700">);<br /></font><font color="#0000BB">$datay3&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">255</font><font color="#007700">,</font><font color="#0000BB">35</font><font color="#007700">,</font><font color="#0000BB">745</font><font color="#007700">,</font><font color="#0000BB">244</font><font color="#007700">);<br /></font><font color="#0000BB">$datay4&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">130</font><font color="#007700">,</font><font color="#0000BB">97</font><font color="#007700">,</font><font color="#0000BB">68</font><font color="#007700">,</font><font color="#0000BB">119</font><font color="#007700">);<br /><br /></font><font color="#FF8000">//&nbsp;Setup&nbsp;the&nbsp;graph<br /></font><font color="#0000BB">$graph&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">Graph</font><font color="#007700">(</font><font color="#0000BB">600</font><font color="#007700">,</font><font color="#0000BB">250</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetMargin</font><font color="#007700">(</font><font color="#0000BB">30</font><font color="#007700">,</font><font color="#0000BB">200</font><font color="#007700">,</font><font color="#0000BB">20</font><font color="#007700">,</font><font color="#0000BB">20</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetMarginColor</font><font color="#007700">(</font><font color="#DD0000">'white'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'lightgray'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetScale</font><font color="#007700">(</font><font color="#DD0000">"intlin"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">0</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">1</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">2</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p1&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay</font><font color="#007700">);<br /></font><font color="#0000BB">$p1</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">Add</font><font color="#007700">(</font><font color="#0000BB">$p1</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p2&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay2</font><font color="#007700">);<br /></font><font color="#0000BB">$p2</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'darkred'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">0</font><font color="#007700">,</font><font color="#0000BB">$p2</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">0</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'darkred'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p3&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay3</font><font color="#007700">);<br /></font><font color="#0000BB">$p3</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'red'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">1</font><font color="#007700">,</font><font color="#0000BB">$p3</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">1</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'red'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p4&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay4</font><font color="#007700">);<br /></font><font color="#0000BB">$p4</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">2</font><font color="#007700">,</font><font color="#0000BB">$p4</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">2</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /><br /></font><font color="#FF8000">//&nbsp;Output&nbsp;line<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">Stroke</font><font color="#007700">();<br /><br /></font><font color="#0000BB"><br /></font></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_ADDY2"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AddY2(&amp;$aPlot)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add plot to second Y-axis</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$aPlot</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Plot to add to the Y2 axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Works the same way as Add() but the plot is added for use with the Y2 scale (the right Y scale) instead.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_ADD">Graph::Add</a> and <a href="Graph.html#_GRAPH_SETY2SCALE">Graph::SetY2Scale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200);<br />$graph-&gt;SetScale('linlin');<br />$graph-&gt;SetY2Scale('linlog');<br />$lineplot&nbsp;=&nbsp;new&nbsp;LinePlot($datay);<br />$graph-&gt;AddY2($lineplot);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_CHECKCSIMCACHE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;CheckCSIMCache($aCacheName,$aTimeOut)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Check if cached CSIM graph exists</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCacheName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Cache file name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTimeOut</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+60</font>
+</td><td>Timeout (in minutes)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method is used to enable caching for graphs that use image maps (CSIM). It should be called as the first method after the creation of the Graph(). If the cached image and image map exists this will be directly sent back to the browser and script execution will stop.
+<p>
+This specifically means that no lines of code after this method will be executed in case the image/map is found in the cache.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_STROKECSIM">Graph::StrokeCSIM</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;Graph(300,200);<br />$graph-&gt;CheckCSIMCache('myimage01',10);<br /><br />//&nbsp;..&nbsp;Lopt&nbsp;of&nbsp;code&nbsp;to&nbsp;create&nbsp;the&nbsp;image<br /><br />$graph-&gt;StrokeCSIM();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_GETHTMLIMAGEMAP"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetHTMLImageMap($aMapName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Get a complete <MAP>..</MAP> tag for the final image map</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMapName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image map name</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>When you are using image maps for a plot then this routine is called in your script to get the resulting image map as a string for the graph. The image map is given the name specified as the first argument to the method.
+<p>
+Please note that due to the way client side image maps work you need to have both the image map and the image available in the script that is sent back to the browser. Since you can't do this at the same time you will have to create an image to disk and read the image map. The you have to stream the HTML page with an <img> tag to load the previously generated image as well as the image map.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;The&nbsp;image&nbsp;must&nbsp;be&nbsp;stroked&nbsp;to&nbsp;find&nbsp;out&nbsp;the&nbsp;image&nbsp;maps<br />$graph-&gt;Stroke($myfile);<br /><br />//&nbsp;Then&nbsp;read&nbsp;the&nbsp;image&nbsp;map<br />$imagemap&nbsp;=&nbsp;$graph-&gt;GetHTMLImageMap('MainMap');<br /><br />echo&nbsp;$imagemap;<br />echo&nbsp;"&lt;img&nbsp;src=$myfile&gt;";<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_GRAPH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Graph($aWidth,$aHeight,$aCachedName,$aTimeOut,$aInline)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Creates a new graph.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+300</font>
+</td><td>Width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+200</font>
+</td><td>Height</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCachedName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Cache file name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTimeOut</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Timeout value for cache</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aInline</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Stream the image back to the browser</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Creates a new graph. This is often the first call made to set-up a new graph.
+<br>
+If the cache name is specified (via the $aCachedname) argument then this method will first try to locate the named file in the cache directory (as specified by the DEFINE in jpgraph.php) rather then generating the graph on the fly. If the file is not there or if it is older then the specified timeout value ($aTimeOut) the graph will be generated and saved as the specified file. 
+<p>
+If the cache name is specifed as 'auto' then the cache name will be based on the basename of the script with an extension indicating the image format used, i.e. JPG, GIF or PNG.
+<p>
+If the specified file is found in the cache directory then it will be streamed back to the browser directly.
+<p>
+If no cache name is specified then the graph will always be generated and the cache bypassed. The same is true if the DEFINE 'USE_CACHE' or 'READ_CACHE' is set to false.
+<p>
+Before any other operation is performed on the graph a call to SetScale() should be made to finish the initialisation of the graph.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_STROKE">Graph::Stroke</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Example&nbsp;1.&nbsp;use&nbsp;cache&nbsp;and&nbsp;automtic&nbsp;create&nbsp;the&nbsp;cache&nbsp;name<br />$graph&nbsp;=&nbsp;new&nbsp;Graph(400,200,"auto");&nbsp;&nbsp;&nbsp;&nbsp;<br />$graph-&gt;img-&gt;SetMargin(60,20,30,50);<br />$graph-&gt;SetScale("textlin");<br />$graph-&gt;SetMarginColor("silver");<br />$graph-&gt;SetShadow();<br /><br />//&nbsp;Example&nbsp;2&nbsp;.&nbsp;Don't&nbsp;use&nbsp;the&nbsp;cache<br />$graph&nbsp;=&nbsp;new&nbsp;Graph(400,200);&nbsp;&nbsp;&nbsp;&nbsp;<br />$graph-&gt;SetScale("textint");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SET3DPERSPECTIVE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set3DPerspective($aDir,$aHorizon,$aSkewDist,$aQuality,$aFillColor,$aBorder,$aMinSize,$aHorizonPos)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable image perspective transformation</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDir</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Direction for 3D perspective</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHorizon</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Distance (in pixels) from the bottom of the image to the horizon</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSkewDist</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+120</font>
+</td><td>Skew distance (in pixels) on the horizon</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aQuality</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Boolean. High quality =</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'#FFFFFF'</font>
+</td><td>What fill color to use</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorder</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Boolean. Border around?</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMinSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Boolean. Make the transformed image canvas as small as possible</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHorizonPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0.5</font>
+</td><td>Distance from left on the horizon for the point of focus</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable final image perspective transformation before sending the image back to the browser. This makes a "skewing" tansformation of the image to emulate a 3D depth.
+
+<p>
+Allowed argument for $aDir are
+<ol>
+<li>'SKEW3D_UP'
+<li>'SKEW3D_DOWN'
+<li>'SKEW3D_LEFT'
+<li>'SKEW3D_RIGHT'
+</ol>
+
+<i>$aHorizon</i> Determines how far away the horizon are from the bottom of the picture (in pixels)
+<p>
+<i>aSkewDist</i> How far to the right on the horizon is the 
+"skewing point", a large value gives a very strong for-shortening.
+<p>
+<i>aQuality</i> Use high quality (takes longer time) TRUE or FALSE
+<p>
+<i>aFIllColor</i> Fill background color in the image on places where the original image no longer cover the entire canvas.
+<p>
+<i>aBorder</i> Border around or not
+<p>
+<i>aMinSize</i> Just make the image as large as it has to be. TRUE or FALSE. If this argument is set to false then the original image size will be preserved.
+<p>
+<i>aHorizonPos</i>How far, in fraction, should the point of focus be from the left edge of the image.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;Set3DPerspective(SKEW3D_UP,100,120,true);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SET90ANDMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set90AndMargin($lm,$rm,$tm,$bm)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Rotate the graph 90 degrees and set the margins</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$lm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Left margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$rm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Right Margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$tm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Top margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$bm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Bottom margin</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Rotates the graph 90 degrees and sets the margin as specified.
+<p>
+Remember that when rotating the graph it might be a good idea to adjust the axis so that the alignment of the labels for x and Y axis. For example by setting them as:
+
+<p>
+$graph->xaxis->SetLabelAlign('right','center','right');
+<br>
+$graph->yaxis->SetLabelAlign('center','bottom');
+<p>
+Note: This is slightly different from using SetAngle() and SetMargin() in that this method automatically adjusts the margin so that width becomes height and vice versa due to the rotation.
+
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETANGLE">Graph::SetAngle</a> and <a href="Graph.html#_GRAPH_SETMARGIN">Graph::SetMargin</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200,"auto");<br />$graph-&gt;SetScale('linlin');<br /><br />$graph-&gt;Set90AndMargin(40,40,40,40);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br />$graph-&gt;SetShadow();<br /><br />$graph-&gt;title-&gt;Set("A&nbsp;90&nbsp;degrees&nbsp;rotated&nbsp;scatter&nbsp;plot");<br />$graph-&gt;title-&gt;SetFont(FF_FONT1,FS_BOLD);<br /><br />//&nbsp;Adjust&nbsp;the&nbsp;label&nbsp;align&nbsp;for&nbsp;X-axis&nbsp;so&nbsp;they&nbsp;look&nbsp;good&nbsp;rotated<br />$graph-&gt;xaxis-&gt;SetLabelAlign('right','center','right');<br /><br />//&nbsp;Adjust&nbsp;the&nbsp;label&nbsp;align&nbsp;for&nbsp;Y-axis&nbsp;so&nbsp;they&nbsp;look&nbsp;good&nbsp;rotated<br />$graph-&gt;yaxis-&gt;SetLabelAlign('center','bottom');<br /><br />$sp1&nbsp;=&nbsp;new&nbsp;ScatterPlot($datay,$datax);<br />$sp1-&gt;mark-&gt;SetType(MARK_FILLEDCIRCLE);<br />$sp1-&gt;mark-&gt;SetFillColor("red");<br />$sp1-&gt;mark-&gt;SetWidth(5);<br /><br />$graph-&gt;Add($sp1);<br />$graph-&gt;Stroke();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETALPHABLENDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlphaBlending($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Eanble/disable alpha blending</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Enable alpha blending</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable disable alpha blending. The transparency factor is specified in the color as transparency fraction. For example, to specify a red color which is 50% transparent you specify this as:
+<p>
+"red@0.5" (or  "#FF0000@0.5")
+<p>
+can then use this color specification in all places where the color may be specified. If the alpha blending is not active then the alpha parameter will have no effect. 
+<p>
+Note that the use of alpha blending requires GD 2.01 or higher. By default alpha blending is enabled. 
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetAlphaBlending();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAngle($aAngle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify graph angle 0-360 degrees.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAngle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Rotation angle for graph</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The graph can be rotated an arbitrary number of degrees. This will allow you to easily create, for example, horizontal bar graphs by rotating a normal bar graph 90 degrees.
+<p>
+See horizbarex1.php for a real life example.
+<p>
+Note: If you want a 90 degrees rotated graph consider using Graph::Set90AndMargin() which greatly simplifies this with just one call
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SET90ANDMARGIN">Graph::Set90AndMargin</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200);<br />$graph-&gt;SetScale('textlin');<br />$graph-&gt;SetAngle(90);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETAXISLABELBACKGROUND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAxisLabelBackground($aType,$aXFColor,$aXColor,$aYFColor,$aYColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Finally stream the generated picture</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXFColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'lightgray'</font>
+</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYFColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'lightgray'</font>
+</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>No description available.<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETAXISSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAxisStyle($aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify axis style (boxed or single)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Style of axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The most common type of axis is two axis which crosses at a specified point. However for scientific plot it is often common to want to mirror the axis (and the scale) around the plot area.
+This method controls which type to use
+
+<ul>
+<li> AXSTYLE_SIMPLE, a simple two axis plots (default)
+<li> AXSTYLE_BOXIN, axis around the plot area with the tick marks directed inside the plot area.
+<li> AXSTYLE_BOXOUT, axis around the plot area with the tick marks directed outside of the plot area
+</ul>
+
+See funcex1.php, funcex2.php and funcex3.php for real life examples.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetAxisStyle(AXSTYLE_BOXIN);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBACKGROUNDCFLAG"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundCFlag($aName,$aBgType,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a country flag in the background</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Index or (partial) name of Country</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBgType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+BGIMG_FILLPLOT</font>
+</td><td>Background fill type</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Mix percentage</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>[Synonym for SetBackgroundCountryFlag() )
+Set a country flag in the background. All supported countries can be specified by either 
+<ol>
+<li> Numeric index, (0-238)
+<li> Full or partial name, e.g. "norway"
+<li> The unique string index for the country
+</ol>
+
+For a list of all available flags please run the file "listallflags.php" in the Example directory.
+<p>
+The final arcgument "aMix" is a value between 0-100 and specifies the blend factor for the flag.&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBACKGROUNDCOUNTRYFLAG"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundCountryFlag($aName,$aBgType,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a country flag in the graph background</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Full or partial country name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBgType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+BGIMG_FILLPLOT</font>
+</td><td>Normal background fill type</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Mix fraction</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set a country flag in the background. All supported countries can be specified by either 
+<ol>
+<li> Numeric index, (0-238)
+<li> Full or partial name, e.g. "norway"
+<li> The unique string index for the country
+</ol>
+
+For a list of all available flags please run the file "listallflags.php" in the Example directory.
+<p>
+The final arcgument "aMix" is a value between 0-100 and specifies the blend factor for the flag.
+&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBACKGROUNDGRADIENT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundGradient($aFrom,$aTo,$aGradType,$aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a color gradient as the background</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFrom</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'navy'</font>
+</td><td>Color 1</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTo</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'silver'</font>
+</td><td>Color 2</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aGradType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+2</font>
+</td><td>Gradient type</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+BGRAD_FRAME</font>
+</td><td>Gardient layout style</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method allows you to specify a color gradient as the background of the graph. The color gradient can either fill the entire graph, just the plopt area or just the margin. This is specified by the $aStyle argument by specifyin one of the following values:
+<ul>
+<li>BGRAD_FRAME, Fill the entire graph with the gradient
+<li>BGRAD_PLOT, Just fill the plot area
+<li>BGRAD_MARGIN, Just the margin
+</ul>
+
+The gradient type can be one of
+<ul>
+<li>GRAD_VER, Vertical gradient
+<li>GRAD_HOR, Horizontal gradient
+<li>GRAD_MIDHOR, From the center and out, horizontal
+<li>GRAD_MIDVER, From the center and out, vertical
+<li>GRAD_WIDE_MIDVER, From the center and out, vertical. Wide mid section.
+<li>GRAD_WIDE_MIDHOR, From the center and out, horizontal. Wide mid section.
+<li>GRAD_CENTER, From the center and beaming out
+<li>GRAD_LEFT_REFLECTION, Simulates a reflection on the left side
+<li>GRAD_RIGHT_REFLECTION, Simulates a reflection on the right side
+</ul>
+
+<b>Note:</b> In order for the gradient to be visible the Frame must be enabled, i.e. graph->ShowFrame(false) will hide the gradient. If you like to hide the frame around the entire graph set the color to the margin color or set the weight of the frame line to 0.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETBACKGROUNDIMAGE">Graph::SetBackgroundImage</a> and <a href="Graph.html#_GRAPH_SETFRAME">Graph::SetFrame</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetBackgroundGradient('blue','navy:0.5',GRAD_HOR,BGRAD_MARGIN);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBACKGROUNDIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundImage($aFileName,$aBgType,$aImgFormat)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a background image fro the plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Filename for background image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBgType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+BGIMG_FILLPLOT</font>
+</td><td>Style of background image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aImgFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"auto"</font>
+</td><td>Image format ("jpeg", "gif", "png")</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>A graph may have a background image. The image is loaded from a specified file and may be of type GIF, JPG or PNG. The image type may also be specified as "auto", in this case the image format is determined by the file ending.
+<p>
+The positioning and sizing of the background image can be controlled by the $aBgType parameter. Possible values are
+<ul>
+<li>BGIMG_FILLPLOT, Adjust the size of the image to just fit the plotarea
+<li>BGIMG_FILLFRAME, ADjust the size of the image to just fit the entire graph area
+<li>BGIMG_COPY, Just copy the image as is to upper left corner
+<li>BGIMG_CENTER, Just copy the image but center it.
+</ul>
+
+If you want ot use a background image on a canvas graph you must be carefull. Since canvas graph use no buffering, i.e everythng is written directly in the order you specify the commands. For canvas graph the background image get's stroked when you call the Initframe()  method. 
+SO, this call should eb among the very first. Every graph object after that will be stroked on top of the specified background image.
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETBACKGROUNDGRADIENT">Graph::SetBackgroundGradient</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;<br />$graph-&gt;SetBackgroundImage("tiger_bkg.png",BGIMG_FILLFRAME);<br /><br />//&nbsp;If&nbsp;you&nbsp;use&nbsp;a&nbsp;canvas&nbsp;graph,&nbsp;and&nbsp;only&nbsp;canvas&nbsp;graphs,<br />//&nbsp;you&nbsp;must&nbsp;manually&nbsp;call&nbsp;the&nbsp;InitFrame()&nbsp;method.<br />$graph-&gt;InitFrame();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBACKGROUNDIMAGEMIX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundImageMix($aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specifes what how much the background image should be blendid in with the background</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Mix value (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifes what how much the background image should be blendid in with the background.&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETBOX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBox($aDrawPlotFrame,$aPlotFrameColor,$aPlotFrameWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a frame around the plot area</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDrawPlotFrame</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Draw the frame</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPlotFrameColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(0,0,0)</font>
+</td><td>Frame color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPlotFrameWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width fo frame line</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This is used to specify whether the plot-area should have a rectangle around it and the specifics of that rectangle.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETFRAME">Graph::SetFrame</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200);<br />$graph-&gt;SetScale('linlin');<br />$graph-&gt;Box();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETCLIPPING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetClipping($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable clipping of graph outside the plotarea</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Enable/disbale clipping</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable or disable clipping outside the plot area. If clipping is enabled then only the part of the graph exactly inside the plot area will be visible.
+<p>
+Clipping may come in handy when you for example set a manual scale and have data points outside the specified range.
+<p>
+By default clipping is disabled.
+<p>
+Note 1: Clipping is only supported for graphs at 0 or 90 degrees rotation and will generate an error message if enabled together with any other angle.
+<p>
+Note 2: The clipping is implemented with a O(1) algorithm in terns of data size.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetClipping();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for the plotarea (not the margins)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color for the plotarea (not the margins)&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETFRAME">Graph::SetFrame</a> and <a href="Graph.html#_GRAPH_SETMARGINCOLOR">Graph::SetMarginColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetColor(?wheat?);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETCSIMIMGALT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMImgAlt($aAlt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the Alt text used for the IMG tag generated for CSIM</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Alt text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the ALt text used for the IMG tag generated for CSIM. Whne calling StrokeCSIM() a HTML page will be returned witha recusrive call to teh same script in an IMG tag. This method allows you to specify the Alt text to be used in the returned HTML page.&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>void<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_STROKECSIM">Graph::StrokeCSIM</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetCSIMImgAlt('Yearly&nbsp;values');<br />$graph-&gt;StrokeCSIM();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETFRAME"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFrame($aDrawImgFrame,$aImgFrameColor,$aImgFrameWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a frame around the entire image</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDrawImgFrame</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Draw a frame around the entire image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aImgFrameColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(0,0,0)</font>
+</td><td>Frame color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aImgFrameWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width of frame</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Sets a frame (rectangle) of the chosen color around the edges of the image. 
+
+Note: For implementation reasons the frame must be enabled in order to for a specified gradient background to show up.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETMARGINCOLOR">Graph::SetMarginColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetFrame(true,'darkblue',2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETFRAMEBEVEL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFrameBevel($aDepth,$aBorder,$aBorderColor,$aColor1,$aColor2,$aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a abevel frame around the entire graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDepth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Depth (Height) in pixels for bevel</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorder</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>True=Add 1 pixel border around</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorderColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Border color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'white@0.4'</font>
+</td><td>Right and bottom shadow</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'darkgray@0.4'</font>
+</td><td>Left and top shadow</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Show bevel frame</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a a bevel frame around the entire graph. A Bevel frame will give the entire graph a "3D" uprised feel.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetFrameBevel(2,true,'black');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETGRIDDEPTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetGridDepth($aDepth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Should the grid be in front or back of the plot?</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDepth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Grid depth</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the grid in the plot should be drawn under or on top of the actual plots.
+<p>
+Valid values for grid depth are
+<ul>
+<li>DEPTH_BACK, Under plots
+<li>DEPTH_FRONT, On top of plots
+</ul>
+<p>
+The default is to draw the grid lines under the plots.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetGridDepth(DEPTH_FRONT);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETICONDEPTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetIconDepth($aDepth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Determine if Icons should be under or over the plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDepth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Depth of icons (see description)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Determine if Icons should be under or over the plot. The argument is one of
+<ul>
+<li> DEPTH_BACK
+<li> DEPTH_FRONT
+</ul>
+
+By default the icons are drawn under the plots&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Put&nbsp;the&nbsp;icons&nbsp;in&nbsp;front&nbsp;of&nbsp;the&nbsp;plot<br />$graph-&gt;SetIconDepth(DEPTH_FRONT);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETIMGFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetImgFormat($aFormat,$aQuality)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set Image format and optional quality</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format (see description)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aQuality</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+75</font>
+</td><td>Quality parameter for JPEG</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify what image format the generated image should use. By default the library will try to create PNG images and if the PNG libraries are not available then it will try to use foirst JPEG and finally GIF encoding.
+<p>
+The image format is specified as a string that can be one of
+<ul>
+<li>"PNG", Looseless format with good quality/compression ratio for line graphs
+<li> "JPEG", JPEG format
+<li> "GIF", GIF Format
+</ul>
+
+The PNG format gives in general best compression for ordinary data plots and is also a looseless format.
+<p>
+If the graph has complicated background images or 100s of colors then there is a good chance that JPEG will give better compression on the expense of image quality.
+<p>
+The quality parameter is a value between (0,100) inclusively. = gives best compression but worst quality and 100 give the best quality. Suitable ranges is 60-90.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;JPEG&nbsp;format&nbsp;with&nbsp;60%&nbsp;quality<br />$graph-&gt;SetImgFormat('jpeg',60);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMargin($lm,$rm,$tm,$bm)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify side margins for graph</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$lm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Left margin (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$rm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Right margin (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$tm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top margin (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$bm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom margin (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the margin around the actual plot area. This is actually just a shortcut for the Image::SetMargin()
+<p>
+Note: If you want to set the margin for a 90 degrees rotated graph please consider using Graph::Set90AndMargin() instead since this will automatically adjust for the rotated image and the swapped meaning of width and height.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_SETMARGIN">Image::SetMargin</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetMargin(40,20,60,20);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETMARGINCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMarginColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for the margins (all areas outside the plotarea)</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies the color of the area between the plot area and the edge of the image.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETCOLOR">Graph::SetColor</a> and <a href="Graph.html#_GRAPH_SETFRAME">Graph::SetFrame</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetMarginColor('silver');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETSCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetScale($aAxisType,$aYMin,$aYMax,$aXMin,$aXMax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify scale to use for X and Y axis</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAxisType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Type of axis</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Y-min</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Y-max</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>X-min</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>X-max</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies what kind of scales should be used in the graph. The following combinations are allowed
+
+<ul>
+<li> Linear scale. Both X and Y axis
+<li>Logarithmic scale. Both X and Y axis
+<li>Text scale. Only on X axis
+<li>Integer scale. X and Y axis
+</ul>
+
+Any combination of these may be used. Linear and logarithmic scales are pretty straightforward. The text scale might deserve some explanation. The easiest way to think of the text scale is as a linear scale consisting of only natural numbers, i.e. 0,1,2,3,4,? . This scale is used when you just have a number of Y-values you want to plot in a consecutive order and don?t care about the X-values. It is also used when you need to have text labesl you specify (via $graph->xaxis->SetTickLabels($labels) ).
+<p>
+To specify which combination of X and Y scales you want to use the $axtype parameter is specified. In this parameter you specify, by a text string, the type of scale you want to use for both X and Y scale.
+<p>
+Possible values for each axis are:<br>
+X: 'lin', 'text', 'log', 'int'<br>
+Y: 'lin', 'log', 'int'<br>
+<p>
+Example of possible combination:<br>
+<ul>
+<li>SetScale('textint'); 
+<li>SetScale('loglog');
+<li>SetScale('linlog');
+</ul>
+It is normally recommended to use the auto-scaling feature since for most practical purposes it is good enough. However on rare occasions you might want to specify the limits yourself. This is then done by the rest of the parameters to the method.
+<p>
+Note: If you want to use a logarithmic scale you must make sure that the ?jpgraph_log.php?  is included.
+<p>
+<b>Note1:</b>
+Note that if you manually specify the scale you can also specify the tick distance with a call to Ticks::Set(). For example $graph->yaxis->scale->ticks->Set(10,5) If yiou don't ste it manually a suitable tick distance will be automatically choosen.
+
+<b>Note2:</b>
+If you want to keep the autoscaling for Y-axis but specify the X-axis then just call the method with both min and max set to 0 (e.g. SetScale('linlin',0,0,0,50); )
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Ticks.html#_TICKS_SET">Ticks::Set</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//----------------------<br />//&nbsp;EXAMPLE1:&nbsp;Using&nbsp;autoscaling<br />$graph-&gt;SetScale('textlin');<br /><br />//----------------------<br />//&nbsp;EXAMPLE2:&nbsp;Using&nbsp;manual&nbsp;scale&nbsp;for&nbsp;Y-scale&nbsp;and&nbsp;only&nbsp;major&nbsp;ticks<br />$graph-&gt;SetScale('linlin',5,75);<br />$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;Set(10);&nbsp;//&nbsp;Set&nbsp;major&nbsp;and&nbsp;minor&nbsp;tick&nbsp;to&nbsp;10<br /><br />//----------------------<br />//&nbsp;EXAMPLE3:&nbsp;Using&nbsp;manual&nbsp;scale&nbsp;for&nbsp;Y-scale&nbsp;<br />$graph-&gt;SetScale('linlin',5,200);<br />//&nbsp;Set&nbsp;major&nbsp;tick&nbsp;dist&nbsp;to&nbsp;40&nbsp;and&nbsp;minor&nbsp;to&nbsp;20&nbsp;<br />$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;Set(40,20);&nbsp;<br /><br />//----------------------<br />//&nbsp;EXAMPLE4:&nbsp;Using&nbsp;manual&nbsp;scale&nbsp;for&nbsp;both&nbsp;X&nbsp;and&nbsp;Y-scale&nbsp;<br />$graph-&gt;SetScale('linlin',5,200,0,100);<br />//&nbsp;Set&nbsp;major&nbsp;tick&nbsp;dist&nbsp;to&nbsp;40&nbsp;and&nbsp;minor&nbsp;to&nbsp;20&nbsp;<br />$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;Set(40,20);<br />//&nbsp;Set&nbsp;major&nbsp;and&nbsp;minor&nbsp;tick&nbsp;dist&nbsp;to&nbsp;20&nbsp;<br />$graph-&gt;xaxis-&gt;scale-&gt;ticks-&gt;Set(20);&nbsp;<br /><br />//&nbsp;Keeping&nbsp;the&nbsp;Autoscaling&nbsp;for&nbsp;Y-axis&nbsp;but&nbsp;fixing&nbsp;the&nbsp;X<br />//&nbsp;scale&nbsp;to&nbsp;an&nbsp;integer&nbsp;scale&nbsp;between&nbsp;[0,50]<br />$graph-&gt;SetScale('intlin',0,0,0,50);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETSHADOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetShadow($aShowShadow,$aShadowWidth,$aShadowColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add a drop shadow to the image</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShowShadow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=add a drop shadow</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+5</font>
+</td><td>Width (in pixels of shadow)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShadowColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+array(102,102,102)</font>
+</td><td>Shadow color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Sets a frame with a drop down shadow around the entire image&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETFRAME">Graph::SetFrame</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetShadow();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETTEXTSCALEABSCENTEROFF"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTextScaleAbsCenterOff($aOff)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Text width of bar to be centered in absolute pixels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aOff</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>No description available.<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETTICKDENSITY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTickDensity($aYDensity,$aXDensity)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify how dense the ticks should be drawn</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYDensity</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TICKD_NORMAL</font>
+</td><td>Y-density</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXDensity</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TICKD_NORMAL</font>
+</td><td>X-density</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method is used to hint how many ticks the auto-scaling should try to fit on each of the axis.
+<p>
+The following DEFINES may be used to hint to the auto-scaling how many ticks should be allocated
+
+<ul>
+<li>TICKD_DENSE, Small distance between ticks
+<li>TICKD_NORMAL, Default value
+<li>TICKD_SPARSE, Longer distance between ticks
+<li>TICKD_VERYSPARSE, Very few ticks
+</ul>&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetTickDensity(TICKD_DENSE);&nbsp;//&nbsp;Many&nbsp;Y-ticks</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETTITLEBACKGROUND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTitleBackground($aBackColor,$aStyle,$aFrameStyle,$aFrameColor,$aFrameWeight,$aBevelHeight,$aEnable)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background style for graph titles</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBackColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'gray'</font>
+</td><td>Background color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TITLEBKG_STYLE1</font>
+</td><td>Background size style, see description</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFrameStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TITLEBKG_FRAME_NONE</font>
+</td><td>Frame style, see description</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFrameColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Frame color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFrameWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Frame thickness (weight)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBevelHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Bevel height  used for frame style bevel</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aEnable</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Enable/disable background</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background style for graph titles, i.e. the background style for Graph::title, Graph::subtitle, Graph::subsubtitle. The actual background style is specified with the two arguments $aStyle and $aFrameStyle.
+<p>
+The first argument $aStyle determines the size the background should cover. The two possibilities are
+<ul>
+<li>TITLEBKG_STYLE1,  FIll the background inside the graph frame
+<li>TITLEBKG_STYLE2, Also covers the graph frame
+<li>TITLEBKG_STYLE3, Used together with the Bevel frame. WIll put the title beackground under the graph bevel.
+</ul>
+
+The second style parameter specifies what type of frame should be drawn. The weight of the frame is adjustable by specifying the $aFrameweight argument. The possible options for frame styles are:
+<ul>
+<li> TITLEBKG_FRAME_NONE, No frame
+<li> TITLEBKG_FRAME_FULL, Full frame around the background
+<li> TITLEBKG_FRAME_BOTTOM, Just a line at the bottom
+<li> TITLEBKG_FRAME_BEVEL, Draw a Bevel 3D effect (looks like a raised square button). The height of the bevel can be adjusted with the $aBevelHeight argument.
+</ul>
+
+You can further adjust the style of the background fill by the SetTitleBackgroundFillStyle() method.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_BEVEL">Image::Bevel</a> and <a href="Graph.html#_GRAPH_SETTITLEBACKGROUNDFILLSTYLE">Graph::SetTitleBackgroundFillStyle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetTitleBackground('wheat2',TITLEBKG_STYLE1,TITLEBKG_FRAME_BOTTOM);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETTITLEBACKGROUNDFILLSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTitleBackgroundFillStyle($aStyle,$aColor1,$aColor2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Adjust the title background fill style</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Fill style (see description)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color 1</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'white'</font>
+</td><td>Color 2</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The background for the graph titles as set by SetTitleBackground() can be further adjusted with this method. The style can be sepcified as one of
+<ul>
+<li> TITLEBKG_FILLSTYLE_HSTRIPED, Alternating horizontal lines of color 1 and color 2
+<li> TITLEBKG_FILLSTYLE_VSTRIPED, Alternating vertical lines of color 1 and color 2
+<li> TITLEBKG_FILLSTYLE_SOLID, A solid fill color (default)
+</ul>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetTitleBackgroundFillStyle(TITLEBKG_FILLSTYLE_HSTRIPED,'darkgreen','black');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETY2ORDERBACK"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetY2OrderBack($aBack)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify that plots on the Y2 axis should  be under Y axis plots</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBack</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=under Y axis, FALSE=above</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the depth for Y2 plots as compare to plots added to the Y axis&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetY2OrderBack();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETY2SCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetY2Scale($aAxisType,$aY2Min,$aY2Max)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify secondary Y scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAxisType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"lin"</font>
+</td><td>Type of scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY2Min</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Y2Min value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY2Max</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Y2Max value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The graph allows two different Y-scales to be used and you can choose which one you want to use for a specific plot by the way you are adding the plot to the graph, either by Add() or by AddY2() method.
+<p>
+This method works in the exact same way for the Y2 axis as the SetScale() method previously described.
+<p>
+Allowed values for the $axtype are
+<ul>
+<li>?lin?, Linear scale
+<li>?log?, Logarithmic scale
+<li>?int?, Integer scale
+</ul>
+
+<b>Note:</b> If you want to use a logarithmic scale you must make sure that the ?jpgraph_log.php?  is included.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETSCALE">Graph::SetScale</a> and <a href="Graph.html#_GRAPH_ADDY2">Graph::AddY2</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Left&nbsp;Y&nbsp;scale&nbsp;linear&nbsp;and&nbsp;right&nbsp;Y-scale&nbsp;logarithmic<br />$graph&nbsp;=&nbsp;new&nbsp;Graph(300,200);<br />$graph-&gt;SetScale(?textlin?);<br />$graph-&gt;SetY2Scale(?log?);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETYDELTADIST"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetYDeltaDist($aDist)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the delta position (in pixels) between the multiple Y-axis</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDist</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Distance in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the delta position (in pixels) between the multiple Y-axis&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_SETYSCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetYScale($aN,$aAxisType,$aYMin,$aYMax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify scale for additional Y-axis</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aN</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Index of axis</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAxisType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"lin"</font>
+</td><td>Scale type of axis</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Optional min scale value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYMax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Optional max scale value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify scale for additional Y-axis&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+<font color="#0000BB">php<br /></font><font color="#007700">include&nbsp;(</font><font color="#DD0000">"../jpgraph.php"</font><font color="#007700">);<br />include&nbsp;(</font><font color="#DD0000">"../jpgraph_line.php"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$datay&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">5</font><font color="#007700">,</font><font color="#0000BB">3</font><font color="#007700">,</font><font color="#0000BB">7</font><font color="#007700">,</font><font color="#0000BB">2</font><font color="#007700">);<br /></font><font color="#0000BB">$datay2&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">88</font><font color="#007700">,</font><font color="#0000BB">10</font><font color="#007700">,</font><font color="#0000BB">55</font><font color="#007700">,</font><font color="#0000BB">42</font><font color="#007700">);<br /></font><font color="#0000BB">$datay3&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">255</font><font color="#007700">,</font><font color="#0000BB">35</font><font color="#007700">,</font><font color="#0000BB">745</font><font color="#007700">,</font><font color="#0000BB">244</font><font color="#007700">);<br /></font><font color="#0000BB">$datay4&nbsp;</font><font color="#007700">=&nbsp;array(</font><font color="#0000BB">130</font><font color="#007700">,</font><font color="#0000BB">97</font><font color="#007700">,</font><font color="#0000BB">68</font><font color="#007700">,</font><font color="#0000BB">119</font><font color="#007700">);<br /><br /></font><font color="#FF8000">//&nbsp;Setup&nbsp;the&nbsp;graph<br /></font><font color="#0000BB">$graph&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">Graph</font><font color="#007700">(</font><font color="#0000BB">600</font><font color="#007700">,</font><font color="#0000BB">250</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetMargin</font><font color="#007700">(</font><font color="#0000BB">30</font><font color="#007700">,</font><font color="#0000BB">200</font><font color="#007700">,</font><font color="#0000BB">20</font><font color="#007700">,</font><font color="#0000BB">20</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetMarginColor</font><font color="#007700">(</font><font color="#DD0000">'white'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'lightgray'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetScale</font><font color="#007700">(</font><font color="#DD0000">"intlin"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">0</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">1</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">SetYScale</font><font color="#007700">(</font><font color="#0000BB">2</font><font color="#007700">,</font><font color="#DD0000">"lin"</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p1&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay</font><font color="#007700">);<br /></font><font color="#0000BB">$p1</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">Add</font><font color="#007700">(</font><font color="#0000BB">$p1</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p2&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay2</font><font color="#007700">);<br /></font><font color="#0000BB">$p2</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'darkred'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">0</font><font color="#007700">,</font><font color="#0000BB">$p2</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">0</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'darkred'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p3&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay3</font><font color="#007700">);<br /></font><font color="#0000BB">$p3</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'red'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">1</font><font color="#007700">,</font><font color="#0000BB">$p3</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">1</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'red'</font><font color="#007700">);<br /><br /></font><font color="#0000BB">$p4&nbsp;</font><font color="#007700">=&nbsp;new&nbsp;</font><font color="#0000BB">LinePlot</font><font color="#007700">(</font><font color="#0000BB">$datay4</font><font color="#007700">);<br /></font><font color="#0000BB">$p4</font><font color="#007700">-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">AddY</font><font color="#007700">(</font><font color="#0000BB">2</font><font color="#007700">,</font><font color="#0000BB">$p4</font><font color="#007700">);<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">ynaxis</font><font color="#007700">[</font><font color="#0000BB">2</font><font color="#007700">]-&gt;</font><font color="#0000BB">SetColor</font><font color="#007700">(</font><font color="#DD0000">'blue'</font><font color="#007700">);<br /><br /></font><font color="#FF8000">//&nbsp;Output&nbsp;line<br /></font><font color="#0000BB">$graph</font><font color="#007700">-&gt;</font><font color="#0000BB">Stroke</font><font color="#007700">();<br /><br /></font><font color="#0000BB"><br /></font></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_STROKE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Stroke($aStrokeFileName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Stroke graph to browser or file</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStrokeFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>File name* (or special handle, see below)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Should be the final method called in the script that generates a graph. This will generate the image and send it back to the browser.
+<p>
+If $aStrokeFileName != "" the image will be written to this file and NOT streamed back to the browser
+<p>
+If the file name is specified with the define __IMG_HANDLER (Note: Thre are 2 '_' in the  beginning) then no image will be streamed to file or browser. Instead the Stroke() method will simply return the image handle used by the GD library. This can come in handy of you like to post manipulate the image or use the raw GD image in other context. Such as in creating dynamic PDF documents.
+<p>
+Note: If you want to use the image in a PDF file you can't take the handle directly since this is a GD handle. To use it in PDF you must first create an PDF image by calling pdf_open_memory_image() to get a proper PDF image handle. See example below.
+
+<p>
+You may also specify the file name as "auto" in which case the filename will be created from the script name but with the extension changed to reflect the choosen image format.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Example&nbsp;1&nbsp;:&nbsp;(Normal&nbsp;case)&nbsp;Stream&nbsp;back&nbsp;to&nbsp;browser<br />$graph-&gt;Stroke();<br /><br />//&nbsp;Example&nbsp;2&nbsp;:&nbsp;Stream&nbsp;to&nbsp;the&nbsp;file&nbsp;with&nbsp;absolute&nbsp;file&nbsp;path<br />$graph-&gt;Stroke($fileName);<br /><br />//&nbsp;Example&nbsp;3<br />//&nbsp;Get&nbsp;the&nbsp;image&nbsp;handle.&nbsp;NOTE:&nbsp;No&nbsp;image&nbsp;will&nbsp;be&nbsp;<br />//&nbsp;streamed&nbsp;to&nbsp;the&nbsp;browser&nbsp;in&nbsp;this&nbsp;case.<br />$ih&nbsp;=&nbsp;$graph-&gt;Stroke(__IMG_HANDLER);<br /><br />//&nbsp;PDF&nbsp;example<br />//....<br />$im&nbsp;=&nbsp;$graph-&gt;Stroke(_IMG_HANDLER);<br />$pdf&nbsp;=&nbsp;pdf_new();<br />pdf_open_file($pdf,&nbsp;"");<br /><br />$pimg&nbsp;=&nbsp;pdf_open_memory_image($pdf,&nbsp;$im);<br />pdf_begin_page($pdf,&nbsp;595,&nbsp;842);<br />pdf_add_outline($pdf,&nbsp;"Page&nbsp;1");<br />pdf_place_image($pdf,&nbsp;$pimg,&nbsp;0,&nbsp;500,&nbsp;1);&nbsp;<br />pdf_close_image($pdf,&nbsp;$pimg);&nbsp;<br />pdf_end_page($pdf);<br />pdf_close($pdf);<br />$buf&nbsp;=&nbsp;pdf_get_buffer($pdf);<br />$len&nbsp;=&nbsp;strlen($buf);<br />header("Content-type:&nbsp;application/pdf");<br />header("Content-Length:&nbsp;$len");<br />header("Content-Disposition:&nbsp;inline;&nbsp;filename=jpimage.pdf");<br />echo&nbsp;$buf;<br />pdf_delete($pdf);<br /><br /><br /><br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_STROKECSIM"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;StrokeCSIM($aScriptName,$aCSIMName,$aBorder)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Stroke an image with a CSIM</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScriptName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'auto'</font>
+</td><td>Name of the image generating script</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCSIMName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Image map name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aBorder</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Should the image be bordered?</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>To generate an CSIM you must use this method at the end of your script instead of the normal Graph::Stroke() method. This method does not send back an image to the browser but rather a HTML page which contains an image map and a "recursive call" back to the image script. See the full JpGraph manual for a detailed explanation on how this works.
+<p>
+Please note that it is abolutely imperative that you specify the image generating scripts name as the first argument.
+<p>
+Why that? Because it is impossible for JpGraph to find out the name of the script it is executed from in the case where it is included as oart of a "standard" HTML/PHP page. Using the PHP_SELF will only return the master document and not the actual script name.
+<p>
+If you use several image map images on the same HTML page you must also specify unique names of each of the image maps as the second argument for this function.
+<p>
+To specify targets for the image maps you must call the individual plots Pot::SetCSIMTargets()
+<p>
+Tip: You can easily specify the script name by using the construction
+basename(__FILE__) as the first argument&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Plot.html#_PLOT_SETCSIMTARGETS">Plot::SetCSIMTargets</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+...<br />$graph-&gt;StrokeCSIM(basename(__FILE__));<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GRAPH_STROKEFRAMEBACKGROUND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;StrokeFrameBackground()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Stroke the frames background and border</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Semi Internal routine. Exclusively used together with canvas graphs where object are added directly to the canvas and we therefore must make sure that the background is stroked first.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+e</font>
+</span><br>
+<p> <hr> <p>

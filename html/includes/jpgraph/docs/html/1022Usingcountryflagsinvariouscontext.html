@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1021Timingthegenerationofgraphs.html">
+<LINK REL="Next" HREF="1023Addingiconsontothegraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1021Timingthegenerationofgraphs.html">Previous</A>
+<A HREF="1023Addingiconsontothegraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_22">10.22 Using country flags in various context</A></H2>
+<P> JpGraph has built-in support for over 200 country flags, i.e. they
+ are available to be used in graphs without any external image
+ definitions.</P>
+<P> Country flags can be used in primarily two settings</P>
+<OL>
+<LI> As image markers in line and scatter graphs</LI>
+<LI> As background images for graphs</LI>
+<LI> As a special type of icons (using the IconPlot()) which can be
+ added to the graph in any arbitrary position. See next section</LI>
+</OL>
+<P> In order to make it easy to find the appropriate country flags they
+ can be specified with either full or partial name or as an numeric
+ index. The routines in JpGraph are &quot;smart&quot; enough to figure out which
+ way you are trying to specify a particular flag.</P>
+<P> To specify a country flag as a marker you have to specify the
+ special mark type as one of MARK_FLAG1,MARK_FLAG2,MARK_FLAG3 or
+ MARK_FLAG4</P>
+<P> Flags are internally stored in 4 different sizes which is indicated
+ by the number in the mark types. Flags may also be arbitrary scaled
+ when displayed. Since this is partially overlapping functionality you
+ might very well ask why the flags are stored in four different basic
+ sizes. The reason is of course performance. It you only want a very
+ small flag it takes processing time to scale down a large image to,
+ say, a small icon size. At the same time for large flags to be used as
+ background a small original flag might not have enough details to be
+ scaled up to a large size. Hence the reason for storing the flags in 4
+ different sizes.</P>
+<P> The example below shows how to use country flags as markers<DIV class="example">
+<BR> <A href="exframes/frame_markflagex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/markflagex1.png" WIDTH="300"></A>
+<BR><B>Figure 179:</B> Using country flags as line plot markers <A href="exframes/frame_markflagex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To use country flags as background one has to use the method
+ Graph::SetBackgroundCountryFlag(). With this method you can specify
+ both how much of the image should be filled as well as how much of the
+ flag should be mixed into the background.</P>
+<P> To see a list of all supported country flags you can run the script
+ &quot;listallcountryflags.php&quot; in the Example directory. This will show you
+ a table with all flags.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1021Timingthegenerationofgraphs.html">Previous</A>
+<A HREF="1023Addingiconsontothegraph.html">Next</A>
+</BODY>
+</HTML>

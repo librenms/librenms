@@ -1,0 +1,267 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GANTTACTIVITYINFO"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GanttActivityInfo</b></div>
+<i>(Defined in: jpgraph_gantt.php : 142)</i><table border=1><tr><td>&nbsp;<a href="GanttActivityInfo.html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttActivityInfo</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_HIDE">Hide()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETBACKGROUNDCOLOR">SetBackgroundColor()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLTITLES">SetColTitles()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETCOLUMNMARGIN">SetColumnMargin()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETFONTCOLOR">SetFontColor()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETHEADERALIGN">SetHeaderAlign()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SETSTYLE">SetStyle()</a>&nbsp;<br>
+&nbsp;<a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_SHOW">Show()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class is responsible for handling the titles of the columns in the left section of the Gantt graph, i.e. the information columns for each activity.
+<p>
+It is instantiated in the scale and is accessed through the Gantt scale for example as in
+<p>
+<code>
+$graph->scale->actinfo->SetColTitles(
+    array('Note','Name','Duration','Start','Finish'),array(30,100));
+$graph->scale->actinfo->SetBackgroundColor('green:0.5@0.5');
+$graph->scale->actinfo->SetFont(FF_ARIAL,FS_NORMAL,10);
+$graph->scale->actinfo->vgrid->SetStyle('solid');
+$graph->scale->actinfo->vgrid->SetColor('gray');
+</code>
+<p>
+It is optional to use titles for the columns, so if you don't want to use titles you never have to add the above lines to a Gantt graph (but it sure looks nicer if you do ... )
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_HIDE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Hide($aF)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide titles</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Hide titles</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide titles&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Hide&nbsp;the&nbsp;titles<br />$graph-&gt;scale-&gt;actinfo-&gt;Hide();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETBACKGROUNDCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify backgound color for titles</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify backgound color for titles&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetBackgroundColor('green:0.5@0.5');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color of vertical dividers between each title column</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify color of vertical dividers between each title column&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetColor('navy');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETCOLTITLES"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColTitles($aTitles,$aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify texts to be used as titles</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTitles</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of titles</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Optional width for each column</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify texts to be used as titles. The columns automatically becoms wide enough to hold the widest text in any columns. However you can also specify a specific width of each column by supplying an array of widths. However, the width can never be made smaller than the width of the texts, just larger.
+<p>
+It is perfectly legal to just specify the explicit width of the first few columns and have the rest of them become automatically sized. See eamplebelow.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Specify&nbsp;some&nbsp;titles&nbsp;and&nbsp;explicitely&nbsp;set&nbsp;the&nbsp;size&nbsp;of&nbsp;the<br />//&nbsp;first&nbsp;two&nbsp;columns.<br />$graph-&gt;scale-&gt;actinfo-&gt;SetColTitles(<br />&nbsp;&nbsp;&nbsp;&nbsp;array('Note','Name','Duration','Start','Finish'),array(30,100));<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETCOLUMNMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColumnMargin($aLeft,$aRight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify extra margin to the left and right of the text in each column</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLeft</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Left margin (in pixels)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Right margin (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify extra margin to the left and right of the text in each column&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetColumnMargin(30,30);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($aFFamily,$aFStyle,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify title font</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFFamily</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify title font&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetFont(FF_ARIAL,FS_NORMAL,10);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETFONTCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFontColor($aFontColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify title font color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify title font color&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetFontColor('navy');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETHEADERALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetHeaderAlign($aAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Adjust headers left, right or centered</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Header alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Adjust headers left, right or centered. By default headers are centered.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;actinfo-&gt;SetHeaderAlign('left');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SETSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStyle($aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable 3D header style</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>1=3D style</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable 3D header style. This is enabled by default.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;No&nbsp;3D&nbsp;style&nbsp;for&nbsp;titles<br />$graph-&gt;scale-&gt;actinfo-&gt;SetStyle(0);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTACTIVITYINFO_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aF)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Show titles</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Show headers</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Show titles. If you specify titles they are by default displayed.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttActivityInfo.html#_GANTTACTIVITYINFO_HIDE">GanttActivityInfo::Hide</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Hide&nbsp;the&nbsp;titles<br />$graph-&gt;scale-&gt;actinfo-&gt;Show(false);</font>
+</span><br>
+<p> <hr> <p>

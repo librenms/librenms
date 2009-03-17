@@ -1,0 +1,176 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GANTTPLOTOBJECT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GanttPlotObject</b></div>
+<i>(Defined in: jpgraph_gantt.php : 2931)</i><table border=1><tr><td>&nbsp;<a href="GanttPlotObject.html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttPlotObject</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCAPTIONMARGIN">SetCaptionMargin()</a>&nbsp;<br>
+&nbsp;<a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCONSTRAIN">SetConstrain()</a>&nbsp;<br>
+&nbsp;<a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMALT">SetCSIMAlt()</a>&nbsp;<br>
+&nbsp;<a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMTARGET">SetCSIMTarget()</a>&nbsp;<br>
+&nbsp;<a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETLABELLEFTMARGIN">SetLabelLeftMargin()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Abstract base class to hold common properties for all objects that are drawn on the Gantt plot like activity bars, milestones, vertical markers.
+<p>
+Internal method that can't be instantiated directly. Used to capture the common properties of all objects that can be added to the Ganttgraph, i.e. GanttBar, MileStones GanttVLine.
+
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="GanttGraph.html">GanttGraph</a>, <a href="GanttBar.html">GanttBar</a>, <a href="GanttVLine.html">GanttVLine</a> and <a href="MileStone.html">MileStone</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTPLOTOBJECT_SETCAPTIONMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCaptionMargin($aMarg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify margin (in pixels) between object and caption string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMarg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify margin (in pixels) between object and caption string&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ms-&gt;SetCaptionMargin(20);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTPLOTOBJECT_SETCONSTRAIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetConstrain($aRow,$aType,$aColor,$aArrowSize,$aArrowType)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a constrain link between this object and another</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Gantt row where tarhet for constrain is</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Type of constrain</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color of constrain</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArrowSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+ARROW_S2</font>
+</td><td>Size of ending arrow</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArrowType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+ARROWT_SOLID</font>
+</td><td>Type of arrow</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a constrain link between this object and another. The possible constrain types are
+<ul>
+<li> CONSTRAIN_STARTSTART
+<li> CONSTRAIN_STARTEND
+<li> CONSTRAIN_ENDSTART
+<li> CONSTRAIN_ENDEND
+</ul>
+<p>
+The possible arrow sizes are
+<ul>
+<li> ARROW_S1, smallest
+<li> ARROW_S2, (default)
+<li> ARROW_S3
+<li> ARROW_S4
+<li> ARROW_S5, largest
+</ul>
+
+<p>
+Type of arrow can be either of
+<ul>
+<li> ARROWT_SOLID
+<li> ARROWT_OPEN
+</ul>&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Add&nbsp;a&nbsp;constrain&nbsp;from&nbsp;the&nbsp;end&nbsp;of&nbsp;this&nbsp;activity&nbsp;to&nbsp;<br />//&nbsp;the&nbsp;start&nbsp;of&nbsp;the&nbsp;activity&nbsp;on&nbsp;row&nbsp;2<br />$bar-&gt;SetConstrain(2,CONSTRAIN_ENDSTART);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTPLOTOBJECT_SETCSIMALT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMAlt($aAlt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify ALT-tag text for hotspot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Alt text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>The ALT text used in conjunction with image map is handled slightly diffrent between different browsers. Most browser show this text if you let the mouse pointer hoover over a hotspot in the image for 1 or 2 seconds.
+<p>
+Note: You must have specified a CSIM atrget for this to have any effect.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMTARGET">GanttPlotObject::SetCSIMTarget</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$bar-&gt;SetCSIMAlt('Main&nbsp;activity');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTPLOTOBJECT_SETCSIMTARGET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMTarget($aTarget,$aAlt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify URL when object is used in a CSIM</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTarget</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Target URL</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Alt texts</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Used to specify the target URL for for a hotspot&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMALT">GanttPlotObject::SetCSIMAlt</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$bar-&gt;SetCSIMTarget('http://localhost/show_details.php');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTPLOTOBJECT_SETLABELLEFTMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelLeftMargin($aOff)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify offset (in pixels) for the title of this object.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aOff</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Offset in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify offset (in pixels) for the title of this object&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ms-&gt;SetLabelLeftMargin(20);<br /></font>
+</span><br>
+<p> <hr> <p>

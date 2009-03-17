@@ -9,9 +9,9 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc");
 if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
-require("includes/jpgraph/jpgraph.php");
-include("includes/jpgraph/jpgraph_line.php");
-include("includes/jpgraph/jpgraph_utils.inc.php");
+require("includes/jpgraph/src/jpgraph.php");
+include("includes/jpgraph/src/jpgraph_line.php");
+include("includes/jpgraph/src/jpgraph_utils.inc.php");
 
 if($_GET['bill_id']){
         if(testPassword($_GET['bill_id'],$_GET['bill_code']) == "1") {

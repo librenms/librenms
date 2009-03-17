@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="811AddingplotmarkstolineplotsXXX.html">
+<LINK REL="Next" HREF="813Addingseveralplotstothesamegraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="811AddingplotmarkstolineplotsXXX.html">Previous</A>
+<A HREF="813Addingseveralplotstothesamegraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_2">8.1.2 Displaying the values for each data point</A></H3>
+<P> As a final easy modification we can enable the display of the data
+ value above each data point. The value is represented by the 'value'
+ property in the plot. (You can read more about the possibilities of the
+ <A href="../ref/DisplayValue.html#_C_DISPLAYVALUE"> display value</A>
+ in the class reference.)</P>
+<P> To enable the display of the value you just need to call the Show()
+ method of the value as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$lineplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">value</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Show</FONT><FONT color="#007700">()</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> Adding that line to the previous line plot would give the result
+ shown below.<DIV class="example">
+<BR> <A href="exframes/frame_example3.3.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example3.3.png" WIDTH="300"></A>
+<BR><B>Figure 7:</B> Displaying the value for each data point <A href="exframes/frame_example3.3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> We can of course change both color, font and format of the displayed
+ value. So for example if we wanted the display values to be dark red,
+ use a bold font and have a '$' in front we need to add the lines<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$lineplot</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">value</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;darkred&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">value</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">value</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFormat</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;$&nbsp;%0.1f&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> This would then result in the following image<DIV class="example">
+<BR> <A href="exframes/frame_example3.4.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example3.4.png" WIDTH="300"></A>
+<BR><B>Figure 8:</B> Making the display values a little bit more
+ interesting <A href="exframes/frame_example3.4.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> You can achieve more advanced
+ formatting by using not just the printf() style format string by a
+ format callback function. This could allow you to change the displayed
+ value with more advanced formatting such as displaying money values
+ with &quot;,&quot; to separate thousands.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="811AddingplotmarkstolineplotsXXX.html">Previous</A>
+<A HREF="813Addingseveralplotstothesamegraph.html">Next</A>
+</BODY>
+</HTML>

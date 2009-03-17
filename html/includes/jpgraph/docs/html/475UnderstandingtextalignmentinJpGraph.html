@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="474AddingadditionalfontstoJpGraph.html">
+<LINK REL="Next" HREF="48SpecifyingcolorsinJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="474AddingadditionalfontstoJpGraph.html">Previous</A>
+<A HREF="48SpecifyingcolorsinJpGraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="4_7_5">4.7.5 Understanding text alignment in JpGraph</A></H3>
+<P> For everyday use of JpGraph understanding of the alignment of text
+ strings in not necessary. However, if you like to add arbitrary strings
+ to the graph (with Graph::AddText()) or when working directly on a
+ canvas it will help understand this.</P>
+<P> Text is added to a graph with the creation of a <A href="../ref/Text.html#_C_TEXT">
+Text()</A> object. And the alignment is specified with <A href="../ref/Text.html#_TEXT_ALIGN">
+Text::Align()</A> Text alignment might actually be a misguiding name.
+ What you specify is rather the anchor point for the text, i.e. when you
+ specify that a text should be positioned at position<I> (x,y)</I> how
+ is that coordinate to be interpretated.</P>
+<P> The image below shows a text string aligned in the 9 possible
+ combinations. In the image the red crosses indicate what coordinate
+ that text string was positioned at. The alignment used for each of the
+ cases is shown below.<DIV class="example">
+<BR> <A href="exframes/frame_textalignex1.html" target="blank"><IMG border="0"
+HEIGHT="494"  src="img/textalignex1.png" WIDTH="480"></A>
+<BR><B>Figure 2:</B> Specifying alignment (anchor-point) for text
+ strings <A href="exframes/frame_textalignex1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="474AddingadditionalfontstoJpGraph.html">Previous</A>
+<A HREF="48SpecifyingcolorsinJpGraph.html">Next</A>
+</BODY>
+</HTML>

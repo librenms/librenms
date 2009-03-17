@@ -1,0 +1,80 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_HORIZONTALGRIDLINE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>HorizontalGridLine</b></div>
+<i>(Defined in: jpgraph_gantt.php : 3061)</i><table border=1><tr><td>&nbsp;<a href="HorizontalGridLine.html" style="font-family:arial;font-weight:bold;color:darkblue;">HorizontalGridLine</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SETROWFILLCOLOR">SetRowFillColor()</a>&nbsp;<br>
+&nbsp;<a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SETSTART">SetStart()</a>&nbsp;<br>
+&nbsp;<a href="HorizontalGridLine.html#_HORIZONTALGRIDLINE_SHOW">Show()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Handles the alternating row colors in the Gantt chart <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HORIZONTALGRIDLINE_SETROWFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowFillColor($aColor1,$aColor2)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify alternating row fill color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color 1</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Color 2</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify alternating row fill color for the Gantt chart.
+
+See gantthgridex1.php for a full example.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+...<br />$graph-&gt;hgrid-&gt;Show();<br />$graph-&gt;hgrid-&gt;SetRowFillColor('darkblue@0.9');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HORIZONTALGRIDLINE_SETSTART"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStart($aStart)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify start row for alternating colors</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStart</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start row</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify start row for alternating colors. By default it will start from row 0 (first row)&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HORIZONTALGRIDLINE_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aShow)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable alternating row colors</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE/FALSE</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable alternating row colors&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;hgrid-&gt;Show();</font>
+</span><br>
+<p> <hr> <p>

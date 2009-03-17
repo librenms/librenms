@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="93AsimpleGanttchart.html">
+<LINK REL="Next" HREF="95CreatingaGanttChart.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="93AsimpleGanttchart.html">Previous</A>
+<A HREF="95CreatingaGanttChart.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_4">9.4  The structure of a Gantt chart</A></H2>
+<P> A Gantt chart is made up of four distinct areas.</P>
+<OL>
+<LI>On the left side there is the activity title column.</LI>
+<LI>On the top there is the scale headers (up to four headers may be
+ displayed)</LI>
+<LI>The actual plot area where all the Gantt bars and markers go</LI>
+<LI>The margin area, where for example the titles are shown</LI>
+</OL>
+<P> Since a Gantt chart inherits all the usual properties of a JpGraph
+ Graph() you have the access to the same method to formatting the image
+ as before. For example to have a shadow around the image you call
+ Graph::SetShadow() and to set the margin color you can use
+ Graph::SetMarginColor(). Please refer to the reference documentation
+ for a full list of supported features.</P>
+<P> To create a Gantt chart you<STRONG> add</STRONG> objects to it. As
+ of this writing you may add the following object by the use of the
+ GanttChart::Add() method</P>
+<UL>
+<LI> Gantt bars (indicates the length of an activity)</LI>
+<LI> Milestones, a single mark at a specific date</LI>
+<LI> Vertical line, might be use to mark phases in projects</LI>
+</UL>
+<P> All these objects may be extensively modified in terms of
+ formatting. You can specify color (both fill- and frame color), size,
+ titles, style and patterns and so on. All these objects comes with (in
+ my mind) sensible default so you don't have to specify a lot of
+ parameters. But if you need a fine grain control or if you disagree
+ with my taste you<STRONG> can</STRONG>.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="93AsimpleGanttchart.html">Previous</A>
+<A HREF="95CreatingaGanttChart.html">Next</A>
+</BODY>
+</HTML>

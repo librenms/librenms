@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="721Addingbandsofpatternandcolortographs.html">
+<LINK REL="Next" HREF="722Addingstaticlinestotheplot.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="721Addingbandsofpatternandcolortographs.html">Previous</A>
+<A HREF="722Addingstaticlinestotheplot.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_21_1">7.21.1  Customizing the patterns</A></H3>
+<P> All patterns can be customized by</P>
+<UL>
+<LI> ... altering the colors of the band
+<BR> &nbsp;</LI>
+<LI> ... altering the density of the patterns using the method <A href="../ref/PlotBand.html#_PLOTBAND_SETDENSITY">
+ PlotBand::SetDensity()</A> The density is specified as an integer in
+ range 1 to 100 where a higher number means a higher density (smaller
+ distance between the lines). For example setting the density of the 3D
+ plane above to 60 gives the result<DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex4.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex4.png" WIDTH="200"></A>
+<BR><B>Figure 111:</B> Increasing the desnity in a pattern <A href="exframes/frame_smallstaticbandsex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P>
+<BR> &nbsp;</P>
+</LI>
+<LI> ... enabling or disabling a frame around the pattern by using the
+ method <A href="../ref/PlotBand.html#_PLOTBAND_SHOWFRAME">
+ PlotBand::ShowFrame()</A> The band will be given the same color as the
+ band.
+<BR> &nbsp;</LI>
+<LI> ... finally you can change whether the band should be drawn on top
+ of the plots or beneath, (by default the bands are under the plots),
+ using the <A href="../ref/PlotBand.html#_PLOTBAND_SETORDER">
+ PlotBand::SetOrder()</A> as the following example show<DIV class="example">
+<BR> <A href="exframes/frame_smallstaticbandsex5.html" target="blank"><IMG
+border="0" HEIGHT="150"       src="img/img/img/img/img/img/smallstaticbandsex5.png" WIDTH="200"></A>
+<BR><B>Figure 112:</B> Stroking the pattern on top of the plots <A href="exframes/frame_smallstaticbandsex5.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</LI>
+</UL>
+<P><DIV class="note"><B>Note:</B> 3D planes actually carry another
+ possible modification. You can specify the vanish point to change the
+ perspective used. You can't access the method to change the horizon
+ directly but you can access it through</DIV><DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;$band</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">prect</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetHorizon</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aHorizon</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P><SMALL> assuming that the band is a 3D plane.</SMALL></P>
+<P> To finish this section we give one final, more creative, example on
+ how to use the bands.<DIV class="example">
+<BR> <A href="exframes/frame_staticbandbarex7.html" target="blank"><IMG border="0"
+HEIGHT="300"       src="img/img/img/img/img/img/staticbandbarex7.png" WIDTH="400"></A>
+<BR><B>Figure 113:</B> Combining 3D plane, solid band and a sttaic line <A
+href="exframes/frame_staticbandbarex7.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="721Addingbandsofpatternandcolortographs.html">Previous</A>
+<A HREF="722Addingstaticlinestotheplot.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,155 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="915Addingplotmarksiradargraphs.html">
+<LINK REL="Next" HREF="921AddingguidelinestoPiePlots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="915Addingplotmarksiradargraphs.html">Previous</A>
+<A HREF="921AddingguidelinestoPiePlots.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_2">9.2 Pie plots</A></H2>
+<P> So far we have just show plots based on an X-Y coordinate system.
+ This is not the only types of graphs you can create with JpGraph.
+ Another common type is Pie plots. JpGraph supports both 2D and 3D pie
+ plots. For 2D pie plots there are also 2 versions, but more on that
+ later.</P>
+<P> The main difference as compared to the X-Y plots is that to all pie
+ plots are added to the <A href="../ref/PieGraph.html#_C_PIEGRAPH">
+ PieGraph()</A> instead of the Graph() object we used for the X-Y graphs
+ we have drawn so far. For this you must first include the
+ &quot;jpgraph_pie.php&quot; in your script (or &quot;jpgraph_pie3d.php&quot; if you want to
+ use 3-dimensional pies).</P>
+<P> Below you cane see the code needed to create the simplest possible
+ pie graph just using the default settings.</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;</FONT><FONT color="#007700">include&nbsp;(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>include&nbsp;(</FONT><FONT color="#DD0000">&quot;../jpgraph_pie.php&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$data&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array(</FONT><FONT color="#0000BB">40</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">60</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+21</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">33</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">PieGraph</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">300</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">200</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetShadow</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;A&nbsp;simple&nbsp;Pie&nbsp;plot&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$p1&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">PiePlot</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$data</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$p1</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The above code would give the following pie graph<DIV class="example">
+<BR> <A href="exframes/frame_example26.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example26.png" WIDTH="300"></A>
+<BR><B>Figure 117:</B> The simplest possible pie graph <A href="exframes/frame_example26.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> There is a few things worth noting here</P>
+<UL>
+<LI> By default all pie slices have the percentage shown just outside
+ the slice.</LI>
+<LI> The colors are automatically assigned to the slices.</LI>
+<LI> The pie have the edges marked by default</LI>
+<LI> The first slice start at 0 degrees (3 o'clock)</LI>
+</UL>
+<P> You can change almost all aspects of appearance of the pie graphs.
+ For example you could change :</P>
+<UL>
+<LI> Change the angle for the first slice, (<A href="../ref/PiePlot.html#_PIEPLOT_SETSTARTANGLE">
+PiePlot::SetStartAngle()</A>)</LI>
+<LI>Remove the border lines around the pie (<A href="../ref/PiePlot.html#_PIEPLOT_SHOWBORDER">
+PiePlot::ShowBorder()</A>)</LI>
+<LI>Change the color of the border (<A href="../ref/PiePlot.html#_PIEPLOT_SETCOLOR">
+PiePlot::SetColor()</A>,</LI>
+<LI>Change the colors of the slices (<A href="../ref/PiePlot.html#_PIEPLOT_SETSLICECOLORS">
+PiePlot::SetSliceCOlors()</A>)</LI>
+<LI> Change the size and position of the pie (<A href="../ref/PiePlot.html#_PIEPLOT_SETSIZE">
+PiePlot::SetSize()</A>, <A href="../ref/PiePlot.html#_PIEPLOT_SETCENTER">
+PiePlot::SetCenter()</A>)</LI>
+<LI> Adjust the labels for the slice (color, font, format, position ) by
+ accessing the <A href="../ref/DisplayValue.html#_C_DISPLAYVALUE">value
+ property</A> of pie plots, for example (<A href="../ref/DisplayValue.html#_DISPLAYVALUE_SETFONT">
+PiePlot::value::SetFont()</A>, You can read more about label formatting
+ and how to change what is displayed as a value further down in this
+ chapter.</LI>
+</UL>
+<P></P>
+<P> The next simplest addition we can do is to add a legend to the pie
+ graph. We do this by using the <A href="../ref/PiePlot.html#_PIEPLOT_SETLEGENDS">
+ SetLegends();</A> method. By adding the legends to the previous example
+ we get the following image<DIV class="example">
+<BR> <A href="exframes/frame_example26.1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example26.1.png" WIDTH="300"></A>
+<BR><B>Figure 118:</B> Adding a legend to the pie graph <A href="exframes/frame_example26.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> (In the figure above we also moved the center of the pie slightly to
+ the left to make more room for the legend box.)</P>
+<P> The text for the legends can also contain printf() style format
+ strings to format a number. This number passed on into this string is
+ either the absolute value of the slice or the percentage value. How to
+ switch between the is describe further down in this chapter.</P>
+<P> The next change you might want to change is the size and position of
+ the Pie plot. You can change the size with a call to <A href="../ref/PiePlot.html#_PIEPLOT_SETSIZE">
+ SetSize();</A> and the position of the center of the pie plot with a
+ call to <A href="../ref/PiePlot.html#_PIEPLOT_SETCENTER"> SetCenter();</A>
+ The size can be specified as either an absolute size in pixels or as a
+ fraction of width/height (whatever is the smallest). The position of
+ the pie plot is specified as a fraction of the width and height.</P>
+<P> To put the size and positioning API to use we will show how to put
+ several pie plots on the same pie graph. In the following example we
+ have also adjusted the legends of the slice values to use a smaller
+ font.</P>
+<P> What we do in this example is quite simple, create 4 pie plots, make
+ them smaller and put them in the four corner of the graph. This will
+ give the result as shown in the following example.<DIV class="example">
+<BR> <A href="exframes/frame_pieex3.html" target="blank"><IMG border="0" HEIGHT="300"
+ src="img/pieex3.png" WIDTH="350"></A>
+<BR><B>Figure 119:</B> Multiple pie plots in the same pie graph <A href="exframes/frame_pieex3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="915Addingplotmarksiradargraphs.html">Previous</A>
+<A HREF="921AddingguidelinestoPiePlots.html">Next</A>
+</BODY>
+</HTML>
