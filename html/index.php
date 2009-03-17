@@ -28,7 +28,9 @@ if($_GET[debug]) {
 <head>
   <title><?php echo($config['page_title']); ?></title>
   <base href="<?php echo($config['base_url']); ?>" />
-  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />
+  <meta http-equiv="content-language" content="en-us" />
 <?php
   if($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$config['page_refresh']."'>"); }
 ?>

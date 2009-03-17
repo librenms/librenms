@@ -92,8 +92,8 @@ function strgen ($length = 16)
     return $string;
 }
 
-function billpermitted($bill_id) {
-
+function billpermitted($bill_id) 
+{
   global $_SESSION;
   if($_SESSION['userlevel'] >= "5") {
     $allowed = TRUE;
@@ -112,21 +112,26 @@ function interfacepermitted($interface_id)
   global $_SESSION;
   if($_SESSION['userlevel'] >= "5") { 
     $allowed = TRUE; 
-  } elseif ( devicepermitted(mysql_result(mysql_query("SELECT device_id FROM interfaces WHERE interface_id = '$interface_id'"),0))) {
+  } elseif ( devicepermitted(mysql_result(mysql_query("SELECT `device_id` FROM `interfaces` WHERE `interface_id` = '$interface_id'"),0))) {
     $allowed = TRUE;
-  } elseif ( @mysql_result(mysql_query("SELECT interface_id FROM interfaces_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0)) {
+  } elseif ( @mysql_result(mysql_query("SELECT `interface_id` FROM `interfaces_perms` WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0)) {
     $allowed = TRUE;
-  } else { $allowed = FALSE; }
+  } else { 
+    $allowed = FALSE; 
+  }
   return $allowed;
 }
 
 function devicepermitted($device_id) 
 {
   global $_SESSION;
-  if($_SESSION['userlevel'] >= "5") { $allowed = true; 
+  if($_SESSION['userlevel'] >= "5") { 
+    $allowed = true; 
   } elseif ( @mysql_result(mysql_query("SELECT * FROM devices_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `device_id` = $device_id"), 0) > '0' ) {
     $allowed = true;
-  } else { $allowed = false; }
+  } else { 
+    $allowed = false; 
+  }
   return $allowed;
 
 }

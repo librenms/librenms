@@ -10,11 +10,9 @@ if($_GET['status'] == "alerted") {
 }
 
 $device_query = mysql_query($sql);
-
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
-
 while($device = mysql_fetch_array($device_query)) {
-  if( devicepermitted($device['device_id']) || $_SESSION['userlevel'] >= '5' ) {
+  if( devicepermitted($device['device_id']) ) {
     $device['uptime'] = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] ."' AND `attrib_type` = 'uptime'"), 0);
     include("includes/hostbox.inc");
   }
