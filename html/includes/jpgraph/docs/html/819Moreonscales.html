@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="818Usinglogarithmicscale.html">
+<LINK REL="Next" HREF="8110Adjustingthegridlinesintheplot.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="818Usinglogarithmicscale.html">Previous</A>
+<A HREF="8110Adjustingthegridlinesintheplot.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_9">8.1.9 More on scales</A></H3>
+<P> As you saw in the previous example it is possible to use different
+ types of scales. In JpGraph you can use the following scales</P>
+<UL>
+<LI>Linear scale, the standard &quot;scale&quot;</LI>
+<LI>Logarithmic scale</LI>
+<LI>Integer scale, very similar to linear scale but restricts the scale
+ values (and labels) to integer values.</LI>
+<LI>Text scale, Similar to integer scale and used when only the
+ numbering of items is relevant. A text scale is almost exclusively used
+ for the X-axis. A typical example for this is the X-axis for a bar
+ plot. The labels for the text scale is usually replaced by user
+ supplied texts. Text scales can only be used for the X-axis (it doesn't
+ make sense for the Y-scale).</LI>
+</UL>
+<P> Any combination of these may be used. Linear and logarithmic scales
+ are pretty straightforward. The text scale might deserve some
+ explanation. The easiest way to think of the text scale is as a linear
+ scale consisting of only natural numbers, i.e. 0,1,2,3,4,... . This
+ scale is used when you just have a number of Y-values you want to plot
+ in a consecutive order and don't care about the X-values. For the above
+ example it will also work fine to use a linear X-scale (try it!).
+ However, the scale is now treated as consisting or real numbers so the
+ auto scaling, depending on the size of the image an the number of data
+ points, might decide to display other labels then the natural numbers.,
+ i.e. a label might be 2.5 say. This is not going to happen if you use a
+ text scale.</P>
+<P> The normal practice for text scale is to specify text strings as
+ labels instead as the default natural numbers. You can specify text
+ strings for the labels by calling the <A href="../ref/Axis.html#_AXIS_SETTICKLABELS">
+ SetTickLabels()</A> method on the Axis.</P>
+<P> To specify the scale you use the <A href="../ref/Graph.html#_GRAPH_SETSCALE">
+ SetScale()</A> method. A few examples might help clarify this.</P>
+<UL>
+<LI> &quot;textlin&quot;, text-scale for X-axis, Linear scale for Y-axis</LI>
+<LI> &quot;linlin&quot;, linear-scale for X-axis, Linear scale for Y-axis</LI>
+<LI> &quot;linlog&quot;, linear-scale for X-axis, Logarithmic scale for Y-axis</LI>
+<LI> &quot;loglog&quot;, Logarithmic scale for X-axis, Logarithmic scale for
+ Y-axis</LI>
+<LI> &quot;textint&quot;, text-scale for X-axis, Integer scale for Y-axis</LI>
+<LI> &quot;textlog&quot;, Text scale for X-axis, Logarithmic scale for Y-axis</LI>
+</UL>
+<P> As you can see all your graphs will require at least one call to
+ SetScale() in the beginning of your script. Normally it will come right
+ after the creation of the Graph().</P>
+<P> To specify the scale for the Y2 axis you use the <A href="../ref/Graph.html#_GRAPH_SETY2SCALE">
+ SetY2Scale()</A> Since you only specify one axis you only specify
+ &quot;half&quot; of the string in the previous examples. So to set a logarithmic
+ Y2 scale you will call
+<!--?
+$t ='$grap-->
+ SetY2Scale(&quot;log&quot;);'; ShowCodeSnippet($t); ?&gt;</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="818Usinglogarithmicscale.html">Previous</A>
+<A HREF="8110Adjustingthegridlinesintheplot.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="45ChoosingtheimageformatforJpGraph.html">
+<LINK REL="Next" HREF="47WorkingwithfontsinJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="45ChoosingtheimageformatforJpGraph.html">Previous</A>
+<A HREF="47WorkingwithfontsinJpGraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="4_6">4.6 Alternatives to streaming back the image</A></H2>
+<P> If you like to save the image directly to a file instead of
+ streaming it back to the browser then you just have to specify an
+ absolute filename in the final call to Graph::Stroke(), i.e.</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Stroke</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;/usr/home/peter/images/result2002.png&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> Please note that the user running as Apache/PHP must have write
+ access to the specified directory.</P>
+<P> There are also two predefined filenames which have special meaning.</P>
+<UL>
+<LI>&quot;auto&quot;, This will create a file in the same directory as the script
+ with the same name as the script but with the correct image extension.</LI>
+<LI>__IMG_HANDLER, (This is defined in jpgraph.php). Specifying this
+ filename will not create a an image to file or stram it back to the
+ browser. Instead it will instruct the Stroke() method to just return
+ the handle for the GD image. This is useful if you later want to
+ manipulate the image in ways that are not yet supported by Jpgraph. For
+ example include the image in generated PDF files.
+<BR><I> Example:</I><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$handle&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT color="#0000BB">
+$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Stroke</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">__IMG_HANDLER</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+</UL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="45ChoosingtheimageformatforJpGraph.html">Previous</A>
+<A HREF="47WorkingwithfontsinJpGraph.html">Next</A>
+</BODY>
+</HTML>

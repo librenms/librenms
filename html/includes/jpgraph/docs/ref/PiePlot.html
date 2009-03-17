@@ -1,0 +1,618 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_PIEPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PiePlot</b></div>
+<i>(Defined in: jpgraph_pie.php : 24)</i><table border=1><tr><td>&nbsp;<a href="PiePlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">PiePlot</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PiePlot.html#_PIEPLOT_EXPLODE">Explode()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_EXPLODEALL">ExplodeAll()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_EXPLODESLICE">ExplodeSlice()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_PIEPLOT">PiePlot()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETCENTER">SetCenter()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETCSIMTARGETS">SetCSIMTargets()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETFONTCOLOR">SetFontColor()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETGUIDELINES">SetGuideLines()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETGUIDELINESADJUST">SetGuideLinesAdjust()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETLABELPOS">SetLabelPos()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETLABELS">SetLabels()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETLABELTYPE">SetLabelType()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETLEGENDS">SetLegends()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETSHADOW">SetShadow()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETSIZE">SetSize()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETSLICECOLORS">SetSliceColors()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETSTARTANGLE">SetStartAngle()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETTHEME">SetTheme()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SETVALUETYPE">SetValueType()</a>&nbsp;<br>
+&nbsp;<a href="PiePlot.html#_PIEPLOT_SHOWBORDER">ShowBorder()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Creates a new Pie plot from the supplied data. <p>
+By default the value (if enabled through the $pie->label->show() ) close to each slice will have a label corresponding to the percentage of that slice.  
+<p>
+Each plot may have an arbitrary title which can be accessed through the ?title? property in the PiePlot class. The title will be automatically centred on top of the PiePlot clear of any possible labels. To set the title use the Set() method , i.e. $plot->title->Set(?MyTitle?).
+<p>
+To format the slice labels use the SetFormat() method of the value class. <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="PieGraph.html">PieGraph</a> and <a href="PiePlot3D.html">PiePlot3D</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_EXPLODE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Explode($aExplodeArr)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Explode one or more slices as specified radius.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aExplodeArr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Explode specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>To emphasise a specific slice it can be exploded, i.e moved out fro the center of the pie plot. This method will allow you to specify what slices and to waht radius you want them exploded.
+<p>
+If you only want to explode a single slice you could also use the ExplodeSlice() method.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_EXPLODESLICE">PiePlot::ExplodeSlice</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//To&nbsp;explode&nbsp;slice&nbsp;0,2&nbsp;to&nbsp;radius&nbsp;100&nbsp;you&nbsp;would&nbsp;call<br />$pieplot-&gt;Explode(array(100,0,100));<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_EXPLODEALL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ExplodeAll($radius)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Explode all slices a specified amount</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$radius</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+20</font>
+</td><td>Explode radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Explode all slices a specified amount. If no radius is specified it will default to 20 pixels.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_EXPLODESLICE">PiePlot::ExplodeSlice</a> and <a href="PiePlot.html#_PIEPLOT_EXPLODE">PiePlot::Explode</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p1-&gt;ExplodeAll();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_EXPLODESLICE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ExplodeSlice($e,$radius)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Explode a single slice a specified radius</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$e</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Which slice to explode</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$radius</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+20</font>
+</td><td>Radius to explode to</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Explode a single slice to a specific radius.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_EXPLODE">PiePlot::Explode</a> and <a href="PiePlot.html#_PIEPLOT_EXPLODEALL">PiePlot::ExplodeAll</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Explode&nbsp;slice&nbsp;number&nbsp;2&nbsp;(the&nbsp;third&nbsp;slice)&nbsp;using&nbsp;the&nbsp;default<br />//&nbsp;explode&nbsp;radius.<br />$pieplot-&gt;ExplodeSlice(2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_PIEPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;PiePlot($data)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor for PiePlots</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$data</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Data array for Pie</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Construct a new pie plot which later can be added to Piegraph&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PieGraph.html#_PIEGRAPH_ADD">PieGraph::Add</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot&nbsp;=&nbsp;new&nbsp;PiePlot($slicedata);<br />$piegraph-&gt;Add($pieplot);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETCENTER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCenter($x,$y)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>//---------------// PUBLIC METHODS	
+</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$x</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-position as fraction of width</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$y</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0.5</font>
+</td><td>Y-position as fraction of height</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the center point for the PiePlot&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETSIZE">PiePlot::SetSize</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetCenter(0.4,0.5);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify frame color for pie.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color.</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the color of the border around each slice.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETSLICECOLORS">PiePlot::SetSliceColors</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetColor('red');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETCSIMTARGETS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMTargets($targets,$alts)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify URL targets for image maps</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$targets</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of URL targets</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$alts</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Alt strings</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify  list of targets for the image map for each slice. The target should be a fully qualified URL.
+<p>
+Each slice will aslo have it's own 'alt' tag. Depending on the browser this tag is usually showed when the mouse is hold over a poarticular area on the image map. When formatting the alt strings can be specified as a printf() format string. The value supplied to the string will be the value for each slice.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_GETCSIMAREAS">PiePlot::GetCSIMareas</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$targets&nbsp;=&nbsp;array('godetail1.html',&nbsp;'gotodetail2.html'&nbsp;'gotodetail3.html');<br />$alts&nbsp;=&nbsp;array('Year&nbsp;%d',&nbsp;'Year&nbsp;%d',&nbsp;'Year&nbsp;%d');<br /><br />$pieplot-&gt;SetCSIMTargets($targets,$alts);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($family,$style,$size)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Deprecated. Use $pieplot->value->SetFont() instead.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$family</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$style</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$size</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Deprecated. Use $pieplot->value->SetFont() instead.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//Deprecated.&nbsp;Use&nbsp;$pieplot-&gt;value-&gt;SetFont()&nbsp;instead.</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETFONTCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFontColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Deprecated. Use $pieplot->value->SetFontColor() instead.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Deprecated. Use $pieplot->value->SetFontColor() instead.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//Deprecated.&nbsp;Use&nbsp;$pieplot-&gt;value-&gt;SetFontColor()&nbsp;instead.</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETGUIDELINES"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetGuideLines($aFlg,$aCurved,$aAlways)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable guideline and set drawing policy</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>TRUE=Enable guide lines</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCurved</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Curve the labels around the pie</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlways</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>Always use a guide line to the label</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable guideline and set drawing policy for guide lines and labels&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetGuideLines();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETGUIDELINESADJUST"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetGuideLinesAdjust($aVFactor,$aRFactor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Adjuste the distance between labels and labels and pie</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVFactor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Vertical fraction</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRFactor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0.8</font>
+</td><td>Radius factor</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Adjuste the distance between labels and labels and pie&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;SetGuideLinesAdjust(1.7);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETLABELPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelPos($aLblPosAdj)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Adjust the positoin of slice labels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLblPosAdj</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Position as fraction of radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the position of the labels for each slice as a fraction of the radius.
+<p>
+Note: The adjustment affect both manually speicfied labels with SetLabels() as well as automtic labels.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETLABELS">PiePlot::SetLabels</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p1&nbsp;=&nbsp;new&nbsp;PiePlot($data);<br />$p1-&gt;SetLabelPos(0.6);<br />$graph-&gt;Add($p1);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETLABELS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabels($aLabels,$aLblPosAdj)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify individual text labels for all slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLabels</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Arrays of strings</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLblPosAdj</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"auto"</font>
+</td><td>Position as fraction of the radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Normally pie slice gets assigned a label which displays either the percentage or the absolute value of a slice. These automtically asigned labels are positioned in a ring around the pie.
+<br>
+However, you can also manually assign a label to each slice individually with this method.
+<br>
+Each label can contain format specification so for example the label
+<p>
+"May %.1f%%" 
+<p>
+would display the in the pie "May 28.3%" assuming you had choosen to use percentage values (SetLabelType())
+<p>
+The second parameter specifies where to position these labels. The position is specified as a fraction of the radius of the pie plot or as the special strine 'auto'. If you specify this string value JpGraph will automtically determine the best position for the labels inside the pie. This is the default if you don't explicitely specify the position.
+<p>
+If you specify a value > 1.0 then the labels will
+just be move further out. For example if you specify the position as 1.5 then the labels will move out a further 50% of the current pie radius.
+<p>
+Note: The actual alignment of the labels are dependent on the position. If the labels are just outside the pie they will be individually positioned according to the angle. If the labels are positioned inside the pie then the point of gravity within the text will be aligned with the specified position in the pie.
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETLABELTYPE">PiePlot::SetLabelType</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p1-&gt;SetLabelType(PIE_VALUE_PER);<br />$lbl&nbsp;=&nbsp;array("adam\n%.1f%%","bertil\n%.1f%%","kalle\n%.1f%%","peter\n%.1f%%","daniel\n%.1f%%","erik\n%.1f%%");<br />$p1-&gt;SetLabels($lbl);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETLABELTYPE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelType($t)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Should we display actual value or percentage?</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$t</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Set absolute or percentage value constant</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if the value displayed by each slice (if the $pieplot->value->Show()) have been called shold be absolute or in percent.
+<p>
+The following values are allowed arguments:
+<ul>
+<li>PIE_VALUE_ABS
+<li>PIE_VALUE_PER
+<li>PIE_VALUE_ADJPER. This is a special case of the percentage. Specifying this value will adjust integer percetage values so that the total sum will always be 100%. This is done with the the Hare/Niemeyer method. This makes most sense when used together with a format string for labels of "%d" so it will only display a whole integer value without any deciamals.
+<li>
+</ul>
+The defauklt is to show percent.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Show&nbsp;absolute&nbsp;values<br />$pieplot-&gt;SetLabelType(PIE_VALUE_ABS);<br /><br />//&nbsp;Display&nbsp;each&nbsp;label&nbsp;with&nbsp;postfix&nbsp;'kr',&nbsp;e.g.&nbsp;each&nbsp;label&nbsp;will<br />//&nbsp;look&nbsp;like&nbsp;(for&nbsp;example)&nbsp;23.5&nbsp;kr<br />$pieplot-&gt;value-&gt;SetFormat('%d&nbsp;kr');<br />$pieplot-&gt;value-&gt;Show();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETLEGENDS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLegends($aLegend)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Set label arrays</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLegend</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of strings</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify an array of text strings that should be used as legends for the slices. 
+<p>
+Each text string can be formatted as a printf() format string since when printed they will be passed the value for that slice.
+<p>
+<b>Tip:</b> If you have many evry small slices then the labels close to the pie may be overwriting each other. In this case it is probably better to hide the labels by the slices and instead just show the values ion the legends.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$legends&nbsp;=&nbsp;array('April&nbsp;(%d)','May&nbsp;(%d)','June&nbsp;(%d)');<br /><br />$pieplot-&gt;SetLegends($legends);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETSHADOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetShadow($aColor,$aDropWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Add a drop shadow to the pie slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'darkgray'</font>
+</td><td>Shadow color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDropWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+4</font>
+</td><td>Drop distance for shadow</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Add a drop shadow to the pie slices. 
+<p>
+This is often more affective if one or more slices are exploded.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Explode&nbsp;all&nbsp;slices<br />$p1-&gt;ExplodeAll(10);<br /><br />//&nbsp;Add&nbsp;drop&nbsp;shadow<br />$p1-&gt;SetShadow();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETSIZE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSize($aSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Size in percentage</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Size of radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>If the value specified is between 0 and 1 then it is interpreted as a a fraction of either height or width, whatever is smallest, of the graph.
+<p>
+If the value is >1 then it is interpretated as an absolute size in pixels.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETCENTER">PiePlot::SetCenter</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetSize(0.3);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETSLICECOLORS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSliceColors($aColors)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Override theme coplros for slices</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColors</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of colors</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Normally the colors of the slices are set according to what color-theme you are using. You can however, override this by supplying an array of colors to be used for the slices.
+<p>
+If you supply fewer colors than pie-slices than the colors will be   re-used from the beginning of the array.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETTHEME">PiePlot::SetTheme</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$p1-&gt;SetSliceColors(array('red','green','blue'));</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETSTARTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStartAngle($aStart)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Speciy start angel for first slice</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStart</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Start angle in degrees</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Normally the first slice is drawn at 0 degrees, i.e. 3'a clock. With this method you can adjust that to an arbitrary angle. Positive angle will rotate the slice clockwise and a negative angle will move the slice counter-clockwise.
+<p>
+The angle should be specified in degrees.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetStartAngle(45);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETTHEME"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTheme($aTheme)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>//Add the last point on the arc</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTheme</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Theme name</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify what color theme should be used for this pie. As of version 1.6.4 the following themes are available:
+<ul>
+<li> "earth"
+<li> "pastel"
+<li> "sand"
+<li> "water"
+</ul>&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;SetTheme('water');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SETVALUETYPE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetValueType($aType)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>DEPRECATED: See SetLabelType()</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Value type</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>See SetLabelType()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PiePlot.html#_PIEPLOT_SETLABELTYPE">PiePlot::SetLabelType</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+NA</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PIEPLOT_SHOWBORDER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ShowBorder($exterior,$interior)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Should the circle around a pie plot be displayed</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$exterior</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Display circle on the outer edge of pieplot</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$interior</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>Display the lines between each slice</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Show the lines between each slice and the border around the pie.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;show&nbsp;both<br />$pieplot-&gt;ShowBorder();</font>
+</span><br>
+<p> <hr> <p>

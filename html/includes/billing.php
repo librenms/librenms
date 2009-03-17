@@ -120,11 +120,11 @@ $lastmonth = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INT
 $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
 $now = date(U);
 
-$di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
+$di =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
 $di = $di . "&from=" . $yesterday .  "&to=" . $now . "&x=715&y=250";
 $di = $di . "$type'>";
 
-$mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
+$mi =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
 $mi = $mi . "&from=" . $lastmonth .  "&to=" . $now . "&x=715&y=250";
 $mi = $mi . "$type'>";
 

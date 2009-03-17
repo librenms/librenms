@@ -1,0 +1,243 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="102CapabilitiesinJpGraphGanttmodule.html">
+<LINK REL="Next" HREF="104ThestructureofaGanttchart.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="102CapabilitiesinJpGraphGanttmodule.html">Previous</A>
+<A HREF="104ThestructureofaGanttchart.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_3">10.3 A simple Gantt chart</A></H2>
+<P> Time to show you an example of a Gantt chart and how easy it is to
+ make one. Lets make it the simplest possible Gantt chart. One activity,
+ named &quot;Project&quot;, which lasts from &quot;2001-11-01&quot; to &quot;2002-02-20&quot;.</P>
+<P> All it takes to do this (using default values for everything) is the
+ following code.<DIV class="phpscript">(File: ganttex00.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#007700">include&nbsp;(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>include&nbsp;(</FONT><FONT color="#DD0000">&quot;../jpgraph_gantt.php&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;A&nbsp;new&nbsp;graph&nbsp;with&nbsp;automatic&nbsp;size
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttGraph</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;auto&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;&nbsp;A&nbsp;new&nbsp;activity&nbsp;on&nbsp;row&nbsp;'0'
+<BR></FONT><FONT color="#0000BB">$activity&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttBar</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;Project&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-12-21&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2002-01-20&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$activity</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Display&nbsp;the&nbsp;Gantt&nbsp;chart
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT></FONT></CODE></DIV></P>
+<P> The resulting image is shown in Figure
+<!--?echo FigNbr(); ?-->
+ below.<DIV style="margin-left:-120px;"><DIV class="example">
+<BR> <A href="exframes/frame_ganttex00.html" target="blank"><IMG border="0"
+HEIGHT="112"  src="img/ganttex00.png" WIDTH="486"></A>
+<BR><B>Figure 143:</B> Your first simple Gantt chart. <A href="exframes/frame_ganttex00.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV>
+<P></P>
+</DIV></P>
+<P> Let's note a few things with the above image and code:</P>
+<UL>
+<LI> You always need to include both jpgraph.php and jpgraph_gantt.php</LI>
+<LI> A bar is specified a minimum of four parameters, vertical position
+ (more about that in a second), a title, start and end date.</LI>
+<LI> If you don't specify a size for the image it will be automatically
+ decided based on the min and max dates for the bars rounded to a full
+ week.</LI>
+<LI> By default the week and day scale are displayed.</LI>
+<LI> Weekend background are displayed default in a slightly gray color</LI>
+<LI> Sundays are written in red.</LI>
+<LI> Weeks are numbered according to ISO 8601</LI>
+<LI> Activity bars are rendered as blue stripes on a white background by
+ default.</LI>
+</UL>
+<P> So, lets start making this graph a little bit more interesting.
+ First we are going to add a title, then we will add a month scale and
+ finally we will change the color of the bar.</P>
+<P> All that is taken care of in the code below.<DIV class="phpscript">
+(File: ganttex01.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#007700">include&nbsp;(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>include&nbsp;(</FONT><FONT color="#DD0000">&quot;../jpgraph_gantt.php&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttGraph</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;auto&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetShadow</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;title&nbsp;and&nbsp;subtitle
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;A&nbsp;nice&nbsp;main&nbsp;title&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">12</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">subtitle</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;(Draft&nbsp;version)&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Show&nbsp;day,&nbsp;week&nbsp;and&nbsp;month&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">ShowHeaders</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+GANTT_HDAY&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HWEEK&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HMONTH</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Instead&nbsp;of&nbsp;week&nbsp;number&nbsp;show&nbsp;the&nbsp;date&nbsp;for&nbsp;the&nbsp;first&nbsp;day&nbsp;in&nbsp;the&nbsp;week
+<BR>//&nbsp;on&nbsp;the&nbsp;week&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+week</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetStyle</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">WEEKSTYLE_FIRSTDAY</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Make&nbsp;the&nbsp;week&nbsp;scale&nbsp;font&nbsp;smaller&nbsp;than&nbsp;the&nbsp;default
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+week</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT0</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Use&nbsp;the&nbsp;short&nbsp;name&nbsp;of&nbsp;the&nbsp;month&nbsp;together&nbsp;with&nbsp;a&nbsp;2&nbsp;digit&nbsp;year
+<BR>//&nbsp;on&nbsp;the&nbsp;month&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+month</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetStyle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MONTHSTYLE_SHORTNAMEYEAR2</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Format&nbsp;the&nbsp;bar&nbsp;for&nbsp;the&nbsp;first&nbsp;activity
+<BR>//&nbsp;($row,$title,$startdate,$enddate)
+<BR></FONT><FONT color="#0000BB">$activity&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttBar</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;Project&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-12-21&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2002-01-20&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Yellow&nbsp;diagonal&nbsp;line&nbsp;pattern&nbsp;on&nbsp;a&nbsp;red&nbsp;background
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetPattern</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">BAND_RDIAG</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;yellow&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetFillColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;red&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Finally&nbsp;add&nbsp;the&nbsp;bar&nbsp;to&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$activity</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;...&nbsp;and&nbsp;display&nbsp;it
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT></FONT></CODE></DIV> The resulting image is shown in Figure
+ 144 below.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex01.html" target="blank"><IMG border="0"
+HEIGHT="152"  src="img/ganttex01.png" WIDTH="486"></A>
+<BR><B>Figure 144:</B> Making the Gantt chart a little bit more
+ interesting with title and more colors. <A href="exframes/frame_ganttex01.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> From the above example you might note a few things</P>
+<UL>
+<LI> The margins adjust automatically to the added title and subtitle</LI>
+<LI> The height of the scale headers adjust automatically when you
+ change the font.</LI>
+<LI> You have great flexibility in choosing what format the scale labels
+ will have. If you for example wanted the full 4 digit year in the month
+ header all you have to change is use the constant
+ MONTHSTYLE_SHORTNAMEYEAR2 in the code above to
+ MONTHSTYLE_SHORTNAMEYEAR4</LI>
+<LI> You have full freedom of manipulating headers in terms of font,
+ color, background and size.</LI>
+</UL>
+<P> To show that this is really simple let's show the full year in the
+ month, and set the header style to be white text on a dark blue
+ background by adding the lines<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Use&nbsp;the&nbsp;short&nbsp;name&nbsp;of&nbsp;the&nbsp;month&nbsp;together&nbsp;with&nbsp;a&nbsp;4&nbsp;digit&nbsp;year
+<BR>//&nbsp;on&nbsp;the&nbsp;month&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+month</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetStyle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MONTHSTYLE_SHORTNAMEYEAR4</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+month</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTextColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;white&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+month</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetBackgroundColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>to the code above. The resulting image is shown in Figure 145<DIV class="example">
+<BR> <A href="exframes/frame_ganttex02.html" target="blank"><IMG border="0"
+HEIGHT="112"  src="img/ganttex02.png" WIDTH="381"></A>
+<BR><B>Figure 145:</B> Enhancing the scale headers. <A href="exframes/frame_ganttex02.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="102CapabilitiesinJpGraphGanttmodule.html">Previous</A>
+<A HREF="104ThestructureofaGanttchart.html">Next</A>
+</BODY>
+</HTML>

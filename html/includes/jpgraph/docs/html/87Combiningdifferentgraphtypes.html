@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="863ImagemapsforBoxandStockcharts.html">
+<LINK REL="Next" HREF="88Specifyingthescalemanually.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="863ImagemapsforBoxandStockcharts.html">Previous</A>
+<A HREF="88Specifyingthescalemanually.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="8_7">8.7 Combining different graph types</A></H2>
+<P> It is perfectly legal to add several different plot types to the
+ same graph. It is therefore possible to mix line plots with (for
+ example) filled bar graphs. What you should keep in mind doing this is
+ the order in which these plots are stroked to the image since a later
+ stroke will overwrite a previous one. All plots are stroked in the
+ order you add them, i.e. the first plot added will be stroked first.
+ You can therefore control which plot is placed in the background and
+ which one is placed in the foreground by the order you add them to the
+ plot.</P>
+<P> To start simple we just mix a filled line plot with a non-filled
+ line plot as the following example shows.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example16.1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.1.png" WIDTH="400"></A>
+<BR><B>Figure 66:</B> Mixing filled and non-filled line plots in the
+ same graph <A href="exframes/frame_example16.1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Let's now go to something a little bit more complicated. How to mix
+ bar and line graphs. Let's just take one of our previous bar graphs and
+ add a line plot to it and see what happens.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example16.2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.2.png" WIDTH="400"></A>
+<BR><B>Figure 67:</B> Adding a line to a bar graph <A href="exframes/frame_example16.2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P>Not too bad. But we can't see the line so we change the order in
+ which we add the lines to the graph and sees what happens.<DIV class="example">
+<BR> <A href="exframes/frame_example16.3.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.3.png" WIDTH="400"></A>
+<BR><B>Figure 68:</B> Adding a line to a bar graph, in different orderv2
+ <A href="exframes/frame_example16.3.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> If you want the line points to be aligned in the center of the bars
+ you can accomplish this is two ways.</P>
+<P> If you use a text scale then you need to call the <A href="../ref/LinePlot.html#_LINEPLOT_SETBARCENTER">
+ LinePlot::SetBarCenter()</A><DIV class="example">
+<BR> <A href="exframes/frame_linebarcentex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/linebarcentex1.png" WIDTH="400"></A>
+<BR><B>Figure 69:</B> Centering the line point in the middle of the bars
+ using LinePlot::SetBarCenter() <A href="exframes/frame_linebarcentex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> You can also use an integer scale. This places<STRONG> both</STRONG>
+ the bar and the line points centered at the tick marks. As the
+ following example will show</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example16.4.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.4.png" WIDTH="400"></A>
+<BR><B>Figure 70:</B> Using a linear scale <A href="exframes/frame_example16.4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> In this example we also have
+ illustrated the fact that it is possible to add text labels to a linear
+ (or integer) scales as well.</DIV></P>
+<P> As a final example we show how you can combine a scatter plot and a
+ line plot which could be used to illustrate a regression line fitting.<DIV
+class="example">
+<BR> <A href="exframes/frame_example16.6.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.6.png" WIDTH="300"></A>
+<BR><B>Figure 71:</B> Combining a scatter plot and a line plot <A href="exframes/frame_example16.6.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="863ImagemapsforBoxandStockcharts.html">Previous</A>
+<A HREF="88Specifyingthescalemanually.html">Next</A>
+</BODY>
+</HTML>

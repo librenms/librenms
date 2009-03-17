@@ -1,0 +1,251 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_DISPLAYVALUE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>DisplayValue</b></div>
+<i>(Defined in: jpgraph.php : 5517)</i><table border=1><tr><td>&nbsp;<a href="DisplayValue.html" style="font-family:arial;font-weight:bold;color:darkblue;">DisplayValue</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_HIDEZERO">HideZero()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETALIGN">SetAlign()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETANGLE">SetAngle()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETFORMAT">SetFormat()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETFORMATCALLBACK">SetFormatCallback()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SETMARGIN">SetMargin()</a>&nbsp;<br>
+&nbsp;<a href="DisplayValue.html#_DISPLAYVALUE_SHOW">Show()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Property class which is used to represent the display value for graphs. For line and bar graphs they represent the propertied of the value that can be displayed at each data point. For bars it represents the value of each bar that can be displayed at top of the bars.
+<p>
+This class should never be used directly instead this is an internal class which is accessed through it's instance variable, for example,
+<p>
+
+$lineplot = new LinePlot($datay);
+// Access the instance of DisplayValue
+$lineplot->value->Show(); <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="LinePlot.html">LinePlot</a> and <a href="BarPlot.html">BarPlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_HIDEZERO"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;HideZero($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide zero values</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide zero values</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide labels that have zero value&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DisplayValue.html#_DISPLAYVALUE_SETFORMAT">DisplayValue::SetFormat</a> and <a href="DisplayValue.html#_DISPLAYVALUE_SETFORMATCALLBACK">DisplayValue::SetFormatCallback</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$pieplot-&gt;value-&gt;HideZero();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlign($aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify horizontal and vertical alignment</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the alignment of the display value in relation to the data point. Possible values are 'left', 'right', 'center'&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;value-&gt;SetAlign('center');<br />$lineplot-&gt;value-&gt;Show();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAngle($aAngle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Rotate the value a specified angle</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAngle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Angle in degrees</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Roates the text label a number of degrees. 0 degrees is horizontal.
+<p>
+Please rememberthat you must use TTF fonts if you need any angle other than 0 or 90 degrees (horizontal or vertical)&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DisplayValue.html#_DISPLAYVALUE_SETFONT">DisplayValue::SetFont</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$bplot&nbsp;=&nbsp;new&nbsp;barPlot($datay);<br /><br />//&nbsp;Setup&nbsp;the&nbsp;values&nbsp;that&nbsp;are&nbsp;displayed&nbsp;on&nbsp;top&nbsp;of&nbsp;each&nbsp;bar<br />$bplot-&gt;value-&gt;Show();<br /><br />//&nbsp;Must&nbsp;use&nbsp;TTF&nbsp;fonts&nbsp;if&nbsp;we&nbsp;want&nbsp;text&nbsp;at&nbsp;an&nbsp;arbitrary&nbsp;angle<br />$bplot-&gt;value-&gt;SetFont(FF_ARIAL,FS_BOLD);<br />$bplot-&gt;value-&gt;SetAngle(45);<br /><br />//&nbsp;Black&nbsp;color&nbsp;for&nbsp;positive&nbsp;values&nbsp;and&nbsp;darkred&nbsp;for&nbsp;negative&nbsp;values<br />$bplot-&gt;value-&gt;SetColor("black","darkred");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor,$aNegcolor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for values</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color for positive values</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aNegcolor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Color for negative values</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the value for the labels. You can have one color for positive and one color for negative values. If no negative color value is specified it will be the same as the positive color.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Black&nbsp;color&nbsp;for&nbsp;positive&nbsp;values&nbsp;and&nbsp;darkred&nbsp;for&nbsp;negative&nbsp;values<br />$bplot-&gt;value-&gt;SetColor("black","darkred");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($aFontFamily,$aFontStyle,$aFontSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font for values</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontFamily</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFontSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font for display value&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DisplayValue.html#_DISPLAYVALUE_SETANGLE">DisplayValue::SetAngle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Must&nbsp;use&nbsp;TTF&nbsp;fonts&nbsp;if&nbsp;we&nbsp;want&nbsp;text&nbsp;at&nbsp;an&nbsp;arbitrary&nbsp;angle<br />$bplot-&gt;value-&gt;SetFont(FF_ARIAL,FS_BOLD);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFormat($aFormat,$aNegFormat)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify printf() format string.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format for positive values</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aNegFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Format for negative values</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the format string for positive and negative values. The format string follows the same riules as the standard printf() format.
+<p>
+Please remember that if you want to format a number with a '%' sign you must use double '%%' as escape format, e.g. '%01.2.f%%' will format a number with two decimal places and a following '%' sign.
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Format&nbsp;label&nbsp;as&nbsp;floating&nbsp;point&nbsp;with&nbsp;2&nbsp;decimal&nbsp;points&nbsp;and<br />//&nbsp;a&nbsp;dollar&nbsp;sign&nbsp;in&nbsp;front,&nbsp;e.g.&nbsp;'$237.56'<br />$bplot-&gt;SetFormt('$%01.2f');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETFORMATCALLBACK"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFormatCallback($aFunc)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify format callback function</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFunc</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Name of callback function</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a function that get's called to format any value.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DisplayValue.html#_DISPLAYVALUE_SETFORMAT">DisplayValue::SetFormat</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+function&nbsp;barValueFormat($aLabel)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Format&nbsp;'1000&nbsp;english&nbsp;style<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;number_format($aLabel)<br />&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Format&nbsp;'1000&nbsp;french&nbsp;style<br />&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;return&nbsp;number_format($aLabel,&nbsp;2,&nbsp;',',&nbsp;'&nbsp;');<br />}<br /><br />$barplot-&gt;value-&gt;SetFormatCallback('barValueFormat');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SETMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMargin($aMargin)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set nargin between value and anchor point in plot</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMargin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the margin between the data point and the label.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$bplot-&gt;value-&gt;SetMargin(50);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DISPLAYVALUE_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Show value</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=show value</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable display of the label. If you want to display a value you must enable it since it is turned off by default.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Enable&nbsp;display&nbsp;of&nbsp;each&nbsp;slice&nbsp;value<br />$pieplot-&gt;value-&gt;Show();<br /></font>
+</span><br>
+<p> <hr> <p>

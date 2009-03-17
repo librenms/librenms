@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="34Imageformatsandexternalimagelibraries.html">
+<LINK REL="Next" HREF="36Troubleshootingyourinstallation.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="34Imageformatsandexternalimagelibraries.html">Previous</A>
+<A HREF="36Troubleshootingyourinstallation.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="3_5">3.5 Detailed steps to install JpGraph</A></H2>
+<P></P>
+<OL>
+<LI>If You are insatlling the 1.x branch then make sure the PHP version
+ used is at least 4.3.x (preferable 4.3.10 or higher) and that the PHP
+ version have compiled support for GD library. It is absolutely critical
+ that GD is fully working. Please see the earlier sections on how to
+ make sure. JpGraph supports both GD 1.x and GD 2.x However it is
+ strongly recommended to use GD 2.x since that will improve performance
+ and support true color images as well as alphablending.
+<P> If You are insatlling the 2.x branch then make sure the PHP version
+ used is at least 5.0.1 (preferable 5.0.5 or higher) and that the PHP
+ version have compiled support for GD 2.x library. Please note that the
+ 2.x branch will<B> not</B> work with PHP 4.x</P>
+</LI>
+<LI>Unzip and copy the files to a directory of your choice.</LI>
+<LI>Set up the directory paths in<I> jpg-config.inc.php</I> where the
+ cache directory should be and where your TTF directory is. Note that
+ Apache/PHP must have write permission in your cache directory.</LI>
+<LI> Check that all rest of the DEFINE in the top of JpGraph.php is
+ setup to your preference. The default should be fine for most users.
+ (See also Note 5. below) Specifically check that the settings of
+ USE_GD2_LIBRARY reflects your installation, (should be true if you have
+ GD2 installed, false otherwise).</LI>
+<LI>Make sure PHP have write privileges to your cache directory if you
+ plan on using the cache feature.</LI>
+<LI> Some windows installations seems to have a problem with a PHP
+ script ending in a newline (This newline seems to be sent to the
+ browser and will cause a Header already sent error). If you have this
+ problem try remove all trailing newlines in the jpgraph* files</LI>
+<LI> Read (really!) <A href="http://www.aditus.nu/jpgraph/jpgraphfaq.html">
+the JpGraph FAQ</A>.</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="34Imageformatsandexternalimagelibraries.html">Previous</A>
+<A HREF="36Troubleshootingyourinstallation.html">Next</A>
+</BODY>
+</HTML>

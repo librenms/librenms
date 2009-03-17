@@ -1,0 +1,80 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="823Explodingpieslices.html">
+<LINK REL="Next" HREF="825Specifyingslicecolorsandusingthemes.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="823Explodingpieslices.html">Previous</A>
+<A HREF="825Specifyingslicecolorsandusingthemes.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_2_4">8.2.4 Specifying and adjusting labels on pie plots</A>
+</H3>
+<P> By default the values shown just outside the pie for each slice are
+ the percentage value for each slice. If you instead wanted the absolute
+ value you would just have to use the <A href="../ref/PiePlot.html#_PIEPLOT_SETLABELTYPE">
+ SetLabelType()</A> method. So to use the absolute value you would call</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$pieplot</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetLabelType</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;PIE_VALUE_ABS&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> Furthermore you could enhance the formatting of the value by either
+ using a printf() style format string (using <A href="../ref/DisplayValue.html#_DISPLAYVALUE_SETFORMAT">
+ SetFormat()</A> ) or by providing a formatting function callback (using
+ <A href="../ref/DisplayValue.html#_DISPLAYVALUE_SETFORMATCALLBACK">
+ SetFormatCallback()</A> ) for doing more advanced formatting.</P>
+<P> You can also adjust the position of the labels by means of the <A href="../ref/PiePlot.html#_PIEPLOT_SETLABELPOS">
+ PiePlot::SetLabelPos()</A> method. The argument to this method is
+ either the fraction of the radius or the string 'auto'. In the latter
+ case JpGraph automatically determines the best position and the the
+ first case The following example illustrates this<DIV class="example">
+<BR> <A href="exframes/frame_pieex8.html" target="blank"><IMG border="0" HEIGHT="200"
+      src="img/img/img/img/img/img/pieex8.png" WIDTH="250"></A>
+<BR><B>Figure 131:</B> Example of adjusting the position of the labels
+ for the slices <A href="exframes/frame_pieex8.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> If this formatting is not enough you can also &quot;manually&quot; specify the
+ labels for each slice individually. You do this by using the <A href="../ref/PiePlot.html#_PIEPLOT_SETLABELS">
+ PiePLot::SetLabels()</A> method. This will let you specify individual
+ text strings for each label. In each specification you can also add a
+ printf() formatting specification for a number. The number passed on
+ will be either the absolute value for the slice or the percentage value
+ depending on what was specified in the call to <A href="../ref/PiePlot.html#_PIEPLOT_SETLABELTYPE">
+ SetLabelType()</A></P>
+<P> The SetLabels() method can also take a second parameter, the label
+ position parameter. This is just a shortcut to the SetLabelPos() as
+ described above. By default the position will be set to 'auto' if not
+ explicitely specified.<DIV class="note"><B>Note:</B> The alignment of
+ the labels will be different depending on whether they are inside or
+ outside the pie. When inside the center of the strings will be aligned
+ with the center of the slice at the specified fraction of the radius.
+ When positioned outside the alignment will depend on the angle to avoid
+ that the labels inadvertely writes over the pie.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="823Explodingpieslices.html">Previous</A>
+<A HREF="825Specifyingslicecolorsandusingthemes.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">
+<LINK REL="Next" HREF="922Usingcountryflagsinvariouscontext.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">Previous</A>
+<A HREF="922Usingcountryflagsinvariouscontext.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_21">9.21 Timing the generation of graphs</A></H2>
+<P> During development and optimization it can be very handy to have the
+ actual time it took to generate the image as a footnote. The following
+ example shows the usage of this feature<DIV class="example">
+<BR> <A href="exframes/frame_example11.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example11.png" WIDTH="300"></A>
+<BR><B>Figure 182:</B> Timing of a graph <A href="exframes/frame_example11.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To enable this feature you can proceed in two ways.</P>
+<OL>
+<LI> You can either set the global define BRAND_TIMING (in jpgraph.php)
+ to true. This will add the timing string to all graphs generated.</LI>
+<LI> .. or you can enable it for a specific graph by setting the global
+ variable $gJpgBrandTiming as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$gJpgBrandTiming</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">true</FONT><FONT color="#007700">;</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV>
+<P>in the beginning of the script.</P>
+</LI>
+</OL>
+<P> If you like you might also change the way the timing is formatted by
+ setting the string defined by BRAND_TIMING_FORMAT (in jpgraph.php).
+ This string represents a standard printf() format string.<DIV class="note">
+<B>Note:</B> JpGraph contains a utility class called JpgTimer which you
+ can use yourself should you need ms timing of part of your own code.
+ The API is really simple. The class supports multiple running timers
+ and you start a timer simply by calling the Push() method. This will
+ start a new timer and put it on the top of the timer stack. To stop the
+ timer, pop it from the stack and return the timing value simply call
+ Pop().</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="920Adjustingbrightnessandcontrastforimagesandbackgrounds.html">Previous</A>
+<A HREF="922Usingcountryflagsinvariouscontext.html">Next</A>
+</BODY>
+</HTML>

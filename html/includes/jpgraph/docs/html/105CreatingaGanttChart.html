@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="104ThestructureofaGanttchart.html">
+<LINK REL="Next" HREF="106PositioningobjectsintheGanttplot.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="104ThestructureofaGanttchart.html">Previous</A>
+<A HREF="106PositioningobjectsintheGanttplot.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_5">10.5 Creating a GanttChart</A></H2>
+<P> You create a new Gantt Chart with a call to GanttChart(). The
+ signature for GanttGraph is the same as for ordinary JpGraph graphs,
+ i.e<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;</FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+GanttGraph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aWidth</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aHeight</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aCachedName</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aTimeOut</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aInline</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>The only real difference is that for GanttCharts you can specify one
+ or both of the dimension parameters (width and height) as -1 in which
+ case that dimension will be automatically sized determined by scale and
+ fonts chosen. The following examples shows some possible ways of
+ creating a new graph</P>
+<UL>
+<LI> $graph=new GanttGraph()
+<BR> The size of the graph will be determined automatically, no caching
+ will be used and the graph will be generated in-line.</LI>
+<LI> $graph=new GanttGraph(-1,-1,&quot;auto&quot;)
+<BR> The size of the graph will be determined automatically, caching
+ will be used (the name will be based on the script name), no timeout
+ will be used and the graph will be generated in-line</LI>
+<LI> $graph=new GanttGraph(450,-1,&quot;auto&quot;,5)
+<BR> Same as the previous entry but the width is fixed to 450 points and
+ the cached image will have a timeout of 5 min.</LI>
+<LI> $graph=new GanttGraph(-1,-1,&quot;auto&quot;,5,false)
+<BR> The image will not be generated in-line, only the cache will be
+ updated if it has timed out, otherwise nothing will happen.</LI>
+</UL>
+<P> Since GanttGraph() inherits all the methods (that make sense for
+ GanttGraph) from Graph you can specify shadow, color etc of the general
+ frame.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="104ThestructureofaGanttchart.html">Previous</A>
+<A HREF="106PositioningobjectsintheGanttplot.html">Next</A>
+</BODY>
+</HTML>

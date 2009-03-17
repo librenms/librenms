@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="911Simpleradarplots.html">
+<LINK REL="Next" HREF="913Addinggridlinetotheradarplot.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="911Simpleradarplots.html">Previous</A>
+<A HREF="913Addinggridlinetotheradarplot.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_1_2">9.1.2 Specifying titles for the axis and legends for
+ the plots</A></H3>
+<P> We normally would like something more meaningful as description of
+ each axis than it's number. Specifying the titles are accomplished
+ through the use of the method SetTitles() of the graph. Let's say that
+ each axis corresponds to a month. We could then use the code<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$titles&nbsp;</FONT><FONT color="#007700">
+=&nbsp;</FONT><FONT color="#0000BB">$gDateLocale</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">GetShortMonth</FONT><FONT color="#007700">
+();
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetTitles</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$titles</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> As you can see the way radar plot is constructed will assign the
+ titles (and plot points) in a counter-clockwise direction. If you want
+ them in clock-wise order you will have to inverse your input data array
+ as well as the title array.</P>
+<P> To specify a legend you (as with the other plot) make use of the <A href="../ref/SpiderPlot.html#_SPIDERPLOT_SETLEGEND">
+ SetLegend();</A> method on each radar plot.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="911Simpleradarplots.html">Previous</A>
+<A HREF="913Addinggridlinetotheradarplot.html">Next</A>
+</BODY>
+</HTML>

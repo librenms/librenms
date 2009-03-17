@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="931Overview.html">
+<LINK REL="Next" HREF="933Adjustingthegridlines.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="931Overview.html">Previous</A>
+<A HREF="933Adjustingthegridlines.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_3_2">9.3.2 Adjusting the radius scale</A></H3>
+<P> The radius axis can be shown in either a linear or logarithmic
+ scale. This is controlled, as usual, by a call to <A href="../ref/PolarGraph.html#_POLARGRAPH_SETSCALE">
+PolarGraph::SetScale()</A> The two examples below show the same plot in
+ either linear or logarithmic scale</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_polarex3.html" target="blank"><IMG border="0"
+HEIGHT="300"  src="img/polarex3.png" WIDTH="300"></A>
+<BR><B>Figure 137:</B> Using a logarithmic scale <A href="exframes/frame_polarex3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_polarex3-lin.html" target="blank"><IMG border="0"
+HEIGHT="300"  src="img/polarex3-lin.png" WIDTH="300"></A>
+<BR><B>Figure 138:</B> Using a linear scale <A href="exframes/frame_polarex3-lin.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Please note that the maximum values of the scales are different.</P>
+<P> By default the scale will be auto scaled depending on the data. You
+ can also specify a manual scale by supplying an extra argument to the
+ SetScale() value. The only difference from the manual scaling with the
+ other X-Y-graphs is that for polar graph you only specify a manual
+ maximum. The minimum will always be 0 for the linear scale and a scaled
+ value of 10 (i.e 1, 0.1, 0.001 and so on) for the logarithmic scale.</P>
+<P> The plot is clipped to the plot area so if you specify a smaller
+ scale then the maximum value that part of the plot that are outside the
+ plot area will be clipped.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="931Overview.html">Previous</A>
+<A HREF="933Adjustingthegridlines.html">Next</A>
+</BODY>
+</HTML>

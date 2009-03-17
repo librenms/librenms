@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="55Commonfeatureforallgraphs.html">
+<LINK REL="Next" HREF="552Commonlyusedproperties.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="55Commonfeatureforallgraphs.html">Previous</A>
+<A HREF="552Commonlyusedproperties.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="5_5_1">5.5.1 Clipping</A></H3>
+<P> By default all plots are clipped outside the plot area. This means
+ that if you manually specify a scale and then try to plot which has
+ values smaller/larger than the scale those values will not show.</P>
+<P> The clipping algorithm is &quot;perfect&quot; in the sense that for example
+ line plots where the plot area cuts the line between two data points
+ the line will be drawn up to the edge of the plot area. The algorithm
+ used is O(1) in number of data points.</P>
+<P> The disabling/enabling of clipping manually is controlled by <A href="../ref/Graph.html#_GRAPH_SETCLIPPING">
+Graph::SetClipping()</A></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="55Commonfeatureforallgraphs.html">Previous</A>
+<A HREF="552Commonlyusedproperties.html">Next</A>
+</BODY>
+</HTML>

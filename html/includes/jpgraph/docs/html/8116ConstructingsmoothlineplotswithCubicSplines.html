@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8115Usingaccumulatedlinegraphs.html">
+<LINK REL="Next" HREF="8117Addingplotmarkstoalineplot.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8115Usingaccumulatedlinegraphs.html">Previous</A>
+<A HREF="8117Addingplotmarkstoalineplot.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_16">8.1.16 Constructing smooth line plots with Cubic
+ Splines</A></H3>
+<P> If you only have access to a few data points but still want a smooth
+ curve between those data points JpGraph can help you achieving that by
+ letting you construct cubic splines. If you never have heard of cubic
+ splines before, don't worry. You only have to supply the data points
+ you know tell JpGraph how many interpolated points in total you want in
+ the graph. JpGraph will now take care of constructing a smooth curve
+ between all you data points. The new, smooth, curve will be made up of
+ exactly as many interpolated points as you have specified.</P>
+<P> To construct a spline you need both the X and Y coordinates for the
+ known data points.</P>
+<P> You start by constructing a new <A href="">Spline</A> instance. To
+ get access to the Spline class you must first remember to include the
+ file &quot;jpgraph_regstat.php&quot;. You instantiate this class by calling it
+ with your two known data arrays (X and Y) as follows.<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$spline&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Spline</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$xdata</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$ydata</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>This call initializes the spline with the data points you have. These
+ data points are also known as<I> Control points</I> for the spline.
+ This helper class doesn't draw any line itself. Instead it is merely
+ used to get a new (larger) data array which have all the interpolated
+ values. You then use these new value in your plot. This way give you
+ great flexibility in how you want to use this interpolated data.</P>
+<P> Continuing the above line we now use the <A href="">Spline::Get()</A>
+ method to get an interpolated array containing a specified number of
+ points. So for example the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">list(</FONT><FONT color="#0000BB">
+$sdatax</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$sdatay</FONT><FONT color="#007700">)&nbsp;=&nbsp;</FONT><FONT color="#0000BB">
+$spline</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Get</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">50</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P>Will construct the two new data arrays '$sdatax' and '$sdatay' which
+ contains 50 data points. These two arrays are constructed from the
+ control point we specified when we created the '$spline' object.</P>
+<P> You would then use these two new data array in exactly the same way
+ as you would form ordinary data vectors.</P>
+<P> The following example illustrates this<DIV class="example">
+<BR> <A href="exframes/frame_splineex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/splineex1.png" WIDTH="300"></A>
+<BR><B>Figure 26:</B> Using spline to get a smooth curve between the
+ control points. <A href="exframes/frame_splineex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> In order to make the example more interesting we actually use two
+ plots. First a line plot to get the smooth curve and then a standard
+ scatter plot which is used to illustrate where the control points are.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8115Usingaccumulatedlinegraphs.html">Previous</A>
+<A HREF="8117Addingplotmarkstoalineplot.html">Next</A>
+</BODY>
+</HTML>

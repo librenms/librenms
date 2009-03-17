@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="131AdjustingthesizeoftheLEDdigits.html">
+<LINK REL="Next" HREF="14CodedefinesinJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="131AdjustingthesizeoftheLEDdigits.html">Previous</A>
+<A HREF="14CodedefinesinJpGraph.html">Next</A>
+<HR NOSHADE>
+
+<H2><A NAME="13_2">13.2 Improving the LEDs with supersampling</A></H2>
+ In order to improve the visual appearance the library uses
+ super-sampling in order to create an anti-aliased image of the LED
+ digits. The default level of super-sampling is 3 times (oversampling).
+ In order reduce the CPU load the amount of oversampling can be lowered.
+ The level of super-sampling is controlled via the method <TT>
+DigitalLed74::SetSupersampling::($aSuperSampling=3)</TT>
+<P> For example setting the oversampling to &quot;1&quot; is the same thing as
+ disabling super-sampling. This will generate a fast image but a LED
+ appearance that looks quite &quot;rugged&quot;.</P>
+<P> Increasing the level of oversampling above &quot;4&quot; gives almost no
+ visual improvement to the resulting image, it will only increase the
+ CPU time needed to create the final image. Hence it is recommended that
+ the super-sampling is only specified as an integer in the range one to
+ four.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="131AdjustingthesizeoftheLEDdigits.html">Previous</A>
+<A HREF="14CodedefinesinJpGraph.html">Next</A>
+</BODY>
+</HTML>

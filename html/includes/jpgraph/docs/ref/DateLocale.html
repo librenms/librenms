@@ -1,0 +1,543 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_DATELOCALE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>DateLocale</b></div>
+<i>(Defined in: jpgraph.php : 317)</i><table border=1><tr><td>&nbsp;<a href="DateLocale.html" style="font-family:arial;font-weight:bold;color:darkblue;">DateLocale</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="DateLocale.html#_DATELOCALE_DATELOCALE">DateLocale()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETDAYABB">GetDayAbb()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETLONGMONTHNAME">GetLongMonthName()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETMONTH">GetMonth()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETSHORTDAY">GetShortDay()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETSHORTMONTH">GetShortMonth()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_GETSHORTMONTHNAME">GetShortMonthName()</a>&nbsp;<br>
+&nbsp;<a href="DateLocale.html#_DATELOCALE_SET">Set()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class is mainly used (so far) by the Gantt graphs to get localized names of weekdays and months. There is nothing that prevents you from using this to get hold of localized names in your script.
+<p>
+To help with this JpGraph instantiates the global variable $gDateLocale which can be used to access the methods. 
+<p>
+A quick example could be to for example get hold of the shortform of the names of the month to use as labels. By default this is set to the dafult locale for the installation.
+<p>
+// Get localized array of short form of month names
+$months = $gDateLocale->GetShortMonth(); <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_DATELOCALE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;DateLocale()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Construct a new DateLocale.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$dateLocale&nbsp;=&nbsp;new&nbsp;DateLocale();<br />//&nbsp;Use&nbsp;Swedish&nbsp;locale<br />$dateLocale-&gt;Set('sv_SE');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETDAYABB"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetDayAbb()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return array with day abbreviation in the current locale.</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Returns an array with the abbrevation for weekdays using the current locale.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateLocale.html#_DATELOCALE_GETSHORTDAY">DateLocale::GetShortDay</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$weekdays&nbsp;=&nbsp;$gDateLocale-&gt;GetDayAbb();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETLONGMONTHNAME"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetLongMonthName($aNbr)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Get long month name for the specified month</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aNbr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Number of month [0-11]</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Get the full month name as specified by integer 0-11&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateLocale.html#_DATELOCALE_GETSHORTMONTHNAME">DateLocale::GetShortMonthName</a> and <a href="DateLocale.html#_DATELOCALE_GETSHORTMONTH">DateLocale::GetShortMonth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$jan&nbsp;=&nbsp;$gDateLocale-&gt;GetLongMonthName(0);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETMONTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetMonth()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Get array of all month names</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return an array with all months of the year in their long form.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateLocale.html#_DATELOCALE_GETSHORTMONTH">DateLocale::GetShortMonth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$allmonths&nbsp;=&nbsp;$gDateLocale-&gt;GetMonth();<br />$graph-&gt;xaxis-&gt;SetTickLabels($allmonths);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETSHORTDAY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetShortDay()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return an array with all weekdays in the short form.</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return an array with all weekdays in the short form according to the specified locale.
+
+For english locale this would return
+array('Mon','Tue','Wed','Thu','Fri','Sat','Sun');&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$alldays&nbsp;=&nbsp;$gDateLocale-&gt;GetShortDay();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETSHORTMONTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetShortMonth()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Short month description</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return an array of the short names for all months&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$allmonths&nbsp;=&nbsp;$gDateLocale-&gt;GetShortMonth();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_GETSHORTMONTHNAME"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GetShortMonthName($aNbr)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the short month name for the specified month.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aNbr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Number of month [0-11]</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return the short month name for the specified month.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DateLocale.html#_DATELOCALE_GETLONGMONTHNAME">DateLocale::GetLongMonthName</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$april&nbsp;=&nbsp;$gDateLocale-&gt;GetShortMonthName(3);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DATELOCALE_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aLocale)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set locale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLocale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Locale</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>See PHP manual for more details. The argument should be a valid locale setting. For example 'EN_US' or 'EN_UK'
+
+The following table lists some commonly used locales. The exact locales available depends on the system
+
+<table border=1>
+<tr>
+<td>af_ZA</td>
+<td>ar_AE</td>
+<td>ar_AE.utf8</td>
+</tr><tr><td>ar_BH</td>
+<td>ar_BH</td>
+<td>ar_BH.utf8</td>
+<td>ar_DZ</td>
+<td>ar_DZ.utf8</td>
+</tr><tr><td>ar_EG</td>
+<td>ar_EG</td>
+<td>ar_EG.utf8</td>
+<td>ar_IN</td>
+<td>ar_IQ</td>
+</tr><tr><td>ar_IQ.utf8</td>
+<td>ar_IQ.utf8</td>
+<td>ar_JO</td>
+<td>ar_JO.utf8</td>
+<td>ar_KW</td>
+</tr><tr><td>ar_KW.utf8</td>
+<td>ar_KW.utf8</td>
+<td>ar_LB</td>
+<td>ar_LB.utf8</td>
+<td>ar_LY</td>
+</tr><tr><td>ar_LY.utf8</td>
+<td>ar_LY.utf8</td>
+<td>ar_MA</td>
+<td>ar_MA.utf8</td>
+<td>ar_OM</td>
+</tr><tr><td>ar_OM.utf8</td>
+<td>ar_OM.utf8</td>
+<td>ar_QA</td>
+<td>ar_QA.utf8</td>
+<td>ar_SA</td>
+</tr><tr><td>ar_SA.utf8</td>
+<td>ar_SA.utf8</td>
+<td>ar_SD</td>
+<td>ar_SD.utf8</td>
+<td>ar_SY</td>
+</tr><tr><td>ar_SY.utf8</td>
+<td>ar_SY.utf8</td>
+<td>ar_TN</td>
+<td>ar_TN.utf8</td>
+<td>ar_YE</td>
+</tr><tr><td>ar_YE.utf8</td>
+<td>ar_YE.utf8</td>
+<td>be_BY</td>
+<td>be_BY.utf8</td>
+<td>bg_BG</td>
+</tr><tr><td>bg_BG.utf8</td>
+<td>bg_BG.utf8</td>
+<td>bokmal</td>
+<td>bokm?l</td>
+<td>br_FR</td>
+</tr><tr><td>bs_BA</td>
+<td>bs_BA</td>
+<td>ca_ES</td>
+<td>ca_ES.utf8</td>
+<td>ca_ES@euro</td>
+</tr><tr><td>catalan</td>
+<td>catalan</td>
+<td>croatian</td>
+<td>cs_CZ</td>
+<td>cs_CZ.utf8</td>
+</tr><tr><td>cy_GB</td>
+<td>cy_GB</td>
+<td>czech</td>
+<td>da_DK</td>
+<td>da_DK.utf8</td>
+</tr><tr><td>danish</td>
+<td>danish</td>
+<td>dansk</td>
+<td>de_AT</td>
+<td>de_AT.utf8</td>
+</tr><tr><td>de_AT@euro</td>
+<td>de_AT@euro</td>
+<td>de_BE</td>
+<td>de_BE@euro</td>
+<td>de_CH</td>
+</tr><tr><td>de_CH.utf8</td>
+<td>de_CH.utf8</td>
+<td>de_DE</td>
+<td>de_DE.utf8</td>
+<td>de_DE@euro</td>
+</tr><tr><td>de_LU</td>
+<td>de_LU</td>
+<td>de_LU.utf8</td>
+<td>de_LU@euro</td>
+<td>deutsch</td>
+</tr><tr><td>dutch</td>
+<td>dutch</td>
+<td>eesti</td>
+<td>el_GR</td>
+<td>el_GR.utf8</td>
+</tr><tr><td>en_AU</td>
+<td>en_AU</td>
+<td>en_AU.utf8</td>
+<td>en_BE</td>
+<td>en_BE.utf8</td>
+</tr><tr><td>en_BE@euro</td>
+<td>en_BE@euro</td>
+<td>en_BW</td>
+<td>en_CA</td>
+<td>en_CA.utf8</td>
+</tr><tr><td>en_DK</td>
+<td>en_DK</td>
+<td>en_GB</td>
+<td>en_GB.utf8</td>
+<td>en_HK</td>
+</tr><tr><td>en_IE</td>
+<td>en_IE</td>
+<td>en_IE.utf8</td>
+<td>en_IE@euro</td>
+<td>en_IN</td>
+</tr><tr><td>en_NZ</td>
+<td>en_NZ</td>
+<td>en_NZ.utf8</td>
+<td>en_PH</td>
+<td>en_SG</td>
+</tr><tr><td>en_US</td>
+<td>en_US</td>
+<td>en_US.utf8</td>
+<td>en_ZA</td>
+<td>en_ZA.utf8</td>
+</tr><tr><td>en_ZW</td>
+<td>en_ZW</td>
+<td>es_AR</td>
+<td>es_AR.utf8</td>
+<td>es_BO</td>
+</tr><tr><td>es_BO.utf8</td>
+<td>es_BO.utf8</td>
+<td>es_CL</td>
+<td>es_CL.utf8</td>
+<td>es_CO</td>
+</tr><tr><td>es_CO.utf8</td>
+<td>es_CO.utf8</td>
+<td>es_CR</td>
+<td>es_CR.utf8</td>
+<td>es_DO</td>
+</tr><tr><td>es_DO.utf8</td>
+<td>es_DO.utf8</td>
+<td>es_EC</td>
+<td>es_EC.utf8</td>
+<td>es_ES</td>
+</tr><tr><td>es_ES.utf8</td>
+<td>es_ES.utf8</td>
+<td>es_ES@euro</td>
+<td>es_GT</td>
+<td>es_GT.utf8</td>
+</tr><tr><td>es_HN</td>
+<td>es_HN</td>
+<td>es_HN.utf8</td>
+<td>es_MX</td>
+<td>es_MX.utf8</td>
+</tr><tr><td>es_NI</td>
+<td>es_NI</td>
+<td>es_NI.utf8</td>
+<td>es_PA</td>
+<td>es_PA.utf8</td>
+</tr><tr><td>es_PE</td>
+<td>es_PE</td>
+<td>es_PE.utf8</td>
+<td>es_PR</td>
+<td>es_PR.utf8</td>
+</tr><tr><td>es_PY</td>
+<td>es_PY</td>
+<td>es_PY.utf8</td>
+<td>es_SV</td>
+<td>es_SV.utf8</td>
+</tr><tr><td>es_US</td>
+<td>es_US</td>
+<td>es_UY</td>
+<td>es_UY.utf8</td>
+<td>es_VE</td>
+</tr><tr><td>es_VE.utf8</td>
+<td>es_VE.utf8</td>
+<td>estonian</td>
+<td>et_EE</td>
+<td>et_EE.utf8</td>
+</tr><tr><td>eu_ES</td>
+<td>eu_ES</td>
+<td>eu_ES@euro</td>
+<td>fa_IR.utf8</td>
+<td>fi_FI</td>
+</tr><tr><td>fi_FI.utf8</td>
+<td>fi_FI.utf8</td>
+<td>fi_FI@euro</td>
+<td>finnish</td>
+<td>fo_FO</td>
+</tr><tr><td>fo_FO.utf8</td>
+<td>fo_FO.utf8</td>
+<td>fr_BE</td>
+<td>fr_BE.utf8</td>
+<td>fr_BE@euro</td>
+</tr><tr><td>fr_CA</td>
+<td>fr_CA</td>
+<td>fr_CA.utf8</td>
+<td>fr_CH</td>
+<td>fr_CH.utf8</td>
+</tr><tr><td>fr_FR</td>
+<td>fr_FR</td>
+<td>fr_FR.utf8</td>
+<td>fr_FR@euro</td>
+<td>fr_LU</td>
+</tr><tr><td>fr_LU.utf8</td>
+<td>fr_LU.utf8</td>
+<td>fr_LU@euro</td>
+<td>fran?ais</td>
+<td>french</td>
+</tr><tr><td>ga_IE</td>
+<td>ga_IE</td>
+<td>ga_IE.utf8</td>
+<td>ga_IE@euro</td>
+<td>galego</td>
+</tr><tr><td>galician</td>
+<td>galician</td>
+<td>german</td>
+<td>gl_ES</td>
+<td>gl_ES.utf8</td>
+</tr><tr><td>gl_ES@euro</td>
+<td>gl_ES@euro</td>
+<td>greek</td>
+<td>gv_GB</td>
+<td>he_IL</td>
+</tr><tr><td>he_IL.utf8</td>
+<td>he_IL.utf8</td>
+<td>hebrew</td>
+<td>hi_IN.utf8</td>
+<td>hr_HR</td>
+</tr><tr><td>hr_HR.utf8</td>
+<td>hr_HR.utf8</td>
+<td>hrvatski</td>
+<td>hu_HU</td>
+<td>hu_HU.utf8</td>
+</tr><tr><td>hungarian</td>
+<td>hungarian</td>
+<td>icelandic</td>
+<td>id_ID</td>
+<td>id_ID.utf8</td>
+</tr><tr><td>is_IS</td>
+<td>is_IS</td>
+<td>is_IS.utf8</td>
+<td>it_CH</td>
+<td>it_CH.utf8</td>
+</tr><tr><td>it_IT</td>
+<td>it_IT</td>
+<td>it_IT.utf8</td>
+<td>it_IT@euro</td>
+<td>italian</td>
+</tr><tr><td>iw_IL</td>
+<td>iw_IL</td>
+<td>ja_JP</td>
+<td>ja_JP.eucjp</td>
+<td>ja_JP.sjis</td>
+</tr><tr><td>ja_JP.ujis</td>
+<td>ja_JP.ujis</td>
+<td>ja_JP.utf8</td>
+<td>japanese</td>
+<td>japanese.euc</td>
+</tr><tr><td>japanese.sjis</td>
+<td>japanese.sjis</td>
+<td>ka_GE</td>
+<td>kl_GL</td>
+<td>kl_GL.utf8</td>
+</tr><tr><td>ko_KR</td>
+<td>ko_KR</td>
+<td>ko_KR.euckr</td>
+<td>ko_KR.utf8</td>
+<td>korean</td>
+</tr><tr><td>korean.euc</td>
+<td>korean.euc</td>
+<td>kw_GB</td>
+<td>lithuanian</td>
+<td>lt_LT</td>
+</tr><tr><td>lt_LT.utf8</td>
+<td>lt_LT.utf8</td>
+<td>lv_LV</td>
+<td>lv_LV.utf8</td>
+<td>mi_NZ</td>
+</tr><tr><td>mk_MK</td>
+<td>mk_MK</td>
+<td>mk_MK.utf8</td>
+<td>mr_IN.utf8</td>
+<td>ms_MY</td>
+</tr><tr><td>mt_MT</td>
+<td>mt_MT</td>
+<td>nb_NO</td>
+<td>nb_NO.ISO-8859-1</td>
+<td>nl_BE</td>
+</tr><tr><td>nl_BE.utf8</td>
+<td>nl_BE.utf8</td>
+<td>nl_BE@euro</td>
+<td>nl_NL</td>
+<td>nl_NL.utf8</td>
+</tr><tr><td>nl_NL@euro</td>
+<td>nl_NL@euro</td>
+<td>nn_NO</td>
+<td>no_NO</td>
+<td>no_NO.utf8</td>
+</tr><tr><td>norwegian</td>
+<td>norwegian</td>
+<td>nynorsk</td>
+<td>oc_FR</td>
+<td>pl_PL</td>
+</tr><tr><td>pl_PL.utf8</td>
+<td>pl_PL.utf8</td>
+<td>polish</td>
+<td>portuguese</td>
+<td>pt_BR</td>
+</tr><tr><td>pt_BR.utf8</td>
+<td>pt_BR.utf8</td>
+<td>pt_PT</td>
+<td>pt_PT.utf8</td>
+<td>pt_PT@euro</td>
+</tr><tr><td>ro_RO</td>
+<td>ro_RO</td>
+<td>ro_RO.utf8</td>
+<td>romanian</td>
+<td>ru_RU</td>
+</tr><tr><td>ru_RU.koi8r</td>
+<td>ru_RU.koi8r</td>
+<td>ru_RU.utf8</td>
+<td>ru_UA</td>
+<td>russian</td>
+</tr><tr><td>sh_YU</td>
+<td>sh_YU</td>
+<td>sh_YU.utf8</td>
+<td>sk_SK</td>
+<td>sk_SK.utf8</td>
+</tr><tr><td>sl_SI</td>
+<td>sl_SI</td>
+<td>sl_SI.utf8</td>
+<td>slovak</td>
+<td>slovene</td>
+</tr><tr><td>slovenian</td>
+<td>slovenian</td>
+<td>spanish</td>
+<td>sq_AL</td>
+<td>sq_AL.utf8</td>
+</tr><tr><td>sr_YU</td>
+<td>sr_YU</td>
+<td>sr_YU.utf8</td>
+<td>sr_YU@cyrillic</td>
+<td>sv_FI</td>
+</tr><tr><td>sv_FI.utf8</td>
+<td>sv_FI.utf8</td>
+<td>sv_FI@euro</td>
+<td>sv_SE</td>
+<td>sv_SE.utf8</td>
+</tr><tr><td>swedish</td>
+<td>swedish</td>
+<td>ta_IN</td>
+<td>te_IN</td>
+<td>tg_TJ</td>
+</tr><tr><td>th_TH</td>
+<td>th_TH</td>
+<td>th_TH.utf8</td>
+<td>thai</td>
+<td>tl_PH</td>
+</tr><tr><td>tr_TR</td>
+<td>tr_TR</td>
+<td>tr_TR.utf8</td>
+<td>turkish</td>
+<td>uk_UA</td>
+</tr><tr><td>uk_UA.utf8</td>
+<td>uk_UA.utf8</td>
+<td>ur_PK</td>
+<td>uz_UZ</td>
+<td>vi_VN</td>
+</tr><tr><td>vi_VN.utf8</td>
+<td>vi_VN.utf8</td>
+<td>yi_US</td>
+<td>zh_CN</td>
+<td>zh_CN.gb18030</td>
+</tr><tr><td>zh_CN.gbk</td>
+<td>zh_CN.gbk</td>
+<td>zh_CN.utf8</td>
+<td>zh_HK</td>
+<td>zh_HK.utf8</td>
+</tr><tr><td>zh_TW</td>
+<td>zh_TW</td>
+<td>zh_TW.euctw</td>
+<td>zh_TW.utf8</td>
+</tr>
+
+</table>&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$gDateLocale-&gt;Set('sv_SE');&nbsp;//&nbsp;Set&nbsp;Swedish&nbsp;locale</font>
+</span><br>
+<p> <hr> <p>

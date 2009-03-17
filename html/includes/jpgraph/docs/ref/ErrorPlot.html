@@ -1,0 +1,41 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_ERRORPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>ErrorPlot</b> EXTENDS <a href="Plot .html#_C_PLOT " style="font-face:arial;font-weight:bold;">Plot </a></div>
+<i>(Defined in: jpgraph_error.php : 17)</i><table border=1><tr><td>&nbsp;<a href="ErrorPlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">ErrorPlot</a>&nbsp;</td><td>&nbsp;<a href="Plot .html" style="font-family:arial;font-weight:bold;color:darkblue;">Plot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="ErrorPlot.html#_ERRORPLOT_ERRORPLOT">ErrorPlot()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Concrete class which implements error plots. Error plots takes two y-values for each X-value, min and max. It then marks each pair of min/max values with a vertical bar. <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ERRORPLOT_ERRORPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;ErrorPlot(&amp;$datay,$datax)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>//---------------// CONSTRUCTOR
+</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+&amp;$datay</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y-data. 2 points for each value</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$datax</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>X-data</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new error plot. Each data value is specified by two y-values, a minimum and maximum value.
+<p>
+The X-vector is optional.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$errplot&nbsp;=&nbsp;new&nbsp;ErrorPlot($ydata);<br /></font>
+</span><br>
+<p> <hr> <p>

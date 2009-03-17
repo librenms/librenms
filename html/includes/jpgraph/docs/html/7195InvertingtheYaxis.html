@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7194Formattingthescalelabels.html">
+<LINK REL="Next" HREF="720Adjustingtheautoscalinglimitsgracevalue.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7194Formattingthescalelabels.html">Previous</A>
+<A HREF="720Adjustingtheautoscalinglimitsgracevalue.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_19_5">7.19.5 Inverting the Y-axis</A></H3>
+<P> One good way of illustrate the usefulness of label callbacks in a
+ slightly different context is to show how we can achieve the effect of
+ an inverted Y-scale.</P>
+<P> An inverted Y-scale has the lowest number at the top and the scale
+ values increases downwards.</P>
+<P> Even though JpGraph doesn't directly support this feature it is
+ quite easy to achieve with just a few extra lines of code in your image
+ script.</P>
+<P> Before we continue we give an example of what we are referring to.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_inyaxisex2.html" target="blank"><IMG border="0"
+HEIGHT="300"       src="img/img/img/img/img/img/inyaxisex2.png" WIDTH="400"></A>
+<BR><B>Figure 99:</B> Inverted Y-axis <A href="exframes/frame_inyaxisex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> Two achieve this effect there are two simple steps to take:</P>
+<OL>
+<LI> Negate all you Y-value in the data</LI>
+<LI> Create a callback that negates the scale labels so they appear to
+ be positive.</LI>
+</OL>
+<P> And that's it! We refer you to the code in the example above for the
+ details.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7194Formattingthescalelabels.html">Previous</A>
+<A HREF="720Adjustingtheautoscalinglimitsgracevalue.html">Next</A>
+</BODY>
+</HTML>

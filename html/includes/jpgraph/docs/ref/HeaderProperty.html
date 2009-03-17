@@ -1,0 +1,343 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_HEADERPROPERTY"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>HeaderProperty</b></div>
+<i>(Defined in: jpgraph_gantt.php : 1730)</i><table border=1><tr><td>&nbsp;<a href="HeaderProperty.html" style="font-family:arial;font-weight:bold;color:darkblue;">HeaderProperty</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETBACKGROUNDCOLOR">SetBackgroundColor()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETFONTCOLOR">SetFontColor()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETFORMATSTRING">SetFormatString()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETFRAMECOLOR">SetFrameColor()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETFRAMEWEIGHT">SetFrameWeight()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETINTERVALL">SetIntervall()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETLABELFORMATSTRING">SetLabelFormatString()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETSTYLE">SetStyle()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETSUNDAYFONTCOLOR">SetSundayFontColor()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETTITLEVERTMARGIN">SetTitleVertMargin()</a>&nbsp;<br>
+&nbsp;<a href="HeaderProperty.html#_HEADERPROPERTY_SETWEEKENDCOLOR">SetWeekendColor()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Data encapsulating class to hold properties for each type of the scale headers of the Gantt chart.
+
+It is instantiated in (and accessible through)
+
+<code>
+$ganttgraph->scale->min
+$ganttgraph->scale->hour
+$ganttgraph->scale->day
+$ganttgraph->scale->week
+$ganttgraph->scale->month
+$ganttgraph->scale->year
+</code>
+
+You use the methods on these object to specify how you want the scale to be displayed. For example specifying if the week view will show start date or week number. <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETBACKGROUNDCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBackgroundColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background color in scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background color in scale&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;week-&gt;SetBackgroundColor('lightblue');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont($aFFamily,$aFStyle,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font for scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFFamily</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FS_NORMAL</font>
+</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font for scale&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;week-&gt;SetFont(FF_FONT0);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETFONTCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFontColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font (text) color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font (text) color&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;week-&gt;SetFontColor('darkred');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETFORMATSTRING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFormatString($aStr)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify format string for scales</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify printf() style format string for scales&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETFRAMECOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFrameColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set color of frame around scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set color of frame around scale&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;year-&gt;SetFrameCOlor('darkblue');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETFRAMEWEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFrameWeight($aWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify width of frame around scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify width of frame around scale&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;year-&gt;SetFrameWeight(2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETINTERVALL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetIntervall($aInt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set scale interval</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aInt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Integer intervall</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set scale interval. The exact behaviour depends on if this is evoked on a day, hour or minute scale.
+<p>
+For example if the scale is an hour scale then SetIntervall() will give number of hours between each scale interball.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Setup&nbsp;minute&nbsp;format<br />$graph-&gt;scale-&gt;minute-&gt;SetIntervall(30);<br />$graph-&gt;scale-&gt;minute-&gt;SetBackgroundColor('lightyellow:1.5');<br />$graph-&gt;scale-&gt;minute-&gt;SetFont(FF_FONT0);<br />$graph-&gt;scale-&gt;minute-&gt;SetStyle(MINUTESTYLE_MM);<br />$graph-&gt;scale-&gt;minute-&gt;grid-&gt;SetColor('lightgray');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETLABELFORMATSTRING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelFormatString($aStr)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify format string for use in scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>printf() style format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify format string for use in scale.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;week-&gt;SetLabelFormatString('week&nbsp;%d');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETSTYLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetStyle($aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify style of scale.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Scale style</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies how the week, month, day, hour and minute scale should appear. For year scale this method has no meaning.
+
+For week scale:
+<ul>
+<li>WEEKSTYLE_WNBR, Show the numeric week number
+<li>WEEKSTYLE_FIRSTDAY, Show the date for the first day in the week. e.g. 24/05 (Meaning 24:th of May)
+<li>WEEKSTYLE_FIRSTDAY2, Show the date for the first day in the week but with month as text, e.g. 24 May
+<li>WEEKSTYLE_FIRSTDAYWNBR, Same as Firstday above but also adds the week number, e.g. 24/05, w34
+<li>WEEKSTYLE_FIRSTDAY2WNBR, Same as Firstday2 above but also adds the week number, e.g. 24 May, w34
+ 
+</ul>
+
+For month scale:
+<ul>
+<li>MONTHSTYLE_SHORTNAME, Use short form of month name
+<li>MONTHSTYLE_LONGNAME, Use long form of month name
+<li>MONTHSTYLE_LONGNAMEYEAR2, Show long month nmame with a 2 digit year
+<li>MONTHSTYLE_SHORTNAMEYEAR2, Show short month nmame with a 2 digit year
+<li>MONTHSTYLE_LONGNAMEYEAR4, Show long month nmame with a 4 digit year
+<li>MONTHSTYLE_SHORTNAMEYEAR4, Show short month nmame with a 4 digit year
+</ul>
+
+For Day style
+<ul>
+<li> "DAYSTYLE_ONELETTER"
+<li> "DAYSTYLE_LONG"
+<li> "DAYSTYLE_LONGDAYDATE1"
+<li> "DAYSTYLE_LONGDAYDATE2"
+<li> "DAYSTYLE_SHORT"
+<li> "DAYSTYLE_SHORTDAYDATE1"
+<li> "DAYSTYLE_SHORTDAYDATE2"
+<li> "DAYSTYLE_SHORTDAYDATE3"
+<li> "DAYSTYLE_SHORTDATE1"
+<li> "DAYSTYLE_SHORTDATE2"
+<li> "DAYSTYLE_SHORTDATE3"
+<li> "DAYSTYLE_CUSTOM"
+</ul>
+
+For hour style
+<ul>
+<li> "HOURSTYLE_HM24"
+<li> "HOURSTYLE_HMAMPM"
+<li> "HOURSTYLE_H24"
+<li> "HOURSTYLE_HAMPM"
+<li> "HOURSTYLE_CUSTOM"
+</ul>
+
+Minute style
+<ul>
+<li>"MINUTESTYLE_MM"
+<li>"MINUTESTYLE_CUSTOM"
+</ul>
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;scale-&gt;month-&gt;SetStyle(MONTHSTYLE_SHORTNAMEYEAR4);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETSUNDAYFONTCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSundayFontColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Only used by day scale. Specify font color for sunday.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Only used by day scale. Specify font color for sunday. The default is toi display Sundays in red color as per convention.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttScale.html#_GANTTSCALE_USEWEEKENDBACKGROUND">GanttScale::UseWeekendBackground</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;SetSundayFontColor('red');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETTITLEVERTMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTitleVertMargin($aMargin)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify margin above and below text in scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMargin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify margin above and below text in scale&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;year-&gt;SetTitleVertMargin(7);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_HEADERPROPERTY_SETWEEKENDCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWeekendColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Only valid if if used by day scale</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Background color for the weekend</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the background color for weekends. 
+<p>
+Tip: If you want the weekend background color to continue down the gantt chart theh use the GanttScale::UseWeekendBackground() method.
+ &nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="HeaderProperty.html#_HEADERPROPERTY_SETSUNDAYFONTCOLOR">HeaderProperty::SetSundayFontColor</a> and <a href="GanttScale.html#_GANTTSCALE_USEWEEKENDBACKGROUND">GanttScale::UseWeekendBackground</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$ganttgraph-&gt;scale-&gt;day-&gt;SetWeekendColor('lightgray');<br /></font>
+</span><br>
+<p> <hr> <p>

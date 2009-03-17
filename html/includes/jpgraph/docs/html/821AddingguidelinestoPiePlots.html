@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="82Pieplots.html">
+<LINK REL="Next" HREF="822Creating3Dpieplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="82Pieplots.html">Previous</A>
+<A HREF="822Creating3Dpieplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_2_1">8.2.1 Adding guide lines to Pie Plots</A></H3>
+<P> For very busy Pie plots it can become too little space for the
+ labels to be printed just beside the pie slice. For this purpose it is
+ possible to use guide lines for the labels. The library will then draw
+ a line from the center edge of the slices to the label which will be
+ positioned further out from the Pie Plot.</P>
+<P> There is one method that is primarily used to handle this,<I>
+ PiePlot::SetGuideLines()</I> the simplest usage of this would be<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$pieplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetGuideLines</FONT><FONT color="#007700">
+();</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> An example of this could then be<DIV class="example">
+<BR> <A href="exframes/frame_pielabelsex1.html" target="blank"><IMG border="0"
+HEIGHT="350"       src="img/img/img/img/img/img/pielabelsex1.png" WIDTH="300"></A>
+<BR><B>Figure 124:</B> Using guide lines for PiePlots <A href="exframes/frame_pielabelsex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> The above example will give guide lines very similar as what is
+ produced by other programs, e.g. Excel. In addition to the above
+ variant it is also possible to instruct the library to line up the
+ labels vertically in a way that we think is easier to read. This is
+ achieved by specifying the second parameter to the SetGuideLines() to<I>
+ 'false'</I> as in<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$pieplot</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetGuideLines</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+true</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">false</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> The first parameter is to enable/disable the guide-lines. With the
+ same example as above this would then produce the image<DIV class="example">
+<BR> <A href="exframes/frame_pielabelsex2.html" target="blank"><IMG border="0"
+HEIGHT="350"       src="img/img/img/img/img/img/pielabelsex2.png" WIDTH="300"></A>
+<BR><B>Figure 125:</B> Using guide lines for PiePlots with vertically
+ lined up labels. <A href="exframes/frame_pielabelsex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> It is also possible to configure the vertical distance between the
+ labels. By default the distance between the labels is roughly 40% of
+ the labels font height. By using the method<I>
+ PiePlot::SetGuideLinesAdjust()</I> it is possible to specify a
+ fractional value which is interpretated as the distance between the
+ bottom of one label to the bottom of the next. This means that
+ specifying a value of '1.0' the labels will have no space between them
+ and the bottom of one label will touch the top of another label. By
+ default this value is 1.4.</P>
+<P> By increasing or decreasing this value it is possible to make the
+ labels become positioned more or less compact. Below we have taken the
+ above example and reduced the distance to '1.1' and as can be seen this
+ yields much more compact labeling.<DIV class="example">
+<BR> <A href="exframes/frame_pielabelsex4.html" target="blank"><IMG border="0"
+HEIGHT="350"       src="img/img/img/img/img/img/pielabelsex4.png" WIDTH="300"></A>
+<BR><B>Figure 126:</B> Adjusting to a smaller vertical distance between
+ the labels <A href="exframes/frame_pielabelsex4.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><B> Note:</B> Guide lines is only available in 2D Pie plots.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="82Pieplots.html">Previous</A>
+<A HREF="822Creating3Dpieplots.html">Next</A>
+</BODY>
+</HTML>

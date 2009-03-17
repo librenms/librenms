@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="710Handlingdatetimescales.html">
+<LINK REL="Next" HREF="7102Specifyingadatetimescalewithamanualcallback.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="710Handlingdatetimescales.html">Previous</A>
+<A HREF="7102Specifyingadatetimescalewithamanualcallback.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_10_1">7.10.1 Using the automatic date/time scale</A></H3>
+<P> The easiest way to get a date time scale for the X-axis is to use
+ the pre-defined &quot;dat&quot; scale. To be able to use that it is first
+ necessary to include the module<I> &quot;jpgraph_date.php&quot;</I> and the
+ specify the scale, for example as &quot;datlin&quot; in the call to<I> SetScale()</I>
+ as the following code snippet shows.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">require_once(</FONT><FONT
+color="#DD0000">&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>require_once(</FONT><FONT color="#DD0000">&quot;../jpgraph_line.php&quot;</FONT><FONT
+color="#007700">);
+<BR>require_once(</FONT><FONT color="#DD0000">&quot;../jpgraph_date.php&quot;</FONT><FONT
+color="#007700">);
+<BR>...
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Graph</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">540</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+300</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetScale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'datlin'</FONT><FONT color="#007700">);
+<BR>...</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The above code snippet would create a date/linear scale for the
+ graph. We will first show a basic use of the date scale and then go on
+ to illustrate how it is possible to tailor the exact formatting of the
+ date axis.</P>
+<P> When using the fully automatic formatting the library will use the
+ shortest possible string that uniquely identifieas a date/time. For
+ example if the entire intervall falls within the same day only the time
+ values will be displayed, if the intervall falls over several days then
+ also the date will be added to the label.</P>
+<P> As usual it is also possible to manually force a certain label
+ formatting to be used this is illustrated below.</P>
+<H4>7.10.1.1 Specifying the input data</H4>
+<P> The first basic example below creates a data set that emulates a
+ sample rate every S second and falls over a total period of two days.
+ It is important to note that the input data on the X-axis must be a in
+ the form of timestamp data, i.e. the number of seconds from the system
+ epoch. In PHP the current timestamp value is returned by the function<I>
+ time()</I>.</P>
+<P> This means that it is always mandatory to specify two input vectors
+ for a plot. For example to specify a line plot<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;$line&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">LinePlot</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$data</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$xdata</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> The example below show this in practice<DIV class="example">
+<BR> <A href="exframes/frame_dateaxisex2.html" target="blank"><IMG border="0"
+HEIGHT="300"       src="img/img/img/img/img/img/dateaxisex2.png" WIDTH="540"></A>
+<BR><B>Figure 80:</B> Using the special date X-axis with all default
+ values <A href="exframes/frame_dateaxisex2.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P> Please review the script (by following the [src] link) that creates
+ this graph before continuing since we will base all further examples on
+ the above example.</P>
+<H4>7.10.1.2 Adjusting the start and end alignment</H4>
+<P> As can be seen from the above example the scale starts slightly
+ before the first data point. Why? This is of course by purpose in order
+ to make the first time label to start on an &quot;even&quot; value, in this case
+ on an hour. Depending on the entire interval of the graph the start
+ value will always be chosen to be the largest &quot;even&quot; time value, this
+ could for example be on an even minute, even 30min, even hour, even
+ day, even week and so on.</P>
+<P> The alignment of the start (and end) vdate alignment can also be
+ adjusted manually by using the two methods</P>
+<UL>
+<LI><I> SetTimeAlign($aStartAlign,$aEndAlign)</I></LI>
+<LI><I> SetDateAlign($aStartAlign,$aEndAlign)</I></LI>
+</UL>
+<P> These method allow the alignment to be made by specifying one of the
+ following constants.</P>
+<P> For the SetTimeAlign() the following symbolic constants can be used</P>
+<OL>
+<LI> Alignment on seconds
+<UL>
+<LI> MINADJ_1, Align on a single second (This is the lowest resolution)</LI>
+<LI> MINADJ_5, Align on the nearest 5 seconds</LI>
+<LI> MINADJ_10, Align on the nearest 10 seconds</LI>
+<LI> MINADJ_15, Align on the nearest 15 seconds</LI>
+<LI> MINADJ_30, Align on the nearest 30 seconds</LI>
+</UL>
+</LI>
+<LI> Alignment on minutes
+<UL>
+<LI> MINADJ_1, Align to the nearest minute</LI>
+<LI> MINADJ_5, Align on the nearest 5 minutes</LI>
+<LI> MINADJ_10, Align on the nearest 10 minutes</LI>
+<LI> MINADJ_15, Align on the nearest 15 minutes</LI>
+<LI> MINADJ_30, Align on the nearest 30 minutes</LI>
+</UL>
+</LI>
+<LI> Alignment on hours
+<UL>
+<LI> HOURADJ_1, Align to the nearest hour</LI>
+<LI> HOURADJ_2, Align to the nearest two hour</LI>
+<LI> HOURADJ_3, Align to the nearest three hour</LI>
+<LI> HOURADJ_4, Align to the nearest four hour</LI>
+<LI> HOURADJ_6, Align to the nearest six hour</LI>
+<LI> HOURADJ_12, Align to the nearest tolw hour</LI>
+</UL>
+</LI>
+</OL>
+<P> For the<I> SetDateAlign()</I> the following symbolic constants can
+ be used</P>
+<OL>
+<LI> Alignment on a day basis
+<UL>
+<LI> DAYADJ_1, Align on the start of a day</LI>
+<LI> DAYADJ_7, Align on the start of a week</LI>
+<LI> DAYADJ_WEEK, Synonym to DAYADJ_7</LI>
+</UL>
+</LI>
+<LI> Alignment on a monthly basis
+<UL>
+<LI> MONTHADJ_1, Align on a month start</LI>
+<LI> MONTHADJ_6, Align on the start of halfyear</LI>
+</UL>
+</LI>
+<LI> Alignment on a yearly basis
+<UL>
+<LI> YEARADJ_1, Align on a year</LI>
+<LI> YEARADJ_2, Align on a bi-yearly basis</LI>
+<LI> YEARADJ_5, Align on a 5 year basis</LI>
+</UL>
+</LI>
+</OL>
+<P> Some examples will calrify the use of these methods.</P>
+<P><B> Example 1.</B> We want the time adjustment to start on an even
+ quarter of an hour, i.e. an even 15 minute period.<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTimeAlign</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MINADJ_15</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P><B> Example 2.</B> We want the time to start on an even 2 hour<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTimeAlign</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+HOURADJ_2</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P><B> Example 3.</B> We want the start to be on an even day<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetDateAlign</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+DAYADJ_1</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<H4>7.10.1.3 Adjusting the label format</H4>
+<P> The default label format always tries to use the shortest possible
+ unique string. To manually set a manual scale the method<I>
+ SetDateFormat()</I> is used for example as in<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetDateFormat</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'H:i'</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P>The above example will force the labels to be displayed as hour (24h)
+ and minutes.<DIV class="example">
+<BR> <A href="exframes/frame_dateaxisex4.html" target="blank"><IMG border="0"
+HEIGHT="300"       src="img/img/img/img/img/img/dateaxisex4.png" WIDTH="540"></A>
+<BR><B>Figure 81:</B> Using specific label format and align time axis to
+ start and end on an even 10min <A href="exframes/frame_dateaxisex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<H4>7.10.1.4 Adjusting the date scale density</H4>
+<P> As with the linear scale it is possible to indicate what density of
+ scale ticks is needed. This is specified as usual with a call to<I>
+ Graph::SetTickDensity()</I><DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetTickDensity</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+TICKD_DENSE</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="710Handlingdatetimescales.html">Previous</A>
+<A HREF="7102Specifyingadatetimescalewithamanualcallback.html">Next</A>
+</BODY>
+</HTML>

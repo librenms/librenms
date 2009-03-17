@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="83Errorplots.html">
+<LINK REL="Next" HREF="84Scatterplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="83Errorplots.html">Previous</A>
+<A HREF="84Scatterplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_3_1">8.3.1 Using line error plots</A></H3>
+<P> A line error plot is an error plot with the addition that a line is
+ drawn between the average value of each error pair. You use this type
+ of plot the exact same way you would use an error plot. The only change
+ is that you must instantiated an <A href="../ref/ErrorPlot.html#_C_ERRORPLOT">
+ ErrorLinePlot()</A> instead and make sure you have included the
+ &quot;jpgraph_line.php&quot; since the line error plot makes use of the line plot
+ class to stroke the line.</P>
+<P> To control the various properties of the line drawn the &quot;line&quot;
+ property of the error line plot may be accessed. So, for example, if
+ you want the line to be 2 pixels wide and blue you would have to add
+ the following two lines<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$elplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">line</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetWeight</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">2</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$elplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">line</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>to generate the graph as shown below<DIV class="example">
+<BR> <A href="exframes/frame_example15.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example15.png" WIDTH="300"></A>
+<BR><B>Figure 55:</B> Linear error plot <A href="exframes/frame_example15.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> You may of course add legends to none, one or both of the line types
+ in the above graph. So for example if we wanted the legend &quot;Min/Max&quot;
+ for the red error bars and a legend &quot;Average&quot; for the blue line you
+ would have to add the lines<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$errplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetLegend</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Min/Max&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$errplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">line</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetLegend</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Average&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The resulting graph will now look like (note that we are using the
+ default placement of the legend box)<DIV class="example">
+<BR> <A href="exframes/frame_example16.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example16.png" WIDTH="300"></A>
+<BR><B>Figure 56:</B> Addding a legend box to the line error plot. <A href="exframes/frame_example16.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="83Errorplots.html">Previous</A>
+<A HREF="84Scatterplots.html">Next</A>
+</BODY>
+</HTML>

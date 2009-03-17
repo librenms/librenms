@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="982Hourscale.html">
+<LINK REL="Next" HREF="984Weekscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="982Hourscale.html">Previous</A>
+<A HREF="984Weekscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_8_3">9.8.3 Day scale</A></H3>
+<P> By default the day scale show the first letter of the week day but
+ it is also posible to format the day scale in a number of different
+ ways. Days can have one of the following scale formats.</P>
+<UL>
+<LI>DAYSTYLE_ONELETTER, On letter week day. Example &quot;M&quot;</LI>
+<LI>DAYSTYLE_LONG, Full week day. Example &quot;Monday&quot;</LI>
+<LI>DAYSTYLE_LONGDAYDATE1, Day with date. Example &quot;Monday 23 Jun&quot;</LI>
+<LI>DAYSTYLE_LONGDAYDATE2, Day with date+year. Example &quot;Monday 23 Jun
+ 2003&quot;</LI>
+<LI>DAYSTYLE_SHORT, Short date. Example &quot;Mon&quot;</LI>
+<LI>DAYSTYLE_SHORTDAYDATE1, Short date+date. Example &quot;Mon 23/6&quot;</LI>
+<LI>DAYSTYLE_SHORTDAYDATE2, Short date+date. Example &quot;Mon 23 Jun&quot;</LI>
+<LI>DAYSTYLE_SHORTDAYDATE3,Short date+date. Example &quot;Mon 23&quot;</LI>
+<LI>DAYSTYLE_SHORTDATE1, Short date. Example &quot;23/6&quot;</LI>
+<LI>DAYSTYLE_SHORTDATE2, Short date. Example &quot;23 Jun&quot;</LI>
+<LI>DAYSTYLE_SHORTDATE3, Short date. Example &quot;Mon 23&quot;</LI>
+<LI>DAYSTYLE_SHORTDATE4, Short date. Example &quot;23&quot;</LI>
+<LI>DAYSTYLE_CUSTOM, Custom specified formatting string. Example &quot;M&quot;</LI>
+</UL>
+<P> The formatting is specified by using the SetStyle() method as in<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">day</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetStyle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+DAYSTYLE_LONG</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> The graphical formatting possibilities for days allow the
+ possibility to specify a different color for the weekend background and
+ also for the Sunday.</P>
+<UL>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;SetWeekendColor</FONT><FONT color="#007700">()</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV>
+<P>Set the background color for weekends. (Defaults to light gray)</P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;SetSundayFontColor</FONT><FONT color="#007700">()</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV>
+<P>The Sunday font color. (Defaults to red)</P>
+</LI>
+</UL>
+<P> In addition to this there is also a possibility to choose whether or
+ not the weekend background should be extended vertically down over the
+ plot area. (the default). Since that is a property more of the whole
+ plot this behavior is modified with a call to the method<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;UseWeekendBackground</FONT><FONT
+color="#007700">()</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P>of the scale, e.g.
+<BR> &nbsp;<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">UseWeekendBackground</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">false</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="982Hourscale.html">Previous</A>
+<A HREF="984Weekscale.html">Next</A>
+</BODY>
+</HTML>

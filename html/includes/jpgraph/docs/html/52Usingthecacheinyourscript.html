@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="51Enablingthecachesystem.html">
+<LINK REL="Next" HREF="53UsingthecachewithClientSideImageMaps.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="51Enablingthecachesystem.html">Previous</A>
+<A HREF="53UsingthecachewithClientSideImageMaps.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="5_2">5.2 Using the cache in your script</A></H2>
+<P> To use caching in your script you must supply a suitable file name
+ which will be used to store the image in the cache. You can also supply
+ a timeout value indicating how many minutes the cached image should be
+ considered valid.</P>
+<P> These parameters are supplied in the initial Graph() method call
+ which should be among the first in your script. Instead of manually
+ specifying a file name to be used you could often use the special name
+ &quot;auto&quot;. If the filename is specified as &quot;auto&quot; the cashed image will
+ then be named the same as the image script but with the correct
+ extension depending on what image format have been chosen.</P>
+<P> If you don't specify a file name no caching will be used no matter
+ the settings of USE_CACHE (without a file name it is impossible!)</P>
+<P> The following call to Graph() shows a typical use of the cache.</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+Graph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">300</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;auto&quot;</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">60</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> The above code will use the automatic filename and a make the cache
+ valid for 60 minutes.</P>
+<P> So, how does this all work now?</P>
+<P> The first time you call your script (no cached image) everything
+ will be as usual, the script will run and you will in the end send back
+ the image to the browser. However if you have the caching enabled
+ JpGraph will automatically have stored a copy of the generated image in
+ the cache directory.</P>
+<P> The next time you call the script the first thing that happens in
+ the initial Graph() is that it will go and check in the cache directory
+ if the named image exists there. If this is the case it will also
+ checks that the image isn't too old (as compared to the specified
+ timeout value). If the image is valid then the image will be streamed
+ straight back from the image file to the browser and the script will
+ end it's execution.</P>
+<P> Hence, if the image is found in the cache<STRONG> no code lines
+ after the initial Graph() call will be executed</STRONG></P>
+<P> The design decision behind this is that your image script code never
+ has to include anything special to make full use of the cache. It will
+ just automatically work.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="51Enablingthecachesystem.html">Previous</A>
+<A HREF="53UsingthecachewithClientSideImageMaps.html">Next</A>
+</BODY>
+</HTML>

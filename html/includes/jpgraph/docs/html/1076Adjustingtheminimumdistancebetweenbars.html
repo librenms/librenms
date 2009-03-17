@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1075Addingmarkerstoaganttbar.html">
+<LINK REL="Next" HREF="108Formattingthescaleheaders.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1075Addingmarkerstoaganttbar.html">Previous</A>
+<A HREF="108Formattingthescaleheaders.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_7_6">10.7.6 Adjusting the minimum distance between bars</A>
+</H3>
+<P> Let's see what happens if we set the height of each bar to be 100%
+ of the reserved height by adding another activity/bar below the first
+ one and set the height of each bar to 100% by adding the lines (We omit
+ the added lines to add another bar since they are just a copy of the
+ first bar)<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$activity</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetHeight</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">1.0</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity2</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetHeight</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">1.0</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> to the previous example. (Note that a value in the range [0..1] is
+ interpretated as the fraction of the reserved height while a value &gt; 1
+ is interpretated as the absolute size in pixels.)<DIV class="example">
+<BR> <A href="exframes/frame_ganttex10.html" target="blank"><IMG border="0"
+HEIGHT="243"  src="img/ganttex10.png" WIDTH="502"></A>
+<BR><B>Figure 153:</B> Setting the height for each bar to 100% <A href="exframes/frame_ganttex10.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> Aha.. What we are trying to do doesn't really make sense. Since we
+ have specified that the bar will always occupy 100% of the available
+ reserved with there will be no distance between the bars. So what if we
+ specify the bar as 10 pixel absolute by changing the lines to<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$activity</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetHeight</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">10</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity2</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetHeight</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">10</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> we instead get<DIV class="example">
+<BR> <A href="exframes/frame_ganttex11.html" target="blank"><IMG border="0"
+HEIGHT="243"  src="img/ganttex11.png" WIDTH="502"></A>
+<BR><B>Figure 154:</B> Setting both bars height to 10 pixels <A href="exframes/frame_ganttex11.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> So what can we actually do? Well if you remember the reserved height
+ for each bar is the maximum height of all bars including titles. This
+ guarantees that no two bars will ever overlap. To guarantee that titles
+ don't end up too close together there is a<B> Vertical Label Margin</B>
+ which basically specifies some extra &quot;air&quot; in between the titles. The
+ amount of air is specified in percent of the title height. To set the
+ margin you use<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;GanttGraph</FONT><FONT color="#007700">::</FONT><FONT color="#0000BB">
+SetLabelVMarginFactor</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aMargin</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> As an example let's set that margin in the previous example to 0 and
+ see what happens.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex12.html" target="blank"><IMG border="0"
+HEIGHT="212"  src="img/ganttex12.png" WIDTH="502"></A>
+<BR><B>Figure 155:</B> Setting the vertical label margin to 0% <A href="exframes/frame_ganttex12.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> As you would perhaps expect the two bars just barely touches now
+ since there are no extra margin added. If the two bars hadn't had the
+ extra right marker it would have looked very compressed.</P>
+<P> By default the vertical margin is set to 40%.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1075Addingmarkerstoaganttbar.html">Previous</A>
+<A HREF="108Formattingthescaleheaders.html">Next</A>
+</BODY>
+</HTML>

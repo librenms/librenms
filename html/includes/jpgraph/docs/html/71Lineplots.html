@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7WorkingwithorthogonalXYplots.html">
+<LINK REL="Next" HREF="711AddingplotmarkstolineplotsXXX.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7WorkingwithorthogonalXYplots.html">Previous</A>
+<A HREF="711AddingplotmarkstolineplotsXXX.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_1">7.1 Line plots</A></H2>
+<P> The first example draws a line graph consisting of 10 Y-values. In
+ this first example we show the full code. In the following examples we
+ will only show interesting piece of the code.<DIV class="phpscript">
+(File: example0.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#007700">include&nbsp;(</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">);
+<BR>include&nbsp;(</FONT><FONT color="#DD0000">&quot;../jpgraph_line.php&quot;</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Some&nbsp;data
+<BR></FONT><FONT color="#0000BB">$ydata&nbsp;</FONT><FONT color="#007700">
+=&nbsp;array(</FONT><FONT color="#0000BB">11</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">3</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+8</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">12</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">5</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">9</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+13</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">5</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">7</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;Create&nbsp;the&nbsp;graph.&nbsp;These&nbsp;two&nbsp;calls&nbsp;are&nbsp;always&nbsp;required
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Graph</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">350</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+250</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">&quot;auto&quot;</FONT><FONT
+color="#007700">);&nbsp;&nbsp;&nbsp;&nbsp;
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetScale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;textlin&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;linear&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+=new&nbsp;</FONT><FONT color="#0000BB">LinePlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$ydata</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;blue&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;the&nbsp;plot&nbsp;to&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$lineplot</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Display&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT></FONT></CODE></DIV><DIV class="example">
+<BR> <A href="exframes/frame_example0.html" target="blank"><IMG border="0"
+HEIGHT="250"       src="img/img/img/img/img/img/example0.png" WIDTH="350"></A>
+<BR><B>Figure 4:</B> A simple line graph <A href="exframes/frame_example0.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> You might note a few things</P>
+<UL>
+<LI>Both the X and Y axis have been automatically scaled. We will later
+ on show how you might control the auto scaling how it determines the
+ number of ticks which is displayed.</LI>
+<LI>By default the Y-grid is displayed in a &quot;soft&quot; color</LI>
+<LI>By default the image is bordered and the margins are slightly gray.</LI>
+<LI>By default the 0 label on the Y-axis is not displayed</LI>
+</UL>
+<P> This is a perfect fine graph but looks a little bit &quot;sparse&quot;. To
+ make it more interesting we might want to add a few things like</P>
+<UL>
+<LI>A title for the graph</LI>
+<LI> Title for the axis</LI>
+<LI>Increase the margins to account for the title of the axis</LI>
+</UL>
+<P> From looking at the previous example you can see that you access all
+ properties of JpGraph through the objects you create. Graph(),
+ LinePlot() and so on. In general all objects you can see in the graph
+ is accessed through a named instance.</P>
+<P> For example the title of the graph is accessed through the
+ 'Graph::title' property. So to specify a title string you make a call
+ to the 'Set()' method on the title property as in:</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">title</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'Example&nbsp;2'</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> So by adding just a few more lines to the previous code we get a
+ graph as shown below.<DIV class="example">
+<BR> <A href="exframes/frame_example2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example2.png" WIDTH="300"></A>
+<BR><B>Figure 5:</B> Same basic graph as in previous figure but with a
+ titles for graph and axis. <A href="exframes/frame_example2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P>To achieve this we just needed to add a few more lines. (We only show
+ the part of example 1 we changed, to look at the full source just click
+ the [src] link in the caption. )<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Setup&nbsp;margin&nbsp;and&nbsp;titles
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">40</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">20</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">20</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">40</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Example&nbsp;2&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;X-title&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">yaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">Set</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">&quot;Y-title&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> Again there are a couple of things you should note here</P>
+<UL>
+<LI>A default font and size is used for the text</LI>
+<LI>The default position for the title of the graph is to be centered at
+ the top</LI>
+<LI>The default position for the title of the x-axis is the far right
+ and for the y-axis centered and rotated in a 900 angle.</LI>
+</UL>
+<P></P>
+<P> A nice change would now be to have all the titles in a bold font and
+ the line plot a little bit thicker and in blue color. Let's do that by
+ adding the lines<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">yaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;blue&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$lineplot</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetWeight</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">2</FONT><FONT color="#007700">);&nbsp;&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Two&nbsp;pixel&nbsp;wide</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> Again please note the consistent interface. To change font you just
+ have to invoke the SetFont() method on the appropriate object. This
+ principle is true for most methods you will learn. The methods may be
+ applied to a variety of objects in JpGraph. So for example it might not
+ come as a big surprise that to have the Y-axis in red you have to say:<DIV
+class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">yaxis</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;red&quot;</FONT><FONT color="#007700">)</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> or perhaps we also want to make the Y-axis a bit wider by<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">yaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetWidth</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+2</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> As a final touch let's add a frame and a drop shadow around the
+ image since this is by default turned off. This is done with<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetShadow</FONT><FONT color="#007700">()</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The result of all these modifications are shown below.<DIV class="example">
+<BR> <A href="exframes/frame_example3.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example3.png" WIDTH="300"></A>
+<BR><B>Figure 6:</B> Making the image a little bit more interesting by
+ adding som colors and changing the fonts <A href="exframes/frame_example3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7WorkingwithorthogonalXYplots.html">Previous</A>
+<A HREF="711AddingplotmarkstolineplotsXXX.html">Next</A>
+</BODY>
+</HTML>

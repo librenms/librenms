@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="10123Modifyingtheboxaroundtheplot.html">
+<LINK REL="Next" HREF="10125AddingiconstoGanttgraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="10123Modifyingtheboxaroundtheplot.html">Previous</A>
+<A HREF="10125AddingiconstoGanttgraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_12_4">10.12.4 Horizontal grids and alternating line
+ colors</A></H3>
+<P> In order to make large charts easier to read it is possible to
+ specify alternating an horizontal grid and optional alternating line
+ colors in the background for Gantt charts. The horizontal grid is
+ accessed through the<I> Graph::hgrid</I> property and the line (used in
+ the grid) is accessed through the<I> Graph::hgrid::line</I>
+ sub-property</P>
+<P> In order to specify the alternating line colors the<I>
+ SetRowFillColor()</I> method is used. For example, to use alternating
+ blue background with blue grid line the following lines would have to
+ be added to the graph script<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Setup&nbsp;a&nbsp;horizontal&nbsp;grid
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">hgrid</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Show</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">hgrid</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+line</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">'lightblue'</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">hgrid</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetRowFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'darkblue@0.9'</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> Below is an example of a Gantt graph using this formatting<DIV class="example">
+<BR> <A href="exframes/frame_gantthgridex1.html" target="blank"><IMG border="0"
+HEIGHT="253"  src="img/gantthgridex1.png" WIDTH="500"></A>
+<BR><B>Figure 165:</B> Adding a horizontal grid to the graph <A href="exframes/frame_gantthgridex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="10123Modifyingtheboxaroundtheplot.html">Previous</A>
+<A HREF="10125AddingiconstoGanttgraphs.html">Next</A>
+</BODY>
+</HTML>

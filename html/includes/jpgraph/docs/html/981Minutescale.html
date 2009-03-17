@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="98Formattingthescaleheaders.html">
+<LINK REL="Next" HREF="982Hourscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="98Formattingthescaleheaders.html">Previous</A>
+<A HREF="982Hourscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_8_1">9.8.1 Minute scale</A></H3>
+<P> Minute scale is the lowest resolution you can use. It is often
+ convenient to use Minute scale with &quot;GanttScale::SetINtervall()&quot; since
+ by default the increment will be 1 minute. The style of minute scale
+ can be further adjusted by the use<I> style</I> parameters which can be
+ one of</P>
+<OL>
+<LI> &quot;MINUTESTYLE_MM&quot;, This will display minutes as a two digit number
+ with a leading zero if necessary</LI>
+<LI> &quot;MINUTESTYLE_CUSTOM&quot;, This will let you specify you own custom
+ minute style by making a call to<I> HeaderProperty:: SetFormatString()</I>
+</LI>
+</OL>
+<P> Minute scale is enabled by adding the GANTT_HMIN in the
+ GanttGraph::ShowHeaders() call. For example as in<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">ShowHeaders</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">GANTT_HDAY&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HHOUR&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HMIN</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The code snippet below shows how to set up a minute scale with 30
+ min interval and some custom colors.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+minute</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetIntervall</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+30</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+minute</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetBackgroundColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'lightyellow:1.5'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+minute</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT0</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+minute</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetStyle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MINUTESTYLE_MM</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+minute</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">grid</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'lightgray'</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="98Formattingthescaleheaders.html">Previous</A>
+<A HREF="982Hourscale.html">Next</A>
+</BODY>
+</HTML>

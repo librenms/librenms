@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="103Addinglinesandrectanglestoacanvas.html">
+<LINK REL="Next" HREF="105SampleapplicationDrawingDBschema.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="103Addinglinesandrectanglestoacanvas.html">Previous</A>
+<A HREF="105SampleapplicationDrawingDBschema.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_4">10.4 Using a canvas scale</A></H2>
+<P> The previous method using absolute coordinates works. But nothing
+ more. It doesn't give you any chance to easily scale the image (unless
+ you manually recalculate all used coordinates) , it gets tedious to
+ work with pixel level resolution. Especially if you just like to draw a
+ few basic shapes.</P>
+<P> To help with this you can use a scale for the canvas. This lets you
+ define a &quot;work-space&quot; of your choice. You can for example set the
+ coordinates to be between X:0-10, Y:0-10. This makes it easier to
+ position objects on the canvas. This also has two additional
+ advantages:</P>
+<UL>
+<LI> If you increase the size of the canvas all objects will be
+ automatically scale to keep their proportions without any changes.</LI>
+<LI> You can shrink/enlarge your drawing (not the image) by just using
+ another scale. For example if you originally draw the image using a
+ (0:10, 0:10) scale and then change the scale to (0:20, 0:20) then the
+ effect will be that you drawings will &quot;shrink&quot; to half their size.</LI>
+</UL>
+<P></P>
+<P> To use this type of scaling you must make sure you include the file
+ &quot;jpgraph_canvtools.php&quot; . In addition to the scaling class their are
+ also a couple of other utility classes that may come in handy,
+ especially the <A href="../ref/Shape.html#_C_SHAPE"> Shape</A> class.</P>
+<P> Using the scale is quite simple. You first instantiate a scale
+ object passing the graph as a parameter and then specify the scale you
+ want to use. This means you need to add the lines<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$scale&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">CanvasScale</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$xmax</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$ymax</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> to your code. You can then use one of the translation methods (for
+ example <A href="../ref/CanvasScale.html#_CANVASSCALE_TRANSLATE">
+CanvasScale::Translate()</A>) in the canvas scale class to translate
+ between your world coordinates and the absolute screen coordinates.
+ This means you could take the code in the example above and just add
+ the lines, for example,<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">list(</FONT><FONT color="#0000BB">
+$x1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$y1</FONT><FONT
+color="#007700">)&nbsp;=&nbsp;</FONT><FONT color="#0000BB">$this</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Translate</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$x1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$y1</FONT><FONT
+color="#007700">);
+<BR>list(</FONT><FONT color="#0000BB">$x2</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$y2</FONT><FONT color="#007700">)&nbsp;=&nbsp;</FONT><FONT color="#0000BB">
+$this</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Translate</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$x2</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$y2</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">img</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Line</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">$x1</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$y1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$x2</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$y2</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> Since this pattern has to be repeated for every object that has to
+ be drawn it makes good sense to encapsulate this in a separate class.
+ This is exactly why the canvas tools file also have a utility class
+ called <A href="../ref/Shape.html#_C_SHAPE"> Shape</A> This class is
+ mainly a wrapper around the most commonly used methods in the basic
+ Image class (with one important exception) and does all these the
+ translation for you. Please see the class reference for a complete list
+ of the available methods To set up the Shape class you instantiate it
+ with the graphic context and the scale you want to use as argument as
+ in</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$shape&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+Shape</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">$g</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$scale</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> You are then ready to use all the methods in the shape class. Using
+ a scale and imitating the previous example we would get the source
+ shown below.<DIV class="phpscript">(File: canvasex03.php)
+<BR><CODE><FONT color="#000000"> <FONT color="#0000BB">&lt;?php
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;$Id:&nbsp;canvasex03.php,v&nbsp;1.1&nbsp;2002/08/27&nbsp;20:08:57&nbsp;aditus&nbsp;Exp&nbsp;$
+<BR></FONT><FONT color="#007700">include&nbsp;</FONT><FONT color="#DD0000">
+&quot;../jpgraph.php&quot;</FONT><FONT color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvas.php&quot;</FONT><FONT
+color="#007700">;
+<BR>include&nbsp;</FONT><FONT color="#DD0000">&quot;../jpgraph_canvtools.php&quot;</FONT><FONT
+color="#007700">;
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Define&nbsp;work&nbsp;space
+<BR></FONT><FONT color="#0000BB">$xmax</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">20</FONT><FONT color="#007700">;
+<BR></FONT><FONT color="#0000BB">$ymax</FONT><FONT color="#007700">=</FONT><FONT
+color="#0000BB">20</FONT><FONT color="#007700">;
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Setup&nbsp;a&nbsp;basic&nbsp;canvas&nbsp;we&nbsp;can&nbsp;work&nbsp;
+<BR></FONT><FONT color="#0000BB">$g&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT
+color="#0000BB">CanvasGraph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+400</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">200</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">'auto'</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMargin</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+5</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">11</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">6</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">11</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetShadow</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetMarginColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;teal&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;We&nbsp;need&nbsp;to&nbsp;stroke&nbsp;the&nbsp;plotarea&nbsp;and&nbsp;margin&nbsp;before&nbsp;we&nbsp;add&nbsp;the
+<BR>//&nbsp;text&nbsp;since&nbsp;we&nbsp;otherwise&nbsp;would&nbsp;overwrite&nbsp;the&nbsp;text.
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">InitFrame</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;a&nbsp;new&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$scale&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">CanvasScale</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Set</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$xmax</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$ymax</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;The&nbsp;shape&nbsp;class&nbsp;is&nbsp;wrapper&nbsp;around&nbsp;the&nbsp;Imgae&nbsp;class&nbsp;which&nbsp;translates
+<BR>//&nbsp;the&nbsp;coordinates&nbsp;for&nbsp;us
+<BR></FONT><FONT color="#0000BB">$shape&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">Shape</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$g</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$scale</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'black'</FONT><FONT color="#007700">);
+<BR>
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;a&nbsp;black&nbsp;line
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'black'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Line</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">20</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">20</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;and&nbsp;a&nbsp;circle&nbsp;(x,y,diameter)
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Circle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+5</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">14</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;..&nbsp;and&nbsp;a&nbsp;filled&nbsp;circle&nbsp;(x,y,diameter)
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'red'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">FilledCircle</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+11</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">8</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;add&nbsp;a&nbsp;rectangle
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'green'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">FilledRectangle</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">15</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+8</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">19</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">14</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;add&nbsp;a&nbsp;filled&nbsp;rounded&nbsp;rectangle
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'green'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">FilledRoundedRectangle</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+3</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">8</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">6</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;with&nbsp;a&nbsp;darker&nbsp;border
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'darkgreen'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$shape</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">RoundedRectangle</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">2</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+3</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">8</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">6</FONT><FONT color="#007700">
+);
+<BR>
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Stroke&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$g</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR>
+<BR></FONT><FONT color="#0000BB">?&gt;
+<BR></FONT>
+<BR></FONT></CODE></DIV> The source above gives the following result<DIV class="example">
+<BR> <A href="exframes/frame_canvasex03.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/canvasex03.png" WIDTH="400"></A>
+<BR><B>Figure 190:</B> Drawing shapes on a canvas using a scale. <A href="exframes/frame_canvasex03.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> If we like to make a smaller image we could just change the image
+ size and everything will be rescaled without any further code changes.
+ SO for example making the image half the size would give the result<DIV class="example">
+<BR> <A href="exframes/frame_canvasex04.html" target="blank"><IMG border="0"
+HEIGHT="100"       src="img/img/img/img/img/img/canvasex04.png" WIDTH="200"></A>
+<BR><B>Figure 191:</B> Shrinking the image to half the size is easy
+ since the scaling will maintain the relative position of the objects <A href="exframes/frame_canvasex04.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> If we instead wanted to keep the image size but shrink the shapes we
+ could just make the scale twice as large which would result in<DIV class="example">
+<BR> <A href="exframes/frame_canvasex05.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/canvasex05.png" WIDTH="400"></A>
+<BR><B>Figure 192:</B> Shrinking hte graphic object by making the scale
+ twice as large <A href="exframes/frame_canvasex05.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> We previously mentioned that the Shape class was a wrapper around
+ the image class with one exception. So what is the exception? Well,
+ glad you asked. The exception is that it contain an additional method
+ which draws an &quot;indented rectangle&quot;. An indented rectangle is a
+ rectangle where one of it's four corners have been moved into the
+ rectangle. You create an indented rectangle by calling either <A href="../ref/Shape.html#_SHAPE_INDENTEDRECTANGLE">
+ Shape::IndentedRectangle()</A> or A few examples illustrates what this
+ shape looks like.<DIV class="example">
+<BR> <A href="exframes/frame_canvasex06.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/canvasex06.png" WIDTH="400"></A>
+<BR><B>Figure 193:</B> Examples of filled indented rectangles <A href="exframes/frame_canvasex06.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> As a final note we mention the class <A href="../ref/CanvasRectangleText.html#_C_CANVASRECTANGLETEXT">
+ CanvasRectangleText</A> Which can be used to add a text with a rounded
+ rectangle (possibly filled) onto the canvas. The previous example where
+ all the available fonts were drawn were using this class. We don't
+ describe it further but refer the interested reader to the class
+ reference and the 'listfontsex1.php' example file.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="103Addinglinesandrectanglestoacanvas.html">Previous</A>
+<A HREF="105SampleapplicationDrawingDBschema.html">Next</A>
+</BODY>
+</HTML>

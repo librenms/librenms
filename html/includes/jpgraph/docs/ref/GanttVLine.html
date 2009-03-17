@@ -1,0 +1,111 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GANTTVLINE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GanttVLine</b> EXTENDS <a href="GanttPlotObject .html#_C_GANTTPLOTOBJECT " style="font-face:arial;font-weight:bold;">GanttPlotObject </a></div>
+<i>(Defined in: jpgraph_gantt.php : 3474)</i><table border=1><tr><td>&nbsp;<a href="GanttVLine.html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttVLine</a>&nbsp;</td><td>&nbsp;<a href="GanttPlotObject .html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttPlotObject </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GanttVLine.html#_GANTTVLINE_GANTTVLINE">GanttVLine()</a>&nbsp;<br>
+&nbsp;<a href="GanttVLine.html#_GANTTVLINE_SETDAYOFFSET">SetDayOffset()</a>&nbsp;<br>
+&nbsp;<a href="GanttVLine.html#_GANTTVLINE_SETTITLEMARGIN">SetTitleMargin()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This class represents a vertical line on the gantt scale. It can for example be used to illustrate the boundaries between different phases in a project plan.
+
+To access the title property just use the 'title' property of the line, for example
+
+$line = new GantVLine(.....);
+$line->title->SetFont(FF_FONT1, FS_BOLD);
+
+$ganttgraph->Add($line);
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="GanttGraph.html">GanttGraph</a>, <a href="GanttBar.html">GanttBar</a> and <a href="MileStone.html">MileStone</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTVLINE_GANTTVLINE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GanttVLine($aDate,$aTitle,$aColor,$aWeight,$aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new vertical line in the Gantt graph </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDate</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Date where the line should be</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTitle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Title of line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"black"</font>
+</td><td>Color for line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Line weight</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+"dashed"</font>
+</td><td>Line style (dotted, slashed etc)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new verticla line according to specification that later on can be added to the gantt graph vis its Add() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_SETLINESTYLE">Image::SetLineStyle</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$line&nbsp;=&nbsp;new&nbsp;GanttVLine('2002-11-02','System&nbsp;test&nbsp;starts','darkblue',2,'solid');<br /><br />$granttgraph-&gt;Add($line);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTVLINE_SETDAYOFFSET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDayOffset($aOff)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify where in the single day the line sould be drawn. </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aOff</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0.5</font>
+</td><td>Fraction of day (0,1)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify where in the single day the line sould be drawn.	&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Draw&nbsp;line&nbsp;in&nbsp;the&nbsp;middle&nbsp;of&nbsp;the&nbsp;day<br />$line-&gt;SetDayOffset(0.5);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GANTTVLINE_SETTITLEMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTitleMargin($aMarg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set distance between end of line and title.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMarg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set distance between end of line and title.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$line-&gt;SetTitleMargin(20);</font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,61 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_FIELDARROW"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>FieldArrow</b></div>
+<i>(Defined in: jpgraph_scatter.php : 17)</i><table border=1><tr><td>&nbsp;<a href="FieldArrow.html" style="font-family:arial;font-weight:bold;color:darkblue;">FieldArrow</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="FieldArrow.html#_FIELDARROW_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="FieldArrow.html#_FIELDARROW_SETSIZE">SetSize()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Internal helper class which represents the arrow head of the arrow in the field plot.
+<p>
+Only accessed as FieldPlot::arrow <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="FieldPlot.html">FieldPlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_FIELDARROW_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for arrow head</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color specification</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set color for arrow head&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$fieldplot-&gt;arrow-&gt;SetColor('red');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_FIELDARROW_SETSIZE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSize($aSize,$aArrowSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify arrow and arrow head size</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Arrow size in pixels</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArrowSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+2</font>
+</td><td>Arrow head size (and shape) as integer in range (0-9)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Arrow size is specified in pixels (length of arrow including arrow head). The size of the arrow head is specified as an integer in the range (0,9) inclusive.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;First&nbsp;size&nbsp;argument&nbsp;is&nbsp;length&nbsp;(in&nbsp;pixels&nbsp;of&nbsp;arrow)&nbsp;<br />//&nbsp;Second&nbsp;size&nbsp;argument&nbsp;is&nbsp;roughly&nbsp;size&nbsp;of&nbsp;arrow.&nbsp;Arrow&nbsp;size&nbsp;is&nbsp;specified&nbsp;as<br />//&nbsp;an&nbsp;integer&nbsp;in&nbsp;the&nbsp;range&nbsp;[0,9]<br />$fp-&gt;arrow-&gt;SetSize(20,2);<br />$fp-&gt;arrow-&gt;SetColor('navy');<br /></font>
+</span><br>
+<p> <hr> <p>

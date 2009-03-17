@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="912Specifyingtitlesfortheaxisandlegendsfortheplots.html">
+<LINK REL="Next" HREF="914Addingseveralplotstothesameradargraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="912Specifyingtitlesfortheaxisandlegendsfortheplots.html">Previous</A>
+<A HREF="914Addingseveralplotstothesameradargraph.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_1_3">9.1.3 Adding grid line to the radar plot</A></H3>
+<P> Each major tick mark can also be connected together to create a
+ grid. The grid is accessed through the 'grid' property of the graph. To
+ enable the grid and set the line style to &quot;dotted&quot; you would have to
+ add the lines<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">grid</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Show</FONT><FONT color="#007700">
+();
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">grid</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetLineStyle</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;dotted&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>and would result in the following graph<DIV class="example">
+<BR> <A href="exframes/frame_radarex4.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/radarex4.png" WIDTH="250"></A>
+<BR><B>Figure 113:</B> Adding dotted gridlines to the graph <A href="exframes/frame_radarex4.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P>By design the plot is above the grid line but beneath the axis in
+ image depth, hence some part of the grid lines are hidden.</P>
+<P> To have the grid lines more &quot;visible&quot; just change their color, say
+ to, dark red by invoking the SetColor() method on the grid lines which
+ would give the following result</P>
+<P> Another simple change we could do would be to just change the
+ background color of the radar graph. This is (not surprisingly) done by
+ a call to the method SetColor() invoked on the graph object.<DIV class="example">
+<BR> <A href="exframes/frame_radarex6.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/radarex6.png" WIDTH="250"></A>
+<BR><B>Figure 114:</B> Changing the background color <A href="exframes/frame_radarex6.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="912Specifyingtitlesfortheaxisandlegendsfortheplots.html">Previous</A>
+<A HREF="914Addingseveralplotstothesameradargraph.html">Next</A>
+</BODY>
+</HTML>

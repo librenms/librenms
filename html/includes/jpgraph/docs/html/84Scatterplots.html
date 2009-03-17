@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="831Usinglineerrorplots.html">
+<LINK REL="Next" HREF="85Fieldplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="831Usinglineerrorplots.html">Previous</A>
+<A HREF="85Fieldplots.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="8_4">8.4 Scatter plots</A></H2>
+<P> Scatter plots are very simple; they plot a number of points
+ specified by their X- and Y-coordinate. Each point is stroked on the
+ image with a mark as with line plots. The stroked marks can also be
+ connected with an optional line.<DIV class="note"><B>Note:</B> Even
+ though it is only scatter plot that was designed to be used with X,Y
+ plots it is perfectly possible to use use both X,Y coordinates for bar
+ and line plots as well.</DIV></P>
+<P> Even though you would normally supply X-coordinates it is still
+ perfectly possible to use a text-scale for X-coordinates to just
+ enumerate the points. This is especially useful when using the
+ &quot;Impulse&quot; type of scatter plot as is shown below.</P>
+<P> Scatter pots are created by including the jpgraph extension
+ &quot;jpgraph_scatter.php&quot; and then creating an instance of plot type of
+ ScatterPlot(). To specify the mark you want to use you access the mark
+ with the instance variable &quot;mark&quot; in the scatter plot. The default is
+ to use an unfilled small circle.</P>
+<P> To create a scatter plot you will create an instance</P>
+<P> A simple example using just default values will illustrate this</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_scatterex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/scatterex1.png" WIDTH="300"></A>
+<BR><B>Figure 57:</B> The simplest possible scatter plot <A href="exframes/frame_scatterex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P>We can easily adjust the size and colors for the markers to get
+ another effect as shown below<DIV class="example">
+<BR> <A href="exframes/frame_scatterex2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/scatterex2.png" WIDTH="300"></A>
+<BR><B>Figure 58:</B> The simplest possible scatter plot with adjusted
+ marks <A href="exframes/frame_scatterex2.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P> Another possible variant of scatter plot is impulse-scatter plots.
+ This is a variant of normal scatter plot where each mark have a line
+ from the mark to the Y=0 base line. To change a scatter plot into an
+ impulse scatter plot you have to call the method <A href="../ref/ScatterPlot.html#_SCATTERPLOT_SETIMPULS">
+ SetImpuls()</A> on the scatter plot.</P>
+<P> This type of plots are often used to illustrate signals in
+ conjunction with digital signal processing. The following two examples
+ illustrates simple use of impulse plots.<DIV class="example">
+<BR> <A href="exframes/frame_impulsex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/impulsex1.png" WIDTH="300"></A>
+<BR><B>Figure 59:</B> A simple impuls plot <A href="exframes/frame_impulsex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> The next example shows how to modify the color and width of the
+ impulse plot<DIV class="example">
+<BR> <A href="exframes/frame_impulsex2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/impulsex2.png" WIDTH="300"></A>
+<BR><B>Figure 60:</B> A modified impuls plot <A href="exframes/frame_impulsex2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> You may draw impulse graphs without
+ any mark by specifying the mark type as (-1) . That way only the
+ impulse lines will be drawn.</DIV></P>
+<P> As a final touch we show two more advanced impulse graphs . In these
+ graphs we have used more advanced formatting for the Y-axis labels as
+ well as adjusted the position of the axis position.<DIV class="example">
+<BR> <A href="exframes/frame_impulsex3.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/impulsex3.png" WIDTH="400"></A>
+<BR><B>Figure 61:</B> In this imuplsplot we have adjusted the position
+ of the X-axis to the bottom and also added more decimals to the labels
+ on the Y-axis <A href="exframes/frame_impulsex3.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_impulsex4.html" target="blank"><IMG border="0"
+HEIGHT="250"  src="img/impulsex4.png" WIDTH="500"></A>
+<BR><B>Figure 62:</B> In this impuls plot we have also added a lineplot
+ with a dotted line style. <A href="exframes/frame_impulsex4.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="831Usinglineerrorplots.html">Previous</A>
+<A HREF="85Fieldplots.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="61Thebasicstructureofanimagemapscript.html">
+<LINK REL="Next" HREF="63UsingStrokeCSIM.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="61Thebasicstructureofanimagemapscript.html">Previous</A>
+<A HREF="63UsingStrokeCSIM.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="6_2">6.2 Specifying targets for image map plots</A></H2>
+<P> To turn a standard image script into a CSIM script the first thing
+ needed to do is to supply the appropriate URL targets for the hotspots
+ in the image.</P>
+<P> What the hotspots represent depends on the type of plot you are
+ doing. The following plot types and graph areas support image maps.</P>
+<UL>
+<LI> Line plots. Markers are hotspots.</LI>
+<LI> Scatter plot. Markers are hotspots.</LI>
+<LI> Pie Plots and 3D Pie plots. Each slice is a hotspot</LI>
+<LI> All types of Bar graphs. Each bar is a hotspot</LI>
+<LI> Legends</LI>
+<LI> Text strings, for example titles and title of axis</LI>
+</UL>
+<P> To specify a link for each hotspot you have to use the <A href="../ref/Plot.html#_PLOT_SETCSIMTARGETS">
+ SetCSIMTargets()</A> method for each plot (or specific area) in the
+ graph which should be a hotspot.</P>
+<P> There are two arguments to this method</P>
+<OL>
+<LI> $aTargets, an array of valid URL targets. One URL per hot spot, for
+ example if you have a 10 values bar plot you need 10 URLs. If the
+ SetCSIMTarget() is applied to, for example, a text then of course only
+ one URL target should be specified.</LI>
+<LI> $aAlts, an array of valid alt-texts. Many browsers (but not all)
+ will show this text string if the mouse hovers over a hotspot.</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="61Thebasicstructureofanimagemapscript.html">Previous</A>
+<A HREF="63UsingStrokeCSIM.html">Next</A>
+</BODY>
+</HTML>

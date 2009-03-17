@@ -149,7 +149,7 @@ function getRates($bill_id,$datefrom,$dateto) {
 	$q_95_text		= $q_95_text . " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY delta ASC";
 	$q_95th			= mysql_query($q_95_text);
 	$m_95th 		= mysql_result($q_95th,$measurement_95th);
-        $mt_q 			= mysql_query("SELECT sum(delta) FROM bill_data  WHERE bill_id = $bill_id AND timestamp > $datefrom AND timestamp <= $dateto");
+        $mt_q 			= mysql_query("SELECT SUM(delta) FROM bill_data WHERE bill_id = '$bill_id' AND timestamp > '$datefrom' AND timestamp <= '$dateto'");
         $mtot 			= mysql_result($mt_q,0);
 	$data['rate_95th_in'] = get95thIn($bill_id,$datefrom,$dateto);
 	$data['rate_95th_out'] = get95thOut($bill_id,$datefrom,$dateto);

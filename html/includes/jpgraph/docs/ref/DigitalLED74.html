@@ -1,0 +1,88 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_DIGITALLED74"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>DigitalLED74</b></div>
+<i>(Defined in: jpgraph_led.php : 24)</i><table border=1><tr><td>&nbsp;<a href="DigitalLED74.html" style="font-family:arial;font-weight:bold;color:darkblue;">DigitalLED74</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="DigitalLED74.html#_DIGITALLED74_DIGITALLED74">DigitalLED74()</a>&nbsp;<br>
+&nbsp;<a href="DigitalLED74.html#_DIGITALLED74_SETSUPERSAMPLING">SetSupersampling()</a>&nbsp;<br>
+&nbsp;<a href="DigitalLED74.html#_DIGITALLED74_STROKENUMBER">StrokeNumber()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div> <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DIGITALLED74_DIGITALLED74"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;DigitalLED74($aRadius,$aMargin)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor for 4x7 module LED digits</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRadius</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Radius in pixel for each "led"</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMargin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Margin around the "led"</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Instantiate a LED digit class that is used to genereta text which looks like LED digits&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>An instance of the LED class<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="DigitalLED74.html#_DIGITALLED74_SETSUPERSAMPLING">DigitalLED74::SetSupersampling</a> and <a href="DigitalLED74.html#_DIGITALLED74_STROKENUMBER">DigitalLED74::StrokeNumber</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$led&nbsp;=&nbsp;new&nbsp;DigitalLED74();<br />$led-&gt;StrokeNumber('0123456789.&nbsp;ABCDEFGHIJKL',LEDC_GREEN);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DIGITALLED74_SETSUPERSAMPLING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSupersampling($aSuperSampling)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set level of supersampling used in the creation led digits</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSuperSampling</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Level of supersampling</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies the amount of oversampling that sould be used to create a smoother looking image. A higher value will generate a smoother image. 
+
+The value used for supersampling should be an integer in the range 2-4. A higher value could be used but the increase in CPU time will not generate any perceivable improvements in image quality.
+
+For each integer step increased supersampling the processor time needed is multipled by 2&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>void<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$led&nbsp;=&nbsp;new&nbsp;DigitalLED74(5);<br />$led-&gt;SetSupersampling(4);<br />$led-&gt;StrokeNumber('ABC123.',LEDC_RED);&nbsp;</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_DIGITALLED74_STROKENUMBER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;StrokeNumber($aValStr,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>// Margin in between "Led" dots</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aValStr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>No description available</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>No description available.<p> <hr> <p>

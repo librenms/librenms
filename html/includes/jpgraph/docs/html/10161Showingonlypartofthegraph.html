@@ -1,0 +1,47 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1016Advancedformatting.html">
+<LINK REL="Next" HREF="10162Specifyingstartdayofweek.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1016Advancedformatting.html">Previous</A>
+<A HREF="10162Specifyingstartdayofweek.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_16_1">10.16.1 Showing only part of the graph</A></H3>
+<P> You can choose to only display a vertical slice of the overall Gantt
+ chart by explicitly specifying a date range with the method
+ GanttGraph::SetDateRange(). This will cap any bars to only be displayed
+ in between the start and end date given as parameters. For example
+ specifying<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetDateRange</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-20&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2002-01-20&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> will show the part of the Gantt chart between the 20 Dec 2001 and 20
+ of January 2002. Please note that the format depends on the locale
+ setting.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1016Advancedformatting.html">Previous</A>
+<A HREF="10162Specifyingstartdayofweek.html">Next</A>
+</BODY>
+</HTML>

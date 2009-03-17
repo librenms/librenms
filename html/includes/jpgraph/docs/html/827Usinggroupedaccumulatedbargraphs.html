@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="826Usingaccumulatedbarplots.html">
+<LINK REL="Next" HREF="828Horizontalbargraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="826Usingaccumulatedbarplots.html">Previous</A>
+<A HREF="828Horizontalbargraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_2_7">8.2.7 Using grouped accumulated bar graphs</A></H3>
+<P> It is perfectly possible to combine the previous bar types to have
+ grouped accumulated bar plots. This is done by just adding the
+ different accumulated plots to a group bar plot, for example the
+ following code would do that.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;Create&nbsp;all&nbsp;the&nbsp;4&nbsp;bar&nbsp;plots
+<BR></FONT><FONT color="#0000BB">$b1plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data1y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b1plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;orange&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b2plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data2y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b2plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b3plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data3y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b3plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;green&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b4plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$data4y</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$b4plot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;brown&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;accumulated&nbsp;bar&nbsp;plots
+<BR></FONT><FONT color="#0000BB">$ab1plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">AccBarPlot</FONT><FONT color="#007700">
+(array(</FONT><FONT color="#0000BB">$b1plot</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$b2plot</FONT><FONT color="#007700">));
+<BR></FONT><FONT color="#0000BB">$ab2plot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">AccBarPlot</FONT><FONT color="#007700">
+(array(</FONT><FONT color="#0000BB">$b3plot</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$b4plot</FONT><FONT color="#007700">));
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;grouped&nbsp;bar&nbsp;plot
+<BR></FONT><FONT color="#0000BB">$gbplot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GroupBarPlot</FONT><FONT color="#007700">
+(array(</FONT><FONT color="#0000BB">$ab1plot</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$ab2plot</FONT><FONT color="#007700">));
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;...and&nbsp;add&nbsp;it&nbsp;to&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$gbplot</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> Putting this together in an example would then produce the graph as
+ shown below<DIV class="example">
+<BR> <A href="exframes/frame_example24.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example24.png" WIDTH="310"></A>
+<BR><B>Figure 39:</B> Combining grouped and accumulated bar plots <A href="exframes/frame_example24.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="826Usingaccumulatedbarplots.html">Previous</A>
+<A HREF="828Horizontalbargraphs.html">Next</A>
+</BODY>
+</HTML>

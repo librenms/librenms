@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="981Minutescale.html">
+<LINK REL="Next" HREF="983Dayscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="981Minutescale.html">Previous</A>
+<A HREF="983Dayscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_8_2">9.8.2 Hour scale</A></H3>
+<P> The hour scale has more builtin formatting possibilities. The
+ following formatting options are available</P>
+<OL>
+<LI> &quot;HOURSTYLE_HM24&quot;, Will display the only the hour in military time
+ 0-24 , for example 13:00</LI>
+<LI> &quot;HOURSTYLE_H24&quot;, Will display the hour with both hour and minute in
+ military time 0-24, for example 13</LI>
+<LI>&quot;HOURSTYLE_HMAMPM&quot;, Will display the hour and minutes with a
+ suitable am/pm postfix, for example 1:30pm</LI>
+<LI> &quot;HOURSTYLE_HAMPM&quot;, Will display only the hour with a suitable am/pm
+ postfix, for example 1pm</LI>
+<LI>&quot;HOURSTYLE_CUSTOM&quot;, Custom defined format as specified with a call
+ to HeaderProperty::SetFormatString()</LI>
+</OL>
+<P> For hours it is possible to specify the interval in either of two
+ ways. With an integer, e.g. 6, or as time interval, e.g. &quot;1:30&quot; which
+ makes the interval one and a half hour. The only restriction is that
+ the interval must be even dividable for 24 hours since one day is the
+ smallest possible interval to show. This means that it is allowed to
+ use, for example 2,4,6,&quot;1:30&quot; or &quot;0:45&quot; as intervals but not 7, &quot;2:45&quot;.</P>
+<P> The code snippet below shows hot to set up a hour scale to with 45
+ minutes interval and some custom colors<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">hour</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetBackgroundColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'lightyellow:1.5'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+hour</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT1</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+hour</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetStyle</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">HOURSTYLE_HMAMPM</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+hour</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetIntervall</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;0:45&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The example below shows a gantt chart with the day and hour scale
+ enabled<DIV class="example">
+<BR> <A href="exframes/frame_gantthourex1.html" target="blank"><IMG border="0"
+HEIGHT="173"       src="img/img/img/img/img/img/gantthourex1.png" WIDTH="545"></A>
+<BR><B>Figure 160:</B> Using hour scale in the Gantt chart <A href="exframes/frame_gantthourex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="981Minutescale.html">Previous</A>
+<A HREF="983Dayscale.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="922Creating3Dpieplots.html">
+<LINK REL="Next" HREF="924Specifyingandadjustinglabelsonpieplots.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="922Creating3Dpieplots.html">Previous</A>
+<A HREF="924Specifyingandadjustinglabelsonpieplots.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_2_3">9.2.3 Exploding pie slices</A></H3>
+<P> One way to attract attention to some specific piece of information
+ in a pie chart is to &quot;explode&quot; one or more slices. Both 2D and 3D pies
+ support exploding one or several slices.</P>
+<P> Exploding slices is accomplished by the methods <A href="../ref/PiePlot.html#_PIEPLOT_EXPLODE">
+ Explode()</A> and <A href="../ref/PiePlot.html#_PIEPLOT_EXPLODESLICE">
+ ExplodeSlice()</A> The first method is used if you want to explode more
+ than one slices and the second is a shorthand to make it easy to just
+ explode one slice.</P>
+<P> For example to explode one slice the default &quot;explode&quot; radius you
+ would just have to say<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$pieplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">ExplodeSlice</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+1</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> The above line would explode the second slice (slices are numbered
+ from 0 and upwards) the default amount. Doing this to the two previous
+ example would result in<DIV class="example">
+<BR> <A href="exframes/frame_example27.2.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example27.2.png" WIDTH="300"></A>
+<BR><B>Figure 125:</B> Exploding one slice <A href="exframes/frame_example27.2.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example27.3.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example27.3.png" WIDTH="330"></A>
+<BR><B>Figure 126:</B> Exploding one 3D slice <A href="exframes/frame_example27.3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> To explode all slices at once you can use the <A href="../ref/PiePlot.html#_PIEPLOT_EXPLODEALL">
+ PiePlot::ExplodeAll()</A> method. If you want to explode several slices
+ you can use the <A href="../ref/PiePlot.html#_PIEPLOT_EXPLODE">
+ PiePlot::Explode()</A> method and supply a suitable array argument.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="922Creating3Dpieplots.html">Previous</A>
+<A HREF="924Specifyingandadjustinglabelsonpieplots.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,506 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_PLOTMARK"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>PlotMark</b></div>
+<i>(Defined in: jpgraph_plotmark.inc : 73)</i><table border=1><tr><td>&nbsp;<a href="PlotMark.html" style="font-family:arial;font-weight:bold;color:darkblue;">PlotMark</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="PlotMark.html#_PLOTMARK_HIDE">Hide()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETCALLBACK">SetCallback()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETCALLBACKYX">SetCallbackYX()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETDEFAULTWIDTH">SetDefaultWidth()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETFILLCOLOR">SetFillColor()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETSIZE">SetSize()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETTYPE">SetType()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETWEIGHT">SetWeight()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SETWIDTH">SetWidth()</a>&nbsp;<br>
+&nbsp;<a href="PlotMark.html#_PLOTMARK_SHOW">Show()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>In scatter plots and (possible) line plots each data point have a marker. This class implements these markers and the mtethod to modify it's apperance.
+<p>
+There are a number of possible marker, circle, filled circle, square, filled square, star, triangle and so on.
+See PlotMark::PlotMark() below for details on how to specify what mark.
+<p>
+Marks are accessed thtough the 'mark' property in line and scatter plot, i.e LinePlot::mark and ScatterPlot::mark. Marks in line plot are by default turned off. To enable marks use the construction $lineplot->mark->Show().
+<p>
+You can modify the type of plotmarks by calling the SetType() method. Possible plot marks are:
+
+<ol>
+<li>MARK_SQUARE, A filled square
+<lI>MARK_UTRIANGLE, A triangle pointed upwards
+<li>MARK_DTRIANGLE, A triangle pointed downwards
+<li>MARK_DIAMOND, A diamond
+<li>MARK_CIRCLE, A circle
+<li>MARK_FILLEDCIRCLE, A filled circle
+<li>MARK_CROSS, A cross
+<li>MARK_STAR, A star
+<li>MARK_X, An 'X'
+<li>MARK_LEFTTRIANGLE, A half triangle, vertical line to left (used as group markers for Gantt charts)
+<li>MARK_RIGHTTRIANGLE, A half triangle, vertical line to right (used as group markers for Gantt charts)
+<lI>MARK_FLASH, A Zig-Zag vertical flash
+</ol>
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="LinePlot.html">LinePlot</a> and <a href="ScatterPlot.html">ScatterPlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_HIDE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Hide($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide plot mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide plot mark</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide plot mark
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotMark.html#_PLOTMARK_SHOW">PlotMark::Show</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$linerplot-&gt;mark-&gt;Hide();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETCALLBACK"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCallback($aFunc)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify callback function for plotmark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFunc</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Function name</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Callback for plotmarks is only really used in one circumstance. Scatter plot. The callback can be used to individually adjust, sixe and color of the plot marks.
+<p>
+The specified callback function gets called with the Y-value for the current plotmark. The callback function should return an array consisting of three elements
+<ol>
+<li> Plot size
+<li> Color
+<li> Fill color
+</ol>
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+function&nbsp;FCallback($aVal)&nbsp;{<br />//&nbsp;This&nbsp;callback&nbsp;will&nbsp;adjust&nbsp;the&nbsp;fill&nbsp;color&nbsp;and&nbsp;size&nbsp;of<br />//&nbsp;the&nbsp;datapoint&nbsp;according&nbsp;to&nbsp;the&nbsp;data&nbsp;value&nbsp;according&nbsp;to<br />&nbsp;&nbsp;&nbsp;&nbsp;if(&nbsp;$aVal&nbsp;&lt;&nbsp;30&nbsp;)&nbsp;$c&nbsp;=&nbsp;"blue";<br />&nbsp;&nbsp;&nbsp;&nbsp;elseif(&nbsp;$aVal&nbsp;&lt;&nbsp;70&nbsp;)&nbsp;$c&nbsp;=&nbsp;"green";<br />&nbsp;&nbsp;&nbsp;&nbsp;else&nbsp;$c="red";<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;array(floor($aVal/3),"",$c);<br />}<br /><br />...<br /><br />//&nbsp;Specify&nbsp;the&nbsp;callback<br />$scatterplot-&gt;mark-&gt;SetCallback("FCallback");<br /><br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETCALLBACKYX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCallbackYX($aFunc)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify callback function</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFunc</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Callback function</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Callback for plotmarks is only really used in one circumstance. Scatter plot. The callback can be used to individually adjust, sixe and color of the plot marks.
+<p>
+The specified callback function gets called with the Y-value for the current plotmark. The callback function should return an array consisting of three elements
+<ol>
+<li> Plot size
+<li> Color
+<li> Fill color
+</ol>
+The difference from the ordinary SetCallback() is that the callback function specified in SetCallbackYX() gets passed both the Y and X coordinate (note the order!) as arguments.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+function&nbsp;FCallback($aYVal,$aXVal)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;Some&nbsp;code&nbsp;to&nbsp;the&nbsp;size&nbsp;and&nbsp;color<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;array(&nbsp;...&nbsp;);<br />}<br /><br />...<br /><br />//&nbsp;Specify&nbsp;the&nbsp;callback<br />$scatterplot-&gt;mark-&gt;SetCallbackYX("FCallback");<br /><br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify color for plot mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify the line color for plot mark
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotMark.html#_PLOTMARK_SETFILLCOLOR">PlotMark::SetFillColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;SetColor('navy');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETDEFAULTWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetDefaultWidth()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Restore default size of mark</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Restore default size of mark&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;SetDefaultWidth()</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillColor($aFillColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set fill color for mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set fill color for mark&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotMark.html#_PLOTMARK_SETCOLOR">PlotMark::SetColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;SetFillColor('blue');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETSIZE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSize($aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set size of mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>WIdth of mark in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Synonym for SetWidth()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="PlotMark.html#_PLOTMARK_SETWIDTH">PlotMark::SetWidth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;SetSize(10);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETTYPE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetType($aType,$aFileName,$aScale)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify type of plot mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Type of plotmark, shape or built-in image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Filename or country name depending on type of plotmark. See below.</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Scaling of image</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method is used to specify what type of plotmarks should be be displayed. There are two classes of plotmarks. The first class is a number of different shapes and the second class is a number of built-in renderd images.
+<p>
+The following shape (the first class) plot marks are available
+
+<ol>
+<li>MARK_SQUARE, A filled square
+<lI>MARK_UTRIANGLE, A triangle pointed upwards
+<li>MARK_DTRIANGLE, A triangle pointed downwards
+<li>MARK_DIAMOND, A diamond
+<li>MARK_CIRCLE, A circle
+<li>MARK_FILLEDCIRCLE, A filled circle
+<li>MARK_CROSS, A cross
+<li>MARK_STAR, A star
+<li>MARK_X, An 'X'
+<li>MARK_IMAGE, Use the image specified with the filename and scale as the second and third argument as the mark.
+<li>MARK_FLAG<n>, Use one of MARK_FLAG1, MARK_FLAG2, MARK_FLAG3, MARK_FLAG4 to indicate that you want to display a country flag. The numbers indicate which original size of the flag you want to use. 1 is the smallest size and 4 is the largest flag size. You can of course also scale a flag by specifying the scale as the third argument. Which country flag you want is specified in the second argument as either the full country name, partial country name or by ordinal number as specified in the table below. Please note that if you specify a partial name then the first country in alphabetic order that matches the partial name will be used.
+</ol>
+
+<p>
+For the second class (built-in images) the following table list the different images as well as what color they are available in. For the built-in images you specify the color with the second argument.
+<p>
+Note that some of the images are available in different sizes. The reason is that even though you can scale them by the third argument there is a visual degradation to scale an image larger than it's original size since some pixels needs to be interpolated. Reducing the size with a scale < 1.0 gives much better visual apperance. 
+<p>
+The scaling works with both GD 1 and GD 2 but with GD 2 the quality of the scaling is much better.
+<p>
+Built-in images and available colors:
+<table border=1>
+<tr><th>Type</th><th>Description</th><th>Colors</th></tr>
+<tr>
+<td>MARK_IMG_PUSHPIN, MARK_IMG_SPUSHPIN</td>
+<td> Push-pin image</td>
+<td>'red','blue','green','pink','orange'</td>
+</tr>
+<tr>
+<td>MARK_IMG_LPUSHPIN</td>
+<td> A larger Push-pin image</td>
+<td>'red','blue','green','pink','orange'</td>
+</tr>
+<tr>
+<td>MARK_IMG_BALL, MARK_IMAGE_SBALL</td>
+<td>A round 3D rendered ball</td>
+<td>'bluegreen','cyan','darkgray','greengray',
+ 'gray','graypurple','green','greenblue','lightblue',
+ 'lightred','navy','orange','purple','red','yellow'</td>
+</tr>
+
+<tr>
+<td>MARK_IMAGE_MBALL</td>
+<td>A medium sized round 3D rendered ball</td>
+<td>
+'blue','bluegreen','brown','cyan',
+'darkgray','greengray','gray','green',
+'greenblue','lightblue','lightred',
+'purple','red','white','yellow'
+</td>
+</tr>
+
+<tr>
+<td>MARK_IMAGE_LBALL</td>
+<td>A large sized round 3D rendered ball</td>
+<td>
+'blue','lightblue','brown','darkgreen',
+'green','purple','red','gray','yellow','silver','gray'
+</td>
+<tr>
+<td>MARK_IMAGE_SQUARE</td>
+<td>A 3D rendered square</td>
+<td>'bluegreen','blue','green', 
+'lightblue','orange','purple','red','yellow'</td>
+</tr>
+
+<tr>
+<td>MARK_IMG_STAR</td>
+<td>A 3D rendered star image</td>
+<td>'bluegreen','lightblue','purple','blue','green','pink','red','yellow'</td>
+</tr>
+
+<tr>
+<td>MARK_IMG_DIAMOND</td>
+<td>A 3D rendered diamond</td>
+<td>'lightblue','darkblue','gray', 
+'blue','pink','purple','red','yellow'</td>
+</tr>
+
+<tr>
+<td>MARK_IMG_BEVEL</td>
+<td>A 3D rendered bevel style round ring</td>
+<td>'green','purple','orange','red','yellow'</td>
+</tr>
+</table>
+<p>
+In terms of the builtin flags 230 countries are supported. The following table lists all available flags:
+<p>
+<table border=1>
+<tr><td>1:    'Afghanistan' </td><td>2:    'Republic of Angola' </td></tr>
+<tr><td>3:    'Republic of Albania' </td><td>4:    'Alderney' </td></tr>
+<tr><td>5:    'Democratic and Popular Republic of Algeria' </td><td>6:    'Territory of American Samoa' </td></tr>
+<tr><td>7:    'Principality of Andorra' </td><td>8:    'British Overseas Territory of Anguilla' </td></tr>
+<tr><td>9:    'Antarctica' </td><td>10:    'Argentine Republic' </td></tr>
+<tr><td>11:    'League of Arab States' </td><td>12:    'Republic of Armenia' </td></tr>
+<tr><td>13:    'Aruba' </td><td>14:    'Commonwealth of Australia' </td></tr>
+<tr><td>15:    'Republic of Austria' </td><td>16:    'Azerbaijani Republic' </td></tr>
+<tr><td>17:    'British Antarctic Territory' </td><td>18:    'Kingdom of Belgium' </td></tr>
+<tr><td>19:    'British Overseas Territory of Bermuda' </td><td>20:    'Commonwealth of the Bahamas' </td></tr>
+<tr><td>21:    'Kingdom of Bahrain' </td><td>22:    'Republic of Belarus' </td></tr>
+<tr><td>23:    'Republic of Bolivia' </td><td>24:    'Belize' </td></tr>
+<tr><td>25:    'Republic of Benin' </td><td>26:    'Republic of Botswana' </td></tr>
+<tr><td>27:    'Federative Republic of Brazil' </td><td>28:    'Barbados' </td></tr>
+<tr><td>29:    'British Indian Ocean Territory' </td><td>30:    'Brunei Darussalam' </td></tr>
+<tr><td>31:    'Republic of Burkina' </td><td>32:    'Republic of Bulgaria' </td></tr>
+<tr><td>33:    'Republic of Burundi' </td><td>34:    'Overseas Territory of the British Virgin Islands' </td></tr>
+<tr><td>35:    'Central African Republic' </td><td>36:    'Kingdom of Cambodia' </td></tr>
+<tr><td>37:    'Republic of Cameroon' </td><td>38:    'Dominion of Canada' </td></tr>
+<tr><td>39:    'Caribbean Community' </td><td>40:    'Republic of Cape Verde' </td></tr>
+<tr><td>41:    'Republic of Chad' </td><td>42:    'Republic of Chile' </td></tr>
+<tr><td>43:    'Territory of Christmas Island' </td><td>44:    'Commonwealth of Independent States' </td></tr>
+<tr><td>45:    'Cook Islands' </td><td>46:    'Republic of Colombia' </td></tr>
+<tr><td>47:    'Territory of Cocos Islands' </td><td>48:    'Commonwealth' </td></tr>
+<tr><td>49:    'Union of the Comoros' </td><td>50:    'Republic of the Congo' </td></tr>
+<tr><td>51:    'Republic of Costa Rica' </td><td>52:    'Republic of Croatia' </td></tr>
+<tr><td>53:    'Republic of Cuba' </td><td>54:    'British Overseas Territory of the Cayman Islands' </td></tr>
+<tr><td>55:    'Republic of Cyprus' </td><td>56:    'The Czech Republic' </td></tr>
+<tr><td>57:    'Kingdom of Denmark' </td><td>58:    'Republic of Djibouti' </td></tr>
+<tr><td>59:    'Commonwealth of Dominica' </td><td>60:    'Dominican Republic' </td></tr>
+<tr><td>61:    'Republic of Ecuador' </td><td>62:    'Arab Republic of Egypt' </td></tr>
+<tr><td>63:    'Republic of El Salvador' </td><td>64:    'England' </td></tr>
+<tr><td>65:    'Republic of Equatorial Guinea' </td><td>66:    'State of Eritrea' </td></tr>
+<tr><td>67:    'Republic of Estonia' </td><td>68:    'Ethiopia' </td></tr>
+<tr><td>69:    'European Union' </td><td>70:    'British Overseas Territory of the Falkland Islands' </td></tr>
+<tr><td>71:    'International Federation of Vexillological Associations' </td><td>72:    'Republic of Fiji' </td></tr>
+<tr><td>73:    'Republic of Finland' </td><td>74:    'Territory of French Polynesia' </td></tr>
+<tr><td>75:    'French Republic' </td><td>76:    'Overseas Department of French Guiana' </td></tr>
+<tr><td>77:    'Gabonese Republic' </td><td>78:    'Republic of the Gambia' </td></tr>
+<tr><td>79:    'Republic of Georgia' </td><td>80:    'Federal Republic of Germany' </td></tr>
+<tr><td>81:    'Republic of Ghana' </td><td>82:    'Gibraltar' </td></tr>
+<tr><td>83:    'Hellenic Republic' </td><td>84:    'State of Grenada' </td></tr>
+<tr><td>85:    'Overseas Department of Guadeloupe' </td><td>86:    'Territory of Guam' </td></tr>
+<tr><td>87:    'Republic of Guatemala' </td><td>88:    'The Bailiwick of Guernsey' </td></tr>
+<tr><td>89:    'Republic of Guinea' </td><td>90:    'Republic of Haiti' </td></tr>
+<tr><td>91:    'Hong Kong Special Administrative Region' </td><td>92:    'Republic of Honduras' </td></tr>
+<tr><td>93:    'Republic of Hungary' </td><td>94:    'Republic of Iceland' </td></tr>
+<tr><td>95:    'International Committee of the Red Cross' </td><td>96:    'Republic of India' </td></tr>
+<tr><td>97:    'Republic of Indonesia' </td><td>98:    'Republic of Iraq' </td></tr>
+<tr><td>99:    'Republic of Ireland' </td><td>100:    'Organization of the Islamic Conference' </td></tr>
+<tr><td>101:    'Isle of Man' </td><td>102:    'State of Israel' </td></tr>
+<tr><td>103:    'Italian Republic' </td><td>104:    'Jamaica' </td></tr>
+<tr><td>105:    'Japan' </td><td>106:    'The Bailiwick of Jersey' </td></tr>
+<tr><td>107:    'Hashemite Kingdom of Jordan' </td><td>108:    'Republic of Kazakhstan' </td></tr>
+<tr><td>109:    'Republic of Kenya' </td><td>110:    'Republic of Kiribati' </td></tr>
+<tr><td>111:    'State of Kuwait' </td><td>112:    'Kyrgyz Republic' </td></tr>
+<tr><td>113:    'Republic of Latvia' </td><td>114:    'Lebanese Republic' </td></tr>
+<tr><td>115:    'Kingdom of Lesotho' </td><td>116:    'Republic of Liberia' </td></tr>
+<tr><td>117:    'Principality of Liechtenstein' </td><td>118:    'Republic of Lithuania' </td></tr>
+<tr><td>119:    'Grand Duchy of Luxembourg' </td><td>120:    'Macao Special Administrative Region' </td></tr>
+<tr><td>121:    'Republic of Macedonia' </td><td>122:    'Republic of Madagascar' </td></tr>
+<tr><td>123:    'Republic of the Marshall Islands' </td><td>124:    'Republic of Mali' </td></tr>
+<tr><td>125:    'Federation of Malaysia' </td><td>126:    'Republic of Malta' </td></tr>
+<tr><td>127:    'Republic of Malawi' </td><td>128:    'Overseas Department of Martinique' </td></tr>
+<tr><td>129:    'Islamic Republic of Mauritania' </td><td>130:    'Territorial Collectivity of Mayotte' </td></tr>
+<tr><td>131:    'United Mexican States' </td><td>132:    'Federated States of Micronesia' </td></tr>
+<tr><td>133:    'Midway Islands' </td><td>134:    'Republic of Moldova' </td></tr>
+<tr><td>135:    'Principality of Monaco' </td><td>136:    'Republic of Mongolia' </td></tr>
+<tr><td>137:    'British Overseas Territory of Montserrat' </td><td>138:    'Kingdom of Morocco' </td></tr>
+<tr><td>139:    'Republic of Mozambique' </td><td>140:    'Republic of Mauritius' </td></tr>
+<tr><td>141:    'Union of Myanmar' </td><td>142:    'Republic of Namibia' </td></tr>
+<tr><td>143:    'North Atlantic Treaty Organization' </td><td>144:    'Republic of Nauru' </td></tr>
+<tr><td>145:    'Turkish Republic of Northern Cyprus' </td><td>146:    'Netherlands Antilles' </td></tr>
+<tr><td>147:    'Kingdom of Nepal' </td><td>148:    'Kingdom of the Netherlands' </td></tr>
+<tr><td>149:    'Territory of Norfolk Island' </td><td>150:    'Federal Republic of Nigeria' </td></tr>
+<tr><td>151:    'Republic of Nicaragua' </td><td>152:    'Republic of Niger' </td></tr>
+<tr><td>153:    'Niue' </td><td>154:    'Commonwealth of the Northern Mariana Islands' </td></tr>
+<tr><td>155:    'Province of Northern Ireland' </td><td>156:    'Nordic Council' </td></tr>
+<tr><td>157:    'Kingdom of Norway' </td><td>158:    'Territory of New Caledonia and Dependencies' </td></tr>
+<tr><td>159:    'New Zealand' </td><td>160:    'Organization of American States' </td></tr>
+<tr><td>161:    'Organization of African Unity' </td><td>162:    'International Olympic Committee' </td></tr>
+<tr><td>163:    'Sultanate of Oman' </td><td>164:    'Islamic Republic of Pakistan' </td></tr>
+<tr><td>165:    'Republic of Palau' </td><td>166:    'Independent State of Papua New Guinea' </td></tr>
+<tr><td>167:    'Republic of Paraguay' </td><td>168:    'Republic of the Philippines' </td></tr>
+<tr><td>169:    'British Overseas Territory of the Pitcairn Islands' </td><td>170:    'Republic of Poland' </td></tr>
+<tr><td>171:    'Republic of Portugal' </td><td>172:    'Commonwealth of Puerto Rico' </td></tr>
+<tr><td>173:    'State of Qatar' </td><td>174:    'Russian Federation' </td></tr>
+<tr><td>175:    'Republic of Rwanda' </td><td>176:    'Kingdom of Saudi Arabia' </td></tr>
+<tr><td>177:    'Republic of San Marino' </td><td>178:    'Nordic Sami Conference' </td></tr>
+<tr><td>179:    'Sark' </td><td>180:    'Scotland' </td></tr>
+<tr><td>181:    'Principality of Seborga' </td><td>182:    'Republic of Sierra Leone' </td></tr>
+<tr><td>183:    'Republic of Singapore' </td><td>184:    'Republic of Korea' </td></tr>
+<tr><td>185:    'Republic of Slovenia' </td><td>186:    'Somali Republic' </td></tr>
+<tr><td>187:    'Republic of Somaliland' </td><td>188:    'Republic of South Africa' </td></tr>
+<tr><td>189:    'Solomon Islands' </td><td>190:    'Kingdom of Spain' </td></tr>
+<tr><td>191:    'Secretariat of the Pacific Community' </td><td>192:    'Democratic Socialist Republic of Sri Lanka' </td></tr>
+<tr><td>193:    'Saint Lucia' </td><td>194:    'Republic of the Sudan' </td></tr>
+<tr><td>195:    'Republic of Suriname' </td><td>196:    'Slovak Republic' </td></tr>
+<tr><td>197:    'Kingdom of Sweden' </td><td>198:    'Swiss Confederation' </td></tr>
+<tr><td>199:    'Syrian Arab Republic' </td><td>200:    'Kingdom of Swaziland' </td></tr>
+<tr><td>201:    'Republic of China' </td><td>202:    'Republic of Tajikistan' </td></tr>
+<tr><td>203:    'United Republic of Tanzania' </td><td>204:    'Kingdom of Thailand' </td></tr>
+<tr><td>205:    'Autonomous Region of Tibet' </td><td>206:    'Turkmenistan' </td></tr>
+<tr><td>207:    'Togolese Republic' </td><td>208:    'Tokelau' </td></tr>
+<tr><td>209:    'Kingdom of Tonga' </td><td>210:    'Tristan da Cunha' </td></tr>
+<tr><td>211:    'Tromelin' </td><td>212:    'Republic of Tunisia' </td></tr>
+<tr><td>213:    'Republic of Turkey' </td><td>214:    'Tuvalu' </td></tr>
+<tr><td>215:    'United Arab Emirates' </td><td>216:    'Republic of Uganda' </td></tr>
+<tr><td>217:    'Ukraine' </td><td>218:    'United Kingdom of Great Britain' </td></tr>
+<tr><td>219:    'United Nations' </td><td>220:    'United States of America' </td></tr>
+<tr><td>221:    'Oriental Republic of Uruguay' </td><td>222:    'Virgin Islands of the United States' </td></tr>
+<tr><td>223:    'Republic of Uzbekistan' </td><td>224:    'State of the Vatican City' </td></tr>
+<tr><td>225:    'Republic of Vanuatu' </td><td>226:    'Bolivarian Republic of Venezuela' </td></tr>
+<tr><td>227:    'Republic of Yemen' </td><td>228:    'Democratic Republic of Congo' </td></tr>
+<tr><td>229:    'Republic of Zimbabwe' </td>
+</table>
+
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;A&nbsp;standard&nbsp;shape<br />$lineplot-&gt;mark-&gt;SetType(MARK_FILLEDCIRCLE);<br />$lineplot-&gt;mark-&gt;Show();<br /><br />//&nbsp;Use&nbsp;image&nbsp;in&nbsp;file&nbsp;'mark.jpg'&nbsp;as&nbsp;mark.,&nbsp;aslo&nbsp;scale&nbsp;it&nbsp;to<br />//&nbsp;half&nbsp;the&nbsp;size<br />$lineplot-&gt;mark-&gt;SetType(MARK_IMAGE,'mark.jpg',0.5);<br />$lineplot-&gt;mark-&gt;Show();<br /><br />//&nbsp;Using&nbsp;the&nbsp;built-in&nbsp;image&nbsp;diamond&nbsp;in&nbsp;yellow&nbsp;color&nbsp;and&nbsp;70%&nbsp;of&nbsp;originally&nbsp;size<br />$lineplot-&gt;mark-&gt;SetType(MARK_IMG_DIAMOND,&nbsp;'yellow',&nbsp;0.7);<br />$lineplot-&gt;mark-&gt;Show();<br /><br />//&nbsp;Setting&nbsp;the&nbsp;plotmarks&nbsp;to&nbsp;a&nbsp;Swedish&nbsp;flag&nbsp;showing&nbsp;the&nbsp;three<br />//&nbsp;ways&nbsp;of&nbsp;doing&nbsp;it<br />....<br />$p1-&gt;mark-&gt;SetType(MARK_FLAG1,'sweden');<br />//&nbsp;OR<br />$p1-&gt;mark-&gt;SetType(MARK_FLAG1,197);<br />//&nbsp;OR<br />$p1-&gt;mark-&gt;SetType(MARK_FLAG1,'Kingdom&nbsp;of&nbsp;Sweden');<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETWEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWeight($aWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify line weight</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Line weight</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify line weight&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$line-&gt;mark-&gt;SetWeight(2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SETWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWidth($aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set width of plot mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width in pixels</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set width of plot mark&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;SetWidth(10);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_PLOTMARK_SHOW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Show($aShow)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable or disable plotmarks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aShow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Show plot marks</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Enable or disable plotmarks. By default plot marks are not shown so if you want to display them you need to use this method.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$lineplot-&gt;mark-&gt;Show();</font>
+</span><br>
+<p> <hr> <p>

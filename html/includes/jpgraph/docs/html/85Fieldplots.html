@@ -1,0 +1,60 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="84Scatterplots.html">
+<LINK REL="Next" HREF="86BoxandStockcharts.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="84Scatterplots.html">Previous</A>
+<A HREF="86BoxandStockcharts.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="8_5">8.5 Field plots</A></H2>
+<P> A variant of scatter plot is the so called<I> Field Plots</I> this
+ is basically a scatter plot where each scatter point is an arrow with a
+ direction between 0 to 359 degrees. This effectively allows the
+ visualization of 3 parameters at each point (x,y,angle). As an
+ additional bonus there is also possible to define a callback for each
+ scatter plot to also define the color for each point.</P>
+<P> To create a field plot you create an instance of <A href="../ref/FieldPlot.html#_C_FIELDPLOT">
+FieldPlot</A> in the same way as you created a normal scatter plot. The
+ arguments to this method are Y-coordinate, X-coordinate and angle. To
+ specify a callback you use <A href="../ref/FieldPlot.html#_FIELDPLOT_SETCALLBACK">
+FieldPlot::SetCallback()</A></P>
+<P> The following example (and code) illustrates the usage of the field
+ plot type.</P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_fieldscatterex1.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/fieldscatterex1.png" WIDTH="300"></A>
+<BR><B>Figure 63:</B> Example of the Field plot type <A href="exframes/frame_fieldscatterex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> In addition to the parameters mentioned above you can also adjust
+ both the general size of the arrow and also the specific size of the
+ arrowhead. The arrow size is specified in pixels and the arrow head is
+ specified as an integers between 0 and 10. These sizes are specified
+ with a call to <A href="../ref/FieldArrow.html#_FIELDARROW_SETSIZE">
+FieldPlot::arrow::SetSize()</A></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="84Scatterplots.html">Previous</A>
+<A HREF="86BoxandStockcharts.html">Next</A>
+</BODY>
+</HTML>

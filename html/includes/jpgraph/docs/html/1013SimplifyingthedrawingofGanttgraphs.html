@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="10126Adjustingthemarginswithautosizing.html">
+<LINK REL="Next" HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="10126Adjustingthemarginswithautosizing.html">Previous</A>
+<A HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_13">10.13 Simplifying the drawing of Gantt graphs</A></H2>
+<P> As we have shown in the previous examples constructing a Gantt chart
+ consists of a number of repetitive tasks; Create the individual
+ activity bars and add them to the graph.</P>
+<P> Now when you have a basic understanding of how this works you are
+ ready to appreciate a small helper method. <A href="">
+GanttGraph::CreateSimple()</A>. This method takes a few arrays of data
+ which specifies you Gantt chart and then constructs this chart. By
+ using this method you sacrifices a few adjustment possibilities for
+ simplicity. This method is nothing magical it just takes the data for
+ the activities,(start and end date, titles, progress, any constrains
+ and so on) and constructs the activities and adds them to the graph.</P>
+<P> The activities are specified in data array which for each activity
+ have the following fields</P>
+<UL>
+<LI> What row the activity should be on</LI>
+<LI> Activity type, controls the appearance. Can be one of
+<OL>
+<LI> ACTYPE_NORMAL, A standard activty bar</LI>
+<LI> ACTYPE_GROUP, A Grouping bar</LI>
+<LI> ACTYPE_MILESTONE, A milestone</LI>
+<LI></LI>
+</OL>
+<P></P>
+</LI>
+<LI> Title text</LI>
+<LI> Start date</LI>
+<LI> End date (NOT FOR Milestones!)</LI>
+<LI> Caption</LI>
+</UL>
+<P></P>
+<P> So for example to create a Gantt chart consisting of two activities
+ which are grouped and a milestone one would have to use something
+ similar to the following code</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$data&nbsp;</FONT><FONT color="#007700">=&nbsp;array(
+<BR>&nbsp;&nbsp;array(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">ACTYPE_GROUP</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;2001-10-26&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-11-23&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;&quot;</FONT><FONT color="#007700">),
+<BR>&nbsp;&nbsp;array(</FONT><FONT color="#0000BB">1</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">ACTYPE_NORMAL</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;&nbsp;&nbsp;Label&nbsp;2&quot;</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;2001-10-26&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-11-13&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;[KJ]&quot;</FONT><FONT color="#007700">),
+<BR>&nbsp;&nbsp;array(</FONT><FONT color="#0000BB">2</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">ACTYPE_NORMAL</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;&nbsp;&nbsp;Label&nbsp;3&quot;</FONT><FONT color="#007700">,&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</FONT><FONT
+color="#DD0000">&quot;2001-11-20&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2001-11-22&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;[EP]&quot;</FONT><FONT color="#007700">),
+<BR>&nbsp;&nbsp;array(</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">ACTYPE_MILESTONE</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;&nbsp;&nbsp;Phase&nbsp;1&nbsp;Done&quot;</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#DD0000">&quot;2001-11-23&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;M2&quot;</FONT><FONT color="#007700">)&nbsp;);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Create&nbsp;the&nbsp;basic&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttGraph</FONT><FONT color="#007700">
+();
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Gantt&nbsp;Graph&nbsp;using&nbsp;CreateSimple()&quot;</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Setup&nbsp;scale
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">ShowHeaders</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+GANTT_HYEAR&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HMONTH&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HDAY&nbsp;</FONT><FONT color="#007700">|&nbsp;</FONT><FONT color="#0000BB">
+GANTT_HWEEK</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+week</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetStyle</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">WEEKSTYLE_FIRSTDAY</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Add&nbsp;the&nbsp;specified&nbsp;activities
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">CreateSimple</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$data</FONT><FONT color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;..&nbsp;and&nbsp;stroke&nbsp;the&nbsp;graph
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Stroke</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> This will then show up as<DIV class="example">
+<BR> <A href="exframes/frame_ganttsimpleex1.html" target="blank"><IMG border="0"
+HEIGHT="231"  src="img/ganttsimpleex1.png" WIDTH="523"></A>
+<BR><B>Figure 166:</B> Using the simplified way via CreateSimple()
+ method <A href="exframes/frame_ganttsimpleex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> You may (slightly) modify the appearance of the simple Gantt charts
+ by means of the methods <A href="">GanttGraph::SetSimpleFont()</A> and <A
+href="">GanttGraph::SetSimpleStyle()</A> But not anything else, remember
+ that the purpose with this way of constructing graphs is to be simple.
+ If you need full advanced control you have to construct all the
+ activities in the &quot;normal&quot; way.</P>
+<P> You can also specify constrains and progress for each bar by
+ supplying additional data arrays to GanttGraph::CreateSimple().</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="10126Adjustingthemarginswithautosizing.html">Previous</A>
+<A HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">Next</A>
+</BODY>
+</HTML>

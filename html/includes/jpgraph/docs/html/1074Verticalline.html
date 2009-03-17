@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1073Milestones.html">
+<LINK REL="Next" HREF="1075Addingmarkerstoaganttbar.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1073Milestones.html">Previous</A>
+<A HREF="1075Addingmarkerstoaganttbar.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_7_4">10.7.4 Vertical line</A></H3>
+<P> The final object you may add to a Gantt chart is simple, but quite
+ useful, a straight vertical line extending over the whole plot height.
+ This could for example be used to illustrate different phases in a
+ project. You create a line object by a call to GanttVLine()</P>
+<P> The full signature for GanttVLine() is<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">
+function&nbsp;</FONT><FONT color="#0000BB">GanttVLine</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$aDate</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$aTitle</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aColor</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aWeight</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aStyle</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P></P>
+<TABLE border="0">
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aDate&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Date for the milestone</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aTitle&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Title for the line. The title is
+ displayed at the bottom of the line</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aColor&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Color for the line</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aWeight&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Line width</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aStyle&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Line style,&quot;dashed&quot;, &quot;dotted&quot; and
+ so on</TD></TR>
+</TABLE>
+<P> Valid creations of lines are for example</P>
+<UL>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$vline&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+GanttVLine</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-24&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$vline&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+GanttVLine</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-24&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$vline&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+GanttVLine</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-24&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;darkred&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$vline&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+GanttVLine</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-24&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;darkred&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">5</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$vline&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+GanttVLine</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;2001-12-24&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;darkred&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">5</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;dotted&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+</UL>
+<P> To add the line to the graph you just have to call GanttGraph::Add()
+ as with milestones and bars. Let's illustrate the use of vertical lines
+ by adding a line to the previous example.<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;$vline&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttVLine</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;2001-12-24&quot;</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;Phase&nbsp;1&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$vline</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> and the example (See 149) now becomes<DIV class="example">
+<BR> <A href="exframes/frame_ganttex06.html" target="blank"><IMG border="0"
+HEIGHT="189"  src="img/ganttex06.png" WIDTH="502"></A>
+<BR><B>Figure 149:</B> Adding a vertical line with a title to the Gantt
+ chart <A href="exframes/frame_ganttex06.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> From the above figure you can see that by default the line is drawn
+ at the beginning of the day of the specified date and in a 'dashed'
+ style. This can (of course!) be modified so that the line is
+ drawn/aligned anywhere in the specified day. You modify this by
+ invoking the method SetDayOffset() with an argument specifying the
+ fraction of the day where you want the line positioned.</P>
+<P> If you, for example, want to display the line in the middle of the
+ day just add the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$vline</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetDayOffset</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+0.5</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> to the previous code and the result will be<DIV class="example">
+<BR> <A href="exframes/frame_ganttex07.html" target="blank"><IMG border="0"
+HEIGHT="189"  src="img/ganttex07.png" WIDTH="502"></A>
+<BR><B>Figure 150:</B> Modifying the position of the line within the day
+ <A href="exframes/frame_ganttex07.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> As usual you may modify the font, size and color by invoking the
+ appropriate method (SetFont(), SetColor()) on the 'title' property of
+ lines.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1073Milestones.html">Previous</A>
+<A HREF="1075Addingmarkerstoaganttbar.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="717UsingcallbacksforPlotmarks.html">
+<LINK REL="Next" HREF="719Formattingtheaxis.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="717UsingcallbacksforPlotmarks.html">Previous</A>
+<A HREF="719Formattingtheaxis.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_18">7.18 Rotating graphs 90 degrees</A></H2>
+<P> In section <A href="7adv.html#10_2">10.2</A> you can read about
+ arbitrary rotation of the graphs. For most practical purposes rotation
+ of 90 degrees is most useful. This could for example be used to plot
+ horizontal bar graphs.</P>
+<P> The slight complication with general rotation is that the margins
+ also rotates, this means that if you rotate a graph 90 degrees the left
+ margin in the image was originally the bottom margin. In additional by
+ default the center of the rotation is the center of the plot area and
+ not the entire image (if all the margins are symmetrical then they will
+ of course coincide). This means that depending on your margin the
+ center of the rotation will move. You can read more about this and how
+ to manually set the center for rotation in the section about rotation, <A
+href="7adv.html#10_2">10.2</A></P>
+<P> This is just a slight inconvenience which you have to take into
+ account when you need to set an explicit margin with a call to <A href="../ref/Graph.html#_GRAPH_SETMARGIN">
+Graph::SetMargin()</A></P>
+<P> However, in order to make a rotation of 90 degrees much easier you
+ can easily rotate a graph 90 degrees and set the correct margin with a
+ call to <A href="../ref/Graph.html#_GRAPH_SET90ANDMARGIN">
+Graph::Set90AndMargin()</A> The parameter to this method lets you
+ specify the margins as you will see them in the image without having to
+ think of what becomes what after the rotation.</P>
+<P> So, the only thing you need to do is call this method and then the
+ graph will have been rotated 90 degrees.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="717UsingcallbacksforPlotmarks.html">Previous</A>
+<A HREF="719Formattingtheaxis.html">Next</A>
+</BODY>
+</HTML>

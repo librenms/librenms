@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="12AntiSpamChallenges.html">
+<LINK REL="Next" HREF="13GeneratingLEDlikedigitswithJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="12AntiSpamChallenges.html">Previous</A>
+<A HREF="13GeneratingLEDlikedigitswithJpGraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="12_1">12.1 Generating Anti-Spam challenge</A></H2>
+<P> There are two basic alternatives on how to generate the content of
+ the anti-spam image</P>
+<OL>
+<LI> Submit a string that should be used</LI>
+<LI> Automatically generate a random string. If this alternative is
+ chosen then the user of the library should save the created string and
+ compare it to what the user enters.</LI>
+</OL>
+<P> In order to write a script to generate a new challenge there are
+ four steps to be completed.</P>
+<P><B> First</B> include the library file<I> jpgraph_antispam.php</I>.
+ Note that there is no need to include the &quot;jpgraph.php&quot; library since
+ all functionality is included in this library file.<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">
+require_once&nbsp;</FONT><FONT color="#DD0000">&quot;jpgraph_antispam.php&quot;</FONT><FONT
+color="#007700">;</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P><B> Secondly</B> a new instance of the class<I> AntiSpam</I> must be
+ created<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$spam&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+AntiSpam</FONT><FONT color="#007700">();</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P><B> Thirdly</B> the string to be used in the challenge must be
+ specified. To automatically generate a suitable string use<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;The&nbsp;argument&nbsp;determines&nbsp;the&nbsp;length&nbsp;of&nbsp;the&nbsp;generated&nbsp;string
+<BR></FONT><FONT color="#0000BB">$chars&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">$spam</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Rand</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">5</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> If instead the string to be used should be specified this string
+ should be specified in the initial creation of the AntiSpam() or by
+ calling the<I> Set()</I> method as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$spam</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">&quot;aui8k&quot;</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P>Please note that in order to minimize the risk for confusion the
+ letters 'O' and the number '0' (zero) is not allowed since they are too
+ alike and can be mistaken for each other.</P>
+<P><B> The final and fourth step</B> is to output the image with a call
+ the method<I> Stroke()</I> on the created instance of the<I> AntiSpam</I>
+ class.<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;</FONT><FONT color="#007700">if(&nbsp;</FONT><FONT color="#0000BB">$spam</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">Stroke</FONT><FONT color="#007700">
+()&nbsp;===&nbsp;</FONT><FONT color="#0000BB">false&nbsp;</FONT><FONT color="#007700">
+)&nbsp;{
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;die(</FONT><FONT color="#DD0000">&quot;Illegal&nbsp;or&nbsp;no&nbsp;data&nbsp;to&nbsp;plot&quot;</FONT><FONT
+color="#007700">);
+<BR>}</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P>Note that we have put a guard around the output since in the case of
+ an error this method will result a boolean false value. As with the
+ other graph types it is possible to write the generated image to a file
+ by submitting a file name as an argument to<I> Stroke()</I>.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="12AntiSpamChallenges.html">Previous</A>
+<A HREF="13GeneratingLEDlikedigitswithJpGraph.html">Next</A>
+</BODY>
+</HTML>

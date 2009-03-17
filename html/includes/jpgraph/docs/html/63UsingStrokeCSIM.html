@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="62Specifyingtargetsforimagemapplots.html">
+<LINK REL="Next" HREF="64ExamplesofImagemaps.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="62Specifyingtargetsforimagemapplots.html">Previous</A>
+<A HREF="64ExamplesofImagemaps.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="6_3">6.3 Using StrokeCSIM()</A></H2>
+<P> The simplest way of creating a creating a CSIM image is with the
+ StrokeCSIM() method. As mentioned before this method actually returns a
+ (small) HTML page containing both the image-tag as well as the image
+ map specification. Hence it is<B> not</B> possible to use a script that
+ ends with this method in a standard image-tags src property.</P>
+<P> There are two ways to create CSIM (or get hold of) the image maps</P>
+<OL>
+<LI> Use the CSIM image script as the target in a standard anchor
+ reference, for example <CODE>
+<PRE>
+&lt;a href=&quot;mycsimscript.html&quot;&gt;
+</PRE>
+</CODE> This has the drawback that the image page will only contain the
+ image and nothing else.</LI>
+<LI> The other way will allow the image script to be included in an
+ arbitrary HTML page by just including the image script at the wanted
+ place in the HTML page using any of the standard &quot;include&quot; php
+ statement. For example <CODE>
+<PRE>
+&lt;h2&gt; This is an CSIM image &lt;/h2&gt;
+
+&lt;?php
+include &quot;mycsimscript.php&quot;
+?&gt;
+</PRE>
+</CODE></LI>
+</OL>
+<P><DIV class="note"><B>Note:</B> If there are several CSIM images on
+ the same page it is necessary to use &quot;include_once&quot; in the scripts for
+ the inclusion of &quot;jpgraph.php&quot; and the other jpgraph library files
+ since the files will be included multiple times on the same page and
+ one or more &quot;Already defined error&quot; will be displayed.</DIV></P>
+<P> The process to replace Stroke() with StrokeCSIM() is strait forward.
+ Replace all existing calls to Stroke() with the equivalent calls to
+ StrokeCSIM().</P>
+<P> The only difference is that it is necessary ti supply a minimum of
+ one file name in the StrokeCSIM() method. The first argument must be
+ the name of the actual image script file including the extension. So
+ for example if the image script is called &quot;mycsimscript.php&quot; it is
+ necessary to write
+<BR> &nbsp;<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+StrokeCSIM</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'mycsimscript.php'</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P>
+<BR> However, it is possible to apply a small &quot;trick&quot; here. PHP maintain
+ a special variable called &quot;__FILE__&quot; which is always set to the current
+ file name. This means you could use the following construction:</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+StrokeCSIM</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+basename</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+__FILE__</FONT><FONT color="#007700">))</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P>This is a better way since the script can now be renamed without
+ having to change any code in the file which otherwise would be needed.<DIV
+class="note"><B>Note:</B> Why does the script name need to be used as
+ the first parameter? The reason is that in the creation of the HTML
+ page which is sent back we need to refer to the script in the image
+ tag. So why is it not possible to use the PHP_SELF reference? The
+ problem with PHP_SELF is that in the case where we include the
+ image-script in an HTML page and use the PHP_SELF we will get the name
+ of the HTML page and not the actual script in which the PHP_SELF is
+ used. We also can not use the __FILE__ trick in the library since in
+ the context __FILE__ is set to &quot;jpgraph.php&quot;. Hence, this must be
+ specified by the client as shown above.</DIV></P>
+<P> The other arguments to StrokeCSIM() are optional. Please note that
+ if several CSIM images are used in the same HTML page it is also
+ necessary to specify the image map name as the second parameter since
+ all image maps must be unique to properly match each image map against
+ each image. Please consult the class reference <A href="../ref/Graph.html#_GRAPH_STROKECSIM">
+ StrokeCSIM()</A> for more details.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="62Specifyingtargetsforimagemapplots.html">Previous</A>
+<A HREF="64ExamplesofImagemaps.html">Next</A>
+</BODY>
+</HTML>

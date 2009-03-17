@@ -1,0 +1,1944 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_GTEXTTABLE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>GTextTable</b></div>
+<i>(Defined in: jpgraph_table.php : 438)</i><table border=1><tr><td>&nbsp;<a href="GTextTable.html" style="font-family:arial;font-weight:bold;color:darkblue;">GTextTable</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="GTextTable.html#_GTEXTTABLE_GTEXTTABLE">GTextTable()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_INIT">Init()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_MERGECELLS">MergeCells()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_MERGECOL">MergeCol()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_MERGEROW">MergeRow()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETALIGN">SetAlign()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETANCHORPOS">SetAnchorPos()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETBORDER">SetBorder()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLALIGN">SetCellAlign()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLCOLOR">SetCellColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLCOUNTRYFLAG">SetCellCountryFlag()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLCSIMTARGET">SetCellCSIMTarget()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLFILLCOLOR">SetCellFillColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLFONT">SetCellFont()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE">SetCellImage()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGECONSTRAIN">SetCellImageConstrain()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT">SetCellNumberFormat()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCELLPADDING">SetCellPadding()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLALIGN">SetColAlign()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLCOLOR">SetColColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLFILLCOLOR">SetColFillColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLFONT">SetColFont()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLGRID">SetColGrid()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLIMAGE">SetColImage()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLNUMBERFORMAT">SetColNumberFormat()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCOLPADDING">SetColPadding()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETCSIMTARGET">SetCSIMTarget()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETFILLCOLOR">SetFillColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETFONT">SetFont()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETGRID">SetGrid()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETIMAGE">SetImage()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETMINCOLWIDTH">SetMinColWidth()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETMINROWHEIGHT">SetMinRowHeight()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETNUMBERFORMAT">SetNumberFormat()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETPADDING">SetPadding()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETPOS">SetPos()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWALIGN">SetRowAlign()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWCOLOR">SetRowColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWFILLCOLOR">SetRowFillColor()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWFONT">SetRowFont()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWGRID">SetRowGrid()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWIMAGE">SetRowImage()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWNUMBERFORMAT">SetRowNumberFormat()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETROWPADDING">SetRowPadding()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_SETSCALEPOS">SetScalePos()</a>&nbsp;<br>
+&nbsp;<a href="GTextTable.html#_GTEXTTABLE_TOSTRING">toString()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>When visualizing data it is often useful to have both a quick graphical view which can show high level trends and a detailed view with the exact figures. The pro-version of JpGraph now supports the creation of graphic tables in all available graph types.
+
+The specification of the tables data, position, fonts, alignment, colors, borders etc. is all fully flexible with an intuitive set of APIs to control the table. In this HowTo we will start by showing how to build basic tables which we will augment with more advanced formatting by introducing the formatting capabilities one by one.
+
+In addition to adding data tables to graphs it is also possible to create graphic tables on the fly all by its own. This has the advantage compared with HTML tables to allow users to make copies of the table while maintaining the exact formatting of the table. Figure 2. shows an example with just a graphical table  <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_GTEXTTABLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;GTextTable()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new Graphic text table</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Create a new Graphic text table. The next call should either be to specify a value for the table (using GTextTable::Set() ) or a call to GTextTable::Init() to specify the size of table.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_INIT">GTextTable::Init</a> and <a href="GTextTable.html#_GTEXTTABLE_SET">GTextTable::Set</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table&nbsp;=&nbsp;new&nbsp;GTextTable();<br />$table-&gt;Set($tableData);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_INIT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Init($aRows,$aCols,$aFillText)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Initialize the size for a newly created table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRows</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Number of rows in table</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCols</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+0</font>
+</td><td>Number of columns in table</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFillText</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Deafult fill value for each cell</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>After the table has been created the size of the table has to be established. This can either be done by a call to this method or by supplying a matrix in the call to Set().
+<p>
+If You plan on specifying the cells by individual calls to Set($row,$col,$value) then this method must have been called after the creation of the table.
+<p>
+When You set the entire table content with a call to Set() with a full 2D-matrix as argument the size of the matrix will be used to determine the size of the table.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table&nbsp;=&nbsp;new&nbsp;GTextTable();<br />$table-&gt;Init(5,7);<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_MERGECELLS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;MergeCells($aR1,$aC1,$aR2,$aC2,$aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Merge cells in the specified range</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Merge cells in the specified range. The alignment of the merged cells cab be set by the laet two optional arguments.
+
+Note: To merge all cells in a specific row or column use the alternative methods MergeCol() and MergeRow()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_MERGEROW">GTextTable::MergeRow</a> and <a href="GTextTable.html#_GTEXTTABLE_MERGECOL">GTextTable::MergeCol</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Merge&nbsp;the&nbsp;top&nbsp;2x2&nbsp;cells<br />$table-&gt;MergeCells(0,0,1,1,"right");</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_MERGECOL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;MergeCol($aCol,$aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Merge all cells in one column</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Merge all cells in one column.
+
+Note: By default if no alignment is given the content in the merged cells will be centered both horixontally and vertically.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_MERGECELLS">GTextTable::MergeCells</a> and <a href="GTextTable.html#_GTEXTTABLE_MERGEROW">GTextTable::MergeRow</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;MergeCol(3);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_MERGEROW"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;MergeRow($aRow,$aHAlign,$aVAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Merge all cells in one row.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Merge all cells in one row.
+
+Note: By default if no alignment is given the content in the merged cells will be centered both horixontally and vertically.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_MERGECELLS">GTextTable::MergeCells</a> and <a href="GTextTable.html#_GTEXTTABLE_MERGECOL">GTextTable::MergeCol</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;MergeRow(2,"right","top");</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aArg1,$aArg2,$aArg3)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the value in cell or cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>2D-Array or Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+NULL</font>
+</td><td>[Oprional] Columns index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg3</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+NULL</font>
+</td><td>(Optional) Value for cell</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method is used to put values in a cell or initialize the table using a 2D-matrix. The method is polymorphic and can be called in two ways
+<ol>
+<li><b>Set($aTableMatrix)</b>, Specify the entire table by supplying a 2D-Matrix
+<li><b>Set($aRow,$aCol,$aValue)</b>, Set the value in a specific cell. Note that if You use this method then the size of the table muts have been previously specified with a call to Init()
+</ol>
+
+Note: If the table is initialized with an 2D-matrix then there is no need to call the Init() method since the ovberall size of the table will be set to the same as the supplied matrix.
+
+Note: After the entire table have beedn specified with an initial 2D-array it is of course still possible to modify/set individual values with a call to the second version of the table.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_INIT">GTextTable::Init</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Create&nbsp;a&nbsp;new&nbsp;table&nbsp;from&nbsp;a&nbsp;2D-array<br />$data&nbsp;=&nbsp;array(<br />&nbsp;&nbsp;&nbsp;array("Jun",34,18,13),&nbsp;<br />&nbsp;&nbsp;&nbsp;array("Jul",15,9,12));<br />$table&nbsp;=&nbsp;new&nbsp;GTextTable();<br />$table-&gt;Set($data);<br />$table-&gt;SetAlign("right");<br />...<br /><br /><br />//&nbsp;Create&nbsp;a&nbsp;table&nbsp;by&nbsp;setting&nbsp;individual&nbsp;cells<br />$table&nbsp;=&nbsp;new&nbsp;GTextTable();<br />$table-&gt;Init(5,7);&nbsp;//&nbsp;5&nbsp;rows&nbsp;by&nbsp;7&nbsp;column&nbsp;sized&nbsp;table<br /><br />for($i=0;&nbsp;$i&nbsp;&lt;&nbsp;5;&nbsp;++$i)&nbsp;{<br />&nbsp;&nbsp;for($j=0;&nbsp;$j&nbsp;&lt;&nbsp;7;&nbsp;++$j)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;$table-&gt;Set(0,0,$data[$i][$j]);<br />&nbsp;&nbsp;}<br />}<br />...<br /><br />$table-&gt;Set(0,0,$data1);<br /><br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlign($aR1HAlign,$aC1VAlign,$aR2,$aC2,$aHArg,$aVArg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set cell alignment for entire table or range of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR1HAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left row OR horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1VAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column OR vertical alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHArg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVArg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'center'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set cell alignment for entire table or range of cells. The alignment fcan be specifed both horizontally and vertically.
+
+The possible settings for horizontal alignment are
+"left", "center", "right"
+
+Vertical alignment can be set as 
+"top","center","bottom"
+
+Note that the alignment options are specified as strings.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLALIGN">GTextTable::SetCellAlign</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWALIGN">GTextTable::SetRowAlign</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLALIGN">GTextTable::SetColAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;the&nbsp;default&nbsp;alignment&nbsp;for&nbsp;the&nbsp;entire&nbsp;table<br />$table-&gt;SetAlign("right");<br /><br />//&nbsp;The&nbsp;set&nbsp;the&nbsp;first&nbsp;column&nbsp;to&nbsp;use&nbsp;left&nbsp;alignment<br />$table-&gt;SetColAlign(0,"left");<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETANCHORPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAnchorPos($aXAnchor,$aYAnchor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify where the anchor position of the table should be</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aXAnchor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal anchor</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aYAnchor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'top'</font>
+</td><td>Vertical anchor</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify where the anchor of the table should be. By default the anchor is top left corner so that the positoin you specify for the table is taken as the top left corner.
+
+This can be adjusted horixontally as
+"left", "center" or "right"
+
+Vertically it can be adjusted as 
+"top","center","bottom"
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETPOS">GTextTable::SetPos</a> and <a href="GTextTable.html#_GTEXTTABLE_SETSCALEPOS">GTextTable::SetScalePos</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Make&nbsp;the&nbsp;position&nbsp;refer&nbsp;to&nbsp;the&nbsp;center&nbsp;of&nbsp;the&nbsp;table<br />$table-&gt;SetAnchorPos('center','center');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETBORDER"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetBorder($aWeight,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the color and weight on the border around the table-</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Weight of border</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color of border</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the color and weight on the border around the table. By default the border is a 1 pixel black solid line.
+
+Note: Specify a weight of 0 to disable the border entirely.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETGRID">GTextTable::SetGrid</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+...<br />$table-&gt;SetBorder(2,"navy");<br />...<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellAlign($aRow,$aCol,$aHorAlign,$aVertAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set cell alignment for a specified cell.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHorAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVertAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'bottom'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set cell alignment for a specified cell. The alignment can be specifed both horizontally and vertically.
+
+The possible settings for horizontal alignment are
+"left", "center", "right"
+
+Vertical alignment can be set as 
+"top","center","bottom"
+
+Note that the alignment options are specified as strings.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETALIGN">GTextTable::SetAlign</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCOLALIGN">GTextTable::SetColAlign</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWALIGN">GTextTable::SetRowAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetCellAlign(2,5,'left');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellColor($aRow,$aCol,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set font color for a specific cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set font color for a specific cell.
+
+Note: To set the default color for all cells use the SetColor() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCOLOR">GTextTable::SetColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWCOLOR">GTextTable::SetRowColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLCOLOR">GTextTable::SetColColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetCellColor(3,1,'darkred');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLCOUNTRYFLAG"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellCountryFlag($aRow,$aCol,$aFlag,$aScale,$aMix,$aStdSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a country flag in the background of the specified cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Flag specification partial name or index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Scaling factor to be used</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Blending factor (0-100)</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStdSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Which original size of flag image to use</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set a country flag in the background of the specified cell. 
+
+Before this method can be used make sure that the file "jpgraph_flags.php" is included in the script.
+
+All supported countries can be specified by setting the '$aFlag" parameter to either
+<ol>
+<li> Numeric index, (0-238)
+<li> Full or partial name, e.g. "norway"
+<li> The unique string index for the country
+</ol>
+
+For a list of all available flags please run the file "listallflags.php" in the Example directory.
+<p>
+The parameter "$aMix" is a value between 0-100 and specifies the blend factor for the flag.
+<p>
+The paraneter $aStdSize specifes one of three orignal izes of flag where size can be one of
+<ol>	
+<li>FLAGSIZE1, corresponds to an original flag size of 35x35 pixels
+<li>FLAGSIZE2, corresponds to an original flag size of 60x60',
+<li>FLAGSIZE3, corresponds to an original flag size of 100x100',
+<li>FLAGSIZE4, corresponds to an original flag size of roughly 400x400
+</ol>
+
+For best result always use an original flag that is at least as big as the size that is wanted, i.e. even though the scaling factor can be used to arbitrary change the size of any of these original flags the result when up scaling is not optimal since there is a need to interpolate. By starting with a larger original image which is the downsampled the result is much better.
+<p>
+Note 1: In order to lock either the height or the width of the flag to a specific value use the SetImageConstrain() 
+method.
+
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETIMAGE">GTextTable::SetImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;one&nbsp;row&nbsp;with&nbsp;a&nbsp;number&nbsp;of&nbsp;country&nbsp;flags&nbsp;and&nbsp;constrain<br />//&nbsp;the&nbsp;height&nbsp;to&nbsp;be&nbsp;20&nbsp;pixels<br />$countries&nbsp;=&nbsp;array('united&nbsp;states','united&nbsp;kingdom','french&nbsp;republic','denmark','iceland','canada');<br />$n&nbsp;=&nbsp;count($countries);<br />for($i=0;&nbsp;$i&nbsp;&lt;&nbsp;$n;&nbsp;++$i&nbsp;)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;$table-&gt;SetCellCountryFlag(1,$i+1,$countries[$i]);<br />&nbsp;&nbsp;&nbsp;&nbsp;$table-&gt;SetCellImageConstrain(1,$i+1,TIMG_HEIGHT,20);<br />}</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLCSIMTARGET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellCSIMTarget($aRow,$aCol,$aTarget,$aAlt)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify URL for CSIM target</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTarget</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Target URL</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>ALT text</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify URL and optional ALT text for CSIM target for the specified cell.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCSIMTARGET">GTextTable::SetCSIMTarget</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetCellCSIMTarget(3,0,'detail.php','View&nbsp;detailes');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellFillColor($aRow,$aCol,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background color in a cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>background color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background color in a cell.
+
+Note: To set the default background fill color for all cells usde the SetFillColor() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETFILLCOLOR">GTextTable::SetFillColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWFILLCOLOR">GTextTable::SetRowFillColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLFILLCOLOR">GTextTable::SetColFillColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Highlight&nbsp;cell&nbsp;(7,0)<br />$table-&gt;SetCellFillColor(7,0,'yellow');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellFont($aRow,$aCol,$aFF,$aFS,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font family and style for a specific cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFS</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font family and style for a specific cell.
+
+Note:To set the default font for all cells use the SetFont() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETFONT">GTextTable::SetFont</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWFONT">GTextTable::SetRowFont</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLFONT">GTextTable::SetColFont</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Highlight&nbsp;cell&nbsp;(4,1)&nbsp;with&nbsp;red&nbsp;on&nbsp;yellow&nbsp;background<br />$table-&gt;SetCellFillColor(4,1,'yellow');<br />$table-&gt;SetCellColor(4,1,'darkred');<br />$table-&gt;SetCellFont(4,1,FF_ARIAL,FS_BOLD,12);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellImage($aRow,$aCol,$aFile,$aScale,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set a background image in the specified cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFile</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image file name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Image scale factor</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Blending factor (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set a background image in the specified cell. The image is stored in the file with the name given as the third parameter.
+
+The image name must end with a valid image prefix, i.e. one of ".png", ".jpg" or possibly ".gif"
+
+Note: To set a default background image for all cells in the table use the SetImage() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETIMAGE">GTextTable::SetImage</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWIMAGE">GTextTable::SetRowImage</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLIMAGE">GTextTable::SetColImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Put&nbsp;the&nbsp;image&nbsp;'warning.jpg'&nbsp;in&nbsp;cell&nbsp;(3,6)&nbsp;and<br />//&nbsp;scale&nbsp;the&nbsp;image&nbsp;to&nbsp;half&nbsp;size<br />$table-&gt;SetCellImage(3,6,'warning.jpg',0.5);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLIMAGECONSTRAIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellImageConstrain($aRow,$aCol,$aType,$aVal)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Lock either the image height or width in a particular cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aType</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Specify width or height constrain</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVal</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Value of constrain</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Use this method to locj either the width or height of the image ina a cell. The non-specified image width or height will be automatically determied so that the orignal propertion of the image is maintained.
+
+The $aType parameter is used to indicate if the value given should be interpretated as width or height constarin and is specifed as either
+<ol>
+<li> TIMG_WIDTH, Interpret as width
+<li> TIMG_HEIGHT,Interpret as height
+</ol>&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>VOID<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE">GTextTable::SetCellImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Make&nbsp;sure&nbsp;image&nbsp;in&nbsp;cell&nbsp;(3,1)&nbsp;is&nbsp;exactlyb&nbsp;20&nbsp;pixels&nbsp;<br />//&nbsp;in&nbsp;height<br />$table-&gt;SetCellImageConstrain(3,1,TIMG_HEIGHT,20);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLNUMBERFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellNumberFormat($aRow,$aCol,$aF)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set number format in cell</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set number format in cell. The number format should be given in the style of printf() family format strings. A cell that contains non numeric data will not be affected in any way by this method.
+
+Note: It is the resposnibility of the client to make any necessary rounding of the numbers.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Use&nbsp;two&nbsp;decimals&nbsp;with&nbsp;leading&nbsp;0&nbsp;on&nbsp;numbers<br />$this-&gt;SetCellNumberFormat(3,1,'%0.2f');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCELLPADDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCellPadding($aRow,$aCol,$aPad)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set internal cell margin</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPad</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Internal cell margin (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set internal cell margins in pixels.
+
+By default the internal cell padding is 5 pixels.
+
+Note: To change the default cell padding for all cells in the table use the Setpadding() method.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;8&nbsp;pixel&nbsp;cell&nbsp;padding&nbsp;for&nbsp;cell&nbsp;(1,3)<br />$table-&gt;SerCellPadding(3,1,8);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColAlign($aCol,$aHorAlign,$aVertAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set cell alignment for an entire column of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHorAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVertAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'bottom'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set cell alignment for an entire column of cells. The alignment can be specifed both horizontally and vertically.
+
+The possible settings for horizontal alignment are
+"left", "center", "right"
+
+Vertical alignment can be set as 
+"top","center","bottom"
+
+Note that the alignment options are specified as strings.
+
+Note2: In order to set the default alignment for all cells in the table use the SetAlign() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETALIGN">GTextTable::SetAlign</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLALIGN">GTextTable::SetCellAlign</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWALIGN">GTextTable::SetRowAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColAlign(3,'center');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColColor($aCol,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set font color for a entire column.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set font color for a entire column.
+
+Note: To set the default color for all cells use the SetColor() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCOLOR">GTextTable::SetColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLCOLOR">GTextTable::SetCellColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWCOLOR">GTextTable::SetRowColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColColor(2,'blue');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColFillColor($aCol,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background color in an entire column of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Background color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background color in an entire column of cells.
+
+Note: To set the default background fill color for all cells usde the SetFillColor() method.&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>VOID<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLFILLCOLOR">GTextTable::SetCellFillColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETFILLCOLOR">GTextTable::SetFillColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWFILLCOLOR">GTextTable::SetRowFillColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Highlight&nbsp;column&nbsp;3&nbsp;with&nbsp;white&nbsp;text&nbsp;on&nbsp;gray&nbsp;bakground<br />$table-&gt;SetColFillColor(3,'darkgray');<br />$table-&gt;SetColColor(3,'white');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColFont($aCol,$aFF,$aFS,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font family and style for an entire column of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFS</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font family and style for an entire column of cells
+
+Note:To set the default font for all cells use the SetFont() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETFONT">GTextTable::SetFont</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWFONT">GTextTable::SetRowFont</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCELLFONT">GTextTable::SetCellFont</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColFont(0,FF_ARIAL,FS_NORMAL,12);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLGRID"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColGrid($aCol,$aWeight,$aColor,$aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set style, color and width of a specified vertical grid line </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Grind line to specify</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width of line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color of line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TGRID_SINGLE</font>
+</td><td>Grid line style (see below)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set style, color and width of a specified vertical grid line in the table. The grid lines are numbered from 1 to columns-1 and from left to right. The grid lines are defined as the internal lines in the table. The outer border of the table is controlled separately with the SetBorder() method.
+<p>
+The style for the grid lines can be one of the following three
+<ol>
+<li><b>TGRID_SINGLE</b>, Single solid line of the given color and weight
+<li><b>TGRID_DOUBLE</b>, Two solid lines of the given color and weight. The distance between the lines is the same as the weight.
+<li><b>TGRID_DOUBLE2</b>, Two solid lines of the given color. The first line has twice the weight as the second. This type of line is often used to mark a summation line in a table.
+</ol>
+
+Note: In order to remove all grid lines in the table set the width to 0.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColGrid(1,1,'black',TGRID_DOUBLE2);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColImage($aCol,$aFile,$aScale,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set background image for an entire column of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFile</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Filename of image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Scale of image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Blend factor for image (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set background image for an entire column of cells. The should be stored in a file whos filename is given as the second parameter. The scdaling factor can be specifed as an arbitary floating point value between 0-1.
+<p>
+The Blend factor is specified as an integer between 0 and 100 where 100 is 100% blend factor.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETIMAGE">GTextTable::SetImage</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE">GTextTable::SetCellImage</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWIMAGE">GTextTable::SetRowImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColImage(2,$imageFileNmae,0.7);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLNUMBERFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColNumberFormat($aCol,$aF)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set number format in an entire column of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set number format in an entire column of cells. The number format should be given in the style of printf() family format strings. A cell that contains non numeric data will not be affected in any way by this method.
+
+Note: It is the resposnibility of the client to make any necessary rounding of the numbers.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT">GTextTable::SetCellNumberFormat</a>, <a href="GTextTable.html#_GTEXTTABLE_SETNUMBERFORMAT">GTextTable::SetNumberFormat</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWNUMBERFORMAT">GTextTable::SetRowNumberFormat</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Use&nbsp;two&nbsp;decimals&nbsp;with&nbsp;leading&nbsp;zero<br />$table-&gt;SetColNumberFormat(4,'%0.2f');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aArgR1,$aC1,$aR2,$aC2,$aArg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set font color for the whole table or a range of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArgR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row OR font color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Font color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set font color for the whol table or a range of cells.
+Thie method is polymorphic an can be called in two ways
+<ul>
+<li><b>SetColor($aColor)</b>, Set the font color for the entire table
+<li><b>SetColor($aR1,$aC1,$aR2,$aC2,$aColor)</b>, Set the font color for a range of cells specified by the top left and bottom right cell.
+</ul>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLCOLOR">GTextTable::SetCellColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWCOLOR">GTextTable::SetRowColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLCOLOR">GTextTable::SetColColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;the&nbsp;font&nbsp;color&nbsp;for&nbsp;the&nbsp;entire&nbsp;table<br />$table-&gt;SetColor('darkgray');<br /><br />//&nbsp;Set&nbsp;the&nbsp;font&nbsp;color&nbsp;for&nbsp;the&nbsp;top&nbsp;left&nbsp;2x2&nbsp;cells<br />$table-&gt;SetColor(0,0,1,1,'blue');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCOLPADDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColPadding($aCol,$aPad)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set internal cell margins in pixels for all cells in the specified column.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCol</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPad</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Internal cell margin</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set internal cell margins in pixels for all cells in the specified column.
+
+By default the internal cell padding is 5 pixels.
+
+Note: To change the default cell padding for all cells in the table use the Setpadding() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLPADDING">GTextTable::SetCellPadding</a>, <a href="GTextTable.html#_GTEXTTABLE_SETPADDING">GTextTable::SetPadding</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWPADDING">GTextTable::SetRowPadding</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetColPadding(3,12):</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETCSIMTARGET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCSIMTarget($aTarget,$aAlt,$aAutoTarget)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set URL CSIM target for all cells in the table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aTarget</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Target URL</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAlt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>ALT etxt</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aAutoTarget</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+false</font>
+</td><td>TRUE=Append auto row and column argument</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set URL CSIM target for all cells in the table. If the $aAutoTarget is set to TRUE then an additional GET method argument will be appended to the base URL. This makes it possible to spcify a base URL which will then be called with the two additional arguments "row" and "col". This can be used to determien from which cell the click was made.
+<p>
+An example will clarify this.
+<p>
+Assume that the base URL is "target.php". If we then setup the table with
+
+$table->SetCSIMTarget('target.php','Click for details',true);
+
+then if the user clicks the cell (1,1) the url called will be  "target.php?row=1&col=1", for cell (2,3) the call would be "target.php?row=2&col=3" and so on.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Assume&nbsp;that&nbsp;the&nbsp;base&nbsp;URL&nbsp;is&nbsp;"target.php".&nbsp;<br />$table-&gt;SetCSIMTarget('taregt.php','Click&nbsp;for&nbsp;details',true);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFillColor($aArgR1,$aC1,$aR2,$aC2,$aArg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set background image for an entire range of cells or entire table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArgR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row OR color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Color for range</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set background image for an entire range of cells or entire table. 
+
+This method is polymorphic and can be called in two ways
+<ol>
+<li><b>SetFillColor($aFillColor)</b>, Set fill color for all cells in the table
+<li> <b>SetFillColor($aR1,$aC1,$aR2,$aC2,$aFillColor)</b>, Set fill color for a range of cells
+</ol>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLFILLCOLOR">GTextTable::SetCellFillColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCOLFILLCOLOR">GTextTable::SetColFillColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWFILLCOLOR">GTextTable::SetRowFillColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;default&nbsp;fill&nbsp;color&nbsp;for&nbsp;entire&nbsp;table<br />$table-&gt;SetFillColor('lightgray');<br /><br />//&nbsp;Highlight&nbsp;top&nbsp;left&nbsp;2x2&nbsp;cells<br />$table-&gt;SetFillColor(0,0,1,1,'yellow');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFont()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set font for entire table or range of cells.</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set font for entire table or range of cells. This si a polymorphic method and can be called in two ways-
+<ol>
+<li><b>SetFont($aFF,$aFS,$aFSize)</b>, Set default font for entire table
+<li><b>SetFont($aR1,$aC1,$aR2,$aC2,$aFF,$aFS,$aFSize)</b>, Set default font for range of cells table
+</ol>
+&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>VOID<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLFONT">GTextTable::SetCellFont</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWFONT">GTextTable::SetRowFont</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLFONT">GTextTable::SetColFont</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;default&nbsp;font&nbsp;for&nbsp;entire&nbsp;table<br />$table-&gt;SetFont(FF_TIMES,FS_NORMAL,11);<br /><br />//&nbsp;Set&nbsp;font&nbsp;for&nbsp;the&nbsp;two&nbsp;top&nbsp;rows<br />$table-&gt;SetFont(0,0,1,5,FF_ARIAL,FS_BOLD,12);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETGRID"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetGrid($aWeight,$aColor,$aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set style, color and width of all table grid lines</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width of grid lines</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color of grid lines</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TGRID_SINGLE</font>
+</td><td>Style of grid lines</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set style, color and width of all table grid lines. The grid lines are defined as the internal lines in the table. The outer border of the table is controlled separately with the SetBorder() method.
+<p>
+The style for the grid lines can be one of the following three
+<ol>
+<li><b>TGRID_SINGLE</b>, Single solid line of the given color and weight
+<li><b>TGRID_DOUBLE</b>, Two solid lines of the given color and weight. The distance between the lines is the same as the weight.
+<li><b>TGRID_DOUBLE2</b>, Two solid lines of the given color. The first line has twice the weight as the second. This type of line is often used to mark a summation line in a table.
+</ol>
+
+Note: In order to remove all grid lines in the table set the width to 0.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCOLGRID">GTextTable::SetColGrid</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWGRID">GTextTable::SetRowGrid</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;the&nbsp;default&nbsp;grid&nbsp;lines&nbsp;for&nbsp;whole&nbsp;table<br />$table-&gt;SetGrid(1,'gray',TGRID_SOLID);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetImage($aFileR1,$aScaleC1,$aMixR2,$aC2,$aFile,$aScale,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set background image for an entire range of cells or entire table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFileR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row OR file name</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScaleC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column OR scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMixR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row OR blend factor</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFile</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Image filename</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Image scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Blend factor (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set background image for an entire rnage of cells or entire table. The should be stored in a file whos filename is given as the second parameter. The scdaling factor can be specifed as an arbitary floating point value between 0-1.
+<p>
+The Blend factor is specified as an integer between 0 and 100 where 100 is 100% blend factor.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE">GTextTable::SetCellImage</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWIMAGE">GTextTable::SetRowImage</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLIMAGE">GTextTable::SetColImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Set&nbsp;the&nbsp;same&nbsp;background&nbsp;image&nbsp;for&nbsp;all&nbsp;cells&nbsp;in&nbsp;the&nbsp;table<br />$table-&gt;SetImage($fileName,0.8);<br /><br />//&nbsp;Set&nbsp;the&nbsp;background&nbsp;image&nbsp;for&nbsp;the&nbsp;top&nbsp;2x2&nbsp;cells<br />$table-&gt;SetImage(0,0,1,1,$fileName,0.8);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETMINCOLWIDTH"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMinColWidth($aColWidth,$aWidth)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify minimum column width</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width or column index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWidth</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Width</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify minimum column width of all columns or a specific column. The method is polymorphic and can be called in two different ways.
+<ol>
+<li><b>SetMinColWidth($aWidth)</b>, Set the minimum width for all columns in the table
+<li><b>SetMinColWidth($aColIndex,$aWidth)</b>, Set the minimum width for the specified column
+</ol>
+
+Note that the column width will always be wide enough to hold the widest text or image. This means that the table will never to adny clipping of data.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETMINROWHEIGHT">GTextTable::SetMinRowHeight</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Make&nbsp;all&nbsp;columns&nbsp;at&nbsp;least&nbsp;50&nbsp;pixels&nbsp;wide<br />$table-&gt;SetMinColWidth(50);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETMINROWHEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMinRowHeight($aRowHeight,$aHeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify minimum row height of all rows or a specific row. </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRowHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index or height</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Height</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify minimum row height of all rows or a specific row. The method is polymorphic and can be called in two different ways.
+<ol>
+<li><b>SetMinRowHeight($aWidth)</b>, Set the minimum height for all rows in the table
+<li><b>SetMinRowHeight($aRowIndex,$aWidth)</b>, Set the minimum height for the specified table row
+</ol>
+
+Note that the row height will always be tall enough to hold the highest text or image. This means that the table will never to adny clipping of the data.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETMINCOLWIDTH">GTextTable::SetMinColWidth</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Make&nbsp;the&nbsp;top&nbsp;row&nbsp;at&nbsp;least&nbsp;40&nbsp;pixels&nbsp;in&nbsp;height<br />$table-&gt;SetMinRowHeight(0,40);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETNUMBERFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetNumberFormat($aArgR1,$aC1,$aR2,$aC2,$aArg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set number format for entire table or a range of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArgR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row OR format string</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set number format for entire table or a range of cells. The number format should be given in the style of printf() family format strings. A cell that contains non numeric data will not be affected in any way by this method.
+
+The method is polymorphic and can be called in two ways
+<ol>
+<li><b>SetNumberFormat($aFormat)</b>, Set the number format for the entire table
+<li><b>SetNumberFormat($aFormat)</b>, Set the number format for a range of cells
+</ol>
+
+Note: It is the resposnibility of the client to make any necessary rounding of the numbers.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT">GTextTable::SetCellNumberFormat</a>, <a href="GTextTable.html#_GTEXTTABLE_SETROWNUMBERFORMAT">GTextTable::SetRowNumberFormat</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLNUMBERFORMAT">GTextTable::SetColNumberFormat</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetNumberFormat('%0.2f');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETPADDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetPadding($aArgR1,$aC1,$aR2,$aC2,$aPad)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set internal cell margins for all cells in the specified range or entire table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aArgR1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left row OR cell padding</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC1</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Top left column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aR2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right row</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aC2</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Bottom right column</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPad</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+null</font>
+</td><td>Cell padding</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set internal cell margins for all cells in the specified range or entire table
+
+By default the internal cell padding is 5 pixels.
+
+This method is polymorphic and can be called in two ways
+<ol>
+<li><b>SetPadding($aPadding)</b>, Set padding for all cells in the table
+<li><b>SetPadding($aR1,$aC1,$aR2,$aC2,$aPadding)</b>, Set padding for the specified range of cells
+</ol>
+
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLPADDING">GTextTable::SetCellPadding</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCOLPADDING">GTextTable::SetColPadding</a> and <a href="GTextTable.html#_GTEXTTABLE_SETROWPADDING">GTextTable::SetRowPadding</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;First&nbsp;set&nbsp;the&nbsp;default&nbsp;padding&nbsp;for&nbsp;all&nbsp;cells<br />$table-&gt;SetPadding(8);<br /><br />//&nbsp;Set&nbsp;the&nbsp;padding&nbsp;much&nbsp;larger&nbsp;in&nbsp;the&nbsp;top&nbsp;left&nbsp;2x2&nbsp;cells<br />$table-&gt;SetPadding(0,0,1,1,20);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetPos($aX,$aY)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set absolute pixel position the table</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aX</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X Coordinate of top left corner</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y Coordinate of top left corner</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set absolute pixel position for top left corner of the table. This is the simplest way of positioning a table in the graph area.
+<p>
+Note: The anchor position of the table can also be adjusted by the method SetAnchorPos(). By deagule the top left corner of the table is aligned with the specified coordinates.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETSCALEPOS">GTextTable::SetScalePos</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetPos(10,10);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWALIGN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowAlign($aRow,$aHorAlign,$aVertAlign)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set cell alignment for an entire row of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHorAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Horizontal alignment</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVertAlign</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'bottom'</font>
+</td><td>Vertical alignment</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set cell alignment for an entire row of cells. The alignment can be specifed both horizontally and vertically.
+
+The possible settings for horizontal alignment are
+"left", "center", "right"
+
+Vertical alignment can be set as 
+"top","center","bottom"
+
+Note that the alignment options are specified as strings.
+
+Note2: In order to set the default alignment for all cells in the table use the SetAlign() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETALIGN">GTextTable::SetAlign</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLALIGN">GTextTable::SetCellAlign</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLALIGN">GTextTable::SetColAlign</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetRowAlign(6,'right');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowColor($aRow,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set font color for an entire row.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set font color for an entire row.
+
+Note: To set the default color for all cells use the SetColor() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCOLOR">GTextTable::SetColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLCOLOR">GTextTable::SetCellColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLCOLOR">GTextTable::SetColColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetRowColor(5,'red');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWFILLCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowFillColor($aRow,$aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify background color in an entire row of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Background color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify background color in an entire row of cells.
+
+Note: To set the default background fill color for all cells usde the SetFillColor() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETFILLCOLOR">GTextTable::SetFillColor</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLFILLCOLOR">GTextTable::SetCellFillColor</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLFILLCOLOR">GTextTable::SetColFillColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Highlight&nbsp;row&nbsp;0&nbsp;with&nbsp;white&nbsp;text&nbsp;on&nbsp;gray&nbsp;bakground<br />$table-&gt;SetRowFillColor(0,'darkgray');<br />$table-&gt;SetRowColor(0,'white');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWFONT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowFont($aRow,$aFF,$aFS,$aFSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify font family and style for an entire row of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font family</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFS</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Font style</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+10</font>
+</td><td>Font size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify font family and style for an entire row of cells
+
+Note:To set the default font for all cells use the SetFont() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETFONT">GTextTable::SetFont</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLFONT">GTextTable::SetCellFont</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLFONT">GTextTable::SetColFont</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetRowFont(0,FF_ARIAL,FS_NORMAL,12);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWGRID"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowGrid($aRow,$aWeight,$aColor,$aStyle)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set style, color and width of a specified horizontal grid line</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Grind line to specify</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1</font>
+</td><td>Width of line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+'black'</font>
+</td><td>Color of line</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStyle</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+TGRID_SINGLE</font>
+</td><td>Grid line style (see below)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set style, color and width of a specified horizontal grid line in the table. The grid lines are numbered from 1 to columns-1 and from top to bottom. The grid lines are defined as the internal lines in the table. The outer border of the table is controlled separately with the SetBorder() method.
+<p>
+The style for the grid lines can be one of the following three
+<ol>
+<li><b>TGRID_SINGLE</b>, Single solid line of the given color and weight
+<li><b>TGRID_DOUBLE</b>, Two solid lines of the given color and weight. The distance between the lines is the same as the weight.
+<li><b>TGRID_DOUBLE2</b>, Two solid lines of the given color. The first line has twice the weight as the second. This type of line is often used to mark a summation line in a table.
+</ol>
+
+Note: In order to remove a grid line in the table set the width to 0.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETGRID">GTextTable::SetGrid</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLGRID">GTextTable::SetColGrid</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Add&nbsp;a&nbsp;double&nbsp;line&nbsp;of&nbsp;width=2&nbsp;to&nbsp;mark&nbsp;the&nbsp;summation&nbsp;row<br />//&nbsp;in&nbsp;a&nbsp;atable<br />$table-&gt;SetRowGrid(4,2,'black',TGRID_DOUBLE2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWIMAGE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowImage($aRow,$aFile,$aScale,$aMix)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set background image for an entire row of cells</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFile</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Filename of image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aScale</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+1.0</font>
+</td><td>Scale of image</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMix</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+100</font>
+</td><td>Blend factor for image (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set background image for an entire row of cells. The should be stored in a file whos filename is given as the second parameter. The scdaling factor can be specifed as an arbitary floating point value between 0-1.
+<p>
+The Blend factor is specified as an integer between 0 and 100 where 100 is 100% blend factor.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETIMAGE">GTextTable::SetImage</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLIMAGE">GTextTable::SetCellImage</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLIMAGE">GTextTable::SetColImage</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetRowImage(1,$fileName,0.5,60);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWNUMBERFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowNumberFormat($aRow,$aF)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set number format in an entire row of cells.</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aF</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Format string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set number format in an entire row of cells. The number format should be given in the style of printf() family format strings. A cell that contains non numeric data will not be affected in any way by this method.
+
+Note: It is the resposnibility of the client to make any necessary rounding of the numbers.&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>VOID<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETNUMBERFORMAT">GTextTable::SetNumberFormat</a>, <a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT">GTextTable::SetCellNumberFormat</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCELLNUMBERFORMAT">GTextTable::SetCellNumberFormat</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Use&nbsp;2&nbsp;decimals&nbsp;with&nbsp;leading&nbsp;zero<br />$table-&gt;SetRowNumberFormat('%0.2f');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETROWPADDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetRowPadding($aRow,$aPad)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set internal cell margins in pixels for all cells in the specified row</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aRow</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row index</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aPad</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Internal cell margin</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set internal cell margins in pixels for all cells in the specified row.
+
+By default the internal cell padding is 5 pixels.
+
+Note: To change the default cell padding for all cells in the table use the Setpadding() method.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETCELLPADDING">GTextTable::SetCellPadding</a>, <a href="GTextTable.html#_GTEXTTABLE_SETPADDING">GTextTable::SetPadding</a> and <a href="GTextTable.html#_GTEXTTABLE_SETCOLPADDING">GTextTable::SetColPadding</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$table-&gt;SetRowPadding(4,12);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_SETSCALEPOS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetScalePos($aX,$aY)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set position of the entire table on the graphn using the current X,Y sclae</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aX</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>X-position according to current scle</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aY</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Y position according to curent scale</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method makes it possible to place the table at specific scale coordinates within the plot area of the graph. This could for example be used to place a small table at each of the data points in a line graph (or some other type of plot) to show fyrther details.
+<p>
+Note: The anchor position of the table can also be adjusted by the method SetAnchorPos(). By deagule the top left corner of the table is aligned with the specified coordinates.&nbsp;<br>
+<br>
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Returns</div>VOID<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GTextTable.html#_GTEXTTABLE_SETPOS">GTextTable::SetPos</a> and <a href="GTextTable.html#_GTEXTTABLE_SETANCHORPOS">GTextTable::SetAnchorPos</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Create&nbsp;the&nbsp;tables&nbsp;and&nbsp;position&nbsp;them&nbsp;at&nbsp;each&nbsp;data&nbsp;point<br />//&nbsp;In&nbsp;the&nbsp;line&nbsp;plot<br />//&nbsp;The&nbsp;data&nbsp;for&nbsp;each&nbsp;table&nbsp;is&nbsp;held&nbsp;in&nbsp;$tabledata[]&nbsp;array<br />//&nbsp;and&nbsp;the&nbsp;plot&nbsp;data&nbsp;is&nbsp;available&nbsp;in&nbsp;$datay[]&nbsp;array.<br /><br />$n&nbsp;=&nbsp;count($datay);<br />$table=array();<br />for($i=0;&nbsp;$i&nbsp;&lt;&nbsp;$n;&nbsp;++$i&nbsp;)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;$table[$i]&nbsp;=&nbsp;new&nbsp;GTextTable();<br />&nbsp;&nbsp;&nbsp;&nbsp;$table[$i]-&gt;Set($tabledata[$i]);<br />&nbsp;&nbsp;&nbsp;&nbsp;$table[$i]-&gt;SetScalePos($i,$datay[$i]);<br />&nbsp;&nbsp;&nbsp;&nbsp;$table[$i]-&gt;SetFillColor('lightyellow@0.5');<br />&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;We&nbsp;center&nbsp;all&nbsp;tables&nbsp;on&nbsp;the&nbsp;data&nbsp;point<br />&nbsp;&nbsp;&nbsp;&nbsp;$table[$i]-&gt;SetAnchorPos('center','middle');<br />&nbsp;&nbsp;&nbsp;&nbsp;$graph-&gt;Add($table[$i]);<br />}<br />...<br />//&nbsp;Create&nbsp;the&nbsp;line<br />$l1&nbsp;=&nbsp;new&nbsp;LinePlot($datay);<br />$l1-&gt;SetWeight(2);<br />$graph-&gt;Add($l1);<br />...</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_GTEXTTABLE_TOSTRING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;toString()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return basic HTML version of the table</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Return basic HTML version of the table. Note that this is just a very basic representation of the table without any of the formatting applied the table.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$str&nbsp;=&nbsp;$table-&gt;toString();</font>
+</span><br>
+<p> <hr> <p>

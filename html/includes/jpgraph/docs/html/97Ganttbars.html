@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="96PositioningobjectsintheGanttplot.html">
+<LINK REL="Next" HREF="971Specifyingverticalposition.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="96PositioningobjectsintheGanttplot.html">Previous</A>
+<A HREF="971Specifyingverticalposition.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_7">9.7 Gantt bars</A></H2>
+<P> The most common of all object in a Gantt chart is of course the
+ activity bar (GanttBar()). In terms of formatting this object has a
+ very large flexibility. The full signature for the GanttBar constructor
+ is<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;</FONT><FONT color="#007700">function&nbsp;</FONT><FONT color="#0000BB">
+GanttBar</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$aVPos</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">$aTitle</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">$aStart</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$aEnd</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$aCaption</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aHeight</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P></P>
+<TABLE border="0">
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aVPos&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>The vertical position for the
+ bar, [0..n]</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aTitle&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Title for the activity</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aStart&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Start date for the activity given
+ as string, e.g &quot;2001-09-22&quot;</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aEnd&nbsp;</FONT></FONT></CODE>
+</TD><TD valign="top">&nbsp;</TD><TD>End date for activity given as<B> either</B>
+ a date (a string) or as the duration (in days) of the activity, e.g
+ both &quot;2001-10-15&quot; and 20.5 are valid inputs</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aCaption&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Text string (caption) to appear
+ at the end (right side) of the bar</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aHeight&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Height of bar given as<B> either</B>
+ a value in range [0,1] in which case this is interpretated as what
+ fraction of the vertical position should the bar occupy. The height can
+ also be given in absolute pixels [1..200]</TD></TR>
+</TABLE>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="96PositioningobjectsintheGanttplot.html">Previous</A>
+<A HREF="971Specifyingverticalposition.html">Next</A>
+</BODY>
+</HTML>

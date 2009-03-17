@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="74ExamplesofImagemaps.html">
+<LINK REL="Next" HREF="76Gettingholdoftheimagemap.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="74ExamplesofImagemaps.html">Previous</A>
+<A HREF="76Gettingholdoftheimagemap.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_5">7.5 How does StrokeCSIM() work?</A></H2>
+<P> Knowledge of the exact technical details of the way StrokeCSIM()
+ works is probably not needed by many people but for completeness we
+ outline those details in this short section.</P>
+<P> The fundamental issue we have to solve is that we must be able to
+ call the image script in two modes. When the user includes the image
+ script the StrokeCSIM() method should return the HTML page but when the
+ image script is later called directly in the image tag it must not
+ return an HTML page but rather the actual image.</P>
+<P> The way this is solved is by using one HTTP argument which is passed
+ on automatically when we use the image script name in the image-tag.</P>
+<P> If you look at the generated HTML you will see that the argument to
+ the src-property of the image tag is not simply the script name but the
+ script name with a additional argument.</P>
+<P> In the JpGraph internal code this pre-defined argument is checked
+ for and if it exists the image is send back and not the HTML page.</P>
+<P> The name of this argument is defined by a DEFINE() statement in
+ JpGraph. The define is _CSIM_DISPLAY.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="74ExamplesofImagemaps.html">Previous</A>
+<A HREF="76Gettingholdoftheimagemap.html">Next</A>
+</BODY>
+</HTML>

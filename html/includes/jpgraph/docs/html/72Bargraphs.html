@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="7117Addingplotmarkstoalineplot.html">
+<LINK REL="Next" HREF="721Adjustingthewidthofthebars.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="7117Addingplotmarkstoalineplot.html">Previous</A>
+<A HREF="721Adjustingthewidthofthebars.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_2">7.2 Bar graphs</A></H2>
+<P> Jpgraph also supports 2D vertical bar plots. Before you can use any
+ bar plots you must make sure that you included the file
+ &quot;jpgraph_bar.php&quot; in your script.</P>
+<P> Using bar plots is quite straightforward and works in much the same
+ way as line plots which you are already familiar with from the previous
+ examples. Assuming you have a data array consisting of the values
+ [12,8,19,3,10,5] and you want to display them as a bar plot. This is
+ the simplest way to do this:<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$datay</FONT><FONT color="#007700">=array(</FONT><FONT
+color="#0000BB">12</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+8</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">19</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">3</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">10</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">5</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$bplot&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">BarPlot</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$datay</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Add</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$bplot</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> If you compare this to the previous line examples you can see that
+ the only change necessary was that instead of creating a new line plot
+ (via the new LinePlot(...) call) we used the statement new <A href="../ref/BarPlot.html#_C_BARPLOT">
+ BarPplot().</A></P>
+<P> The other change we should do is to make sure the X-axis have an
+ text-scale (it is perfectly fine to use a linear X-scale but in most
+ cases this is not the effect you want when you use a bar graph, see
+ more below). With this two simple change we will now get a bar graph as
+ displayed in the following image<DIV class="example">
+<BR> <A href="exframes/frame_example18.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example18.png" WIDTH="300"></A>
+<BR><B>Figure 31:</B> A very simple bar graph <A href="exframes/frame_example18.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> You can of course modify the appearance of the bar graph. So for
+ example to change the fill color you would use the <A href="../ref/BarPlot.html#_BARPLOT_SETFILLCOLOR">
+ BarPlot::SetFillColor()</A> method. Making this small change to the
+ previous example would give the expected effect as can be seen in the
+ next example.<DIV class="example">
+<BR> <A href="exframes/frame_example19.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example19.png" WIDTH="300"></A>
+<BR><B>Figure 32:</B> A very simple bar graph with changed fill color <A href="exframes/frame_example19.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> You should note from the previous two
+ graphs that slight change in appearance for the X-scale. The bar graphs
+ gets automatically centered between the tick marks when using as text
+ x-scale. If you were to use a linear scale they would instead start at
+ the left edge of the X-axis and the X-axis would be labeled with a
+ linear scale. As is illustrated in the (small) example below.</DIV><DIV class="example">
+<BR> <A href="exframes/frame_example19.1.html" target="blank"><IMG border="0"
+HEIGHT="100"       src="img/img/img/img/img/img/example19.1.png" WIDTH="260"></A>
+<BR><B>Figure 33:</B> A small example with a bar graph using a linear
+ X-scale <A href="exframes/frame_example19.1.html" target="blank">[src]</A>
+&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="7117Addingplotmarkstoalineplot.html">Previous</A>
+<A HREF="721Adjustingthewidthofthebars.html">Next</A>
+</BODY>
+</HTML>

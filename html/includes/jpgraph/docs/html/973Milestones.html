@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="972Specifyingstartandendpositionforabar.html">
+<LINK REL="Next" HREF="974Verticalline.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="972Specifyingstartandendpositionforabar.html">Previous</A>
+<A HREF="974Verticalline.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_7_3">9.7.3 Milestones</A></H3>
+<P> Milestones are similar to bars but have no end date since milestones
+ just apply to one single date. Milestones are created much the same way
+ as activities but using method MileStone() instead.</P>
+<P> The full signature for milestones are<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;</FONT><FONT color="#007700">
+function&nbsp;</FONT><FONT color="#0000BB">MileStone</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$aVPos</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">$aTitle</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aDate</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$aCaption</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P></P>
+<TABLE border="0">
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aVPos&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>The vertical position for the
+ bar, [0..n]</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aTitle&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Title for the activity</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aDate&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Date for the milestone</TD></TR>
+<TR><TD valign="top">
+<!--span style=&quot;font-family:times;font-size:85%;font-weight:bold;&quot;-->
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$aCaption&nbsp;</FONT></FONT>
+</CODE></TD><TD valign="top">&nbsp;</TD><TD>Text to the right of the
+ milestone</TD></TR>
+</TABLE>
+<P> Valid milestones are for example</P>
+<UL>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$milestone&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+MileStone</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">3</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;Code&nbsp;complete&quot;</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;2001-12-01&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$milestone&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+MileStone</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">3</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;Code&nbsp;complete&quot;</FONT><FONT
+color="#007700">,</FONT><FONT color="#DD0000">&quot;2001-12-01&quot;</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">&quot;(2001-12-01)&quot;</FONT><FONT color="#007700">
+);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+</UL>
+<P> By default milestones are rendered as a filled &quot;Diamond&quot; shape. This
+ may be optionally modified. The actual shape is specified by the 'mark'
+ property of milestone which is an instance of the PlotMark() class
+ (same class responsible for the marks in line graphs).</P>
+<P> To change the shape of a milestone to, say a triangle, you use the
+ SetType() method as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$milestone</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">mark</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetType</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MARK_DTRIANGLE</FONT><FONT color="#007700">)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> Let's put this into practice and add a milestone to our previous
+ example by adding the following two lines of code which result in
+ Figure 151 shown below.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex04.html" target="blank"><IMG border="0"
+HEIGHT="189"       src="img/img/img/img/img/img/ganttex04.png" WIDTH="493"></A>
+<BR><B>Figure 151:</B> Illustration of how to add a milestone to a gantt
+ chart <A href="exframes/frame_ganttex04.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> You may note that by default the title color is red for milestones.
+ If you like to change this to be instead, say bold black, you would
+ invoke the SetColor() and SetFont() methods on the title property of
+ milestones as in<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$milestone</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">SetFont</FONT><FONT
+color="#007700">(</FONT><FONT color="#0000BB">FF_FONT1</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">FF_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$milestone</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;black&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> and thew result would now (not surprisingly be)<DIV class="example">
+<BR> <A href="exframes/frame_ganttex05.html" target="blank"><IMG border="0"
+HEIGHT="189"       src="img/img/img/img/img/img/ganttex05.png" WIDTH="502"></A>
+<BR><B>Figure 152:</B> Modifying the milestone title color and font <A href="exframes/frame_ganttex05.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To modify the caption you do exactly the same but act on property
+ 'caption' instead of 'title', i.e.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$milestone</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">caption</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FF_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$milestone</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">caption</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;black&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+<P> It is worth noting that you modify the bar title and caption the
+ exact same way by acting on the 'title' and 'caption' property for the
+ bars.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="972Specifyingstartandendpositionforabar.html">Previous</A>
+<A HREF="974Verticalline.html">Next</A>
+</BODY>
+</HTML>

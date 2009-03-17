@@ -1,0 +1,100 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_ANTISPAM"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>AntiSpam</b></div>
+<i>(Defined in: jpgraph_antispam.php : 545)</i><table border=1><tr><td>&nbsp;<a href="AntiSpam.html" style="font-family:arial;font-weight:bold;color:darkblue;">AntiSpam</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="AntiSpam.html#_ANTISPAM_ANTISPAM">AntiSpam()</a>&nbsp;<br>
+&nbsp;<a href="AntiSpam.html#_ANTISPAM_RAND">Rand()</a>&nbsp;<br>
+&nbsp;<a href="AntiSpam.html#_ANTISPAM_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="AntiSpam.html#_ANTISPAM_STROKE">Stroke()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This module is used to create AntiSpam challenges that can be used to prevent automatic signup by robots on WEB-pages. <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ANTISPAM_ANTISPAM"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AntiSpam($aData)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new ANtiSpam challenge image</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aData</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+''</font>
+</td><td>Data to be displayed</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This method creates a new instance of the AntiSpam challenge. When the anti-spam imga eis created it is possible to directly use a supplied data string that should be displayed.
+
+The data can also be added afterwards with a call to Set()&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="AntiSpam.html#_ANTISPAM_SET">AntiSpam::Set</a> and <a href="AntiSpam.html#_ANTISPAM_RAND">AntiSpam::Rand</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$spam&nbsp;=&nbsp;new&nbsp;AntiSpam();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ANTISPAM_RAND"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Rand($aLen)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Generate a random spam challenge string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLen</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Sets the length of the generated string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Instead of specifying the string manually that should be used as a challenge the string can be automatically generated. This is done witha  call to the Rand() method. &nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$antispam&nbsp;=&nbsp;new&nbsp;AntiSpam();<br />$rval&nbsp;=&nbsp;$antispam-&gt;Rand();<br />...<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ANTISPAM_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aData)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the spam challenge string</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aData</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Spam challenge</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This is an alternative way of specifying the AntiSpam string. This can also be specified in the initial creation of the ANtiSpam object ro be automatically generated with a call to the Rand() method&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="AntiSpam.html#_ANTISPAM_RAND">AntiSpam::Rand</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$antispam&nbsp;=&nbsp;new&nbsp;AntiSpam();<br />...<br />$antispam-&gt;Set($mySpamVal);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ANTISPAM_STROKE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Stroke($aStrokeFileName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Send the antispam image back to the browser</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aStrokeFileName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>An optional file name</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>This sends the antispam image back to the browser or to an optional file named as the first and only argument.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="AntiSpam.html#_ANTISPAM_ANTISPAM">AntiSpam::AntiSpam</a> and <a href="AntiSpam.html#_ANTISPAM_RAND">AntiSpam::Rand</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$antispam&nbsp;=&nbsp;new&nbsp;AntiSpam();<br />$rval&nbsp;=&nbsp;$antispam-&gt;Rand();<br />...<br />$antispam-&gt;Stroke()</font>
+</span><br>
+<p> <hr> <p>

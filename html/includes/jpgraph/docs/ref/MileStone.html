@@ -1,0 +1,49 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_MILESTONE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>MileStone</b> EXTENDS <a href="GanttPlotObject .html#_C_GANTTPLOTOBJECT " style="font-face:arial;font-weight:bold;">GanttPlotObject </a></div>
+<i>(Defined in: jpgraph_gantt.php : 3376)</i><table border=1><tr><td>&nbsp;<a href="MileStone.html" style="font-family:arial;font-weight:bold;color:darkblue;">MileStone</a>&nbsp;</td><td>&nbsp;<a href="GanttPlotObject .html" style="font-family:arial;font-weight:bold;color:darkblue;">GanttPlotObject </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="MileStone.html#_MILESTONE_MILESTONE">MileStone()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Represents a milestone in the GanttChart. A milstone is created by specifyin a date. <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="GanttGraph.html">GanttGraph</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_MILESTONE_MILESTONE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;MileStone($aVPos,$aLabel,$aDate,$aCaption)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Create a new milestone in a GanttGraph </i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aVPos</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Row for milestone</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aLabel</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Label</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDate</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Position on the date scale</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCaption</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Caption string</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>A milestone is by default displayed as a "Diamond" mark at a specified row at a specified date. It can also have a caption to the right of the milestone mark.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="GanttPlotObject.html#_GANTTPLOTOBJECT_GANTTPLOTOBJECT">GanttPlotObject::GanttPlotObject</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph&nbsp;=&nbsp;new&nbsp;GanttGraph();<br /><br />//&nbsp;Setup&nbsp;the&nbsp;gantt&nbsp;graph...<br />...<br /><br />$ms&nbsp;=&nbsp;new&nbsp;MileStone(7,"M5","2002-01-28","28/1");<br />$graph-&gt;Add($ms);</font>
+</span><br>
+<p> <hr> <p>

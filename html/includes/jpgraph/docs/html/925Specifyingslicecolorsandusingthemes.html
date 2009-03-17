@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="924Specifyingandadjustinglabelsonpieplots.html">
+<LINK REL="Next" HREF="926Addingdropshadowstotheslices.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="924Specifyingandadjustinglabelsonpieplots.html">Previous</A>
+<A HREF="926Addingdropshadowstotheslices.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_2_5">9.2.5 Specifying slice colors and using themes</A></H3>
+<P> Another typical change would be to change the colors of the slices.
+ There are two fundamental ways of doing this. You either manually
+ specify the colors for the slices as an array using the method <A href="../ref/PiePlot.html#_PIEPLOT_SETSLICECOLORS">
+ SetSliceColors()</A> If you specify fewer colors than the number of
+ slices they will just wrap around.</P>
+<P> Another way is to use one of the pre-defined color &quot;themes&quot;. This is
+ just a predefined set of colors that will be used for the slices. You
+ choose what &quot;theme&quot; you like to use with the method (<A href="../ref/PiePlot.html#_PIEPLOT_SETTHEME">
+ SetTheme()</A> ) At the time of this writing the available themes are</P>
+<UL>
+<LI> &quot;earth&quot;</LI>
+<LI> &quot;pastel&quot;</LI>
+<LI> &quot;sand&quot;</LI>
+<LI> &quot;water&quot;</LI>
+</UL>
+<P> The following example shows the same pie using the different
+ &quot;themes&quot; in order.<DIV class="example">
+<BR> <A href="exframes/frame_example28.html" target="blank"><IMG border="0"
+HEIGHT="150"  src="img/example28.png" WIDTH="150"></A>
+<BR><B>Figure 128:</B> <A href="exframes/frame_example28.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example28.1.html" target="blank"><IMG border="0"
+HEIGHT="150"  src="img/example28.1.png" WIDTH="150"></A>
+<BR><B>Figure 129:</B> <A href="exframes/frame_example28.1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example28.2.html" target="blank"><IMG border="0"
+HEIGHT="150"  src="img/example28.2.png" WIDTH="150"></A>
+<BR><B>Figure 130:</B> <A href="exframes/frame_example28.2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_example28.3.html" target="blank"><IMG border="0"
+HEIGHT="150"  src="img/example28.3.png" WIDTH="150"></A>
+<BR><B>Figure 131:</B> <A href="exframes/frame_example28.3.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> A complete color chart of all available colors in the different
+ themes can be found <A href="themes.html"> here</A></P>
+<P> Another simple change is to remove the border ( or change it's
+ colors ) that separates each slice. This can be done by a call to <A href="../ref/PiePlot.html#_PIEPLOT_SHOWBORDER">
+ ShowBorder()</A></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="924Specifyingandadjustinglabelsonpieplots.html">Previous</A>
+<A HREF="926Addingdropshadowstotheslices.html">Next</A>
+</BODY>
+</HTML>

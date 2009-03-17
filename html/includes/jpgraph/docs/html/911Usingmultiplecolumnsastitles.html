@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="910Groupingactivities.html">
+<LINK REL="Next" HREF="9111Addingatitleforthecolumns.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="910Groupingactivities.html">Previous</A>
+<A HREF="9111Addingatitleforthecolumns.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="9_11">9.11 Using multiple columns as titles</A></H2>
+<P> It is often of interest not only to show one title for a gantt bar
+ but often one wants to show, title, start date, end date, duration or
+ effort and so on. Up until now we have, to keep things simple only
+ shown a single title for each activity. We will now show you how you
+ can specify an arbitrary number of columns as titles for a Gantt chart
+ as well as adding icons in the graph columns.</P>
+<P> First out is an example to help visualize what we will achieve<DIV class="example">
+<BR> <A href="exframes/frame_gantticonex1.html" target="blank"><IMG border="0"
+HEIGHT="197"       src="img/img/img/img/img/img/gantticonex1.png" WIDTH="590"></A>
+<BR><B>Figure 164:</B> A Gantt chart with multiple columns <A href="exframes/frame_gantticonex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To use multiple columns there is two steps. First you need to set
+ the titles (name, color, fonts etc). Thereafter you need to add the
+ title columns for each individual bar.</P>
+<P> To set the columns you will have to work with the<I> Activity
+ information</I> property of the scale. The following code excerpt show
+ this<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">actinfo</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetColTitles</FONT><FONT color="#007700">
+(
+<BR>&nbsp;&nbsp;&nbsp;&nbsp;array(</FONT><FONT color="#DD0000">'Note'</FONT><FONT color="#007700">
+,</FONT><FONT color="#DD0000">'Task'</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">'Duration'</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+'Start'</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+'Finish'</FONT><FONT color="#007700">),array(</FONT><FONT color="#0000BB">
+30</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">100</FONT><FONT
+color="#007700">));</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P>You will notice two things. We fist specify the titles using an
+ array. We have also specified a second array with the numbers 30 and
+ 100. This is an optional array that specifies the minimum width of, in
+ this case, the first two columns. By default the columns will be wide
+ enough to hold the widest text string in the column. However for
+ esthetic reasons you might sometimes want to increase the minium width.
+ This is what we have done here for the first two columns.</P>
+<P> Furthermore you can also adjust the background colors and the style
+ and colors of the vertical dividing grid lines. In the previous image
+ we used the lines<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT
+color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">actinfo</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetBackgroundColor</FONT><FONT
+color="#007700">(</FONT><FONT color="#DD0000">'green:0.5@0.5'</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+actinfo</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_NORMAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+actinfo</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">vgrid</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetStyle</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'solid'</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+actinfo</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">vgrid</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">'gray'</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> The style for the grid lines can also be &quot;dashed&quot;, &quot;dotted&quot; or
+ &quot;longdashed&quot; as in other line formatting contexts within the library.
+ You can also adjust if you would like the small &quot;3D&quot; effect in the
+ titles. By default this is enabled. You can easily turn this of with a
+ call to<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">actinfo</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetStyle</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">ACTINFO_2D</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> To adjust the colors of the vertical dividing lines in the title the
+ method SetColor() is used as in
+ &quot;$graph-&gt;scale-&gt;actinfo-&gt;SetColor('navy');&quot;.</P>
+<P> The second thins is to actually populate the columns. This is done
+ (of course) as you add the activity bars to the graph. Previous we just
+ used a string as the title when we wasn't using columns. By simply
+ replacing this string with an array we specify the content of the
+ columns.</P>
+<P> For example to specify two column titles we just create a
+ hypothetical Gantt bar as In the full example above we put all this in
+ arrays to make for better coding practice since we create several bars.</P>
+<P> In addition to ordinary text you can also add an image or any of the
+ predefined icons available. In order to add that in a column you first
+ create an instance of<I> IconImage()</I> and then specify that instance
+ instead of the text. So in the previous code snippet if we wanted a
+ &quot;open folder&quot; image in the first column we would change the lines to<DIV
+class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$iconopen&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+IconImage</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+GICON_FOLDEROPEN</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+0.6</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$title2</FONT><FONT color="#007700">=</FONT><FONT
+color="#DD0000">&quot;&quot;</FONT><FONT color="#007700">;
+<BR></FONT><FONT color="#0000BB">$bar&nbsp;</FONT><FONT color="#007700">
+=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">GanttBar</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">,array(</FONT><FONT
+color="#0000BB">$iconopen</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+$title2</FONT><FONT color="#007700">),</FONT><FONT color="#DD0000">
+&quot;2003-11-23&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;2003-12-05&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The available builtin icons are</P>
+<UL>
+<LI>GICON_WARNINGRED</LI>
+<LI>GICON_TEXT</LI>
+<LI>GICON_ENDCONS</LI>
+<LI>GICON_MAIL</LI>
+<LI>GICON_STARTCONS</LI>
+<LI>GICON_CALC</LI>
+<LI>GICON_MAGNIFIER</LI>
+<LI>GICON_LOCK</LI>
+<LI>GICON_STOP</LI>
+<LI>GICON_WARNINGYELLOW</LI>
+<LI>GICON_FOLDEROPEN</LI>
+<LI>GICON_FOLDER</LI>
+<LI>GICON_TEXTIMPORTANT</LI>
+</UL>
+<P> In addition you can also use any of you own images if you specify
+ the argument as a string, for example<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$myicon&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">IconImage</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+'myicon.png'</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> If you wonder, the second argument in the<I> IconImage()</I> call is
+ an optional scaling factor which you can use to adjust the size of the
+ image.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="910Groupingactivities.html">Previous</A>
+<A HREF="9111Addingatitleforthecolumns.html">Next</A>
+</BODY>
+</HTML>

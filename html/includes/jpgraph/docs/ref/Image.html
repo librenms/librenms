@@ -1,0 +1,278 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_IMAGE"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Image</b></div>
+<i>(Defined in: jpgraph.php : 5929)</i><table border=1><tr><td>&nbsp;<a href="Image.html" style="font-family:arial;font-weight:bold;color:darkblue;">Image</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Image.html#_IMAGE_ROUNDEDRECTANGLE">RoundedRectangle()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETALPHABLENDING">SetAlphaBlending()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETANTIALIASING">SetAntiAliasing()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETCANVASCOLOR">SetCanvasColor()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETEXPIRED">SetExpired()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETIMGFORMAT">SetImgFormat()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETMARGIN">SetMargin()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETQUALITY">SetQuality()</a>&nbsp;<br>
+&nbsp;<a href="Image.html#_IMAGE_SETTRANSPARENT">SetTransparent()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>The Image class encapsulates the very lowest layer in the jpgraph library. It encapsulates the GD library function and presents a coherent interface hiding som of the details in the setup and management of GD.
+<p>
+By replacing Image (and RotImage) it is possible to change the output driver for the whole library withou any further changes.
+<p>
+A very close related class is RotImage which builds directly on Image but in additoin provides a 2D rotation featire, i.e the image may be rotated around a given point and possible also translated.
+<p>
+The image gets instantiated through in the Graph::Img property, or more accurate the RotImage class gets instantiated. The only method in this class that any end user is likely to need (and use) is the SetMargin() method used to give the margins around between the end of the image and the actual plotarea.
+<p>
+Note that all coordinates in methods belonging to Image is given in direct screen coordinates.
+
+
+
+ <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="RotImage.html">RotImage</a>, <a href="RGB.html">RGB</a> and <a href="TTF.html">TTF</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_ROUNDEDRECTANGLE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;RoundedRectangle($xt,$yt,$xr,$yl,$r)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Draw a rectangle with rounded corners</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$yt</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top left Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$xr</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right X</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$yl</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom right Y</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$r</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+5</font>
+</td><td>Corner radius</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Draw a rectangle with rounded corners.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$img-&gt;RoundedRectangle(0,0,100,100,10);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETALPHABLENDING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAlphaBlending($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable alpha blending of colors</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True/false = Enable/Disable alpha blending</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Alpha blending for colors can only be used with GD 2.x and above. You specify the alpha channel by adding a '@[alpha-value]' to your normal color specification. The alpha value is specified as a fraction in the range [0, 1] and indicated how much of the background color should be visible.
+<p>
+Alphablending is enabled by default (when GD2 is used) but can be turned off by a call to this function with the argument false.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetAlphaBlending();<br />...<br />$lineplot-&gt;SetFillColor('orange@0.5');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETANTIALIASING"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetAntiAliasing()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify if anti-aliasing should be used</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify if anti-aliasing should be used.
+
+Enabling anti-aliasing will greatly improve the visual apperance of certain graphs. For example spider graphs greatly benefit from this.
+
+<b>Note:</b> Using anti-aliasing makes line drawing roughly 8 time slower than normal lines !! So you image will take longer to construct.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_LINE">Image::Line</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetAntiAliasing();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETCANVASCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetCanvasColor($aColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set canvas color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set canvas color. The canvas color is the fill color for the frame when it is first created. This is white  by defult. If you specify a frame or plot area color this background color will never be visible.
+<p>
+The one time it matters is when you use a drop shadow on the graph. In the small area (top right and bottom left) where there is an empty are which is covered by neither the shadow nor the graph margin this area will have the canvas color.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETMARGINCOLOR">Graph::SetMarginColor</a> and <a href="Graph.html#_GRAPH_SETCOLOR">Graph::SetColor</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;SetCanvasColor('lightblue');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETEXPIRED"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetExpired($aFlg)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Turn on/off expired header</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlg</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Return expired header.</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify that the header returned should not only contain the image format but also the meta tags to force the browser not to cache and reload the image every time the script is called.
+<p>
+By default this is turned on.
+<p>
+Note: There is no reason as far as we can tell to turn this off.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetExpired(false);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETIMGFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetImgFormat($aFormat,$aQuality)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify what image format to use</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFormat</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image format</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aQuality</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+75</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify image format. Note depending on your installation    of PHP not all formats may be supported.
+
+Supported formats are:
+<ul>
+<li> "gif", GIF format. Please note that GD 1.8 and above no longer supports the GIF format.
+<li> "png", PNG format
+<li> "jpeg", JPEG format. The quality of the JPEG format can be specified with the SetQuality() method.
+</ul>
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_SETQUALITY">Image::SetQuality</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetImgFormat('jpeg');</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETMARGIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetMargin($lm,$rm,$tm,$bm)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify margin for the plot area</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$lm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Left margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$rm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Right margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$tm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Top margin</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$bm</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Bottom margin</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify margin for the plot area.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetMargin(20,20,40,20);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETQUALITY"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetQuality($q)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify JPEG image quality</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$q</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Image quality paramer (0-100)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify JPEG image quality. For this to have any effect the image format, as specified with SetImgFormat(), must have been set to "jpeg".
+
+The quality is specified as an integer in the range 0 (worst quality) to 100 (best quality) . By default the quality is set o 75.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Image.html#_IMAGE_SETIMGFORMAT">Image::SetImgFormat</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;image-&gt;SetQuality(40);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_IMAGE_SETTRANSPARENT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetTransparent($color)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify transparent color</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$color</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify transparent color for image.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;img-&gt;SetTransparent("white");<br /></font>
+</span><br>
+<p> <hr> <p>

@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="76BoxandStockcharts.html">
+<LINK REL="Next" HREF="762BoxPLotsStockchartswithamedianline.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="76BoxandStockcharts.html">Previous</A>
+<A HREF="762BoxPLotsStockchartswithamedianline.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_6_1">7.6.1  Stock Charts</A></H3>
+<P> Stock charts is used to display data values where one is interested
+ in 4 different values for each data point. This could for example be
+ used to display a stocks open,close, min and max value during a
+ specific day. Hence the name Stock chart (or Stock plot).</P>
+<P> The figure below illustrates a sample Stock chart plot<DIV class="example">
+<BR> <A href="exframes/frame_stockex1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/stockex1.png" WIDTH="300"></A>
+<BR><B>Figure 68:</B> A simple stock plot <A href="exframes/frame_stockex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> For this type of plot the Y-data array must be consist of a number
+ of quadruples of data where each quadruple consists of
+ (open,close,min,max). The open and close values determine the min max
+ for the middle bar and the min,max determine the end points of the
+ &quot;error-lines&quot; at the top and bottom of of each bar.</P>
+<P> Note that the data follows the following rules</P>
+<UL>
+<LI> min &lt; max</LI>
+<LI> min &lt; min(open.close)</LI>
+<LI> max &gt; max(open,close)</LI>
+</UL>
+<P> To separate the two cases where &quot;open &gt; close&quot; or &quot;open &lt; close &quot;
+ different colors are used. These colors are specified with the <A href="../ref/StockPlot.html#_STOCKPLOT_SETCOLOR">
+SetColor()</A> method. By default a positive bar (close &gt; open) have a
+ fill color of white and for the negative case where (close &lt; open) the
+ bars have a red color.</P>
+<P> You can specify the width of the bar by setting the width (in
+ pixels) with a call to the method <A href="../ref/StockPlot.html#_STOCKPLOT_SETWIDTH">
+SetWidth()</A></P>
+<P> The final variation of stock plots you can have is to determine
+ whether or not the end point for the min,max lines should have the
+ horizontal line marking the end of the line or not. This can be
+ adjusted with a call to method <A href="../ref/StockPlot.html#_STOCKPLOT_HIDEENDLINES">
+HideEndLine()</A>.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="76BoxandStockcharts.html">Previous</A>
+<A HREF="762BoxPLotsStockchartswithamedianline.html">Next</A>
+</BODY>
+</HTML>

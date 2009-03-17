@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="991Addingcaptiontobars.html">
+<LINK REL="Next" HREF="910Groupingactivities.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="991Addingcaptiontobars.html">Previous</A>
+<A HREF="910Groupingactivities.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="9_9_2">9.9.2 Adding progress indicators to bars</A></H3>
+<P> To indicate the progress of a specific activity it is also possible
+ to add a progress indicator to each bar. This progress indicator
+ consists of a smaller bar within the bar. By default this progress bar
+ is black and 70% of the height of the bar. These parameter can (of
+ course) all be changed.</P>
+<P> The properties for the progress indicator are accessed through the
+ 'progress' property and it's methods.</P>
+<P> To set the progress for a specific activity you only specify the
+ percent as a fraction. As in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$activity</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">progress</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">0.4</FONT><FONT
+color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> In Figure 162 the previous example is modified to indicate the
+ progress of each activity by the default progress indicator. A solid
+ bar. To make it clearer we have also modified the caption to reflect
+ the displayed progress. (At the same time we also modified the scale
+ headers just to illustrate some more formatting options).<DIV class="example">
+<BR> <A href="exframes/frame_ganttex14.html" target="blank"><IMG border="0"
+HEIGHT="191"       src="img/img/img/img/img/img/ganttex14.png" WIDTH="409"></A>
+<BR><B>Figure 162:</B> Adding progress indicators. <A href="exframes/frame_ganttex14.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> To specify a different format for the progress you use the
+ SetPattern() method as in<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$activity</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">progress</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetPattern</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+BAND_RDIAG</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;blue&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> In the reference section you can see the exact parameters and all
+ available methods.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex15.html" target="blank"><IMG border="0"
+HEIGHT="191"       src="img/img/img/img/img/img/ganttex15.png" WIDTH="409"></A>
+<BR><B>Figure 163:</B> Changing the style of the progress indicators. <A href="exframes/frame_ganttex15.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="991Addingcaptiontobars.html">Previous</A>
+<A HREF="910Groupingactivities.html">Next</A>
+</BODY>
+</HTML>

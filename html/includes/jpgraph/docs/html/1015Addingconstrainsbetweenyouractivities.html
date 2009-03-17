@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">
+<LINK REL="Next" HREF="1016Advancedformatting.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">Previous</A>
+<A HREF="1016Advancedformatting.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_15">10.15 Adding constrains between your activities</A></H2>
+<P> With Gantt charts there is often the need to illustrate constrains
+ between one or several activities. One of the most common constrain is
+ that on activity can't start before an other activity finish.</P>
+<P> JpGraph support visualizing the following types of constrains</P>
+<UL>
+<LI> Start to End</LI>
+<LI> Start to Start</LI>
+<LI> End to Start</LI>
+<LI> End to End</LI>
+</UL>
+<P> An example will clarify how to specify a constrain between two
+ activities.</P>
+<P> Assume that we start with the Gantt schema as illustrated below<DIV class="example">
+<BR> <A href="exframes/frame_ganttconstrainex0.html" target="blank"><IMG border="0"
+HEIGHT="231"  src="img/ganttconstrainex0.png" WIDTH="523"></A>
+<BR><B>Figure 167:</B> The original Gantt schema we wich to add
+ constrains to <A href="exframes/frame_ganttconstrainex0.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> We would now like to add the constrains that the activity &quot;Label 3&quot;
+ cant start before activity &quot;Label 2&quot; has finished and that the
+ milestone &quot;Phase 1 done&quot; is depending on when activity &quot;Label 3&quot; is
+ done.</P>
+<P> The principle of adding constrains is that you for each activity you
+ want to have a constrain you have to tell to what other activity this
+ constrain should be to. That other activity is specified by telling on
+ what row that activity lies. Depending on what type of constrain, e.g.
+ Start-to-End, an arrow will now connect the two activities in correct
+ way.</P>
+<P> The way to do this is to call the <A href="../ref/GanttPlotObject.html#_GANTTPLOTOBJECT_SETCONSTRAIN">
+ SetConstrain()</A> method on the activity. In this method you specify
+ the type of constrain as well as to what other activity this constrain
+ should be to. If you read the class reference you can also see that you
+ can specify the type and size of arrow used. For now we will just use
+ the default sizes and type.</P>
+<P> So for example to add an End-To-Start constrain between &quot;Label 2&quot;
+ and &quot;Label 3&quot; you could write<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$bar2</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetConstrain</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">2</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">CONSTRAIN_ENDSTART</FONT><FONT
+color="#007700">)</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P> The first parameter in the call above &quot;2&quot; is the row of the target
+ activity (i.e. the row where &quot;Label 3&quot;) activity is. In the example
+ below we have added the constrains we wanted.<DIV class="example">
+<BR> <A href="exframes/frame_ganttconstrainex1.html" target="blank"><IMG border="0"
+HEIGHT="253"  src="img/ganttconstrainex1.png" WIDTH="523"></A>
+<BR><B>Figure 168:</B> Adding constrains to a gantt chart <A href="exframes/frame_ganttconstrainex1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> A note: The actual path followed by the arrow is controlled by some
+ heuristics to make it clear what the constrain is. It has been a design
+ decision that in order to keep the API simple the user has no further
+ detailed controlled on the actual path followed. However, in future
+ version the heuristics may be extended and provide some
+ user-controllable parameters.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html">Previous</A>
+<A HREF="1016Advancedformatting.html">Next</A>
+</BODY>
+</HTML>

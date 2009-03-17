@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="475UnderstandingtextalignmentinJpGraph.html">
+<LINK REL="Next" HREF="481Adjustingthetransparency.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="475UnderstandingtextalignmentinJpGraph.html">Previous</A>
+<A HREF="481Adjustingthetransparency.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="4_8">4.8 Specifying colors in JpGraph</A></H2>
+<P> Colors can be specified in three different ways</P>
+<OL>
+<LI> By using one of the, roughly, 400 pre-defined color names, e.g<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;khaki&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV>
+<P> A named color can also be modified by adding a adjustment factor. An
+ adjustment factor, 0 &lt; f &lt; 1, a smaller value will give a darker
+ version and a value of 0 or 1 will return the original color. A value &gt;
+ 1 will make the color brighter. A few examples<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;khaki:0.5&quot;</FONT><FONT color="#007700">
+);&nbsp;</FONT><FONT color="#FF8000">//&nbsp;A&nbsp;darker&nbsp;version&nbsp;of&nbsp;&quot;khaki&quot;
+<BR></FONT><FONT color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;yellow:1.2&quot;</FONT><FONT color="#007700">);&nbsp;</FONT><FONT color="#FF8000">
+//&nbsp;A&nbsp;slightly&nbsp;lighter&nbsp;version&nbsp;of&nbsp;&quot;yellow&quot;</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P></P>
+</LI>
+<LI> By specifying a RGB triple, e.g.<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;SetColor</FONT><FONT color="#007700">(array(</FONT><FONT
+color="#0000BB">65</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+100</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">176</FONT><FONT
+color="#007700">));</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+<LI> By specifying the color as a hex string value<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;SetColor</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;#A16BFF&quot;</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV>
+<P></P>
+</LI>
+</OL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="475UnderstandingtextalignmentinJpGraph.html">Previous</A>
+<A HREF="481Adjustingthetransparency.html">Next</A>
+</BODY>
+</HTML>

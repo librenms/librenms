@@ -1,0 +1,52 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="47WorkingwithfontsinJpGraph.html">
+<LINK REL="Next" HREF="472VerifyingthattheTTFfontswork.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="47WorkingwithfontsinJpGraph.html">Previous</A>
+<A HREF="472VerifyingthattheTTFfontswork.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="4_7_1">4.7.1 Installing TrueType fonts</A></H3>
+<P> Since Internally TrueType fonts are rendered by locating a font
+ specification file you must install the accompanying TrueType fonts in
+ directory of your choice. You must then tell JpGraph where these fonts
+ may be found by specifying the font-path in the FONT_PATH define (in
+ jpg-config.inc.php). Please note that this must be the absolute file
+ path and not relative to the htdocs directory. By default the path is
+ set to<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;DEFINE</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;TTF_DIR&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#DD0000">
+&quot;/usr/local/fonts/ttf/&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> Since JpGraph must be able to tell the difference between the italic
+ and bold versions of the same font family a standard naming convention
+ is used to name the files. The available fonts are also defined by
+ DEFINES and hence you can't just copy your own TTF files to the
+ directory and expect it to work. At the moment there is no &quot;easy&quot; way
+ to add new fonts but to make some (small) mods to the code. However
+ this is expected to change in future version of JpGraph.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="47WorkingwithfontsinJpGraph.html">Previous</A>
+<A HREF="472VerifyingthattheTTFfontswork.html">Next</A>
+</BODY>
+</HTML>

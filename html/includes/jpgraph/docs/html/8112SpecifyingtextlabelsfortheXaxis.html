@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="8111Usingfilledgridlines.html">
+<LINK REL="Next" HREF="8113Adjustingtheticksonatextscale.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="8111Usingfilledgridlines.html">Previous</A>
+<A HREF="8113Adjustingtheticksonatextscale.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="8_1_12">8.1.12 Specifying text labels for the X-axis</A></H3>
+<P> You might want to have specific labels you want to use for the
+ X-axis when this has been specified as a &quot;text&quot; scale. In the previous
+ example each Y-point might represent a specific measurement for each of
+ the first 10 month. We might then want to display the name of the
+ months as X-scale.</P>
+<P> To specify the labels on the scale you make use of the <A href="../ref/Axis.html#_AXIS_SETTICKLABELS">
+ SetTickLabels()</A> method.</P>
+<P> To get a localized version of the name of the month you can use a
+ nice feature in JpGraph, the global '$gDateLocal' object which is an
+ instance of the <A href="../ref/DateLocale.html#_C_DATELOCALE">
+ DateLocale</A></P>
+<P> This class has a number of methods to get localized versions of
+ relevant names for dates, (months and weekdays).</P>
+<P> So to specify the X-axis with the short form of the month names we
+ use the construction<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$a&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT color="#0000BB">
+$gDateLocale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+GetShortMonth</FONT><FONT color="#007700">();
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">xaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTickLabels</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+$a</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> This will, now result in the image displayed below<DIV class="example">
+<BR> <A href="exframes/frame_example9.html" target="blank"><IMG border="0"
+HEIGHT="200"  src="img/example9.png" WIDTH="350"></A>
+<BR><B>Figure 20:</B> Specifying text labels for the X-axis <A href="exframes/frame_example9.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> It is also perfectly legal to override
+ the default labels for the Y (and Y2) axis in the same way, however
+ there is seldom need for that. Please note that the supplied labels
+ will be applied to each major tick label. If there are insufficient
+ number of supplied labels the non-existent positions will have empty
+ labels.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="8111Usingfilledgridlines.html">Previous</A>
+<A HREF="8113Adjustingtheticksonatextscale.html">Next</A>
+</BODY>
+</HTML>

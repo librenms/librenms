@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="471InstallingTrueTypefonts.html">
+<LINK REL="Next" HREF="473Specifyingfonts.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="471InstallingTrueTypefonts.html">Previous</A>
+<A HREF="473Specifyingfonts.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="4_7_2">4.7.2 Verifying that the TTF fonts work</A></H3>
+<P> In order to get TTF fonts working with JpGraph you should first
+ check that the following pure GD scripts work correctly. Please adjust
+ the font path according to your installation.<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;DEFINE</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;TTF_DIR&quot;</FONT><FONT color="#007700">,</FONT><FONT
+color="#DD0000">&quot;/usr/X11R6/lib/X11/fonts/truetype/&quot;</FONT><FONT color="#007700">
+);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">$im&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">imagecreatetruecolor&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">400</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+100</FONT><FONT color="#007700">);&nbsp;
+<BR></FONT><FONT color="#0000BB">$black&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">imagecolorallocate&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">0</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">0</FONT><FONT color="#007700">
+);&nbsp;
+<BR></FONT><FONT color="#0000BB">$white&nbsp;</FONT><FONT color="#007700">=&nbsp;</FONT><FONT
+color="#0000BB">imagecolorallocate&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+255</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">255</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">255</FONT><FONT color="#007700">
+);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">imagerectangle</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">399</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">99</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$black</FONT><FONT color="#007700">);&nbsp;
+<BR></FONT><FONT color="#0000BB">imagefilledrectangle</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,</FONT><FONT
+color="#0000BB">0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">399</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">99</FONT><FONT color="#007700">
+,</FONT><FONT color="#0000BB">$white</FONT><FONT color="#007700">);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">imagettftext&nbsp;</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">$im</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">30</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">
+0</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">,&nbsp;</FONT><FONT color="#0000BB">40</FONT><FONT color="#007700">
+,&nbsp;</FONT><FONT color="#0000BB">$black</FONT><FONT color="#007700">,&nbsp;</FONT><FONT
+color="#0000BB">TTF_DIR</FONT><FONT color="#007700">.</FONT><FONT color="#DD0000">
+&quot;arial.ttf&quot;</FONT><FONT color="#007700">,&nbsp;</FONT><FONT color="#DD0000">
+&quot;Hello&nbsp;World!&quot;</FONT><FONT color="#007700">);&nbsp;
+<BR>
+<BR></FONT><FONT color="#0000BB">header&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#DD0000">&quot;Content-type:&nbsp;image/png&quot;</FONT><FONT color="#007700">
+);&nbsp;
+<BR></FONT><FONT color="#0000BB">imagepng&nbsp;</FONT><FONT color="#007700">(</FONT><FONT
+color="#0000BB">$im</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> The above script assumes you have the GD2 library and will create an
+ image with the classical &quot;Hello World!&quot; text printed in black.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="471InstallingTrueTypefonts.html">Previous</A>
+<A HREF="473Specifyingfonts.html">Next</A>
+</BODY>
+</HTML>

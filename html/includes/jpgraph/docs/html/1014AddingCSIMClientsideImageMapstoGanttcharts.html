@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1013SimplifyingthedrawingofGanttgraphs.html">
+<LINK REL="Next" HREF="1015Addingconstrainsbetweenyouractivities.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1013SimplifyingthedrawingofGanttgraphs.html">Previous</A>
+<A HREF="1015Addingconstrainsbetweenyouractivities.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_14">10.14 Adding CSIM (Client side Image Maps) to Gantt
+ charts</A></H2>
+<P> Gantt charts can have independent (different targets) hot spots in
+ both the activities and in the associated labels for each activity.</P>
+<P> You specify the target and the associated &quot;Alt&quot; text for an activity
+ bar by calling the <A href="../ref/GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMTARGET">
+ GanttBar::SetCSIMTarget()</A> and <A href="../ref/GanttPlotObject.html#_GANTTPLOTOBJECT_SETCSIMALT">
+ GanttBar::SetCSIMAlt()</A></P>
+<P> In a similar way you set the target and Alt texts for the activity
+ title as the following code extract shows.<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;$bar</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">SetCSIMTarget</FONT><FONT color="#007700">
+(</FONT><FONT color="#DD0000">&quot;http://localhost/abc/&quot;</FONT><FONT color="#007700">
+);
+<BR></FONT><FONT color="#0000BB">$bar</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetCSIMAlt</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Alt&nbsp;Text&nbsp;for&nbsp;the&nbsp;bar&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$bar</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetCSIMTarget</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;http://localhost/abc&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$bar</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetCSIMAlt</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;Alt&nbsp;Text&nbsp;for&nbsp;the&nbsp;title&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> The above code assumes that your activity is available in the
+ variable 'bar'. In the example directory there is a complete example of
+ how to use CSIM together with Gantt charts in the &quot;ganttcsimex1.php&quot;
+ file. (Please note that this example makes use of the simplified Gantt
+ chart specification using the CreateSimple() method.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1013SimplifyingthedrawingofGanttgraphs.html">Previous</A>
+<A HREF="1015Addingconstrainsbetweenyouractivities.html">Next</A>
+</BODY>
+</HTML>

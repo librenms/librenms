@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1012MoregeneralGanttformatting.html">
+<LINK REL="Next" HREF="10122Modifyingthedividerlines.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1012MoregeneralGanttformatting.html">Previous</A>
+<A HREF="10122Modifyingthedividerlines.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_12_1">10.12.1 Adding a table title</A></H3>
+<P> The (default) white area in the top left of the gantt table may have
+ a title. This is accessed by the 'tableTitle' property of the gantt
+ scale. Using this is straightforward as the following lines show.<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">tableTitle</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;(Rev:&nbsp;1.22)&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+tableTitle</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_FONT1</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetTableTitleBackground</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;silver&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+tableTitle</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Show</FONT><FONT color="#007700">();</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> The example lines above also changes the default white background to
+ silver. Adding these lines to the previous example gives the following
+ result:<DIV class="example">
+<BR> <A href="exframes/frame_ganttex16.html" target="blank"><IMG border="0"
+HEIGHT="191"  src="img/ganttex16.png" WIDTH="439"></A>
+<BR><B>Figure 162:</B> Adding a table title. <A href="exframes/frame_ganttex16.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> From the above example you might notice that the width of the left
+ column (which holds all the titles) have automatically adjusted itself
+ to make the table title fit.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1012MoregeneralGanttformatting.html">Previous</A>
+<A HREF="10122Modifyingthedividerlines.html">Next</A>
+</BODY>
+</HTML>

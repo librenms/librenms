@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="10162Specifyingstartdayofweek.html">
+<LINK REL="Next" HREF="1018AntialiasinginJpGraph.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="10162Specifyingstartdayofweek.html">Previous</A>
+<A HREF="1018AntialiasinginJpGraph.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="10_17">10.17 Localizing</A></H2>
+<P> Depending on your installation of PHP you might have support for
+ several locales. By default the locale is set up to use the default
+ locale on the server.</P>
+<P> To specifically set a locale you specify the wanted locale with a
+ locale string (ala standard PHP), for example American English is
+ specified with the string 'EN_US', British English with 'EN_UK' 'nl_NL'
+ for Dutch and so on. If your current installation does not support the
+ specified locale an error message will be given.<DIV class="phpscript"><CODE>
+<FONT color="#000000"> <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">scale</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetDateLocale</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;se_SE&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> The result is displayed below.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex19.html" target="blank"><IMG border="0"
+HEIGHT="191"  src="img/ganttex19.png" WIDTH="431"></A>
+<BR><B>Figure 169:</B> Using swedish locale. (Can you spot the
+ difference from English?) <A href="exframes/frame_ganttex19.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="10162Specifyingstartdayofweek.html">Previous</A>
+<A HREF="1018AntialiasinginJpGraph.html">Next</A>
+</BODY>
+</HTML>

@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="721Adjustingthewidthofthebars.html">
+<LINK REL="Next" HREF="723Addingadropshadowtothebar.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="721Adjustingthewidthofthebars.html">Previous</A>
+<A HREF="723Addingadropshadowtothebar.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_2_2">7.2.2 Displaying the value of each bar</A></H3>
+<P> You can easily choose to display the value (and it's format) on top
+ of each bar by accessing the bar's 'value' property. So for example by
+ just adding the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$barplot</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">value</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Show</FONT><FONT color="#007700">();</FONT><FONT color="#0000BB"></FONT></FONT>
+</CODE></DIV></P>
+<P> Will enable the values in it's simplest form and will give the
+ result<DIV class="example">
+<BR> <A href="exframes/frame_example20.1.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example20.1.png" WIDTH="300"></A>
+<BR><B>Figure 35:</B> Showing the values for each bar <A href="exframes/frame_example20.1.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> You cane see a small nuisance in this graph. The auto scaling
+ algorithm chooses quite tight limits for the scale so that the bars
+ just fit. Adding the value on top of the bar makes it collide with the
+ top of the graph. To remedy this we tell the auto scaling algorithm to
+ allow for more &quot;grace&quot; space at the top of the scale by using the
+ method <A href="../ref/LinearScale.html#_LINEARSCALE_SETGRACE">
+ SetGrace()</A> which is used to tell the scale to add a percentage (of
+ the total scale span) more space to either one end or both ends of the
+ scale. In this case we add 20% more space at the top to make more room
+ for the values with the line<DIV class="phpscript"><CODE><FONT color="#000000">
+ <FONT color="#0000BB">&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">yaxis</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+scale</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetGrace</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">20</FONT><FONT
+color="#007700">);</FONT><FONT color="#0000BB"></FONT></FONT></CODE></DIV>
+</P>
+<P></P>
+<P> This will then give the graph as shown below<DIV class="example">
+<BR> <A href="exframes/frame_example20.2.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example20.2.png" WIDTH="300"></A>
+<BR><B>Figure 36:</B> Adding some grace space to the top of the Y-scale <A
+href="exframes/frame_example20.2.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> You can also adjust the general position of the value in respect to
+ the bar by using the <A href="../ref/BarPlot.html#_BARPLOT_SETVALUEPOS">
+ BarPlot::SetValuePos()</A> method. You can set the position to either
+ 'top' (the default) , 'center' or 'bottom'. The graph below shows the
+ value being positioned in the center. In this example we have also
+ adjusted the format to just display the value as an integer without any
+ decimals.<DIV class="example">
+<BR> <A href="exframes/frame_example20.5.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example20.5.png" WIDTH="300"></A>
+<BR><B>Figure 37:</B> Putting the values in the middle of the bar. <A href="exframes/frame_example20.5.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> It is also possible to specify a more fine grained control on how
+ you want the values presented. You can for example, rotate them, change
+ font, change color. It is also possible to adjust the actual value
+ displayed by either using a printf()-type format string or with the
+ more advanced technique of a format callback routine.</P>
+<P> To show what you can do we just give another example for you to
+ examine without much further explanations. Just remember that to have
+ text at an angle other than 0 or 90 degrees we have to use TTF fonts.
+ Even though we haven't explained the SetFont() method it should be
+ fairly obvious.<DIV class="example">
+<BR> <A href="exframes/frame_example20.3.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/example20.3.png" WIDTH="300"></A>
+<BR><B>Figure 38:</B> Making the displayed values more interesting <A href="exframes/frame_example20.3.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="721Adjustingthewidthofthebars.html">Previous</A>
+<A HREF="723Addingadropshadowtothebar.html">Next</A>
+</BODY>
+</HTML>

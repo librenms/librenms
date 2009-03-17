@@ -1,0 +1,90 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_ACCLINEPLOT"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>AccLinePlot</b> EXTENDS <a href="Plot .html#_C_PLOT " style="font-face:arial;font-weight:bold;">Plot </a></div>
+<i>(Defined in: jpgraph_line.php : 421)</i><table border=1><tr><td>&nbsp;<a href="AccLinePlot.html" style="font-family:arial;font-weight:bold;color:darkblue;">AccLinePlot</a>&nbsp;</td><td>&nbsp;<a href="Plot .html" style="font-family:arial;font-weight:bold;color:darkblue;">Plot </a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="AccLinePlot.html#_ACCLINEPLOT_ACCLINEPLOT">AccLinePlot()</a>&nbsp;<br>
+&nbsp;<a href="AccLinePlot.html#_ACCLINEPLOT_MAX">Max()</a>&nbsp;<br>
+&nbsp;<a href="AccLinePlot.html#_ACCLINEPLOT_MIN">Min()</a>&nbsp;<br>
+&nbsp;<a href="AccLinePlot.html#_ACCLINEPLOT_SETINTERPOLATEMODE">SetInterpolateMode()</a>&nbsp;<br>
+</td><td valign=top>&nbsp;</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>Accumulated bar plot. <br>
+Used to create a line plot where each individual data point is the sum of the individual series data points.
+<p>
+Features:
+<ol>
+<li>Unlimited number of series
+</ol>
+<p> <p> &nbsp;
+<div style="font-weight:bold;font-family:arial;font-size:85%;">See also related classes:</div><a href="AccBarPlot.html">AccBarPlot</a> and <a href="LinePlot.html">LinePlot</a> <p> &nbsp;<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCLINEPLOT_ACCLINEPLOT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;AccLinePlot($plots)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Constructor</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$plots</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Array of line plots to use</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Creates a new accumulated line plot from a number of line plots.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="LinePlot.html#_LINEPLOT_LINEPLOT">LinePlot::LinePlot</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$line1&nbsp;=&nbsp;new&nbsp;LinePlot($datay1);<br />$line2&nbsp;=&nbsp;new&nbsp;LinePlot($datay2);<br />$aline&nbsp;=&nbsp;array($line1,$line2);<br />$acclineplot&nbsp;=&nbsp;new&nbsp;AccLinePlot($aline);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCLINEPLOT_MAX"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Max()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the max value of data points in plot.</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Takes into account all series and returns the maximum Y and X values for all the data series. Used internally to determine the autoscaling.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Plot.html#_PLOT_MAX">Plot::Max</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+list($xmax,$ymax)&nbsp;=&nbsp;$acclineplot-&gt;Max();</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCLINEPLOT_MIN"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Min()</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Return the min value of all data points in plot.</i></span><p>
+<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Takes into account all series and returns the minimum Y and X value. Used internally to determine autoscaling.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="BarPlot.html#_BARPLOT_MIN">BarPlot::Min</a> and <a href="Plot.html#_PLOT_MIN">Plot::Min</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+list($xmin,$ymin)&nbsp;=&nbsp;$acclineplot-&gt;Min()<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_ACCLINEPLOT_SETINTERPOLATEMODE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetInterpolateMode($aIntMode)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Enable interpolate mode</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aIntMode</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>TRUE=Enable interpolation</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>When plotting accumulated line plots which have NULL values as data (i.e. '-') they will distort the accumulated plot since they will in effect be interpretated as having value 0. This means that there will be a drop in the plot. The only way to avoid this is to calculate the intermediate value. 
+
+This can be achieved by calculating a linear interpoaltion for the missing value(s). Calling this method will replace all '-' values with an interpolated value.
+&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$accline-&gt;SetInterpolateMode()</font>
+</span><br>
+<p> <hr> <p>

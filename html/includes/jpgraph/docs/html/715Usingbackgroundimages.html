@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="714Addingatabtitle.html">
+<LINK REL="Next" HREF="716Usingabackgroundgradient.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="714Addingatabtitle.html">Previous</A>
+<A HREF="716Usingabackgroundgradient.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="7_15">7.15 Using background images</A></H2>
+<P> Instead of having a single color background you can easily have an
+ arbitrary image as the background. The image may be in either PNG, JPG
+ or GIF format depending on what your installation supports.</P>
+<P></P>
+<HR> <SMALL>
+<P><STRONG> A note on GD:</STRONG> If you are using GD 2.xx you must
+ make sure that the define USE_TRUECOLOR is set to true. This is also
+ the default. Failure to do so in combination with GD 2.xx will make the
+ background image just look like a solid black square.</P>
+</SMALL>
+<HR>
+<P> To use a specific image as the background you just have to use the
+ method <A href="../ref/Graph.html#_GRAPH_SETBACKGROUNDIMAGE">
+ Graph::SetBackgroundImage()</A> The arguments specify file-name, how
+ the image should be positioned in the graph and finally the format of
+ the image (if it is in JPG, PNG or GIF) format. If the format is
+ specified as &quot;auto&quot; (the default) then the appropriate image format
+ will be determined from the extension of the image file.</P>
+<P> The file name is of course obvious but the second argument might not
+ be. This arguments determine how the image should be copied onto the
+ graph image. You can specify three different variants here</P>
+<OL>
+<LI> BGIMG_ COPY This will just copy the image unchanged onto the graph
+ from the top left corner.</LI>
+<LI> BGIMG_CENTER This will just copy the image unchanged onto the graph
+ but it will center the image in the graph.</LI>
+<LI> BGIMG_FILLFRAME This will scale the image to exactly fit the whole
+ graph image.</LI>
+<LI> BGIMG_FILLPLOT This will scale the image to exactly fit just the
+ plot area of the graph.</LI>
+</OL>
+<P></P>
+<P></P>
+<HR><STRONG> The following section only applies to palette based images.
+ True color images can NOT be manipulated this way. Applying the
+ following sections to true-color images will have no affect.</STRONG>
+<HR>
+<P> You might often find yourself wanting to use a background image as a
+ &quot;waterstamp&quot;. This usually means taking the original image, import it
+ to some image editing program and then &quot;bleaching&quot; the color
+ saturation, reducing the contrast and so on. Finally you save the
+ modified image which you then use as a background image.</P>
+<P> This whole process can be automatically accomplished in JpGraph by
+ using the method <A href="../ref/Graph.html#_GRAPH_ADJBACKGROUNDIMAGE">
+ Graph::AdjBackgroundImage()</A> which allow you to adjust color
+ saturation, brightness and contrast of the background image.</P>
+<P><DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+AdjBackgroundImage</FONT><FONT color="#007700">(...)</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P></P>
+<P> to achieve the &quot;watercolor&quot; effect to avoid the image being too
+ intrusive in the graph.<DIV class="example">
+<BR> <A href="exframes/frame_backgroundex03.html" target="blank"><IMG border="0"
+HEIGHT="200"       src="img/img/img/img/img/img/backgroundex03.png" WIDTH="400"></A>
+<BR><B>Figure 93:</B> Example on using a watermark type background image
+ <A href="exframes/frame_backgroundex03.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="note"><B>Note:</B> The background image depicts a 1998
+ Triumph Tiger. This bike is a 900cc off-road bike.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="714Addingatabtitle.html">Previous</A>
+<A HREF="716Usingabackgroundgradient.html">Next</A>
+</BODY>
+</HTML>

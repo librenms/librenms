@@ -1,0 +1,154 @@
+html {
+    background-color:white;
+}
+
+body {
+     margin-top:10px;
+     margin-left:20px;
+     margin-right:20px;
+     width : 800px;
+    background-color:white;
+    border:black solid 1px;	
+}
+
+sub, sup { 
+    font-size : smaller 
+}
+
+pre {
+    margin-left:6em;
+    font-family:monospace;
+    padding-left:10px;
+    border-left : black solid 3px;
+}
+
+div.exscript {
+     background-color : #d3eae1 ;	
+     font-family:monospace;
+     font-size:85%;
+     font-weight:bold;
+     padding:5px;
+     margin-left:7em;
+     margin-right:7em;
+}
+
+
+div.page {
+     margin-left:0.5em;
+     margin-right:2em;
+     margin-top:0px;
+     background-color:white;
+     width : 800px;
+     text-align:justify;
+     padding-left:1em;
+     padding-right:2em;
+     border-left:solid #101010 2px;
+     border-right:solid #101010 2px;
+     border-bottom:solid #101010 2px;
+}
+
+.page p {
+      margin-left:5em;
+      margin-right:2em;
+      margin-top: 0;
+      margin-bottom: 0.4em;
+}
+
+.page ul, .page ol {
+      margin-left:7em;
+      margin-right:5em;
+      margin-top: 0;
+      margin-bottom: 0.4em;
+}
+
+.page h1 {
+     margin-left:0em;
+     font-family : sans-serif;
+     font-size:2em;
+}
+
+
+.page h2, .page h3 {
+     margin-left:0em;
+     font-family : sans-serif;
+     font-size:1.2em;
+}
+
+div.caption {
+     font-style:italic;
+     font-family:sans-serif;
+     font-size:0.75em;
+     margin-top:2px;
+     margin-left:7em;
+     margin-right:7em;
+     margin-bottom:2em;
+
+}
+
+.capture b {
+     font-style:normal;
+}
+
+div.abstract {
+	margin-left : 7em;
+	margin-right : 7em;
+	font-style: italic;
+	text-align: justify;
+	font-size:0.9em;
+	margin-bottom:3em;	
+}
+
+.abstract h3 {
+     font-family : sans-serif;
+     font-size:0.9em;
+     font-weight:bold;
+     text-align:center;
+     margin-bottom:0.2em;
+     margin-left : 3em;	
+}
+
+div.phpscript {
+      margin-left:7em;
+      margin-right:3em;
+      background-color:#E6E6E6;
+      font-family:monospace;
+      font-size:0.85em;
+      font-weight:bold;
+      padding-left:0.5em;
+}
+
+div.note {
+      margin-left:7em;
+      margin-right:4em;
+      font-size:0.9em;
+      border-top: black solid 1px;
+      border-bottom: black solid 1px;	
+      margin-top:1em;
+      margin-bottom:1em;
+}	  
+
+div.note b {
+      font-weight: bold;
+      font-color:darkred;
+}
+
+div.example {
+      text-align : center;
+      margin-left:10em;
+      margin-right:10em;
+      font-style: italic;
+      margin-bottom : 20px;
+}
+
+table.codedefines {
+      margin-left : 5em;
+      border:black solid 1px;
+}
+
+.codedefines th {
+      background-color: blue;
+      color:white;
+      font-style:bold;
+      font-family: arial;
+      font-size:1.2em;
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="1074Verticalline.html">
+<LINK REL="Next" HREF="1076Adjustingtheminimumdistancebetweenbars.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="1074Verticalline.html">Previous</A>
+<A HREF="1076Adjustingtheminimumdistancebetweenbars.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="10_7_5">10.7.5 Adding markers to a gantt bar</A></H3>
+<P> You can easily add a variety of markers both to the start and end of
+ the gantt bar. They could for example be used as an alternate way to
+ illustrate important milestones or anticipated deliveries.</P>
+<P> The left and right markers are accessed through the two properties
+ 'leftMark' and 'rightMark'. They are both instances of the general
+ 'PlotMark' class which is also used for the milestones (and in line
+ graphs). The 'PlotMark' class supports several different styles, for
+ example, diamond (the default for milestones), filled and unfilled
+ circles, squares, stares, and so on. Please refer to the reference
+ section for a complete listing.</P>
+<P> Let's illustrate this by adding a right marker to the previous
+ example. We will use a style of a filled (red) circle with a white
+ title, say, &quot;M5&quot;. In order to accomplish this we must augment the
+ previous example with the following lines:<DIV class="phpscript"><CODE><FONT
+color="#000000"> <FONT color="#0000BB">&nbsp;$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">Show</FONT><FONT color="#007700">();&nbsp;&nbsp;&nbsp;&nbsp;
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+Set</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">&quot;M5&quot;</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetType</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+MARK_FILLEDCIRCLE</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetWidth</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+10</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;red&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">SetFillColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;red&quot;</FONT><FONT color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetFont</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">
+FF_ARIAL</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">
+FS_BOLD</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">12</FONT><FONT
+color="#007700">);
+<BR></FONT><FONT color="#0000BB">$activity</FONT><FONT color="#007700">
+-&gt;</FONT><FONT color="#0000BB">rightMark</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">title</FONT><FONT color="#007700">-&gt;</FONT><FONT color="#0000BB">
+SetColor</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;white&quot;</FONT><FONT color="#007700">);</FONT><FONT color="#0000BB"></FONT>
+</FONT></CODE></DIV></P>
+<P> This might seem like a lot of lines but this is as complicated as it
+ possible can get. As an illustration in the example belwo more or less
+ everything that is changeable has been changed, the default font,
+ font-color, fill-color, frame-color and width of marker. The two lines
+ only really necessary are the first two, showing the mark and setting a
+ title. One could still get a good result by using default values for
+ the rest of the properties.</P>
+<P> The resulting image can be seen in Figure 151 below.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex08.html" target="blank"><IMG border="0"
+HEIGHT="243"  src="img/ganttex08.png" WIDTH="502"></A>
+<BR><B>Figure 151:</B> Adding a right marker to a bar. <A href="exframes/frame_ganttex08.html"
+target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> We have deliberately introduced a &quot;strangeness&quot; here. If the
+ previous two examples are compared it can bee seen that the last
+ example is larger than the previous one. Why?</P>
+<P> The explanation is trivial once we recall that the height of bars
+ are sized relative to the horizontal spacing. The horizontal spacing
+ are based on the highest single bar including title size and, here come
+ the explanation, marker size. The horizontal spacing has grown since
+ the minimum height is now based on 10 points(=the height of the mark).
+ The bar still occupy the same percentage of the height so it seems to
+ have grown.</P>
+<P> If this behavior is unwanted it is always possible to specify an
+ absolute size for the bar heigh, say 8 pixels, with a call<DIV class="phpscript">
+<CODE><FONT color="#000000"> <FONT color="#0000BB">&nbsp;$activity</FONT><FONT
+color="#007700">-&gt;</FONT><FONT color="#0000BB">SetHeight</FONT><FONT color="#007700">
+(</FONT><FONT color="#0000BB">8</FONT><FONT color="#007700">);</FONT><FONT
+color="#0000BB"></FONT></FONT></CODE></DIV></P>
+<P> and achieve the result in Figure 152 below.<DIV class="example">
+<BR> <A href="exframes/frame_ganttex09.html" target="blank"><IMG border="0"
+HEIGHT="243"  src="img/ganttex09.png" WIDTH="502"></A>
+<BR><B>Figure 152:</B> Specifying an absolute size for the height of the
+ bar. <A href="exframes/frame_ganttex09.html" target="blank">[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P> It is worth noting that the height reserved for each bar is still
+ the same since we haven't changed the height of the marker and the
+ reserved space is the maximum height used by any bar.</P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="1074Verticalline.html">Previous</A>
+<A HREF="1076Adjustingtheminimumdistancebetweenbars.html">Next</A>
+</BODY>
+</HTML>

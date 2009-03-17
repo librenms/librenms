@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="52Usingthecacheinyourscript.html">
+<LINK REL="Next" HREF="54Somefinalcomments.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="52Usingthecacheinyourscript.html">Previous</A>
+<A HREF="54Somefinalcomments.html">Next</A>
+<HR NOSHADE>
+<H2><A NAME="5_3">5.3 Using the cache with Client Side Image Maps</A></H2>
+<P> You can also use the cache system for CSIM as well. The cache system
+ interface is slightly different in this case since the cache needs to
+ store<STRONG> both</STRONG> the cached image and the cached image-map.
+ It also needs to change due to the way CSIM HTML paradigm work. The two
+ major differences from the &quot;standard&quot; cache is</P>
+<OL>
+<LI> The cached version will<STRONG> not</STRONG> be stored in the
+ previous defined cache directory. See more below.</LI>
+<LI> You must call an extra method, CheckCSIMCache(), to check the
+ cache, see more below.</LI>
+</OL>
+<P></P>
+<P> The performance benefits even for simple CSIM images is around 50%
+ if the cache can be used and can of course be several 1000% if
+ construction of the image requires DB calls and other complex
+ operations which can be avoided.</P>
+<P> Before reading further you should have an understanding on how the
+ CSIM works by reading the section &quot;sing Client side image maps&quot;.</P>
+<P> Please remember that when using CSIM you must end your script with a
+ call to <A href="">Graph::StrokeCSIM()</A> method instead of the <A href="">
+Graph::Stroke()</A> used for non-csim.</P>
+<P> To use the cache with CSIM you have to call the <A href="">
+Graph::CheckCSIMCache()</A>. As with the caching for non-CSIM you have
+ to supply a name to be used for the cached version as well as an
+ optional timeout value. The default timeout value if nothing else is
+ specified is 60 minutes.</P>
+<P> The name argument requires some more explanations. You must specify
+ a relative name here. For example &quot;myimage&quot; or perhaps
+ &quot;firstpage/image3&quot;. Depending on your installation of JpGraph this will
+ now end up in the directory specified in the CSIMCACHE_DIR define. This
+ must also be a directory accessible by the normal web server. By
+ default a directory called &quot;csimcache&quot; will be created in the same
+ directory as the image script itself.</P>
+<P> This has the drawback that the directory from where the script is
+ executed must be writable by the process running PHP. Best practice for
+ this is to keep the number of writable directory for PHP down to a
+ minimum and re-use the same directory as is used for the standard
+ cache. This however, require that your system administrator setup that
+ cache directory so that it also accessible by the HTTP server from the
+ htdocs root.</P>
+<P> The CheckCSIMCache() method checks the cache for an existing cached
+ version and if found it returns it and halts execution of the script.
+ So, this call should be the first call after the creation of the
+ Graph() and before any heavy work is done to create the image so that
+ you can minimize the execution of the script in the case a match is
+ found.</P>
+<P> So, the general structure of a script that uses CSIM and the cache
+ is<DIV class="phpscript"><CODE><FONT color="#000000"> <FONT color="#0000BB">
+&nbsp;$graph&nbsp;</FONT><FONT color="#007700">=&nbsp;new&nbsp;</FONT><FONT color="#0000BB">
+Graph</FONT><FONT color="#007700">(</FONT><FONT color="#0000BB">400</FONT><FONT
+color="#007700">,</FONT><FONT color="#0000BB">300</FONT><FONT color="#007700">
+);
+<BR>
+<BR></FONT><FONT color="#FF8000">//&nbsp;Check&nbsp;cache,&nbsp;10&nbsp;min&nbsp;timeout
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">CheckCSIMCache</FONT><FONT color="#007700">(</FONT><FONT color="#DD0000">
+&quot;image1&quot;</FONT><FONT color="#007700">,</FONT><FONT color="#0000BB">10</FONT><FONT
+color="#007700">);
+<BR>
+<BR></FONT><FONT color="#FF8000">
+//&nbsp;!!&nbsp;If&nbsp;cached&nbsp;version&nbsp;exists,&nbsp;execution&nbsp;halts&nbsp;here&nbsp;!!
+<BR>
+<BR>//
+<BR>//&nbsp;...&nbsp;Construct&nbsp;the&nbsp;image&nbsp;with&nbsp;heavy&nbsp;DB&nbsp;calls&nbsp;etc,&nbsp;etc
+<BR>//
+<BR>
+<BR></FONT><FONT color="#0000BB">$graph</FONT><FONT color="#007700">-&gt;</FONT><FONT
+color="#0000BB">StrokeCSIM</FONT><FONT color="#007700">();</FONT><FONT color="#0000BB">
+</FONT></FONT></CODE></DIV></P>
+<P> Please note that you<STRONG> do not</STRONG> need to pass any
+ argument to the final call to StrokeCSIM() as you do when not using the
+ cache.<DIV class="note"><B>Note:</B> The CSIM caching works by storing
+ two files in the cache directory. One file being the image and the
+ other file being the corresponding image map as a pure HTML file.</DIV></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="52Usingthecacheinyourscript.html">Previous</A>
+<A HREF="54Somefinalcomments.html">Next</A>
+</BODY>
+</HTML>

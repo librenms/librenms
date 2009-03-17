@@ -1,0 +1,502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<H1 ALIGN="CENTER"><A NAME="CONTENTS">JpGraph Manual</A></H1>
+<BR>
+<BR><B><A HREF="1Aboutthismanual.html#1">1 About this manual</A></B>
+<UL>
+<LI><A HREF="11Versionhistory.html#1_1">1.1 Version history</A></LI>
+<LI><A HREF="12Howwasthismanualproduced.html#1_2">1.2 How was this
+ manual produced?</A></LI>
+</UL>
+<B><A HREF="2Introduction.html#2">2 Introduction</A></B>
+<UL>
+<LI><A HREF="21Version.html#2_1">2.1 Version</A></LI>
+<LI><A HREF="22SoftwareLicense.html#2_2">2.2 Software License</A></LI>
+<LI><A HREF="23JpGraphFeatures.html#2_3">2.3 JpGraph Features</A></LI>
+<LI><A HREF="24Gettingthelatestversion.html#2_4">2.4  Getting the latest
+ version</A></LI>
+<LI><A HREF="25Plannedfutureaddition.html#2_5">2.5 Planned future
+ addition</A></LI>
+<LI><A HREF="26Knownbugsandomissions.html#2_6">2.6 Known bugs and
+ omissions</A></LI>
+<LI><A HREF="27Acknowledgments.html#2_7">2.7  Acknowledgments</A></LI>
+<LI><A HREF="28Reportingbugsandsuggestingimprovements.html#2_8">2.8 
+Reporting bugs and suggesting improvements</A></LI>
+<LI><A HREF="29Gettingsupport.html#2_9">2.9 Getting support</A></LI>
+</UL>
+<B><A HREF="3Installation.html#3">3 Installation</A></B>
+<UL>
+<LI><A HREF="31Preparation.html#3_1">3.1 Preparation</A>
+<UL>
+<LI><A HREF="311VerifyingthatyouhavetheGDlibraryinstalled.html#3_1_1">
+3.1.1 Verifying that you have the GD library installed</A></LI>
+<LI><A HREF="312VerifyingthatyouhaveGD2installed.html#3_1_2">3.1.2 
+Verifying that you have GD2 installed</A></LI>
+<LI><A HREF="313PreparingTrueTypeFontFiles.html#3_1_3">3.1.3 Preparing
+ True Type Font Files</A></LI>
+<LI><A HREF="314UsingnonlatinbasedfontswithJpGraph.html#3_1_4">3.1.4 
+Using non-latin based fonts with JpGraph</A></LI>
+</UL>
+</LI>
+<LI><A HREF="32Customizingtheinstallation.html#3_2">3.2 Customizing the
+ installation</A></LI>
+<LI><A HREF="33Requiredfiles.html#3_3">3.3  Required files</A>
+<UL>
+<LI><A HREF="331Plotextensionmodules.html#3_3_1">3.3.1 Plot extension
+ modules</A></LI>
+</UL>
+</LI>
+<LI><A HREF="34Imageformatsandexternalimagelibraries.html#3_4">3.4 Image
+ formats and external image libraries</A></LI>
+<LI><A HREF="35DetailedstepstoinstallJpGraph.html#3_5">3.5 Detailed
+ steps to install JpGraph</A></LI>
+<LI><A HREF="36Troubleshootingyourinstallation.html#3_6">3.6 
+Troubleshooting your installation</A></LI>
+<LI><A HREF="37CompilingPHP4.html#3_7">3.7 Compiling PHP 4</A></LI>
+</UL>
+<B><A HREF="4QuickStartDynamicImageGeneration.html#4">4 Quick Start:
+ Dynamic Image Generation</A></B>
+<UL>
+<LI><A HREF="41Scopeofthischapter.html#4_1">4.1 Scope of this chapter</A>
+<UL>
+<LI><A HREF="411Whatyouwilllearninthischapter.html#4_1_1">4.1.1 What you
+ will learn in this chapter</A></LI>
+<LI><A HREF="412WhatyouwillNOTlearninthischapter.html#4_1_2">4.1.2 What
+ you will NOT learn in this chapter</A></LI>
+</UL>
+</LI>
+<LI><A HREF="42HowtogenerateimageswithPHP.html#4_2">4.2 How to generate
+ images with PHP</A>
+<UL>
+<LI><A HREF="421UsingtheJpGraphlibrarytosendbackimages.html#4_2_1">
+4.2.1 Using the JpGraph library to send back images</A></LI>
+</UL>
+</LI>
+<LI><A HREF="43UsingPHPdirectly.html#4_3">4.3 Using PHP directly</A></LI>
+<LI><A HREF="44ThebasicprincipleofJpGraphandthecreationofimages.html#4_4">
+4.4 The basic principle of JpGraph and the creation of images</A></LI>
+<LI><A HREF="45ChoosingtheimageformatforJpGraph.html#4_5">4.5  Choosing
+ the image format for JpGraph</A></LI>
+<LI><A HREF="46Alternativestostreamingbacktheimage.html#4_6">4.6 
+Alternatives to streaming back the image</A></LI>
+<LI><A HREF="47WorkingwithfontsinJpGraph.html#4_7">4.7  Working with
+ fonts in JpGraph</A>
+<UL>
+<LI><A HREF="471InstallingTrueTypefonts.html#4_7_1">4.7.1 Installing
+ TrueType fonts</A></LI>
+<LI><A HREF="472VerifyingthattheTTFfontswork.html#4_7_2">4.7.2 Verifying
+ that the TTF fonts work</A></LI>
+<LI><A HREF="473Specifyingfonts.html#4_7_3">4.7.3 Specifying fonts</A></LI>
+<LI><A HREF="474AddingadditionalfontstoJpGraph.html#4_7_4">4.7.4 Adding
+ additional fonts to JpGraph</A></LI>
+<LI><A HREF="475UnderstandingtextalignmentinJpGraph.html#4_7_5">4.7.5 
+Understanding text alignment in JpGraph</A></LI>
+</UL>
+</LI>
+<LI><A HREF="48SpecifyingcolorsinJpGraph.html#4_8">4.8 Specifying colors
+ in JpGraph</A>
+<UL>
+<LI><A HREF="481Adjustingthetransparency.html#4_8_1">4.8.1 Adjusting the
+ transparency</A></LI>
+<LI><A HREF="482Availablenamedcolors.html#4_8_2">4.8.2 Available named
+ colors</A></LI>
+<LI><A HREF="483Themecolorsforpies.html#4_8_3">4.8.3 Theme colors for
+ pie's</A></LI>
+</UL>
+</LI>
+</UL>
+<B><A HREF="5Localizingerrormessages.html#5">5 Localizing error messages</A>
+</B>
+<UL>
+<LI><A HREF="51Thespecialprodlocale.html#5_1">5.1 The special &quot;prod&quot;
+ locale</A></LI>
+<LI><A HREF="52Includedlocalizederrormessages.html#5_2">5.2 Included
+ localized error messages</A></LI>
+<LI><A HREF="53Creatingyourownlanguageresourcefile.html#5_3">5.3 
+Creating your own language resource file</A></LI>
+</UL>
+<B><A HREF="6UnderstandingtheJpGraphcachingsystem.html#6">6 
+Understanding the JpGraph caching system</A></B>
+<UL>
+<LI><A HREF="61Enablingthecachesystem.html#6_1">6.1 Enabling the cache
+ system</A></LI>
+<LI><A HREF="62Usingthecacheinyourscript.html#6_2">6.2 Using the cache
+ in your script</A></LI>
+<LI><A HREF="63UsingthecachewithClientSideImageMaps.html#6_3">6.3 Using
+ the cache with Client Side Image Maps</A></LI>
+<LI><A HREF="64Somefinalcomments.html#6_4">6.4 Some final comments</A></LI>
+<LI><A HREF="65Commonfeatureforallgraphs.html#6_5">6.5 Common feature
+ for all graphs</A>
+<UL>
+<LI><A HREF="651Clipping.html#6_5_1">6.5.1 Clipping</A></LI>
+<LI><A HREF="652Commonlyusedproperties.html#6_5_2">6.5.2  Commonly used
+ properties</A></LI>
+<LI><A HREF="653Commonlyusedmethods.html#6_5_3">6.5.3  Commonly used
+ methods</A></LI>
+</UL>
+</LI>
+</UL>
+<B><A HREF="7UsingimagemapswithJpGraph.html#7">7 Using image maps with
+ JpGraph</A></B>
+<UL>
+<LI><A HREF="71Thebasicstructureofanimagemapscript.html#7_1">7.1 The
+ basic structure of an image map script</A></LI>
+<LI><A HREF="72Specifyingtargetsforimagemapplots.html#7_2">7.2 
+Specifying targets for image map plots</A></LI>
+<LI><A HREF="73UsingStrokeCSIM.html#7_3">7.3 Using StrokeCSIM()</A></LI>
+<LI><A HREF="74ExamplesofImagemaps.html#7_4">7.4 Examples of Image maps</A>
+</LI>
+<LI><A HREF="75HowdoesStrokeCSIMwork.html#7_5">7.5 How does StrokeCSIM()
+ work?</A></LI>
+<LI><A HREF="76Gettingholdoftheimagemap.html#7_6">7.6 Getting hold of
+ the image map</A></LI>
+<LI><A HREF="77Imagemapsandthecachesystem.html#7_7">7.7 Image maps and
+ the cache system</A></LI>
+</UL>
+<B><A HREF="8WorkingwithorthogonalXYplots.html#8">8 Working with
+ orthogonal X,Y-plots</A></B>
+<UL>
+<LI><A HREF="81Lineplots.html#8_1">8.1 Line plots</A>
+<UL>
+<LI><A HREF="811AddingplotmarkstolineplotsXXX.html#8_1_1">8.1.1 Adding
+ plot marks to line-plots XXX</A></LI>
+<LI><A HREF="812Displayingthevaluesforeachdatapoint.html#8_1_2">8.1.2 
+Displaying the values for each data point</A></LI>
+<LI><A HREF="813Addingseveralplotstothesamegraph.html#8_1_3">8.1.3 
+Adding several plots to the same graph</A></LI>
+<LI><A HREF="814AddingasecondYscale.html#8_1_4">8.1.4 Adding a second
+ Y-scale</A></LI>
+<LI><A HREF="815Addingalegendtothegraph.html#8_1_5">8.1.5 Adding a
+ legend to the graph</A></LI>
+<LI><A HREF="816Handlingnullvaluesinlineplots.html#8_1_6">8.1.6 Handling
+ null-values in line plots</A></LI>
+<LI><A HREF="817Usingthestepstyletorenderlineplots.html#8_1_7">8.1.7 
+Using the step-style to render line plots</A></LI>
+<LI><A HREF="818Usinglogarithmicscale.html#8_1_8">8.1.8 Using
+ logarithmic scale</A></LI>
+<LI><A HREF="819Moreonscales.html#8_1_9">8.1.9 More on scales</A></LI>
+<LI><A HREF="8110Adjustingthegridlinesintheplot.html#8_1_10">8.1.10 
+Adjusting the grid lines in the plot</A></LI>
+<LI><A HREF="8111Usingfilledgridlines.html#8_1_11">8.1.11 Using filled
+ grid lines</A></LI>
+<LI><A HREF="8112SpecifyingtextlabelsfortheXaxis.html#8_1_12">8.1.12 
+Specifying text labels for the X-axis</A></LI>
+<LI><A HREF="8113Adjustingtheticksonatextscale.html#8_1_13">8.1.13 
+Adjusting the ticks on a text scale</A></LI>
+<LI><A HREF="8114Usingfilledlinegraphs.html#8_1_14">8.1.14 Using filled
+ line graphs</A></LI>
+<LI><A HREF="8115Usingaccumulatedlinegraphs.html#8_1_15">8.1.15 Using
+ accumulated line graphs</A></LI>
+<LI><A HREF="8116ConstructingsmoothlineplotswithCubicSplines.html#8_1_16">
+8.1.16 Constructing smooth line plots with Cubic Splines</A></LI>
+<LI><A HREF="8117Addingplotmarkstoalineplot.html#8_1_17">8.1.17 Adding
+ plot marks to a line plot</A></LI>
+</UL>
+</LI>
+<LI><A HREF="82Bargraphs.html#8_2">8.2 Bar graphs</A>
+<UL>
+<LI><A HREF="821Adjustingthewidthofthebars.html#8_2_1">8.2.1 Adjusting
+ the width of the bars</A></LI>
+<LI><A HREF="822Displayingthevalueofeachbar.html#8_2_2">8.2.2 Displaying
+ the value of each bar</A></LI>
+<LI><A HREF="823Addingadropshadowtothebar.html#8_2_3">8.2.3 Adding a
+ drop shadow to the bar</A></LI>
+<LI><A HREF="824Adjustingthealignmentofbarsonatextscale.html#8_2_4">
+8.2.4 Adjusting the alignment of bars on a text scale</A></LI>
+<LI><A HREF="825Usinggroupedbarplots.html#8_2_5">8.2.5 Using grouped bar
+ plots</A></LI>
+<LI><A HREF="826Usingaccumulatedbarplots.html#8_2_6">8.2.6 Using
+ accumulated bar plots</A></LI>
+<LI><A HREF="827Usinggroupedaccumulatedbargraphs.html#8_2_7">8.2.7 Using
+ grouped accumulated bar graphs</A></LI>
+<LI><A HREF="828Horizontalbargraphs.html#8_2_8">8.2.8 Horizontal bar
+ graphs</A></LI>
+<LI><A HREF="829Usinggradientfillforbargraphs.html#8_2_9">8.2.9 Using
+ gradient fill for bar graphs</A></LI>
+<LI><A HREF="8210Creatingsemifilledbargraphs.html#8_2_10">8.2.10 
+ Creating semi-filled bar graphs</A></LI>
+</UL>
+</LI>
+<LI><A HREF="83Errorplots.html#8_3">8.3 Error plots</A>
+<UL>
+<LI><A HREF="831Usinglineerrorplots.html#8_3_1">8.3.1 Using line error
+ plots</A></LI>
+</UL>
+</LI>
+<LI><A HREF="84Scatterplots.html#8_4">8.4 Scatter plots</A></LI>
+<LI><A HREF="85Fieldplots.html#8_5">8.5 Field plots</A></LI>
+<LI><A HREF="86BoxandStockcharts.html#8_6">8.6 Box and Stock charts</A>
+<UL>
+<LI><A HREF="861StockCharts.html#8_6_1">8.6.1  Stock Charts</A></LI>
+<LI><A HREF="862BoxPLotsStockchartswithamedianline.html#8_6_2">8.6.2 
+BoxPLots : Stock charts with a median line</A></LI>
+<LI><A HREF="863ImagemapsforBoxandStockcharts.html#8_6_3">8.6.3 Image
+ maps for Box and Stock charts</A></LI>
+</UL>
+</LI>
+<LI><A HREF="87Combiningdifferentgraphtypes.html#8_7">8.7 Combining
+ different graph types</A></LI>
+<LI><A HREF="88Specifyingthescalemanually.html#8_8">8.8 Specifying the
+ scale manually</A></LI>
+<LI><A HREF="89Adjustingtheautomatictickmarks.html#8_9">8.9 Adjusting
+ the automatic tick marks</A></LI>
+<LI><A HREF="810Handlingdatetimescales.html#8_10">8.10 Handling
+ date/time scales</A>
+<UL>
+<LI><A HREF="8101Usingtheautomaticdatetimescale.html#8_10_1">8.10.1 
+Using the automatic date/time scale</A></LI>
+<LI><A HREF="8102Specifyingadatetimescalewithamanualcallback.html#8_10_2">
+8.10.2 Specifying a date/time scale with a manual call-back</A></LI>
+</UL>
+</LI>
+<LI><A HREF="811Adjustinglabelsonatextscale.html#8_11">8.11 Adjusting
+ labels on a text scale</A></LI>
+<LI><A HREF="812Addingarbitrarytextstringstothegraph.html#8_12">8.12 
+Adding arbitrary text strings to the graph</A></LI>
+<LI><A HREF="813AddingtitlesandfooterstotheGraph.html#8_13">8.13 Adding
+ titles and footers to the Graph</A></LI>
+<LI><A HREF="814Addingatabtitle.html#8_14">8.14 Adding a tab title</A></LI>
+<LI><A HREF="815Usingbackgroundimages.html#8_15">8.15 Using background
+ images</A></LI>
+<LI><A HREF="816Usingabackgroundgradient.html#8_16">8.16 Using a
+ background gradient</A></LI>
+<LI><A HREF="817UsingcallbacksforPlotmarks.html#8_17">8.17 Using
+ callbacks for Plot marks</A></LI>
+<LI><A HREF="818Rotatinggraphs90degrees.html#8_18">8.18 Rotating graphs
+ 90 degrees</A></LI>
+<LI><A HREF="819Formattingtheaxis.html#8_19">8.19 Formatting the axis</A>
+<UL>
+<LI><A HREF="8191Standardtwoaxisgraphs.html#8_19_1">8.19.1  Standard two
+ axis graphs</A></LI>
+<LI><A HREF="8192Scientificstyleaxis.html#8_19_2">8.19.2 Scientific
+ style axis</A></LI>
+<LI><A HREF="8193Adjustingthepositionofthescalelabels.html#8_19_3">
+8.19.3  Adjusting the position of the scale labels</A></LI>
+<LI><A HREF="8194Formattingthescalelabels.html#8_19_4">8.19.4 Formatting
+ the scale labels</A></LI>
+<LI><A HREF="8195InvertingtheYaxis.html#8_19_5">8.19.5 Inverting the
+ Y-axis</A></LI>
+</UL>
+</LI>
+<LI><A HREF="820Adjustingtheautoscalinglimitsgracevalue.html#8_20">8.20 
+Adjusting the auto-scaling limits - grace value</A></LI>
+<LI><A HREF="821Addingbandsofpatternandcolortographs.html#8_21">8.21 
+Adding bands of pattern and color to graphs</A>
+<UL>
+<LI><A HREF="8211Customizingthepatterns.html#8_21_1">8.21.1  Customizing
+ the patterns</A></LI>
+</UL>
+</LI>
+<LI><A HREF="822Addingstaticlinestotheplot.html#8_22">8.22  Adding
+ static lines to the plot</A></LI>
+</UL>
+<B><A HREF="9WorkingwithnonXYplots.html#9">9 Working with non X,Y-plots</A>
+</B>
+<UL>
+<LI><A HREF="91Radarplots.html#9_1">9.1 Radar plots</A>
+<UL>
+<LI><A HREF="911Simpleradarplots.html#9_1_1">9.1.1 Simple radar plots</A>
+</LI>
+<LI><A HREF="912Specifyingtitlesfortheaxisandlegendsfortheplots.html#9_1_2">
+9.1.2 Specifying titles for the axis and legends for the plots</A></LI>
+<LI><A HREF="913Addinggridlinetotheradarplot.html#9_1_3">9.1.3 Adding
+ grid line to the radar plot</A></LI>
+<LI><A HREF="914Addingseveralplotstothesameradargraph.html#9_1_4">9.1.4 
+Adding several plots to the same radar graph</A></LI>
+<LI><A HREF="915Addingplotmarksiradargraphs.html#9_1_5">9.1.5 Adding
+ plotmarks i radar graphs</A></LI>
+</UL>
+</LI>
+<LI><A HREF="92Pieplots.html#9_2">9.2 Pie plots</A>
+<UL>
+<LI><A HREF="921AddingguidelinestoPiePlots.html#9_2_1">9.2.1 Adding
+ guide lines to Pie Plots</A></LI>
+<LI><A HREF="922Creating3Dpieplots.html#9_2_2">9.2.2 Creating 3D pie
+ plots</A></LI>
+<LI><A HREF="923Explodingpieslices.html#9_2_3">9.2.3 Exploding pie
+ slices</A></LI>
+<LI><A HREF="924Specifyingandadjustinglabelsonpieplots.html#9_2_4">
+9.2.4 Specifying and adjusting labels on pie plots</A></LI>
+<LI><A HREF="925Specifyingslicecolorsandusingthemes.html#9_2_5">9.2.5 
+Specifying slice colors and using themes</A></LI>
+<LI><A HREF="926Addingdropshadowstotheslices.html#9_2_6">9.2.6 Adding
+ drop shadows to the slices</A></LI>
+<LI><A HREF="927Anothervariantof2DPieplots.html#9_2_7">9.2.7 Another
+ variant of 2D Pie plots</A></LI>
+</UL>
+</LI>
+<LI><A HREF="93Polarplots.html#9_3">9.3 Polar plots</A>
+<UL>
+<LI><A HREF="931Overview.html#9_3_1">9.3.1 Overview</A></LI>
+<LI><A HREF="932Adjustingtheradiusscale.html#9_3_2">9.3.2 Adjusting the
+ radius scale</A></LI>
+<LI><A HREF="933Adjustingthegridlines.html#9_3_3">9.3.3 Adjusting the
+ grid lines</A></LI>
+<LI><A HREF="934Adjustingthelabelfonts.html#9_3_4">9.3.4 Adjusting the
+ label fonts</A></LI>
+<LI><A HREF="935Adjustingthelabels.html#9_3_5">9.3.5 Adjusting the
+ labels</A></LI>
+<LI><A HREF="936Imagemaps.html#9_3_6">9.3.6 Image maps</A></LI>
+<LI><A HREF="937Afinalexample.html#9_3_7">9.3.7 A final example</A></LI>
+</UL>
+</LI>
+</UL>
+<B><A HREF="10Ganttcharts.html#10">10 Gantt charts</A></B>
+<UL>
+<LI><A HREF="101WhyuseGanttcharts.html#10_1">10.1 Why use Gantt charts?</A>
+</LI>
+<LI><A HREF="102CapabilitiesinJpGraphGanttmodule.html#10_2">10.2 
+Capabilities in JpGraph Gantt module</A></LI>
+<LI><A HREF="103AsimpleGanttchart.html#10_3">10.3 A simple Gantt chart</A>
+</LI>
+<LI><A HREF="104ThestructureofaGanttchart.html#10_4">10.4  The structure
+ of a Gantt chart</A></LI>
+<LI><A HREF="105CreatingaGanttChart.html#10_5">10.5 Creating a
+ GanttChart</A></LI>
+<LI><A HREF="106PositioningobjectsintheGanttplot.html#10_6">10.6 
+Positioning objects in the Gantt plot</A></LI>
+<LI><A HREF="107Ganttbars.html#10_7">10.7 Gantt bars</A>
+<UL>
+<LI><A HREF="1071Specifyingverticalposition.html#10_7_1">10.7.1 
+Specifying vertical position</A></LI>
+<LI><A HREF="1072Specifyingstartandendpositionforabar.html#10_7_2">
+10.7.2 Specifying start and end position for a bar</A></LI>
+<LI><A HREF="1073Milestones.html#10_7_3">10.7.3 Milestones</A></LI>
+<LI><A HREF="1074Verticalline.html#10_7_4">10.7.4 Vertical line</A></LI>
+<LI><A HREF="1075Addingmarkerstoaganttbar.html#10_7_5">10.7.5 Adding
+ markers to a gantt bar</A></LI>
+<LI><A HREF="1076Adjustingtheminimumdistancebetweenbars.html#10_7_6">
+10.7.6 Adjusting the minimum distance between bars</A></LI>
+</UL>
+</LI>
+<LI><A HREF="108Formattingthescaleheaders.html#10_8">10.8 Formatting the
+ scale headers</A>
+<UL>
+<LI><A HREF="1081Minutescale.html#10_8_1">10.8.1 Minute scale</A></LI>
+<LI><A HREF="1082Hourscale.html#10_8_2">10.8.2 Hour scale</A></LI>
+<LI><A HREF="1083Dayscale.html#10_8_3">10.8.3 Day scale</A></LI>
+<LI><A HREF="1084Weekscale.html#10_8_4">10.8.4 Week scale</A></LI>
+<LI><A HREF="1085Monthscale.html#10_8_5">10.8.5 Month scale</A></LI>
+<LI><A HREF="1086Yearscale.html#10_8_6">10.8.6 Year scale</A></LI>
+</UL>
+</LI>
+<LI><A HREF="109Moreformattingforbars.html#10_9">10.9 More formatting
+ for bars</A>
+<UL>
+<LI><A HREF="1091Addingcaptiontobars.html#10_9_1">10.9.1 Adding caption
+ to bars</A></LI>
+<LI><A HREF="1092Addingprogressindicatorstobars.html#10_9_2">10.9.2 
+Adding progress indicators to bars</A></LI>
+</UL>
+</LI>
+<LI><A HREF="1010Groupingactivities.html#10_10">10.10 Grouping
+ activities</A></LI>
+<LI><A HREF="1011Usingmultiplecolumnsastitles.html#10_11">10.11 Using
+ multiple columns as titles</A>
+<UL>
+<LI><A HREF="10111Addingatitleforthecolumns.html#10_11_1">10.11.1 Adding
+ a title for the columns</A></LI>
+<LI><A HREF="10112SpecifyingCSIMentriesforcolumntitles.html#10_11_2">
+10.11.2 Specifying CSIM entries for column titles</A></LI>
+</UL>
+</LI>
+<LI><A HREF="1012MoregeneralGanttformatting.html#10_12">10.12 More
+ general Gantt formatting</A>
+<UL>
+<LI><A HREF="10121Addingatabletitle.html#10_12_1">10.12.1 Adding a table
+ title</A></LI>
+<LI><A HREF="10122Modifyingthedividerlines.html#10_12_2">10.12.2 
+Modifying the divider lines</A></LI>
+<LI><A HREF="10123Modifyingtheboxaroundtheplot.html#10_12_3">10.12.3 
+Modifying the box around the plot</A></LI>
+<LI><A HREF="10124Horizontalgridsandalternatinglinecolors.html#10_12_4">
+10.12.4 Horizontal grids and alternating line colors</A></LI>
+<LI><A HREF="10125AddingiconstoGanttgraphs.html#10_12_5">10.12.5 Adding
+ icons to Gantt graphs</A></LI>
+<LI><A HREF="10126Adjustingthemarginswithautosizing.html#10_12_6">
+10.12.6 Adjusting the margins with auto-sizing</A></LI>
+</UL>
+</LI>
+<LI><A HREF="1013SimplifyingthedrawingofGanttgraphs.html#10_13">10.13 
+Simplifying the drawing of Gantt graphs</A></LI>
+<LI><A HREF="1014AddingCSIMClientsideImageMapstoGanttcharts.html#10_14">
+10.14 Adding CSIM (Client side Image Maps) to Gantt charts</A></LI>
+<LI><A HREF="1015Addingconstrainsbetweenyouractivities.html#10_15">
+10.15 Adding constrains between your activities</A></LI>
+<LI><A HREF="1016Advancedformatting.html#10_16">10.16 Advanced
+ formatting</A>
+<UL>
+<LI><A HREF="10161Showingonlypartofthegraph.html#10_16_1">10.16.1 
+Showing only part of the graph</A></LI>
+<LI><A HREF="10162Specifyingstartdayofweek.html#10_16_2">10.16.2 
+Specifying start day of week</A></LI>
+</UL>
+</LI>
+<LI><A HREF="1017Localizing.html#10_17">10.17 Localizing</A></LI>
+<LI><A HREF="1018AntialiasinginJpGraph.html#10_18">10.18 Anti-aliasing
+ in JpGraph</A>
+<UL>
+<LI><A HREF="10181Enablingantialiasedlines.html#10_18_1">10.18.1 
+Enabling anti-aliased lines</A></LI>
+</UL>
+</LI>
+<LI><A HREF="1019Rotatingthegraphs.html#10_19">10.19 Rotating the graphs</A>
+</LI>
+<LI><A HREF="1020Adjustingbrightnessandcontrastforimagesandbackgrounds.html#10_20">
+10.20 Adjusting brightness and contrast for images and backgrounds</A></LI>
+<LI><A HREF="1021Timingthegenerationofgraphs.html#10_21">10.21 Timing
+ the generation of graphs</A></LI>
+<LI><A HREF="1022Usingcountryflagsinvariouscontext.html#10_22">10.22 
+Using country flags in various context</A></LI>
+<LI><A HREF="1023Addingiconsontothegraph.html#10_23">10.23 Adding icons
+ onto the graph</A></LI>
+</UL>
+<B><A HREF="11Workingwithcanvasgraphs.html#11">11 Working with canvas
+ graphs</A></B>
+<UL>
+<LI><A HREF="111Introduction.html#11_1">11.1 Introduction</A></LI>
+<LI><A HREF="112Creatingasimplecanvas.html#11_2">11.2 Creating a simple
+ canvas</A></LI>
+<LI><A HREF="113Addinglinesandrectanglestoacanvas.html#11_3">11.3 Adding
+ lines and rectangles to a canvas</A></LI>
+<LI><A HREF="114Usingacanvasscale.html#11_4">11.4 Using a canvas scale</A>
+</LI>
+<LI><A HREF="115SampleapplicationDrawingDBschema.html#11_5">11.5 Sample
+ application: Drawing DB schema</A></LI>
+</UL>
+<B><A HREF="12AntiSpamChallenges.html#12">12 Anti-Spam Challenges</A></B>
+<UL>
+<LI><A HREF="121GeneratingAntiSpamchallenge.html#12_1">12.1 Generating
+ Anti-Spam challenge</A></LI>
+</UL>
+<B><A HREF="13GeneratingLEDlikedigitswithJpGraph.html#13">13 Generating
+ LED-like digits with JpGraph</A></B>
+<UL>
+<LI><A HREF="131AdjustingthesizeoftheLEDdigits.html#13_1">13.1 Adjusting
+ the size of the LED digits</A></LI>
+<LI><A HREF="132ImprovingtheLEDswithsupersampling.html#13_2">13.2 
+Improving the LEDs with supersampling</A></LI>
+</UL>
+<B><A HREF="14CodedefinesinJpGraph.html#14">14 Code defines in JpGraph</A>
+</B><HR NOSHADE>
+</BODY>
+</HTML>

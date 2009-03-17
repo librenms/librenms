@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; CHARSET=iso-iso-8859-1">
+<LINK REL="Start" HREF="index.html">
+<LINK REL="Contents" HREF="toc.html">
+<LINK REL="Prev" HREF="728Horizontalbargraphs.html">
+<LINK REL="Next" HREF="7210Creatingsemifilledbargraphs.html">
+<STYLE TYPE="text/css"><!--
+BODY { font-family: serif }
+H1 { font-family: sans-serif }
+H2 { font-family: sans-serif }
+H3 { font-family: sans-serif }
+H4 { font-family: sans-serif }
+H5 { font-family: sans-serif }
+H6 { font-family: sans-serif }
+SUB { font-size: smaller }
+SUP { font-size: smaller }
+PRE { font-family: monospace }
+A { text-decoration: none }
+--></STYLE>
+</HEAD>
+<BODY>
+<A HREF="toc.html">Contents</A>
+<A HREF="728Horizontalbargraphs.html">Previous</A>
+<A HREF="7210Creatingsemifilledbargraphs.html">Next</A>
+<HR NOSHADE>
+<H3><A NAME="7_2_9">7.2.9 Using gradient fill for bar graphs</A></H3>
+<P> It is possible to use color gradient fill for the individual bars in
+ the bar graph.</P>
+<P> Color gradient fill fills a rectangle with a smooth transition
+ between two colors. In what direction the transition goes (from left to
+ right, down and up, from the middle and out etc) is determined by the
+ style of the gradient fill. JpGraph currently supports 8 different
+ styles. All supported styles are displayed in the figure below.<DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex1.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex1.png" WIDTH="200"></A>
+<BR><B>Figure 48:</B> <A href="exframes/frame_bargradsmallex1.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex2.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex2.png" WIDTH="200"></A>
+<BR><B>Figure 49:</B> <A href="exframes/frame_bargradsmallex2.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex3.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex3.png" WIDTH="200"></A>
+<BR><B>Figure 50:</B> <A href="exframes/frame_bargradsmallex3.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex4.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex4.png" WIDTH="200"></A>
+<BR><B>Figure 51:</B> <A href="exframes/frame_bargradsmallex4.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex5.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex5.png" WIDTH="200"></A>
+<BR><B>Figure 52:</B> <A href="exframes/frame_bargradsmallex5.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex6.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex6.png" WIDTH="200"></A>
+<BR><B>Figure 53:</B> <A href="exframes/frame_bargradsmallex6.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex7.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex7.png" WIDTH="200"></A>
+<BR><B>Figure 54:</B> <A href="exframes/frame_bargradsmallex7.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P><DIV class="example">
+<BR> <A href="exframes/frame_bargradsmallex8.html" target="blank"><IMG border="0"
+HEIGHT="150"       src="img/img/img/img/img/img/bargradsmallex8.png" WIDTH="200"></A>
+<BR><B>Figure 55:</B> <A href="exframes/frame_bargradsmallex8.html" target="blank">
+[src]</A>&nbsp;
+<P></P>
+</DIV></P>
+<P></P>
+<P> To specify a gradient fill for the bar plots you make use of the
+ method <A href="../ref/BarPlot.html#_BARPLOT_SETFILLGRADIENT">
+ BarPlot::SetFillGradient()</A> . See the class reference for details of
+ this function.</P>
+<P> When using gradient fills there are a couple of caveats you should
+ be aware of:</P>
+<UL>
+<LI>gradient filling is computational expensive. Large plots with
+ gradient fill will take in the order of 6 times longer to fill then for
+ a normal one-color fill. This might to some extent be helped by making
+ use of the cache feature of JpGraph so that the graph is only generated
+ a few times.</LI>
+<LI>gradient filling will make use of much more colors (by definition)
+ this will make the color palette for the image bigger and hence make
+ the overall image larger. It might also have some severe effect on
+ using anti-aliased line in the same image as color gradient filling
+ since anti-aliased lines also have the possibility to make use of many
+ colors. Hence the color palette might not be big enough for all the
+ colors you need. So if you use gradient fills you should also be using
+ a true-color image since you otherwise run out of colors.
+<BR> This problem is often seen as that for no apparent reason some
+ color you have specified in the image does appear as another color.
+ (This is not a bug in JpGraph!) This is something to especially watch
+ out for when enabling anti-aliasing since that also uses a lot of
+ colors. Since the numbers of colors used with anti-aliasing depends on
+ the angle on the lines it is impossible to foresee the number of colors
+ used for this.</LI>
+</UL>
+<P></P>
+<HR NOSHADE>
+<A HREF="toc.html">Contents</A>
+<A HREF="728Horizontalbargraphs.html">Previous</A>
+<A HREF="7210Creatingsemifilledbargraphs.html">Next</A>
+</BODY>
+</HTML>

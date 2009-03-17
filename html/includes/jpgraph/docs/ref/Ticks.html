@@ -1,0 +1,306 @@
+<style type="text/css">
+		<!--
+		A:link        {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:visited     {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: none; color: #0000ff}
+		A:hover       {font-family: helvetica, arial, geneva, sans-serif; font-size: x-small; text-decoration: underline; color: #FF0000}
+		th            {font-family: helvetica, arial; color : blue; font-size:85%; background : lightgrey; border-right:black solid 1pt; border-bottom:black solid 1pt;}
+		//-->
+		</style><hr><a name="_C_TICKS"><div style="background-color:yellow;font-family:courier new;"></a>CLASS <b>Ticks</b></div>
+<i>(Defined in: jpgraph.php : 3942)</i><table border=1><tr><td>&nbsp;<a href="Ticks.html" style="font-family:arial;font-weight:bold;color:darkblue;">Ticks</a>&nbsp;</td></tr><tr><td valign=top>&nbsp;<a href="Ticks.html#_TICKS_SET">Set()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETCOLOR">SetColor()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETFORMATCALLBACK">SetFormatCallback()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETLABELFORMAT">SetLabelFormat()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETSIDE">SetSide()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETSIZE">SetSize()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SETWEIGHT">SetWeight()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SUPRESSFIRST">SupressFirst()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SUPRESSLAST">SupressLast()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SUPRESSMINORTICKMARKS">SupressMinorTickMarks()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SUPRESSTICKMARKS">SupressTickMarks()</a>&nbsp;<br>
+&nbsp;<a href="Ticks.html#_TICKS_SUPRESSZEROLABEL">SupressZeroLabel()</a>&nbsp;<br>
+</td></tr></table>&nbsp;<p><div style="font-weight:bold;font-family:arial;font-size:100%;">Class usage and Overview</div>This is the abstract base class for ticks. Specifying the common signature for both linear and logartihmic ticks.
+
+Ticks are normally a property of the scale and can be accessed via the $graph->scale->ticks property.
+ <p> &nbsp;
+<hr><span style="font-family:arial;font-size:120%;font-weight:bold;">Class Methods</span><hr><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SET"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;Set($aMaj,$aMin)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set the distance between major and minor tick marks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMaj</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Distance (world coordinates) for major tick marks</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMin</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Distance (world coordinates) for minor tick marks</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Set the distance between major and minor tick marks. Note that when the scale is specified manually then the tick marks must also be specified manually.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Graph.html#_GRAPH_SETSCALE">Graph::SetScale</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;Set(10,5);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETCOLOR"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetColor($aMajorColor,$aMinorColor)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set color for tick marks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMajorColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Major tick mark color</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMinorColor</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+""</font>
+</td><td>Minor tick mark color</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify tick mark colors. If no minor tick mark color is specified then it will be the same as the major tick marks color.&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;SetColor('red','black');<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETFORMATCALLBACK"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetFormatCallback($aCallbackFuncName)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify a format callback function for labels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aCallbackFuncName</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>name of function</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specifies a callback function which will be called and given each tick label in turn as the argument. The callback function is supposed to return a proper formatted label to be displayed.
+
+Note: There is a shortcut to this method through the Axis::SetLabelFormatCallback.
+
+Note 2: The PHP function number_format() is often usefull in callback functions.
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Axis.html#_AXIS_SETLABELFORMATCALLBACK">Axis::SetLabelFormatCallback</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+//&nbsp;Callback&nbsp;function&nbsp;for&nbsp;Y-scale.&nbsp;Use&nbsp;money&nbsp;format&nbsp;with<br />//&nbsp;a&nbsp;','&nbsp;to&nbsp;separate&nbsp;1000:s<br />function&nbsp;yScaleCallback($aVal)&nbsp;{<br />&nbsp;&nbsp;&nbsp;&nbsp;return&nbsp;number_format($aVal);<br />}<br /><br /><br />//&nbsp;Short&nbsp;for&nbsp;$graph-&gt;yaxis-&gt;scale-&gt;ticks-&gt;SetFormatCallback()<br />$graph-&gt;yaxis-&gt;SetLabelFormatCallback('yScaleCallback');<br /><br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETLABELFORMAT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetLabelFormat($aFormatString,$aDate)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Set format string for automatic labels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFormatString</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Specify a printf() style format string</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aDate</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+FALSE</font>
+</td><td>No description available</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify a printf() style format string.
+
+Note: Can also be called trough the shortcut Axis::SetLabelFormatString()
+&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Ticks.html#_TICKS_SETFORMATCALLBACK">Ticks::SetFormatCallback</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;yaxis-&gt;SetLabelFormatString("%-02.1f");</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETSIDE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSide($aSide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify side of axis for ticks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aSide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Side</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Synonym for SetDirection().
+Specify what side of the axis the tick marks should be drawn on. For Y -axis the possible directions are
+
+<ul>
+<li>SIDE_LEFT
+<li>SIDE_RIGHT
+</ul>
+
+and for X-axis the possible parameters are
+
+<ul>
+<li> SIDE_UP
+<li> SIDE_DOWN
+</ul>&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Axis.html#_AXIS_SETTICKSIDE">Axis::SetTickSide</a>, <a href="Axis.html#_AXIS_SETLABELSIDE">Axis::SetLabelSide</a> and <a href="Axis.html#_AXIS_SETTITLESIDE">Axis::SetTitleSide</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;ticks-&gt;SetSide(SIDE_UP);<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETSIZE"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetSize($aMajSize,$aMinSize)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify absolute size of tick marks in pixels</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMajSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Major tick size</td></tr>
+
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aMinSize</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+3</font>
+</td><td>Minor tick size</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify absolute size of tick marks in pixels&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;ticks-&gt;SetSize(8,3);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SETWEIGHT"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SetWeight($aWeight)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Specify width of tick marks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aWeight</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'>&nbsp;</td><td>Width (in pixels)</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Specify width of tick marks&nbsp;<br>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;ticks-&gt;SetWeight(2);</font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SUPRESSFIRST"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SupressFirst($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide the first tick mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide the vbery first tick mark on the axis</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide the first tick mark on the axis.&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Ticks.html#_TICKS_SUPRESSLAST">Ticks::SupressLast</a>
+<div style="font-weight:bold;font-family:arial;font-size:85%;"><p>Example</div><span style="font-family:courier;font-size:85%;"><font color="#000000">
+$graph-&gt;xaxis-&gt;scale-&gt;ticks-&gt;SupressFirst();<br /></font>
+</span><br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SUPRESSLAST"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SupressLast($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide the last tick mark</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide the last tick mark</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide the last tick mark on the axis&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Ticks.html#_TICKS_SUPRESSFIRST">Ticks::SupressFirst</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SUPRESSMINORTICKMARKS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SupressMinorTickMarks($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide all minor tick marks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide minor tick marks</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide all minor tick marks&nbsp;<br>
+<p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SUPRESSTICKMARKS"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SupressTickMarks($aHide)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Hide major tick marks</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aHide</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide major tick marks</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide major tick marks&nbsp;<br>
+ &nbsp; <div style="font-weight:bold;font-family:arial;font-size:85%;">See also</div><a href="Ticks.html#_TICKS_SUPRESSMINORTICKMARKS">Ticks::SupressMinorTickMarks</a><p>
+<p>&nbsp; <p> &nbsp; <span style='font-size:110%;'><a name="_TICKS_SUPRESSZEROLABEL"><div style="border-top:solid black 2pt;background-color:lightblue;font-family:courier new;font-size:90%;font-weight:bold;"><b><font color="#000000">
+function&nbsp;SupressZeroLabel($aFlag)</font>
+</b></div></a></span>
+
+<span style='font-family:arial;font-size:90%;'><i>Don't display the first zero label</i></span><p>
+
+<table cellspacing=0 style='border:black solid 1pt;' width=100%>
+<tr><th width=25%>Argument</th><th width=15%>Default</th><th width=60%>Description</th></tr>
+<tr><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+$aFlag</font>
+
+</td><td style='border-right:black solid 1pt;font-family:courier;font-size:90%;font-weight:bold;'><font color="#000000">
+true</font>
+</td><td>True=Hide zero-label</td></tr>
+</table>
+
+<div style="font-weight:bold;font-family:arial;font-size:85%;">Description</div>Hide any label with numeric value == 0.0&nbsp;<br>
+<p> <hr> <p>
