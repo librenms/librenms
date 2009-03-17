@@ -1,0 +1,157 @@
+
+             THANKS - List of credits for GeSHi
+
+I owe these people/groups my thanks for help with GeSHi. Thanks, guys!
+
+- Amit Gupta            - Thanks for all that constructive criticism - it's
+                          a great help for making GeSHi even better. And
+                          thanks for the Wordpress plugin! (Anyone who is
+                          interested in the plugin can visit:
+                          http://blog.igeek.info/still-fresh/category/wp-plugins/igsyntax-hiliter/)
+- Andreas Gohr          - Thanks for language files and for using GeSHi for DokuWiki
+                          (http://www.splitbrain.org/dokuwiki/wiki:dokuwiki). And thanks
+                          for all your criticisms and for that stylesheet-maker code :).
+                          Also, thanks for the UTF-8 patch.
+- Andreas von Oettingen - Thanks for those great ideas! :)
+- bbspliff              - Thanks for pointing out that bug (pity I already
+                          found it though ;))
+- Benny Baumann         - Thanks for your innumerable suggestions for improvements, and your
+                          work on Delphi support :)
+- Ben Keen              - Thanks for the language files and pointing out some
+                          ideas for future releases. Lookin' forward to seeing that
+                          software soon! ;)
+- Brian Cheesman        - Thanks for using GeSHi in phpCvsView, and for the suggestion about
+                          extension => language lookup
+- Christian Weiske      - Thanks for the inspiration for creating advanced regexp
+                          highlighting :D
+- Cliff Stanford        - Thanks for the hardquote support for C# and Perl (can be used elsewhere
+                          I'm sure)
+- David Gartner         - Thanks for using GeSHi in net2ftp, and for the idea about a load_from_file
+                          method
+- forum.qbasicnews.com  - Thanks for putting up with the crappy versions
+                          that I "forced" on you guys before ;)
+- Jack Lloyd            - Thanks for pointing out the versioning and method CSS bugs, and giving
+                          me the extra C/C++ keywords
+- Karim Scheik          - Thanks for the php5 support report
+- Marcin Gryszkalis     - Thanks for those links for C, Java, Perl
+- M. Uli Kusterer       - Thanks for the idea about URL case conversion
+- Milian Wolff          - Thanks for the loads of optimizations
+                        - Thanks for helping with implementation of various features
+- Roberto Armellin      - Thanks for pointing out some flaws in GeSHi (that will be solved
+                          in 1.2 guaranteed)
+- Sterling Christensen  - Thanks for those links to language specs
+- Tux                   - Thanks for making all those language files :D
+- zbw                   - Thanks for proving a phpBB port was possible
+
+PEOPE WHO MADE LANGUAGE FILES
+
+- ABAP                   Andres Picazo
+- Actionscript           Steffen Krause (french translation by NikO)
+- ActionScript 3         Jordi Boggiano (version for ActionScript3 and MXML)
+- Ada                    Tux
+- Apache                 Tux
+- Applescript            Stephan Klimek
+- Apt sources.list       Milian Wolff
+- ASM                    Tux
+- ASP                    Amit Gupta
+- AutoIT                 mastrboy
+- AviSynth               Ryan Jones
+- Bash                   Andreas Gohr
+- Basic4GL               Matthew Webb
+- BlitzBasic             P�draig O`Connel
+- BNF                    Rowan Rodrik van der Molen
+- Boo                    Marcus Griep
+- Brainfuck \ Brainfork  Benny Baumann
+- C++                    Dennis Bayer, M. Uli Kusterer
+- C++/QT                 Iulian M
+- C#                     Alan Juden
+- C for Macs             M. Uli Kusterer
+- CADDCL                 Roberto Rossi
+- CadLisp                Roberto Rossi
+- CDFG                   John Horigan
+- CIL                    Marcus Griep
+- COBOL                  Benny Baumann
+- ColdFusion             Diego
+- D                      Thomas Kuehne
+- Delphi                 Járja Norbert, Benny Baumann
+- Div                    Gabriel Lorenzo
+- DOS                    Alessandro Staltari
+- Eiffel                 Zoran Simic
+- eMail \ mbox           Benny Baumann
+- FreeBasic              Roberto Rossi
+- Fortran                Cedric Arrabie
+- glSlang                Benny Baumann
+- Gettext                Milian Wolff
+- GNU make               Neil Bird
+- Gnuplot                Milian Wolff
+- GML                    José Jorge Enríquez Rodríguez
+- Groovy                 Ivan F. Villanueva B.
+- Haskell                Dagit
+- HQ9+                   Benny Baumann
+- Ini                    Deguix
+- Inno                   Thomas Klinger
+- INTERCAL               Benny Baumann
+- Java 5                 Clemens Bruckmann
+- Javascript             Ben Keen
+- KiXtart                Riley McArdle
+- KLone C                Mickael Auger
+- KLone C++              Mickael Auger
+- LaTeX                  Matthais Pospiech
+- Lisp                   Roberto Rossi
+- LOLcode                Benny Baumann
+- LScript                Beau McGuigan
+- Lua                    Roberto Rossi
+- m86k                   Benny Baumann
+- mIRC                   Alberto de Areba Sánchez
+- MPASM                  Bakalex
+- MXML                   David Spurr
+- MySQL                  Carl Fürstenberg, Marjolein Katsma
+- NSIS                   Tux, Deguix
+- Objective C            M. Uli Kusterer
+- Ocaml                  Flaie
+- Ocaml-brief            Flaie
+- OpenOffice.org BASIC   Roberto Rossi
+- Oracle 8               Guy Wicks
+- Oracle 11i             Simon Redhead
+- Pascal                 Tux
+- Perl                   Andreas Gohr, Ben Keen
+- PIC16xxx assembler     Phil Mattison
+- Pixel Bender           Richard Olsson
+- PL/SQL                 Victor Engmark
+- POV-Ray                Carl Fürstenberg
+- PowerShell             Frode Aarebrot
+- Progress               Marco Aurelio de Pasqual
+- Prolog                 Benny Baumann
+- ProvideX               Jeff Wilder
+- Python                 Roberto Rossi
+- Rails                  Moises Deniz
+- Reg                    SmokingRope
+- Robots                 Christian Lescuyer
+- Ruby                   Amit Gupta, Moises Deniz
+- SAS                    Galen Johnson
+- SDLBasic               Roberto Rossi
+- Scheme                 Jon Raphaelson
+- SciLab                 Christophe David
+- Smalltalk              Bananeweizen
+- Smarty                 Alan Juden
+- T-SQL                  Duncan Lock
+- TeraTerm               Boris Maisuradze
+- Text                   SmokingRope
+- TCL                    Reid van Melle
+- thinBasic              Eros Olmi
+- TypoScript             Jan-Philipp Halle
+- Uno IDL                Cedric Bosdonnat
+- VB                     Roberto Rossi
+- VB.NET                 Alan Juden
+- Verilog                Günter Dannoritzer
+- VIM Script             Swaroop C H
+- Visual FoxPro          Roberto Armellin
+- Visual Prolog          Thomas Linder Puls
+- Whitespace             Benny Baumann
+- Winbatch               Craig Storey
+- X++                    Simon Butcher
+- Xorg config            Milian Wolff
+- Z80 Assembler          Benny Baumann
+
+Do you want your name in here? Help me out! Make a language file, or suggest a new
+feature, or make a plugin for GeSHi for some other software, then tell me about it!
