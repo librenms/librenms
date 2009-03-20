@@ -1,4 +1,4 @@
-<script type="text/javascript" src="js/tw-sack.js"></script>
+<script type="text/javascript" src="<?php echo($config['base_url']); ?>/js/tw-sack.js"></script>
 <script type="text/javascript">
 
 
@@ -12,7 +12,7 @@ function getInterfaceList(sel)
                 var index = ajax.length;
                 ajax[index] = new sack();
 
-                ajax[index].requestFile = 'list_interfaces.php?device_id='+deviceId;    // Specifying which file to get
+                ajax[index].requestFile = '<?php echo($config['base_url']); ?>/ajax/list_interfaces.php?device_id='+deviceId;    // Specifying which file to get
                 ajax[index].onCompletion = function(){ createInterfaces(index) };       // Specify function that will be executed after file has been found
                 ajax[index].runAJAX();          // Execute AJAX function
         }

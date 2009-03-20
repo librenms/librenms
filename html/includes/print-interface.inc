@@ -28,7 +28,7 @@
 #  $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
 
   
-  echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top>
+  echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='#fdd';\" onmouseout=\"this.style.backgroundColor='$bg';\" onclick=\"location.href='/device/".$device['device_id']."/'\" style='cursor: hand;'>
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
