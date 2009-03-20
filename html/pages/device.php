@@ -41,7 +41,7 @@ if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id =
   echo("
 <li class=" . $select['vlans'] . ">
   <a href='/device/" . $device['device_id'] . "/vlans/'>
-    <img src='images/16/vlans.png' align=absmiddle border=0> VLANs
+    <img src='images/16/vlans.png' align='absmiddle' border='0'> VLANs
   </a>
 </li>");
 }
