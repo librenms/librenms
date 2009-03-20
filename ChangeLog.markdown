@@ -1,5 +1,12 @@
 # Mouse Wheel ChangeLog
 
+# 3.0.1
+
+* Fixed delta being opposite value in latest Opera
+* No longer fix pageX, pageY for older mozilla browsers
+* Removed browser detection
+
+
 # 3.0
 
 * Uses new special events API in jQuery 1.2.2+

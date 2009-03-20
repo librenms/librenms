@@ -4,7 +4,7 @@
  * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
  *
- * Version: 3.0.1-pre
+ * Version: 3.0.1
  * 
  * Requires: 1.2.2+
  */
@@ -14,51 +14,35 @@
 $.event.special.mousewheel = {
 	setup: function() {
 		var handler = $.event.special.mousewheel.handler;
-		
-		// Fix pageX, pageY, clientX and clientY for mozilla
-		if ( $.browser.mozilla )
-			$(this).bind('mousemove.mousewheel', function(event) {
-				$.data(this, 'mwcursorposdata', {
-					pageX: event.pageX,
-					pageY: event.pageY,
-					clientX: event.clientX,
-					clientY: event.clientY
-				});
-			});
 	
-		if ( this.addEventListener )
-			this.addEventListener( ($.browser.mozilla ? 'DOMMouseScroll' : 'mousewheel'), handler, false);
-		else
+		if ( this.addEventListener ) {
+			this.addEventListener( 'DOMMouseScroll', handler, false);
+			this.addEventListener( 'mousewheel', handler, false);
+		} else
 			this.onmousewheel = handler;
 	},
 	
 	teardown: function() {
 		var handler = $.event.special.mousewheel.handler;
 		
-		$(this).unbind('mousemove.mousewheel');
-		
-		if ( this.removeEventListener )
-			this.removeEventListener( ($.browser.mozilla ? 'DOMMouseScroll' : 'mousewheel'), handler, false);
-		else
-			this.onmousewheel = function(){};
-		
-		$.removeData(this, 'mwcursorposdata');
+		if ( this.removeEventListener ) {
+			this.removeEventListener( 'DOMMouseScroll', handler, false);
+			this.removeEventListener( 'mousewheel', handler, false);
+		} else
+			this.onmousewheel = null;
 	},
 	
 	handler: function(event) {
-		var args = Array.prototype.slice.call( arguments, 1 );
+		var args = [].slice.call( arguments, 1 );
 		
 		event = $.event.fix(event || window.event);
-		// Get correct pageX, pageY, clientX and clientY for mozilla
-		$.extend( event, $.data(this, 'mwcursorposdata') || {} );
 		var delta = 0, returnValue = true;
 		
 		if ( event.wheelDelta ) delta = event.wheelDelta/120;
 		if ( event.detail     ) delta = -event.detail/3;
-		if ( $.browser.opera  ) delta = -event.wheelDelta;
 		
-		event.data  = event.data || {};
-		event.type  = "mousewheel";
+		event.data = event.data || {};
+		event.type = "mousewheel";
 		
 		// Add delta to the front of the arguments
 		args.unshift(delta);
