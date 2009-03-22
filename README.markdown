@@ -2,6 +2,7 @@
 
 A jQuery plugin that adds cross-browser mouse wheel support.
 
+The latest stable release can be downloaded from the [project page](http://plugins.jquery.com/project/mousewheel)
 
 ## License
 
