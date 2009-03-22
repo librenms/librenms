@@ -4,53 +4,30 @@
  * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
  *
- * Version: 3.0.1
+ * Version: 3.0.2
  * 
  * Requires: 1.2.2+
  */
 
 (function($) {
 
+var types = ['DOMMouseScroll', 'mousewheel'];
+
 $.event.special.mousewheel = {
 	setup: function() {
-		var handler = $.event.special.mousewheel.handler;
-	
-		if ( this.addEventListener ) {
-			this.addEventListener( 'DOMMouseScroll', handler, false);
-			this.addEventListener( 'mousewheel', handler, false);
-		} else
+		if ( this.addEventListener )
+			for ( var i=types.length; i; )
+				this.addEventListener( types[--i], handler, false );
+		else
 			this.onmousewheel = handler;
 	},
 	
 	teardown: function() {
-		var handler = $.event.special.mousewheel.handler;
-		
-		if ( this.removeEventListener ) {
-			this.removeEventListener( 'DOMMouseScroll', handler, false);
-			this.removeEventListener( 'mousewheel', handler, false);
-		} else
+		if ( this.removeEventListener )
+			for ( var i=types.length; i; )
+				this.removeEventListener( types[--i], handler, false );
+		else
 			this.onmousewheel = null;
-	},
-	
-	handler: function(event) {
-		var args = [].slice.call( arguments, 1 );
-		
-		event = $.event.fix(event || window.event);
-		event.currentTarget = this;
-		var delta = 0, returnValue = true;
-		
-		if ( event.wheelDelta ) delta = event.wheelDelta/120;
-		if ( event.detail     ) delta = -event.detail/3;
-		
-		event.data = event.data || {};
-		event.type = "mousewheel";
-		
-		// Add delta to the front of the arguments
-		args.unshift(delta);
-		// Add event to the front of the arguments
-		args.unshift(event);
-
-		return $.event.handle.apply(this, args);
 	}
 };
 
@@ -63,5 +40,21 @@ $.fn.extend({
 		return this.unbind("mousewheel", fn);
 	}
 });
+
+
+function handler(event) {
+	var args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true;
+	
+	event = $.event.fix(event || window.event);
+	event.type = "mousewheel";
+	
+	if ( event.wheelDelta ) delta = event.wheelDelta/120;
+	if ( event.detail     ) delta = -event.detail/3;
+	
+	// Add events and delta to the front of the arguments
+	args.unshift(event, delta);
+
+	return $.event.handle.apply(this, args);
+}
 
 })(jQuery);

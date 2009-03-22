@@ -1,11 +1,17 @@
 # Mouse Wheel ChangeLog
 
-# 3.0.1
 
-* Normalize event.currentTarget
+# 3.0.2
+
 * Fixed delta being opposite value in latest Opera
 * No longer fix pageX, pageY for older mozilla browsers
 * Removed browser detection
+* Cleaned up the code
+
+
+# 3.0.1
+
+* Bad release... creating a new release due to plugins.jquery.com issue :(
 
 
 # 3.0
