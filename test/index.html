@@ -1,10 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!doctype html>
 <html>
 	<head>
 		<title>Testing mousewheel plugin</title>
-		<link rel="Stylesheet" media="screen" href="../../../qunit/testsuite.css" />
-		<script type="text/javascript" src="jquery.js"></script>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js"></script>
 		<script type="text/javascript" src="../jquery.mousewheel.js"></script>
 		
 		<style>
@@ -71,6 +69,15 @@
 				clear: both;
 				height: 1000px;
 			}
+			
+			#logger {
+				position: absolute;
+				top: 395px;
+				left: 12px;
+				width: 380px;
+				height: 290px;
+				overflow: auto;
+			}
 		</style>
 		<script type="text/javascript">
 			$(function() {
@@ -80,47 +87,47 @@
 				$('#test1')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test1: up ('+delta+')<br />');
+							log('#test1: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test1: down ('+delta+')<br />');
+							log('#test1: down ('+delta+')');
 						
-						$('#logger').append('pageX: ' + event.pageX + ' pageY: ' + event.pageY );
+						log('pageX: ' + event.pageX + ' pageY: ' + event.pageY );
 					});
 				
 				$('#test2')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test2: up ('+delta+')<br />');
+							log('#test2: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test2: down ('+delta+')<br />');
+							log('#test2: down ('+delta+')');
 						return false; // prevent default
 					});
 				
 				$('#test3')
-					.hover(function() { $('#logger').append('#test3: mouseover'); }, function() { $('#logger').append('#test3: mouseout'); })
+					.hover(function() { log('#test3: mouseover'); }, function() { log('#test3: mouseout'); })
 					.mousewheel(function(event, delta) {
-						$('#logger').append('#test3: I should not have been logged');
+						log('#test3: I should not have been logged');
 					})
 					.unmousewheel();
 				
 				var testRemoval = function(event, delta) {
-					$('#logger').append('#test4: I should not have been logged');
+					log('#test4: I should not have been logged');
 				};
 				
 				$('#test4')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test4: up ('+delta+')<br />');
+							log('#test4: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test4: down ('+delta+')<br />');
+							log('#test4: down ('+delta+')');
 						return false;
 					})
 					.mousewheel(testRemoval)
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test4: up ('+delta+') from 2nd handler');
+							log('#test4: up ('+delta+') from 2nd handler');
 						else if (delta < 0)
-							$('#logger').append('#test4: down ('+delta+') from 2nd handler');
+							log('#test4: down ('+delta+') from 2nd handler');
 						return false;
 					})
 					.unmousewheel(testRemoval);
@@ -128,9 +135,9 @@
 				$('#test5')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test5: up ('+delta+')<br />');
+							log('#test5: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test5: down ('+delta+')<br />');
+							log('#test5: down ('+delta+')');
 						
 						event.stopPropagation();
 						event.preventDefault();
@@ -139,9 +146,9 @@
 				$('#test6')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test6: up ('+delta+')<br />');
+							log('#test6: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test6: down ('+delta+')<br />');
+							log('#test6: down ('+delta+')');
 						
 						event.stopPropagation();
 						event.preventDefault();
@@ -150,12 +157,16 @@
 				$('#test7')
 					.mousewheel(function(event, delta) {
 						if (delta > 0)
-							$('#logger').append('#test7: up ('+delta+')<br />');
+							log('#test7: up ('+delta+')');
 						else if (delta < 0)
-							$('#logger').append('#test7 down ('+delta+')<br />');
+							log('#test7 down ('+delta+')');
 						
 						event.preventDefault();
 					});
+				
+				function log(msg) {
+					$('#logger').append(msg+'<br>');
+				};
 			});
 		</script>
 	</head>
