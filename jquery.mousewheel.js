@@ -36,6 +36,7 @@ $.event.special.mousewheel = {
 		var args = [].slice.call( arguments, 1 );
 		
 		event = $.event.fix(event || window.event);
+		event.currentTarget = this;
 		var delta = 0, returnValue = true;
 		
 		if ( event.wheelDelta ) delta = event.wheelDelta/120;

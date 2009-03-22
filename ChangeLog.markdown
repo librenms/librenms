@@ -2,6 +2,7 @@
 
 # 3.0.1
 
+* Normalize event.currentTarget
 * Fixed delta being opposite value in latest Opera
 * No longer fix pageX, pageY for older mozilla browsers
 * Removed browser detection
