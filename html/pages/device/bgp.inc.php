@@ -10,8 +10,8 @@ echo("
 <div style='padding: 5px; height: 20px; clear: both; display: block;'>
   <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : " . $device['bgpLocalAs'] . "</div>
   <div style='float: right; text-align: right;'>
-  <a href='/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
-  <a href='/device/" . $_GET['id'] . "/bgp/graphs/'>Graphs</a> 
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/graphs/'>Graphs</a> 
  </div>
 </div>");
 

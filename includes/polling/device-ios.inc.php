@@ -21,7 +21,7 @@
    $version = str_replace("-M|", "|", $version);
    $version = str_replace("-", "|", $version);
    list($hardware, $features, $version) = explode("|", $version);
-   $features = fixIOSFeatures($features);
+   #$features = rewrite_ios_features($features);
    #$hardware = fixIOSHardware($hardware);
    if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
    if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
@@ -29,15 +29,13 @@
    }
 
    if($device['os'] == "IOS XE") {
-	list(,$features,$version) = explode(",", $sysDescr);
-	$version = str_replace(" Version ", "", $version);
-
-	$features = str_replace(" IOS-XE Software (", "", $features);
-        $features = str_replace("-M", "", $features);
-        $features = str_replace(")", "", $features);
-	$features = str_replace("PPC_LINUX_IOSD-", "", $features);
-	$features = fixIOSFeatures($features);
-
+     list(,$features,$version) = explode(",", $sysDescr);
+     $version = str_replace(" Version ", "", $version);
+     $features = str_replace(" IOS-XE Software (", "", $features);
+     $features = str_replace("-M", "", $features);
+     $features = str_replace(")", "", $features);
+     $features = str_replace("PPC_LINUX_IOSD-", "", $features);
+     #$features = rewrite_ios_features($features);
    }
 
 

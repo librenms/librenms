@@ -9,7 +9,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   echo("Checking temp " . $temperature['temp_descr'] . "... ");
 
-  $temprrd  = addslashes($rrd_dir . "/" . $device['hostname'] . "/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+  $temprrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
   $temprrd  = str_replace(")", "_", $temprrd);
   $temprrd  = str_replace("(", "_", $temprrd);
 
