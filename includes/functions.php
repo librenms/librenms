@@ -183,23 +183,8 @@ function percent_colour($perc)
 {
  $r = min(255, 5 * ($perc - 25));
  $b = max(0, 255 - (5 * ($perc + 25)));
-
  return sprintf('#%02x%02x%02x', $r, $b, $b);
 } 
-
-function percent_colour_old($perc) 
-{
-  $red = round(5 * $perc);
-  $blue = round(255 - (5 * $perc));
-  if($red > '255') { $red = "255"; } 
-  if($blue < '0') { $blue = "0"; }
-  $red = dechex($red);
-  $blue = dechex($blue);
-  if(strlen($red) == 1) { $red = "0$red"; }
-  if(strlen($blue) == 1) { $blue = "0$blue"; }
-  $colour = "#$red" . "00" . "$blue";
-  return $colour;
-}
 
 function print_error($text)
 {
@@ -218,8 +203,7 @@ function truncate($substring, $max = 50, $rep = '...')
   if(strlen($string) > $max){ return substr_replace($string, $rep, $leave); } else { return $string; }      
 }
 
-
-function interface_rates ($interface) 
+function interface_rates ($interface)  // Returns the last in/out value in RRD
 {
   global $config;
   $rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
@@ -233,8 +217,7 @@ function interface_rates ($interface)
   return $rate;
 }
 
-
-function interface_errors ($interface) 
+function interface_errors ($interface) // Returns the last in/out errors value in RRD
 {
   global $config;
   $rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
@@ -268,9 +251,9 @@ function generateiflink($interface, $text=0,$type=bits)
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = "graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
+  $graph_url = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
   $device_id = getifhost($interface['interface_id']);
-  $link = "<a class=$class href='/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
+  $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
   $link .= "<img src=\'$graph_url\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</span>";
   if($interface['ifAlias']) { $link .= "<br />" . $interface['ifAlias']; }
@@ -287,8 +270,8 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   if(!$end) { $end = $now; }
   $class = devclass($device);
   if(!$text) { $text = $device['hostname']; }
-  $graph_url = "graph.php?host=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=cpu";
-  $link  = "<a class=$class href='/device/" . $device['device_id'] . "/' ";
+  $graph_url = $config['base_url'] . "/graph.php?host=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=cpu";
+  $link  = "<a class=$class href='".$config['base_url']."/device/" . $device['device_id'] . "/' ";
   $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU Load</div>";
   $link .= "<img src=\'$graph_url\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">$text</a>";
   return $link;
@@ -300,7 +283,8 @@ function device_traffic_image($device, $width, $height, $from, $to)
   return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "' />";
 }
 
-function devclass($device) {
+function devclass($device) 
+{
    if ($device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
    if ($device['ignore'] == '1') {
      $class = "list-device-ignored";
@@ -312,17 +296,18 @@ function devclass($device) {
 
 function getImage($host) 
 {
+global $config;
 $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
 $data = mysql_fetch_array(mysql_query($sql));
 $type = strtolower($data['os']);
-  if(file_exists("images/os/$type" . ".png")){ $image = "<img src='images/os/$type.png'>";
-  } elseif(file_exists("images/os/$type" . ".gif")){ $image = "<img src='images/os/$type.gif'>"; }
-  if($device['monowall']) {$image = "<img src='images/os/m0n0wall.png'>";}
+  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png'>";
+  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif'>"; }
+  if($device['monowall']) {$image = "<img src='".$config['base_url']."images/os/m0n0wall.png'>";}
   if($type == "linux") {
     $features = strtolower(trim($data[features]));
     list($distro) = split(" ", $features);
-    if(file_exists("images/os/$distro" . ".png")){ $image = "<img src='images/os/$distro" . ".png'>";
-    } elseif(file_exists("images/os/$distro" . ".gif")){ $image = "<img src='images/os/$distro" . ".gif'>"; }
+    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".png'>";
+    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".gif'>"; }
   }
   return $image;
 }
@@ -416,36 +401,12 @@ function humanmedia($media)
         return $media;
 }
 
-
-function humanspeed($speed) {
-#        $speed = preg_replace("/^0$/", "-", $speed);
-#        $speed = preg_replace("/^9000$/", "9Kbps", $speed);
-#	$speed = preg_replace("/^48000$/", "48Kbps", $speed);
-#	$speed = preg_replace("/^56000$/", "56Kbps", $speed);
-#        $speed = preg_replace("/^64000$/", "64Kbps", $speed);
-#        $speed = preg_replace("/^128000$/", "128Kbps", $speed);
-#        $speed = preg_replace("/^256000$/", "256Kbps", $speed);
-#	$speed = preg_replace("/^448000$/", "448Kbps", $speed);
-#        $speed = preg_replace("/^512000$/", "512Kbps", $speed);
-#	$speed = preg_replace("/^768000$/", "768Kbps", $speed);
-#        $speed = preg_replace("/^1024000$/", "1Mbps", $speed);
-#        $speed = preg_replace("/^2048000$/", "2Mbps", $speed);
-#        $speed = preg_replace("/^4192000$/", "4Mbps", $speed);
-#	$speed = preg_replace("/^10000000$/", "10Mbps", $speed);
-#	$speed = preg_replace("/^34000000$/", "34Mbps", $speed);
-#        $speed = preg_replace("/^45000000$/", "45Mbps", $speed);
-#        $speed = preg_replace("/^54000000$/", "54Mbps", $speed);
-#        $speed = preg_replace("/^100000000$/", "100Mbps", $speed);
-# 	$speed = preg_replace("/^155000000$/", "155Mbps", $speed);
-#        $speed = preg_replace("/^622000000$/", "622Mbps", $speed);
-#        $speed = preg_replace("/^1000000000$/", "1Gbps", $speed);
-#        $speed = preg_replace("/^10000000000$/", "10Gbps", $speed);
-#	$speed = preg_replace("/^4294967295$/", "", $speed);
+function humanspeed($speed) 
+{
 	$speed = formatRates($speed);
         if($speed == "") { $speed = "-"; }
 	return $speed;
 }
-
 
 function netmask2cidr($netmask) 
 {

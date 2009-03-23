@@ -6,17 +6,17 @@
 
   if(!$device) { $device['device_id'] = getifhost($interface['interface_id']); }
 
-  $daily_traffic   = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=215&height=100";
-  $daily_url       = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
+  $daily_traffic   = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=215&height=100";
+  $daily_url       = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
 
-  $weekly_traffic  = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$week&to=$now&width=215&height=100";
-  $weekly_url      = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
+  $weekly_traffic  = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$week&to=$now&width=215&height=100";
+  $weekly_url      = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
 
-  $monthly_traffic = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$month&to=$now&width=215&height=100";
-  $monthly_url     = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
+  $monthly_traffic = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$month&to=$now&width=215&height=100";
+  $monthly_url     = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
 
-  $yearly_traffic  = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$year&to=$now&width=215&height=100";
-  $yearly_url  = "graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
+  $yearly_traffic  = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$year&to=$now&width=215&height=100";
+  $yearly_url      = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
 
   echo("<a href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$daily_traffic' border=0></a> ");

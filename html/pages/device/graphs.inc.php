@@ -178,7 +178,7 @@ while($device = mysql_fetch_array($device_query)) {
 
       include("blocks/netstats.inc.php");
       include("blocks/uptime.inc.php");
-
+      break;
     case "Snom":
       echo("<div class=graphhead>Calls</div>");
       $graph_type = "calls";              include ("includes/print-device-graph.php");

@@ -1,5 +1,39 @@
 <?php
 
+
+  $rewrite_ios_features = array(
+        "PK9S" => "IP w/SSH LAN Only",
+        "LANBASEK9" => "Lan Base Crypto",
+        "LANBASE" => "Lan Base",
+        "ADVENTERPRISEK9" => "Advanced Enterprise Crypto",
+        "ADVSECURITYK9" => "Advanced Security Crypto",
+        "K91P" => "Provider Crypto",
+        "K4P" => "Provider Crypto",
+        "ADVIPSERVICESK9" => "Adv IP Services Crypto",
+        "ADVIPSERVICES" => "Adv IP Services",
+        "IK9P" => "IP Plus Crypto",
+        "K9O3SY7" => "IP ADSL FW IDS Plus IPSEC 3DES",
+        "SPSERVICESK9" => "SP Services Crypto",
+        "PK9SV" => "IP MPLS/IPV6 W/SSH + BGP",
+        "IS" => "IP Plus",
+        "IPSERVICESK9" => "IP Services Crypto",
+        "BROADBAND" => "Broadband",
+        "IPBASE" => "IP Base",
+        "IPSERVICE" => "IP Services",
+        "P" => "Service Provider",
+        "P11" => "Broadband Router",
+        "G4P5" => "NRP",
+        "JK9S" => "Enterprise Plus Crypto",
+        "IK9S" => "IP Plus Crypto",
+        "JK" => "Enterprise Plus",
+        "I6Q4L2" => "Layer 2",
+        "I6K2L2Q4" => "Layer 2 Crypto",
+        "C3H2S" => "Layer 2 SI/EI",
+        "_WAN" => " + WAN",
+  );
+
+
+
   $rewrite_shortif = array (
     'tengigabitethernet' => 'Te',
     'gigabitethernet' => 'Gi',
@@ -57,6 +91,8 @@
     'loop' => 'Loop',
   );
 
+
+
 // Specific rewrite functions
 
 function makeshortif($if)
@@ -67,6 +103,14 @@ function makeshortif($if)
         $if = array_str_replace($rewrite_shortif, $if);
         return $if;
 }
+
+function rewrite_ios_features ($features)
+{
+        global $rewrite_ios_features;
+        $type = array_preg_replace($rewrite_ios_features, $features);
+        return ($features);
+}
+
 
 function fixiftype ($type)
 {

@@ -3,24 +3,11 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 20, 2008 at 03:39 PM
+-- Generation Time: Mar 23, 2009 at 05:29 PM
 -- Server version: 5.0.51
--- PHP Version: 5.2.4-2ubuntu5.3
+-- PHP Version: 5.2.4-2ubuntu5.5
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
---
--- Table structure for table `authlog`
---
-
-CREATE TABLE IF NOT EXISTS `authlog` (
-  `id` int(11) NOT NULL auto_increment,
-  `datetime` timestamp NOT NULL default CURRENT_TIMESTAMP,
-  `user` text NOT NULL,
-  `address` text NOT NULL,
-  `result` text NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 
 --
 -- Database: `observer`
@@ -37,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `adjacencies` (
   `network_id` int(11) NOT NULL default '0',
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`adj_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -53,7 +40,22 @@ CREATE TABLE IF NOT EXISTS `alerts` (
   `time_logged` timestamp NOT NULL default CURRENT_TIMESTAMP,
   `alerted` smallint(6) NOT NULL default '0',
   KEY `id` (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `authlog`
+--
+
+CREATE TABLE IF NOT EXISTS `authlog` (
+  `id` int(11) NOT NULL auto_increment,
+  `datetime` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  `user` text NOT NULL,
+  `address` text NOT NULL,
+  `result` text NOT NULL,
+  PRIMARY KEY  (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -64,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `alerts` (
 CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeer_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
-  `astext` varchar(32) NOT NULL,
+  `astext` varchar(64) NOT NULL,
   `bgpPeerIdentifier` text NOT NULL,
   `bgpPeerRemoteAs` int(11) NOT NULL,
   `bgpPeerState` text NOT NULL,
@@ -79,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `bgpPeers` (
   `bgpPeerInUpdateElapsedTime` int(11) NOT NULL,
   PRIMARY KEY  (`bgpPeer_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -95,7 +97,7 @@ CREATE TABLE IF NOT EXISTS `bills` (
   `bill_day` int(11) NOT NULL default '1',
   `bill_gb` int(11) default NULL,
   UNIQUE KEY `bill_id` (`bill_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -111,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `bill_data` (
   `in_delta` bigint(11) NOT NULL,
   `out_delta` bigint(11) NOT NULL,
   KEY `bill_id` (`bill_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -122,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `bill_data` (
 CREATE TABLE IF NOT EXISTS `bill_perms` (
   `user_id` int(11) NOT NULL,
   `bill_id` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -133,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `bill_perms` (
 CREATE TABLE IF NOT EXISTS `bill_ports` (
   `bill_id` int(11) NOT NULL,
   `port_id` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -149,7 +151,7 @@ CREATE TABLE IF NOT EXISTS `customers` (
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`customer_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -159,26 +161,31 @@ CREATE TABLE IF NOT EXISTS `customers` (
 
 CREATE TABLE IF NOT EXISTS `devices` (
   `device_id` int(11) NOT NULL auto_increment,
-  `hostname` text NOT NULL,
+  `hostname` varchar(128) NOT NULL,
+  `sysName` varchar(128) default NULL,
   `community` varchar(32) NOT NULL,
   `snmpver` varchar(4) NOT NULL default 'v2c',
+  `port` smallint(5) NOT NULL default '161',
   `bgpLocalAs` varchar(16) default NULL,
   `sysDescr` text,
-  `sysContact` text NOT NULL,
-  `version` text NOT NULL,
-  `hardware` text NOT NULL,
-  `features` text NOT NULL,
+  `sysContact` text,
+  `version` text,
+  `hardware` text,
+  `features` text,
   `location` text,
-  `os` varchar(8) NOT NULL default '',
+  `os` varchar(8) default NULL,
   `status` tinyint(4) NOT NULL default '0',
   `ignore` tinyint(4) NOT NULL default '0',
   `disabled` tinyint(1) NOT NULL default '0',
   `lastchange` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `purpose` text NOT NULL,
+  `purpose` varchar(64) default NULL,
   `type` varchar(8) NOT NULL default 'other',
   PRIMARY KEY  (`device_id`),
-  KEY `status` (`status`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+  KEY `status` (`status`),
+  KEY `hostname` (`hostname`),
+  KEY `sysName` (`sysName`),
+  KEY `os` (`os`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -190,11 +197,10 @@ CREATE TABLE IF NOT EXISTS `devices_attribs` (
   `attrib_id` int(11) NOT NULL auto_increment,
   `device_id` int(11) NOT NULL,
   `attrib_type` varchar(32) NOT NULL,
-  `attrib_value` int(11) NOT NULL,
+  `attrib_value` text NOT NULL,
   `updated` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`attrib_id`),
-  FULLTEXT KEY `attrib_type` (`attrib_type`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+  PRIMARY KEY  (`attrib_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -207,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `devices_perms` (
   `device_id` int(11) NOT NULL,
   `access_level` int(4) NOT NULL default '0',
   KEY `user_id` (`user_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -231,7 +237,7 @@ CREATE TABLE IF NOT EXISTS `entPhysical` (
   `ifIndex` int(11) default NULL,
   PRIMARY KEY  (`entPhysical_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -247,7 +253,7 @@ CREATE TABLE IF NOT EXISTS `eventlog` (
   `message` text NOT NULL,
   `type` int(11) NOT NULL,
   KEY `host` (`host`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -286,7 +292,7 @@ CREATE TABLE IF NOT EXISTS `interfaces` (
   KEY `host` (`device_id`),
   KEY `snmpid` (`ifIndex`),
   KEY `if_2` (`ifDescr`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -298,7 +304,7 @@ CREATE TABLE IF NOT EXISTS `interfaces_perms` (
   `user_id` int(11) NOT NULL,
   `interface_id` int(11) NOT NULL,
   `access_level` int(11) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -316,7 +322,7 @@ CREATE TABLE IF NOT EXISTS `ip6addr` (
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `addr` (`addr`,`cidr`,`interface_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -329,7 +335,7 @@ CREATE TABLE IF NOT EXISTS `ip6adjacencies` (
   `network_id` int(11) NOT NULL default '0',
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`adj_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -342,7 +348,7 @@ CREATE TABLE IF NOT EXISTS `ip6networks` (
   `cidr` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `cidr` (`cidr`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -358,7 +364,7 @@ CREATE TABLE IF NOT EXISTS `ipaddr` (
   `interface_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `addr` (`addr`,`cidr`,`interface_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -372,8 +378,28 @@ CREATE TABLE IF NOT EXISTS `links` (
   `dst_if` int(11) default NULL,
   `active` tinyint(4) NOT NULL default '1',
   `cdp` int(11) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+  PRIMARY KEY  (`id`),
+  KEY `src_if` (`src_if`),
+  KEY `dst_if` (`dst_if`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mac_accounting`
+--
+
+CREATE TABLE IF NOT EXISTS `mac_accounting` (
+  `ma_id` int(11) NOT NULL auto_increment,
+  `interface_id` int(11) NOT NULL,
+  `peer_ip` varchar(32) NOT NULL,
+  `peer_desc` varchar(64) NOT NULL,
+  `peer_asn` int(11) NOT NULL,
+  `peer_mac` varchar(32) NOT NULL,
+  `in_oid` varchar(128) NOT NULL,
+  `out_oid` varchar(128) NOT NULL,
+  PRIMARY KEY  (`ma_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -386,7 +412,7 @@ CREATE TABLE IF NOT EXISTS `networks` (
   `cidr` varchar(32) NOT NULL default '',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `cidr` (`cidr`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -400,7 +426,7 @@ CREATE TABLE IF NOT EXISTS `port_in_measurements` (
   `counter` bigint(11) NOT NULL,
   `delta` bigint(11) NOT NULL,
   KEY `port_id` (`port_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -414,7 +440,7 @@ CREATE TABLE IF NOT EXISTS `port_out_measurements` (
   `counter` bigint(11) NOT NULL,
   `delta` bigint(11) NOT NULL,
   KEY `port_id` (`port_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -430,7 +456,7 @@ CREATE TABLE IF NOT EXISTS `pseudowires` (
   `cpwVcID` int(11) NOT NULL,
   `cpwOid` int(11) NOT NULL,
   PRIMARY KEY  (`pseudowire_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -453,7 +479,7 @@ CREATE TABLE IF NOT EXISTS `services` (
   `service_disabled` tinyint(1) NOT NULL default '0',
   PRIMARY KEY  (`service_id`),
   KEY `service_host` (`service_host`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -471,7 +497,7 @@ CREATE TABLE IF NOT EXISTS `storage` (
   `hrStorageUsed` int(11) NOT NULL,
   `storage_perc` text NOT NULL,
   PRIMARY KEY  (`storage_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -495,7 +521,7 @@ CREATE TABLE IF NOT EXISTS `syslog` (
   KEY `datetime` (`datetime`),
   KEY `device_id` (`device_id`),
   KEY `processed` (`processed`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -513,7 +539,7 @@ CREATE TABLE IF NOT EXISTS `temperature` (
   `temp_limit` tinyint(4) NOT NULL default '60',
   PRIMARY KEY  (`temp_id`),
   KEY `temp_host` (`temp_host`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -526,11 +552,27 @@ CREATE TABLE IF NOT EXISTS `users` (
   `username` char(30) NOT NULL,
   `password` char(32) NOT NULL,
   `realname` text NOT NULL,
+  `email` text NOT NULL,
   `descr` char(30) NOT NULL,
   `level` tinyint(4) NOT NULL default '0',
   PRIMARY KEY  (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_prefs`
+--
+
+CREATE TABLE IF NOT EXISTS `users_prefs` (
+  `user_id` int(16) NOT NULL,
+  `pref` varchar(32) NOT NULL,
+  `value` varchar(128) NOT NULL,
+  PRIMARY KEY  (`user_id`),
+  UNIQUE KEY `user_id.pref` (`user_id`,`pref`),
+  KEY `pref` (`pref`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -546,7 +588,7 @@ CREATE TABLE IF NOT EXISTS `vlans` (
   `vlan_descr` text,
   PRIMARY KEY  (`vlan_id`),
   KEY `device_id` (`device_id`,`vlan_vlan`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -563,21 +605,5 @@ CREATE TABLE IF NOT EXISTS `vrfs` (
   `device_id` int(11) NOT NULL,
   PRIMARY KEY  (`vrf_id`),
   KEY `device_id` (`device_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
-
---
--- Table structure for table `mac_accounting`
---
-
-CREATE TABLE IF NOT EXISTS `mac_accounting` (
-  `ma_id` int(11) NOT NULL auto_increment,
-  `interface_id` int(11) NOT NULL,
-  `peer_ip` varchar(32) NOT NULL,
-  `peer_desc` varchar(64) NOT NULL,
-  `peer_asn` int(11) NOT NULL,
-  `peer_mac` varchar(32) NOT NULL,
-  `in_oid` varchar(128) NOT NULL,
-  `out_oid` varchar(128) NOT NULL,
-  PRIMARY KEY  (`ma_id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=703 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 

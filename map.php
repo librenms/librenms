@@ -4,9 +4,9 @@
 include("config.php");
 include("includes/functions.php");
 
-echo("digraph G { sep=0.1; size=\"40,20\"; pack=10; bgcolor=transparent;splines=true;
+echo("digraph G { sep=0.6; size=\"40,20\"; pack=10; bgcolor=transparent;splines=true;
      node [ fontname=\"helvetica\", fontsize=38, fontstyle=bold, shape=box, style=bold]; 
-     edge [ labelfontsize=10, labelfontname=\"helvetica\", overlap=false, fontstyle= bold];
+     edge [ labelfontsize=10, labelfontname=\"helvetica\", overlap=false, fontstyle=bold];
      graph [bgcolor=transparent, remincross=true]; 
 
 ");
@@ -35,11 +35,14 @@ while($loc_data = mysql_fetch_array($loc_result)) {
         if(strpos($host, "cust." . $config['mydomain'])) { $hostinfo = "shape=egg style=filled fillcolor=pink"; }
         if(strpos($host, "bas")) { $hostinfo = "shape=rectangle style=filled fillcolor=skyblue"; } 
         if(strpos($host, "crs")) { $hostinfo = "shape=box3d style=filled fillcolor=skyblue"; }
-        if(strpos($host, "ler")) { $hostinfo = "shape=tripleoctagon style=filled fillcolor=darkolivegreen3"; }
+        if(strpos($host, "lcr")) { $hostinfo = "shape=tripleoctagon style=filled fillcolor=darkolivegreen4"; }
+	if(strpos($host, "ler")) { $hostinfo = "shape=octagon style=filled fillcolor=darkolivegreen1"; }
 	if(strpos($host, "pbr")) { $hostinfo = "shape=ellipse style=filled fillcolor=orange"; }
-	if(strpos($host, "tbr")) { $hostinfo = "shape=ellipse style=filled fillcolor=red"; }
-	if(strstr($host, "gw")) { $hostinfo = "shape=rect style=filled fillcolor=orange"; }
-	if(strpos($host, "bar")) { $hostinfo = "shape=egg style=filled fillcolor=darkolivegreen4"; }
+	if(strpos($host, "tbr")) { $hostinfo = "shape=ellipse style=filled fillcolor=orange"; }
+	if(strstr($host, "gwr")) { $hostinfo = "shape=ellipse style=filled fillcolor=orange"; }
+	if(strpos($host, "bgw")) { $hostinfo = "shape=ellipse style=filled fillcolor=orange"; }
+	if(strpos($host, "vax")) { $hostinfo = "shape=rect style=filled fillcolor=skyblue"; }
+        if(strpos($host, "vsx")) { $hostinfo = "shape=box3d style=filled fillcolor=skyblue"; }
         #} else { $hostinfo = "style=filled shape=circle fillcolor=lightgray"; }
 
         $host = $dev_data[hostname];
