@@ -1,5 +1,7 @@
 <?php
 
+if($config['enable_pseudowires']) {
+
   unset( $cpw_count );
   unset($cpw_exists);  
 
@@ -55,6 +57,8 @@ while ($cpw = mysql_fetch_array($query)) {
 #    echo($this_cpw . "\n");
     mysql_query("DELETE FROM pseudowires WHERE pseudowire_id = '" . $cpw['pseudowire_id'] . "'");
   }
+}
+
 }
 
 ?>
