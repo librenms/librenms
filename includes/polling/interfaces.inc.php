@@ -36,13 +36,10 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if(!$ifDescr) { $ifDescr = $ifName; }
 
-   $older_rrdfile = "rrd/" . $device['hostname'] . "." . $interface['ifIndex'] . ".rrd";
    $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd"; 
 
-   if(is_file($older_rrdfile) && !is_file($rrdfile)) { rename($older_rrdfile, $rrdfile); echo("Moving $older_rrdfile to $rrdfile");  }
-
    if(!is_file($rrdfile)) {
-     $woo = `rrdtool create $rrdfile \
+     $woo = shell_exec($config['rrdtool'] . " create $rrdfile \
       DS:INOCTETS:COUNTER:600:0:12500000000 \
       DS:OUTOCTETS:COUNTER:600:0:12500000000 \
       DS:INERRORS:COUNTER:600:0:12500000000 \
@@ -58,7 +55,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
       RRA:MAX:0.5:1:600 \
       RRA:MAX:0.5:6:700 \
       RRA:MAX:0.5:24:775 \
-      RRA:MAX:0.5:288:797`;
+      RRA:MAX:0.5:288:797");
    }
 
 
