@@ -2,13 +2,14 @@
 
 ## ifDescr whitelist (used instead of ifName)
 $config['ifdescr']['IOS'] = true;
+$config['ifdescr']['IOS XE'] = true;
 
 
 ##############################
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.4.1";
+$config['version'] = "0.4.2";
 
 ### Connect to database
 if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
