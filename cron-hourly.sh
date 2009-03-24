@@ -7,3 +7,5 @@
 ./generate-map.sh
 ./check-errors.php
 ./versioncheck.php --cron
+./mac-accounting.sh && ./discover-macaccounting.php
+

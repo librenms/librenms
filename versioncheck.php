@@ -4,7 +4,10 @@
 include("config.php");
 include("includes/functions.php");
 
-$dataHandle = fopen("http://www.observernms.org/latest.php", r);
+$interfaces = mysql_result(mysql_query("SELECT count(*) FROM interfaces"),0); 
+$devices    = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
+
+$dataHandle = fopen("http://www.observernms.org/latest.php?i=$interfaces&d=$devices&v=".$config['version'], r);
 
 if($dataHandle)
 {
@@ -28,13 +31,16 @@ if($dataHandle)
 
 		if($major > $cur_major) {
 	          echo("New major release : $major.$minor.$release");
-                } elseif ($minor > $cur_minor) {
+                } elseif ($major == $cur_major && $minor > $cur_minor) {
 	          echo("New minor release : $major.$minor.$release");
-                } elseif ($release > $cur_release) {
+                } elseif ($major == $cur_major && $minor == $cur_minor && $release > $cur_release) {
                   echo("New trivial release : $major.$minor.$release");
+                } elseif($major < $cur_major || ($major == $cur_major && $minor < $cur_minor) || ($major == $cur_major && $minor == $cur_minor && $release < $cur_release)) {
+		  echo("Your release is newer than the official version!\n");
                 } else {
 		  echo("Your release is up to date\n");
                 }
+                echo("\n");
              }
 	}
 	fclose($dataHandle);

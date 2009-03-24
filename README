@@ -25,12 +25,25 @@ Installation
 Installation of Observer is currently not for the faint of heart! There is no automated
 install script, so it'll probably take quite a bit of fiddling!
 
-Please see http://www.project-observer.org.
+Please see http://www.observernms.org.
 
 Changelog
 ---------
 
-Release 0.4.0.1 ( 20th Nov 2008 )
+Release 0.5 ( 24 March 2009 )
+
+Cleaned up a lot of hardcoded paths
+Cleaned up BGP session polling
+Added CDP-based device link map
+Added sysName tracking for more accurate CDP linking
+Added more search features for syslog, device list and inventory
+Replaced old syslog system with new version, without pipes
+Added more Pseudowire/X-Connect tracking information
+Fixed a lot of URLs to be absolute URLs built from base_url
+Fixed some mod_rewrite rules
+Added basic MAC accounting polling
+
+Release 0.4.1 ( 20th Nov 2008 )
 
 Cleaned up some configuration settings
 Added more connection type rewrites
@@ -135,11 +148,11 @@ Release 0.1.2 - Late November 2006
 Graphing of additional server-related data
 
 Release 0.1.1 - November 2006
-Removal of large amounts of perl.
+Removal of large amounts of perl
 
 Release 0.1.0 - October 2006
-Initial Release.
-Basic discovery in place. Graphing in place.
+Initial Release
+Basic discovery in place. Graphing in place
 
 
 Feature Waiting List
