@@ -74,6 +74,24 @@ function popUp(URL) {
       <td style="padding: 0px; margin:0px; border: none;">
         <div id=logo style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" border="0" /></a></div>
       </td>
+      <td align=center><?php
+        
+        $data = trim(shell_exec("cat " . $config['install_dir'] . "/rrd/version.txt"));
+              
+        list($major, $minor, $release) = explode(".", $data);
+                list($cur, $tag) = explode("-", $config['version']);
+                list($cur_major, $cur_minor, $cur_release) = explode(".", $cur);
+
+                if($major > $cur_major) {
+                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+                } elseif ($major == $cur_major && $minor > $cur_minor) {
+		  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+                } elseif ($major == $cur_major && $minor == $cur_minor && $release > $cur_release) {
+		  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+                } elseif($major < $cur_major || ($major == $cur_major && $minor < $cur_minor) || ($major == $cur_major && $minor == $cur_minor && $release < $cur_release)) {
+                }
+
+      ?></td>
       <td align=right style="margin-right: 10px;">
         <div id="topnav" style="float: right;">
  	  <?php if($_SESSION['authenticated']) {
