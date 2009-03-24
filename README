@@ -42,6 +42,8 @@ Added more Pseudowire/X-Connect tracking information
 Fixed a lot of URLs to be absolute URLs built from base_url
 Fixed some mod_rewrite rules
 Added basic MAC accounting polling
+Added config display and syntax colouring for RANCID-collected IOS configs
+
 
 Release 0.4.1 ( 20th Nov 2008 )
 
