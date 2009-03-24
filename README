@@ -30,6 +30,8 @@ Please see http://www.observernms.org.
 Changelog
 ---------
 
+Added Pseudowire menu entry and configuration option
+
 Release 0.5.0 ( 24 March 2009 )
 
 Cleaned up a lot of hardcoded paths
