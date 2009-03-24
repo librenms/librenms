@@ -23,7 +23,7 @@ while($peer = mysql_fetch_array($peers)) {
   $peerrrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
 
   if(!is_file($peerrrd)) {
-    $woo = `rrdtool create $peerrrd \
+    $woo = shell_exec($config['rrdtool'] . " create $peerrrd \
       DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 \
       DS:bgpPeerInUpdates:COUNTER:600:U:100000000000 \
       DS:bgpPeerOutTotal:COUNTER:600:U:100000000000 \
@@ -32,10 +32,10 @@ while($peer = mysql_fetch_array($peers)) {
       RRA:AVERAGE:0.5:1:600 \
       RRA:AVERAGE:0.5:6:700 \
       RRA:AVERAGE:0.5:24:775 \
-      RRA:AVERAGE:0.5:288:797`;
+      RRA:AVERAGE:0.5:288:797");
   }
 
-  rrdtool_update($peerrrd, "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
+  rrdtool_update("$peerrrd", "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
 
   $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
   $update .= "bgpPeerFsmEstablishedTime = '$bgpPeerFsmEstablishedTime', bgpPeerInUpdates = '$bgpPeerInUpdates' , bgpLocalAddr = '$bgpLocalAddr' , bgpPeerOutUpdates = '$bgpPeerOutUpdates'";
