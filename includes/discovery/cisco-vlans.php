@@ -3,9 +3,10 @@
   echo("Cisco VLANs : ");
 
   $vtpversion_cmd = $config['snmpget'] . " -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.1.1.0";
+  echo("$vtpversion_cmd");
   $vtpversion = trim(`$vtpversion_cmd 2>/dev/null`);  
 
-  if($vtpversion == '1' || $vtpversion == '2') { 
+  if($vtpversion == '1' || $vtpversion == '2' || $vtpversion == 'three') { 
 
     $vtp_domain_cmd = "snmpget -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.2.1.1.2.1";
     $vtp_domain = trim(str_replace("\"", "", `$vtp_domain_cmd 2>/dev/null`));
