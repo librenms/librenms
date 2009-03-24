@@ -72,6 +72,7 @@ $config['enable_bgp'] 		= 0; # Enable BGP session collection and display
 $config['enable_syslog'] 	= 0; # Enable Syslog
 $config['enable_billing']	= 0; # Enable BGP session collection and display
 $config['enable_inventory']     = 0; # Enable Inventory
+$config['enable_pseudowires']	= 0; # Enable Cisco Pseudowires
 
 ## Uncomment this to enable display of rancid-collected configs
 #$config['rancid_configs']      = '/var/lib/rancid/network/configs/';
