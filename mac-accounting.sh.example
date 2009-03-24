@@ -1,0 +1,2 @@
+./mac-accounting.pl <router> planning <interface-ip> > mac-accounting.txt
+./mac-accounting.pl <router> planning <interface-ip> >> mac-accounting.txt
