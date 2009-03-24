@@ -30,7 +30,7 @@ Please see http://www.observernms.org.
 Changelog
 ---------
 
-Release 0.5 ( 24 March 2009 )
+Release 0.5.0 ( 24 March 2009 )
 
 Cleaned up a lot of hardcoded paths
 Cleaned up BGP session polling
