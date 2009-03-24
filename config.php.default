@@ -7,9 +7,9 @@ $config['db_pass'] = "password";
 $config['db_name'] = "observer";
 
 ### Installation Location
-$config['install_dir'] 	= "/opt/observer/";
-$config['html_dir']	= $config['install_dir'] . "html";
-$config['rrd_dir'] 	= $config['install_dir'] . "rrd";
+$config['install_dir'] 	= "/opt/observer";
+$config['html_dir']	= $config['install_dir'] . "/html";
+$config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
 
 ### Default community
 $config['community'] = "observer";
