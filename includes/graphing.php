@@ -74,14 +74,13 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
 
   $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
   $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
-
+  
   $filename = str_replace(")", "_", str_replace("(", "_", str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr']))));
-
 
   $temprrd  = $config['rrd_dir'] . "/$hostname/temp-" . $filename . ".rrd";
   $opts[] = "DEF:temp=$temprrd:temp:AVERAGE";
   $opts[] = "CDEF:tempwarm=temp,".$temperature[temp_limit].",GT,temp,UNKN,IF";
-  $opts[] = "LINE1.5:temp#006600:'" . trim($temperature[temp_descr_fixed]) . "'";
+  $opts[] = "LINE1.5:temp#006600:" . quotemeta($temperature[temp_descr_fixed]);
   $opts[] = "LINE1.5:tempwarm#cc0000";
   $opts[] = "GPRINT:temp:LAST:%3.0lf°C";
   $opts[] = "GPRINT:temp:MAX:%3.0lf°C\\\l";
@@ -90,6 +89,7 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
     $opt = str_replace(" ","\ ", $opt);
     $options .= " $opt";
   }
+#  echo($config['rrdtool'] . " graph $imgfile $options");
   $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
