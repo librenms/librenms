@@ -21,9 +21,10 @@ if($argv[1] == "--device" && $argv[2]) {
 } elseif ($argv[1] == "--all") {
   $where = "";
 } elseif ($argv[1] == "--forced") {
+  echo("Doing forced discoveries\n");
   $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_type = 'discover' AND A.device_id = D.device_id AND D.ignore = '0' AND D.disabled = '0'");
   while($device = mysql_fetch_array($sql)){
-    shell_exec("./discover --device " . $device['device_id']);
+    echo(shell_exec("./discovery.php --device " . $device['device_id']));
   }
   exit;
 } else {
