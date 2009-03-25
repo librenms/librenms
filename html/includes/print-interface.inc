@@ -5,7 +5,7 @@
   $interface['device_id'] = $device['device_id'];
   $interface['hostname'] = $device['hostname'];
 
-  if(!$graph_type) { $graph_type = "bits"; }
+  if(!$_GET['type']) { $_GET['type'] = "bits"; }
 
   $if_id = $interface['interface_id'];
 
@@ -19,13 +19,16 @@
   $ifHardType = $interface['ifHardType'];
   
   if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
-  if($bg == "#e5e5e5") { $bg = "#ffffff"; } else { $bg="#e5e5e5"; }
+  if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
   if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
   } else { $error_img = ""; }
 
-  echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='#fdd';\" onmouseout=\"this.style.backgroundColor='$bg';\" onclick=\"location.href='/device/".$device['device_id']."/'\" style='cursor: hand;'>
+#  $graph_url = "graph.php?if=$if_id&from=$twoday&to=$now&width=400&height=120&type=bits";
+
+  
+  echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='#fdd';\" onmouseout=\"this.style.backgroundColor='$bg';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
@@ -207,19 +210,19 @@ echo("</td>");
      // If we're showing graphs, generate the graph and print the img tags
      if($dographs && is_file($config['rrd_dir'] . "/" . $hostname . "/". $ifIndex . ".rrd")) {
  
-          $type = $graph_type;
+          $type = $_GET['type'];
 
-          $daily_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
-          $daily_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
+          $daily_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$day&to=$now&width=210&height=100";
+          $daily_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$day&to=$now&width=500&height=150";
 
-          $weekly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
-          $weekly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
+          $weekly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$week&to=$now&width=210&height=100";
+          $weekly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$week&to=$now&width=500&height=150";
 
-          $monthly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
-          $monthly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
+          $monthly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$month&to=$now&width=210&height=100";
+          $monthly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$month&to=$now&width=500&height=150";
 
-          $yearly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
-          $yearly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
+          $yearly_traffic = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$year&to=$now&width=210&height=100";
+          $yearly_url = "graph.php?if=$if_id&type=" . $_GET['type'] . "&from=$year&to=$now&width=500&height=150";
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=3>");
 

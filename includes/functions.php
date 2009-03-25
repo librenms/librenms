@@ -571,7 +571,9 @@ function createHost ($host, $community, $snmpver, $port = 161){
         if($host_os) {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1')");
            if(mysql_affected_rows()) {
-             return("Created host : $host ($host_os)");
+	     $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
+	     mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
+             return("Created host : $host (id:$device_id) (os:$host_os)");
            } else { return FALSE; }
         } else {
 	   return FALSE;
