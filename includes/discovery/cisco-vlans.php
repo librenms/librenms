@@ -3,7 +3,6 @@
   echo("Cisco VLANs : ");
 
   $vtpversion_cmd = $config['snmpget'] . " -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.9.9.46.1.1.1.0";
-  echo("$vtpversion_cmd");
   $vtpversion = trim(`$vtpversion_cmd 2>/dev/null`);  
 
   if($vtpversion == '1' || $vtpversion == '2' || $vtpversion == 'two' || $vtpversion == 'three') { 
