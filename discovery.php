@@ -20,6 +20,12 @@ if($argv[1] == "--device" && $argv[2]) {
   $where = "AND MOD(device_id,2) = 0";
 } elseif ($argv[1] == "--all") {
   $where = "";
+} elseif ($argv[1] == "--forced") {
+  $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_type = 'discover' AND A.device_id = D.device_id AND D.ignore = '0' AND D.disabled = '0'");
+  while($device = mysql_fetch_array($sql)){
+    shell_exec("./discover --device " . $device['device_id']);
+  }
+  exit;
 } else {
   echo("--device <device id>    Poll single device\n");
   echo("--os <os string>        Poll all devices of a given OS\n");
@@ -65,6 +71,7 @@ while ($device = mysql_fetch_array($device_query)) {
   }
 
   echo("\n"); $devices_polled++;
+  mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '".$device['device_id']."' AND `attrib_type` = 'discover'");
 }
 
 $end = utime(); $run = $end - $start;
