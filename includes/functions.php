@@ -335,18 +335,27 @@ function delHost($id)
     mysql_query("DELETE from `links` WHERE `src_if` = '$int_id'");
     mysql_query("DELETE from `links` WHERE `dst_if` = '$int_id'");
     mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `mac_accounting` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
+    mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
     echo("Removed interface $int_id ($int_if)<br />");
   }
+  mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `bgpPeers` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `temperature` WHERE `temp_host` = '$id'");
+  mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");  
+  mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
-  mysql_query("DELETE FROM `syslog` WHERE `host` = '$id'");
+  mysql_query("DELETE FROM `syslog` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  shell_exec("rm -f ".$config['rrd_dir'] . "/$host-*.rrd");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   echo("Removed device $host<br />");
 }
