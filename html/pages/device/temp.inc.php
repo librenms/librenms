@@ -6,7 +6,7 @@ $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=5 width=100%>");
 
 echo("<tr class=tablehead>
-        <th width=280>Sensor</th>
+        <th width=200>Sensor</th>
         <th width=100>Current</th>
         <th width=100>Alert</th>
         <th>Notes</th>
@@ -19,7 +19,7 @@ while($temp = mysql_fetch_array($query)) {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
-          <td width=200>" . $temp['temp_descr'] . "</td>
+          <td>" . $temp['temp_descr'] . "</td>
           <td>" . print_temperature($temp['temp_current'], $temp['temp_limit']) . "</td>
           <td>" . $temp['temp_limit'] . "</td>
           <td>" . $temp['temp_notes'] . "</td>
