@@ -1,6 +1,6 @@
 <?php
 
-if($_GET['optb'] == "graphs" || $_GET['idb'] == "graphs") {
+if($_GET['optb'] == "graphs" || $_GET['opta'] == "graphs") {
   $graphs = 1;
 } else {
   $graphs = 0;

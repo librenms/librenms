@@ -1,6 +1,6 @@
 <?php
 
-$hostname = gethostbyid($_GET[id]);
+$hostname = gethostbyid($device['device_id']);
 
    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
    $i = "1";
