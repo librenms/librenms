@@ -69,7 +69,7 @@ function getHostOS($hostname, $community, $snmpver, $port) {
     $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
       if( preg_match("/^discover-([a-z0-9]*).php/", $file) ) {
-        include($config['install_dir'] . "includes/osdiscovery/" . $file);
+        include($config['install_dir'] . "/includes/osdiscovery/" . $file);
       }
     }
     closedir($dir_handle);
