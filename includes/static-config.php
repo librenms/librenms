@@ -9,7 +9,7 @@ $config['ifdescr']['IOS XE'] = true;
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.5.0";
+$config['version'] = "0.5.1";
 
 ### Connect to database
 if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {

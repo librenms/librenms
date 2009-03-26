@@ -247,15 +247,16 @@ function geteventicon ($message)
 
 function generateiflink($interface, $text=0,$type=bits) 
 {
-  global $twoday; global $now; global $config; global $day;
+  global $twoday; global $now; global $config; global $day; global $month;
   if(!$text) { $text = fixIfName($interface['ifDescr']); }
   if(!$type) { $type = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=120&type=" . $type;
+  $graph_url = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=100&type=" . $type;
+  $graph_url_month = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$month&to=$now&width=400&height=100&type=" . $type;
   $device_id = getifhost($interface['interface_id']);
   $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
-  $link .= "<img src=\'$graph_url\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</span>";
+  $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['ifDescr']) . "</span>";
   if($interface['ifAlias']) { $link .= "<br />" . $interface['ifAlias']; }
   $link .= "' ";
   $link .= $config['overlib_defaults'].");\" onmouseout=\"return nd();\" >$text</a>";
