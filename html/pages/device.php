@@ -74,7 +74,7 @@ if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE d
 </li>
 <li class=" . $select['ifgraphs'] . ">
   <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ifgraphs/'>
-    <img src='images/16/chart_curve_link.png' align=absmiddle border=0> Port Graphs
+    <img src='images/16/port_graphs.png' align=absmiddle border=0> Port Graphs
   </a>
 </li>");
 }
