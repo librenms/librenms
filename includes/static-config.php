@@ -5,6 +5,14 @@ $config['ifdescr']['IOS'] = true;
 $config['ifdescr']['IOS XE'] = true;
 
 
+## AFI / SAFI pairs for BGP (and other stuff, perhaps)
+$config['afi']['ipv4']['unicast']    = "IPv4";
+$config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
+$config['afi']['ipv4']['vpn']        = "VPNv4";
+$config['afi']['ipv6']['unicast']    = "IPv6";
+$config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
+
+
 ##############################
 # No changes below this line #
 ##############################

@@ -11,11 +11,9 @@
   include("includes/authenticate.inc");
   if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   
-
   if($_GET['params']) {
     list($_GET['host'], $_GET['if'], $_GET['from'], $_GET['to'], $_GET['width'], $_GET['height'], $_GET['title'], $_GET['vertical'], $_GET['type'], $_GET['interfaces']) = explode("||", mcrypt_ecb(MCRYPT_DES, $key_value, $_GET['params'], MCRYPT_DECRYPT));
   }
-
 
   if($_GET['host']) {
     $device_id = $_GET['host'];
@@ -28,16 +26,9 @@
     $device_id = getpeerhost($_GET['peer']);
   }
 
-  if($_GET['legend']) {
-    $legend = $_GET['legend'];
-  }
-  if($_GET['inverse']) {
-    $inverse = $_GET['inverse'];  
-  }
-
-  if($device_id) {
-    $hostname = gethostbyid($device_id);
-  }
+  if($_GET['legend']) { $legend = $_GET['legend']; }
+  if($_GET['inverse']) { $inverse = $_GET['inverse'];  }
+  if($device_id) { $hostname = gethostbyid($device_id); }
 
   $from = $_GET['from'];
   $to = $_GET['to'];
@@ -92,7 +83,7 @@
     $graph = graph_mac_acc ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'device_bits':
-    $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;  
   case 'bits':
     $graph = graph_bits ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
@@ -115,9 +106,13 @@
   case 'unixfs':
     $graph = unixfsgraph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
-  case 'bgpupdates':
+  case 'bgp_updates':
     $bgpPeerIdentifier = mysql_result(mysql_query("SELECT bgpPeerIdentifier FROM bgpPeers WHERE bgpPeer_id = '".$_GET['peer']."'"),0);
     $graph = bgpupdatesgraph ($hostname . "/bgp-" . $bgpPeerIdentifier . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
+  case 'cbgp_prefixes':
+    $bgpPeerIdentifier = mysql_result(mysql_query("SELECT bgpPeerIdentifier FROM bgpPeers WHERE bgpPeer_id = '".$_GET['peer']."'"),0);
+    $graph = graph_cbgp_prefixes ($hostname . "/cbgp-" . $bgpPeerIdentifier . ".".$_GET['afi'].".".$_GET['safi'].".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'calls':
     $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -225,7 +220,9 @@
       $graph = apachebitsgraphUnix ($hostname . "/apache.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
-
+  default:
+    echo("INCORRECT GRAPH TYPE");
+    exit;
   }
 
   if($graph) {
@@ -233,7 +230,13 @@
     echo(`cat graphs/$graphfile`);
   } else {  
     header('Content-type: image/png');
-    echo(`cat images/no-graph.png`);
+    $string = "Graph Generation Error";
+    $im     = imagecreate($width, $height);
+    $orange = imagecolorallocate($im, 255, 255, 255);
+    $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+    imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+    imagepng($im);
+    imagedestroy($im);
   }
 
   $delete = `rm graphs/$graphfile`; 

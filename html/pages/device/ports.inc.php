@@ -1,15 +1,12 @@
 <?php
 echo("
-<div style='float: right; text-align: right;'>
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/'>Details</a> | Graphs:
-
+<div style='float: right; text-align: right; padding-bottom: 10px'>
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Details</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
 </div>");
-
-$dographs = 1;
 
 if($_GET['opta'] == graphs ) { 
   if($_GET['optb']) {

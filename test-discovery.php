@@ -28,6 +28,14 @@ if($argv[1] == "--device" && $argv[2]) {
   exit;
 }
 
+if ($argv[2] == "--type" && $argv[3]) {
+  $type = $argv[3];
+} elseif ($argv[3] == "--type" && $argv[4]) {
+  $type = $argv[4];
+} else {
+  echo("Require valid discovery type.\n");
+  exit;
+}
 
 $devices_polled = 0;
 
@@ -36,12 +44,13 @@ while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] ."\n");
 
-#  include("includes/discovery/cisco-physical.php");
-#   include("includes/discovery/ipv6-addresses.php");
-#   include("includes/discovery/cisco-pw.php");
+  include("includes/discovery/".$type.".php");
+#  include("includes/discovery/ipv6-addresses.php");
+#  include("includes/discovery/cisco-pw.php");
 
-  include("includes/discovery/host-physical.php");
+#  include("includes/discovery/host-physical.php");
 
+# include("includes/discovery/bgp-peers.php");
 
   echo("\n"); $devices_polled++;
 }

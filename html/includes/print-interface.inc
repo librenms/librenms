@@ -19,7 +19,8 @@
   $ifHardType = $interface['ifHardType'];
   
   if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
-  if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+  #if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+  if($bg == "#e5e5e5") { $bg = "#ffffff"; } else { $bg="#e5e5e5"; }
 
   if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 

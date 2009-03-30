@@ -7,6 +7,7 @@ $ipv6interfaces = shell_exec($config['snmpget']." -Ovnq -".$device['snmpver']." 
 if($ipv6interfaces){
 
   $oids = trim(trim(shell_exec($config['snmpwalk']." -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAddressIfIndex.ipv6 -Osq | grep -v No")));
+  echo($config['snmpwalk']." -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAddressIfIndex.ipv6 -Osq | grep -v No");
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
   foreach(explode("\n", $oids) as $data) {
    if($data) {
@@ -37,7 +38,7 @@ if($ipv6interfaces){
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ip6addr` WHERE `addr` = '$address' AND `cidr` = '$cidr' AND `interface_id` = '$interface_id'"), 0) == '0') {
        mysql_query("INSERT INTO `ip6addr` (`addr`, `comp_addr`, `cidr`, `origin`, `network`, `interface_id`) VALUES ('$address', '$comp', '$cidr', '$origin', '$network', '$interface_id')");
        echo("+");
-      }
+      } else { echo("."); }
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ip6networks` WHERE `cidr` = '$network'"), 0) < '1') {
         mysql_query("INSERT INTO `ip6networks` (`id`, `cidr`) VALUES ('', '$network')");
         echo("N");
@@ -47,7 +48,7 @@ if($ipv6interfaces){
         mysql_query("INSERT INTO `ip6adjacencies` (`network_id`, `interface_id`) VALUES ('$network_id', '$interface_id')");
         echo("A");
       }
-    } else { echo("."); }
+    }
    }
   }
 } else { echo("None configured"); }
