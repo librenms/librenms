@@ -10,7 +10,7 @@
 
   if($bgpLocalAs) {
 
-    echo("AS$bgpLocalAs ");
+    echo("AS$bgpLocalAs \n");
 
     if($bgpLocalAs != $device['bgpLocalAs']) { mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS\n"); }
 
@@ -26,15 +26,43 @@
 
 	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5 | sed s/\\\"//g")));
 
-        #echo(str_pad($peer_ip, 32). str_pad($astext, 32) . " $peer_as ");
-
+        echo(str_pad($peer_ip, 40) . " AS$peer_as  ");
+        
+        #echo("$peer_ip AS$peer_as ");
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'"),0) < '1') {
           $add = mysql_query("INSERT INTO bgpPeers (`device_id`, `bgpPeerIdentifier`, `bgpPeerRemoteAS`) VALUES ('".$device['device_id']."','$peer_ip','$peer_as')");
           echo("+"); 
         } else { 
-          echo("."); 
           $update = mysql_query("UPDATE `bgpPeers` SET astext = '$astext' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
         }
+
+        ## Get afi/safi and populate cbgp on cisco IOS
+	if($device['os'] == "IOS") {
+          unset($af_list);
+          $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+          $af_cmd .= "cbgpPeerAddrFamilyName." . $peer_ip;
+          $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer_ip.".", "", `$af_cmd`));
+          foreach (explode("\n", $afs) as $af)  {
+	    list($afisafi, $text) = explode(" = ", $af);
+            list($afi, $safi) = explode(".", $afisafi);
+            if($afi && $safi) {
+	     echo("($afi:$safi)");
+             $af_list['$afi']['$safi'] = 1;
+	     if(mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip' AND afi = '$afi' AND safi = '$safi'"),0) == 0) {
+               mysql_query("INSERT INTO `bgpPeers_cbgp` (device_id,bgpPeerIdentifier, afi, safi) VALUES ('".$device['device_id']."','$peer_ip','$afi','$safi')");
+             }
+            }
+          }          
+          $af_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
+          while ($entry = mysql_fetch_array($af_query)) {
+            $afi = $entry['afi'];
+	    $afi = $entry['safi'];
+            if (!$af_list['$afi']['$safi']) {
+              mysql_query("DELETE FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip' AND afi = '$afi' AND safi = '$safi'");
+            }
+          } # AF list
+        } # if IOS 
+      echo("\n");
       } # If Peer
     } # Foreach  
   } else { echo("No BGP on host"); } # End if

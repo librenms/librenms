@@ -68,15 +68,16 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
 if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=" . $select['ifs'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ifs/'>
-    <img src='images/16/server_link.png' align=absmiddle border=0> Ports
-  </a>
-</li>
-<li class=" . $select['ifgraphs'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ifgraphs/'>
-    <img src='images/16/port_graphs.png' align=absmiddle border=0> Port Graphs
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>
+    <img src='images/16/connect.png' align=absmiddle border=0> Ports
   </a>
 </li>");
+
+#<li class=" . $select['ifgraphs'] . ">
+#  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ifgraphs/'>
+#    <img src='images/16/port_graphs.png' align=absmiddle border=0> Port Graphs
+#  </a>
+#</li>");
 }
 
 if($_SESSION[userlevel] >= "5") {
