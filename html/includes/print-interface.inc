@@ -36,7 +36,7 @@
 
              </span><br /><span class=interface-desc>$ifAlias</span>");
 
-  if($ifAlias) { echo("<br />"); }
+#  if($ifAlias) { echo("<br />"); }
 
   unset ($break);
   if(!$dographs) {
