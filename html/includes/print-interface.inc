@@ -18,7 +18,7 @@
   $ifType = fixiftype($interface['ifType']);
   $ifHardType = $interface['ifHardType'];
   
-  if($ifAlias) {$ifAlias = $ifAlias . "</br>";}
+#  if($ifAlias) {$ifAlias = $ifAlias . ;}
   #if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
   if($bg == "#e5e5e5") { $bg = "#ffffff"; } else { $bg="#e5e5e5"; }
 
@@ -36,7 +36,7 @@
 
              </span><br /><span class=interface-desc>$ifAlias</span>");
 
-#  if($ifAlias) { echo("<br />"); }
+  if($ifAlias) { echo("<br />"); }
 
   unset ($break);
   if(!$dographs) {
@@ -47,7 +47,7 @@
     }
     $ip6data = mysql_query("SELECT * FROM `ip6addr` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
     while($ip6 = mysql_fetch_Array($ip6data)) {
-      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip6[addr]')\">".Net_IPv6::compress($ip6[addr])."/$ip6[cidr]</a>");
+      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=".$ip6['ip6_addr']."')\">".Net_IPv6::compress($ip6['ip6_addr'])."/".$ip6['ip6_prefixlen']."</a>");
       $break = "<br />";
     }
  
@@ -143,25 +143,23 @@ echo("</td>");
         unset($br);
      # }
  
-        $sql = "SELECT network_id FROM ip6addr AS A, ip6networks AS N, interfaces AS I
-        WHERE A.interface_id = I.interface_id
-        AND A.network = N.cidr
-        AND I.interface_id = '".$interface['interface_id']."'";
+        $sql = "SELECT ip6_network_id FROM ip6addr WHERE interface_id = '".$interface['interface_id']."'";
 
 	$nets_query = mysql_query($sql);
 
         while($net = mysql_fetch_array($nets_query)) {
-          $network_id = $net['network_id'];
+          echo($net['ip6_network']);
+          $ip6_network_id = $net['ip6_network_id'];
 
         $sql = "SELECT I.interface_id FROM ip6addr AS A, ip6networks AS N, interfaces AS I, devices AS D
         WHERE A.interface_id = I.interface_id
-        AND A.network = N.cidr AND N.network_id = '".$net['network_id']."' AND D.device_id = I.device_id 
-        AND D.device_id != '".$device['device_id']."' AND A.origin != 'linklayer' AND A.origin != 'wellknown'";
+        AND A.ip6_network = N.ip6_network AND N.ip6_network_id = '".$net['ip6_network_id']."' AND D.device_id = I.device_id 
+        AND D.device_id != '".$device['device_id']."' AND A.ip6_origin != 'linklayer' AND A.ip6_origin != 'wellknown'";
 
           $new_query = mysql_query($sql);
           while($new = mysql_fetch_array($new_query)) {
 	    
-	    echo($new['network_id']);
+	    echo($new['ip6_network_id']);
 
             $this_ifid = $new['interface_id'];
             $this_hostid = $new['device_id'];

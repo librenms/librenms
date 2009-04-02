@@ -1,5 +1,6 @@
 <?php 
 
+@ini_set("session.gc_maxlifetime","10000"); 
 session_start();
 
 if($_GET['logout']) {
