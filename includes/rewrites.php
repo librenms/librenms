@@ -1,6 +1,40 @@
 <?php
 
 
+  $translate_ifOperStatus = array(
+   	"1" => "up",
+	"2" => "down",
+	"3" => "testing",
+	"4" => "unknown",
+	"5" => "dormant",
+	"6" => "notPresent",
+	"7" => "lowerLayerDown",
+  );
+
+  function translate_ifOperStatus ($ifOperStatus) {
+    global $translate_ifOperStatus;
+    if($translate_ifOperStatus['$ifOperStatus']) {
+      $ifOperStatus = $translate_ifOperStatus['$ifOperStatus'];
+    }
+    return $ifOperStatus;
+  }
+
+  $translate_ifAdminStatus = array(
+        "1" => "up",
+        "2" => "down",
+        "3" => "testing",
+  );
+
+  function translate_ifAdminStatus ($ifAdminStatus) {
+    global $translate_ifAdminStatus;
+    if($translate_ifAdminStatus['$ifAdminStatus']) {
+      $ifAdminStatus = $translate_ifAdminStatus['$ifAdminStatus'];
+    }
+    return $ifAdminStatus;
+  }
+
+
+
   $rewrite_ios_features = array(
         "PK9S" => "IP w/SSH LAN Only",
         "LANBASEK9" => "Lan Base Crypto",
