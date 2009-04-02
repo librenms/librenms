@@ -28,6 +28,9 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    list($ifAdminStatus, $ifOperStatus, $ifAlias) = explode("\n", $snmp_output);
 
+   $ifAdminStatus = translate_ifAdminStatus ($ifAdminStatus);
+   $ifOperStatus = translate_ifOperStatus ($ifOperStatus);
+
    if ($ifAlias == " ") { $ifAlias = str_replace(" ", "", $ifAlias); }
    $ifAlias = trim(str_replace("\"", "", $ifAlias));
    $ifAlias = trim($ifAlias);
