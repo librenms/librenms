@@ -1,12 +1,12 @@
 <?php
 echo("
-<div style='float: right; text-align: right; padding-bottom: 10px'>
+<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Details</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
-</div>");
+</div> ");
 
 if($_GET['opta'] == graphs ) { 
   if($_GET['optb']) {
@@ -21,7 +21,7 @@ $hostname = gethostbyid($device['device_id']);
 
 echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 $i = "1";
-$interface_query = mysql_query("select * from interfaces WHERE device_id = '$_GET[id]' AND deleted = '0' ORDER BY `ifDescr` ASC");
+$interface_query = mysql_query("select * from interfaces WHERE device_id = '$_GET[id]' AND deleted = '0' ORDER BY `ifIndex` ASC");
 while($interface = mysql_fetch_array($interface_query)) {
   include("includes/print-interface.inc");
 }
