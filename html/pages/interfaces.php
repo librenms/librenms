@@ -51,6 +51,7 @@
              </td>
              <td>
         <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php  echo($_POST['ifAlias']); ?>" />
+        Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if($_POST['deleted']) { echo("checked"); } ?> ></input>
         <input style="align:right;" type=submit value=Search></div>
              </td>
            </form>
@@ -80,10 +81,11 @@ if($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."
 if($_POST['ifType']) { $where .= " AND I.ifType = '".$_POST['ifType']."'"; }
 if($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
 if($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
+if($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
+print_r($_GET);
 
 $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
-
 
 $query = mysql_query($sql);
 
