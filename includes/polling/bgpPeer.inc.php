@@ -39,7 +39,7 @@ while($peer = mysql_fetch_array($peers)) {
 
   mysql_query($update);
 
-  if($device['os'] == "IOS") {
+  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
 
    ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB)
    $afi_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'");
@@ -47,7 +47,7 @@ while($peer = mysql_fetch_array($peers)) {
    
      $afi = $peer_afi['afi'];
      $safi = $peer_afi['safi'];
-     echo($config['afi'][$afi][$safi]. " ");
+     #echo($config['afi'][$afi][$safi]. " ");
 
      $cbgp_cmd  = $config['snmpget'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
      $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
@@ -58,7 +58,7 @@ while($peer = mysql_fetch_array($peers)) {
      $cbgp_cmd .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     echo("\n$cbgp_cmd\n");
+     #echo("\n$cbgp_cmd\n");
      $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
 
      list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);

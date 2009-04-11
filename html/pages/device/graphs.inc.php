@@ -164,6 +164,7 @@ while($device = mysql_fetch_array($device_query)) {
       }
       break;
    case "IOS":
+   case "IOS XE":
       echo("<div class=graphhead>CPU Usage</div>");
       $graph_type = "cpu";              include ("includes/print-device-graph.php");
       echo("<br />");

@@ -37,7 +37,7 @@
         }
 
         ## Get afi/safi and populate cbgp on cisco IOS
-	if($device['os'] == "IOS") {
+	if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
           unset($af_list);
           $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
           $af_cmd .= "cbgpPeerAddrFamilyName." . $peer_ip;

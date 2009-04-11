@@ -36,7 +36,7 @@
       ?>
     </select>
   </label>
-
+  <input type="text" size=10 name="device_string" id="device_string" value="<?php  echo($_POST['device_string']); ?>" />
   <input type=submit value=Search>
 
 </form>
@@ -46,7 +46,11 @@
 <?
 
 if($_POST['string']) {
-  $where = " AND E.entPhysicalDescr LIKE '%".$_POST['string']."%'";
+  $where .= " AND E.entPhysicalDescr LIKE '%".$_POST['string']."%'";
+}
+
+if($_POST['device_string']) {
+  $where .= " AND D.hostname LIKE '%".$_POST['device_string']."%'";
 }
 
 if($_POST['part']) {

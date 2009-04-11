@@ -69,6 +69,7 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/bgp-peers.php");
     include("includes/discovery/cisco-pw.php");
     include("includes/discovery/cisco-vrf.php");
+    include("includes/discovery/cisco-processors.php");
   }
 
   echo("\n"); $devices_polled++;

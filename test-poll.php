@@ -6,7 +6,7 @@ include("includes/functions.php");
 
 $start = utime();
 
-### Observer Device Discovery
+### Observer Device Polling Test
 
 echo("Observer v".$config['version']." Discovery\n\n");
 
@@ -33,7 +33,7 @@ if ($argv[2] == "--type" && $argv[3]) {
 } elseif ($argv[3] == "--type" && $argv[4]) {
   $type = $argv[4];
 } else {
-  echo("Require valid discovery type.\n");
+  echo("Require valid polling type.\n");
   exit;
 }
 
@@ -44,13 +44,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   echo("\n" . $device['hostname'] ."\n");
 
-  include("includes/discovery/".$type.".php");
-#  include("includes/discovery/ipv6-addresses.php");
-#  include("includes/discovery/cisco-pw.php");
-
-#  include("includes/discovery/host-physical.php");
-
-# include("includes/discovery/bgp-peers.php");
+  include("includes/polling/".$type.".inc.php");
 
   echo("\n"); $devices_polled++;
 }
