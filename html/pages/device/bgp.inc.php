@@ -55,7 +55,7 @@ echo("
 
  if($_GET['opta']) {
   foreach(explode(" ", $_GET['opta']) as $graph_type) {        
-    if($graph_type == "cbgp_prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
+   if($graph_type == "cbgp_prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
      if($graph_type == "bgp_updates" || $valid_afi_safi[$afi][$safi]) {
       $daily_traffic   = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
       $daily_url       = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
@@ -71,7 +71,6 @@ echo("
       echo("<a href='' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\"><img src='$monthly_traffic' border=0></a> ");
       echo("<a href='' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\"><img src='$yearly_traffic' border=0></a>");
       echo("</td></tr>");
-
      }
     }
   }

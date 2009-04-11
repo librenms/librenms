@@ -1,16 +1,21 @@
 #!/usr/bin/php
 <?
 
-  ini_set('display_errors', 1);
-  ini_set('display_startup_errors', 1);
-  ini_set('log_errors', 1);
-  ini_set('error_reporting', E_WARNING);
+#ini_set('display_errors', 1);
+#ini_set('display_startup_errors', 1);
+#ini_set('log_errors', 1);
+#ini_set('error_reporting', E_WARNING);
 
 include("config.php");
 include("includes/functions.php");
 include("includes/cdp.inc.php");
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%bar%' ORDER BY `device_id` DESC");
+if($argv[1] == "--device" && $argv[2]) {
+  $where = "AND `device_id` = '".$argv[2]."'";
+}
+
+
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%bar%' $where ORDER BY `device_id` DESC");
 
 while ($device = mysql_fetch_array($device_query)) {
 
@@ -54,10 +59,10 @@ while ($device = mysql_fetch_array($device_query)) {
           createHost ($dst_host, $community, "v2c");
         }
       } else { 
-        echo(".. Already got host $dst_host\n"); 
+        echo("."); 
       }
     } else { 
-      #echo("!! Bad DNS for $dst_host\n"); 
+      echo("!($dst_host)"); 
     }
 
     if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '1' && 
@@ -72,15 +77,17 @@ while ($device = mysql_fetch_array($device_query)) {
       { 
         $sql = "INSERT INTO `links` (`src_if`, `dst_if`, `cdp`) VALUES ('$src_if_id', '$dst_if_id', '1')";
         mysql_query($sql);
-        echo("++ Creating Link : $src_host $src_if -> $dst_host $dst_if\n");
+        echo("++($src_host $src_if -> $dst_host $dst_if)");
       } else { 
-        echo(".. Existing Link : $src_host $src_if -> $dst_host $dst_if\n "); 
+        echo(".."); 
       }
     } else {
 
     } 
   }
 }
+
+echo("\n");
 
 echo(count($linkalive) . " Entries\n");
 

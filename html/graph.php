@@ -132,7 +132,7 @@
   case 'cpu':
     if($os == "Linux" || $os == "NetBSD" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "Windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfSense" || $os == "DragonFly" || $os == "OpenBSD") {
       $graph = cpugraphUnix ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "IOS") {
+    } elseif($os == "IOS" || $os == "IOS XE") {
       $graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
       $graph = cpugraphwin ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -158,7 +158,7 @@
   case 'mem':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
       $graph = memgraphUnix ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "IOS") {
+    } elseif($os == "IOS" || $os == "IOS XE") {
       $graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
     } elseif($os == "ProCurve") {
@@ -168,7 +168,7 @@
   case 'load':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
       $graph = loadgraphUnix ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "IOS") {
+    } elseif($os == "IOS" || $os == "IOS XE") {
       $graph = loadgraph ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
       $graph = loadgraphwin ($hostname . "/load.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);

@@ -89,7 +89,7 @@
 
 
   ## Cisco Temperatures
-  if($device['os'] == "IOS") {
+  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
     echo("Cisco ");
     $oids = shell_exec($config['snmpwalk'] . " -v2c -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.9.9.13.1.3.1.2 | sed s/.1.3.6.1.4.1.9.9.13.1.3.1.2.//g");
     $oids = trim($oids);

@@ -6,6 +6,8 @@ include("includes/functions.php");
 
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%last message repeated%'");
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Connection from UDP: [%]:%'");
+mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `program` LIKE 'Traceback%'");
+
 
 
 if(!$config['enable_syslog']) { 

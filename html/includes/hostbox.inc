@@ -16,7 +16,7 @@
              onclick=\"location.href='/device/".$device['device_id']."/'\" style='cursor: hand;'>
              <td width='40' align=center valign=middle>$image</td>
              <td width='300'><span style='font-weight: bold; font-size: 14px;'>" . generatedevicelink($device) . "</span>
-             <br />$device[purpose]</td>
+             <br />$device[sysName]</td>
              <td width='200'>$device[os]<br />
              $device[version]</td>
              <td width='200'>$device[hardware]<br />

@@ -574,6 +574,19 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
                 padding-left:21px;
 }
 
+.infobox,.infobox-down {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        border: 2px dashed #AAAACC;
+        background-color: #CCCCFF;
+        padding: 8px;
+        font-size: 12px;
+        margin: 8px;
+}
+
+.infobox-down {
+
+}
+
 .errorbox {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	border: 2px dashed #CC0000;

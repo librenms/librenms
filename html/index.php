@@ -113,6 +113,7 @@ function popUp(URL) {
 <div style="margin: 7px;"></div>
 <?php
   if($_SESSION['authenticated']) {
+    include("includes/warn-deleted-interfaces.inc.php");
     ## Authenticated. Print a page.
     if($_GET['page'] && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
