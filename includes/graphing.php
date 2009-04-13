@@ -94,6 +94,34 @@ function temp_graph ($temp, $graph, $from, $to, $width, $height, $title, $vertic
   return $imgfile;
 }
 
+function graph_device_cpmCPU ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
+  global $config, $installdir;
+  $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
+  $options .= " -l 0 -E -b 1024 --title '$title' ";
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $hostname = gethostbyid($device);
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $iter = "1";
+  $sql = mysql_query("SELECT * FROM `cpmCPU` where `device_id` = '$device'");
+  $options .= "COMMENT:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Cur\ \ \ \ Max\\\\n";
+  while($proc = mysql_fetch_array($sql)) {
+    if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
+    } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
+    } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
+    $proc['descr_fixed'] = str_pad($proc['entPhysicalDescr'], 28);
+    $proc['descr_fixed'] = substr($proc['descr_fixed'],0,28);
+    $rrd  = $config['rrd_dir'] . "/$hostname/cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd";
+    $options .= " DEF:proc" . $proc['cpmCPU_oid'] . "=$rrd:usage:AVERAGE ";
+    $options .= " LINE1:proc" . $proc['cpmCPU_oid'] . "#" . $colour . ":'" . $proc['descr_fixed'] . "' ";
+    $options .= " GPRINT:proc" . $proc['cpmCPU_oid'] . ":LAST:%3.0lf";
+    $options .= " GPRINT:proc" . $proc['cpmCPU_oid'] . ":MAX:%3.0lf\\\l ";
+    $iter++;
+  }
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+
 function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";

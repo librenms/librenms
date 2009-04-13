@@ -9,9 +9,7 @@ while($processor = mysql_fetch_array($proc_data)) {
 
   echo("Checking CPU " . $processor['entPhysicalDescr'] . "... ");
 
-  $procrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/cpmCPU-" . str_replace("/", "_", str_replace(" ", "_",$processor['entPhysicalDescr'])) . ".rrd");
-  $procrrd  = str_replace(")", "_", $procrrd);
-  $procrrd  = str_replace("(", "_", $procrrd);
+  $procrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/cpmCPU-" . $processor['cpmCPU_oid'] . ".rrd");
 
   if (!is_file($procrrd)) {
     `rrdtool create $procrrd \
@@ -29,7 +27,7 @@ while($processor = mysql_fetch_array($proc_data)) {
   echo($proc . "%\n");
 
   $updatecmd = $config['rrdtool'] ." update $procrrd N:$proc";
-
+  echo("$updatecmd");
   shell_exec($updatecmd);
 
   mysql_query("UPDATE `cpmCPU` SET `cpmCPUTotal5minRev` = '$proc' WHERE `cpmCPU_id` = '".$processor['cpmCPU_id']."'");
