@@ -82,6 +82,7 @@ while ($entry = mysql_fetch_array($query)) {
         }
         if(!$exists) { 
           mysql_query("DELETE FROM bgpPeers WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'"); 
+	  mysql_query("DELETE FROM bgpPeers_cbgp WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'");
           echo("-");
         }
 }

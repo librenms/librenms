@@ -1,6 +1,6 @@
 <?php
 
-  ini_set('display_errors', 0);
+  ini_set('display_errors', 1);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
   ini_set('allow_url_fopen', 0);
@@ -133,7 +133,8 @@
     if($os == "Linux" || $os == "NetBSD" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "Windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfSense" || $os == "DragonFly" || $os == "OpenBSD") {
       $graph = cpugraphUnix ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS" || $os == "IOS XE") {
-      $graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);     
+      #$graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
       $graph = cpugraphwin ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "ProCurve") {
@@ -148,7 +149,9 @@
       $graph = graph_cpu_generic_single($hostname . "/junos-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     }
     break;
-
+  case 'dev_cpmCPU':
+      $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'temp':
       $graph = temp_graph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;

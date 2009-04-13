@@ -246,6 +246,8 @@ while ($device = mysql_fetch_array($device_query)) {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'uptime', '$uptime')");
     }
 
+    mysql_query("UPDATE `devices` SET `last_polled` = NOW() WHERE `device_id` = '". $device['device_id'] ."'");
+
   } ## End if snmpable
 
 

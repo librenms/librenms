@@ -15,7 +15,7 @@ if($argv[1] == "--device" && $argv[2]) {
 }
 
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%bar%' $where ORDER BY `device_id` DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%esr%' $where ORDER BY `device_id` DESC");
 
 while ($device = mysql_fetch_array($device_query)) {
 
@@ -77,7 +77,7 @@ while ($device = mysql_fetch_array($device_query)) {
       { 
         $sql = "INSERT INTO `links` (`src_if`, `dst_if`, `cdp`) VALUES ('$src_if_id', '$dst_if_id', '1')";
         mysql_query($sql);
-        echo("++($src_host $src_if -> $dst_host $dst_if)");
+        echo("\n++($src_host $src_if -> $dst_host $dst_if)");
       } else { 
         echo(".."); 
       }

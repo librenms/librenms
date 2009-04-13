@@ -43,11 +43,8 @@ if(mysql_result(mysql_query("SELECT count(*) from cpmCPU WHERE device_id = '" . 
     echo("<tr><td class=tablehead><a href='' $proc_popup>" . $proc['entPhysicalDescr'] . "</a></td>
             <td><a href='#' $fs_popup><img src='percentage.php?per=" . $proc['cpmCPUTotal5minRev'] . "'></a></td>
             <td style='font-weight: bold; color: $drv_colour'>" . $proc['cpmCPUTotal5minRev'] . "%</td>
-            <td>" . $total . "</td>
-            <td>" . $used . "</td>
           </tr>");
     $i++;
-
   }
   echo("</table>");
   echo("</div>");

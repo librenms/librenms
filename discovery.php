@@ -36,7 +36,7 @@ if($argv[1] == "--device" && $argv[2]) {
 }
 
 
-$devices_polled = 0;
+$devices_discovered = 0;
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query)) {
@@ -47,7 +47,7 @@ while ($device = mysql_fetch_array($device_query)) {
   include("includes/discovery/interfaces.php");
 
   ## Discover IPv4 Addresses
-  include("includes/discovery/ipaddresses.php");
+  include("includes/discovery/ipv4-addresses.php");
 
   ## Discovery IPv6 Addresses
   include("includes/discovery/ipv6-addresses.php");
@@ -72,14 +72,14 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cisco-processors.php");
   }
 
-  echo("\n"); $devices_polled++;
+  echo("\n"); $devices_discovered++;
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '".$device['device_id']."' AND `attrib_type` = 'discover'");
 }
 
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-echo("$devices_polled devices polled in $proctime secs\n");
+echo("$devices_discovered devices discovered in $proctime secs\n");
 
 
 ?>

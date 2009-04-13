@@ -32,7 +32,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   if($device['os'] == "IOS") {
 
-    $snmp_cmdb  = $config['snmpget'] . " -m +CISCO-VLAN-MEMBERSHIP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $snmp_cmdb  = $config['snmpget'] . " -m +CISCO-VLAN-MEMBERSHIP-MIB:CISCO-VTP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.2.2.1.1.1." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.68.1.2.2.1.2." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.46.1.6.1.1.16." . $interface['ifIndex'];
@@ -43,7 +43,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
     $snmp_outputb = str_replace("\"", "", $snmp_outputb);
 
     list($this['ifHardType'], $this['ifVlan'], $this['ifTrunk']) = explode("\n", $snmp_outputb);
-    if($this['ifTrunk'] == "notApplicable") { unset($this['ifTrunk']); }
+    if($this['ifTrunk'] == "notApplicable" || $this['ifTrunk'] == "6") { unset($this['ifTrunk']); }
     if($this['ifVlan'] == "") { unset($this['ifVlan']); }
 
     if ( $interface['ifTrunk'] != $this['ifTrunk'] ) {

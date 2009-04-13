@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./discovery.php --forced >> /var/log/observer.log
+#./discovery.php --forced >> /var/log/observer.log
 ./poll-mac_accounting.php >> /var/log/observer.log &
 ./discover-bgp_peers.php >> /var/log/observer.log &
 ./poll-device.php --odd >> /var/log/observer.log &
