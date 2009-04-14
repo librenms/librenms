@@ -33,10 +33,27 @@
         echo("+");
       } else { echo("."); }
 
+      $full_address = "$oid/$cidr";
+      $valid_v4[$full_address] = 1;
+
     } else { echo("!"); }
 
   }
 
+  $sql   = "SELECT * FROM ipv4_addresses AS A, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
+    $data = mysql_query($sql);
+    while($row = mysql_fetch_array($data)) {
+      $full_address = $row['ipv4_address'] . "/" . $row['ipv4_prefixlen'];
+      if(!$valid_v4[$full_address]) {
+        echo("-");
+        $query = @mysql_query("DELETE FROM `ipv4_addresses` WHERE `ipv4_address_id` = '".$row['ipv4_address_id']."'");
+        if(!mysql_result(mysql_query("SELECT count(*) FROM ipv4_addresses WHERE ipv4_network_id = '".$row['ipv4_network_id']."'"),0)) {
+          $query = @mysql_query("DELETE FROM `ipv4_networks` WHERE `ipv4_network_id` = '".$row['ipv4_network_id']."'");
+        }
+      }
+    }
+
   echo("\n");
 
+  unset($valid_v4);
 ?>
