@@ -1,7 +1,8 @@
 <?php
 echo("
 <div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Details</a> | Graphs:
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a> |
@@ -16,6 +17,11 @@ if($_GET['opta'] == graphs ) {
   }
   $dographs = 1;
 }
+
+if($_GET['opta'] == "details" ) {
+  $port_details = 1;
+}
+
 
 $hostname = gethostbyid($device['device_id']);
 
