@@ -17,8 +17,8 @@ while($device = mysql_fetch_array($device_query)) {
         echo("<br />");
       }
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
 
       break;
 
@@ -31,8 +31,8 @@ while($device = mysql_fetch_array($device_query)) {
       echo("<div class=graphhead>Firewall Sessions</div>");
       $graph_type = "fortigate_sessions";       include ("includes/print-device-graph.php");
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
 
       break;
 
@@ -47,8 +47,8 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "adsl_atn";         include ("includes/print-device-graph.php");
       echo("<br />");
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
 
       break;
 
@@ -61,8 +61,8 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "netscreen_sessions";       include ("includes/print-device-graph.php");
 
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
 
       break;
 
@@ -129,8 +129,8 @@ while($device = mysql_fetch_array($device_query)) {
         echo("<br />");
       }
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
 
       echo("<div class=graphhead>System Load</div>");
       $graph_type = "load";             include ("includes/print-device-graph.php");
@@ -177,8 +177,8 @@ while($device = mysql_fetch_array($device_query)) {
         echo("<br />");
       }
 
-      include("blocks/netstats.inc.php");
-      include("blocks/uptime.inc.php");
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
       break;
     case "Snom":
       echo("<div class=graphhead>Calls</div>");

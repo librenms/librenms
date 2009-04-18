@@ -27,7 +27,7 @@ echo("
 
      if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
-     $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+     $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
      if($peerhost) { $peername = generatedevicelink($peerhost); } else { unset($peername); }
 
