@@ -14,7 +14,7 @@ if($device[os] != "Snom") {
 
   $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/netinfo.rrd";
 
-  $rrd_create = "rrdtool create $rrdfile ";
+  $rrd_create = $config['rrdtool'] . " create $rrdfile ";
   $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \
                   RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
 
@@ -23,8 +23,10 @@ if($device[os] != "Snom") {
     $snmpstring .= " $oid.0"; 
   }
 
-  if(!file_exists($rrdfile)) { `$rrd_create`; }
-  $snmpdata_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
+  if(!file_exists($rrdfile)) { 
+    shell_exec($rrd_create); 
+  }
+  $snmpdata_cmd = "snmpget -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
   $snmpdata     = trim(`$snmpdata_cmd`);
   $rrdupdate = "N";
   foreach(explode("\n", $snmpdata) as $data) {

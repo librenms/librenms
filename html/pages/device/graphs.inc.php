@@ -7,6 +7,11 @@ while($device = mysql_fetch_array($device_query)) {
 
    echo("<div style='clear: both;'>");
 
+    $os = strtolower(str_replace(" ", "_", $device['os']));  
+    if(is_file($config['install_dir'] . "/html/pages/device/graphs/os-$os.inc.php")) {
+      include($config['install_dir'] . "/html/pages/device/graphs/os-$os.inc.php");
+    }
+
    switch ($device['os']) {
    case "JunOS":
       echo("<div class=graphhead>Processor Utilisation</div>");
@@ -165,22 +170,8 @@ while($device = mysql_fetch_array($device_query)) {
       break;
    case "IOS":
    case "IOS XE":
-      echo("<div class=graphhead>CPU Usage</div>");
-      $graph_type = "cpu";              include ("includes/print-device-graph.php");
-      echo("<br />");
-      echo("<div class=graphhead>Memory Usage</div>");
-      $graph_type = "mem";              include ("includes/print-device-graph.php");
-      echo("<br />");
-      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
-        echo("<div class=graphhead>Temperatures</div>");
-        $graph_type = "dev_temp";             include ("includes/print-device-graph.php");
-        echo("<br />");
-      }
-
-      include("graphs/netstats.inc.php");
-      include("graphs/uptime.inc.php");
       break;
-    case "Snom":
+   case "Snom":
       echo("<div class=graphhead>Calls</div>");
       $graph_type = "calls";              include ("includes/print-device-graph.php");
    }

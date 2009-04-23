@@ -23,13 +23,9 @@ while ($device = mysql_fetch_array($device_query)) {
    $status = trim($status);
 
    if(strstr($status, "alive")) {
-     $pos = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
+     $pos = shell_exec($config['snmpget'] . " -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
      if($pos == '') { 
        $status='0';
-       $posb = shell_exec($config['snmpget'] . " -$snmpver -c $community -t 1 $hostname:$port 1.3.6.1.2.1.7526.2.4");
-       if($posb == '') { } else { 
-         $status='1'; 
-       }
      } else { 
        $status='1'; 
      }

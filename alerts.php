@@ -18,7 +18,7 @@ while ($alert = mysql_fetch_array($alert_query)) {
 
 if($alert_text) {
   echo("$alert_text");
-#  `echo '$alert_text' | gnokii --sendsms 07885729982`;
+#  `echo '$alert_text' | gnokii --sendsms <NUMBER>`;
 }
 
 

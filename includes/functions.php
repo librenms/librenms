@@ -16,6 +16,11 @@ include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 
+function only_alphanumeric( $string )
+{
+        return preg_replace('/[^a-zA-Z0-9]/', '', $string);
+}
+
 
 function mres($string) { // short function wrapper because the real one is stupidly long and ugly. aestetics.
   return mysql_real_escape_string($string);
@@ -142,9 +147,9 @@ function formatRates($rate)
    return $rate;
 }
 
-function formatstorage($rate) 
+function formatstorage($rate, $round = '2') 
 {
-   $rate = format_bi($rate) . "B";
+   $rate = format_bi($rate, $round) . "B";
    return $rate;
 }
 
@@ -157,12 +162,12 @@ function format_si($rate)
   return round($rate, $round[$i]).$ext;
 }
 
-function format_bi($size) 
+function format_bi($size, $round = '2') 
 {
-  $sizes = Array('', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei');
+  $sizes = Array('', 'K', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
-  return round($size, 2).$ext;
+  return round($size, $round).$ext;
 }
 
 function arguments($argv) 
@@ -203,11 +208,11 @@ function truncate($substring, $max = 50, $rep = '...')
   if(strlen($string) > $max){ return substr_replace($string, $rep, $leave); } else { return $string; }      
 }
 
-function interface_rates ($interface)  // Returns the last in/out value in RRD
+function interface_rates ($rrd_file)  // Returns the last in/out value in RRD
 {
   global $config;
-  $rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
-  $cmd  = $config['rrdtool']." fetch -s -600s -e now ".$rrdfile." AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
+  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
+  $cmd  = $config['rrdtool']." fetch -s -600s -e now $rrd_file AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
   $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
     list($in, $out) = split(" ", $entry);
@@ -217,12 +222,12 @@ function interface_rates ($interface)  // Returns the last in/out value in RRD
   return $rate;
 }
 
-function interface_errors ($interface) // Returns the last in/out errors value in RRD
+function interface_errors ($rrd_file) // Returns the last in/out errors value in RRD
 {
   global $config;
-  $rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
-  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrdfile AVERAGE | grep : | cut -d\" \" -f 4,5";
-  $data = trim(`$cmd`);
+  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
+  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
+  $data = trim(shell_exec($cmd));
   foreach( explode("\n", $data) as $entry) {
         list($in, $out) = explode(" ", $entry);
         $in_errors += ($in * 300);

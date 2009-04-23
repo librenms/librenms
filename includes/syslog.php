@@ -15,7 +15,7 @@ function process_syslog ($entry, $update) {
   if($device_id_host) { 
     $device_id = $device_id_host;
   } else {
-    $device_id_ip = @mysql_result(mysql_query("SELECT D.device_id as device_id FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '" . $entry['host']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"),0);
+    $device_id_ip = @mysql_result(mysql_query("SELECT D.device_id as device_id FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"),0);
     if($device_id_ip) { 
       $device_id = $device_id_ip;
     }
@@ -23,8 +23,10 @@ function process_syslog ($entry, $update) {
 
   if($device_id && !$delete) {
     $entry['device_id'] = $device_id;
-    if(mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$device_id'"),0) == "IOS") {
+    $os = mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$device_id'"),0);
+    if($os == "IOS" || $os == "IOS XE") {
       if(strstr($entry[msg], "%")) {
+        $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
         list(,$entry[msg]) = split(": %", $entry['msg']);
         $entry['msg'] = "%" . $entry['msg'];
         $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);      

@@ -48,7 +48,7 @@ while ($dr = mysql_fetch_array($dq)) {
   $hrStorageAllocationUnits = $dr['hrStorageAllocationUnits'];
   $hrStorageSize = $dr['hrStorageAllocationUnits'] * $dr['hrStorageSize']; 
   $hrStorageDescr = $dr['hrStorageDescr'];
-  $cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageUsed.$hrStorageIndex";
+  $cmd  = "snmpget -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageUsed.$hrStorageIndex";
   $used_units = trim(`$cmd`);
   $used = $used_units * $hrStorageAllocationUnits;
   $perc = round($used / $hrStorageSize * 100, 2);
@@ -78,14 +78,10 @@ while ($dr = mysql_fetch_array($dq)) {
     if($dr['storage_perc'] < '40' && $perc >= '40') {
 
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-
     $msg  = "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'] . " is " . $perc;
     $msg .= " at " . date('l dS F Y h:i:s A');
-
     mail($email, "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'], $msg, $config['email_headers']);
-
     echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "/n");
-
   }
 
 
@@ -104,11 +100,11 @@ $oid_ssCpuUser		  = ".1.3.6.1.4.1.2021.11.9.0";
 $oid_ssCpuSystem	  = ".1.3.6.1.4.1.2021.11.10.0";
 
 
-$cpu_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$cpu_cmd  = $config['snmpget'] ." -m UCD-SNMP-MIB:HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
-$cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem .1.3.6.1.4.1.2021.1.101.1";
+$cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem";
 $cpu  = `$cpu_cmd`;
-list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $UsageSystem, $cputemp) = explode("\n", $cpu);
+list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $UsageSystem) = explode("\n", $cpu);
 
 $cpuUsage = $UsageUser + $UsageSystem;
 
@@ -192,30 +188,19 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
     RRA:MAX:0.5:288:800");
   } // end create load rrd
 
-  $mem_get = "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
-  $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $mem_get;
-  $mem_raw = `$mem_cmd`;
-  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", $mem_raw); 
+  $mem_cmd  = $config['snmpget'] . " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $mem_cmd .= " memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
+
+  $mem_raw = shell_exec($mem_cmd);
+  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", str_replace(" kB", "", $mem_raw)); 
 
   $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-  $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
+  $load_cmd = "snmpget -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
   $load_raw = `$load_cmd`;
   list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
   rrdtool_update($sysrrd,  "N:$users:$procs");
   rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
   rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
-
-  if($device['courier']) {
-    include("includes/polling/courierstats.inc.php");
-  }
-
-  if($device['postfix']) {
-    include("includes/polling/mailstats.inc.php");
-  }
-
-  if($device['apache']) {
-   include("includes/polling/apachestats.inc.php");
-  }
 
 } // end Non-m0n0wall

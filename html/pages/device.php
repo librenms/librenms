@@ -37,6 +37,40 @@ echo("<li class=" . $select['graphs'] . ">
 </li>
 ");
 
+$health = mysql_result(mysql_query("select count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0) +
+           mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
+           mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0);
+
+if($health) {
+  echo("
+<li class=" . $select['health'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/'>
+    <img src='images/16/chart_curve.png' align=absmiddle border=0> Health
+  </a>
+</li>
+");
+}
+
+if(is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
+  echo("
+<li class=" . $select['collectd'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/collectd/'>
+    <img src='images/16/chart_line.png' align=absmiddle border=0> CollectD
+  </a>
+</li>
+");
+}
+
+
+if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+  echo("
+<li class=" . $select['ports'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/".$config['ports_page_default']."'>
+    <img src='images/16/connect.png' align=absmiddle border=0> Ports
+  </a>
+</li>");
+}
+
 if(@mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo("
 <li class=" . $select['vlans'] . ">
@@ -65,22 +99,17 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
 </li>");
 }
 
-if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(@mysql_result(mysql_query("SELECT count(*) FROM nagios_hosts WHERE address = '".$device['hostname']."'", $nagios_link), 0) > '0') {
   echo("
-<li class=" . $select['ifs'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>
-    <img src='images/16/connect.png' align=absmiddle border=0> Ports
+<li class=" . $select['nagios'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/nagios/'>
+    <img src='images/16/transmit_blue.png' align=absmiddle border=0> Nagios
   </a>
 </li>");
-
-#<li class=" . $select['ifgraphs'] . ">
-#  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ifgraphs/'>
-#    <img src='images/16/port_graphs.png' align=absmiddle border=0> Port Graphs
-#  </a>
-#</li>");
 }
 
-if($_SESSION[userlevel] >= "5") {
+
+if($_SESSION[userlevel] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.src_if"),0)) {
   echo("
 <li class=" . $select['map'] . ">
   <a href='".$config['base_url']."/device/" . $device['device_id'] . "/map/'>
@@ -100,16 +129,6 @@ if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entP
 ");
 
 
-}
-
-if(mysql_result(mysql_query("select count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0) > '0') {
-  echo("
-<li class=" . $select['temp'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/temp/'>
-    <img src='images/16/weather_sun.png' align=absmiddle border=0> Temps
-  </a>
-</li>
-");
 }
 
 if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
