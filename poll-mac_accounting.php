@@ -7,9 +7,9 @@
   $mac_accounting_query = mysql_query("SELECT * FROM `mac_accounting` as A, `interfaces` AS I, `devices` AS D where A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'");
   while ($acc = mysql_fetch_array($mac_accounting_query)) {
 
-   echo("Polling :" . $acc['peer_ip']. " " . $acc['ifDescr']. " " . $acc['hostname'] . "\n");
+   echo("Polling :" . $acc['peer_ip']. " " . $acc['ifDescr']. " " . $acc['hostname'] . " ");
 
-   $snmp_cmd  = $config['snmpget'] . " -O Uqnv -" . $acc['snmpver'] . " -c " . $acc['community'] . " " . $acc['hostname'];
+   $snmp_cmd  = $config['snmpget'] . " -m CISCO-IP-STAT-MIB -O Uqnv -" . $acc['snmpver'] . " -c " . $acc['community'] . " " . $acc['hostname'];
    $snmp_cmd .= " " . $acc['in_oid'] . " " . $acc['out_oid'];
 
    $snmp_output = trim(`$snmp_cmd`);
@@ -36,6 +36,11 @@
 
    $woo = "N:$in:$out";
    $ret = rrdtool_update("$rrdfile", $woo);
+
+  $rates = interface_rates ($rrdfile);
+  mysql_query("UPDATE `mac_accounting` SET bps_in = '" . $rates['in'] . "', bps_out = '" . $rates['out'] . "' WHERE ma_id= '" . $acc['ma_id'] . "'");
+
+  echo(formatRates($rates['in']) . " in " . formatRates($rates['out']) . " out \n");
 
   }
 ?>

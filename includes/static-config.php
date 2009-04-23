@@ -19,12 +19,20 @@ $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
 $config['version'] = "0.5.1";
 
-### Connect to database
-if (!@mysql_connect($config['db_host'], $config['db_user'], $config['db_pass'])) {
-        echo "<h2>MySQL Error</h2>";
+$nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
+if (!$nagios_link) {
+        echo "<h2>Nagios MySQL Error</h2>";
         die;
 }
-mysql_select_db($config['db_name']);
+$nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
+
+### Connect to database
+$observer_link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$observer_link) {
+        echo "<h2>Observer MySQL Error</h2>";
+        die;
+}
+$observer_db = mysql_select_db($config['db_name'], $observer_link);
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 

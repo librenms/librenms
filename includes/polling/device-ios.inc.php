@@ -107,5 +107,6 @@
 
    include("includes/polling/bgpPeer.inc.php");
    include("includes/polling/cisco-processors.inc.php");
+   include("includes/polling/cisco-mempool.inc.php");
 
 ?>

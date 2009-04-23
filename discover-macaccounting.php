@@ -23,7 +23,7 @@ $data = trim(`cat mac-accounting.txt`);
 
 foreach( explode("\n", $data) as $peer_entry) {
  list($interface_ip, $peer_ip, $peer_desc, $peer_asn, $peer_mac, $in_oid, $out_oid) = explode(",", $peer_entry);
- $interface_id = mysql_result(mysql_query("SELECT interface_id FROM ipaddr WHERE addr = '$interface_ip'"),0);
+ $interface_id = mysql_result(mysql_query("SELECT interface_id FROM ipv4_addresses WHERE ipv4_address = '$interface_ip'"),0);
  $device_id = mysql_result(mysql_query("SELECT device_id FROM interfaces WHERE interface_id = '$interface_id'"),0);
 
  echo("PEER : $peer_ip AS$peer_asn ($peer_mac) int: $interface_id host: $device_id \n");

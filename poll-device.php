@@ -12,8 +12,15 @@ if($argv[1] == "--device" && $argv[2]) {
   $where = "AND MOD(device_id,2) = 1";
 } elseif ($argv[1] == "--even") {
   $where = "AND MOD(device_id,2) = 0";
+} elseif ($argv[1] == "--odd3") {
+  $where = "AND MOD(device_id,2) = 1 AND device_id NOT LIKE '%1'";
+} elseif ($argv[1] == "--even3") {
+  $where = "AND MOD(device_id,2) = 0 AND device_id NOT LIKE '%2'";
+} elseif ($argv[1] == "--other3") {
+  $where = "AND (device_id LIKE '%1' OR device_id LIKE '%2')";
+
 } elseif ($argv[1] == "--all") {
-  $where = "";
+
 } else {
   echo("--device <device id>    Poll single device\n");
   echo("--all                   Poll all devices\n\n");
@@ -56,11 +63,11 @@ while ($device = mysql_fetch_array($device_query)) {
     } else { 
       $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
     }
-    $snmp_cmd =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
+    $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB:HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysName.0";
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
-      $snmp_cmdb =  $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
+      $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
       $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
       $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
       $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
@@ -71,7 +78,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
     list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
-    $sysDescr = trim(shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
+    $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
     list($days, $hours, $mins, $secs) = explode(":", $sysUptime);

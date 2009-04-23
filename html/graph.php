@@ -1,10 +1,12 @@
 <?php
 
+if($_GET['debug']) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
   ini_set('allow_url_fopen', 0);
-#  ini_set('error_reporting', E_ALL);
+  ini_set('error_reporting', E_ALL);
+}
 
   include("../config.php");
   include("../includes/functions.php");
@@ -26,7 +28,7 @@
     $device_id = getpeerhost($_GET['peer']);
   }
 
-  if($_GET['legend']) { $legend = $_GET['legend']; }
+  if($_GET['legend']) { $legend = $_GET['legend']; } else { $legend = '1'; }
   if($_GET['inverse']) { $inverse = $_GET['inverse'];  }
   if($device_id) { $hostname = gethostbyid($device_id); }
 
@@ -152,17 +154,24 @@
   case 'dev_cpmCPU':
       $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
+  case 'cpmCPU':
+      $graph = graph_cpmCPU ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'temp':
       $graph = temp_graph ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'dev_temp':
       $graph = temp_graph_dev ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
+    case 'cempMemPool':
+      $graph = graph_cempMemPool ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'mem':
     if($os == "Linux" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "NetBSD" ) {
       $graph = memgraphUnix ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS" || $os == "IOS XE") {
-      $graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+      $graph = graph_device_cempMemPool ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
+      #$graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
     } elseif($os == "ProCurve") {
       $graph = memgraphHP ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -224,8 +233,13 @@
     }
     break;
   default:
-    echo("INCORRECT GRAPH TYPE");
-    exit;
+    if(is_file($config['install_dir'] . "/html/includes/graphs/$type.inc.php")) {
+      include($config['install_dir'] . "/html/includes/graphs/$type.inc.php");
+    } else {
+      echo("INCORRECT GRAPH TYPE");
+      exit;
+    }
+    break;
   }
 
   if($graph) {

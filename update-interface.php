@@ -20,9 +20,9 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
-  $snmp_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ifName." . $interface['ifIndex'];
+  $snmp_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ifName." . $interface['ifIndex'];
   $snmp_cmd .= " ifDescr." . $interface['ifIndex'] . " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ";
-  $snmp_cmd .= "ifAlias." . $interface['ifIndex'] . " ifSpeed." . $interface['ifIndex'] . " 1.3.6.1.2.1.10.7.2.1." . $interface['ifIndex'];
+  $snmp_cmd .= "ifAlias." . $interface['ifIndex'] . " ifSpeed." . $interface['ifIndex'];
   $snmp_cmd .= " ifType." . $interface['ifIndex'] . " ifMtu." . $interface['ifIndex'] . " ifPhysAddress." . $interface['ifIndex'];
 
   $snmp_output = trim(`$snmp_cmd`);
@@ -32,7 +32,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   if($device['os'] == "IOS") {
 
-    $snmp_cmdb  = $config['snmpget'] . " -m +CISCO-VLAN-MEMBERSHIP-MIB:CISCO-VTP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $snmp_cmdb  = $config['snmpget'] . " -m CISCO-SMI:CISCO-VLAN-MEMBERSHIP-MIB:CISCO-VTP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.2.2.1.1.1." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.68.1.2.2.1.2." . $interface['ifIndex'];
     $snmp_cmdb .= " .1.3.6.1.4.1.9.9.46.1.6.1.1.16." . $interface['ifIndex'];
@@ -55,7 +55,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
     if ( $interface['ifVlan'] != $this['ifVlan']) {
        $update .= $seperator . "`ifVlan` = '" . $this['ifVlan'] . "'";
-       echo($update);
+       #echo($update);
        $seperator = ", ";
        mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'VLAN Vlan -> " . $this['ifVlan'] . "')");
     }
@@ -65,7 +65,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
   }
 
-  list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifDuplex, $ifType, $ifMtu, $ifPhysAddress) = explode("\n", $snmp_output);
+  list($ifName, $ifDescr, $ifAdminStatus, $ifOperStatus, $ifAlias, $ifSpeed, $ifType, $ifMtu, $ifPhysAddress) = explode("\n", $snmp_output);
   $ifDescr = trim(str_replace("\"", "", $ifDescr));
   if ($ifDuplex == 3) { $ifDuplex = "half"; } elseif ($ifDuplex == 2) { $ifDuplex = "full"; } else { $ifDuplex = "unknown"; }
   $ifDescr = strtolower($ifDescr);
@@ -73,7 +73,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $ifAlias = trim(str_replace("\"", "", $ifAlias));
   $ifAlias = trim($ifAlias);
 
-  echo("\n$ifName\n");
+  #echo("\n$ifName\n");
   $ifDescr = fixifname($ifDescr);
 
   $ifPhysAddress = strtolower(str_replace("\"", "", $ifPhysAddress));
