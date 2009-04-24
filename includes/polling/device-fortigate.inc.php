@@ -2,8 +2,8 @@
 
 echo("Fortinet Fortigate Poller\n");
 
-$fnSysVersion = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysVersion.0");
-$serial       = shell_exec($config['snmpget']." -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysSerial.0");
+$fnSysVersion = shell_exec($config['snmpget']." -m FORTINET-MIB-280 -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysVersion.0");
+$serial       = shell_exec($config['snmpget']." -m FORTINET-MIB-280 -".$device['snmpver']." -Ovq -c ".$device['community']." ".$device['hostname'].":".$device['port']." fnSysSerial.0");
 
 $version = preg_replace("/(.+)\ (.+),(.+),(.+)/", "Fortinet \\1||\\2||\\3||\\4", $fnSysVersion);
 list($hardware,$version,$features) = explode("||", $version);
@@ -12,7 +12,7 @@ $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-cpu.rrd
 $memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-memory.rrd";
 $sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate-sessions.rrd";
 
-$cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+$cmd  = $config['snmpget'] . " -m FORTINET-MIB-280 -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $cmd .= " fnSysCpuUsage.0 fnSysMemUsage.0 fnSysSesCount.0 fnSysMemCapacity.0";
 $data = shell_exec($cmd);
 list ($cpu, $mem, $ses, $memsize) = explode("\n", $data);

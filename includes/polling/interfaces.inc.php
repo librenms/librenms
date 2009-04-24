@@ -93,7 +93,6 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if($ifOperStatus == "up") {
 
-#    $snmp_data_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_data_cmd  = "snmpget -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifOutErrors." . $interface['ifIndex'] . " ifInUcastPkts." . $interface['ifIndex'] . " ifOutUcastPkts." . $interface['ifIndex'];
@@ -106,7 +105,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
     list($ifHCInOctets, $ifHCOutOctets, $ifInErrors, $ifOutErrors, $ifInUcastPkts, $ifOutUcastPkts, $ifInNUcastPkts, $ifOutNUcastPkts) = explode("\n", $snmp_data);
     if($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
 
-      $octets_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+      $octets_cmd  = "snmpget -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
       $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex'];
       $octets = `$octets_cmd`;
       list ($ifHCInOctets, $ifHCOutOctets) = explode("\n", $octets);
