@@ -69,7 +69,7 @@ function getHostOS($hostname, $community, $snmpver, $port) {
 
     global $config;
 
-    $sysDescr_cmd = $config['snmpget']." -O qv -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " sysDescr.0";
+    $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " sysDescr.0";
     $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
     $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
@@ -374,7 +374,7 @@ function addHost($host, $community, $snmpver, $port = 161)
   if ( isDomainResolves($host)){
     if ( isPingable($host)) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
-        $snmphost = shell_exec($config['snmpget'] ." -Oqv -$snmpver -c $community $host:$port sysName.0");
+        $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host) {
           createHost ($host, $community, $snmpver, $port);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
@@ -465,11 +465,9 @@ function formatUptime($diff, $format="long")
 function isSNMPable($hostname, $community, $snmpver, $port) 
 {
      global $config;
-     $pos = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
+     $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
      if($pos == '') {
        $status='0';
-       $posb = shell_exec($config['snmpget'] ." -$snmpver -c $community -t 1 $hostname:$port 1.3.6.1.2.1.7526.2.4");
-       if($posb == '') { } else { $status='1'; }
      } else {
        $status='1';
      }

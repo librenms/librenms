@@ -4,7 +4,8 @@
 
   echo("Interfaces : ");
 
-  $cmd = $config['snmpwalk'] . " -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.2.1.2.2.1.2";
+  $cmd  = $config['snmpwalk'] . " -m IF-MIB -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $cmd .= " .1.3.6.1.2.1.2.2.1.2";
   $interfaces = trim(shell_exec($cmd));
   $interfaces = str_replace("\"", "", $interfaces);
   $interfaces = str_replace("ifDescr.", "", $interfaces);
@@ -19,7 +20,7 @@
     list($ifIndex, $ifName) = explode("||", $entry);
 
     if($config['ifdescr'][$device['os']]) {
-      $ifDescr = shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ifDescr.$ifIndex");
+      $ifDescr = shell_exec($config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ifDescr.$ifIndex");
       $ifDescr = str_replace("No Such Object available on this agent at this OID", "", $ifDescr);
       $ifDescr = str_replace("No Such Instance currently exists at this OID", "", $ifDescr);
       $ifDescr = trim(str_replace("\"", "", $ifDescr));

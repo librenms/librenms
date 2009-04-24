@@ -45,12 +45,6 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("\n" . $device['hostname'] ."\n");
 
   include("includes/discovery/".$type.".php");
-#  include("includes/discovery/ipv6-addresses.php");
-#  include("includes/discovery/cisco-pw.php");
-
-#  include("includes/discovery/host-physical.php");
-
-# include("includes/discovery/bgp-peers.php");
 
   echo("\n"); $devices_polled++;
 }

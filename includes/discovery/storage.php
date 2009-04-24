@@ -4,13 +4,13 @@
 
   echo("Storage : ");  
 
-  $oids = shell_exec($config['snmpwalk'] . " -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
+  $oids = shell_exec($config['snmpwalk'] . " -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
   $oids = trim(str_replace("hrStorageIndex.","",$oids));
 
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
     list($oid,$hrStorageIndex) = explode(" ", $data);
-    $temp = shell_exec($config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
+    $temp = shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
     $temp = trim($temp);
     list($descr, $units, $size, $type) = explode("\n", $temp);
     list($units) = explode(" ", $units);

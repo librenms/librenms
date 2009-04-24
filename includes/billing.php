@@ -67,15 +67,10 @@ function getDates($dayofmonth) {
 
 
 function getValue($host, $community, $port, $id, $inout) {
+        global $config;
 	$oid  = "IF-MIB::ifHC" . $inout . "Octets." . $id;
-        $value = `snmpget -c $community -v2c -O qv $host:$port $oid`;
+        $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -v2c -O qv $host:$port $oid");
         return $value;
-}
-
-function getIfName($host, $port, $id) {
-	$oid = "IF-MIB::ifDescr." . $id;
-	$value = `snmpget -c xyyz -v2c -O qv $host:$port $oid`;
-	return $value;
 }
 
 function getLastPortCounter($port_id,$inout) {

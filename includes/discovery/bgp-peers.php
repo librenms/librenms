@@ -4,7 +4,7 @@
 
   echo("BGP Sessions : ");
 
-  $as_cmd  = $config['snmpwalk'] . " -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $as_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $as_cmd .= ".1.3.6.1.2.1.15.2";
   $bgpLocalAs = trim(shell_exec($as_cmd));
 
@@ -14,7 +14,7 @@
 
     if($bgpLocalAs != $device['bgpLocalAs']) { mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS\n"); }
 
-    $peers_cmd  = $config['snmpwalk'] . " -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+    $peers_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $peers_cmd .= "BGP4-MIB::bgpPeerRemoteAs"; 
     $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", `$peers_cmd`));  
     foreach (explode("\n", $peers) as $peer)  {
