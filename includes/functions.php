@@ -238,6 +238,19 @@ function interface_errors ($rrd_file) // Returns the last in/out errors value in
   return $errors;
 }
 
+function interface_packets ($rrd_file) // Returns the last in/out pps value in RRD
+{
+  global $config;
+  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
+  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 6,7";
+  $data = trim(shell_exec($cmd));
+  foreach( explode("\n", $data) as $entry) {
+        list($in, $out) = explode(" ", $entry);
+  }
+  $packets['in'] = round($in);
+  $packets['out'] = round($out);
+  return $packets;
+}
 
 function geteventicon ($message) 
 {
