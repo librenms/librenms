@@ -1,0 +1,7 @@
+<?
+
+include("collectd/collectd.php");
+
+
+?>
+
