@@ -18,12 +18,15 @@ $config['base_url'] = "http://demo.observernms.com";
 
 ### Location of executables
 
-$config['sipcalc'] = "/usr/bin/sipcalc";
-$config['rrdtool'] = "/usr/bin/rrdtool";
-$config['fping'] = "/usr/sbin/fping";
-$config['ipcalc'] = "/usr/bin/ipcalc";
-$config['snmpwalk'] = "/usr/bin/snmpwalk";
-$config['snmpget'] = "/usr/bin/snmpget";
+$config['sipcalc']      = "/usr/bin/sipcalc";
+$config['rrdtool']      = "/usr/bin/rrdtool";
+$config['fping']        = "/usr/sbin/fping";
+$config['ipcalc']       = "/usr/bin/ipcalc";
+$config['snmpwalk']     = "/usr/bin/snmpwalk";
+$config['snmpget']      = "/usr/bin/snmpget";
+$config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
+$config['snmpset']      = "/usr/bin/snmpset";
+
 
 ### RRDGraph Settings
 
@@ -41,7 +44,7 @@ $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 $config['nets'] =  array ("10.0.0.0/8", "172.22.0.0/16");
 
 ## Your local domain name and specifics
-$config['mydomain'] = "observernms.net";
+$config['mydomain'] = "observernms.org";
 $config['page_title']  = "Demo ObserverNMS";
 $config['title_image'] = $config['base_url'] . "images/observer-logo.jpg";
 $config['stylesheet']  = "css/styles.css"; 
