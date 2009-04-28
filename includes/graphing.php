@@ -4,7 +4,6 @@ include("graphing/screenos.php");
 include("graphing/fortigate.php");
 include("graphing/windows.php");
 include("graphing/unix.php");
-include("graphing/collectd.inc.php");
 
 function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
   global $config, $installdir;
