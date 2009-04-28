@@ -17,7 +17,7 @@ $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.5.1";
+$config['version'] = "0.6.0";
 
 $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
 if (!$nagios_link) {
