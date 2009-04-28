@@ -1,0 +1,58 @@
+--
+-- Juniper Enterprise specific MIB: IDP MIB
+--
+-- Copyright (c) 2006-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+
+    JUNIPER-JS-IDP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32
+        FROM SNMPv2-SMI
+        jnxJsIdpRoot
+        FROM JUNIPER-JS-SMI;
+
+    jnxJsIdpMIB MODULE-IDENTITY
+        LAST-UPDATED "200706132153Z" -- Wed Jun 13 21:53:50 2007UTC
+        ORGANIZATION "Juniper Networks, Inc."
+        CONTACT-INFO
+               " Juniper Technical Assistance Center
+                 Juniper Networks, Inc.
+                 1194 N. Mathilda Avenue
+                 Sunnyvale, CA 94089
+                 E-mail: support@juniper.net"
+
+        DESCRIPTION
+                "This is Juniper Networks' implementation of enterprise
+                 specific MIB for IDP."
+    
+        ::= {jnxJsIdpRoot 1}
+
+    jnxJsIdpObjects OBJECT IDENTIFIER ::= { jnxJsIdpMIB 1 }
+
+    jnxJsIdpDataPlaneMemoryUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Memory used by IDP in the data plane in percentage"
+    
+    ::= { jnxJsIdpObjects 1}
+
+    jnxJsIdpSessionsUsage OBJECT-TYPE
+        SYNTAX  Unsigned32
+        UNITS   "percent"
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Currently allocated sessions by IDP in percentage"
+    
+    ::= { jnxJsIdpObjects 2}
+
+END

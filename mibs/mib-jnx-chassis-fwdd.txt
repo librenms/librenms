@@ -1,0 +1,87 @@
+--
+-- Juniper Enterprise Specific MIB: J-Series FWDD (Forwarding Daemon) MIB
+-- 
+-- Copyright (c) 2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-CHASSIS-FWDD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32
+        FROM SNMPv2-SMI
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxFwdd MODULE-IDENTITY
+    LAST-UPDATED "200602162158Z" -- Thurs Feb 16 21:58:00 2006 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for J-Series FWDD module from the router chassis box."
+    ::= { jnxMibs 34 }
+
+
+--
+-- FWDD Process Info
+--
+
+jnxFwddProcess 	  OBJECT IDENTIFIER ::= { jnxFwdd 1 }
+
+
+	jnxFwddMicroKernelCPUUsage OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FWDD Micro Kernel CPU utilization in percentage.
+         Zero if unavailable or inapplicable."
+	::= { jnxFwddProcess 1 }
+
+	jnxFwddRtThreadsCPUUsage OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FWDD Realtime threads total CPU utilization in percentage.
+         Zero if unavailable or inapplicable."
+	::= { jnxFwddProcess 2 }
+
+	jnxFwddHeapUsage OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FWDD Heap utilization in percentage.
+         Zero if unavailable or inapplicable."
+	::= { jnxFwddProcess 3 }
+
+	jnxFwddDmaMemUsage OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FWDD DMA Memory utilization in percentage.
+         Zero if unavailable or inapplicable."
+	::= { jnxFwddProcess 4 }
+
+	jnxFwddUpTime OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"seconds"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The FWDD Module uptime expressed in seconds.
+         Zero if unavailable or inapplicable."
+	::= { jnxFwddProcess 5 }
+
+END

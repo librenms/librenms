@@ -1,0 +1,70 @@
+-- *****************************************************************
+-- OLD-CISCO-CPU-MIB.my:  Old Cisco Cpu MIB file
+--
+-- May 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+               OLD-CISCO-CPU-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+			OBJECT-TYPE
+				FROM RFC-1212
+			local
+				FROM CISCO-SMI;
+          
+-- lcpu is the same as lsystem
+-- name changed to support separate compilation with mibcomp
+
+               lcpu             OBJECT IDENTIFIER ::= { local 1 }
+
+               busyPer OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CPU busy percentage in the last 5 second
+                           period. Not the last 5 realtime seconds but
+                           the last 5 second period in the scheduler."
+                   ::= { lcpu 56 }
+
+               avgBusy1 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "1 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { lcpu 57 }
+
+               avgBusy5 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "5 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { lcpu 58 }
+
+               idleCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "cisco internal variable. not to be used"
+                   ::= { lcpu 59 }
+
+               idleWired OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "cisco internal variable. not to be used"
+                   ::= { lcpu 60 }
+
+END
+
