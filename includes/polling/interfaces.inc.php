@@ -21,7 +21,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $snmp_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
    $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'];
 
-   $snmp_output = trim(`$snmp_cmd`);
+   $snmp_output = trim(shell_exec($snmp_cmd));
    $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);
    $snmp_output = str_replace("No Such Instance currently exists at this OID", "", $snmp_output);
    $snmp_output = str_replace("\"", "", $snmp_output);
@@ -61,7 +61,6 @@ while ($interface = mysql_fetch_array($interface_query)) {
       RRA:MAX:0.5:288:797");
    }
 
-
    if( file_exists("includes/polling/interface-" . $device['os'] . ".php") ) { include("includes/polling/interface-" . $device['os'] . ".php"); }
 
    if ( $interface['ifAlias'] != $ifAlias ) {
@@ -93,21 +92,21 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if($ifOperStatus == "up") {
 
-    $snmp_data_cmd  = "snmpget -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $snmp_data_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifOutErrors." . $interface['ifIndex'] . " ifInUcastPkts." . $interface['ifIndex'] . " ifOutUcastPkts." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifInNUcastPkts." . $interface['ifIndex'] . " ifOutNUcastPkts." . $interface['ifIndex'];
 
-    $snmp_data = `$snmp_data_cmd`;
+    $snmp_data = shell_exec($snmp_data_cmd);
 
     $snmp_data = str_replace("Wrong Type (should be Counter32): ","", $snmp_data);
     $snmp_data = str_replace("No Such Instance currently exists at this OID","", $snmp_data);
     list($ifHCInOctets, $ifHCOutOctets, $ifInErrors, $ifOutErrors, $ifInUcastPkts, $ifOutUcastPkts, $ifInNUcastPkts, $ifOutNUcastPkts) = explode("\n", $snmp_data);
     if($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
 
-      $octets_cmd  = "snmpget -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+      $octets_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
       $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex'];
-      $octets = `$octets_cmd`;
+      $octets = shell_exec($octets_cmd);
       list ($ifHCInOctets, $ifHCOutOctets) = explode("\n", $octets);
     }
      $woo = "N:$ifHCInOctets:$ifHCOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
