@@ -1,0 +1,324 @@
+--
+-- Juniper Enterprise Specific MIB: PAE MIB Extension
+--
+-- Copyright (c) 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-PAE-EXTENSION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+   
+    MacAddress, TruthValue, DisplayString
+        FROM SNMPv2-TC
+   
+    InterfaceIndex  
+   	FROM IF-MIB
+   
+   
+    dot1xPaePortNumber
+	FROM IEEE8021-PAE-MIB
+
+    jnxExPaeExtension
+	FROM JUNIPER-EX-SMI;
+
+jnxPaeExtensionMIB MODULE-IDENTITY
+    LAST-UPDATED "200706071000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+             specific MIB for IEEE802.1x PAE Extension MIB. This MIB 
+	     Module supports Static MAC Authetication."
+    ::= { jnxExPaeExtension 1 }
+
+jnxPaeExtensionMIBNotification  OBJECT IDENTIFIER ::= { jnxPaeExtensionMIB 0 }
+jnxPaeExtensionMIBObjects       OBJECT IDENTIFIER ::= { jnxPaeExtensionMIB 1 }
+
+jnxAuthProfileName OBJECT-TYPE
+    SYNTAX	DisplayString(SIZE(0..255))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The Authentication Profile Name is given by this object. The access 
+	profile with this name is already defined with the radius server ip 
+	address, port and secret key."
+   ::= { jnxPaeExtensionMIBObjects 1 }
+
+-- The Authenticator Configuration Extension Table
+
+jnxPaeAuthConfigTable OBJECT-TYPE
+    SYNTAX 	SEQUENCE OF JnxPaeAuthConfigEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains the configuration objects for the
+        Authenticator PAE associated with each port."
+    ::= { jnxPaeExtensionMIBObjects 2 }
+
+jnxPaeAuthConfigEntry OBJECT-TYPE
+    SYNTAX 	JnxPaeAuthConfigEntry
+    MAX-ACCESS	not-accessible
+    STATUS 	current
+    DESCRIPTION
+	"An Entry appears in the table for each PAE Authenticator 
+	Port."
+    INDEX { dot1xPaePortNumber }
+    ::= { jnxPaeAuthConfigTable 1 }
+
+JnxPaeAuthConfigEntry ::= 
+    SEQUENCE {
+	jnxPaeAuthConfigMacAuthStatus	TruthValue,
+	jnxPaeAuthConfigGuestVlan	DisplayString,
+	jnxPaeAuthConfigNumberRetries	Unsigned32,
+	jnxPaeAuthConfigSupplicantMode  INTEGER,
+	jnxPaeAuthConfigMacRadius       INTEGER,
+	jnxPaeAuthConfigMacRadiusRestrict  INTEGER,
+	jnxPaeAuthConfigReAuthenticate  TruthValue,
+	jnxPaeAuthConfigQuietPeriod     Unsigned32,
+	jnxPaeAuthConfigMaxRequests     Unsigned32,
+	jnxPaeAuthConfigClientsRejected DisplayString,
+	jnxPaeAuthConfigServerTimeout   Unsigned32,
+	jnxPaeAuthConfigSuppTimeout     Unsigned32,
+	jnxPaeAuthConfigTransmitPeriod  Unsigned32
+    }
+
+jnxPaeAuthConfigMacAuthStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current    
+    DESCRIPTION
+         "This object specifies whether MAC Authentication is enabled on the
+         specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 1 }
+
+jnxPaeAuthConfigGuestVlan OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(0..255))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This object specifies the Vlan to which the unauthenticated client 
+	moves to. The Vlan should exist on the switch and is user cofigurable 
+	per port."
+    ::= { jnxPaeAuthConfigEntry 2 }
+
+jnxPaeAuthConfigNumberRetries OBJECT-TYPE
+    SYNTAX	Unsigned32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This sets the number of failed authentications on an interface 
+	before invoking the quiet period, during which no one can be 
+	authenticated on that interface."
+    ::= { jnxPaeAuthConfigEntry 3 }
+
+jnxPaeAuthConfigSupplicantMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                single(1),
+                single-secure(2),
+                multiple(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies the supplicant mode of MAC Authentication 
+         enabled on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 4 }
+
+jnxPaeAuthConfigMacRadius OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies the Mac-Radius mode of MAC Authentication 
+         enabled on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 5 }
+
+jnxPaeAuthConfigMacRadiusRestrict OBJECT-TYPE
+    SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies the Mac-Radius mode of MAC Authentication 
+         enabled on the specified PAE port."
+
+    ::= { jnxPaeAuthConfigEntry 6 }
+
+jnxPaeAuthConfigReAuthenticate OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Re-Authentication is enabled or not on the
+         specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 7 }
+
+jnxPaeAuthConfigQuietPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Time to wait after an authentication 
+         failure on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 8 }
+
+jnxPaeAuthConfigMaxRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Number of EAPOL RequestIDs to send before 
+         timing out on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 9 }
+
+jnxPaeAuthConfigClientsRejected OBJECT-TYPE 
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies VLAN name or 802.1q tag for authentication 
+         rejected clients on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 10 }
+
+jnxPaeAuthConfigServerTimeout OBJECT-TYPE 
+    SYNTAX      Unsigned32(1..60)
+    UNITS       "seconds" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Authentication server timeout interval on the 
+         specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 11 }
+
+jnxPaeAuthConfigSuppTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32(1..60)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Time to wait for a client response on the
+         specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 12 }
+
+jnxPaeAuthConfigTransmitPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object specifies Interval before retransmitting initial 
+         EAPOL PDUs on the specified PAE port."
+    ::= { jnxPaeAuthConfigEntry 13 }
+
+--Static Mac list Authetication Bypass Table
+
+jnxStaticMacAuthBypassTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF JnxStaticMacAuthBypassEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "The static MAC list provides an authentication bypass mechanism for 
+	clients connected to a port. The MAC address of the clients is first 
+	checked in a local database which is a user specified static list of
+	MAC addresses and if a match is found, the client is assumed to be 
+	successfully authenticated and the port is opened up for it. 
+	No further authentication is done for that client. 
+	
+	The VLAN that the client should be moved to or the interfaces on which
+	the MAC address should be allowed from can also be optionally stored 
+	in this table. This will enable devices like printers, which do not 
+	support 802.1X, to be connected on 802.1X enabled ports. If a match is
+	not found in the static list, 802.1X or MAC authentication is initiated.
+	
+	This table contains the static list of MAC addresses specified by the
+	user." 
+    ::= { jnxPaeExtensionMIBObjects 3 }
+
+jnxStaticMacAuthBypassEntry OBJECT-TYPE
+    SYNTAX	JnxStaticMacAuthBypassEntry
+    MAX-ACCESS  not-accessible
+    STATUS 	current
+    DESCRIPTION
+        "A table entry specifies the MacAddress of the client
+	and the Vlan the client is to be moved." 
+    INDEX { jnxStaticMacAddress }
+    ::= { jnxStaticMacAuthBypassTable 1 }
+
+JnxStaticMacAuthBypassEntry ::= 
+    SEQUENCE {
+        jnxStaticMacAddress	    MacAddress,
+	jnxStaticMacVlanName        DisplayString
+  }
+
+jnxStaticMacAddress OBJECT-TYPE
+    SYNTAX	MacAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "This object specifies the MAC Address of the client connected 
+	to the particular PAE port."
+    ::= { jnxStaticMacAuthBypassEntry 1 }
+
+jnxStaticMacVlanName OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(0..255))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+        "This object specifies the Vlan to which the client is 
+	assigned to." 
+    ::= { jnxStaticMacAuthBypassEntry 2 }
+
+jnxStaticMacAuthBypassIfTable OBJECT-TYPE 
+    SYNTAX	SEQUENCE OF JnxStaticMacAuthBypassIfEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"This table provides the list of interfaces on which each MAC 
+	Address in the jnxStaticMacAuthBypassTable can be allowed from.
+	If it is detected on any other interface, the authentication 
+	is not bypassed."
+    ::={ jnxPaeExtensionMIBObjects 4 }
+
+jnxStaticMacAuthBypassIfEntry OBJECT-TYPE
+    SYNTAX 	JnxStaticMacAuthBypassIfEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+        "For each MAC Address in the  jnxStaticMacAuthBypassTable an entry is 
+	present in this table.It specifies the list of interfaces from which
+        the specified MAC Address is allowed from."
+   INDEX { jnxStaticMacAddress, jnxStaticMacIfIndex }
+   ::= { jnxStaticMacAuthBypassIfTable 1 }
+
+JnxStaticMacAuthBypassIfEntry ::=
+    SEQUENCE {
+	jnxStaticMacIfIndex 		InterfaceIndex
+    }
+   
+jnxStaticMacIfIndex OBJECT-TYPE
+    SYNTAX	InterfaceIndex
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This object specifies the list of interfaces from which the MAC Address
+	is allowed from. If it is detected on any other interface, the  
+	authentication is bypassed."
+    ::= { jnxStaticMacAuthBypassIfEntry 1 }
+
+END
+

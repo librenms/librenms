@@ -1,0 +1,227 @@
+-- *******************************************************************
+-- Juniper User AAA objects MIB.
+--
+-- Copyright (c) 2001-2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+    JUNIPER-USER-AAA-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter64, IpAddress, Integer32,
+        NOTIFICATION-TYPE, MODULE-IDENTITY, 
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION, DisplayString
+            FROM SNMPv2-TC 
+
+        jnxUserAAAMibRoot
+            FROM JUNIPER-SMI;
+
+
+    jnxUserAAAMib  	MODULE-IDENTITY
+        LAST-UPDATED  "200708210000Z"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the objects pertaining to User authentication,
+             authorization and accounting"
+        REVISION      "200708210000Z"
+        DESCRIPTION   "Updates related to SecurID authentication"
+        REVISION      "200705140000Z"
+        DESCRIPTION   "Creation Date"
+    	::= { jnxUserAAAMibRoot 1 }   
+
+
+    jnxUserAAANotifications OBJECT IDENTIFIER ::= { jnxUserAAAMib 0 }
+    jnxUserAAAObjects       OBJECT IDENTIFIER ::= { jnxUserAAAMib 1 }
+
+
+    -- ***************************************************************
+    --  Next Branch node. 
+    -- ***************************************************************
+
+	jnxUserAAAGlobalStats OBJECT IDENTIFIER ::= { jnxUserAAAObjects 1 }
+	jnxUserAAAAccessAuthStats    OBJECT IDENTIFIER ::= { jnxUserAAAObjects 2 }
+	jnxUserAAATrapVars    OBJECT IDENTIFIER ::= { jnxUserAAAObjects 3 }
+
+
+    -- ***************************************************************
+    --  Textual Conventions
+    -- ***************************************************************
+
+    JnxAuthenticateType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION 
+           "There several way to authenticate a user, these are 
+            the types:
+            radius - authentication via a radius server.
+            local  - local authenticaiton.
+            ldap   - authentication via a LDAP server.
+            securid- authentication via RSA's SecurID authentication server"
+
+        SYNTAX  INTEGER {
+                            radius    (1),
+                            local     (2),
+                            ldap      (3),
+                            securid   (4)
+                        }
+
+
+    -- ***************************************************************
+    -- Statistic counters for related to access authentication.
+    -- ***************************************************************
+
+    jnxTotalAuthenticationRequests  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total authentication requests received."
+        ::= { jnxUserAAAGlobalStats  1 }
+
+    jnxTotalAuthenticationResponses OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total authentication responses."
+        ::= { jnxUserAAAGlobalStats  2 }
+
+
+    -- ***************************************************************
+    -- Authentication Statistic Table :
+    -- ***************************************************************
+    jnxUserAAAStatTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxAuthStatEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table exposes the user authentication statistics." 
+        ::= { jnxUserAAAAccessAuthStats 1 }	
+
+    jnxUserAAAStatEntry OBJECT-TYPE
+    	SYNTAX        JnxAuthStatEntry 
+    	MAX-ACCESS    not-accessible
+    	STATUS        current
+    	DESCRIPTION
+            "Statistic entry collects for authentication."
+        INDEX   { jnxUserAAAStatAuthType }
+    	::= { jnxUserAAAStatTable 1 }
+
+    JnxAuthStatEntry ::= SEQUENCE
+    {
+        jnxUserAAAStatAuthType          JnxAuthenticateType,
+        jnxUserAAAStatRequestReceived   Counter64,
+        jnxUserAAAStatAccessAccepted    Counter64,
+        jnxUserAAAStatAccessRejected    Counter64
+    }
+	
+    jnxUserAAAStatAuthType OBJECT-TYPE
+    	SYNTAX          JnxAuthenticateType 
+        MAX-ACCESS	    not-accessible
+    	STATUS          current
+        DESCRIPTION
+            "The entry indicates the authentication type.  It
+             uniquely identifies the statistics counters related to
+             its authentication."
+        ::= { jnxUserAAAStatEntry 1 }
+
+    jnxUserAAAStatRequestReceived OBJECT-TYPE
+    	SYNTAX          Counter64	
+        MAX-ACCESS    	read-only
+    	STATUS        	current
+        DESCRIPTION
+            "The number of request received."
+        ::= { jnxUserAAAStatEntry 2 }
+
+    jnxUserAAAStatAccessAccepted OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The number of access granted.  It is an aggregated 
+             statistics for this type of authenticaiton."
+        ::= { jnxUserAAAStatEntry 3 }
+
+    jnxUserAAAStatAccessRejected OBJECT-TYPE
+        SYNTAX          Counter64 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+    	    "This number of access request rejected.  It is an aggregated 
+             statistics for this type of authentication."
+        ::= { jnxUserAAAStatEntry 4 }
+
+
+    -- ********************************************************************
+    -- Objects used for the traps 
+    -- ********************************************************************
+    jnxUserAAAServerName   OBJECT-TYPE
+        SYNTAX      DisplayString 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The server name which identifies the authentication server."
+        ::= { jnxUserAAATrapVars 1 }
+
+
+    -- ***************************************************************
+    -- definition of access authentication related traps.
+    -- ***************************************************************
+
+    -- 
+    -- Authentication Service is up 
+    -- 
+    jnxAccessAuthServiceUp NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that the 
+             specified service has started. "
+        ::= { jnxUserAAANotifications 1 } 
+
+    -- 
+    -- Authentication Service is down 
+    --
+    jnxAccessAuthServiceDown NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that the 
+             specified service has been stopped."
+        ::= { jnxUserAAANotifications 2 }
+
+    -- 
+    -- Authentication server is not accessible.
+    -- 
+	jnxAccessAuthServerDisabled NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAServerName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             the External authentication server is not responding."
+        ::= { jnxUserAAANotifications 3 }
+
+
+    -- 
+    -- Authentication server starting to respond .
+    -- 
+    jnxAccessAuthServerEnabled NOTIFICATION-TYPE
+        OBJECTS         { jnxUserAAAServerName }  
+        STATUS          current
+        DESCRIPTION
+            "An access authentication trap signifies that 
+             the External authentication server started responding
+             again."
+        ::= { jnxUserAAANotifications 4 }
+
+END

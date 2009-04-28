@@ -1,0 +1,1099 @@
+-- *******************************************************************
+-- Juniper enterprise security screening objects MIB.
+--
+-- Copyright (c) 2001-2009, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+
+JUNIPER-JS-SCREENING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Integer32, Counter64,
+        NOTIFICATION-TYPE,
+        MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI
+        DisplayString                   FROM SNMPv2-TC
+        ifName                         FROM IF-MIB 
+        jnxJsScreening                  FROM JUNIPER-JS-SMI;
+
+
+    jnxJsScreenMIB MODULE-IDENTITY
+        LAST-UPDATED  "200901231644Z" -- Jan 23, 2009
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+                        Juniper Networks, Inc.
+                        1194 N. Mathilda Avenue
+                        Sunnyvale, CA 94089
+
+                        E-mail: support@juniper.net
+                        HTTP://www.juniper.net"
+        DESCRIPTION
+            "This module defines the MIB for Juniper Enterprise Firewall 
+             screen functionality.  Juniper documentation is recommended
+             as the reference. 
+
+             Juniper Security Firewall provides various detection methods
+             and defense mechanisms to combat exploits at all stages of 
+             the path of execution.  These includes:
+                            Setting screen options
+                            Firwall DOS attacks
+                            Network DOS attack 
+                            OS specific DOS attack   
+                            Fragment reassembly 
+            "
+        REVISION        "200902040000Z" -- Feb 04, 2009
+        DESCRIPTION     "Added following new trap tresholds:
+                         jnxJsScreenSynFloodSrcThresh
+                         jnxJsScreenSynFloodDstThresh
+                         jnxJsScreenSessLimitSrcThresh
+                         jnxJsScreenSessLimitDstThresh
+                         Added following new counters:
+                         jnxJsScreenMonSynFloodSrc
+                         jnxJsScreenMonSynFloodDst
+                         Deprecated following objects:
+                         jnxJsScreenSynAttackQueSize
+                         jnxJsScreenSynAttackAgeTime"
+        REVISION        "200709240000Z" -- Sep 24, 2007
+        DESCRIPTION     "Creation Date"
+        ::= { jnxJsScreening 1 }
+
+
+    jnxJsScreenNotifications OBJECT IDENTIFIER ::= { jnxJsScreenMIB 0 }
+    jnxJsScreenObjects       OBJECT IDENTIFIER ::= { jnxJsScreenMIB 1 }
+    jnxJsScreenTrapVars      OBJECT IDENTIFIER ::= { jnxJsScreenMIB 2 }
+
+    -- ***************************************************************
+    --  Screening table 
+    -- ***************************************************************
+    
+    jnxJsScreenMonTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsScreenMonEntry  
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Juniper security Firewall can allow DI protection on each of
+             the device's physical interface. This table collects the 
+             screen attributes that monitor the various attacks. 
+
+               The screen options can be enabled at security zone bounded to 
+            a interface or interfaces. When these options apply to traffic 
+            reaching the device through interfaces (via a zone), they offers 
+            protection against malicious information gathering probe or 
+            an attack to compromise, disable, or harm a network or network 
+            resources."
+        ::= { jnxJsScreenObjects 1 }
+
+    jnxJsScreenMonEntry OBJECT-TYPE
+        SYNTAX        JnxJsScreenMonEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The screen option monitoring statistics entry.  Each 
+             entry is uniquely identified by the zone name.
+
+             The data is collected on a per zone basis. There 
+             can be multiple interfaces bound to a particular 
+             zones.  Hence, the statistics are aggregated across 
+             the interfaces on a per zone basis.
+            "
+        INDEX   { IMPLIED jnxJsScreenZoneName }
+        ::= { jnxJsScreenMonTable 1 }
+
+
+    JnxJsScreenMonEntry ::= SEQUENCE
+    {
+        jnxJsScreenZoneName             DisplayString, 
+        jnxJsScreenNumOfIf              Integer32,
+        jnxJsScreenMonSynAttk           Counter64,
+        jnxJsScreenMonTearDrop          Counter64,
+        jnxJsScreenMonSrcRoute          Counter64,
+        jnxJsScreenMonPingDeath         Counter64,
+        jnxJsScreenMonAddrSpoof         Counter64,
+        jnxJsScreenMonLand              Counter64,
+        jnxJsScreenMonIcmpFlood         Counter64,
+        jnxJsScreenMonUdpFlood          Counter64,
+        jnxJsScreenMonWinnuke           Counter64,
+        jnxJsScreenMonPortScan          Counter64,
+        jnxJsScreenMonIpSweep           Counter64,
+        jnxJsScreenMonSynFrag           Counter64,
+        jnxJsScreenMonTcpNoFlag         Counter64,
+        jnxJsScreenMonIpUnknownProt     Counter64,
+        jnxJsScreenMonIpOptBad          Counter64,
+        jnxJsScreenMonIpOptRecRt        Counter64,   -- record route option 
+        jnxJsScreenMonIpOptTimestamp    Counter64,   -- timestamp option 
+        jnxJsScreenMonIpOptSecurity     Counter64,
+        jnxJsScreenMonIpOptLSR          Counter64,   -- Loose source route
+        jnxJsScreenMonIpOptSSR          Counter64,   -- Strict source route 
+        jnxJsScreenMonIpOptStream       Counter64,   -- stream options
+        jnxJsScreenMonIcmpFrag          Counter64,
+        jnxJsScreenMonIcmpLarge         Counter64,
+        jnxJsScreenMonTcpSynFin         Counter64,
+        jnxJsScreenMonTcpFinNoAck       Counter64,
+        jnxJsScreenMonLimitSessSrc      Counter64,  -- session-limit source ip based 
+        jnxJsScreenMonLimitSessDest     Counter64,  -- session-limit dest ip based 
+        jnxJsScreenMonSynAckAck         Counter64,
+        jnxJsScreenMonIpFrag            Counter64,
+
+        -- Threshold data -- 
+        jnxJsScreenSynAttackThresh      Integer32,
+        jnxJsScreenSynAttackTimeout     Integer32,
+        jnxJsScreenSynAttackAlmTh       Integer32,
+        jnxJsScreenSynAttackQueSize     Integer32,
+        jnxJsScreenSynAttackAgeTime     Integer32,
+        jnxJsScreenIcmpFloodThresh      Integer32,
+        jnxJsScreenUdpFloodThresh       Integer32,
+        jnxJsScreenPortScanThresh       Integer32,
+        jnxJsScreenIpSweepThresh        Integer32,
+        jnxJsScreenSynAckAckThres       Integer32
+    }
+
+    jnxJsScreenZoneName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))  
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "The name of the security zone under which the statistics
+             are collected. "
+        ::= { jnxJsScreenMonEntry 1 }
+
+    jnxJsScreenNumOfIf  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of interfaces bound to this zone.  Each counter  
+             contains the aggregated data of all the interfaces"
+        ::= { jnxJsScreenMonEntry 2 }
+
+    jnxJsScreenMonSynAttk OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SYN (TCP connection request) attack is a common denial 
+             of service (DoS) technique characterized by the following 
+             pattern:
+             - Using a spoofed IP address not in use on the Internet, 
+             an attacker sends multiple SYN packets to the target machine.
+    
+             - For each SYN packet received, the target machine allocates 
+             resources and sends an acknowledgement (SYN-ACK) to the source 
+             IP address.  This can cause the target machine to allocate 
+             resources for more than 3 minutes to respond to just one i
+             SYN attack, hence wasting resources.
+             
+             This attribute records the number of SYN attacks."
+        ::= { jnxJsScreenMonEntry 3 }
+
+    jnxJsScreenMonTearDrop OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Teardrop attacks exploit the reassembly of fragmented IP 
+             packets. In the IP header, one of the fields is the fragment 
+             offset field, which indicates one of the fields is the fragment 
+             offset field.  It indicates the starting position of the data 
+             contained in a fragmented packet relative to the data of the 
+             original unfragmented packet. When the sum of the offset and 
+             size of one fragmented packet differ from that of the next 
+             fragmented packet, the packets overlap. The server attempting 
+             to reassemble the packet can crash, especially if it is running 
+             an older operating system that has this vulnerability. 
+
+             When this option is enabled, the security device detects this 
+             discrepancy in a fragmented packet and drops it and this 
+             attribute counts the number of packets dropped."
+        ::= { jnxJsScreenMonEntry 4 }
+
+    jnxJsScreenMonSrcRoute OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IP source route options can be used to hide their true address 
+             and access restricted areas of a network by specifying a 
+             different path. The security device should be able to either 
+             block any packets with loose or strict source route options 
+             set or detect such packets and then record the event for the 
+             ingress interface.
+
+             This attribute records either the loose source route option or
+             strict source route attack packets."
+        ::= { jnxJsScreenMonEntry 5 }
+
+    jnxJsScreenMonPingDeath OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The maximum allowable IP packet size is 65,535 bytes, 
+             including the packet header (typically 20 bytes long). 
+             An ICMP echo request is an IP packet with a pseudo header, 
+             which is 8 bytes long. Therefore, the maximum allowable 
+             size of the data area of an ICMP echo request is 65,507 
+             bytes. 
+
+             However, many ping implementations allow the user to specify 
+             a packet size larger than 65,507 bytes. A grossly oversized 
+             ICMP packet can trigger a range of adverse system reactions 
+             such as denial of service (DoS), crashing, freezing, and 
+             rebooting.   
+
+             When the Ping Death option is enabled, the device detects and 
+             rejects such oversized and irregular packet sizes even when 
+             the attacker hides the total packet size by purposefully 
+             fragmenting it. 
+            
+             This attributes counts the  ping of death attack packets."
+        ::= { jnxJsScreenMonEntry 6 }
+
+    jnxJsScreenMonAddrSpoof OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "One method to gain access to a restricted network is to insert 
+             a bogus source address in the packet header to make the packet 
+             appear to come from a trusted source. This technique is called 
+             IP spoofing. The mechanism to detect IP spoofing relies on 
+             route table entries. 
+                
+             For example, if a packet with source IP address 10.1.1.6 arrives 
+             at port eth3, but the device has a route to 10.1.1.0/24 through 
+             port eth1. IP spoofing checking notes that this address arrived 
+             at an invalid interface as defined in the route table. A valid
+             packet from 10.1.1.6 can only arrive via eth1, not eth3.  The 
+             device concludes that the packet has a spoofed source IP address 
+             and discards it. 
+
+             This attribute records the address spoofing attack packets."
+        ::= { jnxJsScreenMonEntry 7 }
+
+    jnxJsScreenMonLand OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A combined SYN attack with IP spoof is referred to as 
+             Land attack.  A Land attack occurs when an attacker sends 
+             spoofed SYN packets containing the IP address of the victim as 
+             both the destination and source IP address. The receiving 
+             system responds by sending the SYN-ACK packet to itself, 
+             creating an empty connection that lasts until the idle timeout 
+             value is reached. Flooding a system with such empty connections 
+             can overwhelm the system, causing a DoS. 
+
+             This attribute records the land attack packets."
+        ::= { jnxJsScreenMonEntry 8 }
+
+    jnxJsScreenMonIcmpFlood OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "An ICMP flood typically occurs when ICMP echo requests overload 
+             its victim with so many requests that it expends all its 
+             resources responding until it can no longer process valid network 
+             traffic. With the ICMP flood protection feature enabled, and a 
+             threshold set.  If the threshold exceeded,  the system invokes the 
+             flood attack protection feature.  
+
+             The default threshold value is 1000 packets per second. If the 
+             threshold is exceeded, the security device ignores further 
+             ICMP echo requests for the remainder of that second plus the 
+             next second as well. 
+
+             This attribute records the ICMP flood attack packets."
+        ::= { jnxJsScreenMonEntry 9 }
+
+    jnxJsScreenMonUdpFlood OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "UDP flooding occurs when an attacker sends IP packets containing
+             UDP datagrams with the purpose of slowing down the victim to the 
+             point that it can no longer handle valid connections. With the 
+             UDP flood protection feature enabled, a threshold can be set which 
+             once exceeded, the system invokes the UDP flood attack protection 
+             feature. 
+        
+             The default threshold value is 1000 packets per second. 
+             If the number of UDP datagrams from one or more sources to a 
+             single destination exceeds this threshold, security device 
+             ignores further UDP datagrams to that destination for the 
+             remainder of that second plus the next second as well. 
+                
+             This attribute records the UDP flood attack packets."
+        ::= { jnxJsScreenMonEntry 10 }
+
+    jnxJsScreenMonWinnuke OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "WinNuke is a DoS attack targeting any computer on the internet 
+             running Windows.  The attacker sends a TCP segment, usually to 
+             NetBIOS port 139 with the urgent (URG) flag set, to a host with 
+             an established connection. This introduces a NetBIOS fragment 
+             overlap, which causes many machines running Windows to crash. 
+            
+             This attributes counts the netbios attack."
+        ::= { jnxJsScreenMonEntry 11 }
+
+    jnxJsScreenMonPortScan OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A port scan occurs when one source IP address sends IP packets 
+             containing TCP SYN segments to a defined number of different 
+             ports at the same destination IP address within a defined interval. 
+             The purpose of this attack is to scan the available services in 
+             the hope that at least one port will respond, thus identifying 
+             a service of the target. The device should internally log the 
+             number of different ports scanned from one remote source. 
+            
+             This attribute records the port scan attempt attack packets."
+        ::= { jnxJsScreenMonEntry 12 }
+
+    jnxJsScreenMonIpSweep OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "An address sweep occurs when one source IP address sends a 
+             defined number of ICMP packets to different hosts within a 
+             defined interval. The purpose of this attack is to send ICMP 
+             packets, typically echo requests, to various hosts in the 
+             hope that at least one replies, thus uncovering an address of 
+             the target. The device internally log the number of ICMP packets 
+             to different addresses from one remote source. 
+
+            This attributes records the address sweep attemp attack packets."
+        ::= { jnxJsScreenMonEntry 13 }
+
+    jnxJsScreenMonSynFrag OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IP encapsulates a TCP SYN segment in the IP packet that initiates 
+             a TCP connection. The purpose is to initiate a connection and to 
+             invoke a SYN/ACK segment response.  The SYN segment typically does 
+             not contain any data since the IP packet is small and there is 
+             no legitimate reason for it to be fragmented. A fragmented SYN 
+             packet is anomalous and is suspectful. To be cautious, it might 
+             be helpful to block such these fragments from entering the 
+             protected network. 
+
+             When the syn fragmentation check is enable,  the security device 
+             detects and drops the packets when the IP header indicates that 
+             the packet has been fragmented while the SYN flag is set in the 
+             TCP header.  
+            
+             This attributes records the detection of the SYN fragments."
+        ::= { jnxJsScreenMonEntry 14 }
+
+    jnxJsScreenMonTcpNoFlag OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A normal TCP segment header has at least one flag control set. 
+             A TCP segment with no control flags set is an anomalous event.  
+             Operating systems respond to such anomalies in different ways. 
+             The response, or even lack of response, from the targeted device 
+             can provide a clue as to the target's OS type. 
+
+             When this option is enabled, if the device discovers such a 
+             header with a missing or malformed flags field, it drops the
+             packet. 
+
+             The attribure records the detection of TCP without flag set packets."
+        ::= { jnxJsScreenMonEntry 15 }
+
+    jnxJsScreenMonIpUnknownProt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "According to RFC 1700, some protocol types in IP header are 
+             reserved and unassigned at this time. Precisely because these 
+             protocols are undefined, there is no way to know in advance 
+             if a particular unknown protocol is benign or malicious.  Unless 
+             your network makes use of a non-standard protocol with reserved 
+             or unassigned protocol number, a cautious stance is to block 
+             such unknown elements from entering your protected network. 
+
+             When the Unknown Protocol Protection SCREEN option is enabled, 
+             the security device drops packets when the protocol field 
+             contains a protocol ID number of 137 or greater by default. 
+             
+             This attribute records the detection of Unknown protocol 
+             IP packets."
+        ::= { jnxJsScreenMonEntry 16 }
+
+    jnxJsScreenMonIpOptBad OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "IP protocol specifies a set of eight options that provide 
+             special routing controls, diagnostic tools, and security. 
+             These eight options can be used for malicious objectives.
+             
+             Either intentionally or accidentally, attackers sometimes 
+             misconfigure IP options, producing either incomplete or 
+             malformed fields. The misformatting is anomalous and 
+             potentially harmful to the intended recipient. 
+
+             When the Bad IP Option Protection SCREEN option is enabled, 
+             the security device detects and blocks packets when any IP 
+             option in the IP packet header is incorrectly formatted. 
+
+             This attributes records the detection of the IP bad option
+             packets."
+        ::= { jnxJsScreenMonEntry 17 }
+
+    jnxJsScreenMonIpOptRecRt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP standard RFC 791 specifies a set of options to provide 
+             special routing controls, diagnostic tools, and security. 
+             These options appear after the destination address in an IP packet 
+             header.  When they do appear, they are frequently being put to 
+             some nefarious use.  Record option is one of these options that an 
+             attacker can use for reconnaissance or for some unknown but 
+             suspicious purpose 
+
+             When record IP option is received, the security device 
+             flags this as an network reconnaissance attack and records 
+             the event for the ingress interface. 
+
+             This attribute records the detection of IP record option 
+             packets."
+        ::= { jnxJsScreenMonEntry 18 }
+
+    jnxJsScreenMonIpOptTimestamp OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP standard RFC 791 specifies a set of options to provide 
+             special routing controls, diagnostic tools, and security. 
+             These options appear after the destination address in an IP packet 
+             header.  When they do appear, they are frequently being put to 
+             some nefarious use.  Timestamp is one of these options that an 
+             attacker can use for reconnaissance or for some unknown but 
+             suspicious purpose 
+
+             When timestamp IP option is received, the security device 
+             flags this as an network reconnaissance attack and records 
+             the event for the ingress interface. 
+
+             This attribute records the detection of IP timestamp option 
+             packets."
+        ::= { jnxJsScreenMonEntry 19 }
+
+    jnxJsScreenMonIpOptSecurity OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP standard RFC 791 specifies a set of options to provide 
+             special routing controls, diagnostic tools, and security. 
+             These options appear after the destination address in an IP packet 
+             header.  When they do appear, they are frequently being put to 
+             some nefarious use.  Security is one of these options that an 
+             attacker can use for reconnaissance or for some unknown but 
+             suspicious purpose 
+
+             When the security IP option is received, the security device 
+             flags this as an network reconnaissance attack and records 
+             the event for the ingress interface. 
+
+             This attribute records the detection of IP security option 
+             packets."
+        ::= { jnxJsScreenMonEntry 20 }
+
+    jnxJsScreenMonIpOptLSR OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Attackers can use IP source route options to hide their true 
+             address and access restricted areas of a network by specifying 
+             a different path.  The security device should be able to either 
+             block any packets with loose or strict source route options 
+             set or detect such packets and then record the event for the 
+             ingress interface. 
+
+             This attribute records the detection of loose source route
+             packets."
+        ::= { jnxJsScreenMonEntry 21 }
+
+    jnxJsScreenMonIpOptSSR OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Attackers can use IP source route options to hide their true 
+             address and access restricted areas of a network by specifying 
+             a different path.  The security device should be able to either 
+             block any packets with loose or strict source route options 
+             set or detect such packets and then record the event for the 
+             ingress interface. 
+
+             This attribute records the detection of strict source route
+             packets."
+        ::= { jnxJsScreenMonEntry 22 }
+
+    jnxJsScreenMonIpOptStream OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP standard RFC 791 specifies a set of options to provide 
+             special routing controls, diagnostic tools, and security. 
+             These options appear after the destination address in an IP packet 
+             header.  When they do appear, they are frequently being put to 
+             some nefarious use.  Stream is one of these options that an 
+             attacker can use for reconnaissance or for some unknown but 
+             suspicious purpose 
+
+             When the security IP option is received, the security device 
+             flags this as an network reconnaissance attack and records 
+             the event for the ingress interface. 
+
+             This attribute records the detect of IP stream option 
+             packets."
+        ::= { jnxJsScreenMonEntry 23 }
+
+    jnxJsScreenMonIcmpFrag OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "ICMP provides error reporting and network probe capabilities. 
+             ICMP packets contain very short messages, there is no legitimate 
+             reason for ICMP packets to be fragmented. If an ICMP packet is 
+             so large that it must be fragmented, something has gone amiss. 
+             With the ICMP Fragment Protection SCREEN option enabled, the device 
+             should be able to block any ICMP packet with the More Fragments 
+             flag set, or with an offset value indicated in the offset field. 
+
+             This attribute counts the ICMP fragment packets."
+        ::= { jnxJsScreenMonEntry 24 }
+
+    jnxJsScreenMonIcmpLarge OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "ICMP packets contain very short messages, there is no legitimate 
+              reason for ICMP packets to be fragmented. 
+
+              If an ICMP packet is unusually large, something is wrong. For example, 
+              the Loki program uses ICMP as a channel for transmitting covert 
+              messages. The presence of large ICMP packets might expose a 
+              compromised machine acting as a Loki agent. It might also indicate 
+              some other kind of shifty activity. 
+
+              When the the Large Size ICMP Packet Protection SCREEN option is enabled, 
+              the device drops ICMP packets with a length greater than 1024 bytes. 
+
+              This attribute records the detection of large ICMP packets."
+        ::= { jnxJsScreenMonEntry 25 }
+
+    jnxJsScreenMonTcpSynFin OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Both the SYN and FIN control flags are not normally set in the 
+             same TCP segment header. The SYN flag synchronizes sequence 
+             numbers to initiate a TCP connection. The FIN flag indicates 
+             the end of data transmission to finish a TCP connection. Their 
+             purposes are mutually exclusive. A TCP header with the SYN and 
+             FIN flags set is anomalous TCP behavior, causing various 
+             responses from the recipient, depending on the OS. 
+
+             When block both syn and fin option is enable, the device 
+             drops the packet when it discovers such a header 
+            
+             This attribute records the TCP syn fin both set packet 
+             dropped."
+        ::= { jnxJsScreenMonEntry 26 }
+
+    jnxJsScreenMonTcpFinNoAck OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A FIN scan sends TCP segments with the FIN flag set in an 
+             attempt to provoke a response and thereby discover an active 
+             host or an active port on a host. The use of TCP segments 
+             with the FIN flag set might evade detection and thereby help 
+             the attacker succeed in his or her reconnaissance efforts. 
+            
+             This attributes records the detection of the TCP fin set 
+             without ack bit set packets."
+        ::= { jnxJsScreenMonEntry 27 }
+
+    jnxJsScreenMonLimitSessSrc OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "All the virus-generated traffic originates from the same IP 
+             address (generally from a infected server), a source-based 
+             session limit ensures that the firewall can curb such 
+             excessive amounts of traffic.  Based on a threshold value,
+             if the number of concurrent sessions required to fill up 
+             the session table of the particular firewall. 
+            
+             The default maximum for source-based session limit is 128 
+             concurrent sessions, which can be adjusted to accordingly.
+
+             This attribute records the number of the session connection 
+             based on the source IP that exceeds the specified limit."
+        ::= { jnxJsScreenMonEntry 28 }
+
+    jnxJsScreenMonLimitSessDest OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The user can limit the number of concurrent sessions 
+             to the same destination IP address.  A wily attacker can 
+             launch a distributed denial-of-service (DDoS) attack using
+             'zombie agents'.  Setting a destination-based session limit 
+             can ensure that device allows only an acceptable number of 
+             concurrent connection requests, no matter what the source, 
+             to reach any one host. 
+
+             The default maximum for destination-based session limit is 
+             128 concurrent sessions.
+
+             This attribute records the number of session connection based 
+             on the destination source IP address that exceeds the specified 
+             limit."
+        ::= { jnxJsScreenMonEntry 29 }
+
+    jnxJsScreenMonSynAckAck OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When an authentication user initiates a Telnet or FTP connection, 
+             the user sends a SYN segment to the Telnet or FTP server. The 
+             device intercepts the SYN segment, creates an entry in its 
+             session table, and proxies a SYN-ACK segment to the user. The 
+             user then replies with an ACK segment. At that point, the initial 
+             3-way handshake is complete. The device sends a login prompt to 
+             the user. When a malicisou user does not log in, but instead 
+             continue initiating SYN-ACK-ACK sessions, the firewall session 
+             table can fill up to the point where the device begins rejecting 
+             legitimate connection requests. 
+
+             When the SYN-ACK-ACK proxy protection option is enabled, after 
+             the number of connections from the same IP address reaches the 
+             SYN-ACK-ACK proxy threshold, the device rejects further 
+             connection requests from that IP address.  By default, the 
+             threshold is 512 connections from any single IP address. 
+
+             The attribute records the detection of SYN ACK ACK attack."
+        ::= { jnxJsScreenMonEntry 30 }
+
+    jnxJsScreenMonIpFrag OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "As packets travels, it is sometimes necessary to break a packet 
+             into smaller fragments based upon the maximum transmission unit 
+             (MTU) of each network. IP fragments might contain an attacker's 
+             attempt to exploit the vulnerabilities in the packet reassembly 
+             code of specific IP stack implementations. When the victim 
+             receives these packets, the results can range from processing 
+             the packets incorrectly to crashing the entire system. 
+            
+             When the block IP framentation flag is enabled, the device blocks 
+             all IP packet fragments that it receives at interfaces bound to 
+             that zone. 
+
+             This attribute counts the number of block IP fragment packets."
+        ::= { jnxJsScreenMonEntry 31 }
+
+
+    --
+    --  Threshold values  
+    -- 
+    jnxJsScreenSynAttackThresh OBJECT-TYPE
+        SYNTAX        Integer32   
+        MAX-ACCESS    read-only   
+        STATUS        current     
+        DESCRIPTION
+             "The number of SYN segments to the same destination address 
+              and port number per second required to activate the SYN proxying 
+              mechanism. In order to set the appropriate threshold value, it 
+              requires a through knowledge of the normal traffic patterns at site 
+
+              For example, if the security device normally gets 2000 SYN 
+              segments per second,  the threshold value should be set at 
+              3000/second. 
+
+             This attribute displays the configured SYN attack threshold value."
+        ::= { jnxJsScreenMonEntry 32 }
+
+    jnxJsScreenSynAttackTimeout OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The maximum length of time before a half-completed connection is 
+             dropped from the queue. The default is 20 seconds.
+
+             This attributes display the SYN attack timeout value."
+        ::= { jnxJsScreenMonEntry 33 }
+
+    jnxJsScreenSynAttackAlmTh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The syn attack alarm threshold causes an alarm to be generated when 
+             the number of proxied, half-complete TCP connection requests per 
+             second requests to the same destination address and port number 
+             exceeds its value. 
+            
+             This attribute display the SYN attack alarm threshold value."
+        ::= { jnxJsScreenMonEntry 34 }
+
+    jnxJsScreenSynAttackQueSize OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+            "The number of proxied connection requests held in the proxied 
+             connection queue before the device starts rejecting new connection
+             requests. 
+
+             This attribute displays the SYN attack queue size.
+
+             This object has been deprecated."
+        ::= { jnxJsScreenMonEntry 35 }
+
+    jnxJsScreenSynAttackAgeTime OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION
+            "SYN flood age time.
+
+             This object has been deprecated."
+        ::= { jnxJsScreenMonEntry 36 }
+
+    jnxJsScreenIcmpFloodThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "ICMP flooding occurs when an attacker sends IP packets containing 
+             ICMP datagrams with the purpose of slowing down the victim to the 
+             point that it can no longer handle valid connections. 
+
+             This attributes display the ICMP attack alarm threshold value."
+        ::= { jnxJsScreenMonEntry 37 }
+
+    jnxJsScreenUdpFloodThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "UDP flooding occurs when an attacker sends IP packets containing 
+             UDP datagrams with the purpose of slowing down the victim to the 
+             point that it can no longer handle valid connections. 
+
+             The default threshold value is 1000 packets per second.
+
+             This attribute displays the UDP attack alarm threshold value."
+        ::= { jnxJsScreenMonEntry 38 }
+
+    jnxJsScreenPortScanThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The port scan threshold interval is in microseconds.  The default 
+             threshold value is 5000.  The valid threshold range is 1000-1000000. 
+
+             By using the default settings, if a remote host scans 10 ports in 
+             0.005 seconds (5000 microseconds), the device flags this as a 
+             port scan attack, and rejects all further packets from the remote 
+             source for the remainder of the specified timeout period. The 
+             device detects and drops the tenth packet that meets the port scan 
+             attack criterion.
+
+             This attribute displays the port scan threshold value."
+        ::= { jnxJsScreenMonEntry 39 }
+
+    jnxJsScreenIpSweepThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP sweep threshold interval is in microseconds.  The default 
+             threshold value is 5000.  The valid threshold range is 1000-1000000. 
+
+             By using the default settings, if a remote host sends ICMP traffic 
+             to 10 addresses in 0.005 seconds (5000 microseconds), the 
+             security device flags this as an address sweep attack, and 
+             rejects all further ICMP echo requests from that host for 
+             the remainder of the specified threshold time period. The 
+             device detects and drops the tenth packet that meets the address 
+             sweep attack criterion.
+            
+             This attribute holds the UDP attack alarm threshold."
+        ::= { jnxJsScreenMonEntry 40 }
+
+    jnxJsScreenSynAckAckThres OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SYN ack ack alarm threshold value."
+        ::= { jnxJsScreenMonEntry 41 }
+
+
+
+--
+-- Additional Syn Flood, Session Limit thresholds and counters
+--
+
+    jnxJsScreenMonThreshTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF JnxJsScreenMonThreshEntry
+        MAX-ACCESS         not-accessible
+        STATUS             current
+        DESCRIPTION
+            "This table is a read-only table that augments the
+             jnxJsScreenMonTable.  The purpose of this table is
+             to keep threshold and counter information about
+             Syn Flood and Session Limit."
+        ::= { jnxJsScreenObjects 2 }
+
+    jnxJsScreenMonThreshEntry OBJECT-TYPE
+        SYNTAX        JnxJsScreenMonThreshEntry
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Syn Flood and Session Limit thresholds and counts."
+        AUGMENTS { jnxJsScreenMonEntry }
+        ::= { jnxJsScreenMonThreshTable 1 }
+
+    JnxJsScreenMonThreshEntry ::= SEQUENCE
+    {
+        jnxJsScreenSynFloodSrcThresh    Integer32,
+        jnxJsScreenSynFloodDstThresh    Integer32,
+        jnxJsScreenSessLimitSrcThresh   Integer32,
+        jnxJsScreenSessLimitDstThresh   Integer32,
+        jnxJsScreenMonSynFloodSrc       Counter64,
+        jnxJsScreenMonSynFloodDst       Counter64
+    }
+
+    jnxJsScreenSynFloodSrcThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of SYN segments received per second from a single
+             source IP - regardless of the destination IP address and
+             port number - before the security device begins dropping 
+             connection requests from that source."
+        ::= { jnxJsScreenMonThreshEntry 1 }
+
+    jnxJsScreenSynFloodDstThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of SYN segments received per second from a single
+             destination IP address before the security device begins dropping
+             connection requests to that destination. If a protected host runs
+             multiple services, you might want to set a threshold based on
+             destination IP address only - regardless of the destination
+             port number."
+        ::= { jnxJsScreenMonThreshEntry 2 }
+
+    jnxJsScreenSessLimitSrcThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The security device can impose a limit on the number of SYN segments
+             permitted from a single source IP address."
+        ::= { jnxJsScreenMonThreshEntry 3 }
+
+    jnxJsScreenSessLimitDstThresh OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The security device can impose a limit on the number of SYN segments
+             permitted to a single destination IP address."
+        ::= { jnxJsScreenMonThreshEntry 4 }
+
+    jnxJsScreenMonSynFloodSrc OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of concurrent sessions from the same source IP address."
+        ::= { jnxJsScreenMonThreshEntry 5 }
+
+    jnxJsScreenMonSynFloodDst OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of concurrent sessions to the same destination IP address."
+        ::= { jnxJsScreenMonThreshEntry 6 }
+
+
+    -- ***************************************************************
+    -- definition of access authentication related traps.
+    -- ***************************************************************
+
+    --
+    -- When the device detects an attack, based on configured value, 
+    -- an attack trap is generated.
+    --     
+    jnxJsScreenAttack NOTIFICATION-TYPE
+        OBJECTS          { jnxJsScreenZoneName,
+                           ifName, 
+                           jnxJsScreenAttackType,
+                           jnxJsScreenAttackCounter,
+                           jnxJsScreenAttackDescr
+                        }
+        STATUS          current
+        DESCRIPTION
+            "A per min bytes exceed trap signifies that the number of
+             bytes per minutes has exceeds the specified threshold.
+
+             jnxJsScreenZoneName: the zone name under which the attack 
+             is occuring.
+             ifName the interface at which the attack is occuring.
+             jnxJsScreenAttackType: type of attack.
+             jnxJsScreenAttackCounter: the number of attacks recorded
+             based on the particular screening options enabled. The
+             value of this counter is the aggregated statistic of all
+             the interfaces bound to the mentioned zone. 
+             jnxJsScreenAttackDescr: a general text description of the
+             this attack or the trap."
+        ::= { jnxJsScreenNotifications 1 }
+
+    --
+    -- The trap indicates an screen option is changed.  
+    -- 
+    jnxJsScreenCfgChange NOTIFICATION-TYPE
+        OBJECTS          { jnxJsScreenZoneName,
+                          jnxJsScreenAttackType,
+                          jnxJsScreenCfgStatus }
+        STATUS          current
+        DESCRIPTION
+            "The screening configuration change trap signifies that 
+             an screening option has been changed(enabled or disabled).  
+
+             A disable feature may implies a security hole.
+
+            jnxJsScreenZoneName is the zone at which the changed option
+            is applicable to.
+            jnxJsScreenAttackType the screen feature.
+            jnxJsScreenCfgStatus: either enabled or disabled"
+        ::= { jnxJsScreenNotifications 2 }
+
+
+    -- **************************************************************
+    -- Trap variables 
+    -- **************************************************************
+    jnxJsScreenAttackType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            icmpFlood           (1),
+                            udpFlood            (2),
+                            portScanning        (3),
+                            ipSweeping          (4),
+                            synfloodSrcIP       (5),
+                            synfloodDstIP       (6),
+                            sessLimitSrcBased   (7),
+                            sessLimitDestBased  (8),
+                            synAckAck           (9),
+                            synAttack          (10),
+                            winNuke            (11),
+                            tearDrop           (12),
+                            ipAddressSpoof     (13),
+                            pingDeath          (14),
+                            sourceRoute        (15),
+                            landAttack         (16),
+                            synFragmentation   (17),
+                            tcpNoFlag          (18),
+                            ipUnknownProtocol  (19),
+                            ipOptionBad        (20),
+                            ipOptionRecRt      (21),
+                            ipOptionTimeStamp  (22),
+                            ipOptionSecurity   (23),
+                            ipOptionLSR        (24),
+                            ipOptionSRR        (25),
+                            ipOptionStream     (26),
+                            icmpFragmentation  (27),
+                            icmpLarge          (28),
+                            tcpSynFin          (29),
+                            tcpFinNoAck        (30),
+                            ipFragmentation    (31)
+                    } 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The type of attacks that the device support."
+        ::= { jnxJsScreenTrapVars 1 }
+
+    jnxJsScreenAttackCounter OBJECT-TYPE
+        SYNTAX         Integer32 
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The threshold value that triggers the trap to be generated."
+        ::= { jnxJsScreenTrapVars 2 }
+
+    jnxJsScreenAttackDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..255))  
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The description pertinent to the attack trap."
+        ::= { jnxJsScreenTrapVars 3 }
+
+    jnxJsScreenCfgStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            disabled (1),
+                            enabled  (2)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The screening option configuration status: enabled or disabled."
+        ::= { jnxJsScreenTrapVars 4 }
+
+--
+-- End of File 
+--
+
+END
+
+

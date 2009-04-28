@@ -1,0 +1,734 @@
+--
+-- Juniper Enterprise Specific MIB: RPM MIB
+-- 
+-- Copyright (c) 2007, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-RPM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI              -- RFC2578
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex
+        FROM DISMAN-PING-MIB
+    jnxRpmMibRoot
+        FROM JUNIPER-SMI;
+
+jnxRpmMib MODULE-IDENTITY
+    LAST-UPDATED "200703010000Z" -- March 1 00:00:00 2007 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This mib provides data associated with the Realtime Performance
+             Monitoring feature."
+    -- revision history
+    REVISION "200703010000Z" 
+    DESCRIPTION
+            "Initial definition."
+    ::= { jnxRpmMibRoot 1 }
+
+
+JnxRpmCollectionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Each RPM entry can maintain several collections of probes and
+         provide separate calculations over each collection.  The types of
+         collections include:
+
+             currentTest       -- the test currently being executed
+             lastCompletedTest -- the most recently completed test
+             movingAverage     -- the 'n' most recent probes (n is configurable)
+             allTests          -- all the probes (since the entry was last
+                                  reset).
+         
+         Objects with this type identify a specific collection."
+    SYNTAX INTEGER {  
+               currentTest       (1),
+               lastCompletedTest (2),
+               movingAverage     (3),
+               allTests          (4)
+           }
+
+
+JnxRpmMeasurementType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "For each individual probe, several different measurements can be
+         made.  These include the following (all measurements are provided
+         in units of microseconds):
+
+             roundTripTime -- this is the delay between the the transmission of 
+                 a probe and the arrival of its response.
+
+             rttJitter -- this is the difference between the current round trip 
+                 time measurement and the previous one.
+
+             rttInterarrivalJitter -- An estimate of the statistical variance 
+                 of a packet's interarrival time.  Defined in rfc1889 as:
+
+                   J=J+(|D(i-1,i)|-J)/16
+
+                 where J is the interarrival jitter and D(i-1, i) is the current
+                 round trip jitter measurement. 
+  
+             egress -- this is the delay beween the transmission of a probe and
+                 its arrival at its destination.
+
+             egressJitter -- this is the difference between the current egress
+                 delay the previous measurement.
+
+             egressInterarrivalJitter -- similar to rttInterarrivalJitter, but
+                 applied to egress jitter measurements.
+
+             ingress -- this is the delay between the transmission of a probe
+                 response and its arrival at its destination.
+
+             ingressJitter -- this is the difference between the current ingress
+                 delay and the previous measurement.
+
+             ingressInterarrivalJitter -- similar to rttInterarrivalJitter, but
+                 applied to ingress jitter measurements.
+
+         Note, not all types of measurements will be performed for every
+         probe.  The jitter measurements are available only for those RPM 
+         entries that employ hardware timestamps.  Further, the ingress & 
+         egress measurements are available only for those probe types that
+         measure one-way delays or where hardware timestamps are 
+         employed and the one-way-hardware timestamp knob is enabled.  
+         In either case, the one-way delays must be less than the round
+         trip times, otherwise they are discarded.
+
+         Also note, due to clock synchronization artifacts, many one-way 
+         jitter measurements & calculations may include signifacant variations,
+         in some cases orders of magnitude greater than the round trip times.
+         Because of this, one-way jitter measurements will only be performed
+         on samples which are less than 10 seconds apart."
+    SYNTAX     INTEGER {
+                   roundTripTime             (1),
+                   rttJitter                 (2),
+                   rttInterarrivalJitter     (3),
+                   egress                    (4),
+                   egressJitter              (5),
+                   egressInterarrivalJitter  (6),
+                   ingress                   (7),
+                   ingressJitter             (8),
+                   ingressInterarrivalJitter (9)
+               }
+
+
+JnxRpmMeasurementSet ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Over each collection of probes, RPM calculates statistics for several
+         sets of measurements.  These sets include the following:
+
+             roundTripTime    -- the set of round trip delays
+             posRttJitter     -- the set of positive round trip jitter 
+                                 measurements
+             negRttJitter     -- the set of negative round trip jitter
+                                 measurements
+             egress           -- the set of outgoing (source to destination)
+                                 one-way delays
+             posEgressJitter  -- the set of positive egress jitter measurements
+             negEgressJitter  -- the set of negative egress jitter measurements
+             ingress          -- the set of incoming (destination to source)
+                                 one-way delays
+             posIngressJitter -- the set of positive ingress jitter measurements
+             negIngressJitter -- the set of negative ingress jitter measurements
+
+        Objects with this type identify a specific set of measurements."
+    SYNTAX INTEGER {
+               roundTripTime    (1),
+               posRttJitter     (2),
+               negRttJitter     (3),
+               egress           (4),
+               posEgressJitter  (5),
+               negEgressJitter  (6),
+               ingress          (7),
+               posIngressJitter (8),
+               negIngressJitter (9)
+           }
+
+
+JnxRpmTimestampType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This object identifies the type of timestamp used to obtain a
+         measurement:
+
+         software
+             this indicates software based timestamps
+             are used on both client and server.
+
+         clientHardware
+             this indicates hardware based timestamps
+             are used on the RPM client.  The RPM server
+             is processed entirely in software.
+
+         clientAndServerHardware
+             this indicates hardware based timestamps
+             are used on the RPM client and the server."
+    SYNTAX     INTEGER {
+                   software                (1),
+                   clientHardware          (2),
+                   clientAndServerHardware (3)
+               }
+ 
+
+--
+-- Sample Results Table
+--
+    jnxRpmResultsSampleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmResultsSampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides measurements from the latest individual RPM 
+             probe samples.  Within each sample, the specific measurement type 
+             is identified by jnxRpmResSampleType.  Note, if the latest
+             probe was unsuccessful, no measurement types will be available.
+
+             See the definition of JnxRpmMeasurementType for details on
+             the types of measurements available."
+        ::= { jnxRpmMib 1 }
+  
+    jnxRpmResultsSampleEntry OBJECT-TYPE
+        SYNTAX      JnxRpmResultsSampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry provides a specific measurement type for a single
+             probe."
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxRpmResSampleType }
+        ::= { jnxRpmResultsSampleTable 1 }
+
+    JnxRpmResultsSampleEntry ::=
+        SEQUENCE {
+            jnxRpmResSampleType          JnxRpmMeasurementType,
+            jnxRpmResSampleValue         Integer32,
+            jnxRpmResSampleTsType        JnxRpmTimestampType,
+            jnxRpmResSampleDate          DateAndTime
+        }
+
+    jnxRpmResSampleType OBJECT-TYPE
+        SYNTAX     JnxRpmMeasurementType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This object identifies the specific measurement type returned
+            by jnxRpmResSampleValue."
+       ::= { jnxRpmResultsSampleEntry 1 }
+
+    jnxRpmResSampleValue OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object returns the measurement identified by the corresponding
+            jnxRpmResSampleType."
+       ::= { jnxRpmResultsSampleEntry 2 }
+
+    jnxRpmResSampleTsType OBJECT-TYPE
+       SYNTAX     JnxRpmTimestampType
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object identifies the type of timestamp used to obtain this
+            measurement."
+       ::= { jnxRpmResultsSampleEntry 3 }
+
+    jnxRpmResSampleDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the date and time of when this measurement
+             was obtained."
+        ::= { jnxRpmResultsSampleEntry 4 }
+
+
+--
+-- Summary Results Table
+--
+    jnxRpmResultsSummaryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmResultsSummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a summary of the results for a specific
+             RPM entry (identified by pingCtlOwnerIndex/pingCtlTestName).
+             The scope of the summary is identified by jnxRpmResSumCollection."
+        ::= { jnxRpmMib 2 }
+   
+    jnxRpmResultsSummaryEntry OBJECT-TYPE
+        SYNTAX      JnxRpmResultsSummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry in the table provides a summary of the RPM results
+             over a single collection of probes.  For each RPM entry, there
+             are several collections maintained: the current test, the
+             most recently completed test, a configurable number of the most
+             recent probes (aka 'moving average'), and a global collection
+             representing all the probes.  Each entry in this table summarizes
+             the results for one of these collections."
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxRpmResSumCollection }
+        ::= { jnxRpmResultsSummaryTable 1 }
+        
+    JnxRpmResultsSummaryEntry ::=
+        SEQUENCE {
+            jnxRpmResSumCollection               JnxRpmCollectionType,
+            jnxRpmResSumSent                     Unsigned32,
+            jnxRpmResSumReceived                 Unsigned32,
+            jnxRpmResSumPercentLost              Unsigned32,
+            jnxRpmResSumDate                     DateAndTime
+        }
+
+    jnxRpmResSumCollection OBJECT-TYPE
+        SYNTAX      JnxRpmCollectionType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifes the collection of probes over which the
+             summary data represented by the other objects in this table 
+             applies.  Note, if a collection type is not supported or not
+             configured, it will not be instantiated in this table."
+        ::= { jnxRpmResultsSummaryEntry 1 }
+
+    jnxRpmResSumSent OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes sent within the 
+             collection identified by jnxRpmResSumCollection."
+        ::= { jnxRpmResultsSummaryEntry 2 }
+
+    jnxRpmResSumReceived OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes received within the
+             collection identified by jnxRpmResSumCollection."
+        ::= { jnxRpmResultsSummaryEntry 3 }
+
+    jnxRpmResSumPercentLost OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the percentage of probes lost within the
+             collection identified by jnxRpmResSumCollection."
+        ::= { jnxRpmResultsSummaryEntry 4 }
+
+    jnxRpmResSumDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the date and time of when the most recent
+             probe within the collection identified by jnxRpmResSumCollection 
+             was completed."
+        ::= { jnxRpmResultsSummaryEntry 5 }
+
+
+
+--
+-- Calculated Results Table
+--
+    jnxRpmResultsCalculatedTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmResultsCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a set of calculated values for each
+             RPM entry, for each collection of probes maintained within that
+             entry, and for each supported measurement set within that 
+             collection of probes.
+
+             Note, not all collection types will be available for every
+             RPM Entry (identified by pingCtlOwnerIndex/pingCtlTestName).
+             The jitter calculations are available only for those RPM entries 
+             that employ hardware timestamps.  Further, the ingress & egress
+             calculations are available only for those probe types that
+             measure one-way delays or where hardware timestamps are 
+             employed and the one-way-hardware timestamp knob is enabled.  
+             In either case, the one-way delays must be less than the round
+             trip times, otherwise they are discarded.
+
+             Also, this table will skip over any measurement set for which
+             there are 0 samples."
+        ::= { jnxRpmMib 3 }
+  
+    jnxRpmResultsCalculatedEntry OBJECT-TYPE
+        SYNTAX      JnxRpmResultsCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, jnxRpmResSumCollection,
+                jnxRpmResCalcSet }
+        ::= { jnxRpmResultsCalculatedTable 1 }
+
+    JnxRpmResultsCalculatedEntry ::=
+        SEQUENCE {
+            jnxRpmResCalcSet       JnxRpmMeasurementSet,
+            jnxRpmResCalcSamples   Unsigned32,
+            jnxRpmResCalcMin       Unsigned32,
+            jnxRpmResCalcMax       Unsigned32,
+            jnxRpmResCalcAverage   Unsigned32,
+            jnxRpmResCalcPkToPk    Unsigned32,
+            jnxRpmResCalcStdDev    Unsigned32,
+            jnxRpmResCalcSum       CounterBasedGauge64
+        }
+
+    jnxRpmResCalcSet OBJECT-TYPE
+        SYNTAX      JnxRpmMeasurementSet
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the measurement set upon which the 
+             calculations returned by the other objects in this table are
+             based."
+        ::= { jnxRpmResultsCalculatedEntry 1 }
+
+    jnxRpmResCalcSamples OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of samples used in this calculations."
+        ::= { jnxRpmResultsCalculatedEntry 2 }
+
+    jnxRpmResCalcMin OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The minimum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 3 }
+
+    jnxRpmResCalcMax OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The maximum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 4 }
+
+    jnxRpmResCalcAverage OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The average of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 5 }
+
+    jnxRpmResCalcPkToPk OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The difference between the minimum and maximum of all the samples 
+             in the collection and measurement set associated with this row.  
+             Values are provided in units of microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 6 }
+
+    jnxRpmResCalcStdDev OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The standard deviation calculated over all the samples 
+             in the collection and measurement set associated with this row.  
+             Values are provided in units of microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 7 }
+
+    jnxRpmResCalcSum OBJECT-TYPE
+        SYNTAX     CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The sum of all the samples in the collection and measurement set 
+             associated with this row.  Values are provided in units of 
+             microseconds."
+        ::= { jnxRpmResultsCalculatedEntry 8 }
+
+
+--
+-- History Sample Table
+--
+    jnxRpmHistorySampleTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmHistorySampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides measurements for individual RPM probe samples.
+             In addition to the last completed sample, a configurable number of
+             the most recent samples are available as well.  Within each sample,
+             the specific measurement type is identified by
+             jnxRpmHistSampleType.  Note, if probe was unsuccessful, no 
+             measurement types will be available for that history entry.
+
+             See the definition of JnxRpmMeasurementType for details on
+             the types of measurements available."
+        ::= { jnxRpmMib 4 }
+  
+    jnxRpmHistorySampleEntry OBJECT-TYPE
+        SYNTAX      JnxRpmHistorySampleEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxRpmHistSampleType }
+        ::= { jnxRpmHistorySampleTable 1 }
+
+    JnxRpmHistorySampleEntry ::=
+        SEQUENCE {
+            jnxRpmHistSampleType          JnxRpmMeasurementType,
+            jnxRpmHistSampleValue         Integer32,
+            jnxRpmHistSampleTsType        JnxRpmTimestampType
+        }
+
+    jnxRpmHistSampleType OBJECT-TYPE
+        SYNTAX     JnxRpmMeasurementType
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "This object identifies the specific measurement type returned
+            by jnxRpmHistSampleValue."
+       ::= { jnxRpmHistorySampleEntry 1 }
+
+    jnxRpmHistSampleValue OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object returns the measurement identified by the corresponding
+            jnxRpmHistSampleType."
+       ::= { jnxRpmHistorySampleEntry 2 }
+
+    jnxRpmHistSampleTsType OBJECT-TYPE
+       SYNTAX     JnxRpmTimestampType
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+           "This object identifies the type of timestamp used to obtain this
+            measurement."
+       ::= { jnxRpmHistorySampleEntry 3 }
+
+     
+--
+-- History Summary Table
+--
+    jnxRpmHistorySummaryTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmHistorySummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides historical summary data for each collection
+             of probes within each RPM Entry, similar to the
+             jnxRpmResultsSummaryTable.  
+
+             In addition to the current summary, this table provides the same 
+             number of historical entries as the jnxRpmHistorySampleTable."
+        ::= { jnxRpmMib 5 }
+  
+    jnxRpmHistorySummaryEntry OBJECT-TYPE
+        SYNTAX      JnxRpmHistorySummaryEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxRpmHistSumCollection }
+        ::= { jnxRpmHistorySummaryTable 1 }
+
+    JnxRpmHistorySummaryEntry ::=
+        SEQUENCE {
+            jnxRpmHistSumCollection  JnxRpmCollectionType,
+            jnxRpmHistSumSent        Unsigned32,
+            jnxRpmHistSumReceived    Unsigned32,
+            jnxRpmHistSumPercentLost Unsigned32
+        }
+
+    jnxRpmHistSumCollection OBJECT-TYPE
+        SYNTAX      JnxRpmCollectionType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Identifies the collection of probes whose results are summarized by
+             this row.  
+
+             At this time, historical summaries are available only for the 
+             current test (currentTest(1))."
+        ::= { jnxRpmHistorySummaryEntry 1 }
+
+    jnxRpmHistSumSent OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes sent within the 
+             collection identified by jnxRpmHistSumCollection."
+        ::= { jnxRpmHistorySummaryEntry 2 }
+
+    jnxRpmHistSumReceived OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the number of probes received within the 
+             collection identified by jnxRpmHistSumCollection."
+        ::= { jnxRpmHistorySummaryEntry 3 }
+
+    jnxRpmHistSumPercentLost OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "This object provides the percentage of probes lost within the 
+             collection identified by jnxRpmHistSumCollection."
+        ::= { jnxRpmHistorySummaryEntry 4 }
+
+
+
+--
+-- History Calculated Table
+--
+    jnxRpmHistoryCalculatedTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF JnxRpmHistoryCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table provides a set of calculated values for each
+             RPM entry, for each collection of probes maintained within that
+             entry, and for each supported calculated type within that 
+             collection of probes, similar to the jnxRpmResultsCalculatedTable.
+
+             In addition to the current summary, this table provides the same 
+             number of historical entries as the jnxRpmHistorySampleTable."
+        ::= { jnxRpmMib 6 }
+  
+    jnxRpmHistoryCalculatedEntry OBJECT-TYPE
+        SYNTAX      JnxRpmHistoryCalculatedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            ""
+        INDEX { pingCtlOwnerIndex, pingCtlTestName, pingProbeHistoryIndex,
+                jnxRpmHistSumCollection, jnxRpmHistCalcSet }
+        ::= { jnxRpmHistoryCalculatedTable 1 }
+
+    JnxRpmHistoryCalculatedEntry ::=
+        SEQUENCE {
+            jnxRpmHistCalcSet       JnxRpmMeasurementSet,
+            jnxRpmHistCalcSamples   Unsigned32,
+            jnxRpmHistCalcMin       Unsigned32,
+            jnxRpmHistCalcMax       Unsigned32,
+            jnxRpmHistCalcAverage   Unsigned32,
+            jnxRpmHistCalcPkToPk    Unsigned32,
+            jnxRpmHistCalcStdDev    Unsigned32,
+            jnxRpmHistCalcSum       CounterBasedGauge64
+        }
+
+    jnxRpmHistCalcSet OBJECT-TYPE
+       SYNTAX     JnxRpmMeasurementSet
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "This object identifies the measurement set upon which the 
+             calculations returned by the other objects in this table are
+             based."
+       ::= { jnxRpmHistoryCalculatedEntry 1 }
+
+    jnxRpmHistCalcSamples OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The number of samples used in this calculations."
+        ::= { jnxRpmHistoryCalculatedEntry 2 }
+
+    jnxRpmHistCalcMin OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The minimum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 3 }
+
+    jnxRpmHistCalcMax OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The maximum of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 4 }
+
+    jnxRpmHistCalcAverage OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The average of all the samples in the collection and measurement
+             set associated with this row.  Values are provided in units
+             of microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 5 }
+
+    jnxRpmHistCalcPkToPk OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The difference between the minimum and maximum of all the samples 
+             in the collection and measurement set associated with this row.  
+             Values are provided in units of microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 6 }
+
+    jnxRpmHistCalcStdDev OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The standard deviation calculated over all the samples 
+             in the collection and measurement set associated with this row.  
+             Values are provided in units of microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 7 }
+
+    jnxRpmHistCalcSum OBJECT-TYPE
+        SYNTAX     CounterBasedGauge64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The sum of all the samples in the collection and measurement set 
+             associated with this row.  Values are provided in units of 
+             microseconds."
+        ::= { jnxRpmHistoryCalculatedEntry 8 }
+
+END

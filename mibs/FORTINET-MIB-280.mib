@@ -1,0 +1,730 @@
+--
+-- MODULE-IDENTITY
+--  OrgName
+--    Fortinet, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+FORTINET-MIB-280 DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, 
+		enterprises, IpAddress
+			FROM SNMPv2-SMI;
+
+	--
+	-- Textual conventions --
+	--
+
+	FnBoolState ::= INTEGER { 
+		disabled ( 1 ),
+		enabled  ( 2 )
+	} 
+
+	FnIndex ::= INTEGER (
+		0 .. 2147483647
+	)
+
+	FnOpMode ::= INTEGER { 
+		nat         ( 1 ),
+		transparent ( 2 )
+	}
+
+	FnHaMode ::= INTEGER {
+		standalone     ( 1 ),
+		active-active  ( 2 ),
+		active-passive ( 3 )
+	}
+
+	FnHaSchedule ::= INTEGER { 
+		none                 ( 1 ),
+		hub                  ( 2 ),
+		least-connections    ( 3 ),
+		round-robin          ( 4 ),
+		weighted-round-robin ( 5 ),
+		random               ( 6 ),
+		ip-based             ( 7 ),
+		ip-port-based        ( 8 )
+	} 
+
+	FnAdminPerm ::= INTEGER { 
+		super-admin  ( 255 ),
+		domain-admin ( 15 ),
+		write-admin  ( 1 ),
+		read-admin   ( 0 )
+	} 
+
+	FnUserAuth ::= INTEGER { 
+		local           ( 1 ),
+		radius-single   ( 2 ),
+		radius-multiple ( 3 ),
+		ldap            ( 4 )
+	} 
+
+
+	FnIfAddrMode ::= INTEGER  {
+		static ( 1 )
+		-- fixme --
+	} 
+
+	FnSessProto ::= INTEGER  {
+		ip   ( 0 ) ,
+		icmp ( 1 ) ,
+		igmp ( 2 ) ,
+		ipip ( 4 ) ,
+		tcp  ( 6 ) , 
+		egp  ( 8 ) ,
+		pup  ( 12 ) ,				
+		udp  ( 17 ) ,
+		idp  ( 22 ) ,
+		ipv6 ( 41 ) ,
+		rsvp ( 46 ) ,
+		gre  ( 47 ) ,
+		esp  ( 50 ) ,
+		ah   ( 51 ) ,
+		ospf ( 89 ) ,
+		pim  ( 103 ) ,
+		comp ( 108 ) ,
+		raw  ( 255 )
+	}
+
+	--
+	--
+	--
+
+	fortinet        OBJECT IDENTIFIER ::=  { enterprises  12356 }
+
+	fnSystem        OBJECT IDENTIFIER ::=  { fortinet  1 }
+	fnDomains       OBJECT IDENTIFIER ::=  { fortinet  2 }
+--	fnInterfaces    OBJECT IDENTIFIER ::=  { fortinet  3 }
+	fnIp            OBJECT IDENTIFIER ::=  { fortinet  4 }
+--	fnDhcp          OBJECT IDENTIFIER ::=  { fortinet  5 }
+--	fnSnmp          OBJECT IDENTIFIER ::=  { fortinet  6 }
+--	fnDns           OBJECT IDENTIFIER ::=  { fortinet  7 }
+--	fnFirewall      OBJECT IDENTIFIER ::=  { fortinet  8 }
+	fnVpn           OBJECT IDENTIFIER ::=  { fortinet  9 }
+--	fnVip           OBJECT IDENTIFIER ::=  { fortinet  10 }
+--	fnAntivirus     OBJECT IDENTIFIER ::=  { fortinet  11 }
+	fnIps           OBJECT IDENTIFIER ::=  { fortinet  12 }
+--	fnWebfilter     OBJECT IDENTIFIER ::=  { fortinet  13 }
+--	fnAntispam      OBJECT IDENTIFIER ::=  { fortinet  14 }
+	fnBridge        OBJECT IDENTIFIER ::=  { fortinet  15 }
+	fnTraps         OBJECT IDENTIFIER ::=  { fortinet  0 }
+
+	-- fnSystem
+
+	fnSysModel          OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "System model number"
+		::= { fnSystem    1 }
+
+	fnSysSerial         OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device serial number"
+		::= { fnSystem    2 }
+
+	fnSysVersion        OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Device firmware version"
+		::= { fnSystem    3 }
+
+	fnSysVersionAv      OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Antivirus DB version"
+		::= { fnSystem    4 }
+
+	fnSysVersionNids    OBJECT-TYPE
+		SYNTAX          DisplayString  ( SIZE ( 0 .. 128 ) ) 
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "NIDS DB version"
+		::= { fnSystem    5 }
+
+	fnSysHaMode         OBJECT-TYPE
+		SYNTAX          FnHaMode
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "High-availabilty mode (Standalone, A-A or A-P)"
+		::= { fnSystem    6 }
+
+	fnSysOpMode         OBJECT-TYPE
+		SYNTAX          FnOpMode
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Operational mode (Transparent or Nat)"
+		::= { fnSystem    7 }
+
+	fnSysCpuUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous CPU usage"
+		::= { fnSystem    8 }
+
+	fnSysMemUsage       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous memory utilization"
+		::= { fnSystem    9 }
+
+	fnSysSesCount       OBJECT-TYPE
+		SYNTAX          Gauge32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Instantaneous session count"
+		::= { fnSystem    10 }
+
+	fnHa            OBJECT IDENTIFIER ::=  { fnSystem 100 }
+	fnAdmin         OBJECT IDENTIFIER ::=  { fnSystem 101 }
+	fnUsers         OBJECT IDENTIFIER ::=  { fnSystem 102 }
+	fnOptions       OBJECT IDENTIFIER ::=  { fnSystem 103 }
+	fnLogging       OBJECT IDENTIFIER ::=  { fnSystem 104 }
+	fnMessages      OBJECT IDENTIFIER ::=  { fnSystem 105 }
+
+	-- fnSystem . fnHa
+
+	fnHaGroupId      OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "HA cluster group ID"
+		::= { fnHa        1 }
+
+	fnHaPriority     OBJECT-TYPE
+		SYNTAX          INTEGER (0 .. 255)
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "HA clustering priority (default - 127)"
+		::= { fnHa        2 }
+
+	fnHaOverride     OBJECT-TYPE
+		SYNTAX          FnBoolState
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Status of a master override flag"
+		::= { fnHa        3 }
+
+	fnHaAutoSync     OBJECT-TYPE
+		SYNTAX          FnBoolState
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Status of an automatic configuration 
+		                 synchronization"
+		::= { fnHa        4 }
+
+	fnHaSchedule     OBJECT-TYPE
+		SYNTAX          FnHaSchedule
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Load-balancing schedule in A-A mode"
+		::= { fnHa        5 }
+
+	-- fnSystem . fnHa . fnHaStatusTable
+
+	fnHaStatsTable  OBJECT-TYPE
+        	SYNTAX     SEQUENCE OF FnHaStatsEntry
+	        MAX-ACCESS not-accessible
+        	STATUS     current
+	        DESCRIPTION "HA cluster status"
+        	::= { fnHa        6 }
+
+	fnHaStatsEntry  OBJECT-TYPE
+        	SYNTAX     FnHaStatsEntry
+	        MAX-ACCESS not-accessible
+        	STATUS     current
+	        DESCRIPTION "Statistics for a particular HA cluster's unit"
+	        INDEX       { fnHaStatsIndex }
+        	::= { fnHaStatsTable 1 }
+
+	FnHaStatsEntry ::= SEQUENCE {
+		    fnHaStatsIndex			FnIndex,
+		    fnHaStatsSerial			DisplayString,
+		    fnHaStatsCpuUsage		Gauge32,
+		    fnHaStatsMemUsage		Gauge32,
+		    fnHaStatsNetUsage		Gauge32,
+		    fnHaStatsSesCount		Gauge32,
+		    fnHaStatsPktCount		Counter32,
+		    fnHaStatsByteCount		Counter32,
+		    fnHaStatsIdsCount		Counter32,
+		    fnHaStatsAvCount		Counter32
+        	}
+
+	fnHaStatsIndex  OBJECT-TYPE
+	        SYNTAX      FnIndex
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "An index value that uniquely identifies an
+                	     unit in the HA Cluster"
+        	::= { fnHaStatsEntry 1 }
+
+	fnHaStatsSerial  OBJECT-TYPE
+	        SYNTAX      DisplayString  ( SIZE ( 0 .. 32  ) )
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Serial number of HA Cluster's unit"
+        	::= { fnHaStatsEntry 2 }
+
+	fnHaStatsCpuUsage  OBJECT-TYPE
+	        SYNTAX      Gauge32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "CPU Usage of HA Cluster's unit"
+        	::= { fnHaStatsEntry 3 }
+
+	fnHaStatsMemUsage  OBJECT-TYPE
+	        SYNTAX      Gauge32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Memory Usage of HA Cluster's unit"
+        	::= { fnHaStatsEntry 4 }
+
+	fnHaStatsNetUsage  OBJECT-TYPE
+	        SYNTAX      Gauge32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Network Usage of HA Cluster's unit"
+        	::= { fnHaStatsEntry 5 }
+
+	fnHaStatsSesCount  OBJECT-TYPE
+	        SYNTAX      Gauge32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Sessions Counter of HA Cluster's unit"
+        	::= { fnHaStatsEntry 6 }
+
+	fnHaStatsPktCount  OBJECT-TYPE
+	        SYNTAX      Counter32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Packets Counter of HA Cluster's unit"
+        	::= { fnHaStatsEntry 7 }
+
+	fnHaStatsByteCount  OBJECT-TYPE
+	        SYNTAX      Counter32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "Bytes Counter of HA Cluster's unit"
+        	::= { fnHaStatsEntry 8 }
+
+	fnHaStatsIdsCount  OBJECT-TYPE
+	        SYNTAX      Counter32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "IDS Counter of HA Cluster's unit"
+        	::= { fnHaStatsEntry 9 }
+
+	fnHaStatsAvCount  OBJECT-TYPE
+	        SYNTAX      Counter32
+        	MAX-ACCESS  read-only
+	        STATUS      current
+        	DESCRIPTION "AV Counter of HA Cluster's unit"
+        	::= { fnHaStatsEntry 10 }
+
+	-- fnSystem . fnAdmin
+
+	fnAdminNumber    OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "The number of admin accounts in fnAdminTable"
+		::= { fnAdmin     1 }
+
+	fnAdminTable     OBJECT-TYPE
+		SYNTAX          SEQUENCE OF FnAdminEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "A list of admin accounts"
+		::= { fnAdmin     2 }
+
+	fnAdminEntry     OBJECT-TYPE
+		SYNTAX          FnAdminEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "An entry containing information applicable
+		                 to a particular admin account"
+        INDEX          { fnAdminIndex }
+		::= { fnAdminTable 1 }
+
+	FnAdminEntry ::= SEQUENCE {
+		fnAdminIndex   FnIndex,
+		fnAdminName    DisplayString,
+		fnAdminAddr    IpAddress,
+		fnAdminMask    IpAddress,
+		fnAdminPerm    FnAdminPerm
+	}
+
+	fnAdminIndex     OBJECT-TYPE
+		SYNTAX          FnIndex
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "An index of admin account"
+		::= { fnAdminEntry 1 }
+
+	fnAdminName      OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "A username of an account"
+		::= { fnAdminEntry 2 }
+
+	fnAdminAddr      OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "An address of a subnet where this admin account
+		                 can be used from"
+		::= { fnAdminEntry 3 }
+
+	fnAdminMask      OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "A mask of a subnet where this admin account
+		                 can be used from"
+		::= { fnAdminEntry 4 }
+
+	fnAdminPerm      OBJECT-TYPE
+		SYNTAX          FnAdminPerm
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Access level of this admin account"
+		::= { fnAdminEntry 5 }
+
+	-- fnSystem . fnUsers
+
+	fnUserNumber    OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "The number of user accounts in fnUserTable"
+		::= { fnUsers     1 }
+
+	fnUserTable     OBJECT-TYPE
+		SYNTAX          SEQUENCE OF FnUserEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "A list of local and proxied (Radius server)
+		                 user accounts"
+		::= { fnUsers     2 }
+
+	fnUserEntry     OBJECT-TYPE
+		SYNTAX          FnUserEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "An entry containing information applicable
+		                 to a particular user account"
+        INDEX           { fnUserIndex }
+		::= { fnUserTable 1 }
+
+	FnUserEntry ::= SEQUENCE {
+		fnUserIndex    FnIndex,
+		fnUserName     DisplayString,
+		fnUserAuth     FnUserAuth,
+		fnUserState    FnBoolState
+	}
+
+	fnUserIndex      OBJECT-TYPE
+		SYNTAX          FnIndex
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "An index of user account"
+		::= { fnUserEntry 1 }
+
+	fnUserName       OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "A name of user account"
+		::= { fnUserEntry 2 }
+
+	fnUserAuth       OBJECT-TYPE
+		SYNTAX          FnUserAuth
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Authentication type of the account"
+		::= { fnUserEntry 3 }
+
+	fnUserState      OBJECT-TYPE
+		SYNTAX          FnBoolState
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Status of the user account"
+		::= { fnUserEntry 4 }
+
+	-- fnSystem . fnOptions
+
+	fnOptIdleTimeout OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Idle period after which the administrator
+		                 is automatically logged out off the system"
+		::= { fnOptions  1 }
+
+	-- fnSystem . fnLogging
+
+	fnLogOption      OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Logging preferences"
+		::= { fnLogging  1 }
+
+	-- fnSystem . fnMessages
+
+	fnMesgNumber    OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "The number of custom messages in sysMesgTable"
+		::= { fnMessages  1 }
+
+	-- fnDomains
+
+	fnVdNumber          OBJECT-TYPE
+		SYNTAX          Integer32
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "The number of virtual fnDomains in vdTable"
+		::= { fnDomains   1 }
+
+	fnVdTable           OBJECT-TYPE
+		SYNTAX          SEQUENCE OF FnVdEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "A list of virtual fnDomains"
+		::= { fnDomains   2 }
+
+	fnVdEntry           OBJECT-TYPE
+		SYNTAX          FnVdEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "An entry containing information applicable
+		                 to a particular virtual domain"
+		INDEX          { fnVdIndex }
+		::= { fnVdTable 1 }
+
+	FnVdEntry ::= SEQUENCE {
+		fnVdIndex   FnIndex,
+		fnVdName    DisplayString
+	}
+
+	fnVdIndex          OBJECT-TYPE
+		SYNTAX          FnIndex
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Internal virtual domain index"
+		::= { fnVdEntry   1 }
+
+	fnVdName            OBJECT-TYPE
+		SYNTAX          DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION     "Virtual domain name"
+		::= { fnVdEntry   2 }
+
+	-- fnIp
+	
+	fnIpSessTable       OBJECT-TYPE
+        	SYNTAX      SEQUENCE OF FnIpSessEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "IP Sessions Info"
+        	::= { fnIp        2 }
+
+	fnIpSessEntry	OBJECT-TYPE
+        	SYNTAX      FnIpSessEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "Particular IP Session info"
+	        INDEX       { fnIpSessIndex }
+        	::= { fnIpSessTable 1 }
+
+	FnIpSessEntry ::=
+        	SEQUENCE {
+		    fnIpSessIndex	FnIndex,
+		    fnIpSessProto	FnSessProto,
+		    fnIpSessFromAddr	IpAddress,
+		    fnIpSessFromPort	INTEGER,
+		    fnIpSessToAddr	IpAddress,
+		    fnIpSessToPort	INTEGER,
+		    fnIpSessExp		Counter32
+        	}
+
+	fnIpSessIndex	OBJECT-TYPE	
+		SYNTAX      FnIndex
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "An index value that uniquely identifies
+                	     an IP session"
+		::=  { fnIpSessEntry  1 }
+
+	fnIpSessProto	OBJECT-TYPE	
+		SYNTAX      FnSessProto
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "The protocol of the connection"
+		::=  { fnIpSessEntry  2 }
+
+	fnIpSessFromAddr	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source IP address"
+		::=  { fnIpSessEntry  3 }
+
+	fnIpSessFromPort	OBJECT-TYPE	
+		SYNTAX      INTEGER  ( 0 .. 65535  )
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Source Port number"
+		::=  { fnIpSessEntry  4 }
+
+	fnIpSessToAddr	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Destination IP address"
+		::=  { fnIpSessEntry  5 }
+
+	fnIpSessToPort	OBJECT-TYPE	
+		SYNTAX      INTEGER  ( 0 .. 65535  )
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Destination Port number"
+		::=  { fnIpSessEntry  6 }
+
+	fnIpSessExp	OBJECT-TYPE	
+		SYNTAX      Counter32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Time (in seconds) before connection expires"
+		::=  { fnIpSessEntry  7 }
+
+	--  fnVpn
+	
+	fnVpnDialupTable       OBJECT-TYPE
+        	SYNTAX      SEQUENCE OF FnVpnDialupEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "Dialup VPN peers info"
+        	::= { fnVpn        1 }
+
+	fnVpnDialupEntry	OBJECT-TYPE
+        	SYNTAX      FnVpnDialupEntry
+	        MAX-ACCESS  not-accessible
+        	STATUS      current
+	        DESCRIPTION "Dialup VPN peer info"
+	        INDEX       { fnVpnDialupIndex }
+        	::= { fnVpnDialupTable 1 }
+
+	FnVpnDialupEntry ::=
+        	SEQUENCE {
+		    fnVpnDialupIndex		FnIndex,
+		    fnVpnDialupGateway		IpAddress,
+		    fnVpnDialupLifetime		Integer32,
+		    fnVpnDialupTimeout		Integer32,
+		    fnVpnDialupSrcBegin		IpAddress,
+		    fnVpnDialupSrcEnd		IpAddress,
+		    fnVpnDialupDstAddr		IpAddress
+--		    fnVpnDialupDstMask		IpAddress
+        	}
+
+	fnVpnDialupIndex	OBJECT-TYPE	
+		SYNTAX      FnIndex
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "An index value that uniquely identifies
+                	     an VPN dialup peer"
+		::=  { fnVpnDialupEntry  1 }
+
+	fnVpnDialupGateway	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Remote gateway IP address"
+		::=  { fnVpnDialupEntry  2 }
+
+	fnVpnDialupLifetime	OBJECT-TYPE	
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Tunnel life time (seconds)"
+		::=  { fnVpnDialupEntry  3 }
+
+	fnVpnDialupTimeout	OBJECT-TYPE	
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Time before the next key exchange (seconds)"
+		::=  { fnVpnDialupEntry  4 }
+
+	fnVpnDialupSrcBegin	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Remote subnet address"
+		::=  { fnVpnDialupEntry  5 }
+
+	fnVpnDialupSrcEnd	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Remote subnet mask"
+		::=  { fnVpnDialupEntry  6 }
+
+	fnVpnDialupDstAddr	OBJECT-TYPE	
+		SYNTAX      IpAddress
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION "Local subnet address"
+		::=  { fnVpnDialupEntry  7 }
+
+--	fnVpnDialupDstMask	OBJECT-TYPE	
+--		SYNTAX		IpAddress
+--		MAX-ACCESS	read-only
+--		STATUS		current
+--		DESCRIPTION	"Local subnet mask"
+--		::=  { fnVpnDialupEntry	8 }
+
+
+	-- fnBridge
+
+	fnBridgeFgtFailure	OBJECT-TYPE
+		SYNTAX		DisplayString 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"FortiGate failure detected by FortiBridge"
+		::= { fnBridge	1 }
+
+	--  fnIps
+	
+	fnIpsSigId		OBJECT-TYPE
+		SYNTAX		FnIndex
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"ID of IPS signature"
+		::= { fnIps	1 }
+
+	fnIpsSigSrcIp		OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Source IP Address of the IPS signature trigger"
+		::= { fnIps	2 }
+
+END
+
