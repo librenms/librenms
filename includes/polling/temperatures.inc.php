@@ -4,7 +4,7 @@ $query = "SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] 
 $temp_data = mysql_query($query);
 while($temperature = mysql_fetch_array($temp_data)) {
 
-  $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB-O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'];
+  $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'];
   $temp = shell_exec($temp_cmd);
 
   echo("Checking temp " . $temperature['temp_descr'] . "... ");

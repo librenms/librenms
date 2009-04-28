@@ -4,7 +4,7 @@
 
  if($config['enable_inventory']) {
 
-  $ents_cmd  = $config['snmpwalk'] . " -m ENTITY-MIB -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['$port'] . " ";
+  $ents_cmd  = $config['snmpbulkwalk'] . " -m ENTITY-MIB -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['$port'] . " ";
   $ents_cmd .= "1.3.6.1.2.1.47.1.1.1.1.2 | sed s/.1.3.6.1.2.1.47.1.1.1.1.2.//g | cut -f 1 -d\" \"";
 
   $ents  = trim(`$ents_cmd | grep -v o`);
