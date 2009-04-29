@@ -365,15 +365,24 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
   if($height < "33") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   if($inverse) {
-   $options .= " DEF:inoctets=$database:OUTOCTETS:AVERAGE";
-   $options .= " DEF:outoctets=$database:INOCTETS:AVERAGE";
+    $in = 'out';
+    $out = 'in';
   } else {
-   $options .= " DEF:inoctets=$database:INOCTETS:AVERAGE";
-   $options .= " DEF:outoctets=$database:OUTOCTETS:AVERAGE";
+    $in = 'in';
+    $out = 'out';
   }
+  $options .= " DEF:".$out."octets=$database:OUTOCTETS:AVERAGE";
+  $options .= " DEF:".$in."octets=$database:INOCTETS:AVERAGE";
+  $options .= " DEF:".$out."octets_max=$database:OUTOCTETS:MAX";
+  $options .= " DEF:".$in."octets_max=$database:INOCTETS:MAX";
+
   $options .= " CDEF:octets=inoctets,outoctets,+";
   $options .= " CDEF:doutoctets=outoctets,-1,*";
   $options .= " CDEF:inbits=inoctets,8,*";
+  $options .= " CDEF:inbits_max=inoctets_max,8,*";
+  $options .= " CDEF:outbits_max=outoctets_max,8,*";
+  $options .= " CDEF:doutoctets_max=outoctets_max,-1,*";
+  $options .= " CDEF:doutbits_max=doutoctets_max,8,*";
   $options .= " CDEF:outbits=outoctets,8,*";
   $options .= " CDEF:doutbits=doutoctets,8,*";
   $options .= " VDEF:totin=inoctets,TOTAL";
@@ -390,18 +399,18 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
     $options .= " LINE1:95thin#aa0000";
     $options .= " LINE1:d95thout#aa0000";
   } else {
-    $options .= " AREA:inbits#CDEB8B:";
+    $options .= " AREA:inbits_max#aDEB7B:";
     $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\ \ \ 95th\ %\\\\n";
     $options .= " LINE1.25:inbits#006600:In\ ";
     $options .= " GPRINT:inbits:LAST:%6.2lf%s";
     $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
-    $options .= " GPRINT:inbits:MAX:%6.2lf%s";
+    $options .= " GPRINT:inbits_max:MAX:%6.2lf%s";
     $options .= " GPRINT:95thin:%6.2lf%s\\\\n";
-    $options .= " AREA:doutbits#C3D9FF:";
+    $options .= " AREA:doutbits_max#a3b9FF:";
     $options .= " LINE1.25:doutbits#000099:Out";
     $options .= " GPRINT:outbits:LAST:%6.2lf%s";
     $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-    $options .= " GPRINT:outbits:MAX:%6.2lf%s";
+    $options .= " GPRINT:outbits_max:MAX:%6.2lf%s";
     $options .= " GPRINT:95thout:%6.2lf%s\\\\n";
     $options .= " GPRINT:tot:Total\ %6.2lf%s";
     $options .= " GPRINT:totin:\(In\ %6.2lf%s";
