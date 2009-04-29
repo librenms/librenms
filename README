@@ -1,6 +1,19 @@
-Copyright (C) 2006-2008 Adam Armstrong <adama@memetic.org>
+Copyright (C) 2006-2009 Adam Armstrong <adama@memetic.org>
 
-Please see license.txt for usage requirements and restrictions.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+Please see COPYING for usage requirements and restrictions.
 
 Introduction
 ------------
@@ -12,12 +25,12 @@ It's designed to be an easily-navigable interface to the health of your network.
 Planned Features
 ----------------
 
+* CollectD Integration				    * In Progress
 * Full IPv6 capabilities                            * In Progress
 * Pseudowire (MPLS/L2TP) tracking                   * In Progress
 * MPLS IP-VPN tracking                              * In Progress
-* 6500/7600 non-MSFC CPU tracking (pfc/dfc et al)
-* 6500/7600 non-MSFC memory tracking
 * 95th and metered usage tracking                   * In Progress
+* Nagios Integration				    * Too scary for contempation
 
 Installation
 ------------
