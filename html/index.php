@@ -140,8 +140,9 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
     echo("<br /> <center>Generated in $gentime seconds 
-          <br /> <a href='http://www.observernms.org'>Observer " . $config['version'] . "</a> &copy; 2006-2009 Adam Armstrong");
-          
+          <br /> <a href='http://www.observernms.org'>Observer " . $config['version'] . "</a> &copy; 2006-2009 Adam Armstrong
+          <br />This work is licensed under the <a href='http://www.gnu.org/licenses/gpl-3.0-standalone.html'>GPL, version 3</a>.");
+	            
 ?>
 
 

@@ -1,4 +1,11 @@
+Release 0.6.0 ( )
+
 Changed IPv6 database structure and discovery *** DATABASE CHANGE ***
+Added CollectD integration code
+Added fixed mib loading to SNMP commands
+Replaced IPv4 and IPv6 discovery code
+Added support for CISCO-PROCESS-MIB for per-CPU graphing
+Added support for CISCO-ENHANCED-MEMORY-POOL-MIB for per-pool graphing
 
 Release 0.5.1 ( 25 March 2009 )
 
