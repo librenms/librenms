@@ -16,6 +16,13 @@ include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 
+## CollectD
+
+require('collectd/config.php');
+require('collectd/functions.php');
+require('collectd/definitions.php');
+
+
 function only_alphanumeric( $string )
 {
         return preg_replace('/[^a-zA-Z0-9]/', '', $string);
