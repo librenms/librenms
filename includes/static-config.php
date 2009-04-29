@@ -19,12 +19,16 @@ $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
 $config['version'] = "0.6.0";
 
+if($config['enable_nagios']) {
+
 $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
 if (!$nagios_link) {
         echo "<h2>Nagios MySQL Error</h2>";
         die;
 }
 $nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
+
+}
 
 ### Connect to database
 $observer_link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
