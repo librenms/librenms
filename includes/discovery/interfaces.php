@@ -37,7 +37,9 @@
       }
       $ifDescr = fixifName($ifDescr);
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
-      if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
+      if(!$config['allow_ng']) {
+       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
+      }
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
