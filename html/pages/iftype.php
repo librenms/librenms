@@ -3,7 +3,26 @@ if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
 if($_GET['type']) {
+
   $type = $_GET['type'];
+  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like '$type: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $query = mysql_query($sql);
+  while($interface = mysql_fetch_array($query)) {
+    $if_list .= $seperator . $interface['interface_id'];
+    $seperator = ",";
+  }
+  unset($seperator);
+
+  echo("<tr bgcolor='$bg'>
+             <td><span class=list-large>Total Graph for interfaces of type : ".$type."</span></td></tr>");
+
+  echo("<tr bgcolor='$bg'><td>");
+  $graph_type = "multi_bits";
+  $interface['interface_id'] = $if_list;
+  include("includes/print-interface-graphs.php");
+  echo("</td></tr>");
+
+
   $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like '$type: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($interface = mysql_fetch_array($query)) {

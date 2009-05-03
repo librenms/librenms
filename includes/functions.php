@@ -23,6 +23,31 @@ require('collectd/functions.php');
 require('collectd/definitions.php');
 
 
+function mac_clean_to_readable($mac){
+
+   $r = substr($mac, 0, 2);
+   $r .= ":".substr($mac, 2, 2);
+   $r .= ":".substr($mac, 4, 2);
+   $r .= ":".substr($mac, 6, 2);
+   $r .= ":".substr($mac, 8, 2);
+   $r .= ":".substr($mac, 10, 2);
+
+   return($r);
+}
+
+function zeropad($num)
+{
+    return (strlen($num) == 1) ? '0'.$num : $num;
+}
+
+function zeropad_lineno($num, $length)
+{
+    while (strlen($num) < $length)
+        $num = '0'.$num;
+   
+    return $num;
+}
+
 function only_alphanumeric( $string )
 {
         return preg_replace('/[^a-zA-Z0-9]/', '', $string);
