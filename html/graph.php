@@ -64,6 +64,7 @@ if($_GET['debug']) {
     $graph = graph_netscreen_memory ($hostname . "/netscreen-memory.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'multi_bits':
+    if($_GET['if']) { $_GET['interfaces'] = $_GET['if']; }
     $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;
   case 'adsl_rate':

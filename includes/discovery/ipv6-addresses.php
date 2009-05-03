@@ -53,7 +53,8 @@ if($ipv6interfaces){
        echo("+");
       } else { echo("."); }
       $full_address = "$ipv6_address/$ipv6_prefixlen";
-      $valid_v6[$full_address] = 1;
+      $valid = $full_address  . "-" . $interface_id;
+      $valid_v6[$valid] = 1;
     }
    }
   }
@@ -63,7 +64,9 @@ $sql   = "SELECT * FROM ipv6_addresses AS A, interfaces AS I WHERE I.device_id =
 $data = mysql_query($sql);
 while($row = mysql_fetch_array($data)) {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
-  if(!$valid_v6[$full_address]) {
+  $interface_id = $row['interface_id'];
+  $valid = $full_address  . "-" . $interface_id;
+  if(!$valid_v6[$valid]) {
     echo("-");
     $query = @mysql_query("DELETE FROM `ipv6_addresses` WHERE `ipv6_address_id` = '".$row['ipv6_address_id']."'");
     if(!mysql_result(mysql_query("SELECT count(*) FROM ipv6_addresses WHERE ipv6_network_id = '".$row['ipv6_network_id']."'"),0)) {
