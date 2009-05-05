@@ -11,9 +11,6 @@ mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%PM-3-
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%RHWatchdog%'");
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Hardware Monitoring%'");
 
-
-
-
 if(!$config['enable_syslog']) { 
   echo("Syslog support disabled.\n"); 
   exit(); 
