@@ -547,6 +547,37 @@ function bgpupdatesgraph ($rrd, $graph , $from, $to, $width, $height) {
   return $imgfile;
 }
 
+function graph_entity_sensor ($sensor, $graph , $from, $to, $width, $height, $title, $vertical) {
+  global $config;
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $sensor = mysql_fetch_array(mysql_query("SELECT * FROM entPhysical as E, devices as D WHERE entPhysical_id = '$sensor' and D.device_id = E.device_id"));
+  $database = $config['rrd_dir'] . "/" . $sensor['hostname'] . "/ces-" . $sensor['entPhysicalIndex'] . ".rrd";
+  $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+
+  $type = str_pad($sensor['entSensorType'], 8);
+  $type = substr($type,0,8);
+
+
+  $options .= " DEF:avg=$database:value:AVERAGE";
+  $options .= " DEF:min=$database:value:MIN";
+  $options .= " DEF:max=$database:value:MAX";
+  $options .= " COMMENT:'             Last     Min     Max      Ave\\n'";
+  $options .= " AREA:max#a5a5a5";
+  $options .= " AREA:min#ffffff";
+  $options .= " LINE1.25:avg#aa2200:'".$type."'";
+
+  $options .= " GPRINT:avg:AVERAGE:%5.2lf%s";
+  $options .= " GPRINT:max:MAX:%5.2lf%s";
+  $options .= " GPRINT:max:MAX:%5.2lf%s";
+  $options .= " GPRINT:avg:LAST:%5.2lf%s";
+
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  #echo($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+
 function graph_cpu_generic_single ($rrd, $graph , $from, $to, $width, $height) {
   global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
