@@ -45,6 +45,9 @@ if($_GET['debug']) {
   $os = gethostosbyid($device_id);
 
   switch ($type) {
+  case 'cisco_entity_sensor':
+    $graph = graph_entity_sensor ($_GET['a'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'fortigate_sessions':
     $graph = graph_fortigate_sessions ($hostname . "/fortigate-sessions.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;

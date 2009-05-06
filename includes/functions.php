@@ -22,6 +22,35 @@ require('collectd/config.php');
 require('collectd/functions.php');
 require('collectd/definitions.php');
 
+function entPhysical_scale($value, $scale) {
+
+  switch ($scale) {
+    case "nano":
+	$value = $value / 1000000000;
+        break;
+    case "micro":
+        $value = $value / 1000000;
+        break;
+    case "milli":
+        $value = $value / 1000;
+        break;
+    case "units":
+        break;
+    case "kilo":
+        $value = $value * 1000;
+        break;
+    case "mega":
+        $value = $value * 1000000;
+        break;
+    case "giga":
+        $value = $value * 1000000000;
+        break;
+  }
+
+  return $value;
+
+}
+
 
 function mac_clean_to_readable($mac){
 

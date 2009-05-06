@@ -67,10 +67,12 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cisco-vlans.php");
     include("includes/discovery/cisco-physical.php");
     include("includes/discovery/bgp-peers.php");
+    include("includes/discovery/cisco-mac-accounting.php");
     include("includes/discovery/cisco-pw.php");
     include("includes/discovery/cisco-vrf.php");
     include("includes/discovery/cisco-processors.php");
     include("includes/discovery/cisco-mempool.php");
+    
   }
 
   echo("\n"); $devices_discovered++;

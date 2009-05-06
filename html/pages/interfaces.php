@@ -83,8 +83,6 @@ if($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
 if($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
 if($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
-print_r($_GET);
-
 $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
 
 $query = mysql_query($sql);

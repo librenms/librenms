@@ -16,8 +16,6 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-#error_reporting(E_ALL | E_NOTICE | E_WARNING);
-
 if($_GET['debug']) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 0);
@@ -26,10 +24,10 @@ if($_GET['debug']) {
   ini_set('error_reporting', E_ALL);
 }
 
-  include("../config.php");
-  include("../includes/functions.php");
-  include("includes/authenticate.inc");
-  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+include("../config.php");
+include("../includes/functions.php");
+include("includes/authenticate.inc");
+if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
 
 function makeTextBlock($text, $fontfile, $fontsize, $width) {
 	// TODO: handle explicit line-break!
