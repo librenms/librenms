@@ -2,7 +2,8 @@
 <?php
 
 include("config.php");
-include("includes/functions.php");
+
+include("includes/syslog.php");
 
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%last message repeated%'");
 mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Connection from UDP: [%]:%'");

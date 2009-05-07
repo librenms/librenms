@@ -7,6 +7,8 @@ include_once("Net/IPv6.php");
 
 ## Observer Includes
 
+include_once($config['install_dir'] . "/includes/common.php");
+
 include_once($config['install_dir'] . "/includes/generic.php");
 include_once($config['install_dir'] . "/includes/procurve.php");
 include_once($config['install_dir'] . "/includes/graphing.php");
@@ -21,36 +23,6 @@ include_once($config['install_dir'] . "/includes/rewrites.php");
 require('collectd/config.php');
 require('collectd/functions.php');
 require('collectd/definitions.php');
-
-function entPhysical_scale($value, $scale) {
-
-  switch ($scale) {
-    case "nano":
-	$value = $value / 1000000000;
-        break;
-    case "micro":
-        $value = $value / 1000000;
-        break;
-    case "milli":
-        $value = $value / 1000;
-        break;
-    case "units":
-        break;
-    case "kilo":
-        $value = $value * 1000;
-        break;
-    case "mega":
-        $value = $value * 1000000;
-        break;
-    case "giga":
-        $value = $value * 1000000000;
-        break;
-  }
-
-  return $value;
-
-}
-
 
 function mac_clean_to_readable($mac){
 
@@ -141,21 +113,6 @@ function getHostOS($hostname, $community, $snmpver, $port) {
     closedir($dir_handle);
     if($os) { return $os; } else { return FALSE; }
 
-}
-
-
-function strgen ($length = 16)
-{
-    $entropy = array(0,1,2,3,4,5,6,7,8,9,'a','A','b','B','c','C','d','D','e',
-    'E','f','F','g','G','h','H','i','I','j','J','k','K','l','L','m','M','n',
-    'N','o','O','p','P','q','Q','r','R','s','S','t','T','u','U','v','V','w',
-    'W','x','X','y','Y','z','Z');
-    $string = "";    
-    for ($i=0; $i<$length; $i++) {
-        $key = mt_rand(0,61);
-        $string .= $entropy[$key];
-    }
-    return $string;
 }
 
 function billpermitted($bill_id) 
@@ -677,44 +634,8 @@ function hoststatus($id) {
     return $result;
 }
 
-function gethostbyid($id) {
-     $sql = mysql_query("SELECT `hostname` FROM `devices` WHERE `device_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
 function getifhost($id) {
      $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
-function getpeerhost($id) {
-     $sql = mysql_query("SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
-function getifindexbyid($id) {
-     $sql = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `interface_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
-function getifbyid($id) {
-     $sql = mysql_query("SELECT `ifDescr` FROM `interfaces` WHERE `interface_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
-function getidbyname($domain){
-     $sql = mysql_query("SELECT `device_id` FROM `devices` WHERE `hostname` = '$domain'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
-function gethostosbyid($id) {
-     $sql = mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
