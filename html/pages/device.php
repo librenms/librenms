@@ -24,11 +24,16 @@ echo("<div class=mainpane>");
 
 echo("
 <ul id='maintab' class='shadetabs'>
-<li class=" . $select['overview'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/overview/'>
-    <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
-  </a>
-</li>");
+");
+
+
+#echo("
+#<ul id='maintab' class='shadetabs'>
+#<li class=" . $select['overview'] . ">
+#  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/overview/'>
+#    <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
+#  </a>
+#</li>");
 
 echo("<li class=" . $select['graphs'] . ">
   <a href='".$config['base_url']."/device/" . $device['device_id'] . "/graphs/'>
@@ -142,15 +147,15 @@ if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entP
 
 }
 
-if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
-  echo("
-<li class=" . $select['storage'] . ">
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/storage/'>
-    <img src='images/16/database.png' align=absmiddle border=0> Storage
-  </a>
-</li>
-");
-}
+#if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
+#  echo("
+#<li class=" . $select['storage'] . ">
+#  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/storage/'>
+#    <img src='images/16/database.png' align=absmiddle border=0> Storage
+#  </a>
+#</li>
+#");
+#}
 
 
 if(mysql_result(mysql_query("select count(service_id) from services WHERE service_host = '" . $device['device_id'] . "'"), 0) > '0') {

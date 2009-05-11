@@ -13,7 +13,7 @@
 
   foreach(explode("\n", $ents) as $entPhysicalIndex) {
 
-    $ent_data  = $config['snmpget'] . " -m ENTITY-MIB -Ovqs -"; 
+    $ent_data  = $config['snmpget'] . " -m ENTITY-MIB:IF-MIB -Ovqs -"; 
     $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
     $ent_data .= " entPhysicalDescr." . $entPhysicalIndex;
     $ent_data .= " entPhysicalContainedIn." . $entPhysicalIndex;
@@ -28,7 +28,8 @@
 
     list($entPhysicalDescr,$entPhysicalContainedIn,$entPhysicalClass,$entPhysicalName,$entPhysicalSerialNum,$entPhysicalModelName,$entPhysicalMfgName,$entPhysicalVendorType,$entPhysicalParentRelPos, $ifIndex) = explode("\n", `$ent_data`);
 
-    if(strpos($ifIndex, "o") || $ifIndex == "") { unset($ifIndex);  }
+    if(!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
+    list(,$ifIndex) = explode(".", $ifIndex);
 
     $entPhysicalModelName = trim($entPhysicalModelName);
     $entPhysicalSerialNum = trim($entPhysicalSerialNum);
@@ -39,12 +40,17 @@
       $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     } 
 
-    if(mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0)) {
+    $entPhysical_id = @mysql_result(mysql_query("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0);
 
-      ### TO DO : WRITE CODE FOR UPDATES!
-
+    if($entPhysical_id) {
+      $sql =  "UPDATE `entPhysical` SET `ifIndex` = '$ifIndex'";
+      $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
+      $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
+      $sql .= ", entPhysicalMfgName = '$entPhysicalMfgName', entPhysicalParentRelPos = '$entPhysicalParentRelPos', entPhysicalVendorType = '$entPhysicalVendorType'";
+      $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+      
+      mysql_query($sql);
       echo(".");
-
     } else {
       $sql  = "INSERT INTO `entPhysical` ( `device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `ifIndex` ) ";
       $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$ifIndex')";      
@@ -55,17 +61,23 @@
     if($entPhysicalClass == "sensor") {
       $sensor_cmd  = $config['snmpget'] . " -m CISCO-ENTITY-SENSOR-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
       $sensor_cmd .= " entSensorType.$entPhysicalIndex entSensorScale.$entPhysicalIndex entSensorPrecision.$entPhysicalIndex";
-      $sensor_cmd .= " entSensorMeasuredEntity.$entPhysicalIndex";
-
+      $sensor_cmd .= " entSensorValueUpdateRate.$entPhysicalIndex entSensorMeasuredEntity.$entPhysicalIndex";
       $sensor_data = shell_exec($sensor_cmd);
-
       list($entSensorType,$entSensorScale,$entSensorPrecision,$entSensorValueUpdateRate,$entSensorMeasuredEntity) = explode("\n", $sensor_data);
+      if($entSensorMeasuredEntity) {
+        echo("M:$entSensorMeasuredEntity");
+      }
+      if($config['allow_entity_sensor'][$entSensorType]) {
+        $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
+        $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
+        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+      } else {
+        echo("!$entSensorType");
+        $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
+        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+      }
 
-      $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
-      $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
-      $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       mysql_query($sql);
-
     }
     $valid[$entPhysicalIndex] = 1;
   }
@@ -74,12 +86,11 @@
 
   $sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '".$device['device_id']."'";
   $query = mysql_query($sql);
-
   while ($test = mysql_fetch_array($query)) {
-    $id = $test['entPhysical_id'];
+    $id = $test['entPhysicalIndex'];
     if(!$valid[$id]) {
       echo("-");
-#      mysql_query("DELETE FROM `entPhysical` WHERE entPhysical_id = '".$test['entPhysical_id']."'");
+      mysql_query("DELETE FROM `entPhysical` WHERE entPhysical_id = '".$test['entPhysical_id']."'");
     }
   }
 

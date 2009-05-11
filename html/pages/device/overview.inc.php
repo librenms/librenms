@@ -40,14 +40,14 @@ if(mysql_result(mysql_query("SELECT count(*) from cpmCPU WHERE device_id = '" . 
   $procs = mysql_query("SELECT * FROM `cpmCPU` WHERE device_id = '" . $device['device_id'] . "'");
   while($proc = mysql_fetch_array($procs)) {
 
-    $proc_url   = "?page=device/".$device['device_id']."/sensors/processors/";
+    $proc_url   = "?page=device/".$device['device_id']."/health/cpm/";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$proc['entPhysicalDescr'];
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$month&to=$now&width=400&height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     if($proc['cpuCPMTotal5minRev'] > '60') { $proc_colour='#cc0000'; } else { $proc_colour='#0000cc';  }
-    echo("<tr><td class=tablehead><a href='' $proc_popup>" . $proc['entPhysicalDescr'] . "</a></td>
+    echo("<tr><td class=tablehead><a href='$proc_url' $proc_popup>" . $proc['entPhysicalDescr'] . "</a></td>
             <td><a href='#' $proc_popup><img src='percentage.php?per=" . $proc['cpmCPUTotal5minRev'] . "'></a></td>
             <td style='font-weight: bold; color: $drv_colour'>" . $proc['cpmCPUTotal5minRev'] . "%</td>
           </tr>");
@@ -80,7 +80,7 @@ if(mysql_result(mysql_query("SELECT count(*) from cempMemPool WHERE device_id = 
 
 
     if($mempool['cpuCPMTotal5minRev'] > '60') { $mempool_colour='#cc0000'; } else { $mempool_colour='#0000cc';  }
-    echo("<tr><td class=tablehead><a href='' $mempool_popup>" . $mempool['descr_fixed'] ."</a></td>
+    echo("<tr><td class=tablehead><a href='$proc_url' $mempool_popup>" . $mempool['descr_fixed'] ."</a></td>
             <td><a href='#' $mempool_popup><img src='percentage.php?per=" . $perc . "'></a></td>
             <td style='font-weight: bold; color: $drv_colour'>$perc%</td>
             <td style='color: $drv_colour'>" . formatstorage($mempool['cempMemPoolFree'], 0) . "/" . formatstorage($mempool['cempMemPoolUsed'] + $mempool['cempMemPoolFree'], 0) . "</strong></td>
@@ -107,7 +107,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
     $total = formatStorage($total);
     $used = formatStorage($used);
 
-    $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
+    $fs_url   = "/device/".$device['device_id']."/health/storage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
     $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125\'>";
@@ -115,7 +115,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
 
     if($perc > '80') { $drv_colour='#cc0000'; } else { $drvclass='#0000cc';  }
     echo("<tr><td class=tablehead><a href='".$fs_url."' $fs_popup>" . $drive['hrStorageDescr'] . "</a></td>
-            <td><a href='#' $fs_popup><img src='percentage.php?per=" . $drive['perc'] . "'></a></td>
+            <td><a href='$fs_url' $fs_popup><img src='percentage.php?per=" . $drive['perc'] . "'></a></td>
             <td style='font-weight: bold; color: $drv_colour'>" . $drive['perc'] . "%</td>
             <td>" . $total . "</td>
             <td>" . $used . "</td>
@@ -144,7 +144,7 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_h
 
     $temp_colour = percent_colour($temp_perc);
     $temp_url  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$month&to=$now&width=400&height=125";
-    $temp_link  = "<a href='?page=device&id=".$device['device_id']."&section=dev-temp' onmouseover=\"return ";
+    $temp_link  = "<a href='/device/".$device['device_id']."/health/temp/' onmouseover=\"return ";
     $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['temp_descr'];
     $temp_link .= "</div><img src=\'$temp_url\'>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
     $temp_link .= $temp['temp_descr'] . "</a>";

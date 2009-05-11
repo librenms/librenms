@@ -128,6 +128,8 @@ if($config['enable_billing']) { echo("<li><a href='bills/'><img src='images/16/m
 
 if($config['enable_pseudowires']) { echo("<li><a href='pseudowires/'><img src='images/16/arrow_switch.png' border=0 align=absmiddle> Pseudowires</a></li>"); $ifbreak = 1;}
 
+if($config['enable_pseudowires']) { echo("<li><a href='vrfs/'><img src='images/16/layers.png' border=0 align=absmiddle> VRFs</a></li>"); $ifbreak = 1;}
+
 
 if($_SESSION['userlevel'] >= '5') {
   echo("<li><hr width=140 /></li>");

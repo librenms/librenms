@@ -48,25 +48,34 @@ if( !$broke)
 
 echo("<div style='clear: both;'>");
 
-if(file_exists("rrd/" . $hostname . "/". $ifIndex . ".rrd")) {
+if($_GET['optb']) {
 
-  $iid = $id;
-  echo("<div class=graphhead>Interface Traffic</div>");
-  $graph_type = "bits";
-  include("includes/print-interface-graphs.php");
+include("pages/device/".mres($_GET['optb']).".php");
 
-  echo("<div class=graphhead>Interface Packets</div>");
-  $graph_type = "pkts";
-  include("includes/print-interface-graphs.php");
+} else {
 
-  echo("<div class=graphhead>Interface Non Unicast</div>");
-  $graph_type = "nupkts";
-  include("includes/print-interface-graphs.php");
+  if(file_exists("rrd/" . $hostname . "/". $ifIndex . ".rrd")) {
 
-  echo("<div class=graphhead>Interface Errors</div>");
-  $graph_type = "errors";
-  include("includes/print-interface-graphs.php");
+    $iid = $id;
+    echo("<div class=graphhead>Interface Traffic</div>");
+    $graph_type = "bits";
+    include("includes/print-interface-graphs.php");
+
+    echo("<div class=graphhead>Interface Packets</div>");
+    $graph_type = "pkts";
+    include("includes/print-interface-graphs.php");
+
+    echo("<div class=graphhead>Interface Non Unicast</div>");
+    $graph_type = "nupkts";
+    include("includes/print-interface-graphs.php");
+
+    echo("<div class=graphhead>Interface Errors</div>");
+    $graph_type = "errors";
+    include("includes/print-interface-graphs.php");
+
+  }
  
 }
+
 
 ?>

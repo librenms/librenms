@@ -25,9 +25,7 @@
             </tr>");
 
 if($auth_message) {
-
-echo("<tr><td colspan=2><span style='font-weight: bold; color: #cc0000;'>$auth_message</span></td></tr>");
-
+  echo("<tr><td colspan=2><span style='font-weight: bold; color: #cc0000;'>$auth_message</span></td></tr>");
 }
 
 echo("          </table>
@@ -35,4 +33,9 @@ echo("          </table>
     </tr>
   </table>
 </center>");
+
+if($config['login_message']) {
+  echo("<div style='text-align: center; font-weight: bold; color: #cc0000; width=300px;'>".$config['login_message']."</div>");
+}
+
 ?>

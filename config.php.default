@@ -52,6 +52,9 @@ $config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
 $config['favicon'] = "favicon.ico";
 $config['header_color'] = "#1F334E";
 
+## Custom pre-login message
+$config['login_message'] = "";                      
+
 $config['page_refresh'] = "0";  ## Refresh the page every xx seconds
 $config['front_page'] = "pages/front/default.php";
 
@@ -101,8 +104,23 @@ $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/pro
 
 ### Style Options
 
+# Alternating list colours
+
 $list_colour_a = "#ffffff";
 $list_colour_b = "#eeeeee";
+
+# Alternating list-within-list colours
+
+$list_colour_a_a = "#f9f9f9";
+$list_colour_a_b = "#f0f0f0";
+
+$list_colour_b_a = "#e9e9e9";
+$list_colour_b_b = "#e0e0e0";
+
+
+$warn_colour_a = "#ffeeee";
+$warn_colour_b = "#ffcccc";
+
 
 $warn_colour_a = "#ffeeee";
 $warn_colour_b = "#ffcccc";

@@ -2,6 +2,12 @@
 
 ## Common Functions
 
+function getifhost($id) {
+     $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
+     $result = @mysql_result($sql, 0);
+     return $result;
+}
+
 function gethostbyid($id) {
      $sql = mysql_query("SELECT `hostname` FROM `devices` WHERE `device_id` = '$id'");
      $result = @mysql_result($sql, 0);
