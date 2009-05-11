@@ -1,6 +1,8 @@
 <?php 
 
-@ini_set("session.gc_maxlifetime","10000"); 
+
+@ini_set("session.gc_maxlifetime","0"); 
+
 session_start();
 
 if($_GET['logout']) {
@@ -12,6 +14,8 @@ if($_GET['logout']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$olduser', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   $auth_message = "Logged Out";
 } else {
+
+
   if($_POST['username'] && $_POST['password']){
     $username = mres($_POST['username']);
     $password = mres($_POST['password']);
