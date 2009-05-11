@@ -39,8 +39,6 @@ while ($device = mysql_fetch_array($device_query)) {
         
   $cdp_links = trim($cdp_links);
 
-#  echo("\n$cdp_links\n\n");
-
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
     list($src_host,$src_if, $dst_host, $dst_if) = explode(",", $link);

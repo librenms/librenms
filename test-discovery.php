@@ -42,7 +42,7 @@ $devices_polled = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo("\n" . $device['hostname'] ."\n");
+  echo("includes/discovery/".$type.".php");
 
   include("includes/discovery/".$type.".php");
 

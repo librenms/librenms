@@ -10,9 +10,9 @@
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
     list($oid,$hrStorageIndex) = explode(" ", $data);
-    $temp = shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
+    $temp = shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
     $temp = trim($temp);
-    list($descr, $units, $size, $type) = explode("\n", $temp);
+    list($descr, $units, $size, $fstype) = explode("\n", $temp);
     list($units) = explode(" ", $units);
 
     $allow = 1;
@@ -23,7 +23,9 @@
       }
     }
 
-    if(strstr($type, "FixedDisk") && $size > '0' && $allow) {
+    echo("$fstype\n");
+
+    if(strstr($fstype, "FixedDisk") && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
         $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
         $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$descr', '$size', '$units')";

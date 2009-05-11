@@ -634,12 +634,6 @@ function hoststatus($id) {
     return $result;
 }
 
-function getifhost($id) {
-     $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
-     $result = @mysql_result($sql, 0);
-     return $result;
-}
-
 function match_network ($nets, $ip, $first=false) {
    $return = false;
    if (!is_array ($nets)) $nets = array ($nets);

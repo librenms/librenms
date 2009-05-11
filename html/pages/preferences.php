@@ -6,12 +6,7 @@ include("includes/update-preferences-password.inc.php");
 
 echo("<div style='width: 800px; background-color: #fff; padding:5px; margin-bottom:10px; float:left;'>");
 
-$pref_sql = "SELECT * FROM user_prefs"
-
-
-
 echo("</div>");
-
 
 echo("<div style='width: 300px; float: right;'>");
 echo("<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px; margin-bottom:10px;'>");
