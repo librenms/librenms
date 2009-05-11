@@ -82,6 +82,10 @@ $config['enable_pseudowires']	= 0; # Enable Cisco Pseudowires
 
 ## Uncomment this to enable display of rancid-collected configs
 #$config['rancid_configs']      = '/var/lib/rancid/network/configs/';
+
+## Uncomment this to enable usage of collectd rrds collectd hostnames must match observer hostnames!
+#$config['collectd_dir']         = '/var/lib/collectd/rrd';
+
 $config['cdp_autocreate']       = false;    # Should we autocreate hosts we see via CDP?
 $config['snmp_autodiscovery']   = false;    # Should we scan for and autocreate hosts via snmp?
                                             # SNMP autodiscovery is * NOT WORKING *
