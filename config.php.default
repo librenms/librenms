@@ -95,8 +95,10 @@ $config['syslog_age']    = "1 month"; ## Time to keep syslog for in
 ### Interface name strings to ignore
 $config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "stackport",
-             "async", "plip", "-physical", "-signalling", "control plane", "stacksub",
+             "async", "plip", "-physical", "-signalling", "control plane", "stacksub", "control",
              "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
+
+$config['bad_if_regexp'] = array("/serial[0-9]:/");
 
 ### Mountpoints to ignore
 
