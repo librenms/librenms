@@ -1,14 +1,27 @@
 <?php
 
   $sql  = "SELECT * FROM `interfaces` AS I, `devices` AS D";
-  $sql .= " WHERE `ifAlias` like 'Cust: %' AND I.device_id = D.device_id AND D.hostname LIKE '%" . $config['mydomain'] . "' ORDER BY I.ifAlias";
+  $sql .= " WHERE I.ifAlias like 'Cust: %' AND I.device_id = D.device_id  ORDER BY I.ifAlias";
   $query = mysql_query($sql);
 
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
   echo("<table border=0 cellspacing=0 cellpadding=2 class=devicetable width=100%>");
 
+    echo("
+           <tr bgcolor='$list_colour_a'>
+             <th width='7'></th>
+             <th width='250'><span style='font-weight: bold;' class=interface>Customer</span></th>
+             <th width='150'>Device</th>
+             <th width='100'>Interface</th>
+             <th width='100'>Speed</th>
+             <th width='100'>Circuit</th>
+             <th>Notes</th>
+           </tr>
+         ");
 
+
+  $customers = 1;
   while($interface = mysql_fetch_array($query)) {
     $device    = &$interface;
 
@@ -16,26 +29,21 @@
 
     $ifname = fixifname($device['ifDescr']);
 
-    $interface['ifAlias'] = str_replace("Cust: ", "", $interface['ifAlias']);
-    $interface['ifAlias'] = str_replace("[PNI]", "Private", $interface['ifAlias']);
-
     $ifclass = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-    
-    $displayifalias = $device['ifAlias'];
-    $device['ifAlias'] = str_replace(" [","|",$device['ifAlias']);
-    $device['ifAlias'] = str_replace("] (","|",$device['ifAlias']);
-    $device['ifAlias'] = str_replace(" (","||",$device['ifAlias']);
-    $device['ifAlias'] = str_replace("]","|",$device['ifAlias']);
-    $device['ifAlias'] = str_replace(")","|",$device['ifAlias']);
-    list($device['ifAlias'],$class,$notes) = explode("|", $device['ifAlias']);
-    $useifalias = $device['ifAlias'];
-    $used = '1';
-    if ($device['ifAlias'] == $previfalias) { unset($useifalias );
-    } elseif ($previfalias) { 
-     echo("<tr bgcolor='#ffffff' height='5'><td></td></tr>"); 
-     if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+
+    list(,$customer) = preg_split("/[\:\[\]\{\}\(\)]/", $interface['ifAlias']);  
+    list(,$circuit) = preg_split("/[\{\}]/", $interface['ifAlias']);
+    list(,$notes) = preg_split("/[\(\)]/", $interface['ifAlias']);
+    list(,$speed) = preg_split("/[\[\]]/", $interface['ifAlias']);
+
+
+    if ($customer == $prev_customer) { 
+      unset($customer);
+    } else { 
+     if(is_integer($customers/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+     $customers++;
+     $prev_customer = $customer;
     }
-    $previfalias = $device['ifAlias'];
 
     if($device['os'] == "IOS") {
 
@@ -46,12 +54,13 @@
     }
 
     echo("
-           <tr bgcolor='$bg'>
+           <tr bgcolor='$bg_colour'>
              <td width='7'></td>
-             <td width='250'><span style='font-weight: bold;' class=interface>$useifalias</span></td>
-             <td width='200'>" . generatedevicelink($device) . "</td>
+             <td width='250'><span style='font-weight: bold;' class=interface>$customer</span></td>
+             <td width='150'>" . generatedevicelink($device) . "</td>
              <td width='100'>" . generateiflink($interface, makeshortif($interface['ifDescr'])) . "</td>
-             <td width='100'>$vlan</td>
+             <td width='100'>$speed</td>
+             <td width='100'>$circuit</td>
              <td>$notes</td>
            </tr>
          ");
