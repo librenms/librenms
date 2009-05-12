@@ -4,8 +4,8 @@ $query = "SELECT * FROM cempMemPool WHERE device_id = '" . $device['device_id'] 
 $pool_data = mysql_query($query);
 while($mempool = mysql_fetch_array($pool_data)) {
 
-  $entPhysicalName = mysql_result(mysql_query("SELECT entPhysicalName from entPhysical WHERE device_id = '".$device['device_id']."'
-                                               AND entPhysicalIndex = '".$mempool['entPhysicalIndex']."'"),0);
+  $entPhysicalName = @mysql_result(mysql_query("SELECT `entPhysicalName` from entPhysical WHERE device_id = '".$device['device_id']."'
+                                               AND `entPhysicalIndex` = '".$mempool['entPhysicalIndex']."'"),0);
 
   echo("Checking Mempool " . $entPhysicalName . " - " . $mempool['cempMemPoolName']);
 
