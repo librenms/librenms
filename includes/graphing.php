@@ -400,6 +400,7 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
     $options .= " LINE1:d95thout#aa0000";
   } else {
     $options .= " AREA:inbits_max#aDEB7B:";
+    $options .= " AREA:inbits#CDEB8B:";
     $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\ \ \ 95th\ %\\\\n";
     $options .= " LINE1.25:inbits#006600:In\ ";
     $options .= " GPRINT:inbits:LAST:%6.2lf%s";
@@ -407,6 +408,7 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
     $options .= " GPRINT:inbits_max:MAX:%6.2lf%s";
     $options .= " GPRINT:95thin:%6.2lf%s\\\\n";
     $options .= " AREA:doutbits_max#a3b9FF:";
+    $options .= " AREA:doutbits#C3D9FF:";
     $options .= " LINE1.25:doutbits#000099:Out";
     $options .= " GPRINT:outbits:LAST:%6.2lf%s";
     $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";

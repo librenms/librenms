@@ -9,7 +9,7 @@
 
      echo("<tr valign=top bgcolor='$bg_colour'>");
 
-     echo("<td width=200 class=list-large>" . $vrf['vrf_name'] . "</td>");
+     echo("<td width=200 class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
      echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 
      echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");

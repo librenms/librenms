@@ -2,10 +2,16 @@
 if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
-if($_GET['type']) {
+#if($_GET['type']) {
 
-  $type = $_GET['type'];
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like '$type: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $type_where = " (";
+  foreach(split(",", $_GET['opta']) as $type) {
+    $type_where .= " $or `ifAlias` like '$type: %' ";
+    $or = "OR";
+  }
+  $type_where .= ") ";
+
+  $sql  = "select * from interfaces as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($interface = mysql_fetch_array($query)) {
     $if_list .= $seperator . $interface['interface_id'];
@@ -14,7 +20,7 @@ if($_GET['type']) {
   unset($seperator);
 
   echo("<tr bgcolor='$bg'>
-             <td><span class=list-large>Total Graph for interfaces of type : ".$type."</span></td></tr>");
+             <td><span class=list-large>Total Graph for interfaces of type : ".$_GET['opta']."</span></td></tr>");
 
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multi_bits";
@@ -23,7 +29,7 @@ if($_GET['type']) {
   echo("</td></tr>");
 
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like '$type: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from interfaces as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($interface = mysql_fetch_array($query)) {
     $done = "yes";
@@ -51,7 +57,7 @@ if(file_exists($config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interf
 }
       echo("</td></tr>");
   }
-}
+#}
 
 echo("</table>");
 

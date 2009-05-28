@@ -39,10 +39,13 @@ if ($argv[2] == "--type" && $argv[3]) {
 
 $devices_polled = 0;
 
+  echo("includes/discovery/".$type.".php \n");
+
+
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo("includes/discovery/".$type.".php");
+  echo($device['hostname'] . "(".$device['sysName'].")\n");
 
   include("includes/discovery/".$type.".php");
 
