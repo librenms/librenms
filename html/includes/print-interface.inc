@@ -12,6 +12,7 @@
 #  $ifHardType = $interface['ifHardType'];
   
   if($bg == "#e5e5e5") { $bg = "#ffffff"; } else { $bg="#e5e5e5"; }
+  if($int_colour) { $bg = $int_colour; }
 
   if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 

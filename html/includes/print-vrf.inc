@@ -4,7 +4,7 @@ if(is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_
 
 echo("<tr bgcolor='$bg_colour'>");
 
-echo("<td  class=list-large> " . $vrf['vrf_name'] . "</td>");
+echo("<td  class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
 echo("<td class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
 echo("<td class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 

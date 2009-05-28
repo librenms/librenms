@@ -33,7 +33,7 @@
         echo("+");
       } else { echo("."); }
 
-      $full_address = "$oid/$cidr";
+      $full_address = "$oid/$cidr|$ifIndex";
       $valid_v4[$full_address] = 1;
 
     } else { echo("!"); }
@@ -43,7 +43,7 @@
   $sql   = "SELECT * FROM ipv4_addresses AS A, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
     $data = mysql_query($sql);
     while($row = mysql_fetch_array($data)) {
-      $full_address = $row['ipv4_address'] . "/" . $row['ipv4_prefixlen'];
+      $full_address = $row['ipv4_address'] . "/" . $row['ipv4_prefixlen'] . "|" . $row['ifIndex'];
       if(!$valid_v4[$full_address]) {
         echo("-");
         $query = @mysql_query("DELETE FROM `ipv4_addresses` WHERE `ipv4_address_id` = '".$row['ipv4_address_id']."'");

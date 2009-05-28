@@ -4,11 +4,11 @@
 
    $i = "1";
 
-   if($_GET['view'] == "alerts") {
+   if($_GET['opta'] == "alerts") {
     $where = "AND B.bgpPeerAdminStatus = 'start' AND B.bgpPeerState != 'established'";
-   } elseif ($_GET['view'] == "external") {
+   } elseif ($_GET['opta'] == "external") {
     $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
-   } elseif ($_GET['view'] == "internal") {
+   } elseif ($_GET['opta'] == "internal") {
     $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
    }
 

@@ -18,10 +18,8 @@ if($argv[1] && $argv[2] && $argv[3]) {
     if ( isPingable($argv[1])) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
         $snmphost = trim(str_replace("\"", "", shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0")));
-#	var_dump($snmphost);
         if ($snmphost == $host || $hostshort = $host) {
           $return = createHost ($host, $community, $snmpver, $port);
-#	  var_dump($return);
 	  if($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
       } else { echo("Already got host $host\n"); }

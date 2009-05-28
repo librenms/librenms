@@ -23,7 +23,7 @@
       }
     }
 
-    echo("$fstype\n");
+#    echo("$fstype\n");
 
     if(strstr($fstype, "FixedDisk") && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {

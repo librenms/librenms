@@ -11,10 +11,10 @@
    $image = getImage($device['device_id']);
 
    echo("
-            <tr >
+            <tr bgcolor=$device_colour>
              <td width='40' align=center valign=middle>$image</td>
              <td valign=middle><span style='font-weight: bold; font-size: 20px;'>" . generatedevicelink($device) . "</span>
-             <br />" . $device['purpose'] . "</td>
+             <br />" . $device['location'] . "</td>
              <td></td>
            </tr>");
 
