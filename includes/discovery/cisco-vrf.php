@@ -30,6 +30,7 @@
       mysql_query($insert_query);
     }
     $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='".$vrf['oid']."'"),0);
+    $valid_vrf[$vrf_id] = 1;
     echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['mplsVpnVrfDescription']." ");
     $interfaces_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
     $interfaces = shell_exec($config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $interfaces_oid");
@@ -40,10 +41,38 @@
       $interface = mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
       echo(makeshortif($interface['ifDescr']) . " ");
       mysql_query("UPDATE interfaces SET ifVrf = '".$vrf_id."' WHERE interface_id = '".$interface['interface_id']."'");
+      $if = $interface['interface_id'];
+      $valid_vrf_if[$vrf_id][$if] = 1;
     }
     echo(") ");
    }
   }
+
+  echo("\n");
+
+  $sql   = "SELECT * FROM interfaces WHERE device_id = '" . $device['device_id'] . "'";
+    $data = mysql_query($sql);
+    while($row = mysql_fetch_array($data)) {
+      $if = $row['interface_id'];
+      $vrf_id = $row['ifVrf'];
+      if($row['ifVrf']){ if(!$valid_vrf_if[$vrf_id][$if]) {
+        echo("-");
+        $query = @mysql_query("UPDATE interfaces SET `ifVrf` = NULL WHERE interface_id = '$if'");
+      } else {echo(".");} }
+    }
+
+    $sql  = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
+    $data = mysql_query($sql);
+    while($row = mysql_fetch_array($data)) {
+      $vrf_id = $row['vrf_id'];
+      if(!$valid_vrf[$vrf_id]) {
+        echo("-");
+        $query = @mysql_query("DELETE FROM vrfs WHERE vrf_id = '$vrf_id'");
+      } else {echo(".");}
+    }
+
+  unset($valid_vrf_if);
+  unset($valid_vrf);
 
   echo("\n");
 
