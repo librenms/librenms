@@ -55,6 +55,7 @@ echo("
                          <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td></tr>");
 
 
+  if ($_GET['opta'] && $_GET['opta'] != "macaccounting") {
   foreach(explode(" ", $_GET['opta']) as $graph_type) {        
    if($graph_type == "cbgp_prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
    if($graph_type == "bgp_updates" || $valid_afi_safi[$afi][$safi]) {
@@ -76,10 +77,10 @@ echo("
    if ($_GET['opta'] == "macaccounting") {
 
      if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0)) {
-
        $acc = mysql_fetch_array(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"));
-
        $graph_type = "mac_acc";    
+       $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+       if ( is_file($database) ) {
 
   $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
   $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
@@ -105,9 +106,12 @@ echo("
   echo("</td></tr>");
 
      }
+}
 
    }
 }
+}
+
      $i++;
    }
    echo("</table></div>");

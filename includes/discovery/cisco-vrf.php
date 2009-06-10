@@ -31,7 +31,7 @@
     }
     $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='".$vrf['oid']."'"),0);
     $valid_vrf[$vrf_id] = 1;
-    echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['mplsVpnVrfDescription']." ");
+    echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['name']." ".$vrf['mplsVpnVrfDescription']." ");
     $interfaces_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
     $interfaces = shell_exec($config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $interfaces_oid");
     $interfaces = trim(str_replace($interfaces_oid . ".", "", $interfaces));
