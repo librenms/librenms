@@ -21,6 +21,9 @@
               <td><input type='password' name='password'></td>
             </tr>
             <tr>
+              <td colspan='2' align='right'><input type='checkbox' name='remember'>
+              <font size='2'>Remember Me</td>
+            <tr>
               <td colspan=2 align='right'><input name='submit' type='submit' value='Login'></td>
             </tr>");
 

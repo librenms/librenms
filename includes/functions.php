@@ -55,10 +55,6 @@ function only_alphanumeric( $string )
 }
 
 
-function mres($string) { // short function wrapper because the real one is stupidly long and ugly. aestetics.
-  return mysql_real_escape_string($string);
-}
-
 function validate_hostip($host) {
 
 }

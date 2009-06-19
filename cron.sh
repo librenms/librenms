@@ -2,8 +2,8 @@
 
 #./discovery.php --forced >> /var/log/observer.log
 
-./poll-device.php --odd >> /var/log/observer.log &
-./poll-device.php --even >> /var/log/observer.log &
+./poll-device.php --all >> /var/log/observer.log &
+#./poll-device.php --even >> /var/log/observer.log &
 
 #./poll-device.php --odd3 >> /var/log/observer.log &
 #./poll-device.php --even3 >> /var/log/observer.log &
