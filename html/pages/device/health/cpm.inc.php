@@ -20,17 +20,17 @@
  
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
-  $daily_graph   = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$day&to=$now&width=400&height=150";
+  $daily_graph   = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$day&to=$now&width=400&height=150";
 
-  $weekly_graph  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$week&to=$now&width=400&height=150";
+  $weekly_graph  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$week&to=$now&width=400&height=150";
 
-  $monthly_graph = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$month&to=$now&width=400&height=150";
+  $monthly_graph = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$month&to=$now&width=400&height=150";
 
-  $yearly_graph  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cempMemPool&from=$year&to=$now&width=400&height=150";
+  $yearly_graph  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$year&to=$now&width=400&height=150";
 
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");

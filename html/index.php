@@ -103,10 +103,10 @@ function popUp(URL) {
   </table>
 </div>
 
+
 <?php if($_SESSION['authenticated']) {include("includes/print-menubar.php");} else {echo("<hr colour=#444444 />");} ?>
 
 <div class=clearer></div>
-
 
 <div class="content-mat" style="border: 1px none #fcc;">
 <div id="content" style="border: 1px none #ccc; min-height:650px;">

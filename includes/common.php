@@ -2,6 +2,10 @@
 
 ## Common Functions
 
+function mres($string) { // short function wrapper because the real one is stupidly long and ugly. aestetics.
+  return mysql_real_escape_string($string);
+}
+
 function getifhost($id) {
      $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);

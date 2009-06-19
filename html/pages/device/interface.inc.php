@@ -3,6 +3,8 @@
 $interface_query = mysql_query("select * from interfaces WHERE interface_id = '".$_GET['opta']."'");
 $interface = mysql_fetch_array($interface_query);
 
+ $port_details = 1;
+
  $hostname = $device['hostname'];
  $hostid   = $device['interface_id'];
  $ifname   = $interface['ifDescr'];
@@ -22,9 +24,6 @@ $interface = mysql_fetch_array($interface_query);
  $inf = fixifName($ifname);
 
  $bg="#ffffff";
-# echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
-# include("includes/device-header.inc");
-# echo("</table>");
 
  $show_all = 1;
 
