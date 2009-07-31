@@ -9,10 +9,10 @@
 
      echo("<tr valign=top bgcolor='$bg_colour'>");
 
-     echo("<td width=200 class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
+     echo("<td width=240><a class=list-large href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a><br /><span class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</span></td>");
      echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
 
-     echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
+#     echo("<td width=200 class=box-desc>" . $vrf['mplsVpnVrfDescription'] . "</td>");
 
      echo("<td><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 
@@ -24,10 +24,13 @@
        } else {
          if(!is_integer($x/2)) { $dev_colour = $list_colour_b_b; } else { $dev_colour = $list_colour_b_a; }
        }
-       echo("<tr bgcolor='$dev_colour'><td width=150>".generatedevicelink($device) . "</td><td>");
+       echo("<tr bgcolor='$dev_colour'><td width=150>".generatedevicelink($device));
+	if($device['vrf_name'] != $vrf['vrf_name']) { echo("<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name']."<br />Configured : ".$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <img align=absmiddle src=images/16/exclamation.png></a>"); }
+       echo("</td><td>");
        $interfaces = mysql_query("SELECT * FROM `interfaces` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
        unset($seperator);
        while($interface = mysql_fetch_array($interfaces)) {
+	 $interface = array_merge ($device, $interface);
          echo($seperator.generateiflink($interface,makeshortif($interface['ifDescr']))); 
 	 $seperator = ", ";         
        }

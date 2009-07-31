@@ -67,7 +67,11 @@ function dhtml_response_list(&$items, $method) {
      if($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
      foreach ($typeinstances as &$tinst) {
+       if($tinst) {
        echo("<div><h3>".$_GET['opta']." $instance - $type - $tinst</h3>");
+       } else {
+        echo("<div><h3>".$_GET['opta']." $instance - $type</h3>");
+       }
 
        $daily_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=day&to=$now&width=215&height=100";
        $daily_traffic  .= $args;

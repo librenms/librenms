@@ -72,6 +72,15 @@ if($_GET['debug']) {
     if($_GET['if']) { $_GET['interfaces'] = $_GET['if']; }
     $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;
+  case 'multi_bits_duo':
+    $groups = array($_GET['interfaces'], $_GET['interfaces_b']);
+    $graph = graph_multi_bits_duo ($groups, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
+    break;
+  case 'multi_bits_trio':
+    $groups = array($_GET['interfaces'], $_GET['interfaces_b'], $_GET['interfaces_c']);
+    $graph = graph_multi_bits_trio ($groups, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
+    break;
+
   case 'adsl_rate':
     $graph = graph_adsl_rate ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
     break;

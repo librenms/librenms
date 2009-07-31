@@ -7,19 +7,13 @@
 
   $if_id = $interface['interface_id'];
 
-
-#  $ifType = fixiftype($interface['ifType']);
-#  $ifHardType = $interface['ifHardType'];
-  
-  if($bg == "#e5e5e5") { $bg = "#ffffff"; } else { $bg="#e5e5e5"; }
-  if($int_colour) { $bg = $int_colour; }
+  if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
   } else { $error_img = ""; }
 
-  
-  echo("<tr style=\"background-color: $bg; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='#fdd';\" onmouseout=\"this.style.backgroundColor='$bg';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
+  echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
@@ -210,9 +204,4 @@ echo("</td>");
 
       }
 
-   
-
-   $i++;
-
-
-?>
+   ?>

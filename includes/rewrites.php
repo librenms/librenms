@@ -1,5 +1,6 @@
 <?php
 
+
 $rewrite_entSensorType = array (
   'celsius' => 'C',
   'unknown' => '',
@@ -194,6 +195,19 @@ function fixifName ($inf)
   $inf = strtolower($inf);
   $inf = array_str_replace($rewrite_ifname, $inf);
   return $inf;
+}
+
+function short_port_descr ($desc) {
+
+  list($desc) = explode("(", $desc);
+  list($desc) = explode("[", $desc);
+  list($desc) = explode("{", $desc);
+  list($desc) = explode("|", $desc);
+  list($desc) = explode("<", $desc);
+  $desc = trim($desc);
+
+  return $desc;
+
 }
 
 

@@ -130,6 +130,10 @@ if($config['enable_pseudowires']) { echo("<li><a href='pseudowires/'><img src='i
 
 if($config['enable_pseudowires']) { echo("<li><a href='vrfs/'><img src='images/16/layers.png' border=0 align=absmiddle> VRFs</a></li>"); $ifbreak = 1;}
 
+?> 
+<li><a href='ipv4/'><img src='images/16/email_link.png' border=0 align=absmiddle> IP Search</a></li>
+
+<?php
 
 if($_SESSION['userlevel'] >= '5') {
   echo("<li><hr width=140 /></li>");
@@ -151,6 +155,8 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 
 <li><a href='interfaces/down/'><img src='images/16/if-disconnect.png' border=0 align=absmiddle> Down</a></li>
 <li><a href='interfaces/admindown/'><img src='images/16/if-disable.png' border=0 align=absmiddle> Disabled</a></li>
+
+
 
 </ul></td></tr></table>
 
@@ -195,7 +201,7 @@ echo("        <li><hr /></li>
 ?>
 
 
-<li style='float: right;'><a><img src='images/16/wrench.png' border=0 align=absmiddle> Configuration
+<li style='float: right;'><a><img src='images/16/wrench.png' border=0 align=absmiddle> System
 <!--[if IE 7]><!--></a><!--<![endif]-->
     <table><tr><td>
     <ul>
@@ -203,7 +209,7 @@ echo("        <li><hr /></li>
     <?php if($_SESSION['userlevel'] >= '10') {
       echo("
         <li><hr width=140 /></li>
-        <li><a href='?page=settings'><img src='images/16/report.png' border=0 align=absmiddle> System Settings</a></li>
+        <li><a href='?page=statistics'><img src='images/16/report.png' border=0 align=absmiddle> Statistics</a></li>
         <li><hr width=140/></li>
 	<li><a href='?page=adduser'><img src='images/16/user_add.png' border=0 align=absmiddle> Add User</a></li>
         <li><a href='?page=deluser'><img src='images/16/user_delete.png' border=0 align=absmiddle> Remove User</a></li>

@@ -1,4 +1,10 @@
-<?
+<?php
+
+echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
+<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'>Full</a> |
+<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/thumbs/'>Compact</a>
+</div> ");
+
 
  $hostname = $device['hostname'];
  $hostid   = $device['interface_id'];
@@ -22,6 +28,8 @@
 
  $query = mysql_query("SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC");
 
+ echo("<div style='clear: both;'>");
+
  while($acc = mysql_fetch_array($query)) { 
 
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
@@ -35,13 +43,31 @@
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
      $peer_info = mysql_fetch_array($peer_query);
 
-   } else { unset ($peer_info); }
+   } else { unset ($peer_info); }  
 
-   echo("<div style='background-color: $bg; padding: 8px;'>");
 
    if($peer_info) { $asn = "AS".$peer_info['bgpPeerRemoteAs']; $astext = $peer_info['astext']; } else {
-   unset ($as); unset ($astext);
+   unset ($as); unset ($astext); unset($asn);
    }
+
+ if($_GET['optc'] == "thumbs") {
+
+  if(!$asn) { $asn = "No Session"; }
+
+  echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 223px; max-width:223px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e5e5e5;'>
+     ".$addy['ipv4_address']." - ".$asn."
+         <a href='#' onmouseover=\"return overlib('\
+    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>".$name." - ".$addy['ipv4_address']." - ".$asn."</div>\
+    <img src=\'graph.php?id=" . $acc['ma_id'] . "&type=mac_acc&from=-2day&to=$now&width=450&height=150\'>\
+    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
+         <img src='graph.php?id=" . $acc['ma_id'] . "&type=mac_acc&from=-2day&to=$now&width=215&height=45'></a>
+
+         <span style='font-size: 10px;'>".$name."</span>
+        </div>");
+
+   } else {
+
+   echo("<div style='background-color: $bg; padding: 8px;'>");
 
    echo("
      <table>
@@ -85,5 +111,7 @@
   echo("</div>");
 
  }
+
+}
 
 ?>
