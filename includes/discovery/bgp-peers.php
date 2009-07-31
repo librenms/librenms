@@ -8,7 +8,7 @@
   $as_cmd .= ".1.3.6.1.2.1.15.2";
   $bgpLocalAs = trim(shell_exec($as_cmd));
 
-  if($bgpLocalAs) {
+  if($bgpLocalAs && !strstr($bgpLocalAs, "No")) {
 
     echo("AS$bgpLocalAs \n");
 

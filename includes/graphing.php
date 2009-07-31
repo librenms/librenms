@@ -5,11 +5,291 @@ include("graphing/fortigate.php");
 include("graphing/windows.php");
 include("graphing/unix.php");
 
+function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
+  global $config, $installdir;
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
+  if($height < "99") { $options .= " --only-graph"; }
+  $i = 1;
+  foreach(explode(",", $interfaces[0]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+    $int = mysql_fetch_row($query);
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+      if(strstr($inverse, "a")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
+      $options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
+      $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
+      $pluses .= $plus;
+      $seperator = ",";
+      $plus = ",+";
+      $i++;
+    }
+  }
+  unset($seperator); unset($plus);
+  foreach(explode(",", $interfaces[1]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+    $int = mysql_fetch_row($query);
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+      if(strstr($inverse, "b")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
+      $options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $in_thingb .= $seperator . "inoctetsb" . $i . ",UN,0," . "inoctetsb" . $i . ",IF";
+      $out_thingb .= $seperator . "outoctetsb" . $i . ",UN,0," . "outoctetsb" . $i . ",IF";
+      $plusesb .= $plus;
+      $seperator = ",";
+      $plus = ",+";
+      $i++;
+    }
+  }
+  unset($seperator); unset($plus);
+  foreach(explode(",", $interfaces[2]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+    $int = mysql_fetch_row($query);
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+      if(strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
+      $options .= " DEF:inoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $options .= " DEF:outoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $in_thingc .= $seperator . "inoctetsc" . $i . ",UN,0," . "inoctetsc" . $i . ",IF";
+      $out_thingc .= $seperator . "outoctetsc" . $i . ",UN,0," . "outoctetsc" . $i . ",IF";
+      $plusesc .= $plus;
+      $seperator = ",";
+      $plus = ",+";
+      $i++;
+    }
+  }
+  $options .= " CDEF:inoctets=" . $in_thing . $pluses;
+  $options .= " CDEF:outoctets=" . $out_thing . $pluses;
+  $options .= " CDEF:inoctetsb=" . $in_thingb . $plusesb;
+  $options .= " CDEF:outoctetsb=" . $out_thingb . $plusesb;
+  $options .= " CDEF:inoctetsc=" . $in_thingc . $plusesc;
+  $options .= " CDEF:outoctetsc=" . $out_thingc . $plusesc;
+  $options .= " CDEF:doutoctets=outoctets,-1,*";
+  $options .= " CDEF:inbits=inoctets,8,*";
+  $options .= " CDEF:outbits=outoctets,8,*";
+  $options .= " CDEF:doutbits=doutoctets,8,*";
+  $options .= " CDEF:doutoctetsb=outoctetsb,-1,*";
+  $options .= " CDEF:inbitsb=inoctetsb,8,*";
+  $options .= " CDEF:outbitsb=outoctetsb,8,*";
+  $options .= " CDEF:doutbitsb=doutoctetsb,8,*";
+  $options .= " CDEF:doutoctetsc=outoctetsc,-1,*";
+  $options .= " CDEF:inbitsc=inoctetsc,8,*";
+  $options .= " CDEF:outbitsc=outoctetsc,8,*";
+  $options .= " CDEF:doutbitsc=doutoctetsc,8,*";
+  $options .= " CDEF:inbits_tot=inbits,inbitsb,inbitsc,+,+";
+  $options .= " CDEF:outbits_tot=outbits,outbitsb,outbitsc,+,+";
+  $options .= " CDEF:inbits_stot=inbitsc,inbitsb,+";
+  $options .= " CDEF:outbits_stot=outbitsc,outbitsb,+";
+  $options .= " CDEF:doutbits_stot=outbits_stot,-1,*";
+  $options .= " CDEF:doutbits_tot=outbits_tot,-1,*";
+  $options .= " CDEF:nothing=outbits_tot,outbits_tot,-";
+
+  if($legend == "no") {
+   $options .= " AREA:inbits_tot#cdeb8b:";
+   $options .= " AREA:doutbits_tot#cdeb8b:";
+   $options .= " LINE1.25:inbits_tot#aacc77:";
+   $options .= " LINE1.25:doutbits_tot#aacc88:";
+   $options .= " AREA:inbits_stot#c3d9ff:";
+   $options .= " AREA:doutbits_stot#c3d9ff:";
+   $options .= " LINE1:inbits_stot#b3a9cf:";
+   $options .= " LINE1:doutbits_stot#b3a9cf:";
+   $options .= " AREA:inbitsc#ffcc99:";
+   $options .= " AREA:doutbitsc#ffcc99:";
+   $options .= " LINE1.25:inbitsc#ddaa88";
+   $options .= " LINE1.25:doutbitsc#ddaa88";
+   $options .= " LINE1:inbits#006600:";
+   $options .= " LINE1:doutbits#006600:";
+   $options .= " LINE1:inbitsb#000099:";
+   $options .= " LINE1:doutbitsb#000099:";
+   $options .= " LINE0.5:nothing#555555:";
+  } else {
+   $options .= " COMMENT:BPS\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
+   $options .= " AREA:inbits_tot#cdeb8b:ATM\ \ In\ ";
+   $options .= " GPRINT:inbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbits:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbits:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbits_tot#cdeb8b:";
+   $options .= " COMMENT:\ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbits:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbits:MAX:%6.2lf%s\\\\l";
+   $options .= " LINE1.25:inbits_tot#aacc77:";
+   $options .= " LINE1.25:doutbits_tot#aacc88:";
+   $options .= " AREA:inbits_stot#c3d9ff:NGN\ \ In\ ";
+   $options .= " GPRINT:inbitsb:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbits_stot#c3d9ff:";
+   $options .= " COMMENT:\ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbitsb:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:MAX:%6.2lf%s\\\\l";
+   $options .= " LINE1:inbits_stot#b3a9cf:";
+   $options .= " LINE1:doutbits_stot#b3a9cf:";
+   $options .= " AREA:inbitsc#ffcc99:Wave\ In\ ";
+   $options .= " GPRINT:inbitsc:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbitsc:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbitsc:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbitsc:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbitsc#ffcc99:";
+   $options .= " COMMENT:\ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbitsc:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbitsc:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbitsc:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbitsc:MAX:%6.2lf%s\\\\l";
+   $options .= " LINE1.25:inbitsc#ddaa88";
+   $options .= " LINE1.25:doutbitsc#ddaa88";
+   $options .= " LINE1:inbits#006600:";
+   $options .= " LINE1:doutbits#006600:";
+   $options .= " LINE1:inbitsb#000099:";
+   $options .= " LINE1:doutbitsb#000099:";
+   $options .= " LINE0.5:nothing#555555:";
+
+   $options .= " COMMENT:Total\ \ In\ ";
+   $options .= " GPRINT:inbits_tot:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:MAX:%6.2lf%s\\\\l";
+   $options .= " COMMENT:\ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbits_tot:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:MAX:%6.2lf%s\\\\l";
+
+
+  }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
+#  echo($config['rrdtool'] . " graph $imgfile $options");
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+
+function graph_multi_bits_duo ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
+  global $config, $installdir;
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
+  if($height < "99") { $options .= " --only-graph"; }
+  $i = 1;
+  foreach(explode(",", $interfaces[1]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+    $int = mysql_fetch_row($query);
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+      $options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";
+      $options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
+      $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
+      $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
+      $pluses .= $plus;
+      $seperator = ",";
+      $plus = ",+";
+      $i++;
+    }
+  }
+  unset($seperator); unset($plus);
+  foreach(explode(",", $interfaces[0]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+    $int = mysql_fetch_row($query);
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+      $options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";
+      $options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
+      $in_thingb .= $seperator . "inoctetsb" . $i . ",UN,0," . "inoctetsb" . $i . ",IF";
+      $out_thingb .= $seperator . "outoctetsb" . $i . ",UN,0," . "outoctetsb" . $i . ",IF";
+      $plusesb .= $plus;
+      $seperator = ",";
+      $plus = ",+";
+      $i++;
+    }
+  }
+  if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+  $options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
+  $options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
+  $options .= " CDEF:".$in."octetsb=" . $in_thingb . $plusesb;
+  $options .= " CDEF:".$out."octetsb=" . $out_thingb . $plusesb;
+  $options .= " CDEF:doutoctets=outoctets,-1,*";
+  $options .= " CDEF:inbits=inoctets,8,*";
+  $options .= " CDEF:outbits=outoctets,8,*";
+  $options .= " CDEF:doutbits=doutoctets,8,*";
+  $options .= " CDEF:doutoctetsb=outoctetsb,-1,*";
+  $options .= " CDEF:inbitsb=inoctetsb,8,*";
+  $options .= " CDEF:outbitsb=outoctetsb,8,*";
+  $options .= " CDEF:doutbitsb=doutoctetsb,8,*";
+  $options .= " CDEF:inbits_tot=inbits,inbitsb,+";
+  $options .= " CDEF:outbits_tot=outbits,outbitsb,+";
+  $options .= " CDEF:doutbits_tot=outbits_tot,-1,*";
+  $options .= " CDEF:nothing=outbits_tot,outbits_tot,-";
+  if($legend == "no") {
+   $options .= " AREA:inbits_tot#cdeb8b:";
+   $options .= " AREA:inbits#ffcc99:";
+   $options .= " AREA:doutbits_tot#cdeb8b:";
+   $options .= " AREA:doutbits#ffcc99:";
+   $options .= " LINE1:inbits#aa9966:";
+   $options .= " LINE1:doutbits#aa9966:";
+   $options .= " LINE1:inbitsb#006600:";
+   $options .= " LINE1:doutbitsb#006600:";
+   $options .= " LINE1.25:inbits_tot#006600:";
+   $options .= " LINE1.25:doutbits_tot#006600:";
+   $options .= " LINE0.5:nothing#555555:";
+  } else {
+   $options .= " COMMENT:BPS\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
+   $options .= " AREA:inbits_tot#cdeb8b:Peering\ In\ ";
+   $options .= " GPRINT:inbitsb:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbitsb:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbits_tot#cdeb8b:";
+   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbitsb:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbitsb:MAX:%6.2lf%s\\\\l";
+
+   $options .= " AREA:inbits#ffcc99:Transit\ In\ ";
+   $options .= " GPRINT:inbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbits:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbits:MAX:%6.2lf%s\\\\l";
+   $options .= " AREA:doutbits#ffcc99:";
+   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbits:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbits:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbits:MAX:%6.2lf%s\\\\l";
+
+   $options .= " COMMENT:Total\ \ \ \ \ In\ ";
+   $options .= " GPRINT:inbits_tot:LAST:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:MIN:%6.2lf%s";
+   $options .= " GPRINT:inbits_tot:MAX:%6.2lf%s\\\\l";
+   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Out";
+   $options .= " GPRINT:outbits_tot:LAST:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:AVERAGE:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:MIN:%6.2lf%s";
+   $options .= " GPRINT:outbits_tot:MAX:%6.2lf%s\\\\l";
+
+   $options .= " LINE1:inbits#aa9966:";
+   $options .= " LINE1:doutbits#aa9966:";
+   $options .= " LINE1.25:inbitsb#006600:";
+   $options .= " LINE1.25:doutbitsb#006600:";
+   $options .= " LINE1.25:inbits_tot#006600:";
+   $options .= " LINE1.25:doutbits_tot#006600:";
+   $options .= " LINE0.5:nothing#555555:";
+
+  }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+
 function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
   global $config, $installdir;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
-  if($height < "33") { $options .= " --only-graph"; }
+  if($height < "99") { $options .= " --only-graph"; }
   $i = 1;
   foreach(explode(",", $interfaces) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
@@ -95,6 +375,7 @@ function graph_cpmCPU ($id, $graph, $from, $to, $width, $height, $title, $vertic
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
   $options .= " -l 0 -E -b 1024 --title '$title' ";
+  if($height < "99") { $options .= " --only-graph -u 100 -l 0 -r "; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
@@ -124,6 +405,7 @@ function graph_device_cpmCPU ($device, $graph, $from, $to, $width, $height, $tit
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
   $options .= " -l 0 -E -b 1024 --title '$title' ";
+  if($height < "99") { $options .= " --only-graph -u 100 -l 0 -r "; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
@@ -151,6 +433,7 @@ function graph_device_cempMemPool ($device, $graph, $from, $to, $width, $height,
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
   $options .= " -l 0 -E -b 1024 --title '$title' ";
+  if($height < "99") { $options .= " --only-graph -u 100 -l 0 -r "; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
@@ -227,6 +510,7 @@ function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $
   global $config, $installdir;
   $options  = "--start $from --end $to --width $width --height $height --vertical-label '$vertical' --alt-autoscale-max ";
   $options .= " -l 0 -E -b 1024 --title '$title' ";
+  if($height < "99") { $options .= " --only-graph -u 100 -l 0 -r "; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
@@ -273,12 +557,23 @@ function graph_mac_acc ($id, $graph, $from, $to, $width, $height) {
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.ma_id = '".$id."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
   $acc = mysql_fetch_array($query);
+  $database = $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+  return graph_bits ($database, $graph, $from, $to, $width, $height, $title, $vertical);
+
+}
+
+
+function graph_mac_acc_old ($id, $graph, $from, $to, $width, $height) {
+  global $config;
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.ma_id = '".$id."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
+  $acc = mysql_fetch_array($query);
   $database = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";  
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
-  if($height < "33") { $options .= " --only-graph"; }
+  if($height < "99") { $options .= " --only-graph"; }
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($height < "33") { $options .= " --only-graph"; }
+  if($height < "99") { $options .= " --only-graph"; }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   
   $options .= " DEF:inoctets=$database:IN:AVERAGE";
@@ -320,7 +615,7 @@ function graph_mac_acc_interface ($interface, $graph, $from, $to, $width, $heigh
   global $config, $installdir;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
-  if($height < "33") { $options .= " --only-graph"; }
+  if($height < "99") { $options .= " --only-graph"; }
   $hostname = gethostbyid($device);
   $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '$interface' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
   if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
@@ -362,7 +657,7 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($height < "33") { $options .= " --only-graph"; unset ($legend); }
+  if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   if($inverse) {
     $in = 'out';
@@ -371,10 +666,17 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
     $in = 'in';
     $out = 'out';
   }
-  $options .= " DEF:".$out."octets=$database:OUTOCTETS:AVERAGE";
-  $options .= " DEF:".$in."octets=$database:INOCTETS:AVERAGE";
-  $options .= " DEF:".$out."octets_max=$database:OUTOCTETS:MAX";
-  $options .= " DEF:".$in."octets_max=$database:INOCTETS:MAX";
+  if(strstr($database, "mac-accounting")) {
+   $options .= " DEF:".$out."octets=$database:OUT:AVERAGE";
+   $options .= " DEF:".$in."octets=$database:IN:AVERAGE";
+   $options .= " DEF:".$out."octets_max=$database:OUT:MAX";
+   $options .= " DEF:".$in."octets_max=$database:IN:MAX";
+  } else {
+   $options .= " DEF:".$out."octets=$database:OUTOCTETS:AVERAGE";
+   $options .= " DEF:".$in."octets=$database:INOCTETS:AVERAGE";
+   $options .= " DEF:".$out."octets_max=$database:OUTOCTETS:MAX";
+   $options .= " DEF:".$in."octets_max=$database:INOCTETS:MAX";
+  }
 
   $options .= " CDEF:octets=inoctets,outoctets,+";
   $options .= " CDEF:doutoctets=outoctets,-1,*";
@@ -555,11 +857,10 @@ function graph_entity_sensor ($sensor, $graph , $from, $to, $width, $height, $ti
   $sensor = mysql_fetch_array(mysql_query("SELECT * FROM entPhysical as E, devices as D WHERE entPhysical_id = '$sensor' and D.device_id = E.device_id"));
   $database = $config['rrd_dir'] . "/" . $sensor['hostname'] . "/ces-" . $sensor['entPhysicalIndex'] . ".rrd";
   $options = "--alt-autoscale-max -l 0 -E --start $from --end $to --width $width --height $height ";
+  if($height < "99") { $options .= " --only-graph -u 100 -l 0 -r "; unset ($legend); }
   if($width <= "300") {$options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
-
   $type = str_pad($sensor['entSensorType'], 8);
   $type = substr($type,0,8);
-
 
   $options .= " DEF:avg=$database:value:AVERAGE";
   $options .= " DEF:min=$database:value:MIN";
@@ -691,7 +992,6 @@ function uptimegraph ($rrd, $graph , $from, $to, $width, $height, $title, $verti
   $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
   return $imgfile;
 }
-
 
 function memgraph ($rrd, $graph , $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;

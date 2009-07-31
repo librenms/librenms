@@ -1,13 +1,43 @@
 <?php
 echo("
-<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
+<div style='background-color: ".$list_colour_b."; margin: auto; text-align: left; padding: 7px; clear: both; display:block; height:20px;'>
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | Graphs:
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> | 
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> 
+(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/thumbs/'>Compact</a>) | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
 </div> ");
+
+if($_GET['optc'] == thumbs) {
+
+  $timeperiods = array('-1day','-1week','-1month','-1year');
+
+  $from = '-1day';
+
+ echo("<div style='display: block; clear: both; margin: auto; background-color: black;'>");
+
+  $sql  = "select * from interfaces WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
+  $query = mysql_query($sql);
+  unset ($seperator);
+  while($interface = mysql_fetch_array($query)) {
+   echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
+    <div style='font-weight: bold;'>".makeshortif($interface['ifDescr'])."</div>
+    <a href='device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('\
+    <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$interface['ifDescr']."</div>\
+    ".$interface['ifAlias']." \
+    <img src=\'graph.php?type=bits&if=".$interface['interface_id']."&from=".$from."&to=".$now."&width=450&height=150\'>\
+    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
+    "<img src='graph.php?type=bits&if=".$interface['interface_id']."&from=".$from."&to=".$now."&width=180&height=45&legend=no'>
+    </a>
+    <div style='font-size: 9px;'>".truncate(short_port_descr($interface['ifAlias']), 32, '')."</div>
+   </div>");
+
+ }
+ echo("</div>");
+
+} else {
 
 if($_GET['opta'] == graphs ) { 
   if($_GET['optb']) {
@@ -30,7 +60,12 @@ $i = "1";
 $interface_query = mysql_query("select * from interfaces WHERE device_id = '$_GET[id]' AND deleted = '0' ORDER BY `ifIndex` ASC");
 while($interface = mysql_fetch_array($interface_query)) {
   include("includes/print-interface.inc");
+  $i++;
 }
 echo("</table></div>");
+
+echo("<div style='min-height: 150px;'></div>");
+
+}
 
 ?>
