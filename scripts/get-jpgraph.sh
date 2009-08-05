@@ -1,6 +1,9 @@
 #!/bin/bash
-wget http://hem.bredband.net/jpgraph2/jpgraph-2.3.4.tar.gz
-tar zxf jpgraph-2.3.4.tar.gz
+mkdir jpgraph
+cd jpgraph
+wget http://hem.bredband.net/jpgraph2/jpgraph-3.0.2.tar.bz2
+tar jxf jpgraph-3.0.2.tar.bz2
 rm -rf html/includes/jpgraph
-mv jpgraph-2.3.4 html/includes/jpgraph
-rm jpgraph-2.3.4.tar.gz
+rm jpgraph-3.0.2.tar.bz2
+cd ..
+mv jpgraph html/includes/jpgraph
