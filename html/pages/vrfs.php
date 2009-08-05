@@ -1,5 +1,15 @@
 <?php
 
+echo("
+<div style='background-color: ".$list_colour_b."; margin: auto; margin-bottom: 5px; text-align: left; padding: 7px; padding-left: 11px; clear: both; display:block; height:20px;'>
+<a href='".$config['base_url']. "/vrfs/'>Basic</a> | Graphs :
+<a href='".$config['base_url']. "/vrfs/bits/'>Bits</a> |
+<a href='".$config['base_url']. "/vrfs/pkts/'>Packets</a> |
+<a href='".$config['base_url']. "/vrfs/nupkts/'>NU Packets</a> |
+<a href='".$config['base_url']. "/vrfs/errors/'>Errors</a>
+</div> ");
+
+
    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
    $i = "1";
    $vrf_query = mysql_query("SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`");
@@ -29,10 +39,18 @@
        echo("</td><td>");
        $interfaces = mysql_query("SELECT * FROM `interfaces` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
        unset($seperator);
-       while($interface = mysql_fetch_array($interfaces)) {
-	 $interface = array_merge ($device, $interface);
-         echo($seperator.generateiflink($interface,makeshortif($interface['ifDescr']))); 
+       while($port = mysql_fetch_array($interfaces)) {
+
+  if($_GET['opta']) {
+   $graph_type = $_GET['opta'];
+   include("includes/print-port-thumbs.inc.php");
+
+  } else {
+
+	 $port = array_merge ($device, $port);
+         echo($seperator.generateiflink($port,makeshortif($port['ifDescr']))); 
 	 $seperator = ", ";         
+  }
        }
        echo("</td></tr>");
        $x++;
