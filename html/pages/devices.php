@@ -1,7 +1,16 @@
-<table cellpadding=7 cellspacing=0 class=devicetable width=100%>
+<div style='margin:auto; text-align: center; margin-top: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; padding:5px;'>
+<table cellpadding=4 cellspacing=0 class=devicetable width=100%>
 <form method='post' action=''>
-<tr bgcolor='#eeeeee' 
-             <td width='40' align=center valign=middle></td>
+<tr> 
+             <td width='30' align=center valign=middle></td>
              <td width='300'><span style='font-weight: bold; font-size: 14px;'></span>
              <input type="text" name="hostname" id="hostname" size=40 value="<?php  echo($_POST['hostname']); ?>" />
              </td>
@@ -75,6 +84,16 @@
            </tr>
   </form>
 </table>
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+
 
 <?php
 

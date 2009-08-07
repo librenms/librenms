@@ -61,7 +61,6 @@ function printEntPhysical($ent, $level, $class) {
     }
 }
 
-   echo("<div style='float: left;'><h3>Inventory</h3></div>");
    echo("<div style='float: right;'>
            <a href='#' class='button' onClick=\"expandTree('enttree');return false;\"><img src='images/16/bullet_toggle_plus.png'>Expand All Nodes</a>
            <a href='#' class='button' onClick=\"collapseTree('enttree');return false;\"><img src='images/16/bullet_toggle_minus.png'>Collapse All Nodes</a>

@@ -1,5 +1,13 @@
 <meta http-equiv="refresh" content="60">
-<div style="background-color: #eeeeee; padding: 10px;">
+<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 0px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; text-align: left; padding: 5px 5px; padding-left: 11px; clear: both; display:block;'>
 <form method="post" action="">
   <label><strong>Search</strong>
     <input type="text" name="string" id="string" value="<?php  echo($_POST['string']); ?>" />
@@ -38,6 +46,14 @@
   <input type=submit value=Search>
 
 </form>
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
 </div>
 
 <?
