@@ -8,7 +8,7 @@
   $as_cmd .= ".1.3.6.1.2.1.15.2";
   $bgpLocalAs = trim(shell_exec($as_cmd));
 
-  if($bgpLocalAs && !strstr($bgpLocalAs, "No")) {
+  if($bgpLocalAs && !strstr($bgpLocalAs, " ")) {
 
     echo("AS$bgpLocalAs \n");
 
@@ -65,7 +65,12 @@
       echo("\n");
       } # If Peer
     } # Foreach  
-  } else { echo("No BGP on host"); } # End if
+  } else { 
+    echo("No BGP on host");
+    if($device['bgpLocalAs']) {
+     mysql_query("UPDATE devices SET bgpLocalAs = NULL WHERE device_id = '".$device['device_id']."'"); echo(" (Removed ASN)\n"); 
+    } # End if
+  } # End if
 
 ## Delete removed peers
 

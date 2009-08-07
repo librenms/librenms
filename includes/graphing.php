@@ -731,6 +731,7 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTUCASTPKTS:AVERAGE";
@@ -755,6 +756,7 @@ function errorgraph ($rrd, $graph, $from, $to, $width, $height) {
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INERRORS:AVERAGE";
   $options .= " DEF:out=$database:OUTERRORS:AVERAGE";
@@ -779,6 +781,7 @@ function nucastgraph ($rrd, $graph, $from, $to, $width, $height) {
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INNUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTNUCASTPKTS:AVERAGE";
