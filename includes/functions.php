@@ -393,6 +393,32 @@ function delHost($id)
   echo("Removed device $host<br />");
 }
 
+function retireHost($id)
+{
+  global $config;
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
+  $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
+  while($int_data = mysql_fetch_array($int_query)) {
+    $int_if = $int_data['ifDescr'];
+    $int_id = $int_data['interface_id'];
+    mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `src_if` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `dst_if` = '$int_id'");
+    mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
+    echo("Removed interface $int_id ($int_if)<br />");
+  }
+  mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `temperature` WHERE `temp_host` = '$id'");
+  mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
+  mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
+  shell_exec("rm -rf ".$config['rrd_dir']."/$host");
+  echo("Removed device $host<br />");
+}
 
 function addHost($host, $community, $snmpver, $port = 161) 
 {

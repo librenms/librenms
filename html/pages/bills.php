@@ -1,33 +1,14 @@
 
-
 <?php
-
-echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%><tr><td>");
 
 if($_GET['opta'] == "add") {
 
 ?>
-<div style='font-size:20px; font-weight: bold;'>Add Bill</div>
+<div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
 
-<div style="margin:5px;">
-  <b class="rounded">
-  <b class="rounded1"><b></b></b>
-  <b class="rounded2"><b></b></b>
-  <b class="rounded3"></b>
-  <b class="rounded4"></b>
-  <b class="rounded5"></b></b>
+<form method='post' action=''>
 
-  <div class="roundedfg" style="padding-left:10px;">
-    Content
-  </div>
 
-  <b class="rounded">
-  <b class="rounded5"></b>
-  <b class="rounded4"></b>
-  <b class="rounded3"></b>
-  <b class="rounded2"><b></b></b>
-  <b class="rounded1"><b></b></b></b>
-</div>
 
 
 
@@ -38,9 +19,21 @@ if($_GET['opta'] == "add") {
 
   ?>
 	
+<div style='margin:auto; text-align: center; margin-top: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; padding:5px;'>
+
+
+
 	<table cellpadding=7 cellspacing=0 class=devicetable width=100%>
 <form method='post' action=''>
-<tr bgcolor='#eeeeee' 
+<tr>
              <td width='40' align=center valign=middle><div style='font-weight: bold; font-size: 16px;'>Bills</div></td>
              <td width='240'><span style='font-weight: bold; font-size: 14px;'></span>
              <input type="text" name="hostname" id="hostname" size=40 value="<?php  echo($_POST['hostname']); ?>" />
@@ -69,13 +62,24 @@ if($_GET['opta'] == "add") {
          <input type=submit value=Search>
              </td>
              <td width='80' style='font-weight:bold; font-size: 12px;'>
-						   <a><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
+						   <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>
              </td>
            </tr>
   </form>
 </table>
+
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+
 	
-	<?php
+<?php
 
   $sql  = "SELECT * FROM `bills` ORDER BY `bill_name`";
   $query = mysql_query($sql);
@@ -107,7 +111,7 @@ if($_GET['opta'] == "add") {
     echo("
            <tr bgcolor='$row_colour'>
              <td width='7'></td>
-             <td width='250'><a href='".$config['base_url']."/bill/".$bill['bill_id']."'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
+             <td width='250'><a href='".$config['base_url']."/bill/".$bill['bill_id']."/'><span style='font-weight: bold;' class=interface>".$bill['bill_name']."</span></a></td>
              <td>$notes</td>
 	     <td>$type</td>
              <td>$allowed</td>
@@ -117,9 +121,9 @@ if($_GET['opta'] == "add") {
 						 <td width=60><a><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
+    $i++;
   }
   echo("</table>");
-  $i++;
 }
 
 echo("</td></tr></table>");

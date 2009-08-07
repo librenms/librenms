@@ -118,6 +118,7 @@ $rewrite_ios_features = array(
     'dialer' => 'Di',
     'vlan' => 'Vlan',
     'tunnel' => 'Tunnel',
+    'serviceinstance' => 'SI',
   );
 
   $rewrite_iftype = array (

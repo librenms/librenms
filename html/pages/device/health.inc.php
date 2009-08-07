@@ -15,7 +15,17 @@ $type_text['cemp'] = "Memory Pools";
 $type_text['cpm'] = "Processor Usage";
 $type_text['storage'] = "Disk Usage";
 
- echo("<div style='width: auto; text-align: right; padding: 10px; display:block; background-color: #eeeeee;'>");
+ echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
+");
+
  unset ($sep);
  foreach ($datas as $type) {
    if(!$_GET['opta']) { $_GET['opta'] = $type; }
@@ -26,7 +36,17 @@ $type_text['storage'] = "Disk Usage";
    $sep = ' | ';
  }
  unset ($sep);
- echo("</div>");
+ echo("</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+");
+
 
 if(is_file("pages/device/health/".mres($_GET['opta']).".inc.php")) { include("pages/device/health/".mres($_GET['opta']).".inc.php"); }
 

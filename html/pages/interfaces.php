@@ -1,7 +1,17 @@
-<table cellpadding=2 cellspacing=1 class=devicetable width=100%>
-  <tr bgcolor='#eeeeee' style='padding: 3px;'>
+<div style='margin:auto; text-align: center; margin-top: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; padding:5px;'>
+
+<table style="text-align: left;" cellpadding=0 cellspacing=5 class=devicetable width=100%>
+  <tr style='padding: 0px;'>
   <form method='post' action=''>
-    <td width='200' style="padding: 10px;">
+    <td width='200'>
       <select name='device_id' id='device_id'>
       <option value=''>All Devices</option>
       <?php
@@ -14,16 +24,22 @@
       ?>
       </select>
     </td>
-    <td>
+    <td width='150'>
       <select name='state' id='state'>
         <option value=''>All States</option>
         <option value='up' <?php if($_POST['state'] == "up") { echo("selected"); } ?>>Up</option>
         <option value='down'<?php if($_POST['state'] == "down") { echo("selected"); } ?>>Down</option>
         <option value='admindown' <?php if($_POST['state'] == "admindown") { echo("selected"); } ?>>Shutdown</option>
         <option value='errors' <?php if($_POST['state'] == "errors") { echo("selected"); } ?>>Errors</option>
+        <option value='ethernet' <?php if($_POST['state'] == "ethernet") { echo("selected"); } ?>>Ethernet</option>
+        <option value='l2vlan' <?php if($_POST['state'] == "l2vlan") { echo("selected"); } ?>>L2 VLAN</option>
+        <option value='sonet' <?php if($_POST['state'] == "sonet") { echo("selected"); } ?>>SONET</option>
+        <option value='propvirtual' <?php if($_POST['state'] == "propvirtual") { echo("selected"); } ?>>Virtual</option>
+        <option value='ppp' <?php if($_POST['state'] == "ppp") { echo("selected"); } ?>>PPP</option>
+        <option value='loopback' <?php if($_POST['state'] == "loopback") { echo("selected"); } ?>>Loopback</option>
       </select>
     </td>
-    <td>
+    <td width=110>
       <select name='ifSpeed' id='ifSpeed'>
       <option value=''>All Speeds</option>
       <?php
@@ -36,7 +52,7 @@
       ?>
        </select>
     </td>
-    <td>
+    <td width=200>
       <select name='ifType' id='ifType'>
       <option value=''>All Media</option>
       <?php
@@ -52,10 +68,24 @@
              <td>
         <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php  echo($_POST['ifAlias']); ?>" />
         Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if($_POST['deleted']) { echo("checked"); } ?> ></input>
+        </td>
+        <td style="text-align: right;">
         <input style="align:right;" type=submit value=Search></div>
              </td>
            </form>
          </tr>
+</table>
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+
+<table cellpadding=3 cellspacing=0 class=devicetable width=100%>
 
 
 <?php
@@ -75,7 +105,21 @@ if($_GET['type'] == "down" || $_POST['state'] == "down") {
   $where .= "AND ( I.`out_errors` > '0' OR I.`in_errors` > '0' )";
 } elseif ($_GET['type'] == "up" || $_POST['state'] == "up") {
   $where .= "AND I.ifOperStatus = 'up'";
+} elseif ($_GET['type'] == "l2vlan" || $_POST['state'] == "l2vlan") {
+  $where .= " AND I.ifType = 'l2vlan'";
+} elseif ($_GET['type'] == "ethernet" || $_POST['state'] == "ethernet") {
+  $where .= " AND I.ifType = 'ethernetCsmacd'";
+} elseif ($_GET['type'] == "loopback" || $_POST['state'] == "loopback") {
+  $where .= " AND I.ifType = 'softwareLoopback'";
+} elseif ($_GET['typee'] == "sonet" || $_POST['state'] == "sonet") {
+  $where .= " AND I.ifType = 'sonet'";
+} elseif ($_POST['state'] == "propvirtual") {
+  $where .= " AND I.ifType = 'propVirtual'";
+} elseif ($_POST['state'] == "ppp") {
+  $where .= " AND I.ifType = 'ppp'";
 }
+
+
 
 if($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
 if($_POST['ifType']) { $where .= " AND I.ifType = '".$_POST['ifType']."'"; }
@@ -87,7 +131,7 @@ $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.de
 
 $query = mysql_query($sql);
 
-echo("<tr class=tablehead><th>Device</a></th><th>Interface</th><th>Speed</th><th>Media</th><th>Description</th></tr>");
+echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Media</th><th>Description</th></tr>");
 
 $row = 1;
 
@@ -105,10 +149,11 @@ while($interface = mysql_fetch_array($query)) {
   if( interfacepermitted($interface['interface_id']) ) 
   {
     echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($interface) . "</td>
-          <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
-          <td>$speed</td>
-          <td>$type</td>
+          <td width=5></td>
+          <td width=200 class=list-bold>" . generatedevicelink($interface) . "</td>
+          <td width=150 class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
+          <td width=110 >$speed</td>
+          <td width=200>$type</td>
           <td>" . $interface['ifAlias'] . "</td>
         </tr>\n");
 
