@@ -1,3 +1,41 @@
+.rounded{display:block}
+.rounded *{
+  display:block;
+  height:1px;
+  overflow:hidden;
+  font-size:.01em;
+  background:#e5e5e5}
+.rounded1{
+  margin-left:3px;
+  margin-right:3px;
+  padding-left:1px;
+  padding-right:1px;
+  border-left:1px solid #f3f36b;
+  border-right:1px solid #f3f36b;
+  background:#ebebaf}
+.rounded2{
+  margin-left:1px;
+  margin-right:1px;
+  padding-right:1px;
+  padding-left:1px;
+  border-left:1px solid #fcfc24;
+  border-right:1px solid #fcfc24;
+  background:#e9e9bc}
+.rounded3{
+  margin-left:1px;
+  margin-right:1px;
+  border-left:1px solid #e9e9bc;
+  border-right:1px solid #e9e9bc;}
+.rounded4{
+  border-left:1px solid #f3f36b;
+  border-right:1px solid #f3f36b}
+.rounded5{
+  border-left:1px solid #ebebaf;
+  border-right:1px solid #ebebaf}
+.roundedfg{
+  background:#e5e5e5}
+
+
 .content-box{display:block}
 .content-box *{
   display:block;

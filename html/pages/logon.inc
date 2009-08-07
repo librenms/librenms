@@ -1,14 +1,21 @@
 <?php
 
     echo("
-  <center><br />
-<table  border='0' cellpadding='20' cellspacing='0' background='images/login.png' width=479 height=212>
+<div style='margin:auto; text-align: center; margin-top: 20px; max-width:420px'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding-left:10px;'>
+  <div style='margin: auto; width:350px; padding:5px;'>
+<table  border='0' cellpadding='0' cellspacing='0'>
     <tr>
-      <td width=128></td>
+      <td width=128><img src='images/password.png'></td>
       <td>
         <form action='". $_SERVER['REQUEST_URI'] ."' method=post>
           <h3>Please log in:</h3>
-
           <div style='height: 0px;'></div>
           <table border=0 align=left>
             <tr>
@@ -35,10 +42,18 @@ echo("          </table>
       </form></td>
     </tr>
   </table>
-</center>");
+	</div>
+  </div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='unded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>");
 
 if($config['login_message']) {
-  echo("<div style='text-align: center; font-weight: bold; color: #cc0000; width=300px;'>".$config['login_message']."</div>");
+  echo("<div style='margin: auto; text-align: center; font-weight: bold; color: #cc0000; width: 470px;'>".$config['login_message']."</div>");
 }
 
 ?>
