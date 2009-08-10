@@ -6,6 +6,7 @@ function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, 
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
 
   $range = $to - $from;
@@ -65,6 +66,7 @@ function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $range = $to - $from;
   $points_per_sample = 3;
@@ -102,6 +104,7 @@ function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $options .= " DEF:atotalswap=$database:totalswap:AVERAGE";
   $options .= " DEF:aavailswap=$database:availswap:AVERAGE";
@@ -168,6 +171,7 @@ function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vert
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $options .= " DEF:1min=$database:1min:AVERAGE";
   $options .= " DEF:5min=$database:5min:AVERAGE";
@@ -201,6 +205,7 @@ function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $options .= " DEF:users=$database:users:AVERAGE";
   $options .= " COMMENT:Users\ \ \ \ \ \ \ Cur\ \ \ \ \ Ave\ \ \ \ \ \ Min\ \ \ \ \ Max\\\\n";
@@ -220,6 +225,7 @@ function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:procs=$database:procs:AVERAGE";
   $options .= " COMMENT:Processes\ \ \ \ Cur\ \ \ \ \ Ave\ \ \ \ \ \ Min\ \ \ \ \ Max\\\\n";
@@ -242,6 +248,7 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "-l 0 --alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $options .= " DEF:user=$database:user:AVERAGE";
   $options .= " DEF:nice=$database:nice:AVERAGE";
@@ -279,6 +286,7 @@ function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $v
   $imgfile = "graphs/" . "$graph";
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $points_per_sample = 3;
   $range = $to - $from;
@@ -328,6 +336,7 @@ function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
   $options .= " DEF:hits=$database:hits:AVERAGE";
   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ \ \ Average\ \ \ \ \ Maximum\\\\n";
@@ -344,6 +353,7 @@ function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertica
   global $config, $installdir;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $iter = "1";
@@ -377,6 +387,7 @@ function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, 
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $hostname = gethostbyid($device);
   $iter = "1";
@@ -409,6 +420,7 @@ function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
   $database = $config['rrd_dir'] . "/" . $rrd;
   $imgfile = "graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
+  $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:bits=$database:bits:AVERAGE";
   $options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ \ \ Average\ \ \ \ \ Maximum\\\\n";

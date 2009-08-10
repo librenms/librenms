@@ -32,10 +32,13 @@ $config['snmpset']      = "/usr/bin/snmpset";
 
 # Set the general colours and other settings for rrdtool graphs
 
-$config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#E5E5E5", "-c", "SHADEB#E5E5E5",
-                                     "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#aaaaaa",
-                                     "-c", "MGRID#FFAAAA", "-c", "FRAME#5e5e5e", "-c", "ARROW#5e5e5e",
+$config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#c5c5c5", "-c", "SHADEB#c5c5c5",
+                                     "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#a5a5a5",
+                                     "-c", "MGRID#FF9999", "-c", "FRAME#5e5e5e", "-c", "ARROW#5e5e5e",
                                      "-R", "normal");
+
+$config['rrdgraph_def_text'] = " -c BACK#FFFFFF -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 \
+                                -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal ";
 
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
 
