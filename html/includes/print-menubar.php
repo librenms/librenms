@@ -35,7 +35,7 @@
 	<?php if($config['enable_syslog']) {
   	  echo("<li><a href='syslog/'><img src='images/16/page.png' border=0 align=absmiddle> Syslog</a></li>");
 	} ?>
-        <li><a href="alerts/"><img src='images/16/exclamation.png' border=0 align=absmiddle> Alerts</a></li>
+<!--        <li><a href="alerts/"><img src='images/16/exclamation.png' border=0 align=absmiddle> Alerts</a></li> -->
         <li><a href="inventory/"><img src='images/16/bricks.png' border=0 align=absmiddle> Inventory</a></li>
 <?php
 if($_SESSION['userlevel'] >= '10') {
