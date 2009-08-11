@@ -4,6 +4,7 @@
 
   echo("ipnettomedia\n");
   $ipNetToMedia_data = shell_exec($config['snmpbulkwalk'] . " -m IP-MIB -Oq -".$device['snmpver']." -c ".$config['community']." ".$device['hostname']." ipNetToMediaPhysAddress");
+  echo("##".$config['snmpbulkwalk'] . " -m IP-MIB -Oq -".$device['snmpver']." -c ".$config['community']." ".$device['hostname']." ipNetToMediaPhysAddress##\n");
   $ipNetToMedia_data = str_replace("ipNetToMediaPhysAddress.", "", trim($ipNetToMedia_data));
   $ipNetToMedia_data = str_replace("IP-MIB::", "", trim($ipNetToMedia_data));
   echo("$ipNetToMedia_data\n");
