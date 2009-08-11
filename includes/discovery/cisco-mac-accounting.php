@@ -2,9 +2,12 @@
 
   unset ($mac_table);
 
+  echo("ipnettomedia\n");
   $ipNetToMedia_data = shell_exec($config['snmpbulkwalk'] . " -m IP-MIB -Oq -".$device['snmpver']." -c ".$config['community']." ".$device['hostname']." ipNetToMediaPhysAddress");
   $ipNetToMedia_data = str_replace("ipNetToMediaPhysAddress.", "", trim($ipNetToMedia_data));
   $ipNetToMedia_data = str_replace("IP-MIB::", "", trim($ipNetToMedia_data));
+  echo("$ipNetToMedia_data\n");
+  echo("done\n");
   foreach(explode("\n", $ipNetToMedia_data) as $data) {
     list($oid, $mac) = explode(" ", $data);
     list($if, $first, $second, $third, $fourth) = explode(".", $oid);
@@ -37,8 +40,11 @@
     }
   }
 
+  echo("cisco-ip-stat-mib\n");
   $datas = shell_exec($config['snmpbulkwalk'] . " -m CISCO-IP-STAT-MIB -Oqn -".$device['snmpver']." -c ".$config['community']." ".$device['hostname']." cipMacSwitchedBytes");
   $datas = trim($datas);
+  echo("$datas\n");
+  echo("done\n");
   foreach(explode("\n", $datas) as $data) {
     list($oid) = explode(" ", $data);
     $oid = str_replace(".1.3.6.1.4.1.9.9.84.1.2.1.1.4.", "", $oid);
