@@ -1,7 +1,16 @@
-<table cellpadding=2 cellspacing=0 class=devicetable width=100%>
-  <tr bgcolor='#eeeeee' style='padding: 3px;'>
+<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; text-align: left; padding: 5px 5px; padding-left: 10px; clear: both; display:block;'>
+<table cellpadding=0 cellspacing=0 class=devicetable width=100%>
+  <tr>
   <form method='post' action=''>
-    <td width='200' style="padding: 10px;">
+    <td width='200'>
       <select name='device_id' id='device_id'>
       <option value=''>All Devices</option>
       <?php
@@ -14,7 +23,7 @@
       ?>
       </select>
     </td>
-    <td width='200' style="padding: 10px;">
+    <td width='200'>
       <select name='interface' id='interface'>
       <option value=''>All Interfaces</option>
       <option value='Loopback%' <?php if($_POST['interface'] == "Loopback%"){ echo("selected");} ?> >Loopbacks</option>
@@ -31,6 +40,17 @@
 
   </tr>
 </table>
+
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+
 
 <?php
 

@@ -9,19 +9,23 @@ while($pw_a = mysql_fetch_array($query)) {
    $i = 0;
    while ($i < count($linkdone)) {
       $thislink = $pw_a['device_id'] . $pw_a['interface_id'];
-      if ($linkdone[$i] == $thislink) { $dupe = "yes"; }
+      if ($linkdone[$i] == $thislink) { $skip = "yes"; }
       $i++;
   }
 
-
-  if($dupe) {
-    unset($dupe);
-  } else {
-    if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
-    $pw_b = mysql_fetch_array(mysql_query("SELECT * from `devices` AS D, `interfaces` AS I, `pseudowires` AS P WHERE D.device_id = '".$pw_a['peer_device_id']."' AND
+  $pw_b = mysql_fetch_array(mysql_query("SELECT * from `devices` AS D, `interfaces` AS I, `pseudowires` AS P WHERE D.device_id = '".$pw_a['peer_device_id']."' AND
                                                                                                           D.device_id = I.device_id AND
                                                                                                           P.cpwVcID = '".$pw_a['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
+
+  if(!interfacepermitted($pw_a['interface_id'])) { $skip = "yes"; }
+  if(!interfacepermitted($pw_b['interface_id'])) { $skip = "yes"; }
+
+
+  if($skip) {
+    unset($skip);
+  } else {
+    if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
     echo("<tr style=\"background-color: $bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID']."</td><td>".generatedevicelink($pw_a)."</td><td>".generateiflink($pw_a)."</td>
                                                                                           <td rowspan=2> => </td>

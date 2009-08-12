@@ -66,15 +66,6 @@ echo("<table width=100%><tr><td valign=top width=33%>");
   // Display devices this users has access to
   echo("<h3>Device Access</h3>");
 
-  $device_perm_data = mysql_query("SELECT * from devices_perms as P, devices as D WHERE `user_id` = '" . $_GET['user_id'] . "' AND D.device_id = P.device_id");
-  while($device_perm = mysql_fetch_array($device_perm_data)) {
-    echo($device_perm['hostname'] . " <a href='?page=edituser&action=deldevperm&user_id=" . $_GET['user_id'] . "&device_id=" . $device_perm['device_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a><br />");
-    $access_list[] = $device_perm['device_id'];
-    $permdone = "yes";
-  }
-
-  if(!$permdone) { echo("None Configured"); }
-
   // Display devices this user doesn't have access to
   echo("<h4>Grant access to new device</h4>");
   echo("<form method='get' action=''>
@@ -93,6 +84,17 @@ echo("<table width=100%><tr><td valign=top width=33%>");
   }
 
   echo("</select> <input type='submit' name='Submit' value='Add'></form>");
+
+
+  $device_perm_data = mysql_query("SELECT * from devices_perms as P, devices as D WHERE `user_id` = '" . $_GET['user_id'] . "' AND D.device_id = P.device_id");
+  while($device_perm = mysql_fetch_array($device_perm_data)) {
+    echo($device_perm['hostname'] . " <a href='?page=edituser&action=deldevperm&user_id=" . $_GET['user_id'] . "&device_id=" . $device_perm['device_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a><br />");
+    $access_list[] = $device_perm['device_id'];
+    $permdone = "yes";
+  }
+
+  if(!$permdone) { echo("None Configured"); }
+
   echo("</td><td valign=top width=33%>");
   echo("<h3>Interface Access</h3>");
 
