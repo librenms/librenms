@@ -132,7 +132,7 @@ if($config['enable_pseudowires']) { echo("<li><a href='vrfs/'><img src='images/1
 
 ?> 
 <li><a href='ipv4/'><img src='images/16/email_link.png' border=0 align=absmiddle> IPv4 Search</a></li>
-<li><a href='ipv4/'><img src='images/16/email_link.png' border=0 align=absmiddle> IPv6 Search</a></li>
+<li><a href='ipv6/'><img src='images/16/email_link.png' border=0 align=absmiddle> IPv6 Search</a></li>
 
 <?php
 
