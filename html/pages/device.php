@@ -216,6 +216,6 @@ echo("</div>
 ");
 }
 
-} else { echo("<span class=alert>You do not have the necessary access permissions to view this device.</span>"); }
+} else { include("includes/error-no-perm-dev.inc.php"); }
 ?>
 

@@ -30,7 +30,7 @@ function createInterfaces(index)
 
 echo("<div style='margin: 10px;'>");
 
-if($_SESSION['userlevel'] != '10') { echo("<div class=error>You do not have then necessary permission to view this page!</div>"); } else {
+if($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php"); } else {
 
 if($_GET['user_id']) {
   $user_data = mysql_fetch_array(mysql_query("SELECT * FROM users WHERE user_id = '" . $_GET['user_id'] . "'"));

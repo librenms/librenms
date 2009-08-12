@@ -82,7 +82,12 @@ if($_POST['device']) {
   $where .= " AND D.device_id = '".$_POST['device']."'";
 }
 
-$sql = "SELECT * from entPhysical AS E, devices AS D WHERE E.device_id = D.device_id $where ORDER BY D.hostname";
+if($_SESSION['userlevel'] >= '5') {
+  $sql = "SELECT * from entPhysical AS E, devices AS D WHERE E.device_id = D.device_id $where ORDER BY D.hostname";
+} else { 
+  $sql = "SELECT * from entPhysical AS E, devices AS D, devices_perms AS P 
+          WHERE E.device_id = D.device_id AND D.device_id = P.device_id $where ORDER BY D.hostname";
+}
 
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");

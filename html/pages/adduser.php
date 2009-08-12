@@ -2,7 +2,9 @@
 
 echo("<div style='margin: 10px;'>");
 
-if($_SESSION['userlevel'] != '10') { echo("<span class=alert>You do not have then necessary permission to view this page!</alert>"); } else {
+if($_SESSION['userlevel'] != '10') { 
+  include("includes/error-no-perm.inc.php");
+} else {
 
   echo("<h3>Add User</h3>");
 
