@@ -70,7 +70,14 @@ if($_POST['device']) {
   $where .= " AND D.device_id = '".$_POST['device']."'";
 }
 
-$sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog AS S, devices AS D WHERE S.device_id = D.device_id $where ORDER BY datetime DESC LIMIT 1000";
+if($_SESSION['userlevel'] >= '5') {
+  $sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog AS S, devices AS D 
+          WHERE S.device_id = D.device_id $where ORDER BY datetime DESC LIMIT 1000";
+} else {
+  $sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog AS S, devices AS D, devices_perms AS P
+          WHERE S.device_id = P.device_id AND P.user_id = " . $_SESSION['user_id'] . " AND S.device_id = D.device_id $where ORDER BY datetime DESC LIMIT 1000";
+}
+
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
