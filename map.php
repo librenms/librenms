@@ -59,11 +59,6 @@ echo("\n}\n");
 
 }
 
-echo("\"Internet\" -> \"je.cen.pbr02\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(4)\"];\n");
-echo("\"Internet\" -> \"je.cen.pbr01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(4)\"];\n");
-echo("\"Internet\" -> \"uk.thn.tbr01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(4)\"];\n");
-#echo("\"ADSL\" -> \"thnlon-pe01\" [ arrowhead=none arrowtail=none color=navyblue weight=5 style=\"setlinewidth(8)\"];\n");
-
 $links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE  I.device_id = D.device_id AND X.device_id = Y.device_id AND L.src_if = I.interface_id AND X.interface_id = L.dst_if";
 
 $links_result = mysql_query($links_sql);
