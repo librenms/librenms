@@ -19,8 +19,8 @@
     $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", `$peers_cmd`));  
     foreach (explode("\n", $peers) as $peer)  {
 
-      if($peer) {
-        list($peer_ip, $peer_as) = split(" ",  $peer);
+      list($peer_ip, $peer_as) = split(" ",  $peer);
+      if($peer && $peer_ip != "0.0.0.0") {
 
 	$peerlist[] = $device['device_id'] ." $peer_ip";
 
