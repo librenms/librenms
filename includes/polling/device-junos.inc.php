@@ -2,18 +2,19 @@
 
 echo("Doing Juniper JunOS");
 
-$jun_ver =  trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname']." .1.3.6.1.2.1.25.6.3.1.2.2")));
-$hardware = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname']." .1.3.6.1.4.1.2636.3.1.2.0")));
-$serial = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname']." .1.3.6.1.4.1.2636.3.1.3.0")));
+$jun_ver =  trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.25.6.3.1.2.2")));
+$hardware = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.2.0")));
+$serial = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.3.0")));
 
-$version = preg_replace("/.+\[(.+)\].+/", "\\1", $jun_ver);
-$features = preg_replace("/.+\ \((.+)\)$/", "\\1", $jun_ver);
+list($version) = explode("]", $jun_ver);
+list(,$version) =  explode("[", $version);
+$features = "";
 
 echo("$hardware - $version - $features - $serial\n");
 
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junos-cpu.rrd";
 
-$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
+$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
 $cpu_usage = trim(shell_exec($cpu_cmd));
 
