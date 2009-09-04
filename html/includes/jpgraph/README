@@ -1,0 +1,165 @@
+README FOR JPGRAPH
+==================
+
+This package contains JpGraph, an Object Oriented PHP5 Graph Plotting library.
+
+The library is Copyright (C) 1999-2009 Aditus Consulting and
+released under dual license QPL 1.0 for open source and educational
+use and JpGraph Professional License for commercial use. 
+
+Please see full license details at http://www.aditus.nu/jpgraph/
+
+* --------------------------------------------------------------------
+* PHP4 IS NOT SUPPORTED IN THIS 2.x SERIE
+* --------------------------------------------------------------------
+
+* --------------------------------------------------------------------
+* Note: Due to a bug in PHP5 make sure that the compatibility mode for
+*       PHP4 is disabled by setting (in php.ini)
+*
+*       zend.ze1_compatibility_mode = Off
+* --------------------------------------------------------------------
+
+
+Included files
+--------------
+README	                This file
+QPL.txt                 QPL 1.0  Licensee
+
+/src
+  Changelog			Changelog
+  jpg-config.inc.php		Configuration setup for JpGraph
+  jpgraph.php			Base library
+  jpgraph_log.php		Extension: logarithmic scales
+  jpgraph_line.php		Extension: line plots 
+  jpgraph_bar.php		Extension: bar plots
+  jpgraph_date.php		Extension: date scale
+  jpgraph_flags.php		Extension: Country flags
+  jpgraph_error.php		Extension: error plots
+  jpgraph_scatter.php		Extension: scatter/impulse plots
+  jpgraph_radar.php		Extension: radar plots
+  jpgraph_pie.php		Extension: pie plots
+  jpgraph_canvas.php		Extension: drawing canvas
+  jpgraph_canvtools.php		Extension: utility classes for working with canvas
+  jpgraph_pie3d.php		Extension: 3D pie plots
+  jpgraph_gantt.php		Extension: Gantt chart
+  jpgraph_regstat.php		Extension: Statistics and cubic splines.
+  jpgraph_stock.php		Extension: Stock and box plots.
+  jpgraph_gradient.php		Extension: Color gradient class
+  jpgraph_gb2312.php		Extension: Chinese GB2312 to Unicode translation
+  jpgraph_imgtrans.php		Extension: Basic image transformation
+  jpgraph_flags.php		Extension: Country flags
+  jpgraph_iconplot.php		Extension: Use image icons in plots
+  jpgraph_polar.php		Extension: Polar plots
+  jpgraph_plotband.php		Extension: Plotbands in graphs
+  jpgraph_plotmark.inc.php	Extension: Using plotmarks in graphs
+  jpgraph_mgraph.php		Extension: Multi graph extension
+  jpgraph_utils.inc.php		Extension: Various non-mandatory utility classes
+  imgdata_*.inc			Extension: Encoded images for plot marks
+  flags*.dat			Image data: Pre-compiled data for country flags.
+
+/src/Examples		A directory with example sripts.
+			Run testsuit.php to get a list of all
+			files and you can easily click on a file to
+			see the code and the resulting image.
+		
+/docs			Directory with all documentation				
+/docs/index.html	Documentation portal
+
+
+/lang
+  de.inc.php		German translation of error messages
+  en.inc.php		English version of error messages
+  prod.inc.php		Production version of error messages (does not
+			give specific details in error message.)
+			
+Requirements:
+-------------
+Miminum:
+* PHP 5.1.0 or higher 
+(Note: Earlier versions might work but is unsupported.)
+* GD 2.0.30 or higher
+(Note: Earlier versions might work but is unsupported.)
+
+Recommended:
+* PHP 5.2.7
+* PHP Builtin GD (2.0.34 compatible) library
+
+Installation
+------------
+0. Make sure that the PHP version is compatible with the stated requirements
+   and that the PHP installation has support for the GD library. 
+   Please run phpinfo() to check if GD library
+   is supported in the installation. 
+   If the GD library doesn't seem to be installed 
+   please consult the PHP manual under section "Image" for
+   instructions on where to find this library. Please refer to
+   the manual section "Verifying your PHP installation"
+   
+1. Unzip and copy the files to a directory of your choice where Your
+   httpd sever can access them. 
+   For a global site installation you should copy the files to 
+   somewhere in the PHP search path. 
+
+2. Check that the default directory paths in jpg-config.inc
+   for cache directory and TTF directory suits your installation. 
+   Note1: The default directories are different depending on if
+   the library is running on Windows or UNIX.
+   Note2: Apache/PHP must have write permission to your cache 
+   directory if you enable the cache feature. By default the cache
+   is disabled.
+
+3. Check that all rest of the DEFINE in jpg-config.inc 
+   is setup to your preference. The default should be fine
+   for most users. (See also Note 3. below)
+   
+4. Read (really!) the FAQ on http://www.aditus.nu/jpgraph/jpg_faq.php.
+
+
+Documentation
+-------------
+The installation includes HTML documentation and reference guide for the
+library. The portal page for all the documentation is
+<YOUR-INSTALLATION-DIRECTORY>/docs/index.html
+
+
+Troubleshooting
+---------------
+1. If an empty page is returned back when running an example check
+   the following
+
+      i) Make sure output_buffer is disabled in php.ini
+     ii) Increase the maximum memory allowed by PHP (in php.ini) to at least
+         32MB
+    iii) Enable all error messages and notices in php.ini (error_reporting = E_ALL)
+
+   Then try running the example again. Most likely an error message will
+   now be shown that will give further information on what is wrong.
+   For further clarifiction on the casues for the error messages see
+   the FAQ section on the WEB site.
+
+1. If you are running IIS and Win2k and get the error "Can't find
+   font' when trying to use TTF fonts then try to change you paths
+   to UNIX style, i.e. "/usr/local/fonts/ttf/". Remember that the
+   path is absolute and not relative to the htdocs catalogue. Some 
+   versions of GD for Windows also need you to set the environment
+   variable GDFONTPATH for GD to find the fonts.
+
+2. If you are using the cache please make sure that you have
+   set the permissions correctly for the cache directory so that
+   Apache/PHP can write to that directory.
+
+3. Some windows installations seems to have a problem with a PHP
+   script ending in a newline (This newline seems to be sent to the
+   browser and will cause a Header already sent error). 
+   If you have this problem try remove all trailing newlines in the
+   jpgraph* files 
+
+
+Bug reports and suggestions
+---------------------------
+Should be reported in the issue tracker at
+
+http://www.aditus.nu/bugtraq
+
+<EOF>
