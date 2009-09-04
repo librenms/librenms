@@ -75,6 +75,7 @@ $rewrite_ios_features = array(
   "PK9S" => "IP w/SSH LAN Only",
   "LANBASEK9" => "Lan Base Crypto",
   "LANBASE" => "Lan Base",
+  "ADVENTERPRISEK9_IVS" => "Advanced Enterprise Crypto Voice",
   "ADVENTERPRISEK9" => "Advanced Enterprise Crypto",
   "ADVSECURITYK9" => "Advanced Security Crypto",
   "K91P" => "Provider Crypto",
