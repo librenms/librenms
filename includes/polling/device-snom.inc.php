@@ -1,4 +1,4 @@
-<?
+<?php
 
    echo("Polling SNOM device...\n");
 

@@ -1,4 +1,4 @@
-<?
+<?php
 
   unset ($mac_table);
 

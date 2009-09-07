@@ -1,4 +1,4 @@
-<?
+<?php
 
   echo("<div style='font-family: courier, serif; margin: 10px';><strong>" . $device['sysDescr'] . "</strong></div>");
 

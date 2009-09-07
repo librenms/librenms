@@ -2,7 +2,8 @@
 
 ### Purge deleted interfaces from the database
 
-<?
+<?php
+
 include("config.php");
 include("includes/functions.php");
 

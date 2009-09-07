@@ -1,4 +1,4 @@
-<?
+<?php
 
 $cpurrd   = $config['rrd_dir'] . "/" . $hostname . "/cpu.rrd";
 $memrrd   = $config['rrd_dir'] . "/" . $hostname . "/mem.rrd";

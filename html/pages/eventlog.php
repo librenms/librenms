@@ -1,4 +1,4 @@
-<?
+<?php
 
 if($_SESSION['userlevel'] >= '5') {
   $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,250";

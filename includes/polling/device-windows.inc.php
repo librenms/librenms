@@ -1,4 +1,4 @@
-<?
+<?php
 
    if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
    if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }

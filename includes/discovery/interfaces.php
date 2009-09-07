@@ -1,4 +1,4 @@
-<?
+<?php
 
 # Discover interfaces
 

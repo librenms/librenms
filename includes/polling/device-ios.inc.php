@@ -1,4 +1,4 @@
-<?
+<?php
 
    $community = $device['community'];
    $id = $device['device_id'];

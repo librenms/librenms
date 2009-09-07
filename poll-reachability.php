@@ -1,8 +1,5 @@
 #!/usr/bin/php
-<?
-#
-# Test Reachability
-#
+<?php
 
 include("config.php");
 include("includes/functions.php");

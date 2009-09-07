@@ -1,4 +1,4 @@
-<?
+<?php
 
 $query = "SELECT * FROM cpmCPU WHERE device_id = '" . $device['device_id'] . "'";
 $proc_data = mysql_query($query);

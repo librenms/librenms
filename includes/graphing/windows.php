@@ -1,4 +1,4 @@
-<?
+<?php
 
 function memgraphWin ($rrd, $graph, $from="-2d")
 {

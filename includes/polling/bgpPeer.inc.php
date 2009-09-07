@@ -1,4 +1,4 @@
-<?
+<?php
 
 echo("Polling BGP peers\n");
 

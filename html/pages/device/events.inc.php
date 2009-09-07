@@ -1,4 +1,4 @@
-<?
+<?php
 
 $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,250";
 $data = mysql_query($query);

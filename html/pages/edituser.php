@@ -26,7 +26,7 @@ function createInterfaces(index)
 
 </script>
 
-<?
+<?php
 
 echo("<div style='margin: 10px;'>");
 

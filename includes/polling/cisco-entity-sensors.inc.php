@@ -1,4 +1,4 @@
-<?
+<?php
 
 $query = "SELECT * FROM entPhysical WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalClass = 'sensor'";
 $sensors = mysql_query($query);

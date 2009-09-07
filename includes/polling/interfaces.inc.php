@@ -1,4 +1,4 @@
-<?
+<?php
 
 $interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {

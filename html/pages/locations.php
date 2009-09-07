@@ -1,4 +1,4 @@
-<?
+<?php
 echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
 if($_SESSION['userlevel'] == '10') {
