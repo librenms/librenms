@@ -1,4 +1,4 @@
-<?
+<?php
 
   $descr = $_POST['descr'];
   $ignore = $_POST['ignore'];

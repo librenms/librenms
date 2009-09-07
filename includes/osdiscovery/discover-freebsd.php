@@ -1,4 +1,4 @@
-<?
+<?php
 
 if(!$os) {
   if(strstr($sysDescr, "FreeBSD")) { $os = "FreeBSD"; }  ## It's FreeBSD!

@@ -1,4 +1,4 @@
-<?
+<?php
 
 echo("Doing Juniper Netscreen (ScreenOS)");
 

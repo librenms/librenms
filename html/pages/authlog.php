@@ -1,4 +1,4 @@
-<?
+<?php
 
 if($_SESSION['userlevel'] == '10') {
   $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `authlog` ORDER BY `datetime` DESC LIMIT 0,250";

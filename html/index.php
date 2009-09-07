@@ -1,4 +1,4 @@
-<?php 
+<?php
   ini_set('allow_url_fopen', 0);
   ini_set('display_errors', 0);
 
@@ -56,7 +56,7 @@ function popUp(URL) {
 <tr>
 <td align=left></td>
 <td align=right>
-  <? 
+  <?php
      if($_SESSION['authenticated']) { 
        echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='?logout=yes'>Logout</a>)"); 
      } else { 

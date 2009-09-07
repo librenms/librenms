@@ -1,4 +1,4 @@
-<?
+<?php
 
 $hostname = gethostbyid($_GET[id]);
 

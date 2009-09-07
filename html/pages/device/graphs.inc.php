@@ -1,4 +1,4 @@
-<?
+<?php
 
 $device_query = mysql_query("select * from devices WHERE `device_id` = '$_GET[id]'");
 while($device = mysql_fetch_array($device_query)) {

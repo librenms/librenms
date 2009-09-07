@@ -1,4 +1,4 @@
-<?
+<?php
 
 $query = "SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] . "'";
 $temp_data = mysql_query($query);

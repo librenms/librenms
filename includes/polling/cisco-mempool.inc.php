@@ -1,4 +1,4 @@
-<?
+<?php
 
 $query = "SELECT * FROM cempMemPool WHERE device_id = '" . $device['device_id'] . "'";
 $pool_data = mysql_query($query);

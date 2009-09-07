@@ -1,5 +1,5 @@
 
-<?
+<?php
 
 if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 

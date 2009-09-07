@@ -1,4 +1,4 @@
-<?
+<?php
 
   unset( $storage_exists );
 

@@ -1,4 +1,4 @@
-<?
+<?php
 
 ### Connect to database
 

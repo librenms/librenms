@@ -56,7 +56,7 @@
   <b class='rounded1'><b></b></b></b>
 </div>
 
-<?
+<?php
 
 if($_POST['string']) {
   $where = " AND S.msg LIKE '%".$_POST['string']."%'";

@@ -1,4 +1,4 @@
-<?
+<?php
 
 ### Discover BGP peers on Cisco devices
 

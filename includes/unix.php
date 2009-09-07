@@ -1,4 +1,3 @@
-<?
-
-include("unix-graphing.php");
-
+<?php
+  include("unix-graphing.php");
+?>

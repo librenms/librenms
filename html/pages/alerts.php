@@ -1,5 +1,5 @@
 <meta http-equiv="refresh" content="60">
-<?
+<?php
 
 if($_GET['del']) { 
   $id = mres($_GET['del']);

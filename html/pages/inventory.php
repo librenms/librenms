@@ -60,7 +60,7 @@
 </div>
 
 
-<?
+<?php
 
 if($_POST['string']) {
   $where .= " AND E.entPhysicalDescr LIKE '%".$_POST['string']."%'";

@@ -1,4 +1,4 @@
-<?
+<?php
 
   unset( $vrf_count );
 
