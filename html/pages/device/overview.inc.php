@@ -202,8 +202,9 @@ echo("
   $sql = "SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
+    $data = ifNameDescr($data);
     $data['hostname'] = $device['hostname'];
-    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['ifDescr']))));
+    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['label']))));
     $ifsep = ", ";
   }
   unset($ifsep);

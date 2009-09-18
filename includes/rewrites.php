@@ -1,6 +1,27 @@
 <?php
 
 
+function formatMac($mac) {
+  $mac = preg_replace("/(..)(..)(..)(..)(..)(..)/", "\\1:\\2:\\3:\\4:\\5:\\6", $mac);
+  return $mac;
+}
+
+
+function ifNameDescr ($interface, $device) {
+  echo($device['os']);
+  if(!$config['ifname'][$device['os']]) {
+    $interface['label'] = $interface['ifDescr'];
+  } else {
+    $interface['label'] = $interface['ifName'];
+  }
+
+#  unset ($interface['ifDescr']);
+#  unset ($interface['ifName']);
+
+  return $interface;
+
+}
+
 $rewrite_entSensorType = array (
   'celsius' => 'C',
   'unknown' => '',

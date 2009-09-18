@@ -30,6 +30,8 @@
     $mac_table[$if][$mac]['ciscomac'] = "$m_a$m_b.$m_c$m_d.$m_e$m_f";
     $clean_mac = $m_a . $m_b . $m_c . $m_d . $m_e . $m_f;    
     $mac_table[$if][$mac]['cleanmac'] = $clean_mac;
+    $interface_id = $interface['interface_id'];
+    $mac_table[$interface_id][$clean_mac] = 1;
     if(mysql_result(mysql_query("SELECT COUNT(*) from ipv4_mac WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'"),0)) {
       $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'";
       mysql_query($sql);
@@ -37,7 +39,23 @@
       #echo("Add MAC $mac\n");
       mysql_query("INSERT INTO `ipv4_mac` (interface_id, mac_address, ipv4_address) VALUES ('".$interface['interface_id']."','$clean_mac','$ip')");
     }
+    $interface_id = $interface['interface_id'];
   }
+
+  print_r($mac_table);
+
+  $sql = "SELECT * from ipv4_mac AS M, interfaces as I WHERE M.interface_id = I.interface_id and I.device_id = '".$device['device_id']."'";
+  $query = mysql_query($sql);
+  while($entry = mysql_fetch_array($query)) {
+    $entry_mac = $entry['mac_address'];
+    $entry_if  = $entry['interface_id'];
+    if(!$mac_table[$entry_if][$entry_mac]) {
+      mysql_query("DELETE FROM ipv4_mac WHERE interface_id = '".$entry_if."' AND mac_address = '".$entry_mac."'");
+      echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
+    } 
+  }
+
+  unset($mac);
 
   $datas = shell_exec($config['snmpbulkwalk'] . " -m CISCO-IP-STAT-MIB -Oqn -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." cipMacSwitchedBytes");
   echo("$datas\n");

@@ -3,6 +3,9 @@
 ## ifDescr whitelist (used instead of ifName)
 $config['ifdescr']['IOS'] = true;
 $config['ifdescr']['IOS XE'] = true;
+$config['ifname']['ASA'] = true;
+
+
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
