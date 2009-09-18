@@ -64,7 +64,8 @@ if($_GET['optc'] == thumbs) {
   if($_GET['opta'] == "arp" ) { 
 
     $interface_query = mysql_query("select * from interfaces WHERE device_id = '$_GET[id]' AND deleted = '0' ORDER BY `ifIndex` ASC");
-    echo("<table  border=0 cellspacing=0 cellpadding=3 width=800><tr><th>Address</th><th>Hardware Addr</th><th>Interface</th><th>Remote Device</th><th>Remote Port</th></tr>");
+    echo("<table  border=0 cellspacing=0 cellpadding=3 width=100%%><tr><th width=125>Address</th><th width=140>Hardware Addr</th><th>Interface</th><th>Remote Device</th><th>Remote Port</th>
+            <th width=90>Rate Up</th><th width=90>Rate Down</th></tr>");
     $i = 1;
     while($interface = mysql_fetch_array($interface_query)) {
       $sql = "SELECT * FROM `ipv4_mac` WHERE `interface_id` = '".$interface['interface_id']."'";
@@ -76,15 +77,32 @@ if($_GET['optc'] == thumbs) {
                 I.device_id = D.device_id AND A.ipv4_address = '".$arp['ipv4_address']."' ORDER BY A.ipv4_address";
 	$remote = mysql_fetch_array(mysql_query($r_sql));
         $mac = formatMac($arp['mac_address']);         
+        $mac_acc = mysql_fetch_array(mysql_query("SELECT * FROM mac_accounting WHERE `interface_id` = '".$interface['interface_id']."' AND mac = '".$arp['mac_address']."'"));
         echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top>
                 <td>" . $arp['ipv4_address'] . "</td><td>" . $mac . "</td><td>".generateiflink($interface)."</td>");
         if ($remote['interface_id'] == $interface['interface_id']) {
-          echo("<td><i>local</i></td><td><i>local</i></td>");
+          $remote_host = "local"; 
+          $remote_port = "local";
         } elseif($remote['device_id']) {
-         echo("<td>" . generatedevicelink($remote) . "</td><td>" . generateiflink($remote) . "</td>");
+           $remote_host = generatedevicelink($remote);
+           $remote_port = generateiflink($remote);
+        } elseif(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND bgpPeerIdentifier ='".$arp['ipv4_address']."'"),0)) {
+          $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND bgpPeerIdentifier = '".$arp['ipv4_address']."'");
+          $peer_info = mysql_fetch_array($peer_query);
+          $remote_host = "AS".$peer_info['bgpPeerRemoteAs'];
+          $remote_port = truncate($peer_info['astext'], 24);
+        } else {
+          $remote_host = "";
+          $remote_port = "";
+        }
+         echo("<td>$remote_host</td><td>$remote_port</td>");
+
+        if ($mac_acc['interface_id'] == $interface['interface_id']) {
+          echo("<td>".formatRates($mac_acc['bps_out'])."</td><td>".formatRates($mac_acc['bps_in'])."</td>");
         } else {
          echo("<td></td><td></td>");
         }
+
         echo("</tr>");
       }
       echo("</div>");
