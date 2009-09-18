@@ -11,7 +11,8 @@ echo("
   <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | Graphs:
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | 
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> 
 (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/thumbs/'>Mini</a>) | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> 
