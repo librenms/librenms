@@ -96,7 +96,11 @@ if($_GET['debug']) {
   case 'mac_acc_int':
     $graph = graph_mac_acc_interface ($_GET['if'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
+  case 'mac_acc_pkts':
+    $graph = graph_mac_pkts ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
+    break;
   case 'mac_acc':
+  case 'mac_acc_bits':
     $graph = graph_mac_acc ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
   case 'device_bits':

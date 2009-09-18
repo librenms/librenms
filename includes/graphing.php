@@ -571,54 +571,6 @@ function graph_mac_acc ($id, $graph, $from, $to, $width, $height) {
 
 }
 
-function graph_mac_acc_old ($id, $graph, $from, $to, $width, $height) {
-  global $config;
-  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
-  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.ma_id = '".$id."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
-  $acc = mysql_fetch_array($query);
-  $database = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";  
-  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
-  $options .= $config['rrdgraph_def_text'];
-  if($height < "99") { $options .= " --only-graph"; }
-  $period = $to - $from;
-  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
-  if($height < "99") { $options .= " --only-graph"; }
-  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
-  $options .= " DEF:inoctets=$database:IN:AVERAGE";
-  $options .= " DEF:outoctets=$database:OUT:AVERAGE";
-  $options .= " CDEF:octets=inoctets,outoctets,+";
-  $options .= " CDEF:doutoctets=outoctets,-1,*";
-  $options .= " CDEF:inbits=inoctets,8,*";
-  $options .= " CDEF:outbits=outoctets,8,*";
-  $options .= " CDEF:doutbits=doutoctets,8,*";
-  $options .= " VDEF:totin=inoctets,TOTAL";
-  $options .= " VDEF:totout=outoctets,TOTAL";
-  $options .= " VDEF:tot=octets,TOTAL";
-  $options .= " VDEF:95thin=inbits,95,PERCENT";
-  $options .= " VDEF:95thout=outbits,95,PERCENT";
-  $options .= " VDEF:d95thout=doutbits,5,PERCENT";
-  $options .= " AREA:inbits#CDEB8B:";
-  $options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\ \ \ 95th\ %\\\\n";
-  $options .= " LINE1.25:inbits#006600:In\ ";
-  $options .= " GPRINT:inbits:LAST:%6.2lf%s";
-  $options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
-  $options .= " GPRINT:inbits:MAX:%6.2lf%s";
-  $options .= " GPRINT:95thin:%6.2lf%s\\\\n";
-  $options .= " AREA:doutbits#C3D9FF:";
-  $options .= " LINE1.25:doutbits#000099:Out";
-  $options .= " GPRINT:outbits:LAST:%6.2lf%s";
-  $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-  $options .= " GPRINT:outbits:MAX:%6.2lf%s";
-  $options .= " GPRINT:95thout:%6.2lf%s\\\\n";
-  $options .= " GPRINT:tot:Total\ %6.2lf%s";
-  $options .= " GPRINT:totin:\(In\ %6.2lf%s";
-  $options .= " GPRINT:totout:Out\ %6.2lf%s\)\\\\l";
-  $options .= " LINE1:95thin#aa0000";
-  $options .= " LINE1:d95thout#aa0000";
-  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
-}
-
 function graph_mac_acc_interface ($interface, $graph, $from, $to, $width, $height) {
   global $config, $installdir;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
@@ -746,6 +698,35 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $options .= " DEF:in=$database:INUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTUCASTPKTS:AVERAGE";
+  $options .= " CDEF:dout=out,-1,*";
+  $options .= " AREA:in#aa66aa:";
+  $options .= " COMMENT:Packets\ \ \ \ Current\ \ \ \ \ Average\ \ \ \ \ \ Maximum\\\\n";
+  $options .= " LINE1.25:in#330033:In\ \ ";
+  $options .= " GPRINT:in:LAST:%6.2lf%spps";
+  $options .= " GPRINT:in:AVERAGE:%6.2lf%spps";
+  $options .= " GPRINT:in:MAX:%6.2lf%spps\\\\n";
+  $options .= " AREA:dout#FFDD88:";
+  $options .= " LINE1.25:dout#FF6600:Out\ ";
+  $options .= " GPRINT:out:LAST:%6.2lf%spps";
+  $options .= " GPRINT:out:AVERAGE:%6.2lf%spps";
+  $options .= " GPRINT:out:MAX:%6.2lf%spps\\\\n";
+  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
+  return $imgfile;
+}
+
+function graph_mac_pkts ($id, $graph, $from, $to, $width, $height) {
+  global $config, $installdir;
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $query = mysql_query("SELECT * FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.ma_id = '".$id."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id");
+  $acc = mysql_fetch_array($query);
+  $database = $config['rrd_dir'] ."/". $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . "-pkts.rrd";
+  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
+  $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
+  $options .= $config['rrdgraph_def_text'];
+  if($height < "99") { $options .= " --only-graph"; unset ($legend); }
+  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  $options .= " DEF:in=$database:IN:AVERAGE";
+  $options .= " DEF:out=$database:OUT:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
   $options .= " AREA:in#aa66aa:";
   $options .= " COMMENT:Packets\ \ \ \ Current\ \ \ \ \ Average\ \ \ \ \ \ Maximum\\\\n";
