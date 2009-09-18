@@ -16,9 +16,10 @@ $select[$section] = "selected";
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $_GET['id'] . "'");
 while($device = mysql_fetch_array($device_query)) {
-  echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
+  echo("<table cellpadding=15
+ cellspacing=0 class=devicetable width=100%>");
   include("includes/device-header.inc");
-  echo("</table><br />");
+  echo("</table>");
 
 echo("<div class=mainpane>");
 

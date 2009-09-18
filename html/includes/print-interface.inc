@@ -5,6 +5,8 @@
   $interface['device_id'] = $device['device_id'];
   $interface['hostname'] = $device['hostname'];
 
+  $interface = ifNameDescr($interface);
+
   $if_id = $interface['interface_id'];
 
   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
@@ -17,7 +19,7 @@
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
-                " . generateiflink($interface, "$i. ".fixifName($interface['ifDescr'])) . " $error_img
+                " . generateiflink($interface, $interface['ifIndex'] . ". ".fixifName($interface['label'])) . " $error_img
 
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
@@ -85,10 +87,10 @@
 
 echo("</td>");
      echo("<td width=375 valign=top class=interface-desc>");
-     if ( strpos($interface['ifDescr'], "oopback") === false && !$graph_type) {
+     if ( strpos($interface['label'], "oopback") === false && !$graph_type) {
        $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
-#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['ifDescr'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
+#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['label'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
           $int_links[$link['interface_id']] = $link['interface_id'];
           $int_links_phys[$link['interface_id']] = 1;    
@@ -112,7 +114,7 @@ echo("</td>");
             $this_ifid = $new['interface_id'];
             $this_hostid = $new['device_id'];
             $this_hostname = $new['hostname'];
-            $this_ifname = fixifName($new['ifDescr']);
+            $this_ifname = fixifName($new['label']);
             $int_links[$this_ifid] = $this_ifid;
             $int_links_v4[$this_ifid] = 1;
           }
@@ -132,7 +134,7 @@ echo("</td>");
             $this_ifid = $new['interface_id'];
             $this_hostid = $new['device_id'];
             $this_hostname = $new['hostname'];
-            $this_ifname = fixifName($new['ifDescr']);
+            $this_ifname = fixifName($new['label']);
             $int_links[$this_ifid] = $this_ifid;
             $int_links_v6[$this_ifid] = 1;
           }
@@ -148,7 +150,7 @@ echo("</td>");
        if($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
                                         echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
 
-       echo("<b>" . generateiflink($link_if, makeshortif($link_if['ifDescr'])) . " on " . generatedevicelink($link_if, shorthost($link_if['hostname'])) );
+       echo("<b>" . generateiflink($link_if, makeshortif($link_if['label'])) . " on " . generatedevicelink($link_if, shorthost($link_if['hostname'])) );
 
        if($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
        if($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }
@@ -166,7 +168,8 @@ echo("</td>");
     $pw_peer_int = mysql_fetch_array(mysql_query("SELECT * from `interfaces` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
                                                                                                           P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
-    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['ifDescr'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
+    $pw_peer_int = ifNameDescr($pw_peer_int);
+    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
   }
 
 

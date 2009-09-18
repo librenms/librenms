@@ -19,14 +19,15 @@ while ($interface = mysql_fetch_array($interface_query)) {
    echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
    $snmp_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-   $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'];
+   $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'] . " ifName." . $interface['ifIndex'];
+   $snmp_cmd .= " ifDescr." . $interface['ifIndex'];
 
    $snmp_output = trim(shell_exec($snmp_cmd));
    $snmp_output = str_replace("No Such Object available on this agent at this OID", "", $snmp_output);
    $snmp_output = str_replace("No Such Instance currently exists at this OID", "", $snmp_output);
    $snmp_output = str_replace("\"", "", $snmp_output);
 
-   list($ifAdminStatus, $ifOperStatus, $ifAlias) = explode("\n", $snmp_output);
+   list($ifAdminStatus, $ifOperStatus, $ifAlias, $ifName, $ifDescr) = explode("\n", $snmp_output);
 
    $ifAdminStatus = translate_ifAdminStatus ($ifAdminStatus);
    $ifOperStatus = translate_ifOperStatus ($ifOperStatus);
@@ -37,7 +38,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifDescr = trim(str_replace("\"", "", $ifDescr));
    $ifDescr = trim($ifDescr);
 
-   if(!$ifDescr) { $ifDescr = $ifName; }
+#   if(!$ifDescr) { $ifDescr = $ifName; }
 
    $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd"; 
 
@@ -63,10 +64,23 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if( file_exists("includes/polling/interface-" . $device['os'] . ".php") ) { include("includes/polling/interface-" . $device['os'] . ".php"); }
 
+   if ( $interface['ifDescr'] != $ifDescr ) {
+     $update .= $seperator . "`ifDescr` = '$ifDescr'";
+     $seperator = ", ";
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifDescr -> $ifDescr')");
+   }
+
+
+   if ( $interface['ifName'] != $ifName ) {
+     $update .= $seperator . "`ifName` = '$ifName'";
+     $seperator = ", ";
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifName -> $ifName')");
+   }
+ 
    if ( $interface['ifAlias'] != $ifAlias ) {
      $update .= $seperator . "`ifAlias` = '$ifAlias'";
      $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
+     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifAlias -> $ifAlias')");
    }
    if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
      $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
