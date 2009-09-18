@@ -21,22 +21,35 @@
    $snmp_cmd  = $config['snmpget'] . " -m CISCO-IP-STAT-MIB -O Uqnv -" . $acc['snmpver'] . " -c " . $acc['community'] . " " . $acc['hostname'];
    $snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".input." . $oid;
    $snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".output." . $oid;
+   $snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".input." . $oid;
+   $snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".output." . $oid;
 
    $snmp_output = trim(shell_exec($snmp_cmd));
 
    $snmp_output = preg_replace("[a-zA-Z\ ]", "", $snmp_output);
 
-   list($in,$out) = explode("\n", $snmp_output);
+   list($in,$out,$pktin,$pktout) = explode("\n", $snmp_output);
 
    $acc_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting";
-
    if(!is_dir($acc_rrd)) { mkdir($acc_rrd); echo("Created directory : $acc_rrd\n"); }
-
    $old_rrdfile = $acc_rrd . "/" . $acc['ifIndex'] . "-" . $acc['ip'] . ".rrd";
    $rrdfile = $acc_rrd . "/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
-
    if(is_file($old_rrdfile) && !is_file($rrdfile)) { rename($old_rrdfile, $rrdfile); echo("Moved $old_rrdfile -> $rrdfile \n"); };
+   $pkts_rrdfile = $acc_rrd . "/" . $acc['ifIndex'] . "-" . $acc['mac'] . "-pkts.rrd";
 
+   if(!is_file($pkts_rrdfile)) {
+     $woo = shell_exec($config['rrdtool'] ." create $pkts_rrdfile \
+       DS:IN:COUNTER:600:0:12500000000 \
+       DS:OUT:COUNTER:600:0:12500000000 \
+       RRA:AVERAGE:0.5:1:600 \
+       RRA:AVERAGE:0.5:6:700 \
+       RRA:AVERAGE:0.5:24:775 \
+       RRA:AVERAGE:0.5:288:797 \
+       RRA:MAX:0.5:1:600 \
+       RRA:MAX:0.5:6:700 \
+       RRA:MAX:0.5:24:775 \
+       RRA:MAX:0.5:288:797");
+   }
 
    if(!is_file($rrdfile)) {
      $woo = shell_exec($config['rrdtool'] ." create $rrdfile \
@@ -55,10 +68,19 @@
    $woo = "N:".($in+0).":".($out+0);
    $ret = rrdtool_update("$rrdfile", $woo);
 
-  $rates = interface_rates ($rrdfile);
-  mysql_query("UPDATE `mac_accounting` SET bps_in = '" . $rates['in'] . "', bps_out = '" . $rates['out'] . "' WHERE ma_id= '" . $acc['ma_id'] . "'");
+  $woo = "N:".($pktin+0).":".($pktout+0);
+  $ret = rrdtool_update("$pkts_rrdfile", $woo);
 
-  echo(formatRates($rates['in']) . " in " . formatRates($rates['out']) . " out \n");
+  $rates = interface_rates ($rrdfile);
+
+  $pkt_rates = interface_rates ($pkts_rrdfile);
+
+  $pkt_rate['in'] = round($pkt_rate['in'] / 8);
+  $pkt_rate['out'] = round($pkt_rate['out'] / 8);
+
+  mysql_query("UPDATE `mac_accounting` SET bps_in = '" . $rates['in'] . "', bps_out = '" . $rates['out'] . "', pps_in = '" . $pkt_rates['in'] . "', pps_out = '" . $pkt_rates['out'] . "' WHERE ma_id= '" . $acc['ma_id'] . "'");
+
+  echo(formatRates($rates['in']) . " (" . $pkt_rates['in'] . "pps) in " . formatRates($rates['out']) . " (" . $pkt_rates['out'] . "pps) out \n");
 
   }
 ?>

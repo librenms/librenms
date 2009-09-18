@@ -30,6 +30,7 @@ RewriteRule ^vrf/(.+)/(.+)/(.+)/ ?page=vrf&id=$1&opta=$2&optb=$3
 RewriteRule ^vrf/(.+)/(.+)/ ?page=vrf&id=$1&opta=$2
 RewriteRule ^vrf/(.+)/ ?page=vrf&id=$1
 
+RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5&optd=$6
 RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4&optc=$5
 RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3&optb=$4
 RewriteRule ^device/([0-9]+)/([a-z]+)/(.+)/ ?page=device&id=$1&section=$2&opta=$3

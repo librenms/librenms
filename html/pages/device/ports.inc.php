@@ -89,16 +89,20 @@ if($_GET['optc'] == thumbs) {
         } elseif(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND bgpPeerIdentifier ='".$arp['ipv4_address']."'"),0)) {
           $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$device['device_id']."' AND bgpPeerIdentifier = '".$arp['ipv4_address']."'");
           $peer_info = mysql_fetch_array($peer_query);
-          $remote_host = "AS".$peer_info['bgpPeerRemoteAs'];
-          $remote_port = truncate($peer_info['astext'], 24);
+          $remote_port = "AS".$peer_info['bgpPeerRemoteAs'];
+          $remote_host = $peer_info['astext'];
+        } elseif($mac_acc['interface_id'] == $interface['interface_id']) {
+          $remote_host = gethostbyaddr($arp['ipv4_address']);
+          if($remote_host == $arp['ipv4_address']) { unset ($remote_host); }
+          $remote_port = "";
         } else {
           $remote_host = "";
           $remote_port = "";
         }
-         echo("<td>$remote_host</td><td>$remote_port</td>");
-
+        echo("<td>".truncate($remote_host, 24, "")."</td><td>$remote_port</td>");
         if ($mac_acc['interface_id'] == $interface['interface_id']) {
-          echo("<td>".formatRates($mac_acc['bps_out'])."</td><td>".formatRates($mac_acc['bps_in'])."</td>");
+          $style = "onmouseover=\"return overlib('<img src=\'graph.php?id=" . $mac_acc['ma_id'] . "&type=mac_acc&from=$day&to=$now&width=500&height=150\'>', LEFT".$config['overlib_defaults'].", WIDTH, 500);\" onmouseout=\"return nd();\"";
+          echo("<td><a $style>".formatRates($mac_acc['bps_out'])."</a></td><td><a $style>".formatRates($mac_acc['bps_in'])."</a></td>");
         } else {
          echo("<td></td><td></td>");
         }

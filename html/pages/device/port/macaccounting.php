@@ -1,11 +1,5 @@
 <?php
 
-echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
-<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'>Full</a> |
-<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/thumbs/'>Compact</a>
-</div> ");
-
-
  $hostname = $device['hostname'];
  $hostid   = $device['interface_id'];
  $ifname   = $interface['ifDescr'];
@@ -24,20 +18,19 @@ echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: b
  $i = 1; 
  $inf = fixifName($ifname);
 
- $bg="#ffffff";
-
  $query = mysql_query("SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC");
 
  echo("<div style='clear: both;'>");
 
  while($acc = mysql_fetch_array($query)) { 
 
+   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    $name = gethostbyaddr($addy['ipv4_address']);
 
    if($name == $addy['ipv4_address']) { unset ($name); }
 
-   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {
 
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
@@ -50,7 +43,13 @@ echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: b
    unset ($as); unset ($astext); unset($asn);
    }
 
- if($_GET['optc'] == "thumbs") {
+  if($_GET['optc']) {
+    $graph_type = "mac_acc_" . $_GET['optc'];
+  } else {
+    $graph_type = "mac_acc_bits";
+  }
+
+ if($_GET['optd'] == "thumbs") {
 
   if(!$asn) { $asn = "No Session"; }
 
@@ -58,16 +57,16 @@ echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: b
      ".$addy['ipv4_address']." - ".$asn."
          <a href='#' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>".$name." - ".$addy['ipv4_address']." - ".$asn."</div>\
-    <img src=\'graph.php?id=" . $acc['ma_id'] . "&type=mac_acc&from=-2day&to=$now&width=450&height=150\'>\
+    <img src=\'graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=450&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
-         <img src='graph.php?id=" . $acc['ma_id'] . "&type=mac_acc&from=-2day&to=$now&width=215&height=45'></a>
+         <img src='graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=215&height=45'></a>
 
          <span style='font-size: 10px;'>".$name."</span>
         </div>");
 
    } else {
 
-   echo("<div style='background-color: $bg; padding: 8px;'>");
+   echo("<div style='background-color: $row_colour; padding: 8px;'>");
 
    echo("
      <table>
@@ -82,9 +81,6 @@ echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: b
    ");
 
    $peer_info['astext'];   
-
-
-  $graph_type = "mac_acc";
 
   $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
   $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
@@ -109,7 +105,7 @@ echo("<div style='width: 100%; text-align: right; padding-bottom: 10px; clear: b
 
 
   echo("</div>");
-
+  $i++;
  }
 
 }
