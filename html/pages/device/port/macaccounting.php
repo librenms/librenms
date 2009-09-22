@@ -17,39 +17,67 @@
 
  $i = 1; 
  $inf = fixifName($ifname);
-
  $query = mysql_query("SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC");
-
  echo("<div style='clear: both;'>");
 
+
+ if($_GET['optd'] == "top10") {
+   if($_GET['opte']) {
+     $from = "-" . $_GET['opte'];
+   } else { $from = "-1day"; }
+   echo("<div style='margin: auto; width: 831px;';>
+          <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&from=$from&to=now&width=750&height=245' /> 
+          <div style='width: 200; float: left;'>
+            <span class=device-head style='line-height: 30px;'>Day</span>
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1day/'>
+              <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&from=-1day&to=now&width=150&height=50' />
+            </a> 
+          </div>
+          <div style='width: 200; float: left;'>
+            <span class=device-head style='line-height: 30px;'>Week</span>
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1week/'>
+             <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&from=-1week&to=now&width=150&height=50' /> 
+             </a>
+          </div>
+          <div style='width: 200; float: left;'>
+            <span class=device-head style='line-height: 30px;'>Month</span>
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1month/'>
+             <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&from=-1month&to=now&width=150&height=50' /> 
+             </a>
+          </div>
+          <div style='width: 200; float: left;'>
+            <span class=device-head style='line-height: 30px;'>Year</span>
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1year/'>
+             <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&from=-1year&to=now&width=150&height=50' /> 
+             </a>
+          </div>
+        </div>
+ 
+");
+   unset($query);
+ }
+
+
  while($acc = mysql_fetch_array($query)) { 
-
    if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    $name = gethostbyaddr($addy['ipv4_address']);
-
    if($name == $addy['ipv4_address']) { unset ($name); }
-
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {
-
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
      $peer_info = mysql_fetch_array($peer_query);
-
    } else { unset ($peer_info); }  
-
-
    if($peer_info) { $asn = "AS".$peer_info['bgpPeerRemoteAs']; $astext = $peer_info['astext']; } else {
    unset ($as); unset ($astext); unset($asn);
    }
 
-  if($_GET['optc']) {
-    $graph_type = "mac_acc_" . $_GET['optc'];
-  } else {
-    $graph_type = "mac_acc_bits";
-  }
+   if($_GET['optc']) {
+     $graph_type = "mac_acc_" . $_GET['optc'];
+   } else {
+     $graph_type = "mac_acc_bits";
+   }
 
- if($_GET['optd'] == "thumbs") {
+  if($_GET['optd'] == "thumbs") {
 
   if(!$asn) { $asn = "No Session"; }
 
@@ -82,27 +110,23 @@
 
    $peer_info['astext'];   
 
-  $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
-  $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
+   $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
+   $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
+   $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100";
+   $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
+   $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100";
+   $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
+   $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100";
+   $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
 
-  $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100";
-  $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
-
-  $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100";
-  $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
-
-  $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100";
-  $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
-
-  echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
+   echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$daily_traffic' border=0></a> ");
-  echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
+   echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$weekly_traffic' border=0></a> ");
-  echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
+   echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
         <img src='$monthly_traffic' border=0></a> ");
-  echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
+   echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
         <img src='$yearly_traffic' border=0></a>");
-
 
   echo("</div>");
   $i++;
