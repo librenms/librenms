@@ -34,7 +34,6 @@ echo("
 
 if($_GET['opta'] == graphs ) {
   if($_GET['optb']) { $graph_type = $_GET['optb']; } else { $graph_type = "bits"; }
-  $dographs = 1;
 }
 
 if($_GET['optc'] == thumbs) {
