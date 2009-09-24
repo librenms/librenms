@@ -5,14 +5,28 @@ $config['ifdescr']['IOS'] = true;
 $config['ifdescr']['IOS XE'] = true;
 $config['ifname']['ASA'] = true;
 
-
-
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
 $config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
 $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
+
+if(!$config['graph_colours']['greens']) {
+  $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
+}
+if(!$config['graph_colours']['pinks']) {
+  $config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38','5C1F1E','401F10');
+}
+if(!$config['graph_colours']['blues']) {
+  $config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');
+}
+if(!$config['graph_colours']['purples']) {
+  $config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
+}
+if(!$config['graph_colours']['default']) {
+  $config['graph_colours']['default'] = $config['graph_colours']['blues'];
+}
 
 ##############################
 # No changes below this line #
