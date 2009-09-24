@@ -80,7 +80,7 @@ echo("</div>
 
 if($_GET['optb']) {
 
-include("pages/device/port/".mres($_GET['optb']).".php");
+include("pages/device/port/".mres($_GET['optb']).".inc.php");
 
 } else {
 

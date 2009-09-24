@@ -1,8 +1,7 @@
 <?php
 
-function graph_mac_acc_total ($interface, $graph, $from, $to, $width, $height, $title, $vertical) {
+function graph_mac_acc_total ($interface, $stat, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;
-  list($interface, $type) = explode("-", $interface);
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -13,14 +12,16 @@ function graph_mac_acc_total ($interface, $graph, $from, $to, $width, $height, $
   $query = mysql_query($sql);
   if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $pluses = ""; $iter = '0';
-  $options .= " COMMENT:'                                             In                    Out\\\\n'";
+  $options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
   while($acc = mysql_fetch_array($query)) {
-   if($type == "pkts") {
+   if($stat == "pkts") {
      $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . "-pkts.rrd";
-     $units='pps';
-   } else {
+     $units='pps'; $unit = 'p'; $multiplier = '1';
+     $colours = 'purples';
+   } elseif ($stat == "bits") {
      $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
-     $units='bps';
+     $units='bps'; $unit='B'; $multiplier='8';
+     $colours='greens';
    }
    if(is_file($this_rrd)) {
 
@@ -28,17 +29,17 @@ function graph_mac_acc_total ($interface, $graph, $from, $to, $width, $height, $
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    if($addy) {
      $name = @gethostbyaddr($addy['ipv4_address']);
-   }
+   } 
 
     $this_id = str_replace(".", "", $acc['mac']);
-    if(!$config['graph_colours'][$iter]) { $iter = 0; }
-    $colour=$config['graph_colours'][$iter];
+    if(!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
+    $colour=$config['graph_colours'][$colours][$iter];
     $descr = str_pad($name, 36);
     $descr = substr($descr,0,36);
     $options .= " DEF:in".$this_id."=$this_rrd:IN:AVERAGE ";
     $options .= " DEF:out".$this_id."temp=$this_rrd:OUT:AVERAGE ";
-    $options .= " CDEF:inB".$this_id."=in".$this_id.",8,* ";
-    $options .= " CDEF:outB".$this_id."temp=out".$this_id."temp,8,*";
+    $options .= " CDEF:inB".$this_id."=in".$this_id.",$multiplier,* ";
+    $options .= " CDEF:outB".$this_id."temp=out".$this_id."temp,$multiplier,*";
     $options .= " CDEF:outB".$this_id."=outB".$this_id."temp,-1,*";
     $options .= " CDEF:octets".$this_id."=inB".$this_id.",outB".$this_id."temp,+";
     $options .= " VDEF:totin".$this_id."=inB".$this_id.",TOTAL";
@@ -48,9 +49,12 @@ function graph_mac_acc_total ($interface, $graph, $from, $to, $width, $height, $
     if($optionsb) {$stack="STACK";}
     $optionsb .= " AREA:outB".$this_id."#" . $colour . "::$stack";
     $options .= " GPRINT:inB".$this_id.":LAST:%6.2lf%s$units";
-    $options .= " GPRINT:totin".$this_id.":\(%6.2lf%sB\)";
+    $options .= " GPRINT:inB".$this_id.":MAX:%6.2lf%s$units";
+    $options .= " GPRINT:totin".$this_id.":%6.2lf%s$unit";
+    $options .= " COMMENT:'    '";
     $options .= " GPRINT:outB".$this_id."temp:LAST:%6.2lf%s$units";
-    $options .= " GPRINT:totout".$this_id.":\(%6.2lf%sB\)\\\\n";
+    $options .= " GPRINT:outB".$this_id."temp:MAX:%6.2lf%s$units";
+    $options .= " GPRINT:totout".$this_id.":%6.2lf%s$unit\\\\n";
     $iter++;
    }
   }
@@ -60,6 +64,8 @@ function graph_mac_acc_total ($interface, $graph, $from, $to, $width, $height, $
 }
 
 $port = $_GET['if'];
-$graph = graph_mac_acc_total ($port, $graphfile, $from, $to, $width, $height, $title, $vertical);
+$stat = $_GET['stat'];
+
+$graph = graph_mac_acc_total ($port, $stat, $graphfile, $from, $to, $width, $height, $title, $vertical);
 
 ?>

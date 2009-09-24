@@ -15,11 +15,15 @@
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
   } else { $error_img = ""; }
 
+   if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
+    $mac = "<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
+  } else { $mac = ""; }
+
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
-                " . generateiflink($interface, $interface['ifIndex'] . ". ".fixifName($interface['label'])) . " $error_img
+                " . generateiflink($interface, $interface['ifIndex'] . ". ".fixifName($interface['label'])) . " $error_img $mac
 
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
@@ -43,8 +47,10 @@
 
   echo("</td><td width=100>");
 
-  if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
-    echo("<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> Mac Acc</a>");
+  if($port_details) {
+    echo(generateiflink($interface, "<img src='graph.php?type=bits&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    echo(generateiflink($interface, "<img src='graph.php?type=pkts&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    echo(generateiflink($interface, "<img src='graph.php?type=errors&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
   }
 
   echo("</td><td width=120>");
