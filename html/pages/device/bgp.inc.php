@@ -1,20 +1,37 @@
 <?php
 
+echo("
+<div style='padding: 10px; height: 20px; clear: both; display: block;'>
+  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : " . $device['bgpLocalAs'] . "</div>
+</div>");
 
 echo("
-<div style='padding: 5px; height: 20px; clear: both; display: block;'>
-  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : " . $device['bgpLocalAs'] . "</div>
-  <div style='float: right; text-align: right;'>
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> | 
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/bgp_updates/'>Updates</a> | Prefixes: 
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv4.unicast/'>IPv4</a> | 
+<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
+  <b class='rounded'>
+  <b class='rounded1'><b></b></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded3'></b>
+  <b class='rounded4'></b>
+  <b class='rounded5'></b></b>
+  <div class='roundedfg' style='padding: 0px 5px;'>
+  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> |
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/bgp_updates/'>Updates</a> | Prefixes:
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv4.unicast/'>IPv4</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv4.vpn/'>VPNv4</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv6.unicast/'>IPv6</a>
   | Traffic:
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/macaccounting/'>Mac Accounting</a>
- </div>
-</div>");
-
+</div>
+</div>
+  <b class='rounded'>
+  <b class='rounded5'></b>
+  <b class='rounded4'></b>
+  <b class='rounded3'></b>
+  <b class='rounded2'><b></b></b>
+  <b class='rounded1'><b></b></b></b>
+</div>
+");
 
    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 

@@ -65,7 +65,7 @@
       $sensor_data = shell_exec($sensor_cmd);
       list($entSensorType,$entSensorScale,$entSensorPrecision,$entSensorValueUpdateRate,$entSensorMeasuredEntity) = explode("\n", $sensor_data);
       if($entSensorMeasuredEntity) {
-        echo("M:$entSensorMeasuredEntity");
+        #echo("M:$entSensorMeasuredEntity");
       }
       if($config['allow_entity_sensor'][$entSensorType]) {
         $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";

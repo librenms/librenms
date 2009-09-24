@@ -580,6 +580,8 @@ function graph_bits ($rrd, $graph, $from, $to, $width, $height, $title, $vertica
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  global $_GET;
+  if($_GET['bg']) { $options .= " -c CANVAS#" . $_GET['bg'] . " "; }
   if($inverse) {
     $in = 'out';
     $out = 'in';
@@ -655,6 +657,8 @@ function pktsgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  global $_GET;
+  if($_GET['bg']) { $options .= " -c CANVAS#" . $_GET['bg'] . " "; }
   $options .= " DEF:in=$database:INUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTUCASTPKTS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -710,6 +714,8 @@ function errorgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  global $_GET;
+  if($_GET['bg']) { $options .= " -c CANVAS#" . $_GET['bg'] . " "; }
   $options .= " DEF:in=$database:INERRORS:AVERAGE";
   $options .= " DEF:out=$database:OUTERRORS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
@@ -736,6 +742,8 @@ function nucastgraph ($rrd, $graph, $from, $to, $width, $height) {
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; unset ($legend); }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  global $_GET;
+  if($_GET['bg']) { $options .= " -c CANVAS#" . $_GET['bg'] . " "; }
   $options .= " DEF:in=$database:INNUCASTPKTS:AVERAGE";
   $options .= " DEF:out=$database:OUTNUCASTPKTS:AVERAGE";
   $options .= " CDEF:dout=out,-1,*";
