@@ -68,9 +68,10 @@ while ($device = mysql_fetch_array($device_query)) {
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
       $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-      $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1";
-      $snmp_cmdb .= " | grep -v 'Cisco Internetwork Operating System Software'";
-      $ciscomodel = str_replace("\"", "", trim(`$snmp_cmdb`));
+      $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1 .1.3.6.1.2.1.47.1.1.1.1.4.1 .1.3.6.1.2.1.47.1.1.1.1.13.1001 .1.3.6.1.2.1.47.1.1.1.1.4.1001";
+      list($a,$b,$c,$d) = explode("\n", shell_exec($snmp_cmdb));
+      if($b == "0") { $ciscomodel = $a; }
+      if($d == "0") { $ciscomodel = $c; }
     } else { unset($ciscomodel); }
 
     $snmpdata = shell_exec($snmp_cmd);
