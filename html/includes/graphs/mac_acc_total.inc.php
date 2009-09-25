@@ -1,36 +1,34 @@
 <?php
 
-function graph_mac_acc_total ($interface, $stat, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
-  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
-  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
+function graph_mac_acc_total ($args) {
+  global $config;
+  if($args['height'] < "99") { $options .= " --only-graph "; }
+  if($args['sort'] == "in" || $args['sort'] == "out") { $sort = "bps_" . $args['sort']; } else { $sort = "bps"; }
+  $imgfile = $config['install_dir'] . "/graphs/" . $args['graphfile'];
+  $options .= " --alt-autoscale-max -E --start ".$args['from']." --end " . ($args['to'] - 150) . " --width ".$args['width']." --height ".$args['height']." ";
   $options .= $config['rrdgraph_def_text'];
-  if($height < "99") { $options .= " --only-graph "; }
-  $hostname = gethostbyid($device);
-  $sql = "SELECT *, (bps_in + bps_out) AS bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '$interface'
-          AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC LIMIT 0,10";
+  $sql = "SELECT *, (bps_in + bps_out) AS bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$args['port']."'
+          AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY $sort DESC LIMIT 0,10";
   $query = mysql_query($sql);
-  if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  if($args['width'] <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $pluses = ""; $iter = '0';
   $options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
   while($acc = mysql_fetch_array($query)) {
-   if($stat == "pkts") {
+   if($args['stat'] == "pkts") {
      $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . "-pkts.rrd";
      $units='pps'; $unit = 'p'; $multiplier = '1';
      $colours = 'purples';
-   } elseif ($stat == "bits") {
+   } elseif ($args['stat'] == "bits") {
      $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
      $units='bps'; $unit='B'; $multiplier='8';
      $colours='greens';
    }
    if(is_file($this_rrd)) {
-
    $name = $acc['mac'];
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    if($addy) {
      $name = @gethostbyaddr($addy['ipv4_address']);
    } 
-
     $this_id = str_replace(".", "", $acc['mac']);
     if(!$config['graph_colours'][$colours][$iter]) { $iter = 0; }
     $colour=$config['graph_colours'][$colours][$iter];
@@ -63,9 +61,15 @@ function graph_mac_acc_total ($interface, $stat, $graph, $from, $to, $width, $he
   return $imgfile;
 }
 
-$port = $_GET['if'];
-$stat = $_GET['stat'];
+$args['port']      = $_GET['port'];
+$args['stat']      = $_GET['stat'];
+$args['sort']      = $_GET['sort'];
+$args['graphfile'] = $graphfile;
+$args['from']      = $from;
+$args['to']        = $to;
+$args['width']     = $width;
+$args['height']    = $height;
 
-$graph = graph_mac_acc_total ($port, $stat, $graphfile, $from, $to, $width, $height, $title, $vertical);
+$graph = graph_mac_acc_total ($args);
 
 ?>
