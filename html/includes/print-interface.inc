@@ -48,8 +48,11 @@
   echo("</td><td width=100>");
 
   if($port_details) {
+    $interface['graph_type'] = "bits";
     echo(generateiflink($interface, "<img src='graph.php?type=bits&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    $interface['graph_type'] = "pkts";
     echo(generateiflink($interface, "<img src='graph.php?type=pkts&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    $interface['graph_type'] = "errors";
     echo(generateiflink($interface, "<img src='graph.php?type=errors&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
   }
 

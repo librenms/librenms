@@ -68,10 +68,6 @@ if($_GET['debug']) {
   case 'netscreen_memory':
     $graph = graph_netscreen_memory ($hostname . "/netscreen-memory.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
-  case 'multi_bits':
-    if($_GET['if']) { $_GET['interfaces'] = $_GET['if']; }
-    $graph = graph_multi_bits ($_GET['interfaces'], $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
-    break;
   case 'multi_bits_duo':
     $groups = array($_GET['interfaces'], $_GET['interfaces_b']);
     $graph = graph_multi_bits_duo ($groups, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
@@ -103,9 +99,6 @@ if($_GET['debug']) {
   case 'mac_acc_bits':
     $graph = graph_mac_acc ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
-  case 'device_bits':
-    $graph = graph_device_bits ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
-    break;  
   case 'bits':
     $graph = graph_bits ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;

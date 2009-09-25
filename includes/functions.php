@@ -277,15 +277,16 @@ function geteventicon ($message)
   if($icon) { return $icon; } else { return false; }
 }
 
-function generateiflink($interface, $text=0,$type=bits) 
+function generateiflink($interface, $text=0,$type) 
 {
   global $twoday; global $now; global $config; global $day; global $month;
   $interface = ifNameDescr($interface);
   if(!$text) { $text = fixIfName($interface['label']); }
-  if(!$type) { $type = 'bits'; }
+  if($type) { $interface['graph_type'] = $type; }
+  if(!$interface['graph_type']) { $interface['graph_type'] = 'bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=100&type=" . $type;
-  $graph_url_month = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$month&to=$now&width=400&height=100&type=" . $type;
+  $graph_url = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=100&type=" . $interface['graph_type'];
+  $graph_url_month = $config['base_url'] . "/graph.php?if=" . $interface['interface_id'] . "&from=$month&to=$now&width=400&height=100&type=" . $interface['graph_type'];
   $device_id = getifhost($interface['interface_id']);
   $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
@@ -448,20 +449,14 @@ function scanUDP ($host, $port, $timeout)
   } 
   socket_set_timeout ($handle, $timeout); 
   $write = fwrite($handle,"\x00"); 
-  if (!$write) { 
-    next; 
-  } 
+  if (!$write) { next; } 
   $startTime = time(); 
   $header = fread($handle, 1); 
   $endTime = time(); 
   $timeDiff = $endTime - $startTime;  
   if ($timeDiff >= $timeout) { 
-    fclose($handle); 
-    return 1; 
-  } else { 
-    fclose($handle); 
-    return 0; 
-  } 
+    fclose($handle); return 1; 
+  } else { fclose($handle); return 0; } 
 }
 
 function humanmedia($media) 
