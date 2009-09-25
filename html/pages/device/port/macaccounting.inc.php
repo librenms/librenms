@@ -32,42 +32,42 @@
             <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Day</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1day/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&stat=$stat&type=mac_acc_total&from=-1day&to=now&width=150&height=50' />
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=$stat&type=mac_acc_total&from=-1day&to=now&width=150&height=50' />
             </a> 
             </div>
             <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Week</span><br />
              <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1week/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1week&to=now&width=150&height=50' /> 
+             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1week&to=now&width=150&height=50' /> 
              </a>
              </div>
              <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
              <span class=device-head>Month</span><br />
              <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1month/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1month&to=now&width=150&height=50' /> 
+             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1month&to=now&width=150&height=50' /> 
              </a>
              </div>
              <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
              <span class=device-head>Year</span><br />
              <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1year/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1year&to=now&width=150&height=50' /> 
+             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1year&to=now&width=150&height=50' /> 
              </a>
              </div>
         </div>
         <div style='float: left;'>
-          <img src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=$from&to=now&width=750&height=245' />
+          <img src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=$from&to=now&width=750&height=245' />
         </div>
         <div style=' margin:0px; float: left;';>
              <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Traffic</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1day/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&stat=bits&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=bits&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
             <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Packets</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/1day/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?if=".$interface['interface_id']."&stat=pkts&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=pkts&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
         </div>
