@@ -72,10 +72,11 @@ while ($device = mysql_fetch_array($device_query)) {
       list($a,$b,$c,$d) = explode("\n", shell_exec($snmp_cmdb));
       if($b == "0") { $ciscomodel = $a; }
       if($d == "0") { $ciscomodel = $c; }
+      $ciscomodel = str_replace("\"","",$ciscomodel);
     } else { unset($ciscomodel); }
 
     $snmpdata = shell_exec($snmp_cmd);
-#    $snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
+    #$snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
     list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
