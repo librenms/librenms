@@ -1,16 +1,15 @@
 <?php
 
 function graph_mac_acc_total ($args) {
-  global $config;
-  if($args['height'] < "99") { $options .= " --only-graph "; }
+
+  include("common.inc.php");
+
   if($args['sort'] == "in" || $args['sort'] == "out") { $sort = "bps_" . $args['sort']; } else { $sort = "bps"; }
-  $imgfile = $config['install_dir'] . "/graphs/" . $args['graphfile'];
-  $options .= " --alt-autoscale-max -E --start ".$args['from']." --end " . ($args['to'] - 150) . " --width ".$args['width']." --height ".$args['height']." ";
-  $options .= $config['rrdgraph_def_text'];
+
   $sql = "SELECT *, (bps_in + bps_out) AS bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$args['port']."'
-          AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY $sort DESC LIMIT 0,10";
+          AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY $sort DESC LIMIT 0," . $args['topn'];
   $query = mysql_query($sql);
-  if($args['width'] <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
+  if($args['width'] <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
   $pluses = ""; $iter = '0';
   $options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
   while($acc = mysql_fetch_array($query)) {
@@ -57,8 +56,9 @@ function graph_mac_acc_total ($args) {
    }
   }
   $options .= $optionsb;
-  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+#  echo($config['rrdtool'] . " graph $graphfile $options");
+  $thing = shell_exec($config['rrdtool'] . " graph $graphfile $options");
+  return $graphfile;
 }
 
 $args['port']      = $_GET['port'];
@@ -69,6 +69,7 @@ $args['from']      = $from;
 $args['to']        = $to;
 $args['width']     = $width;
 $args['height']    = $height;
+if(is_numeric($_GET['topn'])) { $args['topn'] = $_GET['topn']; } else { $args['topn'] = '10'; }
 
 $graph = graph_mac_acc_total ($args);
 

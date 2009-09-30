@@ -19,10 +19,15 @@
    $oid .= ".".hexdec(substr($mac, 10, 2));
 
    $snmp_cmd  = $config['snmpget'] . " -m CISCO-IP-STAT-MIB -O Uqnv -" . $acc['snmpver'] . " -c " . $acc['community'] . " " . $acc['hostname'];
-   $snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".input." . $oid;
-   $snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".output." . $oid;
-   $snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".input." . $oid;
-   $snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".output." . $oid;
+   #$snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".input." . $oid;
+   #$snmp_cmd .= " cipMacSwitchedBytes.". $acc['ifIndex'] .".output." . $oid;
+   #$snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".input." . $oid;
+   #$snmp_cmd .= " cipMacSwitchedPkts.". $acc['ifIndex'] .".output." . $oid;
+   $snmp_cmd .= " cipMacHCSwitchedBytes.". $acc['ifIndex'] .".input." . $oid;
+   $snmp_cmd .= " cipMacHCSwitchedBytes.". $acc['ifIndex'] .".output." . $oid;
+   $snmp_cmd .= " cipMacHCSwitchedPkts.". $acc['ifIndex'] .".input." . $oid;
+   $snmp_cmd .= " cipMacHCSwitchedPkts.". $acc['ifIndex'] .".output." . $oid;
+
 
    $snmp_output = trim(shell_exec($snmp_cmd));
 

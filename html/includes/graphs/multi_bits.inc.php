@@ -1,13 +1,11 @@
 <?php
 
-function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
-  global $config, $installdir;
-  $imgfile = $config['install_dir'] . "/graphs/" . "$graph";
-  $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
-  $options .= $config['rrdgraph_def_text'];
-  if($height < "99") { $options .= " --only-graph"; }
+function graph_multi_bits ($args) {
+
+  include("common.inc.php");
+
   $i = 1;
-  foreach(explode(",", $interfaces) as $ifid) {
+  foreach(explode(",", $args['interfaces']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
@@ -28,7 +26,7 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $ti
   $options .= " CDEF:inbits=inoctets,8,*";
   $options .= " CDEF:outbits=outoctets,8,*";
   $options .= " CDEF:doutbits=doutoctets,8,*";
-  if($legend == "no") {
+  if($args['legend'] == '0') {
    $options .= " AREA:inbits#CDEB8B:";
    $options .= " LINE1.25:inbits#006600:";
    $options .= " AREA:doutbits#C3D9FF:";
@@ -44,16 +42,22 @@ function graph_multi_bits ($interfaces, $graph, $from, $to, $width, $height, $ti
    $options .= " LINE1.25:doutbits#000099:Out";
    $options .= " GPRINT:outbits:LAST:%6.2lf%s";
    $options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
-   $options .= " GPRINT:outbits:MAX:%6.2lf%s";
+   $options .= " GPRINT:outbits:MAX:%6.2lf%s\\\l";
   }
-  if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
-  $thing = shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  $thing = shell_exec($config['rrdtool'] . " graph $graphfile $options");
+  return $graphfile;
 }
 
 if($_GET['if']) { $interfaces = $_GET['if']; }
 if($_GET['interfaces']) { $interfaces = $_GET['interfaces']; }
 
-$graph = graph_multi_bits ($interfaces, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
+$args['interfaces'] = $interfaces;
+$args['graphfile'] = $graphfile;
+$args['from']      = $from;
+$args['to']        = $to;
+$args['width']     = $width;
+$args['height']    = $height;
+
+$graph = graph_multi_bits ($args);
 
 ?>
