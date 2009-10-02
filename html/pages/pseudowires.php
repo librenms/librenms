@@ -1,6 +1,16 @@
 <?php
 
-echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
+print_optionbar_start();
+
+echo("<a href='".$config['base_url']."/pseudowires/'>Details</a> | Graphs : 
+<a href='".$config['base_url']."/pseudowires/graphs/mini/'>Mini</a>
+");
+
+print_optionbar_end();
+
+ list($opta, $optb, $optc, $optd, $opte) = explode("/", $_GET['opta']);
+
+echo("<table cellpadding=5 cellspacing=0 class=devicetable width=100%>");
 
 $sql = "SELECT * FROM pseudowires AS P, interfaces AS I, devices AS D WHERE P.interface_id = I.interface_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr";
 $query = mysql_query($sql);
@@ -25,14 +35,49 @@ while($pw_a = mysql_fetch_array($query)) {
   if($skip) {
     unset($skip);
   } else {
-    if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
 
-    echo("<tr style=\"background-color: $bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID']."</td><td>".generatedevicelink($pw_a)."</td><td>".generateiflink($pw_a)."</td>
-                                                                                          <td rowspan=2> => </td>
+    if($bg == "ffffff") { $bg = "e5e5e5"; } else { $bg="ffffff"; }
+    echo("<tr style=\"background-color: #$bg;\"><td rowspan=2 style='font-size:18px; padding:4px;'>".$pw_a['cpwVcID']."</td><td>".generatedevicelink($pw_a)."</td><td>".generateiflink($pw_a)."</td>
+                                                                                          <td rowspan=2> <img src='".$config['base_url']."/images/16/arrow_right.png'> </td>
                                                                                           <td>".generatedevicelink($pw_b)."</td><td>".generateiflink($pw_b)."</td></tr>");
-    echo("<tr style=\"background-color: $bg;\"><td colspan=2>".$pw_a['ifAlias']."</td><td colspan=2>".$pw_b['ifAlias']."</td></tr>");
+    echo("<tr style=\"background-color: #$bg;\"><td colspan=2>".$pw_a['ifAlias']."</td><td colspan=2>".$pw_b['ifAlias']."</td></tr>");
+    if($opta == "graphs") {
+      echo("<tr style=\"background-color: #$bg;\"><td></td><td colspan=2>");
+      if(!$optb) { $optb = "mini"; }
+     if($pw_a) {
+        $pw_a['width'] = "150";
+        $pw_a['height'] = "30";
+        $pw_a['from'] = $day;
+        $pw_a['to'] = $now;
+        $pw_a['bg'] = $bg;
+        $types = array('bits','pkts','errors');
+        foreach($types as $graph_type) {
+          $pw_a['graph_type'] = $graph_type;
+          generate_port_thumbnail($pw_a);
+        }
+      }
+      echo("</td><td></td><td colspan=2>");
+
+      if($pw_b) {
+        $pw_b['width'] = "150";
+        $pw_b['height'] = "30";
+        $pw_b['from'] = $day;
+        $pw_b['to'] = $now;
+        $pw_b['bg'] = $bg;
+        $types = array('bits','pkts','errors');
+        foreach($types as $graph_type) {
+          $pw_b['graph_type'] = $graph_type;
+          generate_port_thumbnail($pw_b);
+        }
+      }
+
+      echo("</td></tr>");
+  
+    }
+
     $linkdone[] = $pw_b['device_id'] . $pw_b['interface_id'];
   }
+
 }
 
 echo("</table>");

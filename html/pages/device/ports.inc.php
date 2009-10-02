@@ -1,16 +1,8 @@
 <?php
-echo("
-<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'><b></b></b>
-  <b class='rounded2'><b></b></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
+print_optionbar_start();
+
+echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> 
@@ -20,17 +12,9 @@ echo("
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a>
 (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/thumbs/'>Mini</a>) |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/thumbs/'>Mini</a>)</a>
-</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'><b></b></b>
-  <b class='rounded1'><b></b></b></b>
-</div>
-");
+(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/thumbs/'>Mini</a>)</a>");
+
+print_optionbar_end();
 
 if($_GET['opta'] == graphs ) {
   if($_GET['optb']) { $graph_type = $_GET['optb']; } else { $graph_type = "bits"; }
