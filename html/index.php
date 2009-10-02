@@ -3,7 +3,7 @@
   ini_set('display_errors', 0);
 
 
-if($_GET[debug]) {
+if($debug) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
   ini_set('log_errors', 1);
@@ -12,6 +12,7 @@ if($_GET[debug]) {
 
   include("../config.php"); 
   include("../includes/functions.php");  
+  include("includes/functions.inc.php");
   include("includes/authenticate.inc");
   $start = utime();
 
