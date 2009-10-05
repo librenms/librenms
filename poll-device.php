@@ -124,6 +124,10 @@ while ($device = mysql_fetch_array($device_query)) {
       include("includes/polling/device-ios.inc.php");
       break;
 
+    case "CatOS":
+      include("includes/polling/device-catos.inc.php");
+      break;
+
     case "ProCurve":
       $sysDescr = str_replace(", ", ",", $sysDescr);
       list($hardware, $features, $version) = explode(",", $sysDescr);
@@ -133,12 +137,15 @@ while ($device = mysql_fetch_array($device_query)) {
       }
       include("includes/polling/device-procurve.inc.php");
       break;
+
     case "BCM96348":
       include("includes/polling/adslline.inc.php");
     break;
+
     case "Snom":
       include("includes/polling/device-snom.inc.php");
       break;
+
     default:
       pollDevice();
     }   

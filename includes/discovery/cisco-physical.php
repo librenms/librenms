@@ -72,7 +72,7 @@
         $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
         $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       } else {
-        echo("!$entSensorType");
+        echo("!");
         $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
         $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       }

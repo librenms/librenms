@@ -38,7 +38,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifDescr = trim(str_replace("\"", "", $ifDescr));
    $ifDescr = trim($ifDescr);
 
-#   if(!$ifDescr) { $ifDescr = $ifName; }
+   if($config[ifname][$device[os]]) { $ifDescr = $ifName; }
 
    $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd"; 
 
@@ -64,20 +64,19 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if( file_exists("includes/polling/interface-" . $device['os'] . ".php") ) { include("includes/polling/interface-" . $device['os'] . ".php"); }
 
-   if ( $interface['ifDescr'] != $ifDescr ) {
+   if ( $interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
      $update .= $seperator . "`ifDescr` = '$ifDescr'";
      $seperator = ", ";
      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifDescr -> $ifDescr')");
    }
 
-
-   if ( $interface['ifName'] != $ifName ) {
+   if ( $interface['ifName'] != $ifName && $ifName != "" ) {
      $update .= $seperator . "`ifName` = '$ifName'";
      $seperator = ", ";
      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifName -> $ifName')");
    }
  
-   if ( $interface['ifAlias'] != $ifAlias ) {
+   if ( $interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
      $update .= $seperator . "`ifAlias` = '$ifAlias'";
      $seperator = ", ";
      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifAlias -> $ifAlias')");
@@ -98,7 +97,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $update_query  = "UPDATE `interfaces` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-#     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
+     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");

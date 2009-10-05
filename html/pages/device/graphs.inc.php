@@ -168,6 +168,10 @@ while($device = mysql_fetch_array($device_query)) {
         echo("<br />");
       }
       break;
+
+   case "CatOS":
+      break;
+
    case "IOS":
    case "IOS XE":
       break;
