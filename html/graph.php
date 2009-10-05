@@ -148,7 +148,8 @@ if($_GET['debug']) {
       $graph = cpugraphUnix ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS" || $os == "IOS XE") {
       $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);     
-      #$graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    } elseif($os == "CatOS") {
+      $graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
       $graph = cpugraphwin ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "ProCurve") {
@@ -183,7 +184,8 @@ if($_GET['debug']) {
       $graph = memgraphUnix ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "IOS" || $os == "IOS XE") {
       $graph = graph_device_cempMemPool ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
-      #$graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
+    } elseif($os == "CatOS") {
+      $graph = memgraph ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
     } elseif($os == "Windows") {
     } elseif($os == "ProCurve") {
       $graph = memgraphHP ($hostname . "/mem.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);

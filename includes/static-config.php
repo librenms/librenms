@@ -4,6 +4,8 @@
 $config['ifdescr']['IOS'] = true;
 $config['ifdescr']['IOS XE'] = true;
 $config['ifname']['ASA'] = true;
+$config['ifname']['CatOS'] = true;
+
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";

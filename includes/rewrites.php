@@ -7,7 +7,8 @@ function formatMac($mac) {
 
 
 function ifNameDescr ($interface, $device) {
-  echo($device['os']);
+#  echo($device['os']);
+
   if(!$config['ifname'][$device['os']]) {
     $interface['label'] = $interface['ifDescr'];
   } else {

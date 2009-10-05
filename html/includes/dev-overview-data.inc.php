@@ -12,11 +12,13 @@
 
   
 
+    if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
+
     echo("$ddev_img
       <table width=100%>
         <tr>
           <td class=list-bold>Operating System</td>
-          <td>" . $device['os'] . " " . $device['version'] . " ( " . $device['features'] . " )</td>
+          <td>" . $device['os'] . " " . $device['version'] . " " . $device['features'] . " </td>
         </tr>");
 	
     if($device['hardware']) {echo("<tr>

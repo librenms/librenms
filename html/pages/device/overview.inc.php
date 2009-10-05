@@ -199,7 +199,7 @@ echo("
 
   echo("<div style='margin: 8px; font-size: 11px; font-weight: bold;'>");
 
-  $sql = "SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "'";
+  $sql = "SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "' AND deleted != '1'";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
     $data = ifNameDescr($data);

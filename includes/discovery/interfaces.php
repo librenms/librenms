@@ -30,15 +30,12 @@
     if(!strstr($entry, "irtual")) {
       $if = trim(strtolower($ifDescr));
       $nullintf = 0;
-      foreach($config['bad_if'] as $bi) {
-      if (strstr($if, $bi)) {
-          $nullintf = 1;
-        }
-      }
+      foreach($config['bad_if'] as $bi) { if (strstr($if, $bi)) { $nullintf = 1; } }
+      if($device['os'] == "CatOS" && strstr($if, "vlan") ) { $nullintf = 1; } 
       $ifDescr = fixifName($ifDescr);
-      if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
+      if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
       if(!$config['allow_ng']) {
-       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = '1'; }
+       if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = 1; }
       }
       if ($nullintf == 0) {
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
@@ -46,8 +43,8 @@
           # Add Interface
            echo("+");
         } else {
-          mysql_query("UPDATE `interfaces` SET `deleted` = '0', `ifDescr` = '$ifDescr' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
-          if(mysql_affected_rows()) { 
+          if($interface['deleted']) {
+            mysql_query("UPDATE `interfaces` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
             echo("*"); 
           } else {
             echo(".");
