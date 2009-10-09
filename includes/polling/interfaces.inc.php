@@ -1,5 +1,18 @@
 <?php
 
+if($device['os'] == "CatOS" || $device['os'] == "IOS") { 
+  $portifIndex = array();
+  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
+  echo("$cmd");
+  $portifIndex_output = trim(shell_exec($cmd));
+  foreach(explode("\n", $portifIndex_output) as $entry){
+    $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
+    list($slotport, $ifIndex) = explode(" ", $entry);
+    $portifIndex[$ifIndex] = $slotport;
+  }
+#  print_r($portifIndex);
+}
+
 $interface_query = mysql_query("SELECT * FROM `interfaces` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
@@ -37,6 +50,14 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifAlias = trim($ifAlias);
    $ifDescr = trim(str_replace("\"", "", $ifDescr));
    $ifDescr = trim($ifDescr);
+
+   $ifIndex = $interface['ifIndex'];
+   if($portifIndex[$ifIndex]) { 
+     if($device['os'] == "CatOS") {
+       $cmd = $config['snmpget'] . " -m CISCO-STACK-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName." . $portifIndex[$ifIndex];
+       $ifAlias = trim(shell_exec($cmd));
+     }
+   }
 
    if($config[ifname][$device[os]]) { $ifDescr = $ifName; }
 
@@ -97,7 +118,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $update_query  = "UPDATE `interfaces` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
+#     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");
@@ -134,6 +155,8 @@ while ($interface = mysql_fetch_array($interface_query)) {
   mysql_query("UPDATE `interfaces` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
 
 }
+
+unset($portifIndex);
 
 ?>
 
