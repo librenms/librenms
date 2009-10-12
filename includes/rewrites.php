@@ -86,8 +86,8 @@ $translate_ifAdminStatus = array(
 
 function translate_ifAdminStatus ($ifAdminStatus) {
   global $translate_ifAdminStatus;
-  if($translate_ifAdminStatus['$ifAdminStatus']) {
-    $ifAdminStatus = $translate_ifAdminStatus['$ifAdminStatus'];
+  if($translate_ifAdminStatus[$ifAdminStatus]) {
+    $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
   }
   return $ifAdminStatus;
 }

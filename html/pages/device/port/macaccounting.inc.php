@@ -22,8 +22,9 @@
 
  if($_GET['optd'] == "top10") {
    if($_GET['opte']) {
-     $from = "-" . $_GET['opte'];
-   } else { $from = "-1day"; }
+      $period = $_GET['opte'];
+   } else { $period = "1day"; }
+   $from = "-" . $period;
    if($_GET['optc']) {
      $stat = $_GET['optc'];
    } else { $stat = "bits"; }
@@ -60,13 +61,13 @@
         <div style=' margin:0px; float: left;';>
              <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Traffic</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/1day/'>
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/$period/'>
               <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=bits&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
             <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Packets</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/1day/'>
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/$period/'>
               <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=pkts&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
             </a>
             </div>

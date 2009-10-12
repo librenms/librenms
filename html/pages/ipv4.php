@@ -54,7 +54,7 @@
 
 <?php
 
-echo("<table width=100%>");
+echo("<table width=100% cellspacing=0 cellpadding=2>");
 
 if($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
 if($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".$_POST['interface']."'"; }
@@ -63,7 +63,7 @@ $sql = "SELECT * FROM `ipv4_addresses` AS A, `interfaces` AS I, `devices` AS D, 
 
 $query = mysql_query($sql);
 
-echo("<tr class=tablehead><th>Device</a></th><th>Interface</th><th>Address</th><th>Subnet</th><th>Description</th></tr>");
+echo("<tr class=tablehead><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>");
 
 $row = 1;
 
@@ -75,12 +75,14 @@ while($interface = mysql_fetch_array($query)) {
     if (!match_network($addy . "/" . $mask, $interface['ipv4_address'] )) { $ignore = 1; } 
   }
 
-if(!$ignore) {
+ if(!$ignore) {
 
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $speed = humanspeed($interface['ifSpeed']);
   $type = humanmedia($interface['ifType']);
+
+  list($prefix, $length) = explode("/", $interface['ipv4_network']);
 
     if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
@@ -91,8 +93,7 @@ if(!$ignore) {
     echo("<tr bgcolor=$row_colour>
           <td class=list-bold>" . generatedevicelink($interface) . "</td>
           <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
-          <td>" . $interface['ipv4_address'] . "</td>
-          <td>" . $interface['ipv4_network'] . "</td>
+          <td>" . $interface['ipv4_address'] . "/".$length."</td>
           <td>" . $interface['ifAlias'] . "</td>
         </tr>\n");
 

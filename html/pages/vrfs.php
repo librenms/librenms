@@ -54,12 +54,23 @@ echo("
        echo("</td><td>");
        $interfaces = mysql_query("SELECT * FROM `interfaces` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
        unset($seperator);
+
        while($port = mysql_fetch_array($interfaces)) {
+         $port = array_merge ($device, $port);
          if($_GET['opta']) {
-           $graph_type = $_GET['opta'];
-           include("includes/print-port-thumbs.inc.php");
+           $port['width'] = "130";
+           $port['height'] = "30";
+           $port['from'] = $day;
+           $port['to'] = $now;
+           $port['bg'] = "#".$bg;
+           $port['graph_type'] = $_GET['opta'];
+           echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
+             text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
+             <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>");
+           generate_port_thumbnail($port);
+           echo("<div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
+            </div>");
          } else {
-  	   $port = array_merge ($device, $port);
            echo($seperator.generateiflink($port,makeshortif($port['ifDescr']))); 
 	   $seperator = ", ";         
          }

@@ -54,7 +54,7 @@
 
 <?php
 
-echo("<table width=100%>");
+echo("<table width=100% cellpadding=2 cellspacing=0>");
 
 if($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
 if($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".$_POST['interface']."'"; }
@@ -63,7 +63,7 @@ $sql = "SELECT * FROM `ipv6_addresses` AS A, `interfaces` AS I, `devices` AS D, 
 
 $query = mysql_query($sql);
 
-echo("<tr class=tablehead><th>Device</a></th><th>Interface</th><th>Address</th><th>Subnet</th><th>Description</th></tr>");
+echo("<tr class=tablehead><td width=0></td><th>Device</a></th><th>Interface</th><th>Address</th><th>Description</th></tr>");
 
 $row = 1;
 
@@ -82,17 +82,18 @@ if(!$ignore) {
   $speed = humanspeed($interface['ifSpeed']);
   $type = humanmedia($interface['ifType']);
 
+  list($prefix, $length) = explode("/", $interface['ipv6_network']);
+
     if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
   if( interfacepermitted($interface['interface_id']) )
   {
-    echo("<tr bgcolor=$row_colour>
+    echo("<tr bgcolor=$row_colour><td></td>
           <td class=list-bold>" . generatedevicelink($interface) . "</td>
           <td class=list-bold>" . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . " $error_img</td>
-          <td>" . Net_IPv6::compress($interface['ipv6_address']) . "</td>
-          <td>" . $interface['ipv6_network'] . "</td>
+          <td>" . Net_IPv6::compress($interface['ipv6_address']) . "/".$length."</td>
           <td>" . $interface['ifAlias'] . "</td>
         </tr>\n");
 
