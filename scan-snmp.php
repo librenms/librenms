@@ -6,9 +6,6 @@ include("includes/functions.php");
 
 $search = $argv[1] . "$";
 
-
-
-
 $data = trim(`cat ips-scanned.txt | grep alive | cut -d" " -f 1 | egrep $search`);
 
 foreach( explode("\n", $data) as $ip) {
