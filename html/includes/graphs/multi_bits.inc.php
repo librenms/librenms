@@ -26,7 +26,7 @@ function graph_multi_bits ($args) {
   $options .= " CDEF:inbits=inoctets,8,*";
   $options .= " CDEF:outbits=outoctets,8,*";
   $options .= " CDEF:doutbits=doutoctets,8,*";
-  if($args['legend'] == '0') {
+  if($args['legend'] == 'no' || $args['legend'] == '1') {
    $options .= " AREA:inbits#CDEB8B:";
    $options .= " LINE1.25:inbits#006600:";
    $options .= " AREA:doutbits#C3D9FF:";
@@ -57,7 +57,9 @@ $args['from']      = $from;
 $args['to']        = $to;
 $args['width']     = $width;
 $args['height']    = $height;
-
+if($_GET['legend']) {
+  $args['legend']    = $_GET['legend'];
+}
 $graph = graph_multi_bits ($args);
 
 ?>
