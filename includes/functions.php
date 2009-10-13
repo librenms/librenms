@@ -236,11 +236,11 @@ function interface_rates ($rrd_file)  // Returns the last in/out value in RRD
   return $rate;
 }
 
-function interface_errors ($rrd_file) // Returns the last in/out errors value in RRD
+function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
   #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
-  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
+  $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
   foreach( explode("\n", $data) as $entry) {
         list($in, $out) = explode(" ", $entry);

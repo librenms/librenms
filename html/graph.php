@@ -26,6 +26,9 @@ if($_GET['debug']) {
   } elseif($_GET['if']) {
     $device_id = getifhost($_GET['if']);
     $ifIndex = getifindexbyid($_GET['if']);
+  } elseif($_GET['port']) {
+    $device_id = getifhost($_GET['port']);
+    $ifIndex = getifindexbyid($_GET['port']);
   } elseif($_GET['peer']) {
     $device_id = getpeerhost($_GET['peer']);
   }

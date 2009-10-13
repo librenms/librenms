@@ -42,6 +42,10 @@ $interface = mysql_fetch_array($interface_query);
    $broke = yes;
  }
 
+ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'"),0)) {
+  $pagp = " | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/pagp/'>PAgP</a>";
+ }
+
 echo("<div style='clear: both;'>");
 
 echo("
@@ -56,7 +60,9 @@ echo("
   <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/'>Graphs</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/arp/'>ARP Table</a>");
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/arp/'>ARP Table</a>$pagp");
+
+
 
  if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
 
