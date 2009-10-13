@@ -493,22 +493,6 @@ function temp_graph_dev ($device, $graph, $from, $to, $width, $height, $title, $
   return $imgfile;
 }
 
-function graph_device_bits ($device, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
-  global $config;
-  $hostname = gethostbyid($device);
-  $query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
-  if($width <= "300") { $options .= "--font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
-  $pluses = "";
-  while($int = mysql_fetch_row($query)) {
-    if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . $int[0] . ".rrd")) {
-      $interfaces .= $seperator . $int[1];
-      $seperator = ",";
-    }
-  }
-  $imgfile = graph_multi_bits($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
-  return $imgfile;
-}
-
 function graph_mac_acc ($id, $graph, $from, $to, $width, $height) {
   global $config;
   $imgfile = $config['install_dir'] . "/graphs/" . "$graph";

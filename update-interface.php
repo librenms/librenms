@@ -79,27 +79,29 @@ while ($interface = mysql_fetch_array($interface_query)) {
   $ifPhysAddress = strtolower(str_replace("\"", "", $ifPhysAddress));
   $ifPhysAddress = str_replace(" ", ":", $ifPhysAddress);
 
-  if ( $interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
-     $update .= $seperator . "`ifDescr` = '$ifDescr'";
-     $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Name -> " . $ifDescr . "')");
-  }
-  if ( $interface['ifAlias'] != $ifAlias ) {
-     $update .= $seperator . "`ifAlias` = '$ifAlias'";
-     $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
-  }
-  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
-     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
-     $seperator = ", ";
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
-  }
-  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
-     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
-     $seperator = ", ";
-     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
-     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
-  }
+#  if ( $interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
+#     $update .= $seperator . "`ifDescr` = '$ifDescr'";
+#     $seperator = ", ";
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Name -> " . $ifDescr . "')");
+#  }
+#  if ( $interface['ifAlias'] != $ifAlias ) {
+#     $update .= $seperator . "`ifAlias` = '$ifAlias'";
+#     $seperator = ", ";
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Desc  -> $ifAlias')");
+#  }
+
+#  if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
+#     $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
+#     $seperator = ", ";
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface went $ifOperStatus')");
+#  }
+#  if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
+#     $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
+#     $seperator = ", ";
+#     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
+#     mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'Interface $admin')");
+#  }
+
   if ( $interface['ifDuplex'] != $ifDuplex && $ifDuplex != "" ) {
      $update .= $seperator . "`ifDuplex` = '$ifDuplex'";
      $seperator = ", ";
