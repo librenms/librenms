@@ -166,7 +166,7 @@ echo("</td>");
        $br = "<br />";
      }
   
-     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
+#     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
      }
 
@@ -178,8 +178,25 @@ echo("</td>");
                                                                                                           P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
     $pw_peer_int = ifNameDescr($pw_peer_int);
-    echo("<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
+    echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
+    $br = "<br />";
   }
+
+  $members = mysql_query("SELECT * FROM `interfaces` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
+  while($member = mysql_fetch_array($members)) {
+    echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generateiflink($member) . " (PAgP)</strong>");
+    $br = "<br />";
+  }
+
+  if($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interface['ifIndex']) {
+    $parent = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE `ifIndex` = '".$interface['pagpGroupIfIndex']."' and `device_id` = '".$device['device_id']."'"));
+    echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generateiflink($parent) . " (PAgP)</strong>");
+    $br = "<br />";
+  }
+
+
+    unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
+
 
 
      echo("</td></tr>");

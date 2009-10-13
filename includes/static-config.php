@@ -64,4 +64,28 @@ $week = time() - (7 * 24 * 60 * 60);
 $month = time() - (31 * 24 * 60 * 60);
 $year = time() - (365 * 24 * 60 * 60);
 
+
+### Update Database between 0.6.0 and 0.6.1 (slight slowdown)
+
+$exists = false;
+$columns = mysql_query("SHOW columns FROM `interfaces`");
+while($c = mysql_fetch_assoc($columns)){
+  if($c['Field'] == "pagpOperationMode"){
+    $pagp = true;
+    break;
+  }
+}
+if(!$pagp) {
+  mysql_query("ALTER TABLE  `interfaces` ADD  `pagpOperationMode` VARCHAR( 32 ) NULL ,
+ADD  `pagpPortState` VARCHAR( 16 ) NULL ,
+ADD  `pagpPartnerDeviceId` VARCHAR( 48 ) NULL ,
+ADD  `pagpPartnerLearnMethod` VARCHAR( 16 ) NULL ,
+ADD  `pagpPartnerIfIndex` INT NULL ,
+ADD  `pagpPartnerGroupIfIndex` INT NULL ,
+ADD  `pagpPartnerDeviceName` VARCHAR( 128 ) NULL ,
+ADD  `pagpEthcOperationMode` VARCHAR( 16 ) NULL ,
+ADD  `pagpDeviceId` VARCHAR( 48 ) NULL ,
+ADD  `pagpGroupIfIndex` INT NULL");
+}
+
 ?>
