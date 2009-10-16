@@ -71,11 +71,16 @@ $exists = false;
 $columns = mysql_query("SHOW columns FROM `interfaces`");
 while($c = mysql_fetch_assoc($columns)){
   if($c['Field'] == "pagpOperationMode"){
-    $pagp = true;
-    break;
+    $db_pagp = true;
+  }
+  if($c['Field'] == "portName"){
+    $db_portName = true;
+  }
+  if($c['Field'] == "ifHighSpeed"){
+    $db_ifHighSpeed = true;
   }
 }
-if(!$pagp) {
+if(!$db_pagp) {
   mysql_query("ALTER TABLE  `interfaces` ADD  `pagpOperationMode` VARCHAR( 32 ) NULL ,
 ADD  `pagpPortState` VARCHAR( 16 ) NULL ,
 ADD  `pagpPartnerDeviceId` VARCHAR( 48 ) NULL ,
@@ -85,7 +90,10 @@ ADD  `pagpPartnerGroupIfIndex` INT NULL ,
 ADD  `pagpPartnerDeviceName` VARCHAR( 128 ) NULL ,
 ADD  `pagpEthcOperationMode` VARCHAR( 16 ) NULL ,
 ADD  `pagpDeviceId` VARCHAR( 48 ) NULL ,
-ADD  `pagpGroupIfIndex` INT NULL");
-}
+ADD  `pagpGroupIfIndex` INT NULL"); }
+
+if(!$db_portName) { mysql_query("ALTER TABLE  `interfaces` ADD  `portName` VARCHAR( 128 ) NULL DEFAULT NULL AFTER  `ifName`"); }
+if(!$db_ifHighSpeed) { mysql_query("ALTER TABLE `interfaces` ADD `ifHighSpeed` INT ( 11 ) NULL DEFAULT NULL AFTER  `ifSpeed`"); }
+
 
 ?>

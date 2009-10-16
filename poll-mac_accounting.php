@@ -76,16 +76,16 @@
   $woo = "N:".($pktin+0).":".($pktout+0);
   $ret = rrdtool_update("$pkts_rrdfile", $woo);
 
-  $rates = interface_rates ($rrdfile);
+#  $rates = interface_rates ($rrdfile);
 
-  $pkt_rates = interface_rates ($pkts_rrdfile);
+#  $pkt_rates = interface_rates ($pkts_rrdfile);
 
   $pkt_rate['in'] = round($pkt_rate['in'] / 8);
   $pkt_rate['out'] = round($pkt_rate['out'] / 8);
 
-  mysql_query("UPDATE `mac_accounting` SET bps_in = '" . $rates['in'] . "', bps_out = '" . $rates['out'] . "', pps_in = '" . $pkt_rates['in'] . "', pps_out = '" . $pkt_rates['out'] . "' WHERE ma_id= '" . $acc['ma_id'] . "'");
+#  mysql_query("UPDATE `mac_accounting` SET bps_in = '" . $rates['in'] . "', bps_out = '" . $rates['out'] . "', pps_in = '" . $pkt_rates['in'] . "', pps_out = '" . $pkt_rates['out'] . "' WHERE ma_id= '" . $acc['ma_id'] . "'");
 
-  echo(formatRates($rates['in']) . " (" . $pkt_rates['in'] . "pps) in " . formatRates($rates['out']) . " (" . $pkt_rates['out'] . "pps) out \n");
+#  echo(formatRates($rates['in']) . " (" . $pkt_rates['in'] . "pps) in " . formatRates($rates['out']) . " (" . $pkt_rates['out'] . "pps) out \n");
 
   }
 ?>
