@@ -71,6 +71,8 @@ if(mysql_result(mysql_query("SELECT count(*) from cempMemPool WHERE device_id = 
     $mempool['descr_fixed'] = str_replace("Routing Processor", "RP", $mempool['descr_fixed']);
     $mempool['descr_fixed'] = str_replace("Switching Processor", "SP", $mempool['descr_fixed']);
     $mempool['descr_fixed'] = str_replace("Processor", "Proc", $mempool['descr_fixed']);
+    $mempool['descr_fixed'] = str_replace("Sub-Module", "Mod", $mempool['descr_fixed']);
+    $mempool['descr_fixed'] = str_replace("DFC Card", "DFC", $mempool['descr_fixed']);
 
     $proc_url   = "?page=device/".$device['device_id']."/sensors/mempools/";
 

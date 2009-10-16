@@ -98,7 +98,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    }
  
    if ( $interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
-     $update .= $seperator . "`ifAlias` = '$ifAlias'";
+     $update .= $seperator . "`ifAlias` = '".mysql_real_escape_string($ifAlias)."'";
      $seperator = ", ";
      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), 'ifAlias -> $ifAlias')");
    }
@@ -118,7 +118,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $update_query  = "UPDATE `interfaces` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-#     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
+     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");
