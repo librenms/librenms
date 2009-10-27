@@ -2,20 +2,30 @@
 
 ## Generate a list of interfaces and then call the multi_bits grapher to generate from the list
 
-$parent = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE interface_id = '".$_GET['port']."'"));
+$parent = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE interface_id = '".mres($_GET['port'])."'"));
 
-$query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `interfaces` WHERE `device_id` = '".$parent['device_id']."' AND `pagpGroupIfIndex` = '".$parent['ifIndex']."'");
+$query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$parent['device_id']."' AND `pagpGroupIfIndex` = '".$parent['ifIndex']."'");
 
-while($int = mysql_fetch_row($query)) {
-  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . $int[0] . ".rrd")) {
-    $interfaces .= $seperator . $int[1];
-    $seperator = ",";
+$i=0;
+while($int = mysql_fetch_array($query)) {
+  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . $int['ifIndex'] . ".rrd")) {
+    $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $hostname . "/" . $int['ifIndex'] . ".rrd";
+    $rrd_list[$i]['descr'] = $int['ifDescr'];
+    $i++;
   }
 }
 
-$args['nototal'] = 1;
+$units='bps'; 
+$total_units='B'; 
+$colours_in='greens'; 
+$multiplier = "8"; 
+$colours_out = 'blues';
 
-include ("multi_bits_separate.inc.php");
+$nototal = 1;
+$rra_in  = "INOCTETS";
+$rra_out = "OUTOCTETS";
+
+include ("generic_multi_bits_separated.inc.php");
 
 
 

@@ -8,9 +8,20 @@ if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/cip-" . $acc['ifIndex
   $rrd_filename = $config['rrd_dir'] . "/" . $acc['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
 }
 
-$rra_in = "IN";
-$rra_out = "OUT";
+$rra_in = "PIN";
+$rra_out = "POUT";
 
-include("generic_bits.inc.php");
+$colour_area_in = "AA66AA";
+$colour_line_in = "330033";
+$colour_area_out = "FFDD88";
+$colour_line_out = "FF6600";
+
+$colour_area_in_max = "CC88CC";
+$colour_area_out_max = "FFEFAA";
+
+$graph_max = 1;
+$unit_text = "Pkts\ \ \ ";
+
+include("generic_duplex.inc.php");
 
 ?>
