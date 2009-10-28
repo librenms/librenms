@@ -2,26 +2,28 @@
 
 ### Database config
 $config['db_host'] = "localhost";
-$config['db_user'] = "observer";
-$config['db_pass'] = "password";
+$config['db_user'] = "USERNAME";
+$config['db_pass'] = "PASSWORD";
 $config['db_name'] = "observer";
 
-### Installation Location
+### Locations
 $config['install_dir'] 	= "/opt/observer";
 $config['html_dir']	= $config['install_dir'] . "/html";
-$config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
+$config['rrd_dir'] 	= "/mnt/filesystem/rrd";
+$config['temp_dir']	= "/tmp";
+$config['observer_log'] = $config['install_dir'] . "/observer.log";
 
 ### Default community
-$config['community'] = "observer";
+$config['community'] = "public";
 
-$config['base_url'] = "http://demo.observernms.com";
+$config['base_url'] = "http://observer2.as8681.net";
 
 ### Location of executables
 
-$config['sipcalc']      = "/usr/bin/sipcalc";
 $config['rrdtool']      = "/usr/bin/rrdtool";
-$config['fping']        = "/usr/sbin/fping";
+$config['fping']        = "/usr/bin/fping";
 $config['ipcalc']       = "/usr/bin/ipcalc";
+$config['sipcalc']      = "/usr/bin/sipcalc";
 $config['snmpwalk']     = "/usr/bin/snmpwalk";
 $config['snmpget']      = "/usr/bin/snmpget";
 $config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
@@ -32,66 +34,62 @@ $config['snmpset']      = "/usr/bin/snmpset";
 
 # Set the general colours and other settings for rrdtool graphs
 
-$config['rrdgraph_defaults'] = array("-c", "BACK#FFFFFF", "-c", "SHADEA#c5c5c5", "-c", "SHADEB#c5c5c5",
-                                     "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#a5a5a5",
-                                     "-c", "MGRID#FF9999", "-c", "FRAME#5e5e5e", "-c", "ARROW#5e5e5e",
-                                     "-R", "normal");
+$config['rrdgraph_def_text'] =  " -c BACK#FFcccc -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 ";
+$config['rrdgraph_def_text'] .= " -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal";
 
-$config['rrdgraph_def_text'] = " -c BACK#FFFFFF -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 \
-                                -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal ";
+$config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505'";
 
-$config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#e5e5e5'";
+### List of networks to allow scanning-based discovery
+$config['nets'] =  array ("89.21.224.0/19", "212.9.12.0/24", "212.9.13.0/24");
 
-
-## List of networks to allow scanning-based discovery.
-$config['nets'] =  array ("10.0.0.0/8", "172.22.0.0/16");
-
-## Your local domain name and specifics
-$config['mydomain'] = "observernms.org";
-$config['page_title']  = "Demo ObserverNMS";
-$config['title_image'] = $config['base_url'] . "images/observer-logo.jpg";
-$config['stylesheet']  = "css/styles.css"; 
-$config['mono_font'] = $config['install_dir'] . "/fonts/DejaVuSansMono.ttf";
-$config['favicon'] = "favicon.ico";
-$config['header_color'] = "#1F334E";
-
-## Custom pre-login message
-$config['login_message'] = "";                      
+### Your company domain name and specifics
+$config['mydomain'] 	= "jerseytelecom.com";
+$config['page_title']  	= "JT Observer";
+$config['title_image'] 	= "images/observer-logo.jpg";
+$config['stylesheet']  	= "css/styles.css"; 
+$config['mono_font']    = "DejaVuSansMono"; 
+$config['header_color'] = "#133A7B";
+$config['favicon'] 	= "favicon.ico";
 
 $config['page_refresh'] = "0";  ## Refresh the page every xx seconds
-$config['front_page'] = "pages/front/default.php";
+$config['front_page'] 	= "pages/front/jt.php";
 
-$config['email_default']  = "you@yourdomain";
-$config['email_from']     = "Observer <observer@yourdomain>";
+$config['email_default']  = "adama@as8681.net";
+$config['email_from']     = "Observer <observer@jerseytelecom.com>";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
+
+$config['login_message']  = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
+
+### What should we warn about?
+$config['warn']['ifdown'] = false;
+
+## Should we autocreate hosts we see via CDP?
+$config['cdp_autocreate'] = false;
+$config['snmp_autodiscovery'] = false;
 
 ### Which interface sections should we show?
 
-$config['int_customers']       = 0;  # Enable Customer Port Parsing
-$config['int_transit']         = 0;  # Enable Transit Types
-$config['int_peering']         = 0;  # Enable Peering Types
-$config['int_core']            = 0;  # Enable Core Port Types
-$config['int_l2tp']            = 0;  # Enable L2TP Port Types
+$config['int_customers'] 	= 1;  # Enable Customer Port Parsing
+$config['int_transit'] 		= 1;  # Enable Transit Types
+$config['int_peering'] 		= 1;  # Enable Peering Types
+$config['int_core'] 		= 1;  # Enable Core Port Types
+$config['int_l2tp'] 		= 0;  # Enable L2TP Port Types
 
-$config['show_locations']      = 0;  # Enable Locations on menu
+$config['show_locations'] 	= 1;  # Enable Locations on menu
+
+$config['ports_page_default']	= "details/";  
+# Default devices ports page display type. "details/", "graphs/bits/", etc
 
 ### Which additional features should we enable?
 
-$config['enable_bgp'] 		= 0; # Enable BGP session collection and display
+$config['enable_bgp'] 		= 1; # Enable BGP session collection and display
 $config['enable_syslog'] 	= 0; # Enable Syslog
-$config['enable_billing']	= 0; # Enable BGP session collection and display
-$config['enable_inventory']     = 0; # Enable Inventory
-$config['enable_pseudowires']	= 0; # Enable Cisco Pseudowires
+$config['enable_billing']	= 0; # Enable Billing
+$config['enable_inventory']	= 1; # Enable Inventory
+$config['enable_pseudowires']   = 1; # Enable Pseudowires
 
-## Uncomment this to enable display of rancid-collected configs
-#$config['rancid_configs']      = '/var/lib/rancid/network/configs/';
-
-## Uncomment this to enable usage of collectd rrds collectd hostnames must match observer hostnames!
+#$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
 #$config['collectd_dir']         = '/var/lib/collectd/rrd';
-
-$config['cdp_autocreate']       = false;    # Should we autocreate hosts we see via CDP?
-$config['snmp_autodiscovery']   = false;    # Should we scan for and autocreate hosts via snmp?
-                                            # SNMP autodiscovery is * NOT WORKING *
 
 ## If a syslog entry contails these strings it is deleted from the database
 $config['syslog_filter'] = array("last message repeated", "Connection from UDP: [127.0.0.1]:"); 
@@ -101,11 +99,21 @@ $config['syslog_age']    = "1 month"; ## Time to keep syslog for in
 
 ### Interface name strings to ignore
 $config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
-             "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "stackport",
-             "async", "plip", "-physical", "-signalling", "control plane", "stacksub", "control",
-             "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport");
+             "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "container",
+             "async", "plip", "-physical", "-signalling", "control", "container", "unrouted",
+             "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
+             "span rp", "span sp", "sslvpn");
 
 $config['bad_if_regexp'] = array("/serial[0-9]:/");
+
+$config['allow_entity_sensor']['amperes'] = 1;
+$config['allow_entity_sensor']['celsius'] = 1;
+$config['allow_entity_sensor']['dBm'] = 1;
+$config['allow_entity_sensor']['voltsDC'] = 1;
+$config['allow_entity_sensor']['voltsAC'] = 1;
+$config['allow_entity_sensor']['watts'] = 1;
+$config['allow_entity_sensor']['truthvalue'] = 1;
+$config['allow_entity_sensor']['specialEnum'] = 1;
 
 ### Mountpoints to ignore
 
@@ -113,23 +121,42 @@ $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/pro
 
 ### Style Options
 
-# Alternating list colours
-
 $list_colour_a = "#ffffff";
 $list_colour_b = "#eeeeee";
-
-# Alternating list-within-list colours
 
 $list_colour_a_a = "#f9f9f9";
 $list_colour_a_b = "#f0f0f0";
 
-$list_colour_b_a = "#e9e9e9";
-$list_colour_b_b = "#e0e0e0";
+$list_colour_b_a = "#f0f0f0";
+$list_colour_b_b = "#e3e3e3";
 
 $list_highlight  = "#ffcccc";
 
 $warn_colour_a = "#ffeeee";
 $warn_colour_b = "#ffcccc";
+
+/// Many colour schemes for graphs. Feel free to fiddle!
+
+#$config['graph_colours'] = array("000066","330066","990066","990066","CC0033","FF0000"); ## Purple to Red
+#$config['graph_colours'] = array("006600","336600","996600","996600","CC3300","FF0000"); ## Green to Red
+#$config['graph_colours'] = array("002200","004400","006600","008800","00AA00","00CC00"); ## Green
+#$config['graph_colours'] = array("220000","440000","660000","880000","AA0000","CC0000"); ## Red
+#$config['graph_colours'] = array("001122","002244","003366","004488","0055AA","0066CC"); ## Blue
+#$config['graph_colours'] = array("002233","004466","006699","0088CC","0099FF");          ## Sky-Blue
+#$config['graph_colours'] = array("110022","330066","440088","6600AA","8800FF");          ## Purple
+#$config['graph_colours'] = array("002200","004400","006600","008800","00AA00","00AA00","00CC00"); ## Forest Greens
+#$config['graph_colours']['greens']  = array("112200","224400","336600","448800","66AA00","88FF00");          ## Grass Greens
+#$config['graph_colours']['greens']  = array("95FFA7","4EFF97","33FF66","336600","224400","112200");
+#$config['graph_colours']['greens'] = array("B7d6A9","8fcb73","50b91d","3ab419","0a8612","034f11");
+#$config['graph_colours']['blues']   = array("b5d7ff","6eb7ff","0064ff","0082ff","0019d5","0016cb","00007d"); ## Cold Blues
+
+$config['graph_colours']['mixed']  = array("CC0000", "008C00", "4096EE", "73880A", "D01F3C", "36393D", "FF0084");
+
+$config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
+$config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38','5C1F1E','401F10');
+$config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');
+$config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
+$config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
 include("includes/static-config.php");
 
