@@ -49,7 +49,7 @@ if($_GET['debug']) {
   }
 
   if($rrd_options) {
-#    echo("<pre>".$config['rrdtool'] . " graph $graphfile $rrd_options");
+    #echo("<pre>".$config['rrdtool'] . " graph $graphfile $rrd_options");
     $thing = shell_exec($config['rrdtool'] . " graph $graphfile $rrd_options");
     if(is_file($graphfile)) {
       header('Content-type: image/png');
