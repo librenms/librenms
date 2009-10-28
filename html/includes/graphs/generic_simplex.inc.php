@@ -5,42 +5,42 @@
 
 include("common.inc.php");
 
-if(!$unit_text) {$unit_text = "\ \ \ \ \ \ \ ";}
+$unit_text = str_pad(truncate($unit_text,10),10);
 
-$rrd_options .= " DEF:".$in."=".$rrd_filename.":".$rra_in.":AVERAGE";
-$rrd_options .= " DEF:".$in."_max=".$rrd_filename.":".$rra_out.":MAX";
+$rrd_options .= " DEF:".$rra."=".$rrd_filename.":".$rra.":AVERAGE";
+$rrd_options .= " DEF:".$rra."_max=".$rrd_filename.":".$rra.":MAX";
 
 if($print_total) {
-  $rrd_options .= " VDEF:totin=in,TOTAL";
+  $rrd_options .= " VDEF:".$rra."_total=rra,TOTAL";
 }
 
 if($percentile) {
-  $rrd_options .= " VDEF:percentile_in=in,".$percentile.",PERCENT";
+  $rrd_options .= " VDEF:".$rra."_percentile=".$rra.",".$percentile.",PERCENT";
 }
 
 if($graph_max) {
-  $rrd_options .= " AREA:in_max#".$colour_area_in_max.":";
+  $rrd_options .= " AREA:".$rra."_max#".$colour_area_max.":";
 }
-$rrd_options .= " AREA:in#".$colour_area_in.":";
-$rrd_options .= " COMMENT:".$unit_text."Now\ \ \ \ \ \ \ Ave\ \ \ \ \ \ Max";
+$rrd_options .= " AREA:".$rra."#".$colour_area.":";
+$rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 if($percentile) {
-  $rrd_options .= "\ \ \ \ \ \ ".$percentile."th\ %\\\\n";
+  $rrd_options .= "\ \ \ \ \ \ ".$percentile."th\ %";
 }
-$rrd_options .= "\\\\n";
-$rrd_options .= " LINE1.25:in#".$colour_line_in.":In\ ";
-$rrd_options .= " GPRINT:in:LAST:%6.2lf%s";
-$rrd_options .= " GPRINT:in:AVERAGE:%6.2lf%s";
-$rrd_options .= " GPRINT:in_max:MAX:%6.2lf%s";
+$rrd_options .= "\\n'";
+$rrd_options .= " LINE1.25:".$rra."#".$colour_line.":In\ ";
+$rrd_options .= " GPRINT:".$rra.":LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:".$rra.":AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:".$rra."_max:MAX:%6.2lf%s";
 if($percentile) {
-  $rrd_options .= " GPRINT:percentile_in:%6.2lf%s";
+  $rrd_options .= " GPRINT:".$rra."_percentile:%6.2lf%s";
 }
 $rrd_options .= "\\\\n";
 $rrd_options .= " COMMENT:\\\\n";
 if($print_total) {
-  $rrd_options .= " GPRINT:tot:Total\ %6.2lf%s\)\\\\l";
+  $rrd_options .= " GPRINT:".$rra."_tot:Total\ %6.2lf%s\)\\\\l";
 }
 if($percentile) {
-  $rrd_options .= " LINE1:percentile_in#aa0000";
+  $rrd_options .= " LINE1:".$rra."_percentile#aa0000";
 }
 
 ?>

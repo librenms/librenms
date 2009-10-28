@@ -2,7 +2,7 @@
 
   include("common.inc.php");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netinfo.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-icmp.rrd";
 
   $rrd_options .= " DEF:icmpInMsgs=$rrd_filename:icmpInMsgs:AVERAGE";
   $rrd_options .= " DEF:icmpOutMsgs=$rrd_filename:icmpOutMsgs:AVERAGE";
@@ -45,7 +45,5 @@
   $rrd_options .= " GPRINT:icmpOutEchoReps:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:icmpOutEchoReps:AVERAGE:\ %6.2lf%s";
   $rrd_options .= " GPRINT:icmpOutEchoReps:MAX:\ %6.2lf%s\\\\n";
-
-
 
 ?>
