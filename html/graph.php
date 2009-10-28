@@ -1,5 +1,6 @@
 <?php
 
+
 if($_GET['debug']) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 0);
@@ -13,15 +14,9 @@ if($_GET['debug']) {
   include("../includes/graphing.php");
   include("includes/authenticate.inc");
 
-  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+#  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   
-  if($_GET['params']) {
-    list($_GET['host'], $_GET['if'], $_GET['from'], $_GET['to'], $_GET['width'], $_GET['height'], $_GET['title'], $_GET['vertical'], $_GET['type'], $_GET['interfaces']) = explode("||", mcrypt_ecb(MCRYPT_DES, $key_value, $_GET['params'], MCRYPT_DECRYPT));
-  }
-
-  if($_GET['host']) {
-    $device_id = $_GET['host'];
-  } elseif($_GET['device']) {
+  if($_GET['device']) {
     $device_id = $_GET['device'];
   } elseif($_GET['if']) {
     $device_id = getifhost($_GET['if']);
@@ -33,21 +28,43 @@ if($_GET['debug']) {
     $device_id = getpeerhost($_GET['peer']);
   }
 
-  if($_GET['legend']) { $legend = $_GET['legend']; } else { $legend = '1'; }
-  if($_GET['inverse']) { $inverse = $_GET['inverse'];  }
   if($device_id) { $hostname = gethostbyid($device_id); }
 
-  $from = $_GET['from'];
-  $to = $_GET['to'];
-  $width = $_GET['width'];
-  $height = $_GET['height'];
-  $title = $_GET['title'];
-  $vertical = $_GET['vertical'];
-  $type = $_GET['type'];
+  $from     = mres($_GET['from']);
+  $to       = mres($_GET['to']);
+  $width    = mres($_GET['width']);
+  $height   = mres($_GET['height']);
+  $title    = mres($_GET['title']);
+  $vertical = mres($_GET['vertical']);
+  $type     = mres($_GET['type']);
 
-  $graphfile = strgen() . ".png";
+  $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
   $os = gethostosbyid($device_id);
+
+  if(is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".strtolower($os).".inc.php")) {
+    include($config['install_dir'] . "/html/includes/graphs/".$type."_".strtolower($os).".inc.php");
+  } elseif(is_file($config['install_dir'] . "/html/includes/graphs/$type.inc.php")) {
+    include($config['install_dir'] . "/html/includes/graphs/$type.inc.php");
+  }
+
+  if($rrd_options) {
+#    echo("<pre>".$config['rrdtool'] . " graph $graphfile $rrd_options");
+    $thing = shell_exec($config['rrdtool'] . " graph $graphfile $rrd_options");
+    if(is_file($graphfile)) {
+      header('Content-type: image/png');
+      echo(`cat $graphfile`);
+    } else {
+      header('Content-type: image/png');
+      $string = "Graph Generation Error";
+      $im     = imagecreate($width, $height);
+      $orange = imagecolorallocate($im, 255, 255, 255);
+      $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+      imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+      imagepng($im);
+      imagedestroy($im);
+    }
+  } else {
 
   switch ($type) {
   case 'cisco_entity_sensor':
@@ -79,7 +96,6 @@ if($_GET['debug']) {
     $groups = array($_GET['interfaces'], $_GET['interfaces_b'], $_GET['interfaces_c']);
     $graph = graph_multi_bits_trio ($groups, $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
     break;
-
   case 'adsl_rate':
     $graph = graph_adsl_rate ($hostname. "/adsl-4.rrd", $graphfile, $from, $to, $width, $height);
     break;
@@ -102,21 +118,6 @@ if($_GET['debug']) {
   case 'mac_acc_bits':
     $graph = graph_mac_acc ($_GET['id'], $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
-  case 'bits':
-    $graph = graph_bits ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical, $inverse, $legend);
-    break;
-  case 'pkts':
-    $graph = pktsgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'errors':
-    $graph = errorgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'nupkts':
-    $graph = nucastgraph ($hostname . "/". $ifIndex . ".rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'uptime':
-    $graph = uptimegraph ($hostname . "/uptime.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
   case 'unixfs_dev':
     $graph = unixfsgraph_dev ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
     break;
@@ -133,39 +134,6 @@ if($_GET['debug']) {
     break;
   case 'calls':
     $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'ip_graph':
-    $graph = ip_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'icmp_graph':
-    $graph = icmp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'tcp_graph':
-    $graph = tcp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'udp_graph':
-    $graph = udp_graph ($hostname . "/netinfo.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    break;
-  case 'cpu':
-    if($os == "Linux" || $os == "NetBSD" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "Windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfSense" || $os == "DragonFly" || $os == "OpenBSD") {
-      $graph = cpugraphUnix ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "IOS" || $os == "IOS XE") {
-      $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);     
-    } elseif($os == "CatOS") {
-      $graph = cpugraph ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "Windows") {
-      $graph = cpugraphwin ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "ProCurve") {
-      $graph = cpugraphHP ($hostname . "/cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "Snom") {
-      $graph = callsgraphSNOM ($hostname . "/data.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "ScreenOS") {
-      $graph = graph_netscreen_cpu ($hostname . "/netscreen-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "Fortigate") {
-      $graph = graph_fortigate_cpu ($hostname . "/fortigate-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    } elseif($os == "JunOS") {
-      $graph = graph_cpu_generic_single($hostname . "/junos-cpu.rrd", $graphfile, $from, $to, $width, $height, $title, $vertical);
-    }
     break;
   case 'dev_cpmCPU':
       $graph = graph_device_cpmCPU ($device_id, $graphfile, $from, $to, $width, $height, $title, $vertical);
@@ -250,18 +218,12 @@ if($_GET['debug']) {
     }
     break;
   default:
-    if(is_file($config['install_dir'] . "/html/includes/graphs/$type.inc.php")) {
-      include($config['install_dir'] . "/html/includes/graphs/$type.inc.php");
-    } else {
-      echo("INCORRECT GRAPH TYPE");
-      exit;
-    }
     break;
-  }
+  } // End SWITCH
 
   if($graph) {
     header('Content-type: image/png');
-    echo(`cat graphs/$graphfile`);
+    echo(`cat $graphfile`);
   } else {  
     header('Content-type: image/png');
     $string = "Graph Generation Error";
@@ -273,6 +235,9 @@ if($_GET['debug']) {
     imagedestroy($im);
   }
 
-  $delete = `rm graphs/$graphfile`; 
+  $delete = `rm $graphfile`; 
+
+  } // End IF
+
 
 ?>

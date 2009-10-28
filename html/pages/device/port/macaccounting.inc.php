@@ -17,7 +17,7 @@
 
  $i = 1; 
  $inf = fixifName($ifname);
- $query = mysql_query("SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M, `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id AND I.device_id = D.device_id ORDER BY bps DESC");
+
  echo("<div style='clear: both;'>");
 
  if($_GET['optd'] == "top10") {
@@ -28,61 +28,103 @@
    if($_GET['optc']) {
      $stat = $_GET['optc'];
    } else { $stat = "bits"; }
+   if($_GET['optf']) {
+     $sort = $_GET['optf'];
+   } else { $sort = "in"; }
+
 
    echo("<div style=' margin:0px; float: left;';>
-            <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
+            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Day</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1day/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=$stat&type=mac_acc_total&from=-1day&to=now&width=150&height=50' />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
+                     "/macaccounting/$stat/top10/1day/$sort/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id'].
+                     "&stat=$stat&type=mac_acc_total&sort=$sort&from=-1day&to=now&width=150&height=50' />
             </a> 
             </div>
-            <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
+            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
+            <span class=device-head>Two Day</span><br />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
+                     "/macaccounting/$stat/top10/2day/$sort/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id'].
+                     "&stat=$stat&type=mac_acc_total&sort=$sort&from=-2day&to=now&width=150&height=50' />
+            </a>
+            </div>
+            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Week</span><br />
-             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1week/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1week&to=now&width=150&height=50' /> 
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1week/$sort/'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=-1week&to=now&width=150&height=50' /> 
              </a>
              </div>
-             <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
+             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
              <span class=device-head>Month</span><br />
-             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1month/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1month&to=now&width=150&height=50' /> 
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1month/$sort/'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=-1month&to=now&width=150&height=50' /> 
              </a>
              </div>
-             <div style='margin: 0px 10px 20px 0px; padding:5px; background: #e5e5e5;'>
+             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
              <span class=device-head>Year</span><br />
-             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1year/'>
-             <img valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=-1year&to=now&width=150&height=50' /> 
+             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1year/$sort/'>
+             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=-1year&to=now&width=150&height=50' /> 
              </a>
              </div>
         </div>
         <div style='float: left;'>
-          <img src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&stat=$stat&from=$from&to=now&width=750&height=245' />
+          <img src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=$from&to=now&width=750&height=245' />
         </div>
         <div style=' margin:0px; float: left;';>
-             <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
+             <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Traffic</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/$period/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=bits&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/$period/$sort/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=bits&type=mac_acc_total&sort=$sort&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
-            <div style='margin: 0px 0px 20px 10px; padding:5px; background: #e5e5e5;'>
+            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Packets</span><br />
-            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/$period/'>
-              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=pkts&type=mac_acc_total&from=$from&to=now&width=150&height=50' />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/$period/$sort/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&stat=pkts&type=mac_acc_total&sort=$sort&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
+            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
+            <span class=device-head>Top Input</span><br />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
+                     "/macaccounting/$stat/top10/$period/in/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id'].
+                     "&stat=$stat&type=mac_acc_total&sort=in&from=$from&to=now&width=150&height=50' />
+            </a>
+            </div>
+            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
+            <span class=device-head>Top Output</span><br />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
+                     "/macaccounting/$stat/top10/$period/out/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id'].
+                     "&stat=$stat&type=mac_acc_total&sort=out&from=$from&to=now&width=150&height=50' />
+            </a>
+            </div>
+            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
+            <span class=device-head>Top Aggregate</span><br />
+            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
+                     "/macaccounting/$stat/top10/$period/both/'>
+              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?port=".$interface['interface_id'].
+                     "&stat=$stat&type=mac_acc_total&sort=both&from=$from&to=now&width=150&height=50' />
+            </a>
+            </div>
+
         </div>
  
 ");
    unset($query);
- }
+ } else {
 
+ $query = mysql_query("SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
+                      `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id
+                      AND I.device_id = D.device_id ORDER BY bps DESC");
 
  while($acc = mysql_fetch_array($query)) { 
    if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
-   $name = gethostbyaddr($addy['ipv4_address']);
-   if($name == $addy['ipv4_address']) { unset ($name); }
+   #$name = gethostbyaddr($addy['ipv4_address']);
+   #if($name == $addy['ipv4_address']) { unset ($name); }
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
      $peer_info = mysql_fetch_array($peer_query);
@@ -122,8 +164,8 @@
          <td class=list-large width=200>".mac_clean_to_readable($acc['mac'])."</td>
          <td class=list-large width=200>".$addy['ipv4_address']."</td>
          <td class=list-large width=500>".$name."</td>
-         <td class=list-large width=100>".formatRates($acc['bps_in'])."</td>
-         <td class=list-large width=100>".formatRates($acc['bps_out'])."</td>
+         <td class=list-large width=100>".formatRates($acc['cipMacHCSwitchedBytes_input_rate'] / 8)."</td>
+         <td class=list-large width=100>".formatRates($acc['cipMacHCSwitchedBytes_output_rate'] / 8)."</td>
        </tr>
      </table>
    ");
@@ -151,6 +193,8 @@
   echo("</div>");
   $i++;
  }
+
+}
 
 }
 

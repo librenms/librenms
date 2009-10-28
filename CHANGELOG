@@ -1,4 +1,4 @@
-Release 0.6.0 ( )
+Release 0.6.0 ( 28th August 2009 )
 
 Changed IPv6 database structure and discovery *** DATABASE CHANGE ***
 Added CollectD integration code

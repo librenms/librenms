@@ -29,7 +29,7 @@ $interface = mysql_fetch_array($interface_query);
 
  echo("<div class=ifcell style='margin: 0px;'><table width=100% cellpadding=10 cellspacing=0>");
 
-   include("includes/print-interface.inc");
+   include("includes/print-interface.inc.php");
 
  echo("</table></div>");
 
@@ -89,26 +89,30 @@ if($_GET['optb']) {
 include("pages/device/port/".mres($_GET['optb']).".inc.php");
 
 } else {
-
-  if(file_exists("rrd/" . $hostname . "/". $ifIndex . ".rrd")) {
+  if(file_exists($config['rrd_dir'] . "/" . $hostname . "/". $ifIndex . ".rrd")) {
 
     $iid = $id;
     echo("<div class=graphhead>Interface Traffic</div>");
-    $graph_type = "bits";
-    include("includes/print-interface-graphs.php");
+    $graph_type = "port_bits";
+    include("includes/print-interface-graphs.inc.php");
 
     echo("<div class=graphhead>Interface Packets</div>");
-    $graph_type = "pkts";
-    include("includes/print-interface-graphs.php");
+    $graph_type = "port_upkts";
+    include("includes/print-interface-graphs.inc.php");
 
     echo("<div class=graphhead>Interface Non Unicast</div>");
-    $graph_type = "nupkts";
-    include("includes/print-interface-graphs.php");
+    $graph_type = "port_nupkts";
+    include("includes/print-interface-graphs.inc.php");
 
     echo("<div class=graphhead>Interface Errors</div>");
-    $graph_type = "errors";
-    include("includes/print-interface-graphs.php");
+    $graph_type = "port_errors";
+    include("includes/print-interface-graphs.inc.php");
 
+    if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-" . $interface['ifIndex'] . ".rrd")) {
+      echo("<div class=graphhead>Ethernet Errors</div>");
+      $graph_type = "port_etherlike";
+      include("includes/print-interface-graphs.inc.php");
+    }
   }
  
 }

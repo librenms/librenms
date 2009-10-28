@@ -1,6 +1,8 @@
 <?php
 
-if($os == "Linux" || $os == "NetBSD" || $os == "FreeBSD" || $os == "DragonFly" || $os == "OpenBSD" || $os == "Windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfSense" || $os == "DragonFly" || $os == "OpenBSD") {
+$os = strtolower($os);
+
+if($os == "linux" || $os == "netbsd" || $os == "freebsd" || $os == "dragonfly" || $os == "openbsd" || $os == "windows" || $os == "m0n0wall" || $os == "Voswall" || $os == "pfsense" || $os == "dragonfly" || $os == "openbsd") {
   include("device_cpu_unix.inc.php");
 }
 

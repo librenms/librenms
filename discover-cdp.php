@@ -25,19 +25,23 @@ while ($device = mysql_fetch_array($device_query)) {
   $host = $id;
 
   echo("\nDetecting CDP neighbours on $device[1]...\n");
-  $snmp = new snmpCDP($hostname, $community);
-  $ports = $snmp->getports();
-  $cdp = $snmp->explore_cdp($ports);
+#  $snmp = new snmpCDP($hostname, $community);
+#  $ports = $snmp->getports();
+#  $cdp = $snmp->explore_cdp($ports);
 
-  $cdp_links = "";
+#  $cdp_links = "";
 
-  foreach (array_keys($cdp) as $key) {
-    $port = $ports[$key];
-    $link = $cdp[$key];
-    $cdp_links .= $hostname . "," . $port['desc'] . "," . $link['host'] . "," . $link['port'] . "\n";   
-  }
+#  foreach (array_keys($cdp) as $key) {
+#    $port = $ports[$key];
+#    $link = $cdp[$key];
+#    $cdp_links .= $hostname . "," . $port['desc'] . "," . $link['host'] . "," . $link['port'] . "\n";   
+#  }
         
-  $cdp_links = trim($cdp_links);
+#  $cdp_links = trim($cdp_links);
+
+
+
+
 
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }

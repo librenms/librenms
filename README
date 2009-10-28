@@ -1,71 +1,48 @@
-README FOR JPGRAPH 3.0.x
-========================
+Copyright (C) 2006-2009 Adam Armstrong <adama@memetic.org>
 
-This package contains JpGraph, an Object Oriented PHP5 Graph Plotting library.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-The library is Copyright (C) 2001-2009 Aditus Consulting and
-released under dual license QPL 1.0 for open source and educational
-use and JpGraph Professional License for commercial use. 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-Please see full license details at http://www.aditus.nu/jpgraph/
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-* --------------------------------------------------------------------
-* PHP4 IS NOT SUPPORTED in the 2.x or 3.x series
-* --------------------------------------------------------------------
-		
-Requirements:
--------------
-Miminum:
-* PHP 5.1.0 or higher 
-* GD 2.0.28 or higher
-Note: Earlier versions might work but is unsupported.
+Please see COPYING for usage requirements and restrictions.
 
-Recommended:
-* PHP >= 5.2.0
-* PHP Built-in GD library
+Introduction
+------------
+
+Observer is an auto-discovering network monitoring system. 
+
+It's designed to be an easily-navigable interface to the health of your network.
+
+
+
+Planned Features
+----------------
+
+* CollectD Integration                              * In Progress
+* Full IPv6 capabilities                            * In Progress
+* Pseudowire (MPLS/L2TP) tracking                   * In Progress
+* MPLS IP-VPN tracking                              * In Progress
+* 95th and metered usage tracking                   * In Progress
+* Nagios Integration                                * Too scary for contempation
 
 Installation
 ------------
-0. Make sure that the PHP version is compatible with the stated requirements
-   and that the PHP installation has support for the GD library. 
-   Please run phpinfo() to check if GD library
-   is supported in the installation. 
-   If the GD library doesn't seem to be installed 
-   please consult the PHP manual under section "Image" for
-   instructions on where to find this library. Please refer to
-   the manual section "Verifying your PHP installation"
-   
-1. Unzip and copy the files to a directory of your choice where Your
-   httpd sever can access them. 
-   For a global site installation you should copy the files to 
-   somewhere in the PHP search path. 
 
-2. Check that the default directory paths in jpg-config.inc
-   for cache directory and TTF directory suits your installation. 
-   Note1: The default directories are different depending on if
-   the library is running on Windows or UNIX.
-   Note2: Apache/PHP must have write permission to your cache 
-   directory if you enable the cache feature. By default the cache
-   is disabled.
+Installation of Observer is currently not for the faint of heart! There is no automated
+install script, so it'll probably take quite a bit of fiddling!
 
-3. Check that all rest of the DEFINE in jpg-config.inc 
-   is setup to your preference. The default should be fine
-   for most users. 
+Please see http://www.observernms.org.
 
-4. Read the chapters on installation in the manual.
+Please email adama@memetic.org with any feature requests, bug reports or just to tell me
+that you're using observer!
 
 
-Documentation
--------------
-The installation includes HTML documentation and reference guide for the
-library. The portal page for all the documentation is
-<YOUR-INSTALLATION-DIRECTORY>/docs/index.html
-
-
-Bug reports and suggestions
----------------------------
-Should be reported using the the issue tracker at
-
-http://www.aditus.nu/bugtraq
-
-<EOF>

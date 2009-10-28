@@ -35,11 +35,20 @@
     list(,$circuit) = preg_split("/[\{\}]/", $interface['ifAlias']);
     list(,$notes) = preg_split("/[\(\)]/", $interface['ifAlias']);
     list(,$speed) = preg_split("/[\[\]]/", $interface['ifAlias']);
-
+    $customer = trim($customer);
 
     if ($customer == $prev_customer) { 
       unset($customer);
     } else { 
+     if(isset($prev_customer)) {
+       echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
+       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       </td></tr>");
+     }
+
      if(is_integer($customers/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
      $customers++;
      $prev_customer = $customer;

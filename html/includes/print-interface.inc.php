@@ -1,5 +1,9 @@
 <?php
 
+#echo("<pre>");
+#print_r($interface);
+#echo("</pre>");
+
 #  This file prints a table row for each interface 
  
   $interface['device_id'] = $device['device_id'];
@@ -11,8 +15,8 @@
 
   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) { 
-    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors); 
+  if($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) { 
+    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
   } else { $error_img = ""; }
 
    if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
@@ -48,22 +52,24 @@
   echo("</td><td width=100>");
 
   if($port_details) {
-    $interface['graph_type'] = "bits";
-    echo(generateiflink($interface, "<img src='graph.php?type=bits&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
-    $interface['graph_type'] = "pkts";
-    echo(generateiflink($interface, "<img src='graph.php?type=pkts&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
-    $interface['graph_type'] = "errors";
-    echo(generateiflink($interface, "<img src='graph.php?type=errors&if=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    $interface['graph_type'] = "port_bits";
+    echo(generateiflink($interface, "<img src='graph.php?type=port_bits&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    $interface['graph_type'] = "port_upkts";
+    echo(generateiflink($interface, "<img src='graph.php?type=port_upkts&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    $interface['graph_type'] = "port_errors";
+    echo(generateiflink($interface, "<img src='graph.php?type=port_errors&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
   }
 
   echo("</td><td width=120>");
   if($interface['ifOperStatus'] == "up") {
+    $interface['in_rate'] = $interface['ifInOctets_rate'] * 8;
+    $interface['out_rate'] = $interface['ifOutOctets_rate'] * 8;
     $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
     $out_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
     echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . 
-      formatRates($interface['in_rate']) . "</span><br />");
+      formatRates($interface['in_rate']) . "<br />".format_bi($interface['ifInUcastPkts_rate'])."pps</span><br />");
     echo("<img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . 
-      formatRates($interface['out_rate']) . "</span>");  
+      formatRates($interface['out_rate']) . "<br />".format_bi($interface['ifOutUcastPkts_rate'])."pps</span>");  
   }
 
   echo("</td><td width=75>");
@@ -198,7 +204,6 @@ echo("</td>");
     unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 
 
-
      echo("</td></tr>");
 
      // If we're showing graphs, generate the graph and print the img tags
@@ -206,17 +211,17 @@ echo("</td>");
  
           $type = $graph_type;
 
-          $daily_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
-          $daily_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
+          $daily_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
+          $daily_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
 
-          $weekly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
-          $weekly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
+          $weekly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
+          $weekly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
 
-          $monthly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
-          $monthly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
+          $monthly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
+          $monthly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
 
-          $yearly_traffic = "graph.php?if=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
-          $yearly_url = "graph.php?if=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
+          $yearly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
+          $yearly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 

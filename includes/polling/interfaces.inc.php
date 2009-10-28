@@ -3,7 +3,7 @@
 if($device['os'] == "CatOS" || $device['os'] == "IOS") { 
   $portifIndex = array();
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
-  echo("$cmd");
+  #echo("$cmd");
   $portifIndex_output = trim(shell_exec($cmd));
   foreach(explode("\n", $portifIndex_output) as $entry){
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
@@ -118,7 +118,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $update_query  = "UPDATE `interfaces` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
-     echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
+     #echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
      $update_result = mysql_query($update_query);
    } else {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");
@@ -147,7 +147,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $ret = rrdtool_update("$rrdfile", $woo);
 
    } else {
-     echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
+     #echo("Interface " . $device['hostname'] . " " . $interface['ifDescr'] . " is down\n");
   }
  }
 

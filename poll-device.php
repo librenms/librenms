@@ -3,33 +3,33 @@
 
 include("config.php");
 include("includes/functions.php");
+include("includes/functions-poller.inc.php");
+
+$poller_start = utime();
 
 echo("Observer Poller v".$config['version']."\n\n");
 
-if($argv[1] == "--device" && $argv[2]) {  
-  $where = "AND `device_id` = '".$argv[2]."'";
-} elseif ($argv[1] == "--odd") {
+$options = getopt("h:t:i:n:d::a::");
+
+if ($options['h'] == "odd") {
   $where = "AND MOD(device_id,2) = 1";
-} elseif ($argv[1] == "--even") {
+  $doing = $options['h'];
+} elseif ($options['h'] == "even") {
   $where = "AND MOD(device_id,2) = 0";
-} elseif ($argv[1] == "--odd3") {
-  $where = "AND MOD(device_id,2) = 1 AND device_id NOT LIKE '%1'";
-} elseif ($argv[1] == "--even3") {
-  $where = "AND MOD(device_id,2) = 0 AND device_id NOT LIKE '%2'";
-} elseif ($argv[1] == "--other3") {
-  $where = "AND (device_id LIKE '%1' OR device_id LIKE '%2')";
-
-} elseif ($argv[1] == "--all") {
-
-} else {
-  echo("--device <device id>    Poll single device\n");
-  echo("--all                   Poll all devices\n\n");
-  echo("No polling type specified!\n");
-  exit;
+  $doing = $options['h'];
+} elseif($options['h']) {
+  $where = "AND `device_id` = '".$options['h']."'";
+  $doing = "Host ".$options['h'];
+} elseif ($options['i'] && isset($options['n'])) {
+  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
+  $doing = "Proc ".$options['n'] ."/".$options['i'];
+} elseif ($options['h'] == "all") {
+  $where = " ";
+  $doing = "all";
 }
 
 echo("Starting polling run:\n\n");
-
+$i = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
@@ -154,10 +154,15 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("Polling temperatures\n");
   include("includes/polling/temperatures.inc.php");
   include("includes/polling/device-netstats.inc.php");
-  echo("Polling interfaces\n");
 
-  $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
-  include("includes/polling/interfaces.inc.php");
+#  echo("Polling interfaces\n");
+#  $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
+#  include("includes/polling/interfaces.inc.php");
+
+   include("includes/polling/ports.inc.php");
+   include("includes/polling/ports-etherlike.inc.php");
+   include("includes/polling/cisco-mac-accounting.inc.php");
+
 
 
     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
@@ -276,9 +281,16 @@ while ($device = mysql_fetch_array($device_query)) {
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
-
+  $i++;
   echo("\n");
 
 }   
+
+$poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
+
+$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
+echo("$string\n");
+shell_exec("echo '".$string."' >> /opt/observer/observer.log");
+
 
 ?>

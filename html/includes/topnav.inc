@@ -13,7 +13,7 @@ $interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS
 $interfaces['down'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
 $interfaces['shutdown'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
 $interfaces['ignored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '1' OR D.ignore = '1')"),0);
-$interfaces['errored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '0' OR D.ignore = '0') AND (I.in_errors > '0' OR I.out_errors > '0')"),0);
+$interfaces['errored'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')"),0);
 
 
 $services['count'] = mysql_result(mysql_query("SELECT count(service_id) FROM services"),0);
