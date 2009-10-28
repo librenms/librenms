@@ -30,7 +30,12 @@ while($peer = mysql_fetch_array($peers)) {
       RRA:AVERAGE:0.5:1:600 \
       RRA:AVERAGE:0.5:6:700 \
       RRA:AVERAGE:0.5:24:775 \
-      RRA:AVERAGE:0.5:288:797");
+      RRA:AVERAGE:0.5:288:797 \
+      RRA:MAX:0.5:1:600 \
+      RRA:MAX:0.5:6:700 \
+      RRA:MAX:0.5:24:775 \
+      RRA:MAX:0.5:288:797");
+
   }
   rrdtool_update("$peerrrd", "N:$bgpPeerOutUpdates:$bgpPeerInUpdates:$bgpPeerOutTotalMessages:$bgpPeerInTotalMesages:$bgpPeerFsmEstablishedTime");
   $update  = "UPDATE bgpPeers SET bgpPeerState = '$bgpPeerState', bgpPeerAdminStatus = '$bgpPeerAdminStatus', ";
@@ -87,7 +92,11 @@ while($peer = mysql_fetch_array($peers)) {
          RRA:AVERAGE:0.5:1:600 \
          RRA:AVERAGE:0.5:6:700 \
          RRA:AVERAGE:0.5:24:775 \
-         RRA:AVERAGE:0.5:288:797");
+         RRA:AVERAGE:0.5:288:797 \
+         RRA:MAX:0.5:1:600 \
+         RRA:MAX:0.5:6:700 \
+         RRA:MAX:0.5:24:775 \
+         RRA:MAX:0.5:288:797");
      }
      rrdtool_update("$cbgp_rrd", "N:$cbgpPeerAcceptedPrefixes:$cbgpPeerDeniedPrefixes:$cbgpPeerAdvertisedPrefixes:$cbgpPeerSuppressedPrefixes:$cbgpPeerWithdrawnPrefixes");
    }
