@@ -1,24 +1,30 @@
 <?php
 
+if($_GET['opta'] == graphs ) {
+  if($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
+}
+
 print_optionbar_start();
 
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs:
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> 
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/thumbs/'>Mini</a>) | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/upkts/'>Packets</a> 
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/upkts/thumbs/'>Mini</a>) | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a>
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/thumbs/'>Mini</a>) |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/thumbs/'>Mini</a>)</a>");
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs: ");
+
+$graph_types = array("bits" => "Bits",
+                     "upkts" => "Unicast Packets",
+                     "nupkts" => "Non-Unicast Packets", 
+                     "errors" => "Errors", 
+                     "etherlike" => "Etherlike");
+
+foreach ($graph_types as $type => $descr) {
+  echo("$type_sep 
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/'>$descr</a> 
+  (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/thumbs/'>Mini</a>) ");
+  $type_sep = " | ";
+}
+
 
 print_optionbar_end();
-
-if($_GET['opta'] == graphs ) {
-  if($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
-}
 
 if($_GET['optc'] == thumbs) {
 
