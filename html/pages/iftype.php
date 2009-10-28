@@ -25,7 +25,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multi_bits";
   $interface['interface_id'] = $if_list;
-  include("includes/print-interface-graphs.php");
+  include("includes/print-interface-graphs.inc.php");
   echo("</td></tr>");
 
 
@@ -52,7 +52,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 if(file_exists($config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
 
     $graph_type = "bits";
-    include("includes/print-interface-graphs.php");
+    include("includes/print-interface-graphs.inc.php");
 
 }
       echo("</td></tr>");

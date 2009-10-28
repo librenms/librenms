@@ -2,10 +2,8 @@
 
 function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
 {
- global $config, $installdir;
+ global $config;
     $database = "rrd/" . $rrd;
-    $imgfile = "graphs/" . "$graph";
-
     $optsa = array( "--start", $from, "--width", $width, "--height", $height, "--vertical-label", $vertical, "--alt-autoscale-max",
                  "-l 0",
                  "-E",
@@ -23,14 +21,14 @@ function cpugraphHP ($rrd, $graph , $from, $to, $width, $height)
                                       "--font-render-mode", "normal");}
   $opts = array_merge($config['rrdgraph_defaults'], $$optsa, $optsb);
 
-  $ret = rrd_graph("$imgfile", $opts, count($opts));
+  $ret = rrd_graph("$graph", $opts, count($opts));
 
   if( !is_array($ret) ) {
     $err = rrd_error();
     #echo "rrd_graph() ERROR: $err\n";
     return FALSE;
   } else {
-    return $imgfile;
+    return $graph;
   }
 }
 
@@ -38,7 +36,7 @@ function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertic
 {
  global $config, $installdir;
     $database = "rrd/" . $rrd;
-    $imgfile = "graphs/" . "$graph";
+    
     $memrrd = $database;
     $opts = array("--start", "$from", "--alt-autoscale-max", "--width", "$width", "--height", "$height",
             "-l", "0", "-E", "-b", "1024",
@@ -55,14 +53,14 @@ function memgraphHP ($rrd, $graph , $from, $to, $width, $height, $title, $vertic
 
   $opts = array_merge($config['rrdgraph_defaults'], $$opts, $optsb);
 
-  $ret = rrd_graph("$imgfile", $opts, count($opts));
+  $ret = rrd_graph("$graph", $opts, count($opts));
 
   if( !is_array($ret) ) {
     $err = rrd_error();
     #echo "rrd_graph() ERROR: $err\n";
     return FALSE;
   } else {
-    return $imgfile;
+    return $graph;
   }
 
 }

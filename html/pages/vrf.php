@@ -51,7 +51,7 @@ if($_GET['opta'] == "details" ) {
        } else {
          if(is_integer($i/2)) { $int_colour = $list_colour_b_b; } else { $int_colour = $list_colour_b_a; }
        }
-       include("includes/print-interface.inc");
+       include("includes/print-interface.inc.php");
        $i++;
      }
      $x++;

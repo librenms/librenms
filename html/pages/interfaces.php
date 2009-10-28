@@ -102,7 +102,7 @@ if($_GET['type'] == "down" || $_POST['state'] == "down") {
 } elseif ($_GET['type'] == "admindown" || $_POST['state'] == "admindown") {
   $where .= "AND I.ifAdminStatus = 'down'";
 } elseif ($_GET['type'] == "errors" || $_POST['state'] == "errors") {
-  $where .= "AND ( I.`out_errors` > '0' OR I.`in_errors` > '0' )";
+  $where .= "AND ( I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0' )";
 } elseif ($_GET['type'] == "up" || $_POST['state'] == "up") {
   $where .= "AND I.ifOperStatus = 'up'";
 } elseif ($_GET['type'] == "l2vlan" || $_POST['state'] == "l2vlan") {

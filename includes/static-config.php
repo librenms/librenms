@@ -68,8 +68,8 @@ $year = time() - (365 * 24 * 60 * 60);
 ### Update Database between 0.6.0 and 0.6.1 (slight slowdown)
 
 $exists = false;
-$columns = mysql_query("SHOW columns FROM `interfaces`");
-while($c = mysql_fetch_assoc($columns)){
+$columns = @mysql_query("SHOW columns FROM `interfaces`");
+while($c = @mysql_fetch_assoc($columns)){
   if($c['Field'] == "pagpOperationMode"){
     $db_pagp = true;
   }

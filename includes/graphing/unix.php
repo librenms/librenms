@@ -1,9 +1,9 @@
 <?php 
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -56,14 +56,14 @@ function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, 
   $options .= " GPRINT:sspam:MAX:\ %6.0lf";
   $options .= " GPRINT:rspam:AVERAGE:\ \ %5.2lf/min";
   $options .= " GPRINT:rmspam:MAX:\ %5.2lf/min\\\\l";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -95,14 +95,14 @@ function mailsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $options .= " GPRINT:srecv:MAX:\ \ %6.0lf";
   $options .= " GPRINT:rrecv:AVERAGE:\ \ %5.2lf/min";
   $options .= " GPRINT:rmrecv:MAX:\ %5.2lf/min\\\\l";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024";
   $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
@@ -161,14 +161,14 @@ function memgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $options .= " LINE1:totalreal#050505:total";
   $options .= " GPRINT:totalreal:AVERAGE:\ \ %7.2lf%sB";
 
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -194,15 +194,15 @@ function loadgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vert
   $options .= " GPRINT:c:LAST:\ \ \ %7.2lf";
   $options .= " GPRINT:c:AVERAGE:\ \ %7.2lf";
   $options .= " GPRINT:c:MAX:\ \ %7.2lf\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 
 function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   $options .= $config['rrdgraph_def_text'];
@@ -215,14 +215,14 @@ function usersgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $options .= " GPRINT:users:AVERAGE:%6.2lf";
   $options .= " GPRINT:users:MIN:%6.2lf";
   $options .= " GPRINT:users:MAX:%6.2lf\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   $options .= $config['rrdgraph_def_text'];
@@ -235,17 +235,17 @@ function procsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $ver
   $options .= " GPRINT:procs:AVERAGE:%6.2lf";
   $options .= " GPRINT:procs:MIN:%6.2lf";
   $options .= " GPRINT:procs:MAX:%6.2lf\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 
 }
 
 
 
 function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "-l 0 --alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -276,14 +276,14 @@ function cpugraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $verti
   $options .= " GPRINT:idle_perc:LAST:\ \ \ \ \ %5.2lf%%";
   $options .= " GPRINT:idle_perc:AVERAGE:\ \ \ %5.2lf%%";
   $options .= " GPRINT:idle_perc:MAX:\ \ \ %5.2lf%%\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $period = $to - $from;
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
@@ -327,14 +327,14 @@ function couriergraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $v
   $options .= " GPRINT:vimapd_ssl_login:AVERAGE:\ %6.0lf";
   $options .= " GPRINT:rimapd_ssl_login:AVERAGE:%5.2lf/min";
   $options .= " GPRINT:rmimapd_ssl_login:MAX:%5.2lf/min\\\\l";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }  
@@ -345,13 +345,13 @@ function apachehitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
   $options .= " GPRINT:hits:LAST:\ %6.2lf/sec";
   $options .= " GPRINT:hits:AVERAGE:%6.2lf/sec";
   $options .= " GPRINT:hits:MAX:%6.2lf/sec\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
-  $imgfile = "graphs/" . "$graph";
+  global $config;
+
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
   $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
@@ -377,15 +377,15 @@ function unixfsgraph ($id, $graph, $from, $to, $width, $height, $title, $vertica
     $options .= " GPRINT:$fs[storage_id]p:LAST:%5.2lf%%\\\\l";
     $iter++;
   }
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 
 function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -b 1024 -l 0";
   $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
@@ -411,14 +411,14 @@ function unixfsgraph_dev ($device, $graph, $from, $to, $width, $height, $title, 
     $options .= " GPRINT:$fs[storage_id]p:LAST:%5.2lf%%\\\\l";
     $iter++;
   }
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }
 
 function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
-  global $config, $installdir;
+  global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
-  $imgfile = "graphs/" . "$graph";
+
   $options = "--alt-autoscale-max -E --start $from --end $to --width $width --height $height -l 0";
   $options .= $config['rrdgraph_def_text'];
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal "; }
@@ -429,6 +429,6 @@ function apachebitsgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title,
   $options .= " GPRINT:bits:LAST:\ %6.2lf/sec";
   $options .= " GPRINT:bits:AVERAGE:%6.2lf/sec";
   $options .= " GPRINT:bits:MAX:%6.2lf/sec\\\\n";
-  shell_exec($config['rrdtool'] . " graph $imgfile $options");
-  return $imgfile;
+  shell_exec($config['rrdtool'] . " graph $graph $options");
+  return $graph;
 }

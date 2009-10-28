@@ -221,11 +221,11 @@ if($_SESSION['userlevel'] >= '5')
   if($interfaces['wave_broadband']) {
     echo("<div style='width: 235px; float: left;'>
     <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=bits&if=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
-    <img src=\'graph.php?type=bits&if=".$interfaces['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
     ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
     <div style='font-size: 16px; font-weight: bold; color: #555555;'>Wave Broadband</div>".
-    "<img src='graph.php?type=bits&if=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=1&legend=no'></a></div>");
+    "<img src='graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=1&legend=no'></a></div>");
   }
 
   echo("</div>");

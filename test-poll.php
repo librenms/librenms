@@ -4,7 +4,7 @@
 include("config.php");
 include("includes/functions.php");
 
-$start = utime();
+$poller_start = utime();
 
 ### Observer Device Polling Test
 
@@ -43,16 +43,17 @@ $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where O
 while ($device = mysql_fetch_array($device_query)) {
 
   echo("\n" . $device['hostname'] ."\n");
-
+  $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
+  $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
   include("includes/polling/".$type.".inc.php");
 
   echo("\n"); $devices_polled++;
 }
 
-$end = utime(); $run = $end - $start;
-$proctime = substr($run, 0, 5);
+$poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
-echo("$devices_polled devices polled in $proctime secs\n");
-
+$string = $argv[0] . " " . date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
+echo("$string\n");
+shell_exec("echo '".$string."' >> /opt/observer/observer.log");
 
 ?>

@@ -7,8 +7,8 @@ echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs:
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/'>Bits</a> 
 (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/bits/thumbs/'>Mini</a>) | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/'>Packets</a> 
-(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/pkts/thumbs/'>Mini</a>) | 
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/upkts/'>Packets</a> 
+(<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/upkts/thumbs/'>Mini</a>) | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/'>NU Packets</a>
 (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/nupkts/thumbs/'>Mini</a>) |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/errors/'>Errors</a>
@@ -17,7 +17,7 @@ echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports
 print_optionbar_end();
 
 if($_GET['opta'] == graphs ) {
-  if($_GET['optb']) { $graph_type = $_GET['optb']; } else { $graph_type = "bits"; }
+  if($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
 }
 
 if($_GET['optc'] == thumbs) {
@@ -51,7 +51,7 @@ if($_GET['optc'] == thumbs) {
     $i = "1";
     $interface_query = mysql_query("select * from interfaces WHERE device_id = '$_GET[id]' AND deleted = '0' ORDER BY `ifIndex` ASC");
     while($interface = mysql_fetch_array($interface_query)) {
-      include("includes/print-interface.inc");
+      include("includes/print-interface.inc.php");
       $i++; 
     }
     echo("</table></div>");

@@ -2,6 +2,12 @@
 
 ## Common Functions
 
+function truncate($substring, $max = 50, $rep = '...'){
+  if(strlen($substring) < 1){ $string = $rep; } else { $string = $substring; }
+  $leave = $max - strlen ($rep);
+  if(strlen($string) > $max){ return substr_replace($string, $rep, $leave); } else { return $string; }
+}
+
 function mres($string) { // short function wrapper because the real one is stupidly long and ugly. aestetics.
   return mysql_real_escape_string($string);
 }

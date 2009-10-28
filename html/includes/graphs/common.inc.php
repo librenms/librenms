@@ -14,8 +14,8 @@ if($_GET['legend'] == "no")  { $rrd_options = " -g"; }
 
 if(!$scale_min && !$scale_max) { $rrd_options .= " --alt-autoscale-max"; }
 
-if($scale_min) { $rrd_options .= " -l $scale_min"; }
-if($scale_max) { $rrd_options .= " -u $scale_max"; }
+if(isset($scale_min)) { $rrd_options .= " -l $scale_min"; }
+if(isset($scale_max)) { $rrd_options .= " -u $scale_max"; }
 
 
 $rrd_options .= " -E --start ".$from." --end " . ($to - 150) . " --width ".$width." --height ".$height." ";

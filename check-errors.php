@@ -12,11 +12,9 @@ $i = '0';
 
 $interface_query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where");
 while ($interface = mysql_fetch_array($interface_query)) {
-  $rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
-  $errors = interface_errors($rrdfile);
-  mysql_query("UPDATE `interfaces` SET in_errors = '" . $errors['in'] . "', out_errors = '" . $errors['out'] . "' WHERE interface_id = '" . $interface['interface_id'] . "'");
-  if($errors['in'] > '100' || $errors['out'] > '100') { 
-    $errored[] = $interface['hostname'] . " - " . $interface['ifDescr'] . " - " . $interface['ifAlias'] . " - " . $errors['in'] . " - " . $errors['out']; 
+  $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
+  if($errors > '1') { 
+    $errored[] = $interface['hostname'] . " - " . $interface['ifDescr'] . " - " . $interface['ifAlias'] . " - " . $interface['ifInErrors_delta'] . " - " . $interface['ifOutErrors_delta']; 
   }
   $i++;
 }
