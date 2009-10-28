@@ -2,9 +2,8 @@
 
   include("common.inc.php");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netinfo.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-udp.rrd";
 
-  $rrd_options .= " DEF:icmpInMsgs=$rrd_filename:icmpInMsgs:AVERAGE";
   $rrd_options .= " DEF:udpInDatagrams=$rrd_filename:udpInDatagrams:AVERAGE";
   $rrd_options .= " DEF:udpOutDatagrams=$rrd_filename:udpOutDatagrams:AVERAGE";
   $rrd_options .= " DEF:udpInErrors=$rrd_filename:udpInErrors:AVERAGE";

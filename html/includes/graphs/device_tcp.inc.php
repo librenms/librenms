@@ -2,9 +2,8 @@
 
   include("common.inc.php");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netinfo.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-tcp.rrd";
 
-  $rrd_options .= " DEF:icmpInMsgs=$rrd_filename:icmpInMsgs:AVERAGE";
   $rrd_options .= " DEF:tcpActiveOpens=$rrd_filename:tcpActiveOpens:AVERAGE";
   $rrd_options .= " DEF:tcpPassiveOpens=$rrd_filename:tcpPassiveOpens:AVERAGE";
   $rrd_options .= " DEF:tcpAttemptFails=$rrd_filename:tcpAttemptFails:AVERAGE";

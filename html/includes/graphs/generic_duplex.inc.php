@@ -5,7 +5,8 @@
 
 include("common.inc.php");
 
-if(!$unit_text) {$unit_text = "\ \ \ \ \ \ \ ";}
+
+$unit_text = str_pad(truncate($unit_text,10),10);
 
 $rrd_options .= " DEF:".$out."=".$rrd_filename.":".$rra_out.":AVERAGE";
 $rrd_options .= " DEF:".$in."=".$rrd_filename.":".$rra_in.":AVERAGE";
@@ -33,11 +34,11 @@ if($graph_max) {
   $rrd_options .= " AREA:dout_max#".$colour_area_out_max.":";
 }
 $rrd_options .= " AREA:in#".$colour_area_in.":";
-$rrd_options .= " COMMENT:".$unit_text."Now\ \ \ \ \ \ \ Ave\ \ \ \ \ \ Max";
+$rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 if($percentile) {
-  $rrd_options .= "\ \ \ \ \ \ ".$percentile."th\ %\\\\n";
+  $rrd_options .= "      ".$percentile."th %";
 }
-$rrd_options .= "\\\\n";
+$rrd_options .= "\\n'";
 $rrd_options .= " LINE1.25:in#".$colour_line_in.":In\ ";
 $rrd_options .= " GPRINT:in:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:in:AVERAGE:%6.2lf%s";
