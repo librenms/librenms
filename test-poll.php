@@ -3,6 +3,8 @@
 
 include("config.php");
 include("includes/functions.php");
+include("includes/functions-poller.inc.php");
+
 
 $poller_start = utime();
 
@@ -48,6 +50,9 @@ while ($device = mysql_fetch_array($device_query)) {
   include("includes/polling/".$type.".inc.php");
 
   echo("\n"); $devices_polled++;
+
+  unset($array);
+
 }
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);

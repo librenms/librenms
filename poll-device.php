@@ -292,5 +292,4 @@ $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled i
 echo("$string\n");
 shell_exec("echo '".$string."' >> /opt/observer/observer.log");
 
-
 ?>
