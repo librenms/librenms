@@ -50,6 +50,28 @@ global $config;
   return $array;
 }
 
+function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
+  global $config;
+  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  if($mib) { $cmd .= "-m $mib "; }
+  $cmd .= $oid;
+  $data = trim(shell_exec($cmd));
+  $device_id = $device['device_id'];
+  #echo("Caching: $oid\n");
+  foreach(explode("\n", $data) as $entry) {
+    $entry = str_replace($oid.".", "", $entry);
+    list($slotport, $value) = explode("=", $entry);
+    $slotport = trim($slotport); $value = trim($value);
+    if ($array[$device_id][$slotport]['ifIndex']) {
+      $ifIndex = $array[$device_id][$slotport]['ifIndex'];
+      #$array[$device_id][$slotport][$oid] = $value;
+      $array[$device_id][$ifIndex][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
+
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
   $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
@@ -97,6 +119,7 @@ function snmp_cache_portIfIndex ($device, $array) {
   global $config;
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex";
   $output = trim(shell_exec($cmd));
+  $device_id = $device['device_id'];
   #echo("Caching: portIfIndex\n");
   foreach(explode("\n", $output) as $entry){
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
@@ -111,6 +134,7 @@ function snmp_cache_portName ($device, $array) {
   global $config;
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName";
   $output = trim(shell_exec($cmd));
+  $device_id = $device['device_id'];
   #echo("Caching: portName\n");
   foreach(explode("\n", $output) as $entry){
     $entry = str_replace("portName.", "", $entry);
