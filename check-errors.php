@@ -30,6 +30,7 @@ if($errored) { ## If there are errored interfaces
   } 
   ## Send the alert email
   mail($config['email_default'], "Observer detected errors on $i interfaces", $msg, $config['email_headers']);
+  echo($msg);
 }
 
 ?>

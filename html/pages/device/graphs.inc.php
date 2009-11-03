@@ -144,7 +144,7 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "device_users";            include ("includes/print-device-graph.php");
       echo("<br />");
       echo("<div class=graphhead>Running Processes</div>");
-      $graph_type = "device_procs";            include ("includes/print-device-graph.php");
+      $graph_type = "device_processes";            include ("includes/print-device-graph.php");
       echo("<br />");
       break;
 

@@ -1,15 +1,3 @@
-ALTER TABLE `interfaces` ADD `pagpOperationMode` VARCHAR( 32 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpPortState` VARCHAR( 16 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpPartnerDeviceId` VARCHAR( 48 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpPartnerLearnMethod` VARCHAR( 16 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpPartnerIfIndex` INT NULL;
-ALTER TABLE `interfaces` ADD `pagpPartnerGroupIfIndex` INT NULL;
-ALTER TABLE `interfaces` ADD `pagpPartnerDeviceName` VARCHAR( 128 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpEthcOperationMode` VARCHAR( 16 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpDeviceId` VARCHAR( 48 ) NULL;
-ALTER TABLE `interfaces` ADD `pagpGroupIfIndex` INT NULL;
-ALTER TABLE `interfaces` ADD `portName` VARCHAR( 128 ) NULL DEFAULT NULL AFTER  `ifName`;
-ALTER TABLE `interfaces` ADD `ifHighSpeed` INT ( 11 ) NULL DEFAULT NULL AFTER  `ifSpeed`;
 ALTER TABLE `mac_accounting` ADD `cipMacHCSwitchedBytes_input` bigint(20) default NULL;
 ALTER TABLE `mac_accounting` ADD `cipMacHCSwitchedBytes_input_prev` bigint(20) default NULL;
 ALTER TABLE `mac_accounting` ADD `cipMacHCSwitchedBytes_input_delta` bigint(20) default NULL;

@@ -1,7 +1,8 @@
 <?php
 
-if($_GET['if']) { $interfaces = $_GET['if']; }
+if($_GET['port']) { $interfaces = $_GET['port']; }
 if($_GET['interfaces']) { $interfaces = $_GET['interfaces']; }
+
 
 $i = 1;
 foreach(explode(",", $interfaces) as $ifid) {
