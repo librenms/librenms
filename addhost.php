@@ -25,6 +25,6 @@ if($argv[1] && $argv[2] && $argv[3]) {
       } else { echo("Already got host $host\n"); }
     } else { echo("Could not ping $host\n"); }
   } else { echo("Could not resolve $host\n"); }
-} else { echo("Add Host Tool\nUsage: ./addhost.php <hostname> <community> <snmpversion> <port>\n"); }
+} else { echo("Add Host Tool\nUsage: ./addhost.php <hostname> <community> <snmpversion v1|v2c> <port>\n"); }
 
 ?>
