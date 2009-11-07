@@ -2,7 +2,7 @@
 
   unset( $storage_exists );
 
-  echo("Storage : ");  
+  echo("hrStorage : ");  
 
   $oids = shell_exec($config['snmpwalk'] . " -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
   $oids = trim(str_replace("hrStorageIndex.","",$oids));
@@ -17,13 +17,10 @@
 
     $allow = 1;
     foreach($config['ignore_mount'] as $bi) {
-#    echo("$descr == $bi\n");
     if($descr == $bi) {
         $allow = 0;
       }
     }
-
-#    echo("$fstype\n");
 
     if(strstr($fstype, "FixedDisk") && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
@@ -49,22 +46,17 @@ $sql = "SELECT * FROM storage AS S, devices AS D where S.host_id = D.device_id A
 $query = mysql_query($sql);
 
 while ($store = mysql_fetch_array($query)) {
-
         unset($exists);
-
         $i = 0;
         while ($i < count($storage_exists) && !$exists) {
             $thisstore = $store['host_id'] . " " . $store['hrStorageIndex'];
             if ($storage_exists[$i] == $thisstore) { $exists = 1; }
             $i++;
         }
-
         if(!$exists) {
           echo("-");
           mysql_query("DELETE FROM storage WHERE storage_id = '" . $store['storage_id'] . "'");
         }
-
-
 }
 
 echo("\n");

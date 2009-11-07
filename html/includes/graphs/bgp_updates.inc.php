@@ -1,5 +1,7 @@
 <?php
 
+$scale_min = "0";
+
 $data = mysql_fetch_array(mysql_query("SELECT * FROM bgpPeers AS B, devices AS D WHERE bgpPeer_id = '".$_GET['peer']."' AND D.device_id = B.device_id"));
 
 $rrd_filename = $config['rrd_dir'] . "/" . $data['hostname'] . "/bgp-" . $data['bgpPeerIdentifier'] . ".rrd";

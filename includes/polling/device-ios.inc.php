@@ -28,7 +28,7 @@
    echo("$hostname\n");
 
    if (!is_file($cpurrd)) {
-      $rrdcreate = `rrdtool create $cpurrd --step 300 \
+      $rrdcreate = shell_exec($config['rrdtool'] . " create $cpurrd --step 300 \
                     DS:LOAD5S:GAUGE:600:-1:100 \
                     DS:LOAD5M:GAUGE:600:-1:100 \
                     RRA:AVERAGE:0.5:1:2000 \
@@ -38,10 +38,10 @@
                     RRA:MAX:0.5:1:2000 \
                     RRA:MAX:0.5:6:2000 \
                     RRA:MAX:0.5:24:2000 \
-                    RRA:MAX:0.5:288:2000`;
+                    RRA:MAX:0.5:288:2000");
    }
 
-   `rrdtool update $cpurrd N:$cpu5s:$cpu5m`;
+   shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu5s:$cpu5m");
 
    include("includes/polling/bgpPeer.inc.php");
    include("includes/polling/cisco-processors.inc.php");

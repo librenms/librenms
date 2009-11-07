@@ -29,7 +29,7 @@ while($drive = mysql_fetch_array($query)) {
     $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125\'>";
+    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=hrstorage&from=$month&to=$now&width=400&height=125\'>";
     $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
 
     $drv_colour = percent_colour($perc);
@@ -39,7 +39,7 @@ while($drive = mysql_fetch_array($query)) {
           </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td><td></td></tr>");
 
 
-  $graph_type = "unixfs";
+  $graph_type = "hrstorage";
 
 // start temperature graphs
 
@@ -73,7 +73,6 @@ while($drive = mysql_fetch_array($query)) {
 
 }
 
-echo("</table>");
-
+  echo("</table>");
 
 ?>

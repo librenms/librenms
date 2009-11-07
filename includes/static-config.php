@@ -6,13 +6,23 @@ $config['ifdescr']['IOS XE'] = true;
 $config['ifname']['ASA'] = true;
 $config['ifname']['CatOS'] = true;
 
-
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
 $config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
 $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
+
+## Set OS Groups
+
+$os_groups['linux']     = "unix";
+$os_groups['freebsd']   = "unix";
+$os_groups['openbsd']   = "unix";
+$os_groups['netbsd']    = "unix";
+$os_groups['dragonfly'] = "unix";
+$os_groups['solaris']   = "unix";
+
+$os_groups['ios xe']    = "ios";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
@@ -34,7 +44,7 @@ if(!$config['graph_colours']['default']) {
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.6.0";
+$config['version'] = "0.7.0";
 
 if($config['enable_nagios']) {
 

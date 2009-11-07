@@ -91,7 +91,14 @@ function shorthost($hostname, $len=16) {
 
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $config;
+  echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n");
   return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
+}
+
+function rrdtool($command, $file, $options) {
+  global $config;
+  if($config['debug']) { echo($config['rrdtool'] . " $command $file $options \n"); }
+  return shell_exec($config['rrdtool'] . " $command $file $options");
 }
 
 function getHostOS($hostname, $community, $snmpver, $port) {
@@ -155,8 +162,7 @@ function devicepermitted($device_id)
 
 }
 
-function formatRates($rate) 
-{
+function formatRates($rate) {
    $rate = format_si($rate) . "bps";
    return $rate;
 }
@@ -331,7 +337,6 @@ $data = mysql_fetch_array(mysql_query($sql));
 $type = strtolower($data['os']);
   if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png'>";
   } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif'>"; }
-  if($device['monowall']) {$image = "<img src='".$config['base_url']."images/os/m0n0wall.png'>";}
   if($type == "linux") {
     $features = strtolower(trim($data[features]));
     list($distro) = split(" ", $features);
@@ -342,8 +347,7 @@ $type = strtolower($data['os']);
 }
 
 
-function renamehost($id, $new) 
-{
+function renamehost($id, $new) {
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   shell_exec("mv ".$config['rrd_dir']."/$host ".$config['rrd_dir']."/$new");
@@ -517,8 +521,7 @@ function isSNMPable($hostname, $community, $snmpver, $port)
      return $status;
 }
 
-function isPingable($hostname) 
-{
+function isPingable($hostname) {
    global $config;
    $status = shell_exec($config['fping'] . " $hostname");
    if(strstr($status, "alive")) {
@@ -529,13 +532,11 @@ function isPingable($hostname)
 }
 
 
-function is_odd($number) 
-{
-   return $number & 1; // 0 = even, 1 = odd
+function is_odd($number) {  
+  return $number & 1; // 0 = even, 1 = odd 
 }
 
-function isValidInterface($if) 
-{
+function isValidInterface($if) {
       global $config;
       $if = strtolower($if);
       $nullintf = 0;
@@ -561,8 +562,7 @@ function ifclass($ifOperStatus, $ifAdminStatus)
 	return $ifclass;
 }
 
-function utime() 
-{
+function utime() {
         $time = explode( " ", microtime());
         $usec = (double)$time[0];
         $sec = (double)$time[1];

@@ -118,10 +118,10 @@ echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=bits&if=36".
 
 echo("<div style='clear: both; margin-top: 10px;'></div>");
 
-echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=unixfs&id=54".
+echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=hrstorage&id=54".
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Alpha Storage</div>".
-    "<img src='graph.php?type=unixfs&id=54".
+    "<img src='graph.php?type=hrstorage&id=54".
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
 
 #}

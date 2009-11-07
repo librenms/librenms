@@ -84,18 +84,41 @@ while($device = mysql_fetch_array($device_query)) {
 
       break;
    case "Windows":
+
+      echo("<div class=graphhead>CPU Usage</div>");
       $graph_type = "device_cpu";
       include ("includes/print-device-graph.php");
 
-      $memgraph  =   memgraphWin   ($device[hostname] . "-mem.rrd",  $device[hostname] . "-mem.png", $day, $now, 335, 100);
-      $loadgraph  =  loadgraphWin  ($device[hostname] . "-load.rrd", $device[hostname] . "-load.png", $day, $now, 335, 100);
-      $cpugraphm  =  cpugraphWin   ($device[hostname] . "-cpu.rrd",  $device[hostname] . "-cpu-m.png", $month, $now, 335, 100);
-      $memgraphm  =  memgraphWin   ($device[hostname] . "-mem.rrd",  $device[hostname] . "-mem-m.png", $month, $now, 335, 100);
-      $loadgraphm  = loadgraphWin  ($device[hostname] . "-load.rrd", $device[hostname] . "-load-m.png", $month, $now, 335, 100);
-      $usersgraph  = usersgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-users.png", $day, $now, 335, 100);
-      $usersgraphm = usersgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-users-m.png", $month, $now, 335, 100);
-      $procsgraph  = procsgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-procs.png", $day, $now, 335, 100);
-      $procsgraphm = procsgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-procs-m.png", $month, $now, 335, 100);
+      echo("<div class=graphhead>Memory Utilisation</div>");
+      $graph_type = "device_memory";              include ("includes/print-device-graph.php");
+      echo("<br />");
+
+      if(mysql_result(mysql_query("SELECT count(storage_id) FROM storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
+        echo("<div class=graphhead>Storage</div>");
+        $graph_type = "device_hrstorage";           include ("includes/print-device-graph.php");
+        echo("<br />");
+      }
+
+      if(mysql_result(mysql_query("SELECT count(*) FROM temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
+        echo("<div class=graphhead>Temperatures</div>");
+        $graph_type = "device_temperatures";           include ("includes/print-device-graph.php");
+        echo("<br />");
+      }
+
+      include("graphs/netstats.inc.php");
+      include("graphs/uptime.inc.php");
+
+#      $memgraph  =   memgraphWin   ($device[hostname] . "-mem.rrd",  $device[hostname] . "-mem.png", $day, $now, 335, 100);
+#      $loadgraph  =  loadgraphWin  ($device[hostname] . "-load.rrd", $device[hostname] . "-load.png", $day, $now, 335, 100);
+#      $cpugraphm  =  cpugraphWin   ($device[hostname] . "-cpu.rrd",  $device[hostname] . "-cpu-m.png", $month, $now, 335, 100);
+#      $memgraphm  =  memgraphWin   ($device[hostname] . "-mem.rrd",  $device[hostname] . "-mem-m.png", $month, $now, 335, 100);
+#      $loadgraphm  = loadgraphWin  ($device[hostname] . "-load.rrd", $device[hostname] . "-load-m.png", $month, $now, 335, 100);
+#      $usersgraph  = usersgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-users.png", $day, $now, 335, 100);
+#      $usersgraphm = usersgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-users-m.png", $month, $now, 335, 100);
+#      $procsgraph  = procsgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-procs.png", $day, $now, 335, 100);
+#      $procsgraphm = procsgraphWin ($device[hostname] . "-sys.rrd",  $device[hostname] . "-procs-m.png", $month, $now, 335, 100);
+
+
       break;
    case "FreeBSD":
    case "NetBSD":
@@ -124,7 +147,7 @@ while($device = mysql_fetch_array($device_query)) {
 
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
         echo("<div class=graphhead>Storage</div>");
-        $graph_type = "device_unixfs";           include ("includes/print-device-graph.php");
+        $graph_type = "device_hrstorage";           include ("includes/print-device-graph.php");
         echo("<br />");
       }
 
@@ -141,10 +164,10 @@ while($device = mysql_fetch_array($device_query)) {
       $graph_type = "device_load";             include ("includes/print-device-graph.php");
       echo("<br />");
       echo("<div class=graphhead>Users Logged On</div>");
-      $graph_type = "device_users";            include ("includes/print-device-graph.php");
+      $graph_type = "device_hrusers";            include ("includes/print-device-graph.php");
       echo("<br />");
       echo("<div class=graphhead>Running Processes</div>");
-      $graph_type = "device_processes";            include ("includes/print-device-graph.php");
+      $graph_type = "device_hrprocesses";            include ("includes/print-device-graph.php");
       echo("<br />");
       break;
 

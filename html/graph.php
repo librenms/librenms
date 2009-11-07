@@ -41,10 +41,17 @@ if($_GET['debug']) {
   $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
   $os = gethostosbyid($device_id);
+  $os_lower = strtolower($os);
+  if($os_groups[$os_lower]) {$os_group = $os_groups[$os_lower];}
 
-  if(is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".strtolower($os).".inc.php")) {
-    include($config['install_dir'] . "/html/includes/graphs/".$type."_".strtolower($os).".inc.php");
+  if(is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_lower.".inc.php")) {
+    /// Type + OS Specific
+    include($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_lower.".inc.php");
+  }elseif($os_group && is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_group.".inc.php")) {
+    /// Type + OS Group Specific
+    include($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_group.".inc.php");
   } elseif(is_file($config['install_dir'] . "/html/includes/graphs/$type.inc.php")) {
+    /// Type Specific
     include($config['install_dir'] . "/html/includes/graphs/$type.inc.php");
   }
 

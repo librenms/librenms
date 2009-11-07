@@ -1,19 +1,16 @@
 <?php
 
    if(strstr($sysDescr, "x86")) { $hardware = "Generic x86"; }
+   if(strstr($sysDescr, "AMD64")) { $hardware = "Generic x64"; }
    if(strstr($sysDescr, "Windows Version 5.2")) { $version = "2003 Server"; }
+   if(strstr($sysDescr, "Windows Version 6.1")) { $version = "Windows 7"; }
    if(strstr($sysDescr, "Uniprocessor Free")) { $features = "Uniprocessor"; }
    if(strstr($sysDescr, "Multiprocessor Free")) { $features = "Multiprocessor"; }
 
-   $hostname = $device['hostname'];
-   $hardware = $device['hardware'];
-   $version = $device['version'];
-   $features = $device['features'];
-
-   $loadrrd  = "rrd/" . $hostname . "-load.rrd";
-   $cpurrd   = "rrd/" . $hostname . "-cpu.rrd";
-   $memrrd   = "rrd/" . $hostname . "-mem.rrd";
-   $sysrrd   = "rrd/" . $hostname . "-sys.rrd";
+   $loadrrd  = $host_rrd . "/load.rrd";
+   $cpurrd   = $host_rrd . "/cpu.rrd";
+   $memrrd   = $host_rrd . "/mem.rrd";
+   $sysrrd   = $host_rrd . "/sys.rrd";
 
    $oid_ssCpuRawUser         = ".1.3.6.1.4.1.2021.11.50.0";
    $oid_ssCpuRawSystem       = ".1.3.6.1.4.1.2021.11.51.0";
@@ -22,9 +19,9 @@
    $oid_hrSystemProcesses    = ".1.3.6.1.2.1.25.1.6.0";
    $oid_hrSystemNumUsers     = ".1.3.6.1.2.1.25.1.5.0";
 
-   $s_cmd  = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+   $s_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
    $s_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses $oid_hrSystemNumUsers";
-   $s      = `$s_cmd`; 
+   $s      = shell_exec($s_cmd); 
    list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users) = explode("\n", $s);
 
    if (!is_file($cpurrd)) {
@@ -97,13 +94,13 @@
    }
 
    $mem_get = "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
-   $mem_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $mem_get;
-   $mem_raw = `$mem_cmd`;
+   $mem_cmd = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $mem_get;
+   $mem_raw = shell_exec($mem_cmd);
    list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", $mem_raw); 
 
    $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-   $load_cmd = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
-   $load_raw = `$load_cmd`;
+   $load_cmd = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $load_get;
+   $load_raw = shell_exec($load_cmd);
    list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
    rrdtool_update($sysrrd, "N:$users:$procs");

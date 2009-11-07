@@ -10,30 +10,34 @@ $start = utime();
 
 echo("Observer v".$config['version']." Discovery\n\n");
 
-if($argv[1] == "--device" && $argv[2]) {
-  $where = "AND `device_id` = '".$argv[2]."'";
-} elseif ($argv[1] == "--os") {
-  $where = "AND `os` = '".$argv[2]."'";
-} elseif ($argv[1] == "--odd") {
-  $where = "AND MOD(device_id,2) = 1";
-} elseif ($argv[1] == "--even") {
-  $where = "AND MOD(device_id,2) = 0";
-} elseif ($argv[1] == "--all") {
-  $where = "";
-} elseif ($argv[1] == "--forced") {
-  echo("Doing forced discoveries\n");
-  $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_type = 'discover' AND A.device_id = D.device_id AND D.ignore = '0' AND D.disabled = '0'");
-  while($device = mysql_fetch_array($sql)){
-    echo(shell_exec("./discovery.php --device " . $device['device_id']));
-  }
-  exit;
-} else {
-  echo("--device <device id>    Poll single device\n");
-  echo("--os <os string>        Poll all devices of a given OS\n");
-  echo("--all                   Poll all devices\n\n");
+$options = getopt("h:t:i:n:d::a::");
+
+if ($options['h'] == "odd") {
+  $where = "AND MOD(device_id,2) = 1";  $doing = $options['h'];
+} elseif ($options['h'] == "even") {
+  $where = "AND MOD(device_id,2) = 0";  $doing = $options['h'];
+} elseif ($options['h'] == "all") {
+  $where = " ";  $doing = "all";
+} elseif($options['h']) {
+  $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+} elseif ($options['i'] && isset($options['n'])) {
+  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
+}
+
+if(!$where) {
+  echo("-h <device id>                Poll single device\n");
+  echo("-h odd                        Poll odd numbered devices  (same as -i 2 -n 0)\n");
+  echo("-h even                       Poll even numbered devices (same as -i 2 -n 1)\n");
+  echo("-h all                        Poll all devices\n\n");
+  echo("-i <instances> -n <number>    Poll as instance <number> of <instances>\n");
+  echo("                              Instances start at 0. 0-3 for -n 4\n\n");
+  echo("-d                            Enable some debugging output\n");
+  echo("\n");
   echo("No polling type specified!\n");
   exit;
-}
+ }
+
+if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 
 
 $devices_discovered = 0;
@@ -55,17 +59,12 @@ while ($device = mysql_fetch_array($device_query)) {
   ## Discover Temperatures
   include("includes/discovery/temperatures.php");
 
-  if($device['os'] == "Linux" || $device['os'] == "FreeBSD") {
-    include("includes/discovery/storage.php");
-  }
+  ## Discover Storage
+  include("includes/discovery/storage.php");
 
-  if($device['os'] == "Netscreen") {
+  if($device['os'] == "Netscreen") { }
 
-  }
-
-  if($device['os'] == "JunOS") {
-    include("includes/discovery/bgp-peers.php");
-  }
+  if($device['os'] == "JunOS") { include("includes/discovery/bgp-peers.php"); }
 
 
   if($device['os'] == "IOS" || $device['os'] == "IOS XE" || $device['os'] == "CatOS") {

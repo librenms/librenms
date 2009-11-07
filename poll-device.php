@@ -6,27 +6,37 @@ include("includes/functions.php");
 include("includes/functions-poller.inc.php");
 
 $poller_start = utime();
-
 echo("Observer Poller v".$config['version']."\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 
 if ($options['h'] == "odd") {
-  $where = "AND MOD(device_id,2) = 1";
-  $doing = $options['h'];
+  $where = "AND MOD(device_id,2) = 1";  $doing = $options['h'];
 } elseif ($options['h'] == "even") {
-  $where = "AND MOD(device_id,2) = 0";
-  $doing = $options['h'];
-} elseif($options['h']) {
-  $where = "AND `device_id` = '".$options['h']."'";
-  $doing = "Host ".$options['h'];
-} elseif ($options['i'] && isset($options['n'])) {
-  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
-  $doing = "Proc ".$options['n'] ."/".$options['i'];
+  $where = "AND MOD(device_id,2) = 0";  $doing = $options['h'];
 } elseif ($options['h'] == "all") {
-  $where = " ";
-  $doing = "all";
+  $where = " ";  $doing = "all";
+} elseif($options['h']) {
+  $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+} elseif ($options['i'] && isset($options['n'])) {
+  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
 }
+
+if(!$where) {
+  echo("-h <device id>                Poll single device\n");
+  echo("-h odd                        Poll odd numbered devices  (same as -i 2 -n 0)\n");
+  echo("-h even                       Poll even numbered devices (same as -i 2 -n 1)\n");
+  echo("-h all                        Poll all devices\n\n");
+  echo("-i <instances> -n <number>    Poll as instance <number> of <instances>\n");
+  echo("                              Instances start at 0. 0-3 for -n 4\n\n");
+  echo("-d                            Enable some debugging output\n");
+  echo("\n");
+  echo("No polling type specified!\n");
+  exit;
+ }
+
+if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
+
 
 echo("Starting polling run:\n\n");
 $i = 0;
@@ -58,13 +68,8 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($snmpable) { 
 
     $status = '1';
-    if($device['os'] == "FreeBSD" || $device['os'] == "OpenBSD" || $device['os'] == "Linux" || $device['os'] == "Windows" || $device['os'] == "Voswall") { 
-      $uptimeoid = ".1.3.6.1.2.1.25.1.1.0"; 
-    } else { 
-      $uptimeoid = "1.3.6.1.2.1.1.3.0"; 
-    }
-    $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB:HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " $uptimeoid sysLocation.0 sysContact.0 sysName.0";
+    $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
+    $snmp_cmd .= " sysUptime.0 sysLocation.0 sysContact.0 sysName.0";
     #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
     if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
       $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
@@ -85,7 +90,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $sysUptime = str_replace(")", "", $sysUptime); 
     list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
     list($secs, $microsecs) = explode(".", $secs);
-    $timeticks =  mktime(0, $secs, $mins, $hours, $days, 0);
     $hours = $hours + ($days * 24);
     $mins = $mins + ($hours * 60);
     $secs = $secs + ($mins * 60);
@@ -163,15 +167,10 @@ while ($device = mysql_fetch_array($device_query)) {
    include("includes/polling/ports-etherlike.inc.php");
    include("includes/polling/cisco-mac-accounting.inc.php");
 
-
-
     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
     if(mysql_affected_rows() == '0') {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'polled', NOW())");
     }
-
-
-
 
   } else {
     $status = '0';
@@ -291,5 +290,6 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
 echo("$string\n");
 shell_exec("echo '".$string."' >> /opt/observer/observer.log");
+
 
 ?>
