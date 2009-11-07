@@ -30,22 +30,37 @@ $rrd_options .= " CDEF:MReasmFails=MipReasmFails,ipInDelivers,/,100,*";
 $rrd_options .= " CDEF:MFragOKs=MipFragOKs,ipInDelivers,/,100,*";
 $rrd_options .= " CDEF:MFragFails=MipFragFails,ipInDelivers,/,100,*";
 $rrd_options .= " CDEF:MFragCreates=MipFragCreates,ipInDelivers,/,100,*";
-$rrd_options .= " LINE1:FragOKs#00ff00:'Fragmentation OK'";
-$rrd_options .= " LINE2:FragFails#ff0000:'Fragmentation Fail'";
-$rrd_options .= " LINE1:ReasmOKs#0033aa:'Reassembly OK'";
-$rrd_options .= " LINE2:ReasmFails#000000:'Reassembly Fail'";
-$rrd_options .= " GPRINT:ReasmReqds:AVERAGE:Avg\ ReasmReqd\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MReasmReqds:MAX:Max\ ReasmReqd\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:ReasmOKs:AVERAGE:Avg\ ReasmOK\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MReasmOKs:MAX:Max\ ReasmOK\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:ReasmFails:AVERAGE:Avg\ ReasmFail\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MReasmFails:MAX:Max\ ReasmFail\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:FragOKs:AVERAGE:Avg\ FragOK\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MFragOKs:MAX:Max\ FragOK\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:FragFails:AVERAGE:Avg\ FragFail\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MFragFails:MAX:Max\ FragFail\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:FragCreates:AVERAGE:Avg\ FragCreate\ %1.2lf\ %%";
-$rrd_options .= " GPRINT:MFragCreates:MAX:Max\ FragCreate\ %1.2lf\ %%";
-$rrd_options .= " COMMENT:'   Calculated as a % of ipInDelivers'"
+
+$rrd_options .= " COMMENT:'% ipInDelivers   Current  Average  Maximum\\n'";
+
+$rrd_options .= " LINE1.25:FragOKs#00cc00:'Frag OK      '";
+$rrd_options .= " GPRINT:FragOKs:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:FragOKs:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MFragOKs:MAX:%6.2lf%s\\\\n";
+
+$rrd_options .= " LINE1.25:FragFails#cc0000:'Frag Fail    '";
+$rrd_options .= " GPRINT:FragFails:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:FragFails:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MFragFails:MAX:%6.2lf%s\\\\n";
+
+$rrd_options .= " LINE1.25:ReasmOKs#006600:'Reasm OK     '";
+$rrd_options .= " GPRINT:ReasmOKs:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:ReasmOKs:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MReasmOKs:MAX:%6.2lf%s\\\\n";
+
+$rrd_options .= " LINE1.25:ReasmFails#660000:'Reasm Fail   '";
+$rrd_options .= " GPRINT:ReasmFails:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:ReasmFails:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MReasmFails:MAX:%6.2lf%s\\\\n";
+
+$rrd_options .= " LINE1.25:FragCreates#00cc:'Frag Create  '";
+$rrd_options .= " GPRINT:FragCreates:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:FragCreates:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MFragCreates:MAX:%6.2lf%s\\\\n";
+
+$rrd_options .= " LINE1.25:ReasmReqds#000066:'Reasm Reqd   '";
+$rrd_options .= " GPRINT:ReasmReqds:LAST:%6.2lf%s";
+$rrd_options .= " GPRINT:ReasmReqds:AVERAGE:%6.2lf%s";
+$rrd_options .= " GPRINT:MReasmReqds:MAX:%6.2lf%s\\\\n";
 
 ?>

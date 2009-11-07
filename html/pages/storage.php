@@ -1,4 +1,4 @@
-<?php
+\<?php
 
 if($_SESSION['userlevel'] >= '5') {
   $sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.host_id = D.device_id ORDER BY D.hostname, S.hrStorageDescr";
@@ -33,7 +33,7 @@ while($drive = mysql_fetch_array($query)) {
     $total = formatStorage($total);
     $used = formatStorage($used);
 
-    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125";
+    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=hrstorage&from=$month&to=$now&width=400&height=125";
     $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
 
     $drv_colour = percent_colour($perc);

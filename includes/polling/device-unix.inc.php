@@ -3,7 +3,6 @@
 $loadrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/load.rrd";
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/cpu.rrd";
 $memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/mem.rrd";
-$sysrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/sys.rrd";
 
       if ($device['os'] == "FreeBSD") {
         $sysDescr = str_replace(" 0 ", " ", $sysDescr);
@@ -41,70 +40,18 @@ $sysrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/sys.rrd";
       }
 
 
-## Check Disks
-$dq = mysql_query("SELECT * FROM storage WHERE host_id = '" . $device['device_id'] . "'");
-while ($dr = mysql_fetch_array($dq)) {
-  $hrStorageIndex = $dr['hrStorageIndex'];
-  $hrStorageAllocationUnits = $dr['hrStorageAllocationUnits'];
-  $hrStorageSize = $dr['hrStorageAllocationUnits'] * $dr['hrStorageSize']; 
-  $hrStorageDescr = $dr['hrStorageDescr'];
-  $cmd  = "snmpget -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageUsed.$hrStorageIndex";
-  $used_units = trim(`$cmd`);
-  $used = $used_units * $hrStorageAllocationUnits;
-  $perc = round($used / $hrStorageSize * 100, 2);
-
-  $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
-
-  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
-
-  if (!is_file($storage_rrd)) {
-    shell_exec($config['rrdtool'] . " create $storage_rrd \
-     --step 300 \
-     DS:size:GAUGE:600:0:U \
-     DS:used:GAUGE:600:0:U \
-     DS:perc:GAUGE:600:0:U \
-     RRA:AVERAGE:0.5:1:800 \
-     RRA:AVERAGE:0.5:6:800 \
-     RRA:AVERAGE:0.5:24:800 \
-     RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 \
-     RRA:MAX:0.5:6:800 \
-     RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800");
-  }  
-  rrdtool_update($storage_rrd, "N:$hrStorageSize:$used:$perc");
-  mysql_query("UPDATE `storage` SET `hrStorageUsed` = '$used_units', `storage_perc` = '$perc' WHERE storage_id = '" . $dr['storage_id'] . "'");
-
-    if($dr['storage_perc'] < '40' && $perc >= '40') {
-
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'] . " is " . $perc;
-    $msg .= " at " . date('l dS F Y h:i:s A');
-    mail($email, "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "/n");
-  }
-
-
-}
-
 ## Set OIDs
 $oid_ssCpuRawUser         = ".1.3.6.1.4.1.2021.11.50.0";
 $oid_ssCpuRawNice         = ".1.3.6.1.4.1.2021.11.51.0";
 $oid_ssCpuRawSystem       = ".1.3.6.1.4.1.2021.11.52.0";
 $oid_ssCpuRawIdle         = ".1.3.6.1.4.1.2021.11.53.0";
-
-$oid_hrSystemProcesses    = ".1.3.6.1.2.1.25.1.6.0";
-$oid_hrSystemNumUsers     = ".1.3.6.1.2.1.25.1.5.0";
-
 $oid_ssCpuUser		  = ".1.3.6.1.4.1.2021.11.9.0";
 $oid_ssCpuSystem	  = ".1.3.6.1.4.1.2021.11.10.0";
 
-
-$cpu_cmd  = $config['snmpget'] ." -m UCD-SNMP-MIB:HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-$cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_hrSystemProcesses";
-$cpu_cmd .= " $oid_hrSystemNumUsers $oid_ssCpuUser $oid_ssCpuSystem";
+$cpu_cmd  = $config['snmpget'] ." -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_ssCpuUser $oid_ssCpuSystem";
 $cpu  = `$cpu_cmd`;
-list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $procs, $users, $UsageUser, $UsageSystem) = explode("\n", $cpu);
+list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $UsageUser, $UsageSystem) = explode("\n", $cpu);
 
 $cpuUsage = $UsageUser + $UsageSystem;
 
@@ -136,21 +83,6 @@ rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 
 ## If the device isn't monowall or pfsense, monitor all the pretty things
 if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSense" ) {
-  if (!is_file($sysrrd)) {
-     shell_exec($config['rrdtool'] . " create $sysrrd \
-       --step 300 \
-       DS:users:GAUGE:600:0:U \
-       DS:procs:GAUGE:600:0:U \
-       RRA:AVERAGE:0.5:1:800 \
-       RRA:AVERAGE:0.5:6:800 \
-       RRA:AVERAGE:0.5:24:800 \
-       RRA:AVERAGE:0.5:288:800 \
-       RRA:MAX:0.5:1:800 \
-       RRA:MAX:0.5:6:800 \
-       RRA:MAX:0.5:24:800 \
-       RRA:MAX:0.5:288:800");
-  }
-
   if (!is_file($memrrd)) {
       shell_exec($config['rrdtool'] . " create $memrrd \
        --step 300 \
@@ -199,8 +131,8 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
   $load_raw = `$load_cmd`;
   list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
-  rrdtool_update($sysrrd,  "N:$users:$procs");
   rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
   rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
 
 } // end Non-m0n0wall
+

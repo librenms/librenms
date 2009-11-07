@@ -4,7 +4,7 @@ $scale_min = "0";
 
 include("common.inc.php");
 
-$database = $config['rrd_dir'] . "/" . $hostname . "/sys.rrd";
+$database = $config['rrd_dir'] . "/" . $hostname . "/hrSystem.rrd";
 
 $rrd_options .= " DEF:procs=$database:procs:AVERAGE";
 $rrd_options .= " COMMENT:Processes\ \ \ \ Cur\ \ \ \ \ Ave\ \ \ \ \ \ Min\ \ \ \ \ Max\\\\n";
