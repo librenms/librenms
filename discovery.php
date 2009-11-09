@@ -62,6 +62,9 @@ while ($device = mysql_fetch_array($device_query)) {
   ## Discover Storage
   include("includes/discovery/storage.php");
 
+  ## hr-device.inc.php
+  include("includes/discovery/hr-device.inc.php");
+
   if($device['os'] == "Netscreen") { }
 
   if($device['os'] == "JunOS") { include("includes/discovery/bgp-peers.php"); }

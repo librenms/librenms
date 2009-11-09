@@ -3,6 +3,7 @@
 
 include("config.php");
 include("includes/functions.php");
+include("includes/functions-poller.inc.php");
 
 $start = utime();
 
@@ -47,7 +48,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] . "(".$device['sysName']."|".$device['device_id'].")\n");
 
-  include("includes/discovery/".$type.".php");
+  include("includes/discovery/".$type);
 
   echo("\n"); $devices_polled++;
 }
@@ -55,7 +56,7 @@ while ($device = mysql_fetch_array($device_query)) {
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-echo("$devices_polled devices polled in $proctime secs\n");
+echo("$devices_polled devices polled in $proctime secs\n $mysql SQL");
 
 
 ?>

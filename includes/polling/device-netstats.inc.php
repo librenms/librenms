@@ -20,7 +20,7 @@ if($device[os] != "Snom") {
 'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps',
 'snmpEnableAuthenTraps','snmpSilentDrops','snmpProxyDrops');
 
-  $oids['tcp'] = array ('tcpRtoMin', 'tcpRtoMax', 'tcpMaxConn', 'tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab', 
+  $oids['tcp'] = array ('tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab', 
 'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts', 'tcpHCInSegs', 'tcpHCOutSegs');
 
   $oids['udp'] = array ('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');

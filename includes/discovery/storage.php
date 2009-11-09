@@ -2,19 +2,21 @@
 
   unset( $storage_exists );
 
-  echo("hrStorage : ");  
+  echo("HOST-RESOURCES-MIB Storage : ");  
 
-  $oids = shell_exec($config['snmpwalk'] . " -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
+  $oids = shell_exec($config['snmpwalk'] . " -CI -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
   $oids = trim(str_replace("hrStorageIndex.","",$oids));
 
+  echo(".. $oids .. ");
+
   foreach(explode("\n", $oids) as $data) {
+   if($data) {
     $data = trim($data);
     list($oid,$hrStorageIndex) = explode(" ", $data);
     $temp = shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
     $temp = trim($temp);
     list($descr, $units, $size, $fstype) = explode("\n", $temp);
     list($units) = explode(" ", $units);
-
     $allow = 1;
     foreach($config['ignore_mount'] as $bi) {
     if($descr == $bi) {
@@ -39,6 +41,7 @@
       }
       $storage_exists[] = $device[device_id]." $hrStorageIndex";
     } else { echo("X"); };
+   }
   }
 
 
