@@ -2,14 +2,14 @@
 
 function snmp_cache_cip($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O snq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = $config['snmpbulkwalk'] . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
   foreach(explode("\n", $data) as $entry) {
-    list ($this_oid, $this_value) = split(" ", $entry);
+    list ($this_oid, $this_value) = split("=", $entry);
     $this_oid = trim($this_oid);
     $this_value = trim($this_value);
     $this_oid = substr($this_oid, 30);

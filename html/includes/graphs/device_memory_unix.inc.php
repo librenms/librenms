@@ -2,7 +2,7 @@
 
 include("common.inc.php");
 
-$rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/mem.rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/ucd_mem.rrd";
 
 $rrd_options .= " -b 1024";
 

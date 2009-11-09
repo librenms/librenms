@@ -40,8 +40,6 @@ if (!is_file($cpurrd)) {
 rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
 
 
-## If the device isn't monowall or pfsense, monitor all the pretty things
-if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSense" ) {
   if (!is_file($memrrd)) {
       shell_exec($config['rrdtool'] . " create $memrrd \
        --step 300 \
@@ -92,6 +90,4 @@ if($device[os] != "m0n0wall" && $device[os] != "Voswall" && $device[os] != "pfSe
 
   rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
   rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
-
-} // end Non-m0n0wall
 

@@ -1,9 +1,41 @@
 <?php
 
-include("common.inc.php");
+$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".mres($device_id)."' AND hrDeviceType = 'hrDeviceProcessor'");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/" . "cpu.rrd";
+$i=0;
+while($proc = mysql_fetch_array($query)) {
 
+  $rrd_filename  = $config['rrd_dir'] . "/$hostname/hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd";
+
+  if(is_file($rrd_filename)) {
+
+    $descr = str_pad($proc['hrDeviceDescr'], 8);
+    $descr = substr($descr,0,8);
+
+    $rrd_list[$i]['filename'] = $rrd_filename;
+    $rrd_list[$i]['descr'] = $descr;
+    $rrd_list[$i]['rra'] = "usage";
+    $i++;
+  }
+}
+
+$unit_text = "Load %";
+
+$units='%';
+$total_units='%';
+$colours='mixed';
+
+$scale_min = "0";
+$scale_max = "100";
+
+$nototal = 1;
+
+include ("generic_multi_line.inc.php");
+
+if ($not) {
+
+  include("common.inc.php");
+  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/" . "ucd_cpu.rrd";
   $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";
   $rrd_options .= " DEF:nice=$rrd_filename:nice:AVERAGE";
   $rrd_options .= " DEF:system=$rrd_filename:system:AVERAGE";
@@ -30,5 +62,7 @@ include("common.inc.php");
   $rrd_options .= " GPRINT:idle_perc:LAST:\ \ \ \ \ %5.2lf%%";
   $rrd_options .= " GPRINT:idle_perc:AVERAGE:\ \ \ %5.2lf%%";
   $rrd_options .= " GPRINT:idle_perc:MAX:\ \ \ %5.2lf%%\\\\n";
+
+}
 
 ?>

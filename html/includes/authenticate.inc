@@ -43,7 +43,7 @@ if($row['username'] && $row['username'] == $_SESSION['username']) {
     setcookie("username", $_SESSION['username'], time()+60*60*24*100, "/");
     setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
   }
-} else { 
+} elseif ($_SESSION['username']) { 
   $auth_message = "Authentication Failed"; 
   unset ($_SESSION['authenticated']);
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
