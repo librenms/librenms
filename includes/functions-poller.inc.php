@@ -50,9 +50,29 @@ global $config;
   return $array;
 }
 
+function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
+  global $config;
+  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+                                    $device['hostname'].":".$device['port'] . " ";
+  if($mib) { $cmd .= "-m $mib "; }
+  $cmd .= $oid;
+  $data = trim(shell_exec($cmd));
+  $device_id = $device['device_id'];
+  foreach(explode("\n", $data) as $entry) {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $first, $second) = explode(".", $oid);
+    if (!strstr($this_value, "No Such Instance currently exists at this OID") && $oid && $first && $second) {
+      $array[$device_id][$first][$second][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
+                                    $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
