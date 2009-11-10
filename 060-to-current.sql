@@ -63,3 +63,6 @@ ALTER TABLE `interfaces` DROP `in_rate`;
 ALTER TABLE `interfaces` DROP `out_rate`;
 ALTER TABLE `interfaces` DROP `in_errors`;
 ALTER TABLE `interfaces` DROP `out_errors`;
+CREATE TABLE IF NOT EXISTS `cmpMemPool` (  `cmp_id` int(11) NOT NULL auto_increment,  `Index` varchar(8) NOT NULL,  `cmpName` varchar(32) NOT NULL,  `cmpValid` varchar(8) NOT NULL,  `device_id` int(11) NOT NULL,  `cmpUsed` int(11) NOT NULL,  `cmpFree` int(11) NOT NULL,  `cmpLargestFree` int(11) NOT NULL,  `cmpAlternate` tinyint(4) default NULL,  PRIMARY KEY  (`cmp_id`),  KEY `device_id` (`device_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `hrDevice` ( `hrDevice_id` int(11) NOT NULL auto_increment,  `device_id` int(11) NOT NULL,  `hrDeviceIndex` int(11) NOT NULL,  `hrDeviceDescr` text NOT NULL,  `hrDeviceType` text NOT NULL,  `hrDeviceErrors` int(11) NOT NULL,  `hrDeviceStatus` text NOT NULL,  `hrProcessorLoad` tinyint(4) default NULL,  PRIMARY KEY  (`hrDevice_id`),  KEY `device_id` (`device_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
+

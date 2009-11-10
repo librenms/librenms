@@ -1,34 +1,33 @@
 <?php
 
-$query = "SELECT * FROM cempMemPool WHERE device_id = '" . $device['device_id'] . "'";
+echo("CISCO-MEMORY-POOL: ");
+
+$query = "SELECT * FROM cmpMemPool WHERE device_id = '" . $device['device_id'] . "'";
 $pool_data = mysql_query($query);
 while($mempool = mysql_fetch_array($pool_data)) {
 
-  $entPhysicalName = @mysql_result(mysql_query("SELECT `entPhysicalName` from entPhysical WHERE device_id = '".$device['device_id']."'
-                                               AND `entPhysicalIndex` = '".$mempool['entPhysicalIndex']."'"),0);
+  echo($mempool['cmpName'] . " ");
 
-  echo("Checking Mempool " . $entPhysicalName . " - " . $mempool['cempMemPoolName']);
+  $oid = $mempool['Index']; 
 
-
-  $oid = $mempool['entPhysicalIndex'] . "." . $mempool['Index']; 
-
-  $pool_cmd  = "snmpget -m CISCO-ENHANCED-MEMPOOL-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-  $pool_cmd .= " cempMemPoolUsed.$oid cempMemPoolFree.$oid cempMemPoolLargestFree.$oid cempMemPoolLowestFree.$oid";
+  $pool_cmd  = $config['snmpget'] . " -m CISCO-MEMORY-POOL-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $pool_cmd .= " ciscoMemoryPoolUsed.$oid ciscoMemoryPoolFree.$oid ciscoMemoryPoolLargestFree.$oid";
   $pool_cmd .= " | cut -f 1 -d ' '";
 
   $pool = shell_exec($pool_cmd);
 
-  list($cempMemPoolUsed, $cempMemPoolFree, $cempMemPoolLargestFree, $cempMemPoolLowestFree) = explode("\n", $pool);
+  list($cmpUsed, $cmpFree, $cmpLargestFree) = explode("\n", $pool);
 
-  $poolrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/cempMemPool-" . $oid . ".rrd");
+  echo(round(($cmpUsed/($cmpFree+$cmpUsed))*100) . "% ");
+
+  $poolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/cmp-" . $mempool['Index'] . ".rrd";
 
   if (!is_file($poolrrd)) {
-    `rrdtool create $poolrrd \
+    shell_exec ($config['rrdtool'] . " create $poolrrd \
      --step 300 \
       DS:used:GAUGE:600:0:U \
       DS:free:GAUGE:600:-1:U \
       DS:largestfree:GAUGE:600:0:U \
-      DS:lowestfree:GAUGE:600:-1:U \
       RRA:AVERAGE:0.5:1:2000 \
       RRA:AVERAGE:0.5:6:2000 \
       RRA:AVERAGE:0.5:24:2000 \
@@ -36,20 +35,20 @@ while($mempool = mysql_fetch_array($pool_data)) {
       RRA:MAX:0.5:1:2000 \
       RRA:MAX:0.5:6:2000 \
       RRA:MAX:0.5:24:2000 \
-      RRA:MAX:0.5:288:2000`;
+      RRA:MAX:0.5:288:2000");
   }
 
   $pool = trim(str_replace("\"", "", $pool));
   list($pool) = split(" ", $pool); 
 
-  $updatecmd = $config['rrdtool'] ." update $poolrrd N:$cempMemPoolUsed:$cempMemPoolFree:$cempMemPoolLargestFree:$cempMemPoolLowestFree";
+  $updatecmd = $config['rrdtool'] ." update $poolrrd N:$cmpUsed:$cmpFree:$cmpLargestFree";
   shell_exec($updatecmd);
 
-  $update_query = "UPDATE `cempMemPool` SET cempMemPoolUsed='$cempMemPoolUsed', cempMemPoolFree='$cempMemPoolFree', cempMemPoolLargestFree='$cempMemPoolLargestFree', cempMemPoolLowestFree='$cempMemPoolLowestFree' WHERE `cempMemPool_id` = '".$mempool['cempMemPool_id']."'";
+  $update_query = "UPDATE `cmpMemPool` SET cmpUsed='$cmpUsed', cmpFree='$cmpFree', cmpLargestFree='$cmpLargestFree' WHERE `cmp_id` = '".$mempool['cmp_id']."'";
   mysql_query($update_query);
 
-  echo("\n");
-
 }
+
+echo("\n");
 
 ?>

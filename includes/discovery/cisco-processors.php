@@ -5,7 +5,7 @@
   $snmpver = $device['snmpver'];
   $port = $device['port'];
 
-  echo("Cisco Procs : ");
+  echo("CISCO-PROCESS-MIB : ");
 
   ## Cisco Processors
   if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
@@ -27,11 +27,9 @@
         $descr = str_replace("Routing Processor", "RP", $descr);
         $descr = str_replace("Switching Processor", "SP", $descr);
         $descr = trim($descr);
-#        echo("[$descr ($oid)] ");
         if(mysql_result(mysql_query("SELECT count(cpmCPU_id) FROM `cpmCPU` WHERE `cpmCPU_oid` = '$oid' AND `device_id` = '$id'"),0) == '0') {
           $query = "INSERT INTO cpmCPU (`entPhysicalIndex`, `device_id`, `entPhysicalDescr`, `cpmCPU_oid`) values ('$entPhysicalIndex', '$id', '$descr', '$oid')";
           mysql_query($query);
-#	  echo("$query");
           echo("+");
         } else { echo("."); }
         $valid_cpm[$id][$oid] = 1;
