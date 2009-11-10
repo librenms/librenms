@@ -1,67 +1,67 @@
 #!/usr/bin/php
 <?php
 
-#ini_set('display_errors', 1);
-#ini_set('display_startup_errors', 1);
-#ini_set('log_errors', 1);
-#ini_set('error_reporting', E_WARNING);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('log_errors', 1);
+ini_set('error_reporting', E_WARNING);
 
 include("config.php");
 include("includes/functions.php");
-include("includes/cdp.inc.php");
+include("includes/functions-poller.inc.php");
+#include("includes/cdp.inc.php");
 
 if($argv[1] == "--device" && $argv[2]) {
   $where = "AND `device_id` = '".$argv[2]."'";
 }
 
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `status` = '1' AND (`os` = 'IOS' OR `os` = 'IOS XE') AND hostname NOT LIKE '%esr%' $where ORDER BY `device_id` DESC");
-
+$device_query = mysql_query("SELECT * FROM `devices` WHERE (`os` =  'IOS' OR `os` = 'IOS XE') $where ORDER BY `device_id` DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  $hostname = $device['hostname'];
   $community = $device['community'];
-  $id = $device['device_id'];
-  $host = $id;
 
-  echo("\nDetecting CDP neighbours on $device[1]...\n");
-#  $snmp = new snmpCDP($hostname, $community);
-#  $ports = $snmp->getports();
-#  $cdp = $snmp->explore_cdp($ports);
+  echo("CISCO-CDP-MIB: ");
 
-#  $cdp_links = "";
+   
+  unset($cdp_array);
+  $cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, $cdp_array, "CISCO-CDP-MIB");
 
-#  foreach (array_keys($cdp) as $key) {
-#    $port = $ports[$key];
-#    $link = $cdp[$key];
-#    $cdp_links .= $hostname . "," . $port['desc'] . "," . $link['host'] . "," . $link['port'] . "\n";   
-#  }
-        
-#  $cdp_links = trim($cdp_links);
+  $cdp_array = $cdp_array[$device[device_id]];
 
+  unset($cdp_links);
+  foreach( array_keys($cdp_array) as $key) { 
+    $interface = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
+    $cdp_if_array = $cdp_array[$key]; 
+    foreach( array_keys($cdp_if_array) as $entry_key) {
+      $cdp_entry_array = $cdp_if_array[$entry_key];
+      if($device['hostname'] && $interface['ifDescr'] && $cdp_entry_array['cdpCacheDeviceId'] && $cdp_entry_array['cdpCacheDevicePort']){
+        $cdp_links .= $device['hostname'] . "," . $interface['ifDescr'] . "," . $cdp_entry_array['cdpCacheDeviceId'] . "," . $cdp_entry_array['cdpCacheDevicePort'] . "\n";
+      }
+    }    
+  }
 
-
-
+  #echo("$cdp_links");
 
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
     list($src_host,$src_if, $dst_host, $dst_if) = explode(",", $link);
-    $dst_host = strtolower($dst_host);  
+    $dst_host = strtolower($dst_host);
     $dst_if = strtolower($dst_if);
     $src_host = strtolower($src_host);
     $src_if = strtolower($src_if);
     $ip = gethostbyname($dst_host);
-    if ( match_network($config['nets'], $ip) ) {	   
+    if ( match_network($config['nets'], $ip) ) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '0' ) {
         if($config['cdp_autocreate']) {
           echo("++ Creating: $dst_host \n");
           createHost ($dst_host, $community, "v2c");
         }
-      } else { 
-        echo("."); 
+      } else {
+        echo(".");
       }
-    } else { 
-      echo("!($dst_host)"); 
+    } else {
+      echo("!($dst_host)");
     }
 
     if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '1' && 
@@ -83,7 +83,10 @@ while ($device = mysql_fetch_array($device_query)) {
     } else {
 
     } 
+#   }
   }
+
+  echo("\n");
 }
 
 echo("\n");
