@@ -4,9 +4,11 @@ include("common.inc.php");
 
   $rrd_options .= " -l 0 -E -b 1024 -u 100 -r";
 
+  $count = mysql_result(mysql_query("SELECT COUNT(*) FROM `cempMemPool` WHERE `device_id` = '$device_id'"),0);
+
+if($count > '0') {
   $iter = "1";
   $rrd_options .= " COMMENT:'                       Currently Used    Max\\n'";
-
   $sql = mysql_query("SELECT * FROM `cempMemPool` where `device_id` = '$device_id'");
   while($mempool = mysql_fetch_array($sql)) {
     $entPhysicalName = mysql_result(mysql_query("SELECT entPhysicalName from entPhysical WHERE device_id = '".$device_id."'
@@ -34,5 +36,28 @@ include("common.inc.php");
     $rrd_options .= " GPRINT:mempool" . $iter . "total:MAX:%3.0lf%%\\\\n";
     $iter++;
   }
+} else {
+  $database = $config['rrd_dir'] . "/" . $hostname . "/ios-mem.rrd";
+  $rrd_options .= " DEF:MEMTOTAL=$database:MEMTOTAL:AVERAGE";
+  $rrd_options .= " DEF:IOFREE=$database:IOFREE:AVERAGE";
+  $rrd_options .= " DEF:IOUSED=$database:IOUSED:AVERAGE";
+  $rrd_options .= " DEF:PROCFREE=$database:PROCFREE:AVERAGE";
+  $rrd_options .= " DEF:PROCUSED=$database:PROCUSED:AVERAGE";
+  $rrd_options .= " CDEF:FREE=IOFREE,PROCFREE,+";
+  $rrd_options .= " CDEF:USED=IOUSED,PROCUSED,+";
+  $rrd_options .= " COMMENT:Bytes\ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $rrd_options .= " AREA:USED#ff6060:";
+  $rrd_options .= " LINE2:USED#cc0000:Used";
+  $rrd_options .= " GPRINT:USED:LAST:%6.2lf%s";
+  $rrd_options .= " GPRINT:USED:MIN:%6.2lf%s";
+  $rrd_options .= " GPRINT:USED:MAX:%6.2lf%s";
+  $rrd_options .= " GPRINT:USED:AVERAGE:%6.2lf%s\\\\l";
+  $rrd_options .= " AREA:FREE#e5e5e5:Free:STACK";
+  $rrd_options .= " GPRINT:FREE:LAST:%6.2lf%s";
+  $rrd_options .= " GPRINT:FREE:MIN:%6.2lf%s";
+  $rrd_options .= " GPRINT:FREE:MAX:%6.2lf%s";
+  $rrd_options .= " GPRINT:FREE:AVERAGE:%6.2lf%s\\\\l";
+  $rrd_options .= " LINE1:MEMTOTAL#000000:";
+}
 
 ?>
