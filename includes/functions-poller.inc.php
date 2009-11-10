@@ -50,6 +50,25 @@ global $config;
   return $array;
 }
 
+function snmpwalk_cache_oid($oid, $device, $array, $mib = 0) {
+  global $config;
+  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+                                    $device['hostname'].":".$device['port'] . " ";
+  if($mib) { $cmd .= "-m $mib "; }
+  $cmd .= $oid;
+  $data = trim(shell_exec($cmd));
+  $device_id = $device['device_id'];
+  foreach(explode("\n", $data) as $entry) {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $index) = explode(".", $oid);
+    if (!strstr($this_value, "No Such Instance currently exists at this OID") && $oid && $index) {
+      $array[$device_id][$index][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
   $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
