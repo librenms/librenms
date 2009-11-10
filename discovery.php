@@ -78,8 +78,8 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cisco-pw.php");
     include("includes/discovery/cisco-vrf.php");
     include("includes/discovery/cisco-processors.php");
-    include("includes/discovery/cisco-mempool.php");
-    
+    include("includes/discovery/cemp-mib.php");
+    include("includes/discovery/cmp-mib.php");
   }
 
   echo("\n"); $devices_discovered++;

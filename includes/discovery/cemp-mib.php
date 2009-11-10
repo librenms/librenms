@@ -5,7 +5,7 @@
   $snmpver = $device['snmpver'];
   $port = $device['port'];
 
-  echo("Cisco Enh Mempool : ");
+  echo("CISCO-ENHANCED-MEMORY-POOL : ");
 
   ## Cisco Enhanced Mempool
   if($device['os'] == "IOS" || $device['os'] == "IOS XE") {

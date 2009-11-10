@@ -74,7 +74,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = $config['snmpbulkwalk'] . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
