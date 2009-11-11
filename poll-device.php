@@ -155,20 +155,14 @@ while ($device = mysql_fetch_array($device_query)) {
     }   
     $sysLocation = str_replace("\"","", $sysLocation); 
   
-  echo("Polling temperatures\n");
-  include("includes/polling/temperatures.inc.php");
-  include("includes/polling/device-netstats.inc.php");
+    include("includes/polling/temperatures.inc.php");
+    include("includes/polling/device-netstats.inc.php");
+    include("includes/polling/ports.inc.php");
+    if($config['enable_etherlike']) { include("includes/polling/ports-etherlike.inc.php"); }
+    include("includes/polling/cisco-mac-accounting.inc.php");
 
-#  echo("Polling interfaces\n");
-#  $where = "WHERE device_id = '" . $device['device_id'] . "' AND deleted = '0'";
-#  include("includes/polling/interfaces.inc.php");
-
-   include("includes/polling/ports.inc.php");
-   include("includes/polling/ports-etherlike.inc.php");
-   include("includes/polling/cisco-mac-accounting.inc.php");
-
-    $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
-    if(mysql_affected_rows() == '0') {
+     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
+     if(mysql_affected_rows() == '0') {
       $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'polled', NOW())");
     }
 
@@ -247,9 +241,6 @@ while ($device = mysql_fetch_array($device_query)) {
     }
 
     $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
-
-    $old_uptimerrd = "rrd/" . $device['hostname'] . "-uptime.rrd";
-    if(is_file($old_uptimerrd) && !is_file($uptimerrd)) { rename($old_uptimerrd, $uptimerrd); echo("Moving $old_uptimerrd to $uptimerrd");  }
 
     if(!is_file($uptimerrd)) {
       $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
