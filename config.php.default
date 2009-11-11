@@ -87,6 +87,7 @@ $config['enable_syslog'] 	= 0; # Enable Syslog
 $config['enable_billing']	= 0; # Enable Billing
 $config['enable_inventory']	= 1; # Enable Inventory
 $config['enable_pseudowires']   = 1; # Enable Pseudowires
+$config['enable_etherlike']     = 1; # Enable Polling EtherLike-MIB (doubles interface processing time)
 
 #$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
 #$config['collectd_dir']         = '/var/lib/collectd/rrd';
