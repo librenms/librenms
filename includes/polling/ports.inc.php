@@ -135,7 +135,6 @@
       }
 
       $woo = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
-      echo("\n rrdtool update $rrdfile $woo\n");
       $ret = rrdtool_update("$rrdfile", $woo);
 
       /// End Update IF-MIB

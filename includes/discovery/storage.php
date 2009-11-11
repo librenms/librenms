@@ -7,8 +7,6 @@
   $oids = shell_exec($config['snmpwalk'] . " -CI -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
   $oids = trim(str_replace("hrStorageIndex.","",$oids));
 
-  echo(".. $oids .. ");
-
   foreach(explode("\n", $oids) as $data) {
    if($data) {
     $data = trim($data);

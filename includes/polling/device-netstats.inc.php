@@ -37,7 +37,6 @@ if($device[os] != "Snom") {
 
     foreach($oids[$proto] as $oid){
       $oid_ds = truncate($oid, 19, '');
-      echo("\n$oid");
       $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
       $snmpstring .= " $oid.0"; 
     }
