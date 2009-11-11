@@ -12,7 +12,7 @@ while ($hrDevice = mysql_fetch_array($query)) {
   $this_hrDevice = $hrDevice_array[$device[device_id]][$hrDevice[hrDeviceIndex]];
 
   $update_query  = "UPDATE `hrDevice` SET";
-  $update_query .= ", `hrDeviceStatus` = '".mres($this_hrDevice['hrDeviceStatus'])."'";
+  $update_query .= " `hrDeviceStatus` = '".mres($this_hrDevice['hrDeviceStatus'])."'";
   $update_query .= ", `hrDeviceErrors` = '".mres($this_hrDevice['hrDeviceErrors'])."'";
   $update_query .= ", `hrProcessorLoad` = '".mres($this_hrDevice['hrProcessorLoad'])."'";
   $update_query .= " WHERE hrDevice_id = '".$hrDevice['hrDevice_id']."'";

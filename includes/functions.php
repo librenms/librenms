@@ -91,7 +91,8 @@ function shorthost($hostname, $len=16) {
 
 function rrdtool_update($rrdfile, $rrdupdate) {
   global $config;
-  echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n");
+  global $debug;
+  if($debug) { echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n"); }
   return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
 }
 
