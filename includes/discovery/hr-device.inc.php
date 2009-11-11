@@ -4,7 +4,7 @@ echo("hrDevice : ");
 
 $hrDevice_oids = array('hrDeviceIndex','hrDeviceType','hrDeviceDescr','hrDeviceStatus','hrDeviceErrors','hrProcessorLoad');
 
-foreach ($hrDevice_oids as $oid) { echo("$oid "); $hrDevice_array = snmp_cache_oid($oid, $device, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
+foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmp_cache_oid($oid, $device, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
 
 foreach($hrDevice_array[$device[device_id]] as $hrDevice) {
   if(is_array($hrDevice)) {
