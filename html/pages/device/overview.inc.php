@@ -31,137 +31,12 @@ echo("
   echo("</div>");
 #}
 
-
-if(mysql_result(mysql_query("SELECT count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"),0)) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Processors</p>");
-  echo("<table width=100%>");
-  $i = '1';
-  $procs = mysql_query("SELECT * FROM `cpmCPU` WHERE device_id = '" . $device['device_id'] . "'");
-  while($proc = mysql_fetch_array($procs)) {
-
-    $proc_url   = "?page=device/".$device['device_id']."/health/cpm/";
-
-    $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$proc['entPhysicalDescr'];
-    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['cpmCPU_id'] . "&type=cpmCPU&from=$month&to=$now&width=400&height=125\'>";
-    $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
-
-    if($proc['cpuCPMTotal5minRev'] > '60') { $proc_colour='#cc0000'; } else { $proc_colour='#0000cc';  }
-    echo("<tr><td class=tablehead><a href='$proc_url' $proc_popup>" . $proc['entPhysicalDescr'] . "</a></td>
-            <td><a href='#' $proc_popup><img src='percentage.php?per=" . $proc['cpmCPUTotal5minRev'] . "'></a></td>
-            <td style='font-weight: bold; color: $drv_colour'>" . $proc['cpmCPUTotal5minRev'] . "%</td>
-          </tr>");
-    $i++;
-  }
-  echo("</table>");
-  echo("</div>");
-}
-
-if(mysql_result(mysql_query("SELECT count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"),0)) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Memory Pools</p>");
-  echo("<table width=100%>");
-  $i = '1';
-  $mempools = mysql_query("SELECT * FROM `cempMemPool` WHERE device_id = '" . $device['device_id'] . "'");
-  while($mempool = mysql_fetch_array($mempools)) {
-    $entPhysicalName = mysql_result(mysql_query("SELECT entPhysicalName from entPhysical WHERE device_id = '".$device['device_id']."'
-                                               AND entPhysicalIndex = '".$mempool['entPhysicalIndex']."'"),0);
-    $perc = round($mempool['cempMemPoolUsed'] / ($mempool['cempMemPoolUsed'] + $mempool['cempMemPoolFree']) * 100,2);
-    $mempool['descr_fixed'] = $entPhysicalName . " ". $mempool['cempMemPoolName'];
-    $mempool['descr_fixed'] = str_replace("Routing Processor", "RP", $mempool['descr_fixed']);
-    $mempool['descr_fixed'] = str_replace("Switching Processor", "SP", $mempool['descr_fixed']);
-    $mempool['descr_fixed'] = str_replace("Processor", "Proc", $mempool['descr_fixed']);
-    $mempool['descr_fixed'] = str_replace("Sub-Module", "Mod", $mempool['descr_fixed']);
-    $mempool['descr_fixed'] = str_replace("DFC Card", "DFC", $mempool['descr_fixed']);
-
-    $proc_url   = "?page=device/".$device['device_id']."/sensors/mempools/";
-
-    $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$mempool['descr_fixed'];
-    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['cempMemPool_id'] . "&type=cempMemPool&from=$month&to=$now&width=400&height=125\'>";
-    $mempool_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
-
-
-    if($mempool['cpuCPMTotal5minRev'] > '60') { $mempool_colour='#cc0000'; } else { $mempool_colour='#0000cc';  }
-    echo("<tr><td class=tablehead><a href='$proc_url' $mempool_popup>" . $mempool['descr_fixed'] ."</a></td>
-            <td><a href='#' $mempool_popup><img src='percentage.php?per=" . $perc . "'></a></td>
-            <td style='font-weight: bold; color: $drv_colour'>$perc%</td>
-            <td style='color: $drv_colour'>" . formatstorage($mempool['cempMemPoolFree'], 0) . "/" . formatstorage($mempool['cempMemPoolUsed'] + $mempool['cempMemPoolFree'], 0) . "</strong></td>
-          </tr>");
-    $i++;
-  }
-  echo("</table>");
-  echo("</div>");
-}
-
-if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"),0)) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Storage</p>");
-  echo("<table width=100%>");
-  $i = '1';
-
-  echo("<tr class=tablehead><td>Mountpoint</td><td width=203>Usage</td><td width=40></td><td width=75>Total</td>
-          <td width=75>Used</td></tr>");
-  $drives = mysql_query("SELECT * FROM `storage` WHERE host_id = '" . $device['device_id'] . "'");
-  while($drive = mysql_fetch_array($drives)) {
-    $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
-    $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
-    $drive['perc']  = round($drive['storage_perc'], 0);
-    $total = formatStorage($total);
-    $used = formatStorage($used);
-
-    $fs_url   = "/device/".$device['device_id']."/health/storage/";
-
-    $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125\'>";
-    $fs_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
-
-    if($perc > '80') { $drv_colour='#cc0000'; } else { $drvclass='#0000cc';  }
-    echo("<tr><td class=tablehead><a href='".$fs_url."' $fs_popup>" . $drive['hrStorageDescr'] . "</a></td>
-            <td><a href='$fs_url' $fs_popup><img src='percentage.php?per=" . $drive['perc'] . "'></a></td>
-            <td style='font-weight: bold; color: $drv_colour'>" . $drive['perc'] . "%</td>
-            <td>" . $total . "</td>
-            <td>" . $used . "</td>
-          </tr>");
-    $i++;
-  }
-  echo("</table>");
-  echo("</div>");
-}
-
-unset($temp_seperator);
-if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"),0)) {
-  $total = mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"),0);
-  $rows = round($total / 2,0);
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Temperatures</p>");
-  $i = '1';
-  $temps = mysql_query("SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] . "'");
-  echo("<table width=100% valign=top>");
-  echo("<tr><td width=50%>");
-  echo("<table width=100% cellspacing=0 cellpadding=2>");
-  while($temp = mysql_fetch_array($temps)) {
-    if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-
-    $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
-
-    $temp_colour = percent_colour($temp_perc);
-    $temp_url  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$month&to=$now&width=400&height=125";
-    $temp_link  = "<a href='/device/".$device['device_id']."/health/temp/' onmouseover=\"return ";
-    $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['temp_descr'];
-    $temp_link .= "</div><img src=\'$temp_url\'>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
-    $temp_link .= $temp['temp_descr'] . "</a>";
-
-    $temp['temp_descr'] = truncate($temp['temp_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td><strong>$temp_link</strong></td><td width=40 class=tablehead><span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
-    if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
-    $i++;
-  }
-  echo("</table>");
-  echo("</td></tr>");
-  echo("</table>");
-  echo("</div>");
-}
-
+include("overview/hrProcessors.inc.php");
+include("overview/cpmCPU.inc.php");
+include("overview/cemp.inc.php");
+include("overview/cmp.inc.php");
+include("overview/hrStorage.inc.php");
+include("overview/temperatures.inc.php");
 
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
@@ -181,40 +56,7 @@ echo("</table></div>");
 
 echo("</td><td width=50% valign=top>");
 
-if($interfaces['total']) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>
-        <p class=sectionhead>Total Traffic</p>" . device_traffic_image($device['device_id'], 490, 100, $day, '-300s') . "</div>");
-}
-
-if($interfaces['total']) {
-  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Interfaces</p><div style='height: 5px;'></div>");
-
-echo("
-<table class=tablehead cellpadding=2 cellspacing=0 width=100%>
-<tr bgcolor=$interfaces_colour align=center><td></td>
-<td width=25%><img src='images/16/connect.png' align=absmiddle> $interfaces[total]</td>
-<td width=25% class=green><img src='images/16/if-connect.png' align=absmiddle> $interfaces[up]</td>
-<td width=25% class=red><img src='images/16/if-disconnect.png' align=absmiddle> $interfaces[down]</td>
-<td width=25% class=grey><img src='images/16/if-disable.png' align=absmiddle> $interfaces[disabled]</td></tr>
-</table>");
-
-  echo("<div style='margin: 8px; font-size: 11px; font-weight: bold;'>");
-
-  $sql = "SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "' AND deleted != '1'";
-  $query = mysql_query($sql);
-  while($data = mysql_fetch_array($query)) {
-    $data = ifNameDescr($data);
-    $data['hostname'] = $device['hostname'];
-    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['label']))));
-    $ifsep = ", ";
-  }
-  unset($ifsep);
-  echo("</div>");
-
-  echo("</div>");
-
-}
+include("overview/ports.inc.php");
 
 if($services['total']) {
 

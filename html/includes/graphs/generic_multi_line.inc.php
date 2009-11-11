@@ -2,13 +2,13 @@
 
   include("common.inc.php");
 
-  $unit_text = str_pad($unit_text, 10);
-  $unit_text = substr($unit_text,0,10);
+  $unit_text = str_pad($unit_text, 13);
+  $unit_text = substr($unit_text,0,13);
 
   $i = 0;
   $iter = 0;
 
-  $rrd_options .= " COMMENT:'".$unit_text."    Last    Min     Max     Avg\\n'";
+  $rrd_options .= " COMMENT:'".$unit_text."    Cur     Min     Max     Avg\\n'";
 
 
   foreach($rrd_list as $rrd) {
@@ -20,12 +20,16 @@
       $filename = $rrd['filename'];
       $descr = $rrd['descr'];
 
-      $id = $rra."_".$i;
+      $descr = substr(str_pad(short_hrDeviceDescr($rrd['descr']), 10),0,10);
 
+      $id = $rra."_".$i;
+      
       $rrd_options .= " DEF:".$id."=$filename:$rra:AVERAGE";
+      $rrd_options .= " DEF:".$id."min=$filename:$rra:MIN";
+      $rrd_options .= " DEF:".$id."max=$filename:$rra:MAX";
       $rrd_options .= " LINE1.25:".$id."#".$colour.":'$descr'";
-      $rrd_options .= " GPRINT:".$id.":LAST:%6.2lf GPRINT:".$id.":AVERAGE:%6.2lf";
-      $rrd_options .= " GPRINT:".$id.":MAX:%6.2lf GPRINT:".$id.":AVERAGE:%6.2lf\\\\n";
+      $rrd_options .= " GPRINT:".$id.":LAST:%6.2lf GPRINT:".$id."min:MIN:%6.2lf";
+      $rrd_options .= " GPRINT:".$id."max:MAX:%6.2lf GPRINT:".$id.":AVERAGE:%6.2lf\\\\n";
 
       $i++; $iter++;
   }

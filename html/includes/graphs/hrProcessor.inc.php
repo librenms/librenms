@@ -13,8 +13,7 @@ include("common.inc.php");
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
-    $proc['descr_fixed'] = str_pad($proc['hrDeviceDescr'], 28);
-    $proc['descr_fixed'] = substr($proc['descr_fixed'],0,28);
+    $proc['descr_fixed'] = substr(str_pad(short_hrDeviceDescr($proc['hrDeviceDescr']), 28),0,28);
     $proc['descr_fixed'] = str_replace(":", "\:", $proc['descr_fixed']);
     $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd";
     $rrd_options .= " DEF:proc" . $proc['hrDeviceIndex'] . "=$rrd:usage:AVERAGE ";

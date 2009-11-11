@@ -9,8 +9,8 @@ while($proc = mysql_fetch_array($query)) {
 
   if(is_file($rrd_filename)) {
 
-    $descr = str_pad($proc['hrDeviceDescr'], 8);
-    $descr = substr($descr,0,8);
+    $descr = short_hrDeviceDescr($proc['hrDeviceDescr']);
+    $descr = str_replace(":", "\:", $descr);
 
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;

@@ -316,7 +316,7 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
 
 function device_traffic_image($device, $width, $height, $from, $to) 
 {
-  return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "' />";
+  return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "&legend=no' />";
 }
 
 function devclass($device) 
