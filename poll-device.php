@@ -280,7 +280,7 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
 echo("$string\n");
-shell_exec("echo '".$string."' >> /opt/observer/observer.log");
+shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log");
 
 
 ?>
