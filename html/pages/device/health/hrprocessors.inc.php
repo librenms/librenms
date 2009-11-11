@@ -13,8 +13,9 @@
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     if($proc['cpuCPMTotal5minRev'] > '60') { $proc_colour='#cc0000'; } else { $proc_colour='#0000cc';  }
-    echo("<tr><td class=tablehead width=350><a href='' $proc_popup>" . $proc['hrDeviceDescr'] . "</a></td>
-           <td><a href='#' $proc_popup><img src='percentage.php?per=" . $proc['hrProcessorLoad'] . "&width=600'></a></td>
+    echo("<tr><td class=tablehead width=450><a href='' $proc_popup>" . $proc['hrDeviceDescr'] . "</a></td>
+           <td><a href='#' $proc_popup>
+             <img src='percentage.php?per=" . $proc['hrProcessorLoad'] . "&width=500'></a></td>
            <td style='font-weight: bold; color: $proc_colour'>" . $proc['hrProcessorLoad'] . "%</td>
          </tr>");
  

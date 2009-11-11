@@ -184,6 +184,14 @@ $rewrite_ios_features = array(
     'loop' => 'Loop',
   );
 
+  $rewrite_hrDevice = array (
+    'GenuineIntel:' => '',
+    'AuthenticAMD:' => '',
+    'Intel(R)' => '',
+    'CPU' => '',
+    '(R)' => '',
+    '  ' => ' ',
+  );
 
 
 // Specific rewrite functions
@@ -218,6 +226,15 @@ function fixifName ($inf)
   $inf = strtolower($inf);
   $inf = array_str_replace($rewrite_ifname, $inf);
   return $inf;
+}
+
+function short_hrDeviceDescr($dev)
+{
+  global $rewrite_hrDevice;
+  $dev = array_str_replace($rewrite_hrDevice, $dev);
+  $dev = preg_replace("/\ +/"," ", $dev);
+  $dev = trim($dev);
+  return $dev;
 }
 
 function short_port_descr ($desc) {
