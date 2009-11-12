@@ -30,7 +30,17 @@ $scale_max = "100";
 
 $nototal = 1;
 
-include ("generic_multi_line.inc.php");
+if($rrd_list) {include ("generic_multi_line.inc.php"); } else {
+  include("common.inc.php");
+  $database = $config['rrd_dir'] . "/" . $hostname . "/ios-cpu.rrd";
+  $rrd_options .= " DEF:5m=$database:LOAD5M:AVERAGE";
+  $rrd_options .= " DEF:5m_max=$database:LOAD5M:MAX";
+  $rrd_options .= " DEF:5m_min=$database:LOAD5M:MIN";
+  $rrd_options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Current\ \ Minimum\ \ Maximum\ \ Average\\\\n";
+  $rrd_options .= " AREA:5m#ffee99: LINE1.25:5m#aa2200:Load\ %";
+  $rrd_options .= " GPRINT:5m:LAST:%6.2lf\  GPRINT:5m_min:AVERAGE:%6.2lf\ ";
+  $rrd_options .= " GPRINT:5m_max:MAX:%6.2lf\  GPRINT:5m:AVERAGE:%6.2lf\\\\n";
+}
 
 
 ?>

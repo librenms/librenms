@@ -17,8 +17,7 @@ if($device[os] != "Snom") {
   $oids['snmp'] = array ('snmpInPkts','snmpOutPkts','snmpInBadVersions','snmpInBadCommunityNames','snmpInBadCommunityUses','snmpInASNParseErrs',
 'snmpInTooBigs','snmpInNoSuchNames','snmpInBadValues','snmpInReadOnlys','snmpInGenErrs','snmpInTotalReqVars','snmpInTotalSetVars',
 'snmpInGetRequests','snmpInGetNexts','snmpInSetRequests','snmpInGetResponses','snmpInTraps','snmpOutTooBigs','snmpOutNoSuchNames',
-'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps',
-'snmpEnableAuthenTraps','snmpSilentDrops','snmpProxyDrops');
+'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps','snmpSilentDrops','snmpProxyDrops');
 
   $oids['tcp'] = array ('tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab', 
 'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts', 'tcpHCInSegs', 'tcpHCOutSegs');
@@ -40,14 +39,12 @@ if($device[os] != "Snom") {
       $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
       $snmpstring .= " $oid.0"; 
     }
-
-    if(!file_exists($rrdfile)) {  shell_exec($rrd_create); }
-
+    if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
     $snmpdata_cmd = "snmpget -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
     $snmpdata     = trim(shell_exec($snmpdata_cmd));
     $rrdupdate = "N";
     foreach(explode("\n", $snmpdata) as $data) {
-      if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = ""; }
+      if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = "0"; }
       $rrdupdate .= ":$data";
     }
     unset($snmpstring);

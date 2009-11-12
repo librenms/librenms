@@ -10,7 +10,7 @@
 
   if($bgpLocalAs && !strstr($bgpLocalAs, " ")) {
 
-    echo("AS$bgpLocalAs \n");
+    echo("AS$bgpLocalAs ");
 
     if($bgpLocalAs != $device['bgpLocalAs']) { mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS\n"); }
 
@@ -26,7 +26,7 @@
 
 	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5 | sed s/\\\"//g")));
 
-        echo(str_pad($peer_ip, 40) . " AS$peer_as  ");
+#        echo(str_pad($peer_ip, 40) . " AS$peer_as  ");
         
         #echo("$peer_ip AS$peer_as ");
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'"),0) < '1') {
@@ -46,7 +46,7 @@
 	    list($afisafi, $text) = explode(" = ", $af);
             list($afi, $safi) = explode(".", $afisafi);
             if($afi && $safi) {
-	     echo("($afi:$safi)");
+#	     echo("($afi:$safi)");
              $af_list['$afi']['$safi'] = 1;
 	     if(mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip' AND afi = '$afi' AND safi = '$safi'"),0) == 0) {
                mysql_query("INSERT INTO `bgpPeers_cbgp` (device_id,bgpPeerIdentifier, afi, safi) VALUES ('".$device['device_id']."','$peer_ip','$afi','$safi')");
@@ -62,7 +62,6 @@
             }
           } # AF list
         } # if IOS 
-      echo("\n");
       } # If Peer
     } # Foreach  
   } else { 
@@ -92,6 +91,7 @@ while ($entry = mysql_fetch_array($query)) {
         }
 }
 
+echo("\n");
 
 ?>
 
