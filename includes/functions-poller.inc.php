@@ -96,7 +96,6 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
-  #echo("Caching: $oid\n");
   foreach(explode("\n", $data) as $entry) {
     $entry = str_replace($oid.".", "", $entry);
     list($slotport, $value) = explode("=", $entry);
@@ -159,12 +158,13 @@ function snmp_cache_portIfIndex ($device, $array) {
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex";
   $output = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
-  #echo("Caching: portIfIndex\n");
   foreach(explode("\n", $output) as $entry){
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
     list($slotport, $ifIndex) = explode(" ", $entry);
-    $array[$device_id][$ifIndex]['portIfIndex'] = $slotport;
-    $array[$device_id][$slotport]['ifIndex'] = $ifIndex;
+    if($slotport && $ifIndex){
+      $array[$device_id][$ifIndex]['portIfIndex'] = $slotport;
+      $array[$device_id][$slotport]['ifIndex'] = $ifIndex;
+    }
   }
   return $array;
 }

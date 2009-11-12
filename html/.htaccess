@@ -8,6 +8,8 @@ RewriteCond %{REQUEST_URI} !^(.*)\.jpg$
 RewriteCond %{REQUEST_URI} !^(.*)\.gif$
 RewriteCond %{REQUEST_URI} !^(.*)\.png$
 
+RewriteRule ^cust/ ?page=cust
+
 RewriteRule ^bare/(.+)/ index-bare.php?page=$1
 RewriteRule ^bare/(.+)/(.+)/ index-bare.php?page=$1&opta=$2
 RewriteRule ^bare/(.+)/(.+)/(.+)/ index-bare.php?page=$1&opta=$2&optb=$3
