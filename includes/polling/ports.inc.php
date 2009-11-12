@@ -77,7 +77,7 @@
       $update .= ", `poll_period` = '".$polled_period."'";
 
       /// Copy ifHC[In|Out]Octets values to non-HC if they exist
-      if(isset($this_port['ifHCInOctets']) && isset($this_port['ifHCOutOctets'])) {
+      if(is_numeric($this_port['ifHCInOctets']) && is_numeric($this_port['ifHCOutOctets'])) {
         echo("HC ");
         $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
 	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
