@@ -30,10 +30,11 @@ $scale_max = "100";
 
 $nototal = 1;
 
+if ($rrd_list) {
+
 include ("generic_multi_line.inc.php");
 
-if ($not) {
-
+} else {
   include("common.inc.php");
   $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/" . "ucd_cpu.rrd";
   $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";

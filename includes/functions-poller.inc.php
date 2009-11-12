@@ -43,7 +43,7 @@ global $config;
     $this_index = trim($this_index);
     $this_oid = trim($this_oid);
     $this_value = trim($this_value);
-    if(!strstr($this_value, "No Such Instance currently exists at this OID") && $this_index) {
+    if(!strstr($this_value, "at this OID") && $this_index) {
       $array[] = $this_value;
     }
   }
@@ -62,7 +62,7 @@ function snmpwalk_cache_oid($oid, $device, $array, $mib = 0) {
     list($oid,$value) = explode("=", $entry);
     $oid = trim($oid); $value = trim($value);
     list($oid, $index) = explode(".", $oid);
-    if (!strstr($this_value, "No Such Instance currently exists at this OID") && $oid && $index) {
+    if (!strstr($this_value, "at this OID") && $oid && $index) {
       $array[$device_id][$index][$oid] = $value;
     }
   }
@@ -81,7 +81,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
     list($oid,$value) = explode("=", $entry);
     $oid = trim($oid); $value = trim($value);
     list($oid, $first, $second) = explode(".", $oid);
-    if (!strstr($this_value, "No Such Instance currently exists at this OID") && $oid && $first && $second) {
+    if (!strstr($this_value, "at this OID") && $oid && $first && $second) {
       $array[$device_id][$first][$second][$oid] = $value;
     }
   }
@@ -124,7 +124,7 @@ function snmp_cache_oid($oid, $device, $array, $mib = 0) {
     $this_index = trim($this_index);
     $this_oid = trim($this_oid);
     $this_value = trim($this_value);
-    if(!strstr($this_value, "No Such Instance currently exists at this OID") && $this_index) {
+    if(!strstr($this_value, "at this OID") && $this_index) {
       $array[$device_id][$this_index][$this_oid] = $this_value;
     }
     $array[$device_id][$oid] = '1';
@@ -145,7 +145,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   $values = explode("\n", $data);
   #echo("Caching: ifIndex $port\n");
   foreach($oids as $oid){
-    if(!strstr($values[$x], "No Such Instance currently exists at this OID")) {
+    if(!strstr($values[$x], "at this OID")) {
       $array[$device[device_id]][$port][$oid] = $values[$x];
     }
     $x++;
