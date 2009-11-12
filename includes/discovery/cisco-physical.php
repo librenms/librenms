@@ -10,8 +10,6 @@
   $entity_array = snmpwalk_cache_oid("entityPhysical", $device, $empty, "ENTITY-MIB");
   $entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
 
-  print_r($entity_array);
-
   foreach($entity_array[$device[device_id]] as $entPhysicalIndex => $entry) {
 
     $entPhysicalDescr		= $entry['entPhysicalDescr'];
@@ -79,7 +77,7 @@
         $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
         $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       }
-      echo("$sql\n");
+#      echo("$sql\n");
       mysql_query($sql);
     }
     $valid[$entPhysicalIndex] = 1;
