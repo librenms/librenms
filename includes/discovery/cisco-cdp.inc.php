@@ -1,15 +1,14 @@
 <?php
 
-  $community = $device['community'];
+$community = $device['community'];
 
-  echo("CISCO-CDP-MIB: ");
-
+echo("CISCO-CDP-MIB: ");
    
-  unset($cdp_array);
-  $cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, $cdp_array, "CISCO-CDP-MIB");
+unset($cdp_array);
+$cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, $cdp_array, "CISCO-CDP-MIB");
+$cdp_array = $cdp_array[$device[device_id]];
 
-  $cdp_array = $cdp_array[$device[device_id]];
-
+if($cdp_array) {
   unset($cdp_links);
   foreach( array_keys($cdp_array) as $key) { 
     $interface = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
@@ -19,11 +18,10 @@
       if($device['hostname'] && $interface['ifDescr'] && $cdp_entry_array['cdpCacheDeviceId'] && $cdp_entry_array['cdpCacheDevicePort']){
         $cdp_links .= $device['hostname'] . "," . $interface['ifDescr'] . "," . $cdp_entry_array['cdpCacheDeviceId'] . "," . $cdp_entry_array['cdpCacheDevicePort'] . "\n";
       }
-    }    
+    }     
   }
-
-  #echo("$cdp_links");
-
+}
+if($cdp_links) {
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
     list($src_host,$src_if, $dst_host, $dst_if) = explode(",", $link);
@@ -65,5 +63,7 @@
 
     } 
   }
+} else { echo ("No Entries"); }
   echo("\n");
+
 ?>

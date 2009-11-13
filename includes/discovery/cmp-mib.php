@@ -1,6 +1,6 @@
 <?php
 
-echo("ciscoMemoryPool : ");
+echo("OLD-CISCO-MEMORY-POOL: ");
 
 $cmp_oids = array('ciscoMemoryPoolName','ciscoMemoryPoolAlternate','ciscoMemoryPoolValid','ciscoMemoryPoolUsed','ciscoMemoryPoolFree','ciscoMemoryPoolLargestFree');
 
