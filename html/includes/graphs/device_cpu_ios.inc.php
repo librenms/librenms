@@ -4,14 +4,10 @@ $query = mysql_query("SELECT * FROM `cpmCPU` where `device_id` = '".mres($device
 
 $i=0;
 while($proc = mysql_fetch_array($query)) {
-
   $rrd_filename  = $config['rrd_dir'] . "/$hostname/cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd";
-
   if(is_file($rrd_filename)) {
-
     $descr = str_pad($proc['entPhysicalDescr'], 8);
     $descr = substr($descr,0,8);
-
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
     $rrd_list[$i]['rra'] = "usage";
@@ -41,6 +37,5 @@ if($rrd_list) {include ("generic_multi_line.inc.php"); } else {
   $rrd_options .= " GPRINT:5m:LAST:%6.2lf\  GPRINT:5m_min:AVERAGE:%6.2lf\ ";
   $rrd_options .= " GPRINT:5m_max:MAX:%6.2lf\  GPRINT:5m:AVERAGE:%6.2lf\\\\n";
 }
-
 
 ?>
