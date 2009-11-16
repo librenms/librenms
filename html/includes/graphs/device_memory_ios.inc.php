@@ -34,7 +34,7 @@ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cempMemPool` WHERE `device_id
     $rrd_options .= " GPRINT:mempool" . $iter . "total:MAX:%3.0lf%%\\\\n";
     $iter++;
   }
-} else {
+} elseif (mysql_result(mysql_query("SELECT COUNT(*) FROM `cmpMemPool` WHERE `device_id` = '$device_id'"),0) > '0') {
   $iter = "1";
   $rrd_options .= " COMMENT:'                       Currently Used    Max\\n'";
   $sql = mysql_query("SELECT * FROM `cmpMemPool` where `device_id` = '$device_id'");
@@ -58,6 +58,8 @@ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cempMemPool` WHERE `device_id
     $rrd_options .= " GPRINT:mempool" . $iter . "total:MAX:%3.0lf%%\\\\n";
     $iter++;
   }
+} else {
+
 }
 
 ?>
