@@ -42,10 +42,10 @@
     } else { 
      if(isset($prev_customer)) {
        echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
        </td></tr>");
      }
 
