@@ -1,7 +1,7 @@
 <?php
 
   $sql  = "SELECT * FROM `interfaces` AS I, `devices` AS D";
-  $sql .= " WHERE I.ifAlias like 'Cust: %' AND I.device_id = D.device_id  ORDER BY I.ifAlias";
+  $sql .= " WHERE I.ifAlias like 'Cust: %' AND I.device_id = D.device_id  ORDER BY I.ifAlias,D.hostname";
   $query = mysql_query($sql);
 
   if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
@@ -42,10 +42,10 @@
     } else { 
      if(isset($prev_customer)) {
        echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($prev_customer)."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($prev_customer)."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($prev_customer)."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($prev_customer)."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
        </td></tr>");
      }
 
