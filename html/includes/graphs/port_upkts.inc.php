@@ -25,7 +25,7 @@ $colour_area_in_max = "cc88cc";
 $colour_area_out_max = "FFefaa";
 
 $graph_max = 1;
-$unit_text = "Pkts\ \ \ ";
+$unit_text = "Packets";
 
 include("generic_duplex.inc.php");
 

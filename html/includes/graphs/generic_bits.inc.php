@@ -30,7 +30,7 @@ $rrd_options .= " VDEF:d95thout=doutbits,5,PERCENT";
 
 $rrd_options .= " AREA:inbits_max#aDEB7B:";
 $rrd_options .= " AREA:inbits#CDEB8B:";
-$rrd_options .= " COMMENT:BPS\ \ \ \ Now\ \ \ \ \ \ \ Ave\ \ \ \ \ \ Max\ \ \ \ \ \ 95th\ %\\\\n";
+$rrd_options .= " COMMENT:'BPS      Now       Ave      Max      95th %\\n'";
 $rrd_options .= " LINE1.25:inbits#006600:In\ ";
 $rrd_options .= " GPRINT:inbits:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
@@ -48,7 +48,5 @@ $rrd_options .= " GPRINT:totin:\(In\ %6.2lf%s";
 $rrd_options .= " GPRINT:totout:Out\ %6.2lf%s\)\\\\l";
 $rrd_options .= " LINE1:95thin#aa0000";
 $rrd_options .= " LINE1:d95thout#aa0000";
-
-#echo("<pre> [ rrdtool graph $graphfile $rrd_options ] </pre> /n $rrd_filename");
 
 ?>
