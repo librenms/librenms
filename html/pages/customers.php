@@ -42,10 +42,10 @@
     } else { 
      if(isset($prev_customer)) {
        echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
-       <img src='http://observer2.as8681.net/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer)."&type=customer_bits&from=1256573330&to=-300s&width=215&height=100'>
        </td></tr>");
      }
 

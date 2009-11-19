@@ -24,7 +24,7 @@ $colour_line_out = "FF6600";
 $colour_area_in_max = "cc88cc";
 $colour_area_out_max = "FFefaa";
 
-$unit_text = "NUPkts\ ";
+$unit_text = "Packets";
 
 $graph_max = 1;
 
