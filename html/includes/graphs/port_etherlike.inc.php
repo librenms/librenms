@@ -24,9 +24,9 @@ if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/etherlike-" . $port[
   }
 }
 
-$colours = 'mixed';
-
-$nototal = 1;
+$colours   = "mixed";
+$nototal   = 1;
+$unit_text = "Errors";
 
 include ("generic_multi_simplex_seperated.inc.php");
 

@@ -24,7 +24,7 @@ if($graph_max) {
 $rrd_options .= " AREA:".$rra."#".$colour_area.":";
 $rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
 if($percentile) {
-  $rrd_options .= "\ \ \ \ \ \ ".$percentile."th\ %";
+  $rrd_options .= "      ".$percentile."th %";
 }
 $rrd_options .= "\\n'";
 $rrd_options .= " LINE1.25:".$rra."#".$colour_line.":In\ ";
