@@ -26,7 +26,7 @@ $colour_area_out_max = "FF9966";
 
 $graph_max = 1;
 
-$unit_text = "Errors\ ";
+$unit_text = "Errors";
 
 include("generic_duplex.inc.php");
 
