@@ -25,19 +25,25 @@
 
   $ifmib_oids = array_merge($data_oids, $stat_oids);
 
-  if(count($ifmib_oids) > (count($ports)*2.5)) { /// If there are 2.5x more interfaces than OIDs, do per-OID
-    $sub_start = utime();
-    echo("Caching Ports: ");
-    foreach($ports as $port) { echo("$port "); $array = snmp_cache_port_oids($ifmib_oids, $port, $device, $array, "IF-MIB"); }
-    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
-    #echo("\n$proctime secs\n");
-  } else {
-    $sub_start = utime();
-    echo("Caching Oids: ");
-    foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmp_cache_oid($oid, $device, $array, "IF-MIB"); }
-    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
-    #echo("\n$proctime secs\n");
-  }
+#  if(count($ifmib_oids) > (count($ports)*2.5)) { /// If there are 2.5x more interfaces than OIDs, do per-OID
+#    $sub_start = utime();
+#    echo("Caching Ports: ");
+#    foreach($ports as $port) { echo("$port "); $array = snmp_cache_port_oids($ifmib_oids, $port, $device, $array, "IF-MIB"); }
+#    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
+#    #echo("\n$proctime secs\n");
+#  } else {
+#    $sub_start = utime();
+#    echo("Caching Oids: ");
+#    foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmp_cache_oid($oid, $device, $array, "IF-MIB"); }
+#    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
+#    #echo("\n$proctime secs\n");
+#  }
+
+  $ifmib_oids = array('ifentry', 'ifxentry');
+
+  echo("Caching Oids: ");
+  foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmp_cache_oid($oid, $device, $array, "IF-MIB");}
+  echo("\n");
 
   #foreach ($etherlike_oids as $oid) { $array = snmp_cache_oid($oid, $device, $array, "EtherLike-MIB"); }
   #foreach ($cisco_oids as $oid)     { $array = snmp_cache_oid($oid, $device, $array, "OLD-CISCO-INTERFACES-MIB"); }

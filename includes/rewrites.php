@@ -6,18 +6,15 @@ function formatMac($mac) {
 }
 
 
-function ifNameDescr ($interface, $device) {
-#  echo($device['os']);
-
-  if(!$config['ifname'][$device['os']]) {
-    $interface['label'] = $interface['ifDescr'];
-  } else {
+function ifNameDescr ($interface, $device = NULL) {
+  global $config;
+  if(!$device) { $device = device_array($interface['device_id']); }
+  $os = strtolower($device['os']);
+  if($config['ifname'][$os]) {
     $interface['label'] = $interface['ifName'];
+  } else {
+    $interface['label'] = $interface['ifDescr'];
   }
-
-#  unset ($interface['ifDescr']);
-#  unset ($interface['ifName']);
-
   return $interface;
 
 }

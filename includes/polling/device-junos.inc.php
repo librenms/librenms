@@ -34,5 +34,6 @@ if (!is_file($cpurrd)) {
 
 shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu_usage");
 
+include("hr-mib.inc.php");
 
 ?>

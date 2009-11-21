@@ -15,7 +15,7 @@ if(mysql_result(mysql_query("SELECT count(*) from cmpMemPool WHERE device_id = '
     $mempool['descr_fixed'] = str_replace("Sub-Module", "Mod", $mempool['descr_fixed']);
     $mempool['descr_fixed'] = str_replace("DFC Card", "DFC", $mempool['descr_fixed']);
 
-    $proc_url   = "?page=device/".$device['device_id']."/sensors/mempools/";
+    $proc_url   = "/device/".$device['device_id']."/health/cmp/";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$mempool['descr_fixed'];
     $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['cmp_id'] . "&type=cmpMemPool&from=$month&to=$now&width=400&height=125\'>";

@@ -1,10 +1,9 @@
 <?php
 
 ## ifDescr whitelist (used instead of ifName)
-$config['ifdescr']['IOS'] = true;
-$config['ifdescr']['IOS XE'] = true;
-$config['ifname']['ASA'] = true;
-$config['ifname']['CatOS'] = true;
+$config['ifname']['asa'] = true;
+$config['ifname']['catos'] = true;
+$config['ifname']['windows'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
@@ -23,6 +22,7 @@ $os_groups['dragonfly'] = "unix";
 $os_groups['solaris']   = "unix";
 
 $os_groups['ios xe']    = "ios";
+$os_groups['asa']       = "ios";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
@@ -49,6 +49,9 @@ if(!$config['graph_colours']['mixed']) {
 ##############################
 
 $config['version'] = "0.7.0";
+
+$config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
+# print_r($config['rrd_opts_array']);
 
 if($config['enable_nagios']) {
 
