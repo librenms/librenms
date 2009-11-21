@@ -1,31 +1,26 @@
 <?php
 
 function generate_front_box ($type, $content) {
-echo("<div style='  background: transparent url(images/box-$type.png) no-repeat; display: block; height: 84px; width: 119px; padding: 8px; margin: 5px; float: left;'>
- $content
-</div>");
-
-
-# echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
-#  <b class='box-".$type."'>
-#  <b class='box-".$type."1'><b></b></b>
-#  <b class='box-".$type."2'><b></b></b>
-#  <b class='box-".$type."3'></b>
-#  <b class='box-".$type."4'></b>
-#  <b class='box-".$type."5'></b></b>
-#  <div class='box-".$type."fg' style='height: 90px;'>
-#   ".$content."
-#  </div>
-#  <b class='box-".$type."'>
-#  <b class='box-".$type."5'></b>
-#  <b class='box-".$type."4'></b>
-#  <b class='box-".$type."3'></b>
-#  <b class='box-".$type."2'><b></b></b>
-#  <b class='box-".$type."1'><b></b></b></b>
-# </div>");
+ echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
+  <b class='box-".$type."'>
+  <b class='box-".$type."1'><b></b></b>
+  <b class='box-".$type."2'><b></b></b>
+  <b class='box-".$type."3'></b>
+  <b class='box-".$type."4'></b>
+  <b class='box-".$type."5'></b></b>
+  <div class='box-".$type."fg' style='height: 90px;'>
+   ".$content."
+  </div>
+  <b class='box-".$type."'>
+  <b class='box-".$type."5'></b>
+  <b class='box-".$type."4'></b>
+  <b class='box-".$type."3'></b>
+  <b class='box-".$type."2'><b></b></b>
+  <b class='box-".$type."1'><b></b></b></b>
+ </div>");
 }
 
-echo("<div style='width: 875px; float: left; padding: 3px 10px; background: #fff;'>");
+echo("<div style='padding: 3px 10px; background: #fff;'>");
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
@@ -126,85 +121,5 @@ echo("</table>");
 }
 
 echo("</div>");
-
-echo("<div style='width: 290px; margin: 7px; float: right;'>
-  <b class='content-box'>
-  <b class='content-box1'><b></b></b>
-  <b class='content-box2'><b></b></b>
-  <b class='content-box3'></b>
-  <b class='content-box4'></b>
-  <b class='content-box5'></b></b>
-
-  <div class='content-boxfg' style='padding: 2px 8px;'>");
-
-/// this stuff can be customised to show whatever you want....
-
-if($_SESSION['userlevel'] >= '5') {
-
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
-  unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
-    $interfaces['peering'] .= $seperator . $interface['interface_id'];
-    $seperator = ",";
-  }
-
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
-  unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
-    $interfaces['transit'] .= $seperator . $interface['interface_id'];
-    $seperator = ",";
-  }
-
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Core: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
-  $query = mysql_query($sql);
-  unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
-    $interfaces['core'] .= $seperator . $interface['interface_id'];
-    $seperator = ",";
-  }
-
-  if($interfaces['transit']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
-    "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
-    "&from=".$day."&to=".$now."&width=200&height=100'></a>");
-  }
-
-  if($interfaces['peering']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
-    "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>Internet Peering</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
-    "&from=".$day."&to=".$now."&width=200&height=100'></a>");
-  }
-
-  if($interfaces['core']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
-    "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 18px; font-weight: bold;'>Core Links</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['core'].
-    "&from=".$day."&to=".$now."&width=200&height=100'></a>");
-  }
-}
-
-echo("</div>
-
-  <b class='content-box'>
-  <b class='content-box5'></b>
-  <b class='content-box4'></b>
-  <b class='content-box3'></b>
-  <b class='content-box2'><b></b></b>
-  <b class='content-box1'><b></b></b></b>
-</div>
-");
-
-#echo("</div>");
-
-/// END VOSTRON
-
-#}
 
 ?>

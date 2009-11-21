@@ -6,7 +6,7 @@ include("common.inc.php");
 
   $iter = "1";
   $sql = mysql_query("SELECT * FROM `cmpMemPool` AS C, `devices` AS D where C.`cmp_id` = '".mres($_GET['id'])."' AND C.device_id = D.device_id");
-  $rrd_options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ Cur\ \ \ \ Max\\\\n";
+  $rrd_options .= " COMMENT:'                                Cur    Max\\n'";
   while($mempool = mysql_fetch_array($sql)) {
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";

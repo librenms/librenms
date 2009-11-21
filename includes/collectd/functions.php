@@ -545,7 +545,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
           $rrd_cmd = array_merge($rrd_cmd, $small_opts);
         }
 
-	$rrd_cmd = array_merge($rrd_cmd, $config['rrd_opts'], $opts['rrd_opts'], $graph);
+	$rrd_cmd = array_merge($rrd_cmd, $config['rrd_opts_array'], $opts['rrd_opts'], $graph);
 
 	$cmd = RRDTOOL;
 	for ($i = 1; $i < count($rrd_cmd); $i++)
@@ -586,7 +586,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $pinst = null, $type, 
           $rrd_cmd = array_merge($rrd_cmd, $small_opts);
         }
 
-	$rrd_cmd  = array_merge($rrd_cmd, $config['rrd_opts']);
+	$rrd_cmd  = array_merge($rrd_cmd, $config['rrd_opts_array']);
 	$rrd_args = $GraphDefs[$type];
 
 	foreach ($config['datadirs'] as $datadir) {
@@ -642,7 +642,7 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
         }
 
 
-	$cmd = array_merge($cmd, $config['rrd_opts'], $opts['rrd_opts']);
+	$cmd = array_merge($cmd, $config['rrd_opts_array'], $opts['rrd_opts']);
 	$max_inst_name = 0;
 
 	foreach($sources as &$inst_data) {
@@ -730,7 +730,7 @@ function collectd_draw_meta_line(&$opts, &$sources) {
 		array_unshift($opts['rrd_opts'], '-o');
 
 #	$cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $opts['title']);
-#	$cmd = array_merge($cmd, $config['rrd_opts'], $opts['rrd_opts']);
+#	$cmd = array_merge($cmd, $config['rrd_opts_array'], $opts['rrd_opts']);
 
         $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
 

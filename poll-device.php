@@ -125,6 +125,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
     case "IOS":
     case "IOS XE":
+    case "ASA":
       include("includes/polling/device-ios.inc.php");
       break;
 

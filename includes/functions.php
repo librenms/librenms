@@ -102,10 +102,15 @@ function rrdtool($command, $file, $options) {
   return shell_exec($config['rrdtool'] . " $command $file $options");
 }
 
+function device_array($device_id) {
+  $sql = "SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'";
+  $query = mysql_query($sql);
+  $device = mysql_fetch_array($query);
+  return $device;
+}
+
 function getHostOS($hostname, $community, $snmpver, $port) {
-
     global $config;
-
     $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " sysDescr.0";
     $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
     $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
@@ -116,7 +121,6 @@ function getHostOS($hostname, $community, $snmpver, $port) {
     }
     closedir($dir_handle);
     if($os) { return $os; } else { return FALSE; }
-
 }
 
 function billpermitted($bill_id) 

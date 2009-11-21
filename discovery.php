@@ -71,7 +71,7 @@ while ($device = mysql_fetch_array($device_query)) {
   if($device['os'] == "JunOS") { include("includes/discovery/bgp-peers.php"); }
 
 
-  if($device['os'] == "IOS" || $device['os'] == "IOS XE" || $device['os'] == "CatOS") {
+  if($device['os'] == "IOS" || $device['os'] == "IOS XE" || $device['os'] == "CatOS" || $device['os'] == "ASA") {
     include("includes/discovery/cisco-vlans.php");
     include("includes/discovery/cisco-physical.php");
     include("includes/discovery/bgp-peers.php");

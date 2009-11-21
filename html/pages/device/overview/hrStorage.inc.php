@@ -19,7 +19,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
     $fs_url   = "/device/".$device['device_id']."/health/storage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['hrStorageDescr'];
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=unixfs&from=$month&to=$now&width=400&height=125\'>";
+    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=hrstorage&from=$month&to=$now&width=400&height=125\'>";
     $fs_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     if($perc > '80') { $drv_colour='#cc0000'; } else { $drvclass='#0000cc';  }

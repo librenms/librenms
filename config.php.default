@@ -86,6 +86,7 @@ $config['enable_bgp'] 		= 1; # Enable BGP session collection and display
 $config['enable_syslog'] 	= 0; # Enable Syslog
 $config['enable_billing']	= 0; # Enable Billing
 $config['enable_inventory']	= 1; # Enable Inventory
+$config['enable_etherlike']	= 1; # Enable Etherlike
 $config['enable_pseudowires']   = 1; # Enable Pseudowires
 $config['enable_etherlike']     = 1; # Enable Polling EtherLike-MIB (doubles interface processing time)
 
