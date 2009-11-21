@@ -37,10 +37,10 @@ $sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.devi
 while($interface = mysql_fetch_array($sql)){
 
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span>
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
 <!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
-      <strong>".generateiflink($interface, makeshortif($interface['ifDescr']))."</strong> <br />
-      <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
+      <strong>".generateiflink($interface, truncate(makeshortif($interface['ifDescr']),13,''))."</strong> <br />
+      <span class=body-date-1>".truncate($interface['ifAlias'], 20, '')."</span>
       </center>");
 
 }
