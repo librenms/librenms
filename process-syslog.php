@@ -10,17 +10,17 @@ if(!$config['enable_syslog']) {
 
 include("includes/syslog.php");
 
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%last message repeated%'");
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Connection from UDP: [%]:%'");
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Traceback%'");
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%PM-3-INVALID_BRIDGE_PORT%'");
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%RHWatchdog%'");
-mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Hardware Monitoring%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%last message repeated%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Connection from UDP: [%]:%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Traceback%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%PM-3-INVALID_BRIDGE_PORT%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%RHWatchdog%'");
+#mysql_query("DELETE FROM `syslog` WHERE `processed` = '0' AND `msg` LIKE '%Hardware Monitoring%'");
 
 #mysql_query("DELETE FROM `syslog` WHERE `program` LIKE 'SNMP-3-AUTHFAIL'");
 #mysql_query("DELETE FROM `syslog` WHERE `program` LIKE 'SW_MATM-4-MACFLAP_NOTIF'");
 
-mysql_query("DELETE FROM `syslog` WHERE `priority` = 'debug'");
+#mysql_query("DELETE FROM `syslog` WHERE `priority` = 'debug'");
 
 
 ## Delete all the old old old syslogs (as per config.php variable)

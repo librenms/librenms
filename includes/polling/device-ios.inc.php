@@ -9,16 +9,21 @@
    $cpurrd   = $config['rrd_dir'] . "/" . $hostname . "/ios-cpu.rrd";
    $memrrd   = $config['rrd_dir'] . "/" . $hostname . "/ios-mem.rrd";
 
-   if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
-   if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
-     $hardware = $ciscomodel;
-   }
-
    $sysDescr = str_replace("IOS (tm)", "IOS (tm),", $sysDescr);
    list(,$features,$version) = explode(",", $sysDescr);
    $version = str_replace(" Version ", "", $version);
    list(,$features) = explode("(", $features);
    list(,$features) = explode("-", $features);
+
+   $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+                 $device['hostname'].":".$device['port'];
+   $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1 .1.3.6.1.2.1.47.1.1.1.1.4.1 .1.3.6.1.2.1.47.1.1.1.1.7.1 .1.3.6.1.2.1.47.1.1.1.1.10.1";
+   $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1001 .1.3.6.1.2.1.47.1.1.1.1.4.1001";
+   list($a,$b,$c,$d,$e,$f) = explode("\n", shell_exec($snmp_cmdb));
+   if($b == "0" || $c == "Chassis") { $ciscomodel = $a; list($version) = explode(",",$d); }
+   if($f == "0") { $ciscomodel = $d; }
+   $ciscomodel = str_replace("\"","",$ciscomodel);
+   if($ciscomodel) { $hardware = $ciscomodel; }
 
    $cpu5m = shell_exec($config['snmpget'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port avgBusy5.0");
    $cpu5m = $cpu5m + 0;

@@ -43,7 +43,7 @@ $i = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo("Polling " . $device['hostname'] . " ( device_id ".$device['device_id']." )\n\n");
+  echo($device['hostname'] . " ".$device['device_id']." ".$device['os']."\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
   unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName);
@@ -70,16 +70,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $status = '1';
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUptime.0 sysLocation.0 sysContact.0 sysName.0";
-    #$snmp_cmd .= " | grep -v 'Cisco Internetwork Operating System Software'";
-    if($device['os'] == "IOS" || $device['os'] == "IOS XE") {       
-      $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-      $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1 .1.3.6.1.2.1.47.1.1.1.1.4.1 .1.3.6.1.2.1.47.1.1.1.1.13.1001 .1.3.6.1.2.1.47.1.1.1.1.4.1001";
-      list($a,$b,$c,$d) = explode("\n", shell_exec($snmp_cmdb));
-      if($b == "0") { $ciscomodel = $a; }
-      if($d == "0") { $ciscomodel = $c; }
-      $ciscomodel = str_replace("\"","",$ciscomodel);
-    } else { unset($ciscomodel); }
-
     $snmpdata = shell_exec($snmp_cmd);
     #$snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
@@ -133,13 +123,7 @@ while ($device = mysql_fetch_array($device_query)) {
       include("includes/polling/device-catos.inc.php");
       break;
 
-    case "ProCurve":
-      $sysDescr = str_replace(", ", ",", $sysDescr);
-      list($hardware, $features, $version) = explode(",", $sysDescr);
-      list($version) = explode("(", $version);
-      if(!strstr($ciscomodel, " ")) {
-        $hardware = str_replace("\"", "", $ciscomodel);
-      }
+    case "procurve":
       include("includes/polling/device-procurve.inc.php");
       break;
 
@@ -159,7 +143,6 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/temperatures.inc.php");
     include("includes/polling/device-netstats.inc.php");
     include("includes/polling/ports.inc.php");
-    if($config['enable_etherlike']) { include("includes/polling/ports-etherlike.inc.php"); }
     include("includes/polling/cisco-mac-accounting.inc.php");
 
      $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
