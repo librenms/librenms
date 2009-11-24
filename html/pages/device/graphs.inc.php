@@ -71,7 +71,7 @@ while($device = mysql_fetch_array($device_query)) {
 
       break;
 
-   case "ProCurve":
+   case "procurve":
       echo("<div class=graphhead>Processor Utilisation</div>");
       $graph_type = "device_cpu";              include ("includes/print-device-graph.php");
       echo("<br />");

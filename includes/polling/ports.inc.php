@@ -12,10 +12,10 @@
 
   $stat_oids_db = array('ifInOctets', 'ifOutOctets', 'ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts'); // From above for DB
 
-  $etherlike_oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames', 
-                          'dot3StatsSQETestErrors', 'dot3StatsDeferredTransmissions', 'dot3StatsLateCollisions', 'dot3StatsExcessiveCollisions', 
+ $etherlike_oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
+                          'dot3StatsSQETestErrors', 'dot3StatsDeferredTransmissions', 'dot3StatsLateCollisions', 'dot3StatsExcessiveCollisions',
                           'dot3StatsInternalMacTransmitErrors', 'dot3StatsCarrierSenseErrors', 'dot3StatsFrameTooLongs', 'dot3StatsInternalMacReceiveErrors',
-                          'dot3StatsSymbolErrors', 'dot3StatsDuplexStatus');
+                          'dot3StatsSymbolErrors');
 
   $cisco_oids = array('locIfHardType', 'locIfInRunts', 'locIfInGiants', 'locIfInCRC', 'locIfInFrame', 'locIfInOverrun', 'locIfInIgnored', 'locIfInAbort',  
                       'locIfCollisions', 'locIfInputQueueDrops', 'locIfOutputQueueDrops');
@@ -25,24 +25,13 @@
 
   $ifmib_oids = array_merge($data_oids, $stat_oids);
 
-#  if(count($ifmib_oids) > (count($ports)*2.5)) { /// If there are 2.5x more interfaces than OIDs, do per-OID
-#    $sub_start = utime();
-#    echo("Caching Ports: ");
-#    foreach($ports as $port) { echo("$port "); $array = snmp_cache_port_oids($ifmib_oids, $port, $device, $array, "IF-MIB"); }
-#    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
-#    #echo("\n$proctime secs\n");
-#  } else {
-#    $sub_start = utime();
-#    echo("Caching Oids: ");
-#    foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmp_cache_oid($oid, $device, $array, "IF-MIB"); }
-#    $end = utime(); $run = $end - $sub_start; $proctime = substr($run, 0, 5);
-#    #echo("\n$proctime secs\n");
-#  }
-
-  $ifmib_oids = array('ifentry', 'ifxentry');
+  $ifmib_oids = array('ifEntry', 'ifXEntry');
 
   echo("Caching Oids: ");
   foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmp_cache_oid($oid, $device, $array, "IF-MIB");}
+
+  if($config['enable_etherlike']) { echo("dot3Stats "); $array = snmp_cache_oid("dot3StatsEntry", $device, $array, "EtherLike-MIB"); }
+
   echo("\n");
 
   #foreach ($etherlike_oids as $oid) { $array = snmp_cache_oid($oid, $device, $array, "EtherLike-MIB"); }
@@ -155,6 +144,9 @@
         }
       } 
       // End Update PAgP
+
+      /// Do EtherLike-MIB
+      if($config['enable_etherlike']) { include("port-etherlike.inc.php"); }      
 
      if ($update) { /// Do Updates
         $update_query  = "UPDATE `interfaces` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
