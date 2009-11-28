@@ -1,6 +1,6 @@
 <?php
 
-if($device['os'] == "IOS") {
+if($device['os_group'] == "ios") {
 
   $array = snmp_cache_portIfIndex ($device, $array);
 

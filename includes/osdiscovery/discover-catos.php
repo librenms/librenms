@@ -2,7 +2,7 @@
 
 if(!$os) {
 
-  if(strstr($sysDescr, "Cisco Catalyst Operating System Software")) { $os = "CatOS"; }
+  if(strstr($sysDescr, "Cisco Catalyst Operating System Software")) { $os = "catos"; }
 
 }
 

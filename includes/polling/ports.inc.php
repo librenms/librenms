@@ -38,7 +38,7 @@
   #foreach ($cisco_oids as $oid)     { $array = snmp_cache_oid($oid, $device, $array, "OLD-CISCO-INTERFACES-MIB"); }
   #foreach ($pagp_oids as $oid)      { $array = snmp_cache_oid($oid, $device, $array, "CISCO-PAGP-MIB"); }
 
-  if($device['os'] == "IOS" || $device['os'] == "CatOS" || $device['os'] == "IOS XE") {
+  if($device['os_group'] == "ios") {
     #$array = snmp_cache_portIfIndex ($device, $array);
     #$array = snmp_cache_portName ($device, $array);
     #$array = snmp_cache_oid("vmVlan", $device, $array, "CISCO-VLAN-MEMBERSHIP-MIB");

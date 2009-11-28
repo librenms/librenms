@@ -22,16 +22,16 @@
       }
     }
 
-    if(strstr($fstype, "FixedDisk") && $size > '0' && $allow) {
+    if(strstr($fstype, "FixedDisk") || strstr($fstype, "Ram") || strstr($fstype, "VirtualMemory") && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
-        $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
-        $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$descr', '$size', '$units')";
+        $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageType`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
+        $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$fstype', '$descr', '$size', '$units')";
 	mysql_query($query);
 	echo("+");
       } else {
         $data = mysql_fetch_array(mysql_query("SELECT * FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"));
 	if($data['hrStorageDescr'] != $descr || $data['hrStorageSize'] != $size || $data['hrStorageAllocationUnits'] != $units ) {
-          $query  = "UPDATE storage SET `hrStorageDescr` = '$descr', `hrStorageSize` = '$size', `hrStorageAllocationUnits` = '$units' ";
+          $query  = "UPDATE storage SET `hrStorageDescr` = '$descr', `hrStorageType` = '$fstype', `hrStorageSize` = '$size', `hrStorageAllocationUnits` = '$units' ";
           $query .= "WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'";
 	  echo("U");
 	  mysql_query($query);

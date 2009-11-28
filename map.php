@@ -24,7 +24,7 @@ while($loc_data = mysql_fetch_array($loc_result)) {
   style=filled;
   color=lightgrey;\n\n");
     
-  $dev_sql = "SELECT * FROM devices WHERE location = '" . $loc_data['location'] . "' and `os` LIKE '%IOS%' and disabled = 0";
+  $dev_sql = "SELECT * FROM devices WHERE location = '" . $loc_data['location'] . "' and `os` LIKE '%ios%' and disabled = 0";
   $dev_result = mysql_query($dev_sql);
   while($dev_data = mysql_fetch_array($dev_result)) {
         $device_id = $dev_data['device_id'];

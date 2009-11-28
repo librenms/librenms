@@ -78,7 +78,7 @@
 
 #  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 
-  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
+  if($device['os'] == "ios" || $device['os'] == "iosxe") {
     if($interface['ifTrunk']) { 
       echo("<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>"); 
     } elseif ($interface['ifVlan']) { 

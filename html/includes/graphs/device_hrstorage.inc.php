@@ -12,8 +12,8 @@ include("common.inc.php");
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
     } elseif($iter=="7") {$colour="FF0084"; $iter = "0"; }
-    $descr = str_pad($fs[hrStorageDescr], 14);
-    $descr = substr($descr,0,14);
+    $descr = substr(str_pad($fs[hrStorageDescr], 12),0,12);
+    $descr = str_replace(":","\:",$descr);
     $rrd = $config['rrd_dir'] . "/$hostname/hrStorage-".$fs['hrStorageIndex'].".rrd";
     $rrd_options .= " DEF:$fs[storage_id]=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:$fs[storage_id]s=$rrd:size:AVERAGE";

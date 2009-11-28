@@ -50,12 +50,12 @@ global $config;
   return $array;
 }
 
-function snmpwalk_cache_oid($oid, $device, $array, $mib = 0) {
+function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = 0) {
   global $config;
   $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd .= $poll_oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {

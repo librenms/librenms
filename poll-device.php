@@ -43,7 +43,9 @@ $i = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo($device['hostname'] . " ".$device['device_id']." ".$device['os']."\n");
+  echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
+  if($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
+  echo("\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
   unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName);
@@ -69,7 +71,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
     $status = '1';
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " sysUptime.0 sysLocation.0 sysContact.0 sysName.0";
+    $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
     $snmpdata = shell_exec($snmp_cmd);
     #$snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
@@ -78,6 +80,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysUptime = str_replace("(", "", $sysUptime);
     $sysUptime = str_replace(")", "", $sysUptime); 
+    $sysName = strtolower($sysName);
     list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
     list($secs, $microsecs) = explode(".", $secs);
     $hours = $hours + ($days * 24);
@@ -85,87 +88,33 @@ while ($device = mysql_fetch_array($device_query)) {
     $secs = $secs + ($mins * 60);
     $uptime = $secs;
 
-    switch ($device['os']) {
-    case "FreeBSD":
-    case "DragonFly":
-    case "OpenBSD":
-    case "Linux":
-    case "m0n0wall":
-    case "Voswall":
-    case "NetBSD":
-    case "pfSense":
-      include("includes/polling/device-unix.inc.php");
-      break;
+    if(is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
+      /// OS Specific
+      include($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php");
+    }elseif($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) {
+      /// OS Group Specific
+      include($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php");
+    }else{
+      echo("Generic :(");
+    }
 
-    case "Windows":
-      include("includes/polling/device-windows.inc.php");
-      break;
 
-    case "ScreenOS":
-      include("includes/polling/device-screenos.inc.php");
-      break;
-
-    case "Fortigate":
-      include("includes/polling/device-fortigate.inc.php");
-      break;
-
-    case "JunOS":
-      include("includes/polling/device-junos.inc.php");
-      break;
-
-    case "IOS":
-    case "IOS XE":
-    case "ASA":
-      include("includes/polling/device-ios.inc.php");
-      break;
-
-    case "CatOS":
-      include("includes/polling/device-catos.inc.php");
-      break;
-
-    case "procurve":
-      include("includes/polling/device-procurve.inc.php");
-      break;
-
-    case "BCM96348":
-      include("includes/polling/adslline.inc.php");
-    break;
-
-    case "Snom":
-      include("includes/polling/device-snom.inc.php");
-      break;
-
-    default:
-      pollDevice();
-    }   
     $sysLocation = str_replace("\"","", $sysLocation); 
   
     include("includes/polling/temperatures.inc.php");
     include("includes/polling/device-netstats.inc.php");
+    include("includes/polling/ipSystemStats.inc.php");
     include("includes/polling/ports.inc.php");
     include("includes/polling/cisco-mac-accounting.inc.php");
-
-     $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = NOW() WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'polled'");
-     if(mysql_affected_rows() == '0') {
-      $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'polled', NOW())");
-    }
-
-  } else {
-    $status = '0';
-  }
 
   unset( $update ) ;
   unset( $seperator) ;
 
   if ( $sysContact && $sysContact != $device['sysContact'] ) {
-    $update .= $seperator . "`sysContact` = '$sysContact'";
+    $update .= $seperator . "`sysContact` = '".mres($sysContact)."'";
     $seperator = ", ";
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Contact -> $sysContact')");
   }
-
-  echo("$update\n");
-
-  $sysName = strtolower($sysName);
 
   if ( $sysName && $sysName != $device['sysName'] ) {
     $update .= $seperator . "`sysName` = '$sysName'";
@@ -217,11 +166,9 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if ($uptime) {
 
-    $old_uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
-
-    if( $uptime < $old_uptime ) {
+    if( $uptime < $device['uptime'] ) {
       if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-      mail($notify_email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
+      mail($email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
     }
 
     $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
@@ -236,28 +183,28 @@ while ($device = mysql_fetch_array($device_query)) {
     }
     rrdtool_update($uptimerrd, "N:$uptime");
 
-    $update_uptime_attrib = mysql_query("UPDATE devices_attribs SET attrib_value = '$uptime' WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'");
-    if(mysql_affected_rows() == '0') {
-      $insert_uptime_attrib = mysql_query("INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . $device['device_id'] . "', 'uptime', '$uptime')");
-    }
-
-    mysql_query("UPDATE `devices` SET `last_polled` = NOW() WHERE `device_id` = '". $device['device_id'] ."'");
-
-  } ## End if snmpable
-
-
+    $update .= $seperator . "`uptime` = '$uptime'";
+    $seperator = ", ";
+  } 
+  $update .= $seperator . "`last_polled` = NOW()";
   if ($update) {
     $update_query  = "UPDATE `devices` SET ";
     $update_query .= $update;
     $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . "\n");
+    echo("Updating " . $device['hostname'] . " - $update_query \n");
     $update_result = mysql_query($update_query);
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
   $i++;
   echo("\n");
-
+  } else {
+    $update_query  = "UPDATE `devices` SET ";
+    $update .= " `status` = '0'";
+    $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+    echo("Updating " . $device['hostname'] . "\n");
+    $update_result = mysql_query($update_query);
+  }
 }   
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);

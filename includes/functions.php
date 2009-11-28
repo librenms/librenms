@@ -109,9 +109,9 @@ function device_array($device_id) {
   return $device;
 }
 
-function getHostOS($hostname, $community, $snmpver, $port) {
+function getHostOS($device) {
     global $config;
-    $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " sysDescr.0";
+    $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " sysDescr.0";
     $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
     $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
     while ($file = readdir($dir_handle)) {
@@ -628,7 +628,8 @@ function fixIOSHardware($hardware){
 
 function createHost ($host, $community, $snmpver, $port = 161){
         $host = trim(strtolower($host));
-        $host_os = getHostOS($host, $community, $snmpver, $port); 
+        $device = array('hostname' => $host, 'community' => $community, 'snmpver' => $snmpver, 'port' => $port);
+        $host_os = getHostOS($device); 
         if($host_os) {
            $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1')");
            if(mysql_affected_rows()) {

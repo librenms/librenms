@@ -36,8 +36,8 @@
           $update = mysql_query("UPDATE `bgpPeers` SET astext = '$astext' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
         }
 
-        ## Get afi/safi and populate cbgp on cisco IOS
-	if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
+        ## Get afi/safi and populate cbgp on cisco ios (xe/xr)
+	if($device['os_type'] == "ios") {
           unset($af_list);
           $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
           $af_cmd .= "cbgpPeerAddrFamilyName." . $peer_ip;
@@ -61,7 +61,7 @@
               mysql_query("DELETE FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip' AND afi = '$afi' AND safi = '$safi'");
             }
           } # AF list
-        } # if IOS 
+        } # if os_type = ios 
       } # If Peer
     } # Foreach  
   } else { 
