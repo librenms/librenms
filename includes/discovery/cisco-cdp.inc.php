@@ -7,7 +7,6 @@ echo("CISCO-CDP-MIB: ");
 unset($cdp_array);
 $cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, $cdp_array, "CISCO-CDP-MIB");
 $cdp_array = $cdp_array[$device[device_id]];
-
 if($cdp_array) {
   unset($cdp_links);
   foreach( array_keys($cdp_array) as $key) { 
@@ -15,12 +14,16 @@ if($cdp_array) {
     $cdp_if_array = $cdp_array[$key]; 
     foreach( array_keys($cdp_if_array) as $entry_key) {
       $cdp_entry_array = $cdp_if_array[$entry_key];
-      if($device['hostname'] && $interface['ifDescr'] && $cdp_entry_array['cdpCacheDeviceId'] && $cdp_entry_array['cdpCacheDevicePort']){
-        $cdp_links .= $device['hostname'] . "," . $interface['ifDescr'] . "," . $cdp_entry_array['cdpCacheDeviceId'] . "," . $cdp_entry_array['cdpCacheDevicePort'] . "\n";
+      if($device['hostname'] && $interface['ifIndex'] && $cdp_entry_array['cdpCacheDeviceId'] && $cdp_entry_array['cdpCacheDevicePort']){
+        if(strpos($cdp_entry_array['cdpCacheDeviceId'], ")")) { list(,$cdp_entry_array['cdpCacheDeviceId']) = explode("(", $cdp_entry_array['cdpCacheDeviceId']); echo($cdp_entry_array['cdpCacheDeviceId']); 
+                                                               list($cdp_entry_array['cdpCacheDeviceId'],) = explode(")", $cdp_entry_array['cdpCacheDeviceId']); echo($cdp_entry_array['cdpCacheDeviceId']); }
+
+        $cdp_links .= $device['hostname'] . "," . $interface['ifIndex'] . "," . $cdp_entry_array['cdpCacheDeviceId'] . "," . $cdp_entry_array['cdpCacheDevicePort'] . "\n";
       }
     }     
   }
 }
+echo("$cdp_links");
 if($cdp_links) {
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
@@ -43,13 +46,17 @@ if($cdp_links) {
       echo("!($dst_host)");
     }
 
+    $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
+    if(!$dst_if_id) {
+     $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifName` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
+    }
+
     if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '1' && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$src_host'"), 0) == '1' &&
-      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0) == '1' && 
-      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
+      $dst_if_id && 
+      mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifIndex` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
     {
-      $dst_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
-      $src_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0);
+      $src_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifIndex` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0);
       $linkalive[] = $src_if_id . "," . $dst_if_id;
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `dst_if` = '$dst_if_id' AND `src_if` = '$src_if_id'"),0) == '0') 
       { 

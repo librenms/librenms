@@ -31,7 +31,7 @@
       $if = trim(strtolower($ifDescr));
       $nullintf = 0;
       foreach($config['bad_if'] as $bi) { if (strstr($if, $bi)) { $nullintf = 1; } }
-      if($device['os'] == "CatOS" && strstr($if, "vlan") ) { $nullintf = 1; } 
+      if($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; } 
       $ifDescr = fixifName($ifDescr);
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
       if(!$config['allow_ng']) {
