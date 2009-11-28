@@ -1,10 +1,17 @@
 <?php
 
-echo("Doing Juniper JunOS");
+echo("Doing Juniper JunOS ");
 
 $jun_ver  =  trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.25.6.3.1.2.2")));
-$hardware = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.2.0")));
-$serial   = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.3.0")));
+if(strpos($sysDescr, "olive")) {
+  $hardware = "Olive";
+  $serial = "";
+} else {
+  $hardware = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -OQv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.2.0")));
+  $serial   = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.3.0")));
+  list(,$hardware,) = explode(" ", $hardware);
+  $hardware = "Juniper " . $hardware;
+}
 
 list($version) = explode("]", $jun_ver);
 list(,$version) =  explode("[", $version);

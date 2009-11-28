@@ -1,2 +1,0 @@
-Since 0.6.0
- interfaces table added field `ifName` VARCHAR(64)

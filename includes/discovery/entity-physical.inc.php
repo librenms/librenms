@@ -7,8 +7,10 @@
  if($config['enable_inventory']) {
 
   $empty = array();
-  $entity_array = snmpwalk_cache_oid("entityPhysical", $device, $empty, "ENTITY-MIB");
+  $entity_array = snmpwalk_cache_oid("entPhysicalEntry", $device, $empty, "ENTITY-MIB");
   $entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+
+  if(!$entity_array[$device[device_id]]) { $entity_array[$device[device_id]] = array(); }
 
   foreach($entity_array[$device[device_id]] as $entPhysicalIndex => $entry) {
 
@@ -21,6 +23,13 @@
     $entPhysicalMfgName		= $entry['entPhysicalMfgName'];
     $entPhysicalVendorType	= $entry['entPhysicalVendorType'];
     $entPhysicalParentRelPos	= $entry['entPhysicalParentRelPos'];
+    $entPhysicalHardwareRev 	= $entry['entPhysicalHardwareRev']; 
+    $entPhysicalFirmwareRev 	= $entry['entPhysicalFirmwareRev'];
+    $entPhysicalSoftwareRev 	= $entry['entPhysicalSoftwareRev'];
+    $entPhysicalIsFRU 		= $entry['entPhysicalIsFRU'];
+    $entPhysicalAlias     	= $entry['entPhysicalAlias'];
+    $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
+
 
     $ent_data  = $config['snmpget'] . " -m ENTITY-MIB:IF-MIB -Ovqs -";
     $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
@@ -42,24 +51,20 @@
       $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
       $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
       $sql .= ", entPhysicalMfgName = '$entPhysicalMfgName', entPhysicalParentRelPos = '$entPhysicalParentRelPos', entPhysicalVendorType = '$entPhysicalVendorType'";
+      $sql .= ", entPhysicalHardwareRev = '$entPhysicalHardwareRev', entPhysicalFirmwareRev = '$entPhysicalFirmwareRev', entPhysicalSoftwareRev = '$entPhysicalSoftwareRev'";
+      $sql .= ", entPhysicalIsFRU = '$entPhysicalIsFRU', entPhysicalAlias = '$entPhysicalAlias', entPhysicalAssetID = '$entPhysicalAssetID'";
       $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       
       mysql_query($sql);
       echo(".");
     } else {
-      $sql  = "INSERT INTO `entPhysical` ( `device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `ifIndex` ) ";
-      $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$ifIndex')";      
+      $sql  = "INSERT INTO `entPhysical` ( `device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `entPhysicalHardwareRev`,`entPhysicalFirmwareRev`,`entPhysicalSoftwareRev`,`entPhysicalIsFRU`,`entPhysicalAlias`,`entPhysicalAssetID`, `ifIndex` ) ";
+      $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$entPhysicalHardwareRev', '$entPhysicalFirmwareRev', '$entPhysicalSoftwareRev', '$entPhysicalIsFRU', '$entPhysicalAlias', '$entPhysicalAssetID', '$ifIndex')";      
       mysql_query($sql);
       echo("+");
     }
 
     if($entPhysicalClass == "sensor") {
-
-#      $sensor_cmd  = $config['snmpget'] . " -m CISCO-ENTITY-SENSOR-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-#      $sensor_cmd .= " entSensorType.$entPhysicalIndex entSensorScale.$entPhysicalIndex entSensorPrecision.$entPhysicalIndex";
-#      $sensor_cmd .= " entSensorValueUpdateRate.$entPhysicalIndex entSensorMeasuredEntity.$entPhysicalIndex";
-#      $sensor_data = shell_exec($sensor_cmd);
-#      list($entSensorType,$entSensorScale,$entSensorPrecision,$entSensorValueUpdateRate,$entSensorMeasuredEntity) = explode("\n", $sensor_data);
 
       $entSensorType            = $entry['entSensorType'];
       $entSensorScale           = $entry['entSensorScale'];

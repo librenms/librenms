@@ -8,7 +8,7 @@
   echo("CISCO-ENHANCED-MEMORY-POOL : ");
 
   ## Cisco Enhanced Mempool
-  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
+  if($device['os_type'] == "ios") {
 
     $oids = shell_exec($config['snmpwalk'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -v2c -CI -Osq -c ".$community." ".$hostname.":".$port." cempMemPoolName | sed s/cempMemPoolName.//g");
     $oids = trim($oids);

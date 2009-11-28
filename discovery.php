@@ -46,7 +46,9 @@ $devices_discovered = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
-  echo($device['hostname'] ."\n");
+  echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
+  if($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
+  echo("\n");
 
   ## Discover Interfaces 
   include("includes/discovery/interfaces.php");
@@ -73,8 +75,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if($device['os'] == "JunOS") { include("includes/discovery/bgp-peers.php"); }
 
-
-  if($device['os'] == "IOS" || $device['os'] == "IOS XE" || $device['os'] == "CatOS" || $device['os'] == "ASA") {
+  if($device['os'] == "powerconnect" || $device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
     include("includes/discovery/cisco-vlans.php");
     include("includes/discovery/bgp-peers.php");
     include("includes/discovery/cisco-mac-accounting.php");
@@ -86,8 +87,12 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cisco-cdp.inc.php");
   }
 
+  $update_query  = "UPDATE `devices` SET ";
+  $update .= " `last_discovered` = NOW()";
+  $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+  $update_result = mysql_query($update_query);
+
   echo("\n"); $devices_discovered++;
-  mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '".$device['device_id']."' AND `attrib_type` = 'discover'");
 }
 
 $end = utime(); $run = $end - $start;

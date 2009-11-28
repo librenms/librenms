@@ -24,7 +24,7 @@ function process_syslog ($entry, $update) {
   if($device_id && !$delete) {
     $entry['device_id'] = $device_id;
     $os = mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '$device_id'"),0);
-    if($os == "IOS" || $os == "IOS XE") {
+    if($os == "ios" || $os == "iosxe") {
       if(strstr($entry[msg], "%")) {
         $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
         list(,$entry[msg]) = split(": %", $entry['msg']);

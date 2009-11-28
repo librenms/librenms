@@ -4,6 +4,7 @@
 $config['ifname']['asa'] = true;
 $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
+$config['ifname']['powerconnect'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
@@ -21,8 +22,29 @@ $os_groups['netbsd']    = "unix";
 $os_groups['dragonfly'] = "unix";
 $os_groups['solaris']   = "unix";
 
-$os_groups['ios xe']    = "ios";
+$os_groups['iosxe']     = "ios";
+$os_groups['iosxr']     = "ios";
+$os_groups['ios']	= "ios";
 $os_groups['asa']       = "ios";
+
+##
+$os_text['linux']	 = "Linux";
+$os_text['ios']       	 = "Cisco IOS";
+$os_text['iosxr']        = "Cisco IOS XE";
+$os_text['iosxe']        = "Cisco IOS XR";
+$os_text['catos']        = "Cisco CatOS";
+$os_text['nxos']         = "Cisco NX-OS";
+$os_text['asa']          = "Cisco ASA";
+$os_text['pix']          = "Cisco PIX";
+$os_text['freebsd']      = "FreeBSD";
+$os_text['openbsd']      = "OpenBSD";
+$os_text['netbsd']       = "NetBSD";
+$os_text['dragonflybsd'] = "DragonFlyBSD";
+$os_text['powerconnect'] = "Dell PowerConnect";
+$os_text['windows']      = "Microsoft Windows";
+$os_text['junos']        = "Juniper JunOS";
+$os_text['procurve']     = "HP ProCurve";
+
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');

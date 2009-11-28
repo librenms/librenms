@@ -8,7 +8,7 @@ $device_query = mysql_query("SELECT device_id,hostname,os,community,snmpver,port
 while ($device = mysql_fetch_array($device_query)) {
 
 
-   $os = getHostOS($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
+   $os = getHostOS($device);
 
    if($os != $device['os']) {
       $sql = mysql_query("UPDATE `devices` SET `os` = '$os' WHERE `device_id` = '".$device['device_id']."'");

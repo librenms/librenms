@@ -7,24 +7,6 @@
 ?>
 <?php
 
-$nodes = array();
-
-$sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
-
-while($device = mysql_fetch_array($sql)){
-  unset($already);
-  $i = 0;
-  while ($i <= count($nodes)) {
-    $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) {
-     $already = "yes";
-    }
-    $i++;
-  }
-  if(!$already) { $nodes[] = $device['device_id']; }
-}
-
-
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
 while($device = mysql_fetch_array($sql)){
 
@@ -72,15 +54,13 @@ while($peer = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND D.status = '1' AND A.attrib_type = 'uptime' AND A.attrib_value < '84600'");
+$sql = mysql_query("SELECT * FROM `devices` WHERE status = '1' AND `uptime` < '84600'");
 while($device = mysql_fetch_array($sql)){
-
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
       <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br /> 
-      <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
+      <span class=body-date-1>".formatUptime($device['uptime'])."</span>
       </center></div>");
-
 }
 
 

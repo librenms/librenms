@@ -1,6 +1,6 @@
 <?php
 
-if($device['os'] == "CatOS" || $device['os'] == "IOS") { 
+if($device['os_group'] == "ios") { 
   $portifIndex = array();
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
   #echo("$cmd");

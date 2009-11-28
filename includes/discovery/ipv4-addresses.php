@@ -14,17 +14,14 @@
     list($net,$cidr) = explode("/", $network);
     $cidr = trim($cidr);
     if($mask == "255.255.255.255") { $cidr = "32"; $network = "$oid/$cidr"; }
-
-    if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
+    if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0") {
       $i_query = "SELECT interface_id FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
       $interface_id = mysql_result(mysql_query($i_query), 0);
-
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0) < '1') {
         mysql_query("INSERT INTO `ipv4_networks` (`ipv4_network`) VALUES ('$network')");
         #echo("Create Subnet $network\n");
         echo("S");
       }
-
       $ipv4_network_id = @mysql_result(mysql_query("SELECT `ipv4_network_id` from `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0);
 
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_addresses` WHERE `ipv4_address` = '$oid' AND `ipv4_prefixlen` = '$cidr' AND `interface_id` = '$interface_id'"), 0) == '0') {
@@ -32,10 +29,8 @@
         #echo("Added $oid/$cidr to $interface_id ( $hostname $ifIndex )\n $i_query\n");
         echo("+");
       } else { echo("."); }
-
       $full_address = "$oid/$cidr|$ifIndex";
       $valid_v4[$full_address] = 1;
-
     } else { echo("!"); }
 
   }

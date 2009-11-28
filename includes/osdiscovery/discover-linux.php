@@ -1,7 +1,7 @@
 <?php
 
 if(!$os) {
-  if(preg_match("/^Linux/", $sysDescr)) { $os = "Linux"; }
+  if(preg_match("/^Linux/", $sysDescr)) { $os = "linux"; }
 }
 
 ?>

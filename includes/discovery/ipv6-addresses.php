@@ -2,9 +2,9 @@
 
 echo("IPv6 Addresses : ");
 
-$ipv6interfaces = shell_exec($config['snmpget']." -m IPV6-MIB -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipv6Interfaces.0");
+#$ipv6interfaces = shell_exec($config['snmpget']." -m IPV6-MIB -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipv6Interfaces.0");
 
-if($ipv6interfaces){
+#if($ipv6interfaces){
 
   $cmd = $config['snmpwalk']." -m IP-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];
   $cmd .= " ipAddressIfIndex.ipv6 -Osq | grep -v No";
@@ -58,7 +58,7 @@ if($ipv6interfaces){
     }
    }
   }
-} else { echo("None configured"); }
+#} else { echo("None configured"); }
 
 $sql   = "SELECT * FROM ipv6_addresses AS A, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
 $data = mysql_query($sql);

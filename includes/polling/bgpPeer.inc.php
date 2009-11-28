@@ -44,7 +44,7 @@ while($peer = mysql_fetch_array($peers)) {
 
   mysql_query($update);
 
-  if($device['os'] == "IOS" || $device['os'] == "IOS XE") {
+  if($device['os_group'] == "ios") {
 
    ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB)
    $afi_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'");

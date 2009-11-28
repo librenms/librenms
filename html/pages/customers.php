@@ -54,7 +54,7 @@
      $prev_customer = $customer;
     }
 
-    if($device['os'] == "IOS") {
+    if($device['os'] == "ios") {
 
       if($interface['ifTrunk']) { $vlan = "<span class=box-desc><span class=red>" . $interface['ifTrunk'] . "</span></span>";
       } elseif ($interface['ifVlan']) { $vlan = "<span class=box-desc><span class=blue>VLAN " . $interface['ifVlan'] . "</span></span>"; 

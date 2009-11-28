@@ -68,13 +68,11 @@ while($peer = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '84600'");
+$sql = mysql_query("SELECT * FROM `devices` WHERE status = '1' AND `uptime` < '84600'");
 while($device = mysql_fetch_array($sql)){
-
-
    generate_front_box("info", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
-      <span class=body-date-1>".formatUptime($device['attrib_value'], 'short')."</span>
+      <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
       </center>");
 
 }
