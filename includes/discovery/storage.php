@@ -16,13 +16,13 @@
     list($descr, $units, $size, $fstype) = explode("\n", $temp);
     list($units) = explode(" ", $units);
     $allow = 1;
-    foreach($config['ignore_mount'] as $bi) {
-    if($descr == $bi) {
-        $allow = 0;
-      }
-    }
+    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $allow = 0; } }
+    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $allow = 0; } else { echo("$descr -> $bi \n"); } }
+    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $allow = 0; } }
+    $descr = str_replace("mounted on: ", "", $descr);
+    $descr = str_replace(": var file system", "", $descr);
 
-    if(strstr($fstype, "FixedDisk") || strstr($fstype, "Ram") || strstr($fstype, "VirtualMemory") && $size > '0' && $allow) {
+    if((strstr($fstype, "FixedDisk") || strstr($fstype, "Ram") || strstr($fstype, "VirtualMemory")) && $size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
         $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageType`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
         $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$fstype', '$descr', '$size', '$units')";
@@ -41,7 +41,6 @@
     } else { echo("X"); };
    }
   }
-
 
 $sql = "SELECT * FROM storage AS S, devices AS D where S.host_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 $query = mysql_query($sql);
