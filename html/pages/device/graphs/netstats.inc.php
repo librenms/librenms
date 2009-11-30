@@ -1,5 +1,11 @@
 <?php
 
+      if(is_file($config['rrd_dir'] . "/" . $device['hostname'] ."/ipSystemStats-ipv6.rrd")) {
+      echo("<div class=graphhead>IPv4/IPv6 Statistics</div>");
+      $graph_type = "device_ipSystemStats";           include ("includes/print-device-graph.php");
+      echo("<br />");
+      }
+
       echo("<div class=graphhead>IP Statistics</div>");
       $graph_type = "device_ip";           include ("includes/print-device-graph.php");
       echo("<br />");
