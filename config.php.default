@@ -9,7 +9,7 @@ $config['db_name'] = "observer";
 ### Locations
 $config['install_dir'] 	= "/opt/observer";
 $config['html_dir']	= $config['install_dir'] . "/html";
-$config['rrd_dir'] 	= "/mnt/filesystem/rrd";
+$config['rrd_dir'] 	= "/opt/observer/rrd";
 $config['temp_dir']	= "/tmp";
 $config['observer_log'] = $config['install_dir'] . "/observer.log";
 
@@ -34,7 +34,7 @@ $config['snmpset']      = "/usr/bin/snmpset";
 
 # Set the general colours and other settings for rrdtool graphs
 
-$config['rrdgraph_def_text'] =  " -c BACK#CCCCCC -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 ";
+$config['rrdgraph_def_text'] =  " -c BACK#EEEEEE -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 ";
 $config['rrdgraph_def_text'] .= " -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal";
 
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505'";
@@ -46,8 +46,8 @@ $config['nets'] =  array ("89.21.224.0/19", "212.9.12.0/24", "212.9.13.0/24");
 $config['mydomain'] 	= "jerseytelecom.com";
 $config['page_title']  	= "JT Observer";
 $config['title_image'] 	= "images/observer-logo.jpg";
-$config['stylesheet']  	= "css/styles.css"; 
-$config['mono_font']    = "DejaVuSansMono"; 
+$config['stylesheet']  	= "css/styles.css";
+$config['mono_font']    = "DejaVuSansMono";
 $config['header_color'] = "#133A7B";
 $config['favicon'] 	= "favicon.ico";
 
@@ -120,6 +120,8 @@ $config['allow_entity_sensor']['specialEnum'] = 1;
 ### Mountpoints to ignore
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/proc/bus/usb");
+$config['ignore_mount_regex'] = array();
+$config['ignore_mount_string'] = array();
 
 ### Style Options
 
