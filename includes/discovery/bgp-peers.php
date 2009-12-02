@@ -12,7 +12,7 @@
 
     echo("AS$bgpLocalAs ");
 
-    if($bgpLocalAs != $device['bgpLocalAs']) { mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS\n"); }
+    if($bgpLocalAs != $device['bgpLocalAs']) { mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS "); }
 
     $peers_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $peers_cmd .= "BGP4-MIB::bgpPeerRemoteAs"; 
@@ -67,7 +67,7 @@
   } else { 
     echo("No BGP on host");
     if($device['bgpLocalAs']) {
-     mysql_query("UPDATE devices SET bgpLocalAs = NULL WHERE device_id = '".$device['device_id']."'"); echo(" (Removed ASN)\n"); 
+     mysql_query("UPDATE devices SET bgpLocalAs = NULL WHERE device_id = '".$device['device_id']."'"); echo(" (Removed ASN) "); 
     } # End if
   } # End if
 
