@@ -70,7 +70,7 @@ if(!$config['graph_colours']['mixed']) {
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.7.0";
+$config['version'] = "0.7.0-SVN";
 
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 # print_r($config['rrd_opts_array']);
