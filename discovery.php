@@ -52,6 +52,9 @@ while ($device = mysql_fetch_array($device_query)) {
   if($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
   echo("\n");
 
+  ## Discover OS Changes
+  include("includes/discovery/os.inc.php");
+
   ## Discover Interfaces 
   include("includes/discovery/interfaces.php");
 
