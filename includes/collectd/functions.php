@@ -541,7 +541,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 	#$rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $rrdfile);
         $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
         if($config['rrd_width'] <= "300") {
-          $small_opts = array ('--font', "LEGEND:7:".$config['mono_font'], '--font', "AXIS:6:".$config['mono_font'], "--font-render-mode", "normal");
+          $small_opts = array ('--font', "LEGEND:7:mono", '--font', "AXIS:6:mono", "--font-render-mode", "normal");
           $rrd_cmd = array_merge($rrd_cmd, $small_opts);
         }
 
@@ -582,7 +582,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $pinst = null, $type, 
         $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
 
         if($config['rrd_width'] <= "300") {
-          $small_opts = array ('--font', 'LEGEND:7:'.$config['mono_font'], '--font', 'AXIS:6:'.$config['mono_font'], '--font-render-mode', 'normal');
+          $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
           $rrd_cmd = array_merge($rrd_cmd, $small_opts);
         }
 
@@ -637,7 +637,7 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
         $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
 
         if($config['rrd_width'] <= "300") {
-          $small_opts = array ('--font', 'LEGEND:7:'.$config['mono_font'], '--font', 'AXIS:6:'.$config['mono_font'], '--font-render-mode', 'normal');
+          $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
           $cmd = array_merge($cmd, $small_opts);
         }
 
@@ -735,7 +735,7 @@ function collectd_draw_meta_line(&$opts, &$sources) {
         $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
 
         if($config['rrd_width'] <= "300") {
-          $small_opts = array ('--font', 'LEGEND:7:'.$config['mono_font'], '--font', 'AXIS:6:'.$config['mono_font'], '--font-render-mode', 'normal');
+          $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
           $cmd = array_merge($cmd, $small_opts);
         }
 

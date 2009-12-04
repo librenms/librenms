@@ -1,27 +1,27 @@
 <?php
 
-      if ($device['os'] == "FreeBSD") {
+      if ($device['os'] == "freebsd") {
         $sysDescr = str_replace(" 0 ", " ", $sysDescr);
         list(,,$version) = explode (" ", $sysDescr);
         $hardware = "i386";
         $features = "GENERIC";
-      } elseif ($device['os'] == "DragonFly") {
+      } elseif ($device['os'] == "dragonfly") {
         list(,,$version,,,$features,,$hardware) = explode (" ", $sysDescr);
-      } elseif ($device['os'] == "NetBSD") {
+      } elseif ($device['os'] == "netbsd") {
         list(,,$version,,,$features) = explode (" ", $sysDescr);
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
         list(,,$hardware) = explode ("$features", $sysDescr);
-      } elseif ($device['os'] == "OpenBSD") {
+      } elseif ($device['os'] == "openbsd") {
         list(,,$version,$features,$hardware) = explode (" ", $sysDescr);
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
-      } elseif ($device['os'] == "m0n0wall" || $device['os'] == "Voswall") {
+      } elseif ($device['os'] == "monowall" || $device['os'] == "Voswall") {
         list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = split(" ", $sysDescr);
         $features = $freebsda . " " . $freebsdb;
         $hardware = "$hardware ($arch)";
         $hardware = str_replace("\"", "", $hardware);
-      } elseif ($device['os'] == "Linux") {
+      } elseif ($device['os'] == "linux") {
         list(,,$version) = explode (" ", $sysDescr);
         if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
         if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
@@ -32,7 +32,7 @@
         // Detect Dell hardware via OpenManage SNMP
         $cmd = $config['snmpget'] . " -m MIB-Dell-10892 -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
         $hw = trim(str_replace("\"", "", `$cmd`));
-        if(strstr($hw, "No")) { unset($hw); } else { $hardware = "Dell " . $hw; }
+        if(strpos($hw, "No") !== FALSE) { unset($hw); } else { $hardware = "Dell " . $hw; }
       }
 
 include("ucd-mib.inc.php");

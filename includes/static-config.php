@@ -5,6 +5,7 @@ $config['ifname']['asa'] = true;
 $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
 $config['ifname']['powerconnect'] = true;
+$config['ifname']['speedtouch'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
@@ -44,7 +45,7 @@ $os_text['powerconnect'] = "Dell PowerConnect";
 $os_text['windows']      = "Microsoft Windows";
 $os_text['junos']        = "Juniper JunOS";
 $os_text['procurve']     = "HP ProCurve";
-
+$os_text['speedtouch']   = "Thomson Speedtouch";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');

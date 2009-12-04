@@ -20,19 +20,19 @@ function pollDevice() {
    $memrrd   = "rrd/" . $device['hostname'] . "-mem.rrd";
    $memgraph = "public_html/graphs/" . $device['hostname'] . "-mem.png";
 
-   $cmd = $config['snmpget'] . " -O qv -v2c -c ".$community." ".$device['hostname'].":".$device['port']." 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0";
+   $cmd = $config['snmpget'] . " -O qv -".$device['snmpver']." -c ".$community." ".$device['hostname'].":".$device['port']." 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0";
    list ($cpu5m, $cpu5s) = explode("\n", shell_exec($cmd));
 
    $cpu5m = $cpu5m + 0;
    $cpu5s = $cpu5s + 0;
    
-   $cmd = $config['snmpget'] . " -O qv -v2c -c ".$community." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.9.9.13.1.3.1.3.1 .1.3.6.1.4.1.9.9.13.1.3.1.3.2";
+   $cmd = $config['snmpget'] . " -O qv -".$device['snmpver']." -c ".$community." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.9.9.13.1.3.1.3.1 .1.3.6.1.4.1.9.9.13.1.3.1.3.2";
    list ($tempin1, $tempout1) = explode("\n", shell_exec($cmd));
 
    $tempin1 = $tempin1 +0;
    $tempout1 = $tempout1 + 0;
 
-   $cmd  = $config['snmpget'] . " -O qv -v2c -c ".$community." ".$device['hostname'].":".$device['port'];
+   $cmd  = $config['snmpget'] . " -O qv -".$device['snmpver']." -c ".$community." ".$device['hostname'].":".$device['port'];
    $cmd .= " .1.3.6.1.4.1.9.9.48.1.1.1.6.2 .1.3.6.1.4.1.9.9.48.1.1.1.6.1 .1.3.6.1.4.1.9.9.48.1.1.1.5.2 .1.3.6.1.4.1.9.9.48.1.1.1.5.1";
    list ($memfreeio, $memfreeproc, $memusedio, $memusedproc) = explode("\n", shell_exec($cmd));
 

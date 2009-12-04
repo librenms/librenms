@@ -53,7 +53,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("\n");
 
   ## Discover OS Changes
-  include("includes/discovery/os.inc.php");
+#  include("includes/discovery/os.inc.php");
 
   ## Discover Interfaces 
   include("includes/discovery/interfaces.php");
