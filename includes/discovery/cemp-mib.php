@@ -10,15 +10,15 @@
   ## Cisco Enhanced Mempool
   if($device['os_type'] == "ios") {
 
-    $oids = shell_exec($config['snmpwalk'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -v2c -CI -Osq -c ".$community." ".$hostname.":".$port." cempMemPoolName | sed s/cempMemPoolName.//g");
+    $oids = shell_exec($config['snmpwalk'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -".$device['snmpver']." -CI -Osq -c ".$community." ".$hostname.":".$port." cempMemPoolName | sed s/cempMemPoolName.//g");
     $oids = trim($oids);
     foreach(explode("\n", $oids) as $data) {
      $data = trim($data);
      if($data) {
       list($oid, $cempMemPoolName) = explode(" ", $data);
       list($entPhysicalIndex, $Index) = explode(".", $oid);
-      $cempMemPoolType = trim(shell_exec($config['snmpget'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -O qv -v2c -c $community $hostname:$port cempMemPoolType.$oid"));
-      $cempMemPoolValid = trim(shell_exec($config['snmpget'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -O qv -v2c -c $community $hostname:$port cempMemPoolValid.$oid"));
+      $cempMemPoolType = trim(shell_exec($config['snmpget'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -O qv -".$device['snmpver']." -c $community $hostname:$port cempMemPoolType.$oid"));
+      $cempMemPoolValid = trim(shell_exec($config['snmpget'] . " -m CISCO-ENHANCED-MEMPOOL-MIB -O qv -".$device['snmpver']." -c $community $hostname:$port cempMemPoolValid.$oid"));
       if(!strstr($descr, "No") && !strstr($usage, "No") && $cempMemPoolName != "" ) {
         $descr = str_replace("\"", "", $descr);
         $descr = trim($descr);

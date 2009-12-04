@@ -51,7 +51,7 @@
 
    $mem_get  = ".1.3.6.1.4.1.9.9.48.1.1.1.6.2 .1.3.6.1.4.1.9.9.48.1.1.1.6.1 .1.3.6.1.4.1.9.9.48.1.1.1.6.3";
    $mem_get .= ".1.3.6.1.4.1.9.9.48.1.1.1.5.2 .1.3.6.1.4.1.9.9.48.1.1.1.5.1 .1.3.6.1.4.1.9.9.48.1.1.1.5.3";
-   $mem_raw  = shell_exec($config['snmpget'] . " -O qv -v2c -c $community $hostname:$port $mem_get");
+   $mem_raw  = shell_exec($config['snmpget'] . " -O qv -".$device['snmpver']." -c $community $hostname:$port $mem_get");
    $mem_raw  = str_replace("No Such Instance currently exists at this OID", "0", $mem_raw); 
    list ($memfreeio, $memfreeproc, $memfreeprocb, $memusedio, $memusedproc, $memusedprocb) = explode("\n", $mem_raw); 
    $memfreeproc = $memfreeproc + $memfreeprocb;
