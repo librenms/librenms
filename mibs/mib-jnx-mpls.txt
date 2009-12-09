@@ -20,7 +20,7 @@ IMPORTS
 
 
 mpls MODULE-IDENTITY
-    LAST-UPDATED "200705081445Z" -- Tue May 8 14:45:55 2007 UTC
+    LAST-UPDATED "200902231445Z" -- Mon Feb 23 14:45:55 2009 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -31,7 +31,7 @@ mpls MODULE-IDENTITY
     DESCRIPTION
         "The MIB module for Multi-Protocol Label Switched Paths."
     REVISION
-        "200705221445Z"  -- May 22, 2007
+        "200902231445Z"  -- Feb 23, 2009
     DESCRIPTION
         "Second revision; Deprecated mplsLspList, mplsLspEntry and all objects 
          in that SEQUENCE. Introduced new table mplsLspInfoList, mplsLspInfoEntry 
@@ -206,7 +206,9 @@ mplsLspState OBJECT-TYPE
     SYNTAX     INTEGER {
                unknown(1),
                up(2),
-               down(3)
+               down(3),
+               notInService(4),
+               backupActive(5)
     }
     MAX-ACCESS read-only
     STATUS     deprecated
@@ -370,15 +372,21 @@ mplsPathType OBJECT-TYPE
         other(1),
         primary(2),
         standby(3),
-        secondary(4)
+        secondary(4),
+        bypass(5)
     }
     MAX-ACCESS read-only
     STATUS     deprecated
     DESCRIPTION
         "The type of path that is active, i.e., a
-         primary path, a standby path, or a generic
-         secondary path. This field is meaningless
-	 unless mplsPathName is not empty"
+         primary path, a standby path, a generic
+         secondary path, or a bypass path.
+         The value other, primary, standby and
+         secondary apply to data LSPs, and are
+         meaningful only if mplsPathName is not
+         empty. The value bypass applies to
+         bypass tunnels. A bypass tunnel
+         may have an empty mplsPathName."
     ::= { mplsLspEntry 18 }
 
 mplsPathExplicitRoute OBJECT-TYPE
@@ -568,7 +576,9 @@ mplsLspInfoState OBJECT-TYPE
     SYNTAX     INTEGER {
                unknown(1),
                up(2),
-               down(3)
+               down(3),
+               notInService(4),
+               backupActive(5)
     }
     MAX-ACCESS read-only
     STATUS     current
@@ -732,15 +742,21 @@ mplsPathInfoType OBJECT-TYPE
         other(1),
         primary(2),
         standby(3),
-        secondary(4)
+        secondary(4),
+        bypass(5)
     }
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "The type of path that is active, i.e., a
-         primary path, a standby path, or a generic
-         secondary path. This field is meaningless
-	 unless mplsPathInfoName is not empty"
+         primary path, a standby path, a generic
+         secondary path, or a bypass path.
+         The value other, primary, standby and
+         secondary apply to data LSPs, and are
+         meaningful only if mplsPathInfoName is not
+         empty. The value bypass applies to
+         bypass tunnels. A bypass tunnel
+         may have an empty mplsPathInfoName."
     ::= { mplsLspInfoEntry 18 }
 
 mplsPathInfoExplicitRoute OBJECT-TYPE

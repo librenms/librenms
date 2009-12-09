@@ -15,15 +15,18 @@
    list(,$features) = explode("(", $features);
    list(,$features) = explode("-", $features);
 
-   $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+   $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB:OLD-CISCO-CHASSIS-MIB -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                  $device['hostname'].":".$device['port'];
-   $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1 .1.3.6.1.2.1.47.1.1.1.1.4.1 .1.3.6.1.2.1.47.1.1.1.1.7.1 .1.3.6.1.2.1.47.1.1.1.1.10.1";
-   $snmp_cmdb .= " .1.3.6.1.2.1.47.1.1.1.1.13.1001 .1.3.6.1.2.1.47.1.1.1.1.4.1001";
-   list($a,$b,$c,$d,$e,$f) = explode("\n", shell_exec($snmp_cmdb));
-   if($b == "0" || $c == "Chassis") { $ciscomodel = $a; list($version) = explode(",",$d); }
-   if($f == "0") { $ciscomodel = $d; }
+   $snmp_cmdb .= " entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 ";
+   $snmp_cmdb .= " entPhysicalModelName.1001 entPhysicalContainedIn.1001";
+   $snmp_cmdb .= " cardDescr.1 cardSlotNumber.1";
+   list($model_1,$contained_1,$name_1,$ver_1,$model_1001,$contained_1001,$descr_1,$slot_1) = explode("\n", shell_exec($snmp_cmdb));
+   if(($contained_1 == "0" || $name_1 == "Chassis") && strpos($model_1, "No") === FALSE) { $ciscomodel = $model_1; list($version) = explode(",",$ver_1); }
+   if($slot_1 == "-1" && strpos($descr_1, "No") === FALSE) { $ciscomodel = $descr_1; }
+   if($contained_1001 == "0" && strpos($model_1001, "No") === FALSE) { $ciscomodel = $model_1001; }
    $ciscomodel = str_replace("\"","",$ciscomodel);
-   if($ciscomodel) { $hardware = $ciscomodel; }
+   if($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
+
 
    $cpu5m = shell_exec($config['snmpget'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port avgBusy5.0");
    $cpu5m = $cpu5m + 0;

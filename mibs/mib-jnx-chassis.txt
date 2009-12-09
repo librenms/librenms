@@ -66,6 +66,10 @@ jnxBoxAnatomy MODULE-IDENTITY
                 added jcsX chassis IDs to JnxChassisId enumeration."
     REVISION     "200812310000Z"    -- Dec 31, 2008
     DESCRIPTION "Added nodeX chassis IDs to JnxChassisId enumeration."
+    REVISION     "200901090000Z"    -- Jan 09, 2009
+    DESCRIPTION 
+               "Added sfcX and lcc4-lcc15 chassis IDs to JnxChassisId
+                enumeration."
 
 
 
@@ -91,7 +95,24 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      jcs3          (10),
                      jcs4          (11),
                      node0         (12),
-                     node1         (13)
+                     node1         (13),
+                     sfc0          (14),
+                     sfc1          (15),
+                     sfc2          (16),
+                     sfc3          (17),
+                     sfc4          (18),
+                     lcc4          (19),
+                     lcc5          (20),
+                     lcc6          (21),
+                     lcc7          (22),
+                     lcc8          (23),
+                     lcc9          (24),
+                     lcc10         (25),
+                     lcc11         (26),
+                     lcc12         (27),
+                     lcc13         (28),
+                     lcc14         (29),
+                     lcc15         (30)
                  }
 
 
@@ -332,7 +353,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	    jnxContentsInstalled	TimeStamp,
             jnxContentsPartNo           DisplayString,
             jnxContentsChassisId        JnxChassisId,
-            jnxContentsChassisDescr     DisplayString
+            jnxContentsChassisDescr     DisplayString,
+            jnxContentsChassisCleiCode  DisplayString
     }
 
     jnxContentsContainerIndex OBJECT-TYPE
@@ -447,6 +469,34 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 contents of this row exists."
         ::= { jnxContentsEntry 12 }
 
+    jnxContentsChassisCleiCode OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The clei code of this subject, blank if unknown
+                 or unavailable.
+
+                 A CLEI code is an intelligent code that consists of 10
+                 alphanumeric characters with 4 data elements.  The first data
+                 element is considered the basic code with the first 2 characters
+                 indicating the technology or equipment type, and the third and
+                 fourth characters denoting the functional sub-category.  The
+                 second data element represents the features, and its three
+                 characters denote functional capabilities or changes.  The third
+                 data element has one character and denotes a reference to a
+                 manufacturer, system ID, specification, or drawing.  The fourth
+                 data element consists of two characters and contains complementary
+                 data.  These two characters provide a means of differentiating or
+                 providing uniqueness between the eight character CLEI codes by
+                 identifying the manufacturing vintage of the product.  Names are
+                 assigned via procedures defined in [GR485].
+
+                 The assigned maintenance agent for the CLEI code, Telcordia
+                 Technologies, is responsible for assigning certain equipment and
+                 other identifiers (e.g., location, manufacturer/supplier) for the
+                 telecommunications industry."
+        ::= { jnxContentsEntry 13 }
 
 --
 -- Box LED Indicators Table
@@ -1380,7 +1430,31 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 fruInServSoftUpgradeError(32),  -- In Service Software Upgrade Error
                 fruChasdPowerRatingExceed(33),  -- Chassis power rating exceeded
                 fruConfigOffline(34),           -- Configured offline
-                fruServiceRestartRequest(35)    -- restarting request from a service
+                fruServiceRestartRequest(35),   -- restarting request from a service
+                spuResetRequest(36),            -- SPU reset request
+                spuFlowdDown(37),               -- SPU flowd down
+                spuSpi4Down(38),                -- SPU SPI4 down
+                spuWatchdogTimeout(39),         -- SPU Watchdog timeout
+                spuCoreDump(40),                -- SPU kernel core dump
+                fpgaSpi4LinkDown(41),           -- FPGA SPI4 link down
+                i3Spi4LinkDown(42),             -- I3 SPI4 link down
+                cppDisconnect(43),              -- CPP disconnect
+                cpuNotBoot(44),                 -- CPU not boot
+                spuCoreDumpComplete(45),        -- SPU kernel core dump complete
+                rstOnSpcSpuFailure(46),         -- Rst on SPC SPU failure
+                softRstOnSpcSpuFailure(47),     -- Soft Reset on SPC SPU failure
+                hwAuthenticationFailure(48),    -- HW authentication failure
+                reconnectFpcFail(49),           -- Reconnect FPC fail
+                fpcAppFailed(50),               -- FPC app failed
+                fpcKernelCrash(51),             -- FPC kernel crash
+                spuFlowdDownNoCore(52),         -- SPU flowd down, no core dump
+                spuFlowdCoreDumpIncomplete(53), -- SPU flowd crash with incomplete core dump
+                spuFlowdCoreDumpComplete(54),   -- SPU flowd crash with complete core dump
+                spuIdpdDownNoCore(55),          -- SPU idpd down, no core dump
+                spuIdpdCoreDumpIncomplete(56),  -- SPU idpd crash with incomplete core dump
+                spuIdpdCoreDumpComplete(57),    -- SPU idpd crash with complete core dump
+                spuCoreDumpIncomplete(58),      -- SPU kernel crash with incomplete core dump
+                spuIdpdDown(59)                 -- SPU idpd down
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1688,6 +1762,56 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 encountered some operational errors and gone into
                 check state in the chassis."
         ::= { jnxChassisTraps 12 }   
+
+    jnxFEBSwitchover NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFEBSwitchover trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified FEB (Forwarding Engine Board) has
+                switched over."
+        ::= { jnxChassisTraps 13 }
+
+
+    jnxHardDiskFailed NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHardDiskFailed trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the Disk in the specified Routing Engine has
+                encountered some operational errors and gone into
+                failed state in the chassis."
+        ::= { jnxChassisTraps 14 }
+
+    jnxHardDiskMissing NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A DiskMissing trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                hard disk in the specified outing Engine is missing
+                from boot device list."
+        ::= { jnxChassisTraps 15 }
 
 
 

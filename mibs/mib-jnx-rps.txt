@@ -31,6 +31,13 @@ jnxRPSMIBObjects  MODULE-IDENTITY
         "This module contains definitions of management information for
         Redundant power supply."
 
+    REVISION
+        "200908070000Z" -- Fri Aug 07 00:00:00 2009 UTC
+
+    DESCRIPTION
+        "Data types of jnxRPSFanStatus and jnxRPSSystemStatus are 
+         changed to JnxRPSStatus"
+
     ::= { jnxRPS 1 }
 
 JnxRPSStatus ::= TEXTUAL-CONVENTION
@@ -130,8 +137,8 @@ JnxRPSStatus ::= TEXTUAL-CONVENTION
         ::= { jnxRPSStatusTable 1 }
 
     JnxRPSStatusEntry ::= SEQUENCE {
-        jnxRPSFanStatus     Integer32,
-        jnxRPSSystemStatus  Integer32 }
+        jnxRPSFanStatus     JnxRPSStatus,
+        jnxRPSSystemStatus  JnxRPSStatus }
 
     jnxRPSFanStatus OBJECT-TYPE
         SYNTAX JnxRPSStatus

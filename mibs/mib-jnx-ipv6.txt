@@ -1,5 +1,5 @@
 --
--- $Id: jnx-ipv6.mib,v 1.3 2003/07/18 22:57:37 dchuang Exp $
+-- $Id: jnx-ipv6.mib,v 1.3 2003-07-18 22:57:37 dchuang Exp $
 -- Juniper Enterprise Specific MIB: ipv6 MIB Extension
 -- 
 -- Copyright (c) 2001-2003, Juniper Networks, Inc.

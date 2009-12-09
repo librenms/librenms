@@ -18,11 +18,13 @@ IMPORTS
 	FROM IF-MIB
     InetAddress, InetAddressType, InetAddressPrefixLength
 	FROM INET-ADDRESS-MIB
+     Unsigned32
+         FROM SNMPv2-SMI
     jnxExVlan                                       	
 	FROM JUNIPER-EX-SMI;
 
 jnxVlanMIBObjects  MODULE-IDENTITY
-    LAST-UPDATED "200901200000Z"
+    LAST-UPDATED "200901090000Z" -- Fri Jan 09 00:00:00 2009 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "Juniper Technical Assistance Center
@@ -36,15 +38,18 @@ jnxVlanMIBObjects  MODULE-IDENTITY
 	Emulation Client (lec). Devices implementing these pre-standards 
 	maintain port groupings and associated filters used to form a 
 	'virtual bridge'."
-    REVISION
-        "200708290000Z" -- Wed Aug 29 00:00:00 2007 UTC
+    REVISION   
+        "200901090000Z" -- Fri Jan 09 00:00:00 2009 UTC
     DESCRIPTION
-        "Initial Version of the draft."
+        "Marked the deprecated Objects of jnxVlanTable, 
+         jnxVlanInterfaceTable and jnxVlanPortGroupTable 
+         as Obsolete."
     REVISION
         "200901200000Z" -- Mon Jan 20 00:00:00 2009 UTC
     DESCRIPTION
-        "Added new Object jnxExVlanTag to represent Vlan Tag information 
+        "Added new Object jnxExVlanTag to represent Vlan Tag information
          for each Vlan."
+
     ::= { jnxExVlan 1 }
 
 --------------------------------------------------------------------------------
@@ -54,7 +59,7 @@ jnxVlanMIBObjects  MODULE-IDENTITY
 jnxVlanTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF JnxVlanEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A table of VLAN names and characteristics."
     ::= { jnxVlanMIBObjects 1 }
@@ -62,7 +67,7 @@ jnxVlanTable OBJECT-TYPE
 jnxVlanEntry OBJECT-TYPE
     SYNTAX      JnxVlanEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A table entry containing VLAN names and characteristics."
     INDEX   { IMPLIED jnxVlanName }
@@ -80,7 +85,7 @@ JnxVlanEntry ::=
 jnxVlanName OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (1..255)) 
     MAX-ACCESS  not-accessible 
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Vlan name is the textual name and this is the identifier
         that the user of a configuration utility will use."
@@ -89,7 +94,7 @@ jnxVlanName OBJECT-TYPE
 jnxVlanID OBJECT-TYPE
     SYNTAX      Integer32(1..4094)
     MAX-ACCESS  read-only 
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This is the locally significant ID that is used internally by this 
 	device to reference this VLAN."
@@ -101,7 +106,7 @@ jnxVlanType OBJECT-TYPE
         dynamic(2)
     }
     MAX-ACCESS 	read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The valn type can be
         static (1)
@@ -112,7 +117,7 @@ jnxVlanType OBJECT-TYPE
 jnxVlanPortGroupInstance OBJECT-TYPE
     SYNTAX 	Integer32
     MAX-ACCESS 	read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "jnxVlanPortGroupInstance is the index that identifies that the sub 
 	tree in the jnxVlanPortGroupTable helps to retrieve the group of 
@@ -122,7 +127,7 @@ jnxVlanPortGroupInstance OBJECT-TYPE
 jnxVlanMacListInstance OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "jnxVlanMacListInstance is the index , if this is a MAC-based VLAN 
 	which identifies the sub tree to retrieve the list of MAC address to 
@@ -134,7 +139,7 @@ jnxVlanMacListInstance OBJECT-TYPE
 jnxVlanInterfaceTable OBJECT-TYPE
      SYNTAX      SEQUENCE OF JnxVlanInterfaceEntry
      MAX-ACCESS  not-accessible
-     STATUS      deprecated
+     STATUS      obsolete
      DESCRIPTION
          "A table of VLAN names and characteristics in layer 3."
      ::= { jnxVlanMIBObjects 2 }
@@ -142,7 +147,7 @@ jnxVlanInterfaceTable OBJECT-TYPE
 jnxVlanInterfaceEntry OBJECT-TYPE
     SYNTAX      JnxVlanInterfaceEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A table entry containing VLAN names and characteristics in layer 3."
     INDEX   { IMPLIED jnxVlanName }
@@ -163,7 +168,7 @@ JnxVlanInterfaceEntry ::=
 jnxVlanInterfaceIpAddress OBJECT-TYPE
      SYNTAX      InetAddress 
      MAX-ACCESS  read-only
-     STATUS      deprecated
+     STATUS      obsolete
      DESCRIPTION
          "This specifies the IPAddress of this interface. "
      ::= { jnxVlanInterfaceEntry 1 }
@@ -171,7 +176,7 @@ jnxVlanInterfaceIpAddress OBJECT-TYPE
 jnxVlanInterfaceProtocol OBJECT-TYPE
     SYNTAX	InetAddressType
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
          "This specifies the protocol for ipv4."
     ::= { jnxVlanInterfaceEntry 2 }
@@ -179,7 +184,7 @@ jnxVlanInterfaceProtocol OBJECT-TYPE
 jnxVlanInterfaceSubNetMask OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This specifies the subnet mask address of the vlan ."
     ::= { jnxVlanInterfaceEntry 3 }
@@ -187,7 +192,7 @@ jnxVlanInterfaceSubNetMask OBJECT-TYPE
 jnxVlanInterfaceBroadcastAddress OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This specifies the broadcast address of the vlan."
     ::= { jnxVlanInterfaceEntry 4 }
@@ -195,7 +200,7 @@ jnxVlanInterfaceBroadcastAddress OBJECT-TYPE
 jnxVlanInterfaceDescription OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (1..255))
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "jnxvlanInterfaceDescription provides the description for the vlan."
     ::= { jnxVlanInterfaceEntry 5 }
@@ -203,7 +208,7 @@ jnxVlanInterfaceDescription OBJECT-TYPE
 jnxVlanInterfaceAdminStatus OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This takes care of administration status of the vlan"
     ::= { jnxVlanInterfaceEntry 6 }
@@ -211,7 +216,7 @@ jnxVlanInterfaceAdminStatus OBJECT-TYPE
 jnxVlanInterfaceOperStatus OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This specifies the operational status of the vlan"
     ::= { jnxVlanInterfaceEntry 7 }
@@ -219,7 +224,7 @@ jnxVlanInterfaceOperStatus OBJECT-TYPE
 jnxVlanSnmpIfIndex OBJECT-TYPE
     SYNTAX      InterfaceIndex
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "This specifies the SNMP IF Index ."
     ::= { jnxVlanInterfaceEntry 8 }
@@ -231,7 +236,7 @@ jnxVlanSnmpIfIndex OBJECT-TYPE
 jnxVlanPortGroupTable OBJECT-TYPE
     SYNTAX  	SEQUENCE OF JnxVlanPortGroupEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A table of port groupings."
     ::= { jnxVlanMIBObjects 3 }
@@ -239,7 +244,7 @@ jnxVlanPortGroupTable OBJECT-TYPE
 jnxVlanPortGroupEntry OBJECT-TYPE
     SYNTAX      JnxVlanPortGroupEntry
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "A table entry containing a port number"
     INDEX   { jnxVlanPortGroupIndex, jnxVlanPort }
@@ -255,7 +260,7 @@ JnxVlanPortGroupEntry ::=
 jnxVlanPortGroupIndex OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "Index used so that there can be many different
         port groups"
@@ -264,7 +269,7 @@ jnxVlanPortGroupIndex OBJECT-TYPE
 jnxVlanPort OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  not-accessible
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The vlanPort specifies the port in the vlan.By adding a port here,
         that port will now be part of any VLAN(s) that this port group is 
@@ -280,7 +285,7 @@ jnxVlanPortStatus OBJECT-TYPE
         notAssociated   (5)
     }
     MAX-ACCESS  read-only
-    STATUS      deprecated
+    STATUS      obsolete
     DESCRIPTION
         "The status of this port relative to the VLAN that points
         at this port group.[1.autoactive , 2.allowed, 3.allowedActive

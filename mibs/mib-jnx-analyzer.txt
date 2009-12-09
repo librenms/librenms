@@ -24,6 +24,19 @@ jnxAnalyzerMIB MODULE-IDENTITY
 	    used in enterprise switches to send a copy of all or sampled 
 	    packets seen on a port to an anlyzer on the same or different 
 	    switch."
+
+    REVISION
+        "200808010000Z" -- Fri Aug 01 00:00:00 2008 UTC
+
+    DESCRIPTION
+        "Initial version"
+
+    REVISION
+        "200904220000Z" -- Wed April 22 00:00:00 2009 UTC
+
+    DESCRIPTION
+        "Marking jnxAnalyzerStatus as deprecated"
+
     ::= { jnxExAnalyzer 1 }
 
 jnxAnalyzerMIBObjects      OBJECT IDENTIFIER ::= { jnxAnalyzerMIB 1 }
@@ -69,7 +82,7 @@ jnxAnalyzerName OBJECT-TYPE
 jnxAnalyzerStatus OBJECT-TYPE
     SYNTAX 	TruthValue
     MAX-ACCESS	read-only
-    STATUS	current
+    STATUS	deprecated
     DESCRIPTION
 	"This object identifies whether the mirroring associated with a 
 	particular analyzer is enabled or disabled."

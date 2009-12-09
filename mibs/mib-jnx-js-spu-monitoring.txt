@@ -69,10 +69,12 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         jnxJsSPUMonitoringSPUIndex      Unsigned32,
         jnxJsSPUMonitoringCPUUsage      Unsigned32,
         jnxJsSPUMonitoringMemoryUsage   Unsigned32,
-	jnxJsSPUMonitoringCurrentFlowSession	Unsigned32,
-	jnxJsSPUMonitoringMaxFlowSession	Unsigned32,
-	jnxJsSPUMonitoringCurrentCPSession	Unsigned32,
-	jnxJsSPUMonitoringMaxCPSession		Unsigned32
+        jnxJsSPUMonitoringCurrentFlowSession	Unsigned32,
+        jnxJsSPUMonitoringMaxFlowSession	Unsigned32,
+        jnxJsSPUMonitoringCurrentCPSession	Unsigned32,
+        jnxJsSPUMonitoringMaxCPSession	Unsigned32,
+        jnxJsSPUMonitoringNodeIndex     Unsigned32,
+        jnxJsSPUMonitoringNodeDescr     DisplayString
     }
 
     jnxJsSPUMonitoringIndex OBJECT-TYPE
@@ -148,6 +150,27 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         DESCRIPTION
                 "Max CP session number of SPU."
         ::= { jnxJsSPUMonitoringObjects 9 }
+
+    jnxJsSPUMonitoringNodeIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "This attribute is used to identify a chassis. A chassis can 
+                 be configured in a single or cluster mode.  When it is in a 
+                 cluster mode, the chassis can be denote as a cluster node."
+        ::= { jnxJsSPUMonitoringObjects 10 }
+
+    jnxJsSPUMonitoringNodeDescr OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..255))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This attribute is used to describe the chassis/cluster 
+             node information.  Chassis can be configured as a single, or 
+             cluster node.  When it is cluster mode, the chassis can be 
+             denoted as a cluster node."
+        ::= { jnxJsSPUMonitoringObjects 11 }
 
 END
 

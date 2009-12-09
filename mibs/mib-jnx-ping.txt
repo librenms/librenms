@@ -32,7 +32,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxPingMIB MODULE-IDENTITY
-    LAST-UPDATED "200505010000Z" -- May 1 00:00:00 2005 UTC
+    LAST-UPDATED "200902010000Z" -- February 1 00:00:00 2005 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -47,6 +47,9 @@ jnxPingMIB MODULE-IDENTITY
              related entries in mib-2, pingMIB."
 
     -- revision history
+    REVISION "200904200000Z" -- April 20 00:00:00 2009 UTC
+    DESCRIPTION
+            "Added jnxPingCtlTargetPort to jnxPingCtlTable."
     REVISION "200505010000Z" -- May 1 00:00:00 2005 UTC
     DESCRIPTION
             "Added jnxPingCtlTargetPort to jnxPingCtlTable."
@@ -154,7 +157,8 @@ JnxPingCtlEntry ::=
         jnxPingCtlTargetPort             InetPortNumber,
         jnxPingCtlJseriesHWTimeStamp     TruthValue,
         jnxPingCtlOneWayHWTimeStamp      TruthValue,
-        jnxPingCtlMovAvgSize             Unsigned32
+        jnxPingCtlMovAvgSize             Unsigned32,
+        jnxPingCtlMXseriesHWTimeStamp    TruthValue
     }
 
 jnxPingCtlOwnerIndex OBJECT-TYPE
@@ -499,6 +503,18 @@ jnxPingCtlMovAvgSize  OBJECT-TYPE
         maintained in the history table (ie, pingCtlMaxRows)."
     DEFVAL { 0 }
     ::= { jnxPingCtlEntry 20 }
+
+jnxPingCtlMXseriesHWTimeStamp  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use to enable the RPM Hardware Timestamp feature on MX-series routers.
+         For M/T series routers, use the jnxPingCtlIfName and 
+         pingCtlByPassRouteTable objects to redirect probes to the AS PIC.
+         For those routers, this object must have the value: false."
+    DEFVAL { false }
+    ::= { jnxPingCtlEntry 21 }
 
 
 
