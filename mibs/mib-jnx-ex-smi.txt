@@ -39,7 +39,6 @@ jnxExPaeExtension                OBJECT IDENTIFIER ::= { jnxExSwitching 3 }
 jnxExVirtualChassis              OBJECT IDENTIFIER ::= { jnxExSwitching 4 }
 jnxExVlan                        OBJECT IDENTIFIER ::= { jnxExSwitching 5 }
 jnxRPS                           OBJECT IDENTIFIER ::= { jnxExSwitching 6 }
-
-
+jnxMacNotificationRoot           OBJECT IDENTIFIER ::= { jnxExSwitching 7 }
 END
 

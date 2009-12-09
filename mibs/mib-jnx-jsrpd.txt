@@ -23,7 +23,7 @@
 
 
     jnxJsChassisClusterMIB  MODULE-IDENTITY
-        LAST-UPDATED  "200902032022Z"
+        LAST-UPDATED  "200905270000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -39,6 +39,9 @@
              a cluster fails, the other chassis in the cluster takes over the function 
              of the failed chassis with minimal service interruption.
              This module defines the objects pertaining to Chassis Cluster."
+        REVISION      "200905270000Z"
+        DESCRIPTION   "Added trap class for jnxJsChassisClusterSwitchover"
+
         REVISION      "200902030000Z"
         DESCRIPTION   "Creation Date"
     ::= { jnxJsChassisCluster 1 }   

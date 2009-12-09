@@ -5,6 +5,8 @@
   $ipSystemStats = snmpwalk_cache_oid("ipSystemStats", $device, $ipSystemStats, "IP-MIB");
   $ipSystemStats = $ipSystemStats[$device[device_id]];
 
+ if($ipSystemStats) {
+
   foreach($ipSystemStats as $af => $stats) {
 
    echo("$af ");
@@ -37,11 +39,11 @@
       $rrdupdate  .= ":".$stats[$oid]; 
     }
     if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
-
     rrdtool_update($rrdfile, $rrdupdate);
 
     unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
   }
+ }
 
 echo("\n");
 
