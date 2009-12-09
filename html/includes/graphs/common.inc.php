@@ -20,7 +20,7 @@ if($_GET['bg']) { $rrd_options .= " -c CANVAS#" . mres($_GET['bg']) . " "; }
 #$rrd_options .= " -c BACK#FFFFFF";
 
 if($height < "99")  { $rrd_options .= " --only-graph"; }
-if($width <= "300") { $rrd_options .= " --font LEGEND:7:MONO --font AXIS:6:MONO";
-} else {              $rrd_options .= " --font LEGEND:8:MONO --font AXIS:7:MONO";  }
+if($width <= "300") { $rrd_options .= " --font LEGEND:7:mono --font AXIS:6:mono";
+} else {              $rrd_options .= " --font LEGEND:8:mono --font AXIS:7:mono";  }
 
 ?>
