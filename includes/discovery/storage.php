@@ -26,7 +26,7 @@
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
         $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageType`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
         $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$fstype', '$descr', '$size', '$units')";
-	mysql_query($query);
+	mysql_query($query); if($debug) { echo("$query"); }
 	echo("+");
       } else {
         $data = mysql_fetch_array(mysql_query("SELECT * FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"));

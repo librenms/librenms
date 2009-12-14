@@ -67,4 +67,5 @@ CREATE TABLE IF NOT EXISTS `cmpMemPool` (  `cmp_id` int(11) NOT NULL auto_increm
 CREATE TABLE IF NOT EXISTS `hrDevice` ( `hrDevice_id` int(11) NOT NULL auto_increment,  `device_id` int(11) NOT NULL,  `hrDeviceIndex` int(11) NOT NULL,  `hrDeviceDescr` text NOT NULL,  `hrDeviceType` text NOT NULL,  `hrDeviceErrors` int(11) NOT NULL,  `hrDeviceStatus` text NOT NULL,  `hrProcessorLoad` tinyint(4) default NULL,  PRIMARY KEY  (`hrDevice_id`),  KEY `device_id` (`device_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 ALTER TABLE `entPhysical` ADD  `entPhysicalHardwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalName` ,ADD  `entPhysicalFirmwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalHardwareRev` ,ADD  `entPhysicalSoftwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalFirmwareRev` ,ADD  `entPhysicalAlias` VARCHAR( 32 ) NULL AFTER  `entPhysicalSoftwareRev` ,ADD  `entPhysicalAssetID` VARCHAR( 32 ) NULL AFTER  `entPhysicalAlias` ,ADD  `entPhysicalIsFRU` VARCHAR( 8 ) NULL AFTER  `entPhysicalAssetID`;
 ALTER TABLE `devices` ADD `last_discovered` timestamp NULL DEFAULT NULL AFTER `last_polled`;
-ALTER TABLE  `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
+ALTER TABLE `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
+ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`
