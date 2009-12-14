@@ -38,6 +38,7 @@ if(!$where) {
   exit;
  }
 
+echo("Applying database updates...\n");
 shell_exec("scripts/update-sql.php database-update.sql");
 
 if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
