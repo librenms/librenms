@@ -149,7 +149,7 @@
       $eventlog_oids = array('ifDescr', 'ifName', 'ifAlias', 'ifOperStatus', 'ifAdminStatus');      
       foreach ($data_oids as $oid) { // Loop the OIDs
         if ( $port[$oid] != $this_port[oid]) {
-          mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $interface['device_id'] . "', '" . $interface['interface_id'] . "', NOW(), '$oid -> ".$this_port[$oid]."')");
+          mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '$oid -> ".$this_port[$oid]."')");
         }
       }
       // End Eventlogging
