@@ -80,12 +80,15 @@
 
       /// Update IF-MIB data
       foreach ($data_oids as $oid)      { 
-        if ( $port[$oid] != $this_port[$oid]) {
+        if ( $port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
+          $update .= ", `$oid` = NULL";
+          mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '".$oid . ": ".$port[$oid]." -> NULL')");
+          if($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
+        } elseif ( $port[$oid] != $this_port[$oid] ) {
           $update .= ", `$oid` = '".mysql_real_escape_string($this_port[$oid])."'";
-          #mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $port['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '".$oid . ": ".$port[$oid]." -> " . $this_port[$oid]."')");
           #eventlog($device['device_id'], 'interface', $port['interface_id'], $oid . ": ".$port[$oid]." -> " . $this_port[$oid]);
   	  mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '".$oid . ": ".$port[$oid]." -> " . $this_port[$oid]."')");
-          echo($oid . " ");
+          if($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
         }
       }
 
@@ -159,11 +162,13 @@
       /// Do EtherLike-MIB
       if($config['enable_etherlike']) { include("port-etherlike.inc.php"); }      
 
-     if ($update) { /// Do Updates
+     // Update MySQL
+     if ($update) { 
         $update_query  = "UPDATE `interfaces` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
         @mysql_query($update_query); $mysql++;
         if($debug) {echo("\nMYSQL : [ $update_query ]");}
-      } /// End Updates
+      }
+      // End Update MySQL
 
       unset($update_query); unset($update);
     } else {
