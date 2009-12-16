@@ -43,7 +43,6 @@ while($loc_data = mysql_fetch_array($loc_result)) {
 	if(strpos($host, "bgw")) { $hostinfo = "shape=ellipse style=filled fillcolor=orange"; }
 	if(strpos($host, "vax")) { $hostinfo = "shape=rect style=filled fillcolor=skyblue"; }
         if(strpos($host, "vsx")) { $hostinfo = "shape=box3d style=filled fillcolor=skyblue"; }
-        #} else { $hostinfo = "style=filled shape=circle fillcolor=lightgray"; }
 
         $host = $dev_data[hostname];
 	$host = str_replace("." . $config['mydomain'],"", $host);
