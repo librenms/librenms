@@ -1,4 +1,4 @@
-<?
+<?php
 
 $sql = "SELECT * FROM ipv4_mac WHERE interface_id = '".$interface['interface_id']."'";
 $query = mysql_query($sql);
