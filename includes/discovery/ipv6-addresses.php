@@ -3,7 +3,6 @@
 echo("IPv6 Addresses : ");
 
 #$ipv6interfaces = shell_exec($config['snmpget']." -m IPV6-MIB -Ovnq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipv6Interfaces.0");
-
 #if($ipv6interfaces){
 
   $cmd = $config['snmpwalk']." -m IP-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];

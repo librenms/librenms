@@ -34,7 +34,7 @@ $query = mysql_query($sql);
 while ($test_hrDevice = mysql_fetch_array($query)) {
   if(!$valid_hrDevice[$test_hrDevice[hrDeviceIndex]]) {
     echo("-");
-    mysql_query("DELETE FROM `hrDevice` WHERE hrDevice_id = '" . $test['hrDevice_id'] . "'");
+    mysql_query("DELETE FROM `hrDevice` WHERE hrDevice_id = '" . $test_hrDevice['hrDevice_id'] . "'");
   }
 }
 
