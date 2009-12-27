@@ -77,9 +77,11 @@ while ($device = mysql_fetch_array($device_query)) {
   ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
 
-  if($device['os'] == "Netscreen") { }
+  if($device['os'] == "netscreen") { }
 
-  if($device['os'] == "JunOS") { include("includes/discovery/bgp-peers.php"); }
+  if($device['os'] == "junos") { 
+    include("includes/discovery/bgp-peers.php"); 
+  }
 
   if($device['os'] == "powerconnect" || $device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
     include("includes/discovery/cisco-vlans.php");
