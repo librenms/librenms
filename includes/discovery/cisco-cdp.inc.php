@@ -23,7 +23,7 @@ if($cdp_array) {
     }     
   }
 }
-echo("$cdp_links");
+if($debug) {echo("$cdp_links");}
 if($cdp_links) {
   foreach ( explode("\n" ,$cdp_links) as $link ) {
     if ($link == "") { break; }
@@ -57,7 +57,7 @@ if($cdp_links) {
       mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifIndex` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
     {
       $src_if_id   = mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifIndex` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0);
-      $linkalive[] = $src_if_id . "," . $dst_if_id;
+      $link_exists[] = $src_if_id . "," . $dst_if_id;
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `dst_if` = '$dst_if_id' AND `src_if` = '$src_if_id'"),0) == '0') 
       { 
         $sql = "INSERT INTO `links` (`src_if`, `dst_if`, `cdp`) VALUES ('$src_if_id', '$dst_if_id', '1')";
@@ -70,7 +70,28 @@ if($cdp_links) {
 
     } 
   }
-} else { echo ("No Entries"); }
-  echo("\n");
+}
+
+$sql = "SELECT * FROM `links` AS L, `interfaces` AS I, `devices` AS D WHERE L.src_if = I.interface_id AND I.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+$query = mysql_query($sql);
+
+while ($test_link = mysql_fetch_array($query)) {
+  unset($exists);
+  $i = 0;
+  while ($i < count($link_exists) && !$exists) {
+    $this_link = $test_link['src_if'] . ",". $test_link['dst_if'];
+    if ($link_exists[$i] == $this_link) { $exists = 1; }
+    $i++;
+  }
+  if(!$exists) {
+    echo("-");
+    mysql_query("DELETE FROM `links` WHERE `src_if` = '".$test_link['src_if']."' AND `dst_if` = '".$test_link['dst_if']."'");
+    if($debug) { echo($link_exists[$i] . " REMOVED \n"); }
+  } else {
+    if($debug) { echo($link_exists[$i] . " VALID \n"); }
+  }
+}
+
+echo("\n");
 
 ?>
