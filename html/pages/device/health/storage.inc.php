@@ -21,10 +21,10 @@ while($drive = mysql_fetch_array($query)) {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
-    $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
+    $free  = $total - $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
     $perc  = round($drive['storage_perc'], 0);
     $total = formatStorage($total);
-    $used = formatStorage($used);
+    $free = formatStorage($free);
 
     $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
 
@@ -36,7 +36,7 @@ while($drive = mysql_fetch_array($query)) {
 
     echo("<tr bgcolor='$row_colour'><th><a href='$fs_url' $fs_popup>" . $drive['hrStorageDescr'] . "</a></td><td>
           <a href='$fs_url' $fs_popup><img src='percentage.php?per=" . $perc . "&width=350'></a>
-          </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td><td></td></tr>");
+          </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $free . "</td><td></td></tr>");
 
 
   $graph_type = "hrstorage";
