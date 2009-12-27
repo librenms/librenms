@@ -120,8 +120,8 @@ $config['allow_entity_sensor']['specialEnum'] = 1;
 ### Mountpoints to ignore
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/proc/bus/usb");
-$config['ignore_mount_regex'] = array();
-$config['ignore_mount_string'] = array();
+$config['ignore_mount_regexp'] = array();
+$config['ignore_mount_string'] = array("/.*\/dev\/?$/");
 
 ### Style Options
 
