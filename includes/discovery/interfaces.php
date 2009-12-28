@@ -6,7 +6,7 @@
 
   $cmd  = $config['snmpbulkwalk'] . " -m IF-MIB -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $cmd .= " ifDescr";
-  echo("$cmd");
+  if ($debug) echo("$cmd");
   $interfaces = trim(shell_exec($cmd));
   $interfaces = str_replace("\"", "", $interfaces);
   $interfaces = str_replace("ifDescr.", "", $interfaces);
@@ -39,7 +39,7 @@
        if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = 1; }
       }
       if ($nullintf == 0) {
-        echo("$if\n");
+        if ($debug) echo("$if\n");
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
           # Add Interface

@@ -23,7 +23,7 @@ if($device['type'] == 'server') { $server_select = "selected"; }
 if($device['type'] == 'network') { $network_select = "selected"; }
 if($device['type'] == 'firewall') { $firewall_select = "selected"; }
 if($device['type'] == 'workstation') { $workstation_select = "selected"; }
-if($device['type'] == 'other') { $other_select = "selected"; }
+if($device['type'] == 'other' || $device['type'] == 'unknown') { $other_select = "selected"; }
 
 echo("<table cellpadding=0 cellspacing=0><tr><td>
 

@@ -23,8 +23,7 @@
 
 <div class="menu2">
 <ul>
-<li><a><img src='images/16/lightbulb.png' border=0 align=absmiddle> Status
-<!--[if IE 7]><!--></a><!--<![endif]-->
+<li><a class='menu2four' href='overview/'><img src='images/16/lightbulb.png' border=0 align=absmiddle> Status</a>
         <table><tr><td>
         <ul>
         <li><a href="overview/"><img src='images/16/zoom.png' border=0 align=absmiddle> Overview</a></li>
@@ -46,13 +45,11 @@ if($_SESSION['userlevel'] >= '10') {
 ?>
         </ul>
         </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
 
 </li>
 </ul>
 <ul>
-<li><a><img src='images/16/server.png' border=0 align=absmiddle> Devices
-<!--[if IE 7]><!--></a><!--<![endif]-->
+<li><a class='menu2four' href='devices/'><img src='images/16/server.png' border=0 align=absmiddle> Devices</a>
         <table><tr><td>
         <ul>
         <li><a href='devices/'><img src='images/16/server.png' border=0 align=absmiddle> All Devices</a></li>
@@ -77,10 +74,8 @@ if($_SESSION['userlevel'] >= '10') {
 
         </ul>
         </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
 </li>
-<li><a><img src='images/16/cog.png' border=0 align=absmiddle> Services
-<!--[if IE 7]><!--></a><!--<![endif]-->
+<li><a class='menu2four' href='services/'><img src='images/16/cog.png' border=0 align=absmiddle> Services</a>
         <table><tr><td>
         <ul>
         <li><a href="services/"><img src='images/16/cog.png' border=0 align=absmiddle> All Services </a></li>
@@ -100,7 +95,6 @@ if($_SESSION['userlevel'] >= '10') {
 ?>
         </ul>
         </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
 </li>
 
 <?php
@@ -109,8 +103,7 @@ if($config['show_locations']) { echo("<li><a class='menu2four' href='locations/'
 ?>
 
 
-<li><a><img src='images/16/connect.png' border=0 align=absmiddle> Ports
-<!--[if IE 7]><!--></a><!--<![endif]-->
+<li><a class='menu2four' href='interfaces/'><img src='images/16/connect.png' border=0 align=absmiddle> Ports</a>
 
 <table><tr><td>
         <ul>
@@ -161,7 +154,6 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 
 </ul></td></tr></table>
 
-<!--[if lte IE 6]></a><![endif]-->
 </li>
 
 <li><a class="menu2four" href="?page=temperatures"><img src='images/16/weather_sun.png' border=0 align=absmiddle> Temps</a></li>
@@ -174,8 +166,7 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 
 if($_SESSION['userlevel'] >= '5') {
 echo("
-<li><a><img src='images/16/link.png' border=0 align=absmiddle> BGP Sessions
-<!--[if IE 7]><!--></a><!--<![endif]-->
+<li><a class='menu2four' href='bgp/'><img src='images/16/link.png' border=0 align=absmiddle> BGP Sessions</a>
         <table><tr><td>
         <ul>
         <li><a href='bgp/'><img src='images/16/link.png' border=0 align=absmiddle> All Sessions </a></li>
@@ -194,7 +185,6 @@ echo("        <li><hr /></li>
 
         </ul>
         </td></tr></table>
-<!--[if lte IE 6]></a><![endif]-->
 </li>
 ");
 }

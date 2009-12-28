@@ -200,7 +200,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("\n");
   } else {
     $update_query  = "UPDATE `devices` SET ";
-    $update .= " `status` = '0'";
+    $update_query .= " `status` = '0'";
     $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
     echo("Updating " . $device['hostname'] . "\n");
     $update_result = mysql_query($update_query);
@@ -210,7 +210,7 @@ while ($device = mysql_fetch_array($device_query)) {
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
-echo("$string\n");
+if ($debug) echo("$string\n");
 shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log");
 
 

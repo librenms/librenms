@@ -16,9 +16,9 @@
     list($descr, $units, $size, $fstype) = explode("\n", $temp);
     list($units) = explode(" ", $units);
     $allow = 1;
-    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $allow = 0; echo("$bi == $descr \n"); } }
-    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $allow = 0; echo("$descr, $bi \n"); } }
-    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $allow = 0; echo("$bi, $descr \n"); } }
+    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $allow = 0; if ($debug) echo("$bi == $descr \n"); } }
+    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $allow = 0; if ($debug) echo("$descr, $bi \n"); } }
+    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $allow = 0; if ($debug) echo("$bi, $descr \n"); } }
     $descr = str_replace("mounted on: ", "", $descr);
     $descr = str_replace(": var file system", "", $descr);
 

@@ -58,7 +58,7 @@ ALTER TABLE `interfaces` ADD `ifPromiscuousMode` VARCHAR( 12 )  NULL DEFAULT NUL
 ALTER TABLE `interfaces` ADD `ifConnectorPresent` VARCHAR( 12 ) NULL DEFAULT NULL AFTER `ifSpeed`;
 ALTER TABLE `interfaces` ADD `ifName` VARCHAR( 64 )  NULL DEFAULT NULL AFTER `ifDescr`;
 ALTER TABLE `interfaces` ADD `portName` VARCHAR( 128 ) NULL DEFAULT NULL AFTER `ifName`;
-ALTER TABLE `interfaces` ADD `ifHighSpeed` INT ( 11 ) NULL DEFAULT NULL AFTER `ifSpeed`;
+ALTER TABLE `interfaces` ADD `ifHighSpeed` BIGINT ( 20 ) NULL DEFAULT NULL AFTER `ifSpeed`;
 ALTER TABLE `interfaces` DROP `in_rate`;
 ALTER TABLE `interfaces` DROP `out_rate`;
 ALTER TABLE `interfaces` DROP `in_errors`;
