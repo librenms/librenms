@@ -1,6 +1,12 @@
 #!/usr/bin/php
 <?php
 
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', E_ALL);
+
+
 include("config.php");
 
 if(!$config['enable_syslog']) {
@@ -30,7 +36,10 @@ mysql_query("DELETE FROM `syslog` WHERE `datetime` < DATE_SUB(NOW(), INTERVAL ".
 $q = mysql_query("SELECT * FROM `syslog` where `processed` = '0'");
 while($entry = mysql_fetch_array($q)){
 
+   print_r($entry);
+
    process_syslog($entry, 1);
+
 
 }
 
