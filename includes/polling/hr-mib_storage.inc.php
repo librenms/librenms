@@ -36,7 +36,7 @@ while ($dr = mysql_fetch_array($dq)) {
     if($dr['storage_perc'] < '40' && $perc >= '40') {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'] . " is " . $perc;
-    $msg .= " at " . date('l dS F Y h:i:s A');
+    $msg .= "% at " . date('l dS F Y h:i:s A');
     mail($email, "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "/n");
   }

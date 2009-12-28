@@ -77,10 +77,13 @@ while ($device = mysql_fetch_array($device_query)) {
   ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
 
-  if($device['os'] == "netscreen") { }
+  if($device['os'] == "netscreen") { 
+    if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
+  }
 
   if($device['os'] == "junos") { 
     include("includes/discovery/bgp-peers.php"); 
+    if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
 
   if($device['os'] == "powerconnect" || $device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
@@ -93,10 +96,22 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cemp-mib.php");
     include("includes/discovery/cmp-mib.php");
     include("includes/discovery/cisco-cdp.inc.php");
+
+    if ($device['type'] == "unknown") { $device['type'] = 'network'; };
+  }
+
+  if ($device['os'] == "procurve")
+  {
+    if ($device['type'] == "unknown") { $device['type'] = 'network'; };
+  }
+
+  if ($device['os'] == "asa" || $device['os'] == "pix")
+  {
+    if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
   }
 
   $update_query  = "UPDATE `devices` SET ";
-  $update .= " `last_discovered` = NOW()";
+  $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
   $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
   $update_result = mysql_query($update_query);
 

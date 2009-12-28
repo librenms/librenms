@@ -34,8 +34,8 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   while($interface = mysql_fetch_array($query)) {
     $done = "yes";
     unset($class);
-    $interface['ifAlias'] = str_replace($type . ": ", "", $interface['ifAlias']);
-    $interface['ifAlias'] = str_replace("[PNI]", "Private", $interface['ifAlias']);
+    $interface['ifAlias'] = str_ireplace($type . ": ", "", $interface['ifAlias']);
+    $interface['ifAlias'] = str_ireplace("[PNI]", "Private", $interface['ifAlias']);
     $ifclass = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
     if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
     echo("<tr bgcolor='$bg'>

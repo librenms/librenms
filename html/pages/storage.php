@@ -1,4 +1,4 @@
-\<?php
+<?php
 
 if($_SESSION['userlevel'] >= '5') {
   $sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.host_id = D.device_id ORDER BY D.hostname, S.hrStorageDescr";
