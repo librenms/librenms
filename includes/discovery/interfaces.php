@@ -6,7 +6,7 @@
 
   $cmd  = $config['snmpbulkwalk'] . " -m IF-MIB -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $cmd .= " ifDescr";
-  if ($debug) echo("$cmd");
+  if ($debug) echo("$cmd\n");
   $interfaces = trim(shell_exec($cmd));
   $interfaces = str_replace("\"", "", $interfaces);
   $interfaces = str_replace("ifDescr.", "", $interfaces);
@@ -38,8 +38,8 @@
       if(!$config['allow_ng']) {
        if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = 1; }
       }
+      if ($debug) echo("\n $if ");
       if ($nullintf == 0) {
-        if ($debug) echo("$if\n");
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
           mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
           # Add Interface
@@ -55,13 +55,11 @@
         $int_exists[] = "$ifIndex";
       } else { 
         # Ignored Interface
-	#echo("$if \n");
 	if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
           mysql_query("UPDATE `interfaces` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
           # Delete Interface
           echo("-"); ## Deleted Interface
         } else {
-          echo("$if\n");
           echo("X"); ## Ignored Interface
         }
       }
