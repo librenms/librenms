@@ -77,11 +77,10 @@ $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 # print_r($config['rrd_opts_array']);
 
 if($config['enable_nagios']) {
-
-$nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
-if (!$nagios_link) {
-        echo "<h2>Nagios MySQL Error</h2>";
-        die;
+  $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
+  if (!$nagios_link) {
+    echo "<h2>Nagios MySQL Error</h2>";
+    die;
 }
 $nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
 

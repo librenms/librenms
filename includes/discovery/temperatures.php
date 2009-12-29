@@ -90,6 +90,33 @@
     } 
   }## End Dell Sensors
 
+  ## Supermicro Temperatures
+  if($device['os'] == "linux") {
+    echo("Supermicro ");
+    $oids = shell_exec($config['snmpwalk'] . " -m SUPERMICRO-HEALTH-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.10876.2.1.1.1.1.3 | sed s/1.3.6.1.4.1.10876.2.1.1.1.1.3.//g");
+    $oids = trim($oids);
+    foreach(explode("\n", $oids) as $data) {
+     $data = trim($data);
+     if($data) {
+      list($oid,$type) = explode(" ", $data);
+      if ($type == 2)
+      {
+        $temp_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
+        $descr_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
+        $descr = shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid");
+        $temp  = shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid");
+        $descr = str_ireplace("temperature", "", $descr);
+        $descr = trim($descr);
+        if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') {
+          $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`) values ('$id', '$temp_oid', '$descr')";
+          mysql_query($query);
+          echo("+");
+        } else { echo("."); }
+        $temp_exists[] = "$id $temp_oid";
+      }
+     }
+    }
+  } ## End Supermicro Temperatures
 
   ## Cisco Temperatures
   if($device['os_type'] == "ios") {
@@ -105,12 +132,11 @@
       $descr = shell_exec($config['snmpget'] . " -m CISCO-ENVMON-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid");
       $temp  = shell_exec($config['snmpget'] . " -m CISCO-ENVMON-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid");
       if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" ) {
-        $descr = shell_exec($config['snmpget'] . " -m CISCO-ENVMON-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid");
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
         $descr = trim($descr);
-        if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '.1.3.6.1.4.1.9.9.13.1.3.1.3.$oid' AND temp_host = '$id'"),0) == '0') {
+        if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') {
           $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`) values ('$id', '$temp_oid', '$descr')";
           mysql_query($query);
           echo("+");
