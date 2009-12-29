@@ -160,7 +160,7 @@
       // End Eventlogging
 
       /// Do EtherLike-MIB
-      if($config['enable_etherlike']) { include("port-etherlike.inc.php"); }      
+      if($config['enable_ports_etherlike']) { include("port-etherlike.inc.php"); }      
 
      // Update MySQL
      if ($update) { 
