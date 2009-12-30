@@ -35,7 +35,7 @@ while($temp = mysql_fetch_array($query)) {
   $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
   $temp_colour = percent_colour($temp_perc);
 
-  $temp_minigraph = "<img src='graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$day&to=$now&width=100&height=20'>"
+  $temp_minigraph = "<img src='graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$day&to=$now&width=100&height=20'>";
 
 
   echo("<tr bgcolor=$row_colour>
