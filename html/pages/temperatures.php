@@ -27,7 +27,7 @@ while($temp = mysql_fetch_array($query)) {
   $speed = humanspeed($temp['ifSpeed']);
   $type = humanmedia($temp['ifType']);
 
-  $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$week&to=$now&width=500&height=150";
+  $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$week&to=$now&width=500&height=150";
   $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_temp\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $temp['temp_descr'] . "</a>";
 
