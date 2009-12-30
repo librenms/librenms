@@ -19,8 +19,12 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   }
   unset($seperator);
 
+  $types_array = explode(',',$_GET['opta']);
+  for ($i = 0; $i < count($types_array);$i++) $types_array[$i] = ucfirst($types_array[$i]);
+  $types = implode(' + ',$types_array);
+  
   echo("<tr bgcolor='$bg'>
-             <td><span class=list-large>Total Graph for interfaces of type : ".$_GET['opta']."</span></td></tr>");
+             <td><span class=list-large>Total Graph for interfaces of type : ".$types."</span></td></tr>");
 
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multi_bits";

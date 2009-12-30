@@ -92,9 +92,9 @@
 
   ## Supermicro Temperatures
   if($device['os'] == "linux") {
-    echo("Supermicro ");
     $oids = shell_exec($config['snmpwalk'] . " -m SUPERMICRO-HEALTH-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.10876.2.1.1.1.1.3 | sed s/1.3.6.1.4.1.10876.2.1.1.1.1.3.//g");
     $oids = trim($oids);
+    if ($oids) echo("Supermicro ");
     foreach(explode("\n", $oids) as $data) {
      $data = trim($data);
      if($data) {
