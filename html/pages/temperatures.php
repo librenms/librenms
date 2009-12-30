@@ -29,7 +29,7 @@ while($temp = mysql_fetch_array($query)) {
 
   $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$week&to=$now&width=211&height=100";
   $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$weekly_temp' border=0></a> ";
+        " . $temp['temp_descr'] . "</a>";
 
   $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
   $temp_colour = percent_colour($temp_perc);
