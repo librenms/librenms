@@ -27,11 +27,9 @@ while($temp = mysql_fetch_array($query)) {
   $speed = humanspeed($temp['ifSpeed']);
   $type = humanmedia($temp['ifType']);
 
-  $temp_url    = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$week&to=$now&width=400&height=150";
-
-  $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$temp_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        " . $temp['temp_descr'] . "</a> ";
-
+  $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$week&to=$now&width=211&height=100";
+  $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src='$weekly_temp' border=0></a> ";
 
   $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
   $temp_colour = percent_colour($temp_perc);
