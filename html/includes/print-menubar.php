@@ -135,7 +135,7 @@ if($_SESSION['userlevel'] >= '5') {
   if($config['int_l2tp']) { echo("<li><a href='iftype/l2tp/'><img src='images/16/user.png'border=0 align=absmiddle> L2TP</a></li>"); $ifbreak = 1; }
   if($config['int_transit']) { echo("<li><a href='iftype/transit/'><img src='images/16/lorry_link.png' border=0 align=absmiddle> Transit</a></li>");  $ifbreak = 1; }
   if($config['int_peering']) { echo("<li><a href='iftype/peering/'><img src='images/16/bug_link.png' border=0 align=absmiddle> Peering</a></li>"); $ifbreak = 1; }
-  if($config['int_peering'] && $config['int_transit']) { echo("<li><a href='iftype/peering,transit/'><img src='images/16/world_link.png' border=0 align=absmiddle> Peer + Transit</a></li>"); $ifbreak = 1; }
+  if($config['int_peering'] && $config['int_transit']) { echo("<li><a href='iftype/peering,transit/'><img src='images/16/world_link.png' border=0 align=absmiddle> Peering + Transit</a></li>"); $ifbreak = 1; }
   if($config['int_core']) { echo("<li><a href='iftype/core/'><img src='images/16/brick_link.png' border=0 align=absmiddle> Core</a></li>"); $ifbreak = 1;}
 }
 
@@ -156,9 +156,9 @@ echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png
 
 </li>
 
-<li><a class="menu2four" href="?page=temperatures"><img src='images/16/weather_sun.png' border=0 align=absmiddle> Temps</a></li>
+<li><a class="menu2four" href="/temperatures/"><img src='images/16/weather_sun.png' border=0 align=absmiddle> Temps</a></li>
 
-<li><a class="menu2four" href="?page=storage"><img src='images/16/database.png' border=0 align=absmiddle> Storage</a></li>
+<li><a class="menu2four" href="/storage/"><img src='images/16/database.png' border=0 align=absmiddle> Storage</a></li>
 
 <!-- <li><a class="menu2four" href="?page=inventory"><img src='images/16/bricks.png' border=0 align=absmiddle> Inventory</a></li> -->
 
@@ -196,7 +196,7 @@ echo("        <li><hr /></li>
 <!--[if IE 7]><!--></a><!--<![endif]-->
     <table><tr><td>
     <ul>
-    <li><a href="?page=preferences"><img src='images/16/wrench_orange.png' border=0 align=absmiddle> My Settings</a></li>
+    <li><a href="/preferences/"><img src='images/16/wrench_orange.png' border=0 align=absmiddle> My Settings</a></li>
     <?php if($_SESSION['userlevel'] >= '10') {
       echo("
         <li><hr width=140 /></li>
