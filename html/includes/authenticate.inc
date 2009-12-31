@@ -28,7 +28,7 @@ if($_COOKIE['username'] && $_COOKIE['password']){
 
 $auth_success = 0;
 
-if ($config['auth_mechanism'] == "mysql")
+if ($config['auth_mechanism'] == "mysql" || !$config['auth_mechanism'])
 {
   $encrypted = md5($_SESSION['password']);
   $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username']."' AND `password`='".$encrypted."'";
