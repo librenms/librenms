@@ -8,7 +8,7 @@
   echo("CISCO-PROCESS-MIB : ");
 
   ## Cisco Processors
-  if($device['os_type'] == "ios") {
+  if($device['os'] == "ios") {
     $oids = shell_exec($config['snmpwalk'] . " -m CISCO-PROCESS-MIB -".$device['snmpver']." -CI -Osqn -c ".$community." ".$hostname.":".$port." .1.3.6.1.4.1.9.9.109.1.1.1.1.2 | sed s/.1.3.6.1.4.1.9.9.109.1.1.1.1.2.//g");
     $oids = trim($oids);
     foreach(explode("\n", $oids) as $data) {

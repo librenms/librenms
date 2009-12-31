@@ -119,7 +119,7 @@
   } ## End Supermicro Temperatures
 
   ## Cisco Temperatures
-  if($device['os_type'] == "ios") {
+  if($device['os'] == "ios") {
     echo("Cisco ");
     $oids = shell_exec($config['snmpwalk'] . " -m CISCO-ENVMON-MIB -$snmpver -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.9.9.13.1.3.1.2 | sed s/.1.3.6.1.4.1.9.9.13.1.3.1.2.//g");
     $oids = trim($oids);

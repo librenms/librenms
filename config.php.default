@@ -18,6 +18,15 @@ $config['community'] = "public";
 
 $config['base_url'] = "http://observer2.as8681.net";
 
+### Authentication model
+$config['auth_mechanism'] = "mysql"; # default, other options: ldap
+
+# LDAP module configuration
+$config['auth_ldap_server'] = "ldap.yourserver.com";
+$config['auth_ldap_port'] = 389;
+$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+$config['auth_ldap_prefix'] = "uid=";
+
 ### Location of executables
 
 $config['rrdtool']      = "/usr/bin/rrdtool";

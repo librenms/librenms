@@ -12,12 +12,65 @@ while($peer = mysql_fetch_array($peers)) {
 
   echo("Checking ".$peer['bgpPeerIdentifier']." ");
 
+if (!strstr($peer['bgpPeerIdentifier'],':'))
+{
+  # v4 BGP4 MIB
   $peer_cmd  = $config['snmpget'] . " -m BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $peer_cmd .= "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
   $peer_cmd .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
   $peer_cmd .= "bgpPeerLocalAddr." . $peer['bgpPeerIdentifier'] . "";
   $peer_data = trim(`$peer_cmd`);
   list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+} 
+else
+if ($device['os'] == "junos")
+{
+  # v6 for JunOS via Juniper MIB
+  $peer_ip_ex = explode(':',Net_IPv6::uncompress($peer['bgpPeerIdentifier']));
+  for ($i = 0;$i < 8;$i++) { while (strlen($peer_ip_ex[$i]) < 4) $peer_ip_ex[$i] = "0" . $peer_ip_ex[$i]; } # Pad zeroes back
+  $peer_ip = implode('',$peer_ip_ex);
+  for ($i = 0;$i < 16;$i+=2) $peer_ip_split[] = hexdec(substr($peer_ip,$i,2));
+  $peer_ip = implode($peer_ip_split,'.'); unset($peer_ip_split); # Now in JunOS SNMP format
+
+  if (!isset($junos_v6))
+  {
+    echo "\nCaching Oids...";
+    $peer_cmd  = $config['snmpwalk'] . " -m BGP4-V2-MIB-JUNIPER -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6";
+    foreach (explode("\n",trim(`$peer_cmd`)) as $oid)
+    {
+      list($peer_oid) = split(' ',$oid);
+      $peer_id = explode('.',$peer_oid);
+      $junos_v6[implode('.',array_slice($peer_id,35,8))] = implode('.',array_slice($peer_id,18));
+    }
+  }
+  
+  $peer_cmd  = $config['snmpget'] . " -m BGP4-V2-MIB-JUNIPER -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerInUpdates.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerOutUpdates.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerInTotalMessages.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerOutTotalMessages.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerFsmEstablishedTime.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_data = trim(`$peer_cmd`);
+  list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+  
+  $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
+  if ($bgpLocalAddr == "00000000000000000000000000000000") 
+  {
+    $bgpLocalAddr = ''; # Unknown?
+  }
+  else
+  {
+    $bgpLocalAddr = strtolower($bgpLocalAddr);
+    for ($i = 0;$i < 32;$i+=4)
+      $bgpLocalAddr6[] = substr($bgpLocalAddr,$i,4);
+    $bgpLocalAddr = Net_IPv6::compress(implode(':',$bgpLocalAddr6)); unset($bgpLocalAddr6);
+  }
+} 
 
   $peerrrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
   if(!is_file($peerrrd)) {
