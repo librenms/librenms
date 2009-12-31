@@ -36,13 +36,6 @@
 	} ?>
 <!--        <li><a href="alerts/"><img src='images/16/exclamation.png' border=0 align=absmiddle> Alerts</a></li> -->
         <li><a href="inventory/"><img src='images/16/bricks.png' border=0 align=absmiddle> Inventory</a></li>
-<?php
-if($_SESSION['userlevel'] >= '10') {
-  echo("
-
-        <li><a href='authlog/'><img src='images/16/lock.png' border=0 align=absmiddle> Authlog</a></li>");
-}
-?>
         </ul>
         </td></tr></table>
 
@@ -204,7 +197,9 @@ echo("        <li><hr /></li>
         <li><hr width=140/></li>
 	<li><a href='?page=adduser'><img src='images/16/user_add.png' border=0 align=absmiddle> Add User</a></li>
         <li><a href='?page=deluser'><img src='images/16/user_delete.png' border=0 align=absmiddle> Remove User</a></li>
-        <li><a href='?page=edituser'><img src='images/16/user_edit.png' border=0 align=absmiddle> Edit User</a></li>");              
+        <li><a href='?page=edituser'><img src='images/16/user_edit.png' border=0 align=absmiddle> Edit User</a></li>
+        <li><hr width=140 /></li>
+        <li><a href='authlog/'><img src='images/16/lock.png' border=0 align=absmiddle> Authlog</a></li>");
     } ?>
     </ul>
     </td></tr></table>

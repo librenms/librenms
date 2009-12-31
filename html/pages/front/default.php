@@ -22,7 +22,11 @@ function generate_front_box ($type, $content) {
 
 echo("<div style='padding: 3px 10px; background: #fff;'>");
 
+if($_SESSION['userlevel'] == '10') {
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
+} else {
+$sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '0' AND D.ignore = '0'");
+}
 while($device = mysql_fetch_array($sql)){
 
       generate_front_box("alert", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
@@ -33,9 +37,12 @@ while($device = mysql_fetch_array($sql)){
 
 }
 
+if($_SESSION['userlevel'] == '10') {
 $sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+} else {
+$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+}
 while($interface = mysql_fetch_array($sql)){
-
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
 <!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
@@ -45,10 +52,9 @@ while($interface = mysql_fetch_array($sql)){
 
 }
 
+/* FIXME service permissions? seem nonexisting now.. */
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.service_host = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
 while($service = mysql_fetch_array($sql)){
-
-
       generate_front_box("alert", "<center><strong>".generatedevicelink($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span> 
       <strong>".$service['service_type']."</strong><br />
@@ -57,7 +63,11 @@ while($service = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id");
+if($_SESSION['userlevel'] == '10') {
+$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id AND D.ignore = 0");
+} else {
+$sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND bgpPeerState != 'established' AND B.device_id = D.device_id AND D.ignore = 0");
+}
 while($peer = mysql_fetch_array($sql)){
 
   generate_front_box("alert", "<center><strong>".generatedevicelink($peer, shorthost($peer['hostname']))."</strong><br />
@@ -68,7 +78,11 @@ while($peer = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` WHERE status = '1' AND `uptime` < '84600'");
+if($_SESSION['userlevel'] == '10') {
+$sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime < '84600' AND D.ignore = 0");
+} else {
+$sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '84600' AND D.ignore = 0");
+}
 while($device = mysql_fetch_array($sql)){
    generate_front_box("info", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
