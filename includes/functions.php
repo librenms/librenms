@@ -673,4 +673,21 @@ function match_network ($nets, $ip, $first=false) {
    return $return;
 }
 
+function snmp2ipv6($ipv6_snmp)
+{
+  $ipv6 = explode('.',$ipv6_snmp);
+  for ($i = 0;$i <= 15;$i++) { $ipv6[$i] = zeropad(dechex($ipv6[$i])); }
+  for ($i = 0;$i <= 15;$i+=2) { $ipv6_2[] = $ipv6[$i] . $ipv6[$i+1]; }
+  return implode(':',$ipv6_2);
+}
+
+function ipv62snmp($ipv6)
+{
+  $ipv6_ex = explode(':',Net_IPv6::uncompress($ipv6));
+  for ($i = 0;$i < 8;$i++) { while (strlen($ipv6_ex[$i]) < 4) $ipv6_ex[$i] = "0" . $ipv6_ex[$i]; } # Pad zeroes back
+  $ipv6_ip = implode('',$ipv6_ex);
+  for ($i = 0;$i < 16;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
+  return implode($ipv6_split,'.');
+}
+
 ?>
