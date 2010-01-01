@@ -14,17 +14,25 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_h
   while($temp = mysql_fetch_array($temps)) {
     if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
+    $graph_colour = str_replace("#", "", $row_colour);
 
+    $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
     $temp_colour = percent_colour($temp_perc);
-    $temp_url  = "graph.php?id=" . $temp['temp_id'] . "&type=temp&from=$month&to=$now&width=400&height=125";
+    $temp_day    = "graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$day&to=$now&width=300&height=100";
+    $temp_week   = "graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$week&to=$now&width=300&height=100";
+    $temp_month  = "graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$month&to=$now&width=300&height=100";
+    $temp_year  = "graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$year&to=$now&width=300&height=100";
+    $temp_minigraph = "<img src='graph.php?id=" . $temp['temp_id'] . "&type=temperature&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+
     $temp_link  = "<a href='/device/".$device['device_id']."/health/temp/' onmouseover=\"return ";
     $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['temp_descr'];
-    $temp_link .= "</div><img src=\'$temp_url\'>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
-    $temp_link .= $temp['temp_descr'] . "</a>";
+    $temp_link .= "</div><div style=\'width: 750px\'><img src=\'$temp_day\'><img src=\'$temp_week\'><img src=\'$temp_month\'><img src=\'$temp_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+
+    $temp_link_b = $temp_link . "<span style='color: $temp_colour'>$temp_minigraph " . $temp['temp_current'] . "&deg;C</span></a>";
+    $temp_link_a = $temp_link . $temp['temp_descr'] . "</a>";
 
     $temp['temp_descr'] = truncate($temp['temp_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td><strong>$temp_link</strong></td><td width=40 class=tablehead><span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></td></tr>");
+    echo("<tr bgcolor='$row_colour'><td><strong>$temp_link_a</strong></td><td width=140 class=tablehead>$temp_link_b</td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
