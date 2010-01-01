@@ -6,7 +6,6 @@ include("common.inc.php");
 
   $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
 
-
   $sql = mysql_query("SELECT * FROM temperature where temp_id = '$temp'");
   $temperature = mysql_fetch_array(mysql_query("SELECT * FROM temperature where temp_id = '".mres($_GET['id'])."'"));
 
