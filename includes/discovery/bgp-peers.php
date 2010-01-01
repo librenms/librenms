@@ -73,12 +73,9 @@
     $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", `$peers_cmd`));  
     foreach (explode("\n", $peers) as $peer)  {
       list($peer_ip_snmp, $peer_as) = split(" ",  $peer);
-      $peer_ip_ex = explode('.',$peer_ip_snmp);
-      $peer_ip_ex = array_slice($peer_ip_ex,count($peer_ip_ex)-16);
-      for ($i = 0;$i <= 15;$i++) { $peer_ip_ex[$i] = dechex($peer_ip_ex[$i]); if (strlen($peer_ip_ex[$i]) < 2) $peer_ip_ex[$i] = '0' . $peer_ip_ex[$i]; }
-      for ($i = 0;$i <= 15;$i+=2) { $peer_ip_ex2[] = $peer_ip_ex[$i] . $peer_ip_ex[$i+1]; }
-      $peer_ip = implode(':',$peer_ip_ex2); unset($peer_ip_ex2);
-      $peer_ip = Net_IPv6::compress($peer_ip);
+
+      # Magic! Basically, takes SNMP form and finds peer IPs from the walk OIDs.
+      $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.',array_slice(explode('.',$peer_ip_snmp),count($ipv6)-16))));
       
       if($peer) {
 

@@ -26,11 +26,7 @@ else
 if ($device['os'] == "junos")
 {
   # v6 for JunOS via Juniper MIB
-  $peer_ip_ex = explode(':',Net_IPv6::uncompress($peer['bgpPeerIdentifier']));
-  for ($i = 0;$i < 8;$i++) { while (strlen($peer_ip_ex[$i]) < 4) $peer_ip_ex[$i] = "0" . $peer_ip_ex[$i]; } # Pad zeroes back
-  $peer_ip = implode('',$peer_ip_ex);
-  for ($i = 0;$i < 16;$i+=2) $peer_ip_split[] = hexdec(substr($peer_ip,$i,2));
-  $peer_ip = implode($peer_ip_split,'.'); unset($peer_ip_split); # Now in JunOS SNMP format
+  $peer_ip = ipv62snmp($peer['bgpPeerIdentifier']);
 
   if (!isset($junos_v6))
   {
