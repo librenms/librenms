@@ -39,7 +39,7 @@ if (!$oids)
    if($data) {
     $data = trim($data);
     list($if_ipv6addr,$ipv6_prefixlen) = explode(" ", $data);
-    list($ifindex,$ipv6addr) = split("\\.",$if_ipv6addr,2);
+    list($ifIndex,$ipv6addr) = split("\\.",$if_ipv6addr,2);
     $ipv6_address = snmp2ipv6($ipv6addr);
 
     $ipv6_origin    = trim(shell_exec($config['snmpget']." -m IPV6-MIB -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." IPV6-MIB::ipv6AddrType.$if_ipv6addr"));
