@@ -4,16 +4,14 @@
 
 session_start();
 
-if($_GET['logout']) {
+if($_GET['logout'] && $_SESSION['authenticated']) {
+  mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
   session_destroy();
   header('Location: /');
   setcookie ("username", "", time() - 60*60*24*100, "/");
   setcookie ("password", "", time() - 60*60*24*100, "/");
-  mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('$olduser', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   $auth_message = "Logged Out";
-  unset ($_SESSION['authenticated']);
-
 }
 
 if($_POST['username'] && $_POST['password']){
