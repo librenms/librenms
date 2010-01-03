@@ -24,7 +24,9 @@
       } elseif ($device['os'] == "linux") {
         list(,,$version) = explode (" ", $sysDescr);
         if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
-        if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
+        else if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
+        else if(strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
+        else if(strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
         $cmd = $config['snmpget'] . " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port']. " .1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111";
         $features = trim(`$cmd`);
         $features = str_replace("No Such Object available on this agent at this OID", "", $features);
