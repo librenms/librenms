@@ -169,7 +169,8 @@ while ($device = mysql_fetch_array($device_query)) {
 
     if( $uptime < $device['uptime'] ) {
       if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-      mail($email, "Device Rebooted: " . $device['hostname'], "Device Rebooted :" . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
+      mail($email, "Device Rebooted: " . $device['hostname'], "Device Rebooted : " . $device['hostname'] . " " . duration($uptime) . " ago.", $config['email_headers']);
+      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '', NOW(), 'Device rebooted')");
     }
 
     $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";

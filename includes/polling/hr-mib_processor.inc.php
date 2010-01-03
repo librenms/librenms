@@ -30,7 +30,7 @@ while ($hrDevice = mysql_fetch_array($query)) {
      RRA:AVERAGE:0.5:12:2400");
   }
 
-  echo($this_hrDevice['hrProcessorLoad'] . "% ");
+  if ($debug) echo($this_hrDevice['hrProcessorLoad'] . "% ");
 
   rrdtool_update ($procrrd, "N:".$this_hrDevice['hrProcessorLoad']);
 
