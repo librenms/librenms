@@ -684,7 +684,7 @@ function snmp2ipv6($ipv6_snmp)
 function ipv62snmp($ipv6)
 {
   $ipv6_ex = explode(':',Net_IPv6::uncompress($ipv6));
-  for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad_lineno($ipv6_ex[$i]); }
+  for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad_lineno($ipv6_ex[$i],4); }
   $ipv6_ip = implode('',$ipv6_ex);
   for ($i = 0;$i < 16;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
   return implode('.',$ipv6_split);
@@ -724,5 +724,26 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
   }
 }
 
-
+function duration($seconds, $max_periods = 6)
+{
+    $periods = array("year" => 31536000, "month" => 2419200, "week" => 604800, "day" => 86400, "hour" => 3600, "minute" => 60, "second" => 1);
+    $i = 1;
+    foreach ( $periods as $period => $period_seconds )
+    {
+        $period_duration = floor($seconds / $period_seconds);
+        $seconds = $seconds % $period_seconds;
+        if ( $period_duration == 0 )
+        {
+            continue;
+        }
+        $duration[] = "{$period_duration} {$period}" . ($period_duration > 1 ? 's' : '');
+        $i++;
+        if ( $i >  $max_periods )
+        {
+            break;
+        }
+    }
+    return implode(' ', $duration);
+}
+                                                                                                                                
 ?>
