@@ -696,6 +696,10 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
 
   $ipv6_network   = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Subnet | cut -f 2 -d '-'"));
   $ipv6_compressed = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Compressed | cut -f 2 -d '-'"));
+  
+  $ipv6_type = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep \"Address type\" | cut -f 2- -d '-'"));
+  
+  if ($ipv6_type == "Link-Local Unicast Addresses") return; # ignore link-locals (coming from IPV6-MIB)
 
   if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces`
         WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
@@ -744,6 +748,13 @@ function duration($seconds, $max_periods = 6)
         }
     }
     return implode(' ', $duration);
+}
+                                                                                                                                
+function get_astext($asn)
+{
+  $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
+  $txt = explode('|',$result[0]['txt']);
+  return trim(str_replace('"', '', $txt[4]));
 }
                                                                                                                                 
 ?>

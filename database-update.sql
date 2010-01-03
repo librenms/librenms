@@ -69,3 +69,5 @@ ALTER TABLE `entPhysical` ADD  `entPhysicalHardwareRev` VARCHAR( 16 ) NULL AFTER
 ALTER TABLE `devices` ADD `last_discovered` timestamp NULL DEFAULT NULL AFTER `last_polled`;
 ALTER TABLE `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
 ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`
+ALTER TABLE `devices` MODIFY `type` varchar(8) DEFAULT "unknown";
+ 

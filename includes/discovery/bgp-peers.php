@@ -24,7 +24,7 @@
 
 	$peerlist[] = $device['device_id'] ." $peer_ip";
 
-	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5 | sed s/\\\"//g")));
+	$astext = get_astext($peer_pas);
 
 #        echo(str_pad($peer_ip, 40) . " AS$peer_as  ");
         
@@ -81,7 +81,7 @@
 
 	$peerlist[] = $device['device_id'] ." $peer_ip";
 
-	$astext = trim(str_replace("\"", "", shell_exec("/usr/bin/dig +short AS$peer_as.asn.cymru.com TXT | cut -d '|' -f 5 | sed s/\\\"//g")));
+	$astext = get_astext($peer_as);
         
         #echo("$peer_ip AS$peer_as ");
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `bgpPeers` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'"),0) < '1') {
