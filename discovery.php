@@ -86,7 +86,7 @@ while ($device = mysql_fetch_array($device_query)) {
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
 
-  if($device['os'] == "powerconnect" || $device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
+  if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
     include("includes/discovery/cisco-vlans.php");
     include("includes/discovery/bgp-peers.php");
     include("includes/discovery/cisco-mac-accounting.php");
@@ -100,8 +100,9 @@ while ($device = mysql_fetch_array($device_query)) {
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
-  if ($device['os'] == "procurve")
+  if ($device['os'] == "procurve" || $device['os'] == "powerconnect")
   {
+    include("includes/discovery/q-bridge-mib.php");
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
