@@ -28,10 +28,12 @@
       $vlan_descr = trim(str_replace("\"", "", $vlan_descr));
 
       if(mysql_result(mysql_query("SELECT COUNT(vlan_id) FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "' AND `vlan_domain` = '" . $vtp_domain . "' AND `vlan_vlan` = '" . $vlan . "'"), 0) == '0') {
-        mysql_query("INSERT INTO `vlans` (`device_id`,`vlan_domain`,`vlan_vlan`, `vlan_descr`) VALUES (" . $device['device_id'] . ",'" . $vtp_domain . "','$vlan', '$vlan_descr')");
+        mysql_query("INSERT INTO `vlans` (`device_id`,`vlan_domain`,`vlan_vlan`, `vlan_descr`) VALUES (" . $device['device_id'] . ",'" . mysql_escape_string($vtp_domain) . "','$vlan', '" . mysql_escape_string($vlan_descr) . "')");
         echo("+");
-      } else { echo("."); }
-
+      } else { 
+        echo("."); 
+        mysql_query("UPDATE `vlans` SET `vlan_descr`='" . mysql_escape_string($vlan_descr) . "' WHERE `device_id`='" . $device['device_id'] . "' AND `vlan_vlan`='" . $vlan . "' AND `vlan_domain`='" . $vtp_domain . "'");
+      }
 
       $this_vlans[] = $vlan;
 
