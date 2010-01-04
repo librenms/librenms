@@ -79,6 +79,21 @@ while($device = mysql_fetch_array($device_query)) {
       echo("<br />");
 
       break;
+
+   case "powerconnect":
+      echo("<div class=graphhead>Processor Utilisation</div>");
+      $graph_type = "device_cpu";              include ("includes/print-device-graph.php");
+      echo("<br />");
+      /*
+      echo("<div class=graphhead>Memory Usage</div>");
+      $graph_type = "device_memory";              include ("includes/print-device-graph.php");
+      echo("<br />");
+      */
+      echo("<div class=graphhead>Device Uptime</div>");
+      $graph_type = "device_uptime";         include ("includes/print-device-graph.php"); break;
+      echo("<br />");
+
+      break;
    case "Snom":
       echo("<div class=graphhead>Calls</div>");
       $graph_type = "snom_calls";              include ("includes/print-device-graph.php");
