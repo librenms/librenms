@@ -19,6 +19,7 @@ if($cdp_array) {
                                                                list($cdp_entry_array['cdpCacheDeviceId'],) = explode(")", $cdp_entry_array['cdpCacheDeviceId']); echo($cdp_entry_array['cdpCacheDeviceId']); }
 
         $cdp_links .= $device['hostname'] . "," . $interface['ifIndex'] . "," . $cdp_entry_array['cdpCacheDeviceId'] . "," . $cdp_entry_array['cdpCacheDevicePort'] . "\n";
+        echo ".";
       }
     }     
   }
@@ -27,41 +28,6 @@ if($debug) {echo("$cdp_links");}
 
 echo("\nLLDP-MIB: ");
 
-/*
-LLDP-MIB::lldpRemChassisIdSubtype.0.25.1 = INTEGER: macAddress(4)
-LLDP-MIB::lldpRemChassisIdSubtype.0.26.1 = INTEGER: macAddress(4)
-LLDP-MIB::lldpRemChassisId.0.25.1 = Hex-STRING: 00 30 48 74 88 A8
-LLDP-MIB::lldpRemChassisId.0.26.1 = Hex-STRING: 00 30 48 73 C9 7C
-LLDP-MIB::lldpRemPortIdSubtype.0.25.1 = INTEGER: interfaceName(5)
-LLDP-MIB::lldpRemPortIdSubtype.0.26.1 = INTEGER: interfaceName(5)
-LLDP-MIB::lldpRemPortId.0.25.1 = STRING: "eth0"
-LLDP-MIB::lldpRemPortId.0.26.1 = STRING: "eth0"
-LLDP-MIB::lldpRemPortDesc.0.25.1 = STRING:
-LLDP-MIB::lldpRemPortDesc.0.26.1 = STRING:
-LLDP-MIB::lldpRemSysName.0.25.1 = STRING: tequila.powersource.cx
-LLDP-MIB::lldpRemSysName.0.26.1 = STRING: terminator.powersource.cx
-LLDP-MIB::lldpRemSysDesc.0.25.1 = STRING: Linux 2.6.18-6-xen-vserver-686 #1 SMP Tue May 5 05:22:28 UTC 2009 i686
-LLDP-MIB::lldpRemSysDesc.0.26.1 = STRING: Linux 2.6.26-2-xen-686 #1 SMP Wed Nov 4 23:23:33 UTC 2009 i686
-LLDP-MIB::lldpRemSysCapSupported.0.25.1 = BITS: 01 stationOnly(7)
-LLDP-MIB::lldpRemSysCapSupported.0.26.1 = BITS: 20 bridge(2)
-LLDP-MIB::lldpRemSysCapEnabled.0.25.1 = BITS: 01 stationOnly(7)
-LLDP-MIB::lldpRemSysCapEnabled.0.26.1 = BITS: 20 bridge(2)
-LLDP-MIB::lldpRemManAddrIfSubtype.0.25.1.1.4.195.160.167.65 = INTEGER: ifIndex(2)
-LLDP-MIB::lldpRemManAddrIfSubtype.0.25.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.116.136.168 = INTEGER: ifIndex(2)
-LLDP-MIB::lldpRemManAddrIfSubtype.0.26.1.1.4.195.160.167.97 = INTEGER: ifIndex(2)
-LLDP-MIB::lldpRemManAddrIfSubtype.0.26.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.115.201.124 = INTEGER: ifIndex(2)
-LLDP-MIB::lldpRemManAddrIfId.0.25.1.1.4.195.160.167.65 = INTEGER: 2
-LLDP-MIB::lldpRemManAddrIfId.0.25.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.116.136.168 = INTEGER: 2
-LLDP-MIB::lldpRemManAddrIfId.0.26.1.1.4.195.160.167.97 = INTEGER: 2
-LLDP-MIB::lldpRemManAddrIfId.0.26.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.115.201.124 = INTEGER: 2
-LLDP-MIB::lldpRemManAddrOID.0.25.1.1.4.195.160.167.65 = OID: SNMPv2-SMI::zeroDotZero
-LLDP-MIB::lldpRemManAddrOID.0.25.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.116.136.168 = OID: SNMPv2-SMI::zeroDotZero
-LLDP-MIB::lldpRemManAddrOID.0.26.1.1.4.195.160.167.97 = OID: SNMPv2-SMI::zeroDotZero
-LLDP-MIB::lldpRemManAddrOID.0.26.1.2.16.32.1.6.124.0.92.2.0.2.48.72.255.254.115.201.124 = OID: SNMPv2-SMI::zeroDotZero
-LLDP-MIB::lldpRemOrgDefInfo.0.25.1.0.18.15.4.1 = Hex-STRING: 05 F2
-LLDP-MIB::lldpRemOrgDefInfo.0.26.1.0.18.15.4.1 = Hex-STRING: 05 F2
-*/
-   
 unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, $lldp_array, "LLDP-MIB");
 $lldp_array = $lldp_array[$device[device_id]];
@@ -79,6 +45,7 @@ if($lldp_array) {
                                                                list($lldp_entry_instance_array['lldpRemSysName'],) = explode(")", $lldp_entry_instance_array['lldpRemSysName']); echo($lldp_entry_instance_array['lldpRemSysName']); }
 
           $lldp_links .= $device['hostname'] . "," . $interface['ifIndex'] . "," . $lldp_entry_instance_array['lldpRemSysName'] . "," . str_replace('"','',$lldp_entry_instance_array['lldpRemPortId']) . "\n";
+          echo ".";
         }
       }
     }     
