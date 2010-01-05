@@ -728,28 +728,6 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
   }
 }
 
-function duration($seconds, $max_periods = 6)
-{
-    $periods = array("year" => 31536000, "month" => 2419200, "week" => 604800, "day" => 86400, "hour" => 3600, "minute" => 60, "second" => 1);
-    $i = 1;
-    foreach ( $periods as $period => $period_seconds )
-    {
-        $period_duration = floor($seconds / $period_seconds);
-        $seconds = $seconds % $period_seconds;
-        if ( $period_duration == 0 )
-        {
-            continue;
-        }
-        $duration[] = "{$period_duration} {$period}" . ($period_duration > 1 ? 's' : '');
-        $i++;
-        if ( $i >  $max_periods )
-        {
-            break;
-        }
-    }
-    return implode(' ', $duration);
-}
-                                                                                                                                
 function get_astext($asn)
 {
   $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
