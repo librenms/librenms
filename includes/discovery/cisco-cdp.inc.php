@@ -34,7 +34,7 @@ if($cdp_links) {
     $src_if = strtolower($src_if);
     $ip = gethostbyname($dst_host);
     if ( match_network($config['nets'], $ip) ) {
-      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '0' ) {
+      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host' OR `hostname`='$dst_host'"), 0) == '0' ) {
         if($config['cdp_autocreate']) {
           echo("++ Creating: $dst_host \n");
           createHost ($dst_host, $community, "v2c");
@@ -46,12 +46,12 @@ if($cdp_links) {
       echo("!($dst_host)");
     }
 
-    $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
+    $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifDescr` = '$dst_if' AND (sysName = '$dst_host' OR hostname='$dst_host') AND D.device_id = I.device_id"), 0);
     if(!$dst_if_id) {
-     $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifName` = '$dst_if' AND sysName = '$dst_host' AND D.device_id = I.device_id"), 0);
+     $dst_if_id   = @mysql_result(mysql_query("SELECT I.interface_id FROM `interfaces` AS I, `devices` AS D WHERE `ifName` = '$dst_if' AND (sysName = '$dst_host' OR hostname='$dst_host') AND D.device_id = I.device_id"), 0);
     }
 
-    if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host'"), 0) == '1' && 
+    if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `sysName` = '$dst_host' OR `hostname`='$dst_host'"), 0) == '1' && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$src_host'"), 0) == '1' &&
       $dst_if_id && 
       mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` AS I, `devices` AS D WHERE `ifIndex` = '$src_if' AND hostname = '$src_host' AND D.device_id = I.device_id"), 0) == '1')
