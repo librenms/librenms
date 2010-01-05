@@ -178,15 +178,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $seperator = ", ";
   } 
   $update .= $seperator . "`last_polled` = NOW()";
-  if ($update) {
-    $update_query  = "UPDATE `devices` SET ";
-    $update_query .= $update;
-    $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . " - $update_query \n");
-    $update_result = mysql_query($update_query);
-  } else {
-    echo("No Changes to " . $device['hostname'] . "\n");
-  }
   $i++;
   echo("\n");
   } else {
@@ -202,6 +193,16 @@ while ($device = mysql_fetch_array($device_query)) {
     $seperator = ", ";
     mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to " . ($status == '1' ? 'Up' : 'Down') . "')");
+  }
+
+  if ($update) {
+    $update_query  = "UPDATE `devices` SET ";
+    $update_query .= $update;
+    $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+    echo("Updating " . $device['hostname'] . " - $update_query \n");
+    $update_result = mysql_query($update_query);
+  } else {
+    echo("No Changes to " . $device['hostname'] . "\n");
   }
 
 }   
