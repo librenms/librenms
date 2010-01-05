@@ -26,31 +26,34 @@ if($_COOKIE['username'] && $_COOKIE['password']){
 
 $auth_success = 0;
 
-if ($config['auth_mechanism'] == "mysql" || !$config['auth_mechanism'])
+if ($_SESSION['username'])
 {
-  $encrypted = md5($_SESSION['password']);
-  $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username']."' AND `password`='".$encrypted."'";
-  $query = mysql_query($sql);
-  $row = @mysql_fetch_array($query);
-  if($row['username'] && $row['username'] == $_SESSION['username']) {
-    $auth_success = 1;
-  }
-}
-else if ($config['auth_mechanism'] == "ldap")
-{
-  $ds=@ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
-  if ($ds)
+  if ($config['auth_mechanism'] == "mysql" || !$config['auth_mechanism'])
   {
-    if (ldap_bind($ds, $config['auth_ldap_prefix'] . $_SESSION['username'] . $config['auth_ldap_suffix'], $_SESSION['password']))
-    {
+    $encrypted = md5($_SESSION['password']);
+    $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username']."' AND `password`='".$encrypted."'";
+    $query = mysql_query($sql);
+    $row = @mysql_fetch_array($query);
+    if($row['username'] && $row['username'] == $_SESSION['username']) {
       $auth_success = 1;
     }
   }
-}
-else
-{
-  echo "ERROR: no valid auth_mechanism defined.";
-  exit();
+ else if ($config['auth_mechanism'] == "ldap")
+  {
+    $ds=@ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
+    if ($ds)
+    {
+      if (ldap_bind($ds, $config['auth_ldap_prefix'] . $_SESSION['username'] . $config['auth_ldap_suffix'], $_SESSION['password']))
+      {
+        $auth_success = 1;
+      }
+    }
+  }
+  else
+  {
+    echo "ERROR: no valid auth_mechanism defined.";
+    exit();
+  }
 }
 
 if ($auth_success) {
