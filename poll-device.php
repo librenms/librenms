@@ -154,18 +154,6 @@ while ($device = mysql_fetch_array($device_query)) {
     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Hardware -> $hardware')");
   }
 
-  if( $device['status'] != $status ) {
-    $update .= $seperator . "`status` = '$status'";
-    $seperator = ", ";
-    if ($status == '1') { $stat = "Up"; 
-      mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is up\n')");
-    } else { 
-      $stat = "Down"; 
-      mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
-    }
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to $stat')");
-  }
-
   if ($uptime) {
 
     if( $uptime < $device['uptime'] ) {
@@ -208,6 +196,14 @@ while ($device = mysql_fetch_array($device_query)) {
     echo("Updating " . $device['hostname'] . "\n");
     $update_result = mysql_query($update_query);
   }
+
+  if( $device['status'] != $status ) {
+    $update .= $seperator . "`status` = '$status'";
+    $seperator = ", ";
+    mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
+    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to " . ($status == '1' ? 'Up' : 'Down') . "')");
+  }
+
 }   
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
