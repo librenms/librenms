@@ -4,7 +4,6 @@
 $config['ifname']['asa'] = true;
 $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
-$config['ifname']['powerconnect'] = true;
 $config['ifname']['speedtouch'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)

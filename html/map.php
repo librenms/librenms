@@ -3,6 +3,7 @@
 include("../config.php");
 include("../includes/functions.php");
 
+#FIXME if no get device this produces an error (and there is no authentication on this file?)
 $device = mysql_fetch_array(mysql_query("SELECT * from devices WHERE device_id = ".$_GET['device'].""));
 
 if($device && preg_match("/^[a-z]*$/", $_GET['format'])) {
@@ -53,27 +54,23 @@ while($link = mysql_fetch_array($links)) {
       $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `interfaces` AS I WHERE I.interface_id = '$dst_if'  AND D.device_id = I.device_id"),0);
       $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `interfaces` AS I WHERE I.interface_id = '$dst_if'  AND D.device_id = I.device_id"),0);
 
+      $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE `interface_id`=" . $link['src_if'])),$device);
+      $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE `interface_id`=" . $link['dst_if'])));
 
-      $sif = makeshortif($link['ifDescr']);
-      $dif = makeshortif(mysql_result(mysql_query("SELECT ifDescr from interfaces WHERE interface_id = '".$dst_if."'"),0));
-
-      $map .= "\"$src$sif\" [label=\"$sif\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$src_if/\"]\n";
-      $map .= "\"$src\" -> \"$src$sif\" [weight=500000, arrowsize=0, len=0];\n";
-
-#     $map .= "\"$src$sif\" -> \"$dst$dif\" [weight=1] \n";
+      $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$src_if/\"]\n";
+      $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
 
       $map .= "\"$dst\" [URL=\"/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
   if($dst_host == $device['device_id']) {
-      $map .= "\"$dst$dif\" [label=\"$dif\", fontsize=12, fillcolor=lightblue, URL=\"/device/$dst_host/interface/$dst_if/\"]\n";
+      $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"/device/$dst_host/interface/$dst_if/\"]\n";
   } else {
-       $map .= "\"$dst$dif\" [label=\"$dif\", fontsize=12, fillcolor=lightgray, URL=\"/device/$dst_host/interface/$dst_if/\"]\n";
+       $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"/device/$dst_host/interface/$dst_if/\"]\n";
   }
 
 
-      $map .= "\"$dst$dif\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
-
-      $map .= "\"$src$sif\" -> \"$dst$dif\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
+      $map .= "\"" . $dif['interface_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
+      $map .= "\"" . $sif['interface_id'] . "\" -> \"" . $dif['interface_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
 
    }
 
@@ -82,7 +79,7 @@ while($link = mysql_fetch_array($links)) {
 $map .= "
 };";
 
-#echo("<pre>$map</pre>");
+if ($_GET['debug'] == 1) { echo("<pre>$map</pre>");exit(); }
 
 $img = shell_exec("echo \"".addslashes($map)."\" | dot -T".$_GET['format']."");
 if($_GET['format'] == "png") {
