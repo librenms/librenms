@@ -73,7 +73,7 @@ while($peer = mysql_fetch_array($sql)){
 
   generate_front_box("alert", "<center><strong>".generatedevicelink($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span> 
-      <strong>".$peer['bgpPeerIdentifier']."</strong> <br />
+      <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'><strong>".$peer['bgpPeerIdentifier']."</strong></span><br />
       <span title='" . $peer['astext'] . "' class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
       </center>");
 
