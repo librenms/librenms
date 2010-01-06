@@ -43,10 +43,11 @@ $sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.devi
 $sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 }
 while($interface = mysql_fetch_array($sql)){
+  $interface = ifNameDescr($interface);
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
 <!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
-      <strong>".generateiflink($interface, truncate(makeshortif($interface['ifDescr']),13,''))."</strong> <br />
+      <strong>".generateiflink($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20, '')."</span>
       </center>");
 
