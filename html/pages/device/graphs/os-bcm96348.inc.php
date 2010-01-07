@@ -1,3 +1,4 @@
+<?php
       echo("<div class=graphhead>ADSL Attainable Rate</div>");
       $graph_type = "adsl_rate";            include ("includes/print-device-graph.php");
       echo("<br />");
@@ -10,3 +11,4 @@
 
       include("graphs/netstats.inc.php");
       include("graphs/uptime.inc.php");
+?>
