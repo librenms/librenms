@@ -16,13 +16,13 @@ if ($options['h'] == "odd") {
   $where = "AND MOD(device_id,2) = 0";  $doing = $options['h'];
 } elseif ($options['h'] == "all") {
   $where = " ";  $doing = "all";
-} elseif($options['h']) {
+} elseif ($options['h']) {
   $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
 } elseif ($options['i'] && isset($options['n'])) {
   $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
 }
 
-if(!$where) {
+if (!$where) {
   echo("-h <device id>                Poll single device\n");
   echo("-h odd                        Poll odd numbered devices  (same as -i 2 -n 0)\n");
   echo("-h even                       Poll even numbered devices (same as -i 2 -n 1)\n");
@@ -35,7 +35,7 @@ if(!$where) {
   exit;
  }
 
-if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
+if (isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 
 
 echo("Starting polling run:\n\n");
@@ -45,7 +45,7 @@ while ($device = mysql_fetch_array($device_query)) {
   $status = 0;
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
+  if ($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
   echo("\n");
 
   unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
@@ -55,15 +55,15 @@ while ($device = mysql_fetch_array($device_query)) {
 
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
 
-  if(!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
+  if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
-  if($pingable) { echo("Pings : yes :)\n"); } else { echo("Pings : no :(\n"); }
+  if ($pingable) { echo("Pings : yes :)\n"); } else { echo("Pings : no :(\n"); }
 
   $snmpable = FALSE;
 
-  if($pingable) {
+  if ($pingable) {
     $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
-    if($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
+    if ($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
   }
 
   unset($snmpdata);
@@ -89,10 +89,10 @@ while ($device = mysql_fetch_array($device_query)) {
     $secs = $secs + ($mins * 60);
     $uptime = $secs;
 
-    if(is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
+    if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
       /// OS Specific
       include($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php");
-    }elseif($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) {
+    }elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) {
       /// OS Group Specific
       include($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php");
     }else{
@@ -115,56 +115,56 @@ while ($device = mysql_fetch_array($device_query)) {
   if ( $sysContact && $sysContact != $device['sysContact'] ) {
     $update .= $seperator . "`sysContact` = '".mres($sysContact)."'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Contact -> $sysContact')");
+    eventlog("Contact -> $sysContact", $device['device_id']);
   }
 
   if ( $sysName && $sysName != $device['sysName'] ) {
     $update .= $seperator . "`sysName` = '$sysName'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysName -> $sysName')");
+    eventlog("sysName -> $sysName", $device['device_id']);
   }
 
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
     $update .= $seperator . "`sysDescr` = '$sysDescr'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'sysDescr -> $sysDescr')");
+    eventlog("sysDescr -> $sysDescr", $device['device_id']);
   }
 
   if ( $sysLocation && $device['location'] != $sysLocation ) {
     $update .= $seperator . "`location` = '$sysLocation'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Location -> $sysLocation')");
+    eventlog("Location -> $sysLocation", $device['device_id']);
   }
 
   if ( $version && $device['version'] != $version ) {
     $update .= $seperator . "`version` = '$version'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'OS Version -> $version')");
+    eventlog("OS Version -> $version", $device['device_id']);
   }
 
   if ( $features && $features != $device['features'] ) {
     $update .= $seperator . "`features` = '$features'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'OS Features -> $features')");
+    eventlog("OS Features -> $features", $device['device_id']);
   }
 
   if ( $hardware && $hardware != $device['hardware'] ) {
     $update .= $seperator . "`hardware` = '$hardware'";
     $seperator = ", ";
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Hardware -> $hardware')");
+    eventlog("Hardware -> $hardware", $device['device_id']);
   }
 
-  if ($uptime) {
-
-    if( $uptime < $device['uptime'] ) {
-      if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+  if ($uptime) 
+  {
+    if ( $uptime < $device['uptime'] ) {
+      if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
       mail($email, "Device Rebooted: " . $device['hostname'], "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.", $config['email_headers']);
-      mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '', NOW(), 'Device rebooted')");
+      eventlog('Device rebooted', $device['device_id']);
     }
 
     $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
 
-    if(!is_file($uptimerrd)) {
+    if (!is_file($uptimerrd)) {
       $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
         DS:uptime:GAUGE:600:0:U \
         RRA:AVERAGE:0.5:1:600 \
@@ -188,11 +188,11 @@ while ($device = mysql_fetch_array($device_query)) {
     $update_result = mysql_query($update_query);
   }
 
-  if( $device['status'] != $status ) {
+  if ( $device['status'] != $status ) {
     $update .= $seperator . "`status` = '$status'";
     $seperator = ", ";
     mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
-    mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to " . ($status == '1' ? 'Up' : 'Down') . "')");
+    eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
   }
 
   if ($update) {

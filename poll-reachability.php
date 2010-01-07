@@ -51,7 +51,7 @@ while ($device = mysql_fetch_array($device_query)) {
        mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
        mail($email, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
      }
-     mysql_query("INSERT INTO eventlog (host, interface, datetime, message) VALUES ('" . $device['device_id'] . "', NULL, NOW(), 'Device status changed to $stat')");
+     eventlog("Device status changed to $stat", $device['device_id']);
      echo("Status Changed!\n");
    }
 }

@@ -357,7 +357,7 @@ function renamehost($id, $new) {
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   shell_exec("mv ".$config['rrd_dir']."/$host ".$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
-    mysql_query("INSERT INTO eventlog (host, datetime, message) VALUES ('" . $id . "', NULL, NOW(), 'Hostname changed -> $new (console)')");
+  eventlog("Hostname changed -> $new (console)", $id);
 }
 
 function delHost($id) 
@@ -733,6 +733,14 @@ function get_astext($asn)
   $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
   $txt = explode('|',$result[0]['txt']);
   return trim(str_replace('"', '', $txt[4]));
+}
+
+function eventlog($eventtext,$device_id = "", $interface_id = "")
+{
+  $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
+  $event_query .= ", " . ($interface_id ? $interface_id : "NULL") . ", NOW(), '" . mysql_escape_string($eventtext) . "')";
+  echo "$event_query\n";
+  mysql_query($event_query);
 }
                                                                                                                                 
 ?>
