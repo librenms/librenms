@@ -60,11 +60,6 @@ while($link = mysql_fetch_array($links)) {
       $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$src_if/\"]\n";
       $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
 
-      $map .= "\"$src$sif\" [label=\"$sif\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$src_if/\"]\n";
-      $map .= "\"$src\" -> \"$src$sif\" [weight=50000000, arrowsize=0, len=0];\n";
-
-#     $map .= "\"$src$sif\" -> \"$dst$dif\" [weight=1] \n";
-
       $map .= "\"$dst\" [URL=\"/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
   if($dst_host == $device['device_id']) {
@@ -74,7 +69,8 @@ while($link = mysql_fetch_array($links)) {
   }
 
 
-      $map .= "\"$dst$dif\" -> \"$dst\" [weight=50000000, arrowsize=0, len=0];\n";
+      $map .= "\"" . $dif['interface_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
+      $map .= "\"" . $sif['interface_id'] . "\" -> \"" . $dif['interface_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
 
    }
 
