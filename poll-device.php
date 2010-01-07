@@ -39,7 +39,7 @@ if (isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 
 
 echo("Starting polling run:\n\n");
-$i = 0;
+$polled_devices = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
   $status = 0;
@@ -178,7 +178,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $seperator = ", ";
   } 
   $update .= $seperator . "`last_polled` = NOW()";
-  $i++;
+  $polled_devices++;
   echo("\n");
   } else {
     $update_query  = "UPDATE `devices` SET ";
@@ -209,7 +209,7 @@ while ($device = mysql_fetch_array($device_query)) {
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
-$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
+$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
 shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log");
 
