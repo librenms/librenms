@@ -89,7 +89,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 }
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
-  global $config;$debug;
+  global $config, $debug;
   $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
