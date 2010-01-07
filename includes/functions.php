@@ -686,7 +686,7 @@ function ipv62snmp($ipv6)
   $ipv6_ex = explode(':',Net_IPv6::uncompress($ipv6));
   for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad_lineno($ipv6_ex[$i],4); }
   $ipv6_ip = implode('',$ipv6_ex);
-  for ($i = 0;$i < 16;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
+  for ($i = 0;$i < 32;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
   return implode('.',$ipv6_split);
 }
 
