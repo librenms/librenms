@@ -1,6 +1,6 @@
 <?php
-include("graphs/cpu.inc.php");
-include("graphs/temperatures.inc.php");
-include("graphs/netstats.inc.php");
-include("graphs/uptime.inc.php");
+include("cpu.inc.php");
+include("temperatures.inc.php");
+include("netstats.inc.php");
+include("uptime.inc.php");
 ?>
