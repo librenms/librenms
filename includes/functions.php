@@ -739,7 +739,6 @@ function eventlog($eventtext,$device_id = "", $interface_id = "")
 {
   $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
   $event_query .= ", " . ($interface_id ? $interface_id : "NULL") . ", NOW(), '" . mysql_escape_string($eventtext) . "')";
-  echo "$event_query\n";
   mysql_query($event_query);
 }
                                                                                                                                 
