@@ -511,7 +511,7 @@ function formatUptime($diff, $format="long")
     if($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
     if($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
   }
-  return "$uptime";
+  return trim($uptime);
 }
 
 function isSNMPable($hostname, $community, $snmpver, $port) 
