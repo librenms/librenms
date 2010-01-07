@@ -77,6 +77,10 @@ while ($device = mysql_fetch_array($device_query)) {
   ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
 
+  ## CDP & LLDP
+  include("includes/discovery/cdp-lldp.inc.php");
+
+
   if($device['os'] == "netscreen") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
   }
@@ -95,7 +99,6 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/cisco-processors.php");
     include("includes/discovery/cemp-mib.php");
     include("includes/discovery/cmp-mib.php");
-    include("includes/discovery/cdp-lldp.inc.php");
 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
@@ -103,7 +106,6 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($device['os'] == "procurve" || $device['os'] == "powerconnect")
   {
     include("includes/discovery/q-bridge-mib.php");
-    include("includes/discovery/cdp-lldp.inc.php");
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 

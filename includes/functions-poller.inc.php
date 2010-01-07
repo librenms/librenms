@@ -89,7 +89,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 }
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
-  global $config;
+  global $config;$debug;
   $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
@@ -100,6 +100,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
     list($oid,$value) = explode("=", $entry);
     $oid = trim($oid); $value = trim($value);
     list($oid, $first, $second, $third) = explode(".", $oid);
+    if($debug) {echo("$entry || $oid || $first || $second || $third\n");}
     if (!strstr($this_value, "at this OID") && isset($oid) && isset($first) && isset($second) && isset($third)) {
       $array[$device_id][$first][$second][$third][$oid] = $value;
     }
