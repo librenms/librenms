@@ -1,3 +1,4 @@
+<?php
       echo("<div class=graphhead>Processor Utilisation</div>");
       $graph_type = "fortigate_cpu";            include ("includes/print-device-graph.php");
       echo("<div class=graphhead>Memory Usage</div>");
@@ -7,3 +8,4 @@
 
       include("graphs/netstats.inc.php");
       include("graphs/uptime.inc.php");
+?>
