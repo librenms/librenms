@@ -82,12 +82,11 @@
       foreach ($data_oids as $oid)      { 
         if ( $port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
           $update .= ", `$oid` = NULL";
-          mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '".$oid . ": ".$port[$oid]." -> NULL')");
+          eventlog($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
         } elseif ( $port[$oid] != $this_port[$oid] ) {
           $update .= ", `$oid` = '".mysql_real_escape_string($this_port[$oid])."'";
-          #eventlog($device['device_id'], 'interface', $port['interface_id'], $oid . ": ".$port[$oid]." -> " . $this_port[$oid]);
-  	  mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '".$oid . ": ".$port[$oid]." -> " . $this_port[$oid]."')");
+  	  eventlog($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
         }
       }
@@ -144,20 +143,11 @@
           if ( $this_port[$oid] != $port[$oid] ) { // If data has changed, build a query
             $update .= ", `$oid` = '".mres($this_port[$oid])."'";
             echo("PAgP ");
-	    mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '$oid -> ".$this_port[$oid]."')");
+	    eventlog("$oid -> ".$this_port[$oid], $device['device_id'], $port['interface_id']);
           }
         }
       } 
       // End Update PAgP
-
-      // Do Eventlogging
-#      $eventlog_oids = array('ifDescr', 'ifName', 'ifAlias', 'ifOperStatus', 'ifAdminStatus');      
-#      foreach ($data_oids as $oid) { // Loop the OIDs
-#        if ( $port[$oid] != $this_port[oid]) {
-#          mysql_query("INSERT INTO eventlog (`host`, `interface`, `datetime`, `message`) VALUES ('" . $device['device_id'] . "', '" . $port['interface_id'] . "', NOW(), '$oid -> ".$this_port[$oid]."')");
-#        }
-#      }
-      // End Eventlogging
 
       /// Do EtherLike-MIB
       if($config['enable_ports_etherlike']) { include("port-etherlike.inc.php"); }      
