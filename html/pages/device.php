@@ -138,16 +138,22 @@ if($_SESSION[userlevel] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM
 }
 
 if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
-
   echo("<li class=" . $select['entphysical'] . ">
   <a href='".$config['base_url']."/device/" . $device['device_id'] . "/entphysical/'>
     <img src='images/16/bricks.png' align=absmiddle border=0> Inventory
   </a>
 </li>
 ");
-
-
+} elseif ( $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
+  echo("<li class=" . $select['hrdevice'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/hrdevice/'>
+    <img src='images/16/bricks.png' align=absmiddle border=0> Inventory
+  </a>
+</li>
+");
 }
+
+
 
 #if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
 #  echo("
