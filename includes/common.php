@@ -51,6 +51,12 @@ function getifindexbyid($id) {
 }
 
 function getifbyid($id) {
+     $sql = mysql_query("SELECT * FROM `interfaces` WHERE `interface_id` = '$id'");
+     $result = @mysql_fetch_array($sql);
+     return $result;
+}
+
+function getifdescrbyid($id) {
      $sql = mysql_query("SELECT `ifDescr` FROM `interfaces` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
