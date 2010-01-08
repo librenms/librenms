@@ -37,13 +37,13 @@ if ($device['os'] == "junos")
     {
       list($peer_oid) = split(' ',$oid);
       $peer_id = explode('.',$peer_oid);
-      $junos_v6[implode('.',array_slice($peer_id,35,8))] = implode('.',array_slice($peer_id,18));
+      $junos_v6[implode('.',array_slice($peer_id,35))] = implode('.',array_slice($peer_id,18));
     }
   }
   
   $peer_cmd  = $config['snmpget'] . " -m BGP4-V2-MIB-JUNIPER -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
-  $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip];
+  $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip]; # Should be jnxBgpM2CfgPeerAdminStatus but doesn't seem to be implemented?
   $peer_cmd .= " jnxBgpM2PeerInUpdates.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerOutUpdates.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerInTotalMessages.0.ipv6." . $junos_v6[$peer_ip];
@@ -52,7 +52,10 @@ if ($device['os'] == "junos")
   $peer_cmd .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
   $peer_data = trim(`$peer_cmd`);
+  if ($debug) echo "\n$peer_cmd\n";
   list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
+  
+  if ($debug) { echo "State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n"; }
   
   $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
   if ($bgpLocalAddr == "00000000000000000000000000000000") 
