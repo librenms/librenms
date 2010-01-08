@@ -343,7 +343,7 @@ $type = strtolower($data['os']);
   if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png'>";
   } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif'>"; }
   if($type == "linux") {
-    $features = strtolower(trim($data[features]));
+    $features = strtolower(trim($data['features']));
     list($distro) = split(" ", $features);
     if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".png'>";
     } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".gif'>"; }
@@ -498,6 +498,9 @@ function formatUptime($diff, $format="long")
   $minsDiff = floor($diff/60);
   $diff -= $minsDiff*60;
   $secsDiff = $diff;
+  
+  $uptime = "";
+  
   if($format == "short") {
     if($yearsDiff > '0'){ $uptime .= $yearsDiff . "y "; }
     if($daysDiff > '0'){ $uptime .= $daysDiff . "d "; }

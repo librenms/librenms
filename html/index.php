@@ -1,4 +1,6 @@
 <?php
+  ob_start();
+  
   ini_set('allow_url_fopen', 0);
   ini_set('display_errors', 0);
 
@@ -22,9 +24,8 @@ if($debug) {
   $week = time() - (7 * 24 * 60 * 60);
   $month = time() - (31 * 24 * 60 * 60);
   $year = time() - (365 * 24 * 60 * 60);
-
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml2/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml2/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
   <title><?php echo($config['page_title']); ?></title>
@@ -52,11 +53,11 @@ function popUp(URL) {
 <script type="text/javascript" src="js/overlib.js"></script>
 <body topmargin=0 leftmargin=0 rightmargin=0 bottommargin=0>
 <div id="center">
-<div id="top" style='background: <?php echo($config['header_color']); ?>;'>
-<table cellpadding=0 cellspacing=0 width=100%>
+<div id="top" style="background: <?php echo($config['header_color']); ?>;">
+<table cellpadding="0" cellspacing="0" width="100%">
 <tr>
-<td align=left></td>
-<td align=right>
+<td align="left"></td>
+<td align="right">
   <?php
      if($_SESSION['authenticated']) { 
        echo("Logged in as <b>".$_SESSION['username']."</b> (<a href='?logout=yes'>Logout</a>)"); 
@@ -73,9 +74,9 @@ function popUp(URL) {
   <table width="100%" style="padding: 0px; margin:0px;">
     <tr>
       <td style="padding: 0px; margin:0px; border: none;">
-        <div id=logo style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" border="0" /></a></div>
+        <div id="logo" style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" border="0" /></a></div>
       </td>
-      <td align=center><?php
+      <td align="center"><?php
         
         $data = trim(shell_exec("cat " . $config['install_dir'] . "/rrd/version.txt"));
               
@@ -93,7 +94,7 @@ function popUp(URL) {
                 }
 
       ?></td>
-      <td align=right style="margin-right: 10px;">
+      <td align="right" style="margin-right: 10px;">
         <div id="topnav" style="float: right;">
  	  <?php if($_SESSION['authenticated']) {
 	    include("includes/topnav.inc");		
@@ -107,7 +108,7 @@ function popUp(URL) {
 
 <?php if($_SESSION['authenticated']) {include("includes/print-menubar.php");} else {echo("<hr colour=#444444 />");} ?>
 
-<div class=clearer></div>
+<div class="clearer"></div>
 
 <div class="content-mat" style="border: 1px none #fcc;">
 <div id="content" style="border: 1px none #ccc; min-height:650px;">
@@ -140,9 +141,9 @@ function popUp(URL) {
 <?php
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
-    echo("<br /> <center>Generated in $gentime seconds 
-          <br /> <a href='http://www.observernms.org'>Observer " . $config['version'] . "</a> &copy; 2006-2010 Adam Armstrong
-          <br />This work is licensed under the <a href='http://www.gnu.org/licenses/gpl-3.0-standalone.html'>GPL, version 3</a>.");
+    echo('<br /> <center>Generated in ' . $gentime . ' seconds 
+          <br /> <a href="http://www.observernms.org">Observer ' . $config['version'] . '</a> &copy; 2006-2010 Adam Armstrong
+          <br />This work is licensed under the <a href="http://www.gnu.org/licenses/gpl-3.0-standalone.html">GPL, version 3</a>.');
 	            
 ?>
 
