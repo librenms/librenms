@@ -5,7 +5,7 @@
   $device_alerts = "0"; 
   $device_alert_sql = "WHERE 0";
 
-  $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where bgpPeerAdminStatus = 'start' AND bgpPeerState != 'established'"), 0);
+  $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'"), 0);
 
   $query_a = mysql_query("SELECT * FROM `devices`");
   while($device = mysql_fetch_array($query_a)) {
