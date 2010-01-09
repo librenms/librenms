@@ -73,7 +73,11 @@ if (preg_match("/^[a-z]*$/", $_GET['format']))
             $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE `interface_id`=" . $link['dst_if'])));
 
             $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$src_if/\"]\n";
-            $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
+            if (!$ifdone[$src][$sif['interface_id']])
+            {
+              $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
+              $ifdone[$src][$sif['interface_id']] = 1;
+            }
 
             $map .= "\"$dst\" [URL=\"/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
@@ -83,7 +87,11 @@ if (preg_match("/^[a-z]*$/", $_GET['format']))
               $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"/device/$dst_host/interface/$dst_if/\"]\n";
             }
 
-            $map .= "\"" . $dif['interface_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
+            if (!$ifdone[$dst][$dif['interface_id']])
+            {
+              $map .= "\"" . $dif['interface_id'] . "\" -> \"$dst\" [weight=500000, arrowsize=0, len=0];\n";
+              $ifdone[$dst][$dif['interface_id']] = 1;
+            }
             $map .= "\"" . $sif['interface_id'] . "\" -> \"" . $dif['interface_id'] . "\" [weight=1, arrowhead=normal, arrowtail=normal, len=2, $info] \n";
           }
         }
