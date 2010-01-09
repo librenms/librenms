@@ -43,7 +43,7 @@ $config['snmpset']      = "/usr/bin/snmpset";
 
 # Set the general colours and other settings for rrdtool graphs
 
-$config['rrdgraph_def_text'] =  " -c BACK#EEEEEE -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5 ";
+$config['rrdgraph_def_text'] =  " -c BACK#EEEEEE -c SHADEA#c5c5c5 -c SHADEB#c5c5c5 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5";
 $config['rrdgraph_def_text'] .= " -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal";
 
 $config['overlib_defaults'] = ",FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505'";
