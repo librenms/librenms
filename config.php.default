@@ -133,6 +133,10 @@ $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/pro
 $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_string'] = array("/.*\/dev\/?$/");
 
+### Hardcoded ASN descriptions
+
+# $config['astext'][65333] = "Cymru Bogon Feed";
+
 ### Style Options
 
 $list_colour_a = "#ffffff";
