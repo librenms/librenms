@@ -33,7 +33,7 @@
           $add = mysql_query("INSERT INTO bgpPeers (`device_id`, `bgpPeerIdentifier`, `bgpPeerRemoteAS`) VALUES ('".$device['device_id']."','$peer_ip','$peer_as')");
           echo("+"); 
         } else { 
-          $update = mysql_query("UPDATE `bgpPeers` SET astext = '$astext' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
+          $update = mysql_query("UPDATE `bgpPeers` SET bgpPeerRemoteAs = " . $peer_as . ", astext = '" . mysql_escape_string($astext) . "' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
           echo(".");
         }
 
@@ -88,7 +88,7 @@
           $add = mysql_query("INSERT INTO bgpPeers (`device_id`, `bgpPeerIdentifier`, `bgpPeerRemoteAS`) VALUES ('".$device['device_id']."','$peer_ip','$peer_as')");
           echo("+"); 
         } else { 
-          $update = mysql_query("UPDATE `bgpPeers` SET astext = '$astext' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
+          $update = mysql_query("UPDATE `bgpPeers` SET bgpPeerRemoteAs = " . $peer_as . ", astext = '" . mysql_escape_string($astext) . "' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '$peer_ip'");
           echo(".");
         }
 
