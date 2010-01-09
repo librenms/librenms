@@ -1,12 +1,5 @@
-<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:23px;'>
+
+<?php print_optionbar_start('25'); ?>
 
 <form method="post" action="">
   <label><strong>Descr</strong>
@@ -48,19 +41,9 @@
   <input type="text" size=24 name="device_string" id="device_string" value="<?php  echo($_POST['device_string']); ?>" />
   <input style type=submit value=Search>
 
-</form>
-</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-
-
 <?php
+
+print_optionbar_end();
 
 if($_POST['string']) {
   $where .= " AND E.entPhysicalDescr LIKE '%".$_POST['string']."%'";

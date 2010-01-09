@@ -9,27 +9,14 @@ if($_GET['opta'] == "add") {
 <form method='post' action=''>
 
 
-
-
-
 <?php
 
 
 } else {
 
+print_optionbar_start('40');
+
   ?>
-	
-<div style='margin:auto; text-align: center; margin-top: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; padding:5px;'>
-
-
 
 	<table cellpadding=7 cellspacing=0 class=devicetable width=100%>
 <form method='post' action=''>
@@ -68,18 +55,9 @@ if($_GET['opta'] == "add") {
   </form>
 </table>
 
-</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-
-	
 <?php
+
+print_optionbar_end();
 
   $sql  = "SELECT * FROM `bills` ORDER BY `bill_name`";
   $query = mysql_query($sql);
