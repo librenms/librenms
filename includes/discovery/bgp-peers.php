@@ -24,7 +24,7 @@
 
 	$peerlist[] = $device['device_id'] ." $peer_ip";
 
-	$astext = get_astext($peer_pas);
+	$astext = get_astext($peer_as);
 
 #        echo(str_pad($peer_ip, 40) . " AS$peer_as  ");
         
