@@ -32,11 +32,26 @@
           mysql_query($query);
           echo("+");
         } else { echo("."); }
-        $valid_cpm[$id][$oid] = 1;
+        $valid_cpm[$oid] = 1;
       }
      }
     } 
   } ## End Cisco Processors
+
+$sql = "SELECT * FROM `cpmCPU` WHERE `device_id`  = '".$device['device_id']."'";
+$query = mysql_query($sql);
+
+while ($test_cpm = mysql_fetch_array($query)) {
+  $cpm_index = $test_cmp['cpmCPU_oid'];
+  if(!$valid_cpm[$cpm_index]) {
+    echo("-");
+    mysql_query("DELETE FROM `cpmCPU` WHERE cpmCPU_id = '" . $test_cmp['cpmCPU_id']; . "'");
+  }
+  unset($cpm_index);
+}
+
+unset($valid_cpm);
+echo("\n");
 
 
 ##### ************FIX ME***************** 
