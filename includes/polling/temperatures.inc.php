@@ -38,7 +38,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'] . " is " . $temp . " (Limit " . $temperature['temp_limit'];
     $msg .= ") at " . date('l dS F Y h:i:s A');
     mail($email, "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $temperature['temp_descr'] . "/n");
+    echo("Alerting for " . $device['hostname'] . " " . $temperature['temp_descr'] . "\n");
   }
 
   mysql_query("UPDATE temperature SET temp_current = '$temp' WHERE temp_id = '$temperature[temp_id]'");
