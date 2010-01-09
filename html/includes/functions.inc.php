@@ -26,7 +26,7 @@ function generate_port_thumbnail($args) {
     echo $output;
 }
 
-function print_optionbar_start () {
+function print_optionbar_start ($height = 20) {
   echo("
     <div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
     <b class='rounded'>
@@ -36,7 +36,7 @@ function print_optionbar_start () {
     <b class='rounded4'></b>
     <b class='rounded5'></b></b>
     <div class='roundedfg' style='padding: 0px 5px;'>
-    <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>");
+    <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:" . $height . "px;'>");
 }
 
 
