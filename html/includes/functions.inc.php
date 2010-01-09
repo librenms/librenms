@@ -26,9 +26,9 @@ function generate_port_thumbnail($args) {
     echo $output;
 }
 
-function print_optionbar_start ($height = 20) {
+function print_optionbar_start ($height = 20, $width = 0) {
   echo("
-    <div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
+    <div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px; " . ($width ? 'max-width: ' . $width . 'px; ' : '') . "'>
     <b class='rounded'>
     <b class='rounded1'><b></b></b>
     <b class='rounded2'><b></b></b>
