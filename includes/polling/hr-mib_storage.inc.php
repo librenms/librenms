@@ -38,6 +38,6 @@ while ($dr = mysql_fetch_array($dq)) {
     $msg  = "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'] . " is " . $perc;
     $msg .= "% at " . date('l dS F Y h:i:s A');
     mail($email, "Disk Alarm: " . $device['hostname'] . " " . $dr['hrStorageDescr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "/n");
+    echo("Alerting for " . $device['hostname'] . " " . $dr['hrStorageDescr'] . "\n");
   }
 }
