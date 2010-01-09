@@ -4,8 +4,12 @@
   $ignore = $_POST['ignore'];
   $type = $_POST['type'];
   $disabled = $_POST['disabled'];
+  $community = $_POST['community'];
+  $snmpver = $_POST['snmpver'];
 
-  $sql = "UPDATE `devices` SET `purpose` = '$descr', `type` = '$type', `ignore` = '$ignore',  `disabled` = '$disabled' WHERE `device_id` = '$_GET[id]'";
+#FIXME needs more sanity checking!
+  $sql = "UPDATE `devices` SET `purpose` = '" . mysql_escape_string($descr) . "', `community` = '" . mysql_escape_string($community) . "', `type` = '$type'";
+  $sql .= ", `snmpver` = '" . mysql_escape_string($snmpver) . "', `ignore` = '$ignore',  `disabled` = '$disabled' WHERE `device_id` = '$_GET[id]'";
   $query = mysql_query($sql);
 
   $rows_updated = mysql_affected_rows();
