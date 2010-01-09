@@ -25,7 +25,7 @@ if($debug) {
   $month = time() - (31 * 24 * 60 * 60);
   $year = time() - (365 * 24 * 60 * 60);
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml2/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
   <title><?php echo($config['page_title']); ?></title>
@@ -42,7 +42,7 @@ if($debug) {
 </head>
 <body topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0">
 <script type="text/javascript" src="js/mktree.js"></script>
-<SCRIPT LANGUAGE="JavaScript">
+<script type="text/javascript">
 <!-- Begin
 function popUp(URL) {
   day = new Date();
@@ -74,7 +74,7 @@ function popUp(URL) {
   <table width="100%" style="padding: 0px; margin:0px;">
     <tr>
       <td style="padding: 0px; margin:0px; border: none;">
-        <div id="logo" style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" border="0" /></a></div>
+        <div id="logo" style="padding: 10px"><a href="index.php"><img src="<?php echo($config['title_image']); ?>" alt="Logo" border="0" /></a></div>
       </td>
       <td align="center"><?php
         
@@ -106,7 +106,7 @@ function popUp(URL) {
 </div>
 
 
-<?php if($_SESSION['authenticated']) {include("includes/print-menubar.php");} else {echo("<hr colour=#444444 />");} ?>
+<?php if($_SESSION['authenticated']) {include("includes/print-menubar.php");} else {echo('<hr color="#444444" />');} ?>
 
 <div class="clearer"></div>
 
