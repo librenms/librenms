@@ -163,7 +163,7 @@ echo('<li class="' . $select['events'] . '">
 </li>');
 
 if($config['enable_syslog']) { 
-echo("<li class=" . $select['syslog'] . '">
+echo('<li class="' . $select['syslog'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/syslog/">
     <img src="images/16/printer.png" align="absmiddle" border="0" /> Syslog
   </a>
