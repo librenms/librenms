@@ -8,12 +8,12 @@ $cpm  = mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = 
 $hrprocessor  = mysql_result(mysql_query("select count(*) from hrDevice WHERE device_id = '" . $device['device_id'] . "' AND `hrDeviceType` = 'hrDeviceProcessor'"), 0);
 
 
-if($temp) { $datas[] = 'temp'; }
-if($storage) { $datas[] = 'storage'; }
-if($cemp) { $datas[] = 'cemp'; }
-if($cpm) { $datas[] = 'cpm'; }
-if($cmp) { $datas[] = 'cmp'; }
-if($hrprocessor) { $datas[] = 'hrprocessors'; }
+if ($temp) { $datas[] = 'temp'; }
+if ($storage) { $datas[] = 'storage'; }
+if ($cemp) { $datas[] = 'cemp'; }
+if ($cpm) { $datas[] = 'cpm'; }
+if ($cmp) { $datas[] = 'cmp'; }
+if ($hrprocessor) { $datas[] = 'hrprocessors'; }
 
 $type_text['temp'] = "Temperatures";
 $type_text['cmp'] = "Memory Pools";
@@ -23,6 +23,7 @@ $type_text['storage'] = "Disk Usage";
 $type_text['hrprocessors'] = "Processor Usage";
 
 
+/*
  echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
   <b class='rounded'>
   <b class='rounded1'></b>
@@ -33,30 +34,24 @@ $type_text['hrprocessors'] = "Processor Usage";
   <div class='roundedfg' style='padding: 0px 5px;'>
   <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
 ");
+*/
 
- unset ($sep);
- foreach ($datas as $type) {
-   if(!$_GET['opta']) { $_GET['opta'] = $type; }
-   echo($sep);
-   if($_GET['opta'] == $type) { echo("<strong>"); }
-   echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/" . $type . "/'>" . $type_text[$type] ."</a>\n");
-   if($_GET['opta'] == $type) { echo("</strong>"); }
-   $sep = ' | ';
- }
- unset ($sep);
- echo("</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-");
+print_optionbar_start();
 
+unset ($sep);
+foreach ($datas as $type) {
+  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+  echo($sep);
+  if ($_GET['opta'] == $type) { echo("<strong>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/" . $type . "/'>" . $type_text[$type] ."</a>\n");
+  if ($_GET['opta'] == $type) { echo("</strong>"); }
+  $sep = ' | ';
+}
+unset ($sep);
 
-if(is_file("pages/device/health/".mres($_GET['opta']).".inc.php")) { include("pages/device/health/".mres($_GET['opta']).".inc.php"); }
+print_optionbar_end();
+
+if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php")) { include("pages/device/health/".mres($_GET['opta']).".inc.php"); }
 
 
 ?>
