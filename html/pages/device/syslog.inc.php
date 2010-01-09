@@ -1,6 +1,6 @@
 <?php 
 
-print_optionbar_start(); 
+print_optionbar_start('25'); 
 
 ?>
 
@@ -29,7 +29,6 @@ print_optionbar_start();
 
 print_optionbar_end();
 
-
 if($_POST['string']) {
   $where = " AND msg LIKE '%".$_POST['string']."%'";
 }
@@ -44,6 +43,5 @@ $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
 echo("</table>");
-
 
 ?>
