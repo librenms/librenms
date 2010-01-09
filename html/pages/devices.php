@@ -1,12 +1,4 @@
-<div style='margin:auto; text-align: center; margin-top: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; padding:5px;'>
+<?php print_optionbar_start(52); ?>
 <table cellpadding=4 cellspacing=0 class=devicetable width=100%>
 <form method='post' action=''>
 <tr> 
@@ -84,18 +76,10 @@
            </tr>
   </form>
 </table>
-</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-
 
 <?php
+print_optionbar_end();
+
 
 if($_POST['hostname']) { $where = " AND hostname LIKE '%".$_POST['hostname']."%'"; }
 if($_POST['os']) { $where = " AND os = '".$_POST['os']."'"; }
