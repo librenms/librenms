@@ -8,8 +8,8 @@ echo("<div style='  background: transparent url(images/box-$type.png) no-repeat;
 
 # echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
 #  <b class='box-".$type."'>
-#  <b class='box-".$type."1'><b></b></b>
-#  <b class='box-".$type."2'><b></b></b>
+#  <b class='box-".$type."1'></b>
+#  <b class='box-".$type."2'></b>
 #  <b class='box-".$type."3'></b>
 #  <b class='box-".$type."4'></b>
 #  <b class='box-".$type."5'></b></b>
@@ -20,8 +20,8 @@ echo("<div style='  background: transparent url(images/box-$type.png) no-repeat;
 #  <b class='box-".$type."5'></b>
 #  <b class='box-".$type."4'></b>
 #  <b class='box-".$type."3'></b>
-#  <b class='box-".$type."2'><b></b></b>
-#  <b class='box-".$type."1'><b></b></b></b>
+#  <b class='box-".$type."2'></b>
+#  <b class='box-".$type."1'></b></b>
 # </div>");
 }
 
@@ -133,8 +133,8 @@ echo("</div>");
 
 echo("<div style='width: 290px; margin: 7px; float: right;'>
   <b class='content-box'>
-  <b class='content-box1'><b></b></b>
-  <b class='content-box2'><b></b></b>
+  <b class='content-box1'></b>
+  <b class='content-box2'></b>
   <b class='content-box3'></b>
   <b class='content-box4'></b>
   <b class='content-box5'></b></b>
@@ -197,8 +197,8 @@ echo("</div>
   <b class='content-box5'></b>
   <b class='content-box4'></b>
   <b class='content-box3'></b>
-  <b class='content-box2'><b></b></b>
-  <b class='content-box1'><b></b></b></b>
+  <b class='content-box2'></b>
+  <b class='content-box1'></b></b>
 </div>
 ");
 

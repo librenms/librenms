@@ -51,8 +51,8 @@ echo("<div style='clear: both;'>");
 echo("
 <div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
   <b class='rounded'>
-  <b class='rounded1'><b></b></b>
-  <b class='rounded2'><b></b></b>
+  <b class='rounded1'></b>
+  <b class='rounded2'></b>
   <b class='rounded3'></b>
   <b class='rounded4'></b>
   <b class='rounded5'></b></b>
@@ -79,8 +79,8 @@ echo("</div>
   <b class='rounded5'></b>
   <b class='rounded4'></b>
   <b class='rounded3'></b>
-  <b class='rounded2'><b></b></b>
-  <b class='rounded1'><b></b></b></b>
+  <b class='rounded2'></b>
+  <b class='rounded1'></b></b>
 </div>
 ");
 
