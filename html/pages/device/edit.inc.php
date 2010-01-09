@@ -38,13 +38,22 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
 
 <form id='edit' name='edit' method='post' action=''>
   <input type=hidden name='editing' value='yes'>
-  <table width='200' border='0'>
+  <table width='400' border='0'>
     <tr>
-      <td width='300'><div align='right'>Description</div></td>
-      <td colspan='3'><input name='descr' size='32' value='$descr'></input></td>
+      <td><div align='right'>Description</div></td>
+      <td colspan='3'><input name='descr' size='32' value='" . $device['purpose'] . "'></input></td>
+    </tr>
+    <tr>
+      <td width='300'><div align='right'>SNMP Community</div></td>
+      <td colspan='3'><input name='community' size='20' value='" . $device['community'] . "'></input>
+        <select name='snmpver'>
+          <option value='v1'>v1</option>
+          <option value='v2c'" . ($device['snmpver'] == 'v2c' ? 'selected=selected' : '') . ">v2c</option>
+        </select>
+      </td>
     </tr>
    <tr>
-      <td>
+      <td align='right'>
         Type
       </td> 
       <td>
@@ -58,12 +67,12 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
       </td>
     </tr>
     <tr>
-      <td width='300'><div align='right'>Disable</div></td>
-      <td width='300'><input name='disabled' type='checkbox' id='disabled' value='1'");
+      <td><div align='right'>Disable</div></td>
+      <td><input name='disabled' type='checkbox' id='disabled' value='1'");
 if($device['disabled']) { echo("checked=checked"); }
 echo("/></td>
-      <td width='300'><div align='right'>Ignore</div></td>
-      <td width='300'><input name='ignore' type='checkbox' id='disable' value='1'");
+      <td><div align='right'>Ignore</div></td>
+      <td><input name='ignore' type='checkbox' id='disable' value='1'");
       if($device['ignore']) { echo("checked=checked"); }
 echo("/></td>
     </tr>");
@@ -76,9 +85,7 @@ echo("
 </form>
 
 </td>
-<td width=50></td><td>");
-
-  echo("</td></tr></table>");
+<td width=50></td><td></td></tr></table>");
 
 }
 
