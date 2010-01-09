@@ -70,4 +70,4 @@ ALTER TABLE `devices` ADD `last_discovered` timestamp NULL DEFAULT NULL AFTER `l
 ALTER TABLE `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
 ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`
 ALTER TABLE `devices` MODIFY `type` varchar(8) DEFAULT "unknown";
- 
+ALTER TABLE `devices` CHANGE `os` `os` VARCHAR( 32 ) NULL DEFAULT NULL 
