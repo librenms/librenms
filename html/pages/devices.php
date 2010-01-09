@@ -102,7 +102,7 @@ echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
 $device_query = mysql_query($sql);
 while($device = mysql_fetch_array($device_query)) {
   if( devicepermitted($device['device_id']) ) {
-    $device['uptime'] = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] ."' AND `attrib_type` = 'uptime'"), 0);
+#    $device['uptime'] = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] ."' AND `attrib_type` = 'uptime'"), 0);
     include("includes/hostbox.inc");
   }
 }
