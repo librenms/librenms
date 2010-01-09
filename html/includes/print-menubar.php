@@ -70,7 +70,7 @@ if ($_SESSION['userlevel'] >= '10') {
         <li><a href="services/"><img src='images/16/cog.png' border="0" align="absmiddle" /> All Services </a></li>
 <?php if ($service_alerts) { 
 echo("  <li><hr width=140 /></li>
-        <li><a href='?page=services&status=0'><img src='images/16/cog_error.png' border=0 align=absmiddle /> Alerts ($service_alerts)</a></li>"); 
+        <li><a href='services/?status=0'><img src='images/16/cog_error.png' border=0 align=absmiddle /> Alerts ($service_alerts)</a></li>"); 
 } ?>
 
 <?php
@@ -131,7 +131,7 @@ if ($_SESSION['userlevel'] >= '5') {
 if ($ifbreak) { echo("<li><hr width=140 /></li>"); }
 
 if ($interface_alerts) {
-echo("<li><a href='?page=interfaces&status=0'><img src='images/16/link_error.png' border=0 align=absmiddle /> Alerts ($interface_alerts)</a></li>");
+echo("<li><a href='interfaces/?status=0'><img src='images/16/link_error.png' border=0 align=absmiddle /> Alerts ($interface_alerts)</a></li>");
 }
 
 ?>
@@ -189,7 +189,7 @@ echo('        <li><hr /></li>
     <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
         <li><hr width="140" /></li>
-        <li><a href="?page=statistics"><img src="images/16/report.png" border="0" align="absmiddle" /> Statistics</a></li>
+        <li><a href="/statistics/"><img src="images/16/report.png" border="0" align="absmiddle" /> Statistics</a></li>
         <li><hr width="140" /></li>
 	<li><a href="?page=adduser"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
         <li><a href="?page=deluser"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
