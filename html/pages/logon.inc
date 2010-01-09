@@ -1,11 +1,4 @@
-<div style="margin:auto; text-align: center; margin-top: 20px; max-width:420px">
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class="roundedfg" style="padding-left:10px;">
+<?php print_optionbar_start(175,420); ?>
     <div style="margin: auto; width:350px; padding:5px;">
       <table  border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -39,16 +32,10 @@ if($auth_message) {
         </tr>
       </table>
     </div>
-  </div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='unded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-
 <?php
+
+print_optionbar_end();
+
 if($config['login_message']) {
   echo('<div style="margin: auto; margin-top: 10px;text-align: center; font-weight: bold; color: #cc0000; width: 470px;">'.$config['login_message'].'</div>');
 }
