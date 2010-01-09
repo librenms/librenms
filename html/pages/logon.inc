@@ -1,8 +1,8 @@
 <?php print_optionbar_start(175,420); ?>
     <div style="margin: auto; width:350px; padding:5px;">
-      <table  border="0" cellpadding="0" cellspacing="0">
+      <table border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td width=128><img src="images/password.png"></td>
+          <td width="128"><img src="images/password.png" alt="Login required" /></td>
           <td>
             <form action="<?php echo $_SERVER['REQUEST_URI'] ?>" method="post" name="logonform">
               <h3>Please log in:</h3>
@@ -10,17 +10,18 @@
               <table border="0" align="left">
                 <tr>
                   <td>Username</td>
-                  <td><input type="text" name="username"></td>
+                  <td><input type="text" name="username" /></td>
                 </tr>
                 <tr>
                   <td>Password</td>
-                  <td><input type="password" name="password"></td>
+                  <td><input type="password" name="password" /></td>
                 </tr>
                 <tr>
-                  <td colspan="2" align="right"><input type="checkbox" name="remember">
-                  <font size="2">Remember Me</td>
+                  <td colspan="2" align="right"><input type="checkbox" name="remember" />
+                  <font size="2">Remember Me</font></td>
+                </tr>
                 <tr>
-                  <td colspan=2 align="right"><input name="submit" type="submit" value="Login"></td>
+                  <td colspan="2" align="right"><input name="submit" type="submit" value="Login" /></td>
                 </tr>
 <?php
 if($auth_message) {
@@ -28,7 +29,8 @@ if($auth_message) {
 }
 ?>
             </table>
-          </form></td>
+            </form>
+          </td>
         </tr>
       </table>
     </div>
