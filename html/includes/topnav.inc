@@ -49,39 +49,34 @@ if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['b
 ?>
 
 
-<table cellpadding=2 cellspacing=0 border=0>
-    <?php
-      echo("<tr bgcolor=$devices[bgcolour]><td width=5></td>
+<table cellpadding="2" cellspacing="0" border="0">
+<tr bgcolor="<?php echo $devices[bgcolour] ?>"><td width="5"></td>
             <td>Devices : 
-            </td><td>$devices[count] 
-            </td><td> ( <span class=green>$devices[up] up</span>
-            </td><td><span class=red> $devices[down] down</span>
-            </td><td><span class=black> $devices[ignored] ignored</span> 
-            </td><td><span class=grey> $devices[disabled] disabled</span> ) 
+            </td><td><?php echo $devices['count'] ?>
+            </td><td> ( <span class=green> <?php echo $devices['up'] ?> up</span>
+            </td><td><span class="red"> <?php echo $devices['down'] ?> down</span>
+            </td><td><span class="black"> <?php echo $devices['ignored'] ?> ignored</span> 
+            </td><td><span class="grey"> <?php echo $devices['disabled'] ?> disabled</span> ) 
 
-            </td><td width=5></td>");
-      echo("</tr><tr bgcolor=$interfaces[bgcolour]>");
-      echo("<td width=5></td><td>Interfaces : 
-            </td><td>$interfaces[count]
-            </td><td> ( <span class=green> $interfaces[up] up </span>
-            </td><td><span class=red> $interfaces[down] down </span>
-            </td><td><span class=black> $interfaces[ignored] ignored </span>
-            </td><td><span class=grey> $interfaces[shutdown] shutdown</span> ) 
-            </td><td width=5></td>");
-      echo("</tr><tr bgcolor=$services[bgcolour]>");
-      echo("<td width=5></td><td>Services : 
-	    </td><td>$services[count]
-            </td><td> ( <span class=green>$services[up] up</span>
-            </td><td><span class=red> $services[down] down</span>
-            </td><td><span class=black> $services[ignored] ignored</span> 
-            </td><td><span class=grey> $services[disabled] disabled</span> ) 
-            </td><td width=5></td>");
-      echo("</tr>");
-    ?>
+            </td><td width=5></td>
+      </tr><tr bgcolor="<?php echo $interfaces['bgcolour'] ?>">
+      <td width="5"></td><td>Interfaces : 
+            </td><td><?php echo $interfaces['count'] ?>
+            </td><td> ( <span class=green> <?php echo $interfaces['up'] ?> up </span>
+            </td><td><span class="red"> <?php echo $interfaces['down'] ?> down </span>
+            </td><td><span class="black"> <?php echo $interfaces['ignored'] ?> ignored </span>
+            </td><td><span class="grey"> <?php echo $interfaces['shutdown'] ?> shutdown</span> ) 
+            </td><td width=5></td>
+      </tr><tr bgcolor="<?php echo $services['bgcolour'] ?>">
+      <td width="5"></td><td>Services : 
+	    </td><td><?php echo $services['count'] ?>
+            </td><td> ( <span class=green><?php echo $services['up'] ?> up</span>
+            </td><td><span class="red"> <?php echo $services['down'] ?> down</span>
+            </td><td><span class="black"> <?php echo $services['ignored'] ?> ignored</span> 
+            </td><td><span class="grey"> <?php echo $services['disabled'] ?> disabled</span> ) 
+            </td><td width="5"></td>
+      </tr>
     </td>
   </tr>
   <tr>
-    <td align=left>
-    </td>
-  </tr>
 </table>

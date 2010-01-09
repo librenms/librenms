@@ -3,8 +3,8 @@
 function generate_front_box ($type, $content) {
  echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
   <b class='box-".$type."'>
-  <b class='box-".$type."1'><b></b></b>
-  <b class='box-".$type."2'><b></b></b>
+  <b class='box-".$type."1'></b>
+  <b class='box-".$type."2'></b>
   <b class='box-".$type."3'></b>
   <b class='box-".$type."4'></b>
   <b class='box-".$type."5'></b></b>
@@ -15,8 +15,8 @@ function generate_front_box ($type, $content) {
   <b class='box-".$type."5'></b>
   <b class='box-".$type."4'></b>
   <b class='box-".$type."3'></b>
-  <b class='box-".$type."2'><b></b></b>
-  <b class='box-".$type."1'><b></b></b></b>
+  <b class='box-".$type."2'></b>
+  <b class='box-".$type."1'></b></b>
  </div>");
 }
 

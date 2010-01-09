@@ -36,10 +36,11 @@ if($debug) {
 <?php
   if($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$config['page_refresh']."'>"); }
 ?>
-  <link href="<?php  echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css">
+  <link href="<?php  echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
   <link rel="shortcut icon" href="<?php  echo($config['favicon']);  ?>" />
-  <link rel="stylesheet" href="css/mktree.css" type="text/css">
+  <link rel="stylesheet" href="css/mktree.css" type="text/css" />
 </head>
+<body topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0">
 <script type="text/javascript" src="js/mktree.js"></script>
 <SCRIPT LANGUAGE="JavaScript">
 <!-- Begin
@@ -51,7 +52,6 @@ function popUp(URL) {
 // End -->
 </script>
 <script type="text/javascript" src="js/overlib.js"></script>
-<body topmargin=0 leftmargin=0 rightmargin=0 bottommargin=0>
 <div id="center">
 <div id="top" style="background: <?php echo($config['header_color']); ?>;">
 <table cellpadding="0" cellspacing="0" width="100%">
