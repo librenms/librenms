@@ -340,13 +340,13 @@ global $config;
 $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
 $data = mysql_fetch_array(mysql_query($sql));
 $type = strtolower($data['os']);
-  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png'>";
-  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif'>"; }
+  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png' />";
+  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif' />"; }
   if($type == "linux") {
     $features = strtolower(trim($data['features']));
     list($distro) = split(" ", $features);
-    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".png'>";
-    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".gif'>"; }
+    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".png' />";
+    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".gif' />"; }
   }
   return $image;
 }
