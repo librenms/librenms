@@ -42,17 +42,8 @@ function dhtml_response_list(&$items, $method) {
 	print("</response>");
 }
 
+print_optionbar_start();
 
-echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
-");
     $plugins = collectd_list_plugins($device['hostname']);
     foreach ($plugins as &$plugin) {
        if(!$_GET['opta']) { $_GET['opta'] = $plugin; }
@@ -64,16 +55,7 @@ echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-botto
     }
     unset ($sep);
 
-echo("</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>");
-
+print_optionbar_end();
 
     $pinsts = collectd_list_pinsts($device['hostname'], $_GET['opta']);
     foreach ($pinsts as &$instance) {
