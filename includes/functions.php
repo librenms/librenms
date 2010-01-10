@@ -733,7 +733,7 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
 
 function get_astext($asn)
 {
-  global $config;
+  global $config,$cache;
 
   if (isset($config['astext'][$asn]))
   {
@@ -741,9 +741,17 @@ function get_astext($asn)
   }
   else
   {
-    $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
-    $txt = explode('|',$result[0]['txt']);
-    return trim(str_replace('"', '', $txt[4]));
+    if (isset($cache['astext'][$asn]))
+    {
+      return $cache['astext'][$asn];
+    }
+    else
+    {
+      $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
+      $txt = explode('|',$result[0]['txt']);
+      $cache['astext'][$asn] = $txt[4];
+      return trim(str_replace('"', '', $txt[4]));
+    }
   }
 }
 
