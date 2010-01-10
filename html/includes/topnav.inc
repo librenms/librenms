@@ -85,5 +85,4 @@ if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['b
     <td> ) </td>
     <td width="5"></td>
   </tr>
-  <tr>
 </table>

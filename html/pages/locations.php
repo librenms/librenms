@@ -1,5 +1,5 @@
 <?php
-echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
+echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">');
 
 if($_SESSION['userlevel'] == '10') {
   $sql = "SELECT `location` FROM `devices` GROUP BY `location` ORDER BY `location`";
@@ -27,21 +27,18 @@ while($device = mysql_fetch_array($device_query)) {
      $hostalerts = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices AS D, devices_perms AS P WHERE location = '" . $device['location'] . "' AND status = '0'"),0); 
    }
 
-   if($hostalerts) { $alert = "<img src='images/16/flag_red.png'>"; } else { $alert = ""; }
+   if($hostalerts) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
 
-   $loc = $device[location];
-
-   if($loc != "") { 
-     echo("<table border=0 cellspacing=0 cellpadding=7 class=devicetable width=100%>
-           <tr bgcolor='$bg'>
-             <td class=interface width=300><a class='list-bold' href='?page=devices&location=$device[location]'>$loc</a></td>
-             <td width='100'>$alert</td>
-             <td width='100'>$num devices</td>
-             <td width='100'>$net network</td>
-	     <td width='100'>$srv servers</td>
-             <td width='100'>$fwl firewalls</td>
+   if($device['location'] != "") { 
+     echo('      <tr bgcolor="' . $bg . '">
+             <td class="interface" width="300"><a class="list-bold" href="?page=devices&amp;location=' . urlencode($device['location']) . '">' . $device['location'] . '</a></td>
+             <td width="100">' . $alert . '</td>
+             <td width="100">' . $num . ' devices</td>
+             <td width="100">' . $net . ' network</td>
+	     <td width="100">' . $srv . ' servers</td>
+             <td width="100">' . $fwl . ' firewalls</td>
            </tr>
-         ");
+         ');
 
     $done = "yes";
   }
