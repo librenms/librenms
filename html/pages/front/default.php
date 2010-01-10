@@ -48,7 +48,7 @@ while($interface = mysql_fetch_array($sql)){
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
 <!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
       <strong>".generateiflink($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
-      <span class=body-date-1>".truncate($interface['ifAlias'], 20, '')."</span>
+      " . ($interface['ifAlias'] ? '<span class="body-date-1">'.truncate($interface['ifAlias'], 20, '').'</span>' : '') . "
       </center>");
 
 }

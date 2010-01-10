@@ -483,9 +483,8 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 #content { margin: 0px; text-align: left; padding: 0px; }
 
 #footer {
+    text-align: center;
     width: 100%; height: 40px;
-    border: 1px none #ccc; 
-    margin: 0px  0px 0px 0px; padding: 0px 0px 8px 0px;
 }
 
 #copyright { margin: 0px 12px 0px 11px; padding: 2px 0px; border-top: 1px solid #ddd; font-size: 8pt; }

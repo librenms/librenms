@@ -289,13 +289,13 @@ function generateiflink($interface, $text=0,$type)
   if($type) { $interface['graph_type'] = $type; }
   if(!$interface['graph_type']) { $interface['graph_type'] = 'port_bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&from=$day&to=$now&width=400&height=100&type=" . $interface['graph_type'];
-  $graph_url_month = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&from=$month&to=$now&width=400&height=100&type=" . $interface['graph_type'];
+  $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$day&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
+  $graph_url_month = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$month&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
   $device_id = getifhost($interface['interface_id']);
   $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
   $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['label']) . "</span>";
-  if($interface['ifAlias']) { $link .= "<br />" . $interface['ifAlias']; }
+  if($interface['ifAlias']) { $link .= "<br />" . htmlentities($interface['ifAlias']); }
   $link .= "' ";
   $link .= $config['overlib_defaults'].");\" onmouseout=\"return nd();\" >$text</a>";
 
@@ -309,18 +309,18 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   if(!$end) { $end = $now; }
   $class = devclass($device);
   if(!$text) { $text = $device['hostname']; }
-  $graph_url = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=device_cpu";
-  $graph_url_b = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&from=$start&to=$end&width=400&height=120&type=device_memory";
+  $graph_url = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=device_cpu";
+  $graph_url_b = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=device_memory";
   $link  = "<a class=$class href='".$config['base_url']."/device/" . $device['device_id'] . "/' ";
-  $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU & Memory Usage</div>";
-  $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_b\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">$text</a>";
+  $link .= "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - CPU &amp; Memory Usage</div>";
+  $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_b\'>'".$config['overlib_defaults'].", LEFT);\" onmouseout=\"return nd();\">" . htmlentities($text) . "</a>";
   return $link;
 }
 
 
 function device_traffic_image($device, $width, $height, $from, $to) 
 {
-  return "<img src='graph.php?device=" . $device . "&type=device_bits&from=" . $from . "&to=" . $to . "&width=" . $width . "&height=" . $height . "&legend=no' />";
+  return "<img src='graph.php?device=" . $device . "&amp;type=device_bits&amp;from=" . $from . "&amp;to=" . $to . "&amp;width=" . $width . "&amp;height=" . $height . "&amp;legend=no' />";
 }
 
 function devclass($device) 
