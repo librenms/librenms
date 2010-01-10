@@ -2,6 +2,8 @@
 
    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=2 width=100%>");
 
+   echo '<tr style="height: 30px"><th></th><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
+
    $i = "1";
 
    if($_GET['opta'] == "alerts") {
@@ -16,7 +18,7 @@
    $peer_query = mysql_query("select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id $where ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier");
    while($peer = mysql_fetch_array($peer_query)) {
 
-     if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+     if(!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
 
      if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; if ($_GET['opta'] != "alerts") { $bg_colour = "#ffcccc"; } }
      if($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
