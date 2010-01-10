@@ -40,52 +40,54 @@
     if(!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
     list(,$ifIndex) = explode(".", $ifIndex);
 
-    if ($entPhysicalVendorTypes[$entPhysicalVendorType] && !$entPhysicalModelName) {
+    if ($entPhysicalVendorTypes[$entPhysicalVendorType] && !$entPhysicalModelName)
+    {
       $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     } 
 
-    $entPhysical_id = @mysql_result(mysql_query("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0);
+    if ($entPhysicalDescr || $entPhysicalName)
+    {
+      $entPhysical_id = @mysql_result(mysql_query("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0);
 
-    if($entPhysical_id) {
-      $sql =  "UPDATE `entPhysical` SET `ifIndex` = '$ifIndex'";
-      $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
-      $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
-      $sql .= ", entPhysicalMfgName = '$entPhysicalMfgName', entPhysicalParentRelPos = '$entPhysicalParentRelPos', entPhysicalVendorType = '$entPhysicalVendorType'";
-      $sql .= ", entPhysicalHardwareRev = '$entPhysicalHardwareRev', entPhysicalFirmwareRev = '$entPhysicalFirmwareRev', entPhysicalSoftwareRev = '$entPhysicalSoftwareRev'";
-      $sql .= ", entPhysicalIsFRU = '$entPhysicalIsFRU', entPhysicalAlias = '$entPhysicalAlias', entPhysicalAssetID = '$entPhysicalAssetID'";
-      $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+      if($entPhysical_id) {
+        $sql =  "UPDATE `entPhysical` SET `ifIndex` = '$ifIndex'";
+        $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
+        $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
+        $sql .= ", entPhysicalMfgName = '$entPhysicalMfgName', entPhysicalParentRelPos = '$entPhysicalParentRelPos', entPhysicalVendorType = '$entPhysicalVendorType'";
+        $sql .= ", entPhysicalHardwareRev = '$entPhysicalHardwareRev', entPhysicalFirmwareRev = '$entPhysicalFirmwareRev', entPhysicalSoftwareRev = '$entPhysicalSoftwareRev'";
+        $sql .= ", entPhysicalIsFRU = '$entPhysicalIsFRU', entPhysicalAlias = '$entPhysicalAlias', entPhysicalAssetID = '$entPhysicalAssetID'";
+        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
       
-      mysql_query($sql);
-      echo(".");
-    } else {
-      $sql  = "INSERT INTO `entPhysical` ( `device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `entPhysicalHardwareRev`,`entPhysicalFirmwareRev`,`entPhysicalSoftwareRev`,`entPhysicalIsFRU`,`entPhysicalAlias`,`entPhysicalAssetID`, `ifIndex` ) ";
-      $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$entPhysicalHardwareRev', '$entPhysicalFirmwareRev', '$entPhysicalSoftwareRev', '$entPhysicalIsFRU', '$entPhysicalAlias', '$entPhysicalAssetID', '$ifIndex')";      
-      mysql_query($sql);
-      echo("+");
-    }
-
-    if($entPhysicalClass == "sensor") {
-
-      $entSensorType            = $entry['entSensorType'];
-      $entSensorScale           = $entry['entSensorScale'];
-      $entSensorPrecision       = $entry['entSensorPrecision'];
-      $entSensorValueUpdateRate = $entry['entSensorValueUpdateRate'];
-      $entSensorMeasuredEntity  = $entry['entSensorMeasuredEntity'];
-	
-
-      if($config['allow_entity_sensor'][$entSensorType]) {
-        $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
-        $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
-        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+        mysql_query($sql);
+        echo(".");
       } else {
-        echo("!");
-        $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
-        $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+        $sql  = "INSERT INTO `entPhysical` ( `device_id` , `entPhysicalIndex` , `entPhysicalDescr` , `entPhysicalClass` , `entPhysicalName` , `entPhysicalModelName` , `entPhysicalSerialNum` , `entPhysicalContainedIn`, `entPhysicalMfgName`, `entPhysicalParentRelPos`, `entPhysicalVendorType`, `entPhysicalHardwareRev`,`entPhysicalFirmwareRev`,`entPhysicalSoftwareRev`,`entPhysicalIsFRU`,`entPhysicalAlias`,`entPhysicalAssetID`, `ifIndex` ) ";
+        $sql .= "VALUES ( '" . $device['device_id'] . "', '$entPhysicalIndex', '$entPhysicalDescr', '$entPhysicalClass', '$entPhysicalName', '$entPhysicalModelName', '$entPhysicalSerialNum', '$entPhysicalContainedIn', '$entPhysicalMfgName','$entPhysicalParentRelPos' , '$entPhysicalVendorType', '$entPhysicalHardwareRev', '$entPhysicalFirmwareRev', '$entPhysicalSoftwareRev', '$entPhysicalIsFRU', '$entPhysicalAlias', '$entPhysicalAssetID', '$ifIndex')";      
+        mysql_query($sql);
+        echo("+");
       }
-#      echo("$sql\n");
-      mysql_query($sql);
+
+      if($entPhysicalClass == "sensor")
+      {
+        $entSensorType            = $entry['entSensorType'];
+        $entSensorScale           = $entry['entSensorScale'];
+        $entSensorPrecision       = $entry['entSensorPrecision'];
+        $entSensorValueUpdateRate = $entry['entSensorValueUpdateRate'];
+        $entSensorMeasuredEntity  = $entry['entSensorMeasuredEntity'];
+	
+       if($config['allow_entity_sensor'][$entSensorType]) {
+          $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
+          $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
+          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+        } else {
+          echo("!");
+          $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
+          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+        }
+        mysql_query($sql);
+      }
+      $valid[$entPhysicalIndex] = 1;
     }
-    $valid[$entPhysicalIndex] = 1;
   }
 
  } else { echo("Disabled!"); }
