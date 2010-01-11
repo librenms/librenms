@@ -2,7 +2,7 @@
 
 function snmp_cache_cip($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
@@ -33,7 +33,7 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0) {
 function snmp_cache_ifIndex($device) {
 
 global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $cmd .= "-m IF-MIB ifIndex";
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
@@ -52,7 +52,7 @@ global $config;
 
 function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $poll_oid;
@@ -71,7 +71,7 @@ function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
@@ -90,7 +90,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   global $config, $debug;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
@@ -110,7 +110,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
@@ -132,7 +132,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = $config['snmpbulkwalk'] . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
