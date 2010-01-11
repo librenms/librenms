@@ -68,6 +68,7 @@ CREATE TABLE IF NOT EXISTS `hrDevice` ( `hrDevice_id` int(11) NOT NULL auto_incr
 ALTER TABLE `entPhysical` ADD  `entPhysicalHardwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalName` ,ADD  `entPhysicalFirmwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalHardwareRev` ,ADD  `entPhysicalSoftwareRev` VARCHAR( 16 ) NULL AFTER  `entPhysicalFirmwareRev` ,ADD  `entPhysicalAlias` VARCHAR( 32 ) NULL AFTER  `entPhysicalSoftwareRev` ,ADD  `entPhysicalAssetID` VARCHAR( 32 ) NULL AFTER  `entPhysicalAlias` ,ADD  `entPhysicalIsFRU` VARCHAR( 8 ) NULL AFTER  `entPhysicalAssetID`;
 ALTER TABLE `devices` ADD `last_discovered` timestamp NULL DEFAULT NULL AFTER `last_polled`;
 ALTER TABLE `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
-ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`
-ALTER TABLE `devices` MODIFY `type` varchar(8) DEFAULT "unknown";
-ALTER TABLE `devices` CHANGE `os` `os` VARCHAR( 32 ) NULL DEFAULT NULL 
+ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`;
+ALTER TABLE `devices` MODIFY `type` varchar(8) DEFAULT 'unknown';
+ALTER TABLE `devices` CHANGE `os` `os` VARCHAR( 32 ) NULL DEFAULT NULL;
+
