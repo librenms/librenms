@@ -4,7 +4,7 @@
 
   echo("Interfaces : ");
 
-  $cmd  = $config['snmpbulkwalk'] . " -m IF-MIB -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -m IF-MIB -O nsq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $cmd .= " ifDescr";
   if ($debug) echo("$cmd\n");
   $interfaces = trim(shell_exec($cmd));

@@ -2,7 +2,7 @@
 
 if($device['os_group'] == "ios") { 
   $portifIndex = array();
-  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
+  $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
   #echo("$cmd");
   $portifIndex_output = trim(shell_exec($cmd));
   foreach(explode("\n", $portifIndex_output) as $entry){
