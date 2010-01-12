@@ -45,7 +45,7 @@ while ($test_cpm = mysql_fetch_array($query)) {
   $cpm_index = $test_cmp['cpmCPU_oid'];
   if(!$valid_cpm[$cpm_index]) {
     echo("-");
-    mysql_query("DELETE FROM `cpmCPU` WHERE cpmCPU_id = '" . $test_cmp['cpmCPU_id']; . "'");
+    mysql_query("DELETE FROM `cpmCPU` WHERE cpmCPU_id = '" . $test_cmp['cpmCPU_id'] . "'");
   }
   unset($cpm_index);
 }
