@@ -54,7 +54,7 @@ $config['nets'] =  array ("89.21.224.0/19", "212.9.12.0/24", "212.9.13.0/24");
 ### Your company domain name and specifics
 $config['mydomain'] 	= "jerseytelecom.com";
 $config['page_title']  	= "JT Observer";
-$config['title_image'] 	= "images/observer-logo.jpg";
+$config['title_image']  = "images/observer-logo.gif";
 $config['stylesheet']  	= "css/styles.css";
 $config['mono_font']    = "DejaVuSansMono";
 $config['header_color'] = "#133A7B";
