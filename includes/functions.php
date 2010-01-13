@@ -336,17 +336,17 @@ function devclass($device)
 
 function getImage($host) 
 {
-global $config;
-$sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
-$data = mysql_fetch_array(mysql_query($sql));
-$type = strtolower($data['os']);
-  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$type.png' />";
-  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$type.gif' />"; }
+  global $config;
+  $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
+  $data = mysql_fetch_array(mysql_query($sql));
+  $type = strtolower($data['os']);
+  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
+  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
   if($type == "linux") {
     $features = strtolower(trim($data['features']));
     list($distro) = split(" ", $features);
-    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".png' />";
-    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = "<img src='".$config['base_url']."/images/os/$distro" . ".gif' />"; }
+    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
+    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
   }
   return $image;
 }
@@ -464,27 +464,26 @@ function scanUDP ($host, $port, $timeout)
 
 function humanmedia($media) 
 {
-	array_preg_replace($rewrite_iftype, $media);	
-        return $media;
+  array_preg_replace($rewrite_iftype, $media);	
+  return $media;
 }
 
 function humanspeed($speed) 
 {
-	$speed = formatRates($speed);
-        if($speed == "") { $speed = "-"; }
-	return $speed;
+  $speed = formatRates($speed);
+  if($speed == "") { $speed = "-"; }
+  return $speed;
 }
 
 function netmask2cidr($netmask) 
 {
- list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
- return $cidr;
+  list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
+  return $cidr;
 }
 
 function cidr2netmask() 
 {
-   return (long2ip(ip2long("255.255.255.255")
-           << (32-$netmask)));
+  return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
 }
 
 function formatUptime($diff, $format="long") 
@@ -522,11 +521,10 @@ function isSNMPable($hostname, $community, $snmpver, $port)
      global $config;
      $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
      if($pos == '') {
-       $status='0';
+       return false;
      } else {
-       $status='1';
+       return true;
      }
-     return $status;
 }
 
 function isPingable($hostname) {
@@ -563,18 +561,19 @@ function isValidInterface($if) {
 
 function ifclass($ifOperStatus, $ifAdminStatus) 
 {
-        $ifclass = "interface-upup";
-        if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
-        if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
-        if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
-	return $ifclass;
+  $ifclass = "interface-upup";
+  if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
+  if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
+  if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
+  return $ifclass;
 }
 
-function utime() {
-        $time = explode( " ", microtime());
-        $usec = (double)$time[0];
-        $sec = (double)$time[1];
-        return $sec + $usec;
+function utime() 
+{
+  $time = explode( " ", microtime());
+  $usec = (double)$time[0];
+  $sec = (double)$time[1];
+  return $sec + $usec;
 }
 
 function fixIOSFeatures($features)
@@ -645,14 +644,16 @@ function createHost ($host, $community, $snmpver, $port = 161){
 	}
 }
 
-function isDomainResolves($domain){
-     return gethostbyname($domain) != $domain;
+function isDomainResolves($domain)
+{
+  return gethostbyname($domain) != $domain;
 }
 
-function hoststatus($id) {
-    $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
-    $result = @mysql_result($sql, 0);
-    return $result;
+function hoststatus($id) 
+{
+  $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
+  $result = @mysql_result($sql, 0);
+  return $result;
 }
 
 function match_network ($nets, $ip, $first=false) {
@@ -760,6 +761,14 @@ function eventlog($eventtext,$device_id = "", $interface_id = "")
   $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
   $event_query .= ", " . ($interface_id ? $interface_id : "NULL") . ", NOW(), '" . mysql_escape_string($eventtext) . "')";
   mysql_query($event_query);
+}
+
+function notify($device,$title,$message)
+{
+  global $config;
+
+  if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+  mail($email, $title, $message, $config['email_headers']);
 }
                                                                                                                                 
 ?>

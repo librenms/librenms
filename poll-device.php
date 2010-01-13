@@ -157,8 +157,7 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($uptime) 
   {
     if ( $uptime < $device['uptime'] ) {
-      if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-      mail($email, "Device Rebooted: " . $device['hostname'], "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.", $config['email_headers']);
+      notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
       eventlog('Device rebooted', $device['device_id']);
     }
 
