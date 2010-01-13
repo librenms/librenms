@@ -80,6 +80,8 @@ while ($device = mysql_fetch_array($device_query)) {
   ## CDP & LLDP
   include("includes/discovery/cdp-lldp.inc.php");
 
+  ## ARP Table
+  include("includes/discovery/arp-table.php");
 
   if($device['os'] == "netscreen") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
