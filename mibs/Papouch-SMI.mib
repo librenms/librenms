@@ -1,0 +1,61 @@
+--*********************************
+--  Papouch-SMI.txt: PaPouch s.r.o Enterprise
+--  Structure of Management Information
+--
+--  April 2004 Steiger Miroslav
+--  Copyringht (c) 2004 by PaPouch s.r.o
+
+--*********************************
+
+Papouch-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+        	FROM SNMPv2-SMI;
+
+papouchProjekt MODULE-IDENTITY
+	LAST-UPDATED "200604070000Z"
+        ORGANIZATION "PaPouch s.r.o"
+        CONTACT-INFO
+
+		" PaPouch s.r.o
+		  Software development
+		  E-mail: steiger@papouch.com"
+
+        DESCRIPTION
+
+		"The Structure of Management Information for
+		 the PaPouch elektronika enterprise"
+	REVISION	"200604070000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= {enterprises 18248}
+
+tme OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"."
+	::= { papouchProjekt 1 }
+
+quido OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"."
+	::= { papouchProjekt 2 } 
+
+eccitace OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"."
+	::= { papouchProjekt 3 }
+
+e_monitor OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"."
+	::= { papouchProjekt 4 }
+	
+END
+

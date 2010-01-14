@@ -1,0 +1,77 @@
+--*********************************
+-- Quido.txt: MIB corespording to QUIDOSNMP_10.C
+--
+--
+-- April 2006 Steiger Miroslav
+-- Copyringht (c) 2006 by PaPouch elektronika
+
+--*********************************
+
+TMESNMP2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	IpAddress
+		FROM SNMPv2-SMI  
+	DisplayString
+		FROM SNMPv2-TC
+        tme
+		FROM Papouch-SMI;
+
+
+vars          OBJECT IDENTIFIER ::= { tme 1 }
+traps         OBJECT IDENTIFIER ::= { tme 2 }
+
+int_temperature OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "temperature integer value/10"
+			::= { vars 1 } 
+			
+string_temperature OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "temperature as string"
+			::= { vars 2 } 
+device_name OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "device name the SNMP Agent"
+			::= { vars 3 } 
+
+int_temperature_t OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "trap object the temperature at integer value/10 "
+			::= { traps 1 } 
+			
+string_temperature_t OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "trap object the temperature at string"
+			::= { traps 2 } 
+device_name_t OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "trap object device name the SNMP Agent"
+			::= { traps 3 } 
+
+warning_t OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION "trap object temperature exceeded lower or upper limit "
+			::= { traps 4 } 
+			
+END
+
+
+
