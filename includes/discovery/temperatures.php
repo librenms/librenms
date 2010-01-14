@@ -8,7 +8,7 @@
   echo("Temperatures : ");
 
   ## JunOS Temperatures
-  if($device['os'] == "JunOS") {
+  if($device['os'] == "junos") {
     echo("JunOS ");
     $oids = shell_exec($config['snmpwalk'] . " -m JUNIPER-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.2636.3.1.13.1.7");
     $oids = trim($oids);
@@ -22,7 +22,6 @@
       $descr = trim(shell_exec($config['snmpget'] . " -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
       $temp = trim(shell_exec($config['snmpget'] . " -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid"));
       if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") {
-        $descr = shell_exec($config['snmpget'] . " -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid");
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
@@ -35,6 +34,24 @@
         $temp_exists[] = "$id $temp_oid";
       }
      }
+    }
+  }
+
+  ## Papouch TME Temperatures
+  if($device['os'] == "papouch-tme") {
+    echo("Papouch TME ");
+    $descr = trim(shell_exec($config['snmpget'] . " -m TMESNMP2-MIB -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));
+    $temp = trim(shell_exec($config['snmpget'] . " -m TMESNMP2-MIB -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.2.0"));
+    if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") 
+    {
+      $descr = trim(str_replace("\"", "", $descr));
+      if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
+      {
+        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`) values ('$id', '$temp_oid', '$descr')";
+        mysql_query($query);
+        echo("+");
+      } else { echo("."); }
+      $temp_exists[] = "$id $temp_oid";
     }
   }
 
