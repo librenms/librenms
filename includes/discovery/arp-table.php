@@ -3,7 +3,7 @@
 
   echo("ARP Table : ");
 
-  $ipNetToMedia_data = shell_exec($config['snmpbulkwalk'] . " -m IP-MIB -Oq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipNetToMediaPhysAddress");
+  $ipNetToMedia_data = shell_exec(($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -m IP-MIB -Oq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." ipNetToMediaPhysAddress");
   $ipNetToMedia_data = str_replace("ipNetToMediaPhysAddress.", "", trim($ipNetToMedia_data));
   $ipNetToMedia_data = str_replace("IP-MIB::", "", trim($ipNetToMedia_data));
   #echo("$ipNetToMedia_data\n");
