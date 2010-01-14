@@ -40,8 +40,8 @@
   ## Papouch TME Temperatures
   if($device['os'] == "papouch-tme") {
     echo("Papouch TME ");
-    $descr = trim(shell_exec($config['snmpget'] . " -m TMESNMP2-MIB -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));
-    $temp = trim(shell_exec($config['snmpget'] . " -m TMESNMP2-MIB -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.2.0"));
+    $descr = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));
+    $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.2.0"));
     if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") 
     {
       $descr = trim(str_replace("\"", "", $descr));

@@ -42,9 +42,6 @@ while($temperature = mysql_fetch_array($temp_data)) {
   }
 
   mysql_query("UPDATE temperature SET temp_current = '$temp' WHERE temp_id = '$temperature[temp_id]'");
-
-  
-
 }
 
 ?>
