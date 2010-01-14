@@ -3,7 +3,7 @@
 $sql = "SELECT * FROM ipv4_mac WHERE interface_id = '".$interface['interface_id']."'";
 $query = mysql_query($sql);
 
-echo("<table border=0 cellspacing=0 cellpadding=5 width=100%>");
+echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
 $i = "1";
 
 while($arp = mysql_fetch_array($query)) {
@@ -16,16 +16,16 @@ while($arp = mysql_fetch_array($query)) {
   if($arp_host['device_id'] == $device['device_id']) { $arp_name = "Localhost"; }
   if($arp_host['interface_id'] == $arp['interface_id']) { $arp_if = "Local Port"; }
 
-  echo("
-  <tr bgcolor=$bg_colour>
-    <td width=160>".formatmac($arp['mac_address'])."</td>
-    <td width=140>".$arp['ipv4_address']."</td>
-    <td width=200>$arp_name</td>
+  echo('
+  <tr bgcolor="' . $bg_colour .'">
+    <td width="160">'.formatmac($arp['mac_address']).'</td>
+    <td width="140">'.$arp['ipv4_address'].'</td>
+    <td width="200">'.$arp_name;'</td>
     <td>$arp_if</td>
-  </tr>");
+  </tr>');
   $i++;
 }
 
-echo("</table>");
+echo('</table>');
 
 ?>
