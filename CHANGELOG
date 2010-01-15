@@ -1,10 +1,18 @@
-Release 0.7 ( Pre-Release )
+Release 0.10 ( Pre-Release )
 
 Changed netstats (icmp, udp, tcp, snmp, ip) stats collection
 Implemented new includes-based graphing system
 Replaced interfaces polling code
 
-Removed or replaced a lot of old and unused code.
+Removed, cleaned up or replaced a lot of old and unused code.
+
+Added support for ipv6 BGP sessions on JunOS
+Added support for Dell Powerconnect and HP Procurve switches
+Added support for Supermicro SuperoDoctor temperature support
+Added support for LLDP discovery
+Added support for Q-BRIDGE-MIB VLANs (basically for non-cisco HW)
+
+And more...
 
 Release 0.6.0 ( 28th August 2009 )
 
