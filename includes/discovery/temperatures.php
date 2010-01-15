@@ -41,13 +41,13 @@
   if($device['os'] == "papouch-tme") {
     echo("Papouch TME ");
     $descr = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));
-    $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.2.0"));
+    $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.1.0"));
     if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") 
     {
       $descr = trim(str_replace("\"", "", $descr));
       if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`) values ('$id', '$temp_oid', '$descr')";
+        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_tenths`) values ('$id', '$temp_oid', '$descr',1)";
         mysql_query($query);
         echo("+");
       } else { echo("."); }
@@ -56,7 +56,7 @@
   }
 
   ## Begin Observer-Style
-  if($device['os'] == "Linux") {
+  if($device['os'] == "linux") {
     echo("Observer-Style ");
     $oids = shell_exec($config['snmpwalk'] . " -$snmpver -m SNMPv2-SMI -Osqn -CI -c $community $hostname:$port .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep '.1.1 ' | grep -v '.101.' | cut -d'.' -f 1");
     $oids = trim($oids);
@@ -81,7 +81,7 @@
   } ## End Observer-Style
 
   ## Dell Temperatures
-  if(strstr($device['hardware'], "Dell")) {
+  if(strstr($device['hardware'], "dell")) {
     echo("Dell OMSA ");
     $oids = shell_exec($config['snmpwalk'] . " -m MIB-Dell-10892 -$snmpver -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8");
     $oids = trim($oids);
