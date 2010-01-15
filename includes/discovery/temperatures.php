@@ -51,7 +51,12 @@
         $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_tenths`) values ('$id', '$temp_oid', '$descr',1)";
         mysql_query($query);
         echo("+");
-      } else { echo("."); }
+      } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
+        echo("U");
+        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+      } else {
+        echo(".");
+      }
       $temp_exists[] = "$id $temp_oid";
     }
   }
