@@ -44,6 +44,7 @@
     $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.1.0"));
     if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") 
     {
+      $temp_oid = "SNMPv2-SMI::enterprises.18248.1.1.1.0";
       $descr = trim(str_replace("\"", "", $descr));
       if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
       {
