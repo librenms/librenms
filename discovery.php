@@ -38,8 +38,27 @@ if(!$where) {
   exit;
  }
 
-echo("Applying database updates...\n");
-shell_exec("scripts/update-sql.php database-update.sql");
+if (file_exists('.svn'))
+{
+  list(,$dbu_rev) = split(': ',@shell_exec('svn info database-update.sql|grep ^Revision'));
+
+  $device_query = mysql_query("SELECT revision FROM `dbSchema`");
+  if ($rev = @mysql_fetch_array($device_query)) 
+  {
+    $db_rev = $rev['revision'];
+  } 
+  else 
+  { 
+    $db_rev = 0;
+  }
+
+  if ($dbu_rev+0 > $db_rev)
+  {
+    echo("Applying database updates to from r$db_rev to r" . trim($dbu_rev) . "...\n");
+    shell_exec("scripts/update-sql.php database-update.sql");
+    mysql_query("INSERT INTO dbSchema VALUES ($dbu_rev) ON DUPLICATE KEY UPDATE revision=$dbu_rev");
+  }
+}
 
 if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 
