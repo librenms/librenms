@@ -35,7 +35,7 @@
       if($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; } 
       $ifDescr = fixifName($ifDescr);
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
-      if(!$config['allow_ng']) {
+      if(isset($config['allow_ng']) && !$config['allow_ng']) {
        if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = 1; }
       }
       if ($debug) echo("\n $if ");
@@ -45,7 +45,7 @@
           # Add Interface
            echo("+");
         } else {
-          if($interface['deleted']) {
+          if(isset($interface['deleted']) && $interface['deleted']) {
             mysql_query("UPDATE `interfaces` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
             echo("*"); 
           } else {
@@ -73,7 +73,7 @@
   while ($test_if = mysql_fetch_array($query)) {
         unset($exists);
         $i = 0;
-        while ($i < count($int_exists) && !$exists) {
+        while ($i < count($int_exists) && !isset($exists)) {
             $this_if = $test_if['ifIndex'];
             if ($int_exists[$i] == $this_if) { $exists = 1; }
             $i++;

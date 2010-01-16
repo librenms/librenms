@@ -56,11 +56,18 @@ if (file_exists('.svn'))
   {
     echo("Applying database updates to from r$db_rev to r" . trim($dbu_rev) . "...\n");
     shell_exec("scripts/update-sql.php database-update.sql");
-    mysql_query("INSERT INTO dbSchema VALUES ($dbu_rev) ON DUPLICATE KEY UPDATE revision=$dbu_rev");
+    if ($dbrev == 0)
+    {
+      mysql_query("INSERT INTO dbSchema VALUES ($dbu_rev)");
+    }
+    else
+    {
+      mysql_query("UPDATE dbSchema set revision=$dbu_rev");
+    }
   }
 }
 
-if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
+if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; } else { $debug = 0; }
 
 
 $devices_discovered = 0;
@@ -69,7 +76,7 @@ $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where O
 while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
+  if($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
   echo("\n");
 
   ## Discover OS Changes

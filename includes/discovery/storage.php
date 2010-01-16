@@ -37,7 +37,7 @@
 	  mysql_query($query);
         } else { echo("."); }
       }
-      $storage_exists[] = $device[device_id]." $hrStorageIndex";
+      $storage_exists[] = $device['device_id']." $hrStorageIndex";
     } else { echo("X"); };
    }
   }
@@ -48,7 +48,7 @@ $query = mysql_query($sql);
 while ($store = mysql_fetch_array($query)) {
         unset($exists);
         $i = 0;
-        while ($i < count($storage_exists) && !$exists) {
+        while ($i < count($storage_exists) && !isset($exists)) {
             $thisstore = $store['host_id'] . " " . $store['hrStorageIndex'];
             if ($storage_exists[$i] == $thisstore) { $exists = 1; }
             $i++;
