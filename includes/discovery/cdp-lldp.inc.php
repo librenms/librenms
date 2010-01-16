@@ -5,8 +5,8 @@ $community = $device['community'];
 echo("CISCO-CDP-MIB: ");
    
 unset($cdp_array);
-$cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, $cdp_array, "CISCO-CDP-MIB");
-$cdp_array = $cdp_array[$device[device_id]];
+$cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, array(), "CISCO-CDP-MIB");
+$cdp_array = $cdp_array[$device['device_id']];
 if($cdp_array) {
   unset($cdp_links);
   foreach( array_keys($cdp_array) as $key) { 
@@ -29,7 +29,7 @@ if($debug) {echo("$cdp_links");}
 echo("\nLLDP-MIB: ");
 
 unset($lldp_array);
-$lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, $lldp_array, "LLDP-MIB");
+$lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, array(), "LLDP-MIB");
 $lldp_array = $lldp_array[$device['device_id']];
 if($lldp_array) {
   unset($lldp_links);
@@ -53,7 +53,7 @@ if($lldp_array) {
 }
 if($debug) {echo("$lldp_links");}
 
-$discovered_links = $cdp_links . $lldp_links;
+$discovered_links = (isset($cdp_links) ? $cdp_links : '') . (isset($lldp_links) ? $lldp_links : '');
 
 echo "\n";
 

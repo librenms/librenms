@@ -10,9 +10,9 @@
   $entity_array = snmpwalk_cache_oid("entPhysicalEntry", $device, $empty, "ENTITY-MIB");
   $entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
 
-  if(!$entity_array[$device[device_id]]) { $entity_array[$device[device_id]] = array(); }
+  if(!$entity_array[$device['device_id']]) { $entity_array[$device['device_id']] = array(); }
 
-  foreach($entity_array[$device[device_id]] as $entPhysicalIndex => $entry) {
+  foreach($entity_array[$device['device_id']] as $entPhysicalIndex => $entry) {
 
     $entPhysicalDescr		= $entry['entPhysicalDescr'];
     $entPhysicalContainedIn	= $entry['entPhysicalContainedIn'];
