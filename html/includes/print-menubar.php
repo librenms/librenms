@@ -27,11 +27,11 @@
         <table><tr><td>
         <ul>
         <li><a href="overview/"><img src="images/16/zoom.png" border="0" align="absmiddle" /> Overview</a></li>
-        <?php if ($config['enable_map']) {
+        <?php if (isset($config['enable_map']) && $config['enable_map']) {
           echo('<li><a href="map/"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
         } ?>
         <li><a href="eventlog/"><img src="images/16/report.png" border="0" align="absmiddle" /> Eventlog</a></li>
-	<?php if ($config['enable_syslog']) {
+	<?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
   	  echo('<li><a href="syslog/"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
 	} ?>
 <!--        <li><a href="alerts/"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
@@ -127,7 +127,7 @@ if ($_SESSION['userlevel'] >= '5') {##FIXME html
 
 if ($ifbreak) { echo('<li><hr width="140" /></li>'); }
 
-if ($interface_alerts) {
+if (isset($interface_alerts)) {
 echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
