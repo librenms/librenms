@@ -48,7 +48,7 @@
       $descr = trim(str_replace("\"", "", $descr));
       if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_tenths`) values ('$id', '$temp_oid', '$descr',1)";
+        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`) values ('$id', '$temp_oid', '$descr',10)";
         mysql_query($query);
         echo("+");
       } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
@@ -63,9 +63,9 @@
 
   ## Begin Observer-Style
   if($device['os'] == "linux") {
-    echo("Observer-Style ");
     $oids = shell_exec($config['snmpwalk'] . " -$snmpver -m SNMPv2-SMI -Osqn -CI -c $community $hostname:$port .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep '.1.1 ' | grep -v '.101.' | cut -d'.' -f 1");
     $oids = trim($oids);
+    if ($oids) echo("Observer-Style ");
     foreach(explode("\n",$oids) as $oid) {
       $oid = trim($oid);
       if($oid != "") {
@@ -88,9 +88,9 @@
 
   ## Dell Temperatures
   if(strstr($device['hardware'], "dell")) {
-    echo("Dell OMSA ");
     $oids = shell_exec($config['snmpwalk'] . " -m MIB-Dell-10892 -$snmpver -CI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8");
     $oids = trim($oids);
+    if ($oids) echo("Dell OMSA ");
     foreach(explode("\n",$oids) as $oid) {
       $oid = substr(trim($oid), 36);
       list($oid) = explode(" ", $oid);
@@ -99,7 +99,7 @@
         $descr = trim(str_replace("\"", "", shell_exec($descr_query)));
         $fulloid = ".1.3.6.1.4.1.674.10892.1.700.20.1.6.$oid";
         if(!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0)) {
-          mysql_query("INSERT INTO `temperature` (`temp_host`,`temp_oid`,`temp_descr`, `temp_tenths`) VALUES ('$id', '$fulloid', '$descr', '1');");
+          mysql_query("INSERT INTO `temperature` (`temp_host`,`temp_oid`,`temp_descr`, `temp_precision`) VALUES ('$id', '$fulloid', '$descr', '10');");
 	  echo("+");
         } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0) != $descr) {
           mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'");
@@ -112,6 +112,39 @@
       }
     } 
   }## End Dell Sensors
+
+  ## LMSensors Temperatures
+  if($device['os'] == "linux") {
+    $oids = shell_exec($config['snmpwalk'] . " -m LM-SENSORS-MIB -$snmpver -CI -Osqn -c $community $hostname:$port lmTempSensorsDevice");
+    $oids = trim($oids);
+    if ($oids) echo("LM-SENSORS ");
+    foreach(explode("\n", $oids) as $data) {
+      $data = trim($data);
+      if($data) {
+        list($oid,$descr) = explode(" ", $data);
+        if (substr($descr,0,5) == "temp-")
+        {
+          $split_oid = explode('.',$oid);
+          $temp_id = $split_oid[count($split_oid)-1];
+          $temp_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temp_id";
+          $temp  = shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid");
+          $descr = str_ireplace("temp-", "", $descr);
+          $descr = trim($descr);
+          if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') {
+            $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`) values ('$id', '$temp_oid', '$descr',1000)";
+            mysql_query($query);
+            echo("+");
+          } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
+            echo("U");
+            mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+          } else {
+            echo("."); 
+          } 
+          $temp_exists[] = "$id $temp_oid";
+        }
+      }
+    }
+  } ## End LMSensors Temperatures
 
   ## Supermicro Temperatures
   if($device['os'] == "linux") {

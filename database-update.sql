@@ -71,4 +71,6 @@ ALTER TABLE `devices` CHANGE  `lastchange`  `uptime` BIGINT NULL DEFAULT NULL;
 ALTER TABLE `storage` ADD `hrStorageType` VARCHAR( 32 ) NULL DEFAULT NULL AFTER `hrStorageIndex`;
 ALTER TABLE `devices` MODIFY `type` varchar(8) DEFAULT 'unknown';
 ALTER TABLE `devices` CHANGE `os` `os` VARCHAR( 32 ) NULL DEFAULT NULL;
-
+ALTER TABLE `temperature` ADD `temp_precision` INT(11) NULL DEFAULT '1';
+UPDATE temperature SET temp_precision=10 WHERE temp_tenths=1;
+ALTER TABLE `temperature` DROP `temp_tenths`;

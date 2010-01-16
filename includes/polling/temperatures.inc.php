@@ -25,6 +25,10 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   $temp = trim(str_replace("\"", "", $temp));
   if($temperature['temp_tenths']) { $temp = $temp / 10; }
+  else
+  {
+    if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
+  }
 
   echo($temp . "C\n");
 
