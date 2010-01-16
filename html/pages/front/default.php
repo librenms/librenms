@@ -92,7 +92,7 @@ while($device = mysql_fetch_array($sql)){
 
 }
 
-if($config['frontpage_display'] == 'syslog') {
+if($config['enable_syslog']) {
 
   ## Open Syslog Div
   echo("<div style='margin: 4px; clear: both; padding: 5px;'>  
