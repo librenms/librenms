@@ -1,7 +1,7 @@
 
 <?php
 
-if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
+if(isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
   $hostname = gethostbyid($entry['host']);
 
@@ -16,7 +16,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     <td class="syslog" width="160">
       ' . $entry['datetime'] . '
     </td>');
-  if(!$_GET[id] && !$overview) {
+  if(!isset($_GET['id']) && (!isset($overview) || $overview == 0)) {
     $dev['device_id'] = $entry['host'];
     $dev['hostname'] = $hostname;
     echo("<td class=list-bold width=150>

@@ -82,7 +82,7 @@ function popUp(URL) {
         $data = trim(shell_exec("cat " . $config['install_dir'] . "/rrd/version.txt"));
               
         list($major, $minor, $release) = explode(".", $data);
-                list($cur, $tag) = explode("-", $config['version']);
+                if (strstr('-',$config['version'])) { list($cur, $tag) = explode("-", $config['version']); } else { $cur = $config['version']; }
                 list($cur_major, $cur_minor, $cur_release) = explode(".", $cur);
 
                 if($major > $cur_major) {
@@ -118,7 +118,7 @@ function popUp(URL) {
   if($_SESSION['authenticated']) {
     include("includes/warn-deleted-interfaces.inc.php");
     ## Authenticated. Print a page.
-    if($_GET['page'] && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
+    if(isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
     } else { 
       if($config['front_page']) {

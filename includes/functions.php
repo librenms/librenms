@@ -72,19 +72,13 @@ function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
 }
 
 function shorthost($hostname, $len=16) {
-  list ($first, $second, $third, $fourth, $fifth) = explode(".", $hostname);
-  $shorthost = $first;
-  if(strlen($first.".".$second) < $len && $second) { 
-    $shorthost = $first.".".$second; 
-    if(strlen($shorthost.".".$third) < $len && $third) {
-      $shorthost = $shorthost.".".$third;
-      if(strlen($shorthost.".".$fourth) < $len && $fourth) {
-        $shorthost = $shorthost.".".$fourth;
-        if(strlen($shorthost.".".$fifth) < $len && $fifth) {
-          $shorthost = $shorthost.".".$fifth;
-        }
-      }
-    }
+  $parts = explode(".", $hostname);
+  $shorthost = $parts[0];
+  $i=1;
+  while ($i < count($parts) && strlen($shorthost.'.'.$parts[$i]) < $len)
+  {
+    $shorthost = $shorthost.'.'.$parts[$i];
+    $i++;
   }
   return ($shorthost);
 }
@@ -281,12 +275,12 @@ function geteventicon ($message)
   if($icon) { return $icon; } else { return false; }
 }
 
-function generateiflink($interface, $text=0,$type) 
+function generateiflink($interface, $text=0, $type = '') 
 {
   global $twoday; global $now; global $config; global $day; global $month;
   $interface = ifNameDescr($interface);
   if(!$text) { $text = fixIfName($interface['label']); }
-  if($type) { $interface['graph_type'] = $type; }
+  if(isset($type)) { $interface['graph_type'] = $type; }
   if(!$interface['graph_type']) { $interface['graph_type'] = 'port_bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$day&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
@@ -325,10 +319,10 @@ function device_traffic_image($device, $width, $height, $from, $to)
 
 function devclass($device) 
 {
-   if ($device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
-   if ($device['ignore'] == '1') {
+   if (isset($device['status']) && $device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
+   if (isset($device['ignore']) &&$device['ignore'] == '1') {
      $class = "list-device-ignored";
-     if ($device['status'] == '1') { $class = "list-device-ignored-up"; }
+     if (isset($device['status']) && $device['status'] == '1') { $class = "list-device-ignored-up"; }
    }
   return $class;
 }

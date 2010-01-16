@@ -10,7 +10,7 @@ function ifNameDescr ($interface, $device = NULL) {
   global $config;
   if(!$device) { $device = device_array($interface['device_id']); }
   $os = strtolower($device['os']);
-  if($config['ifname'][$os]) {
+  if(isset($config['ifname'][$os])) {
     $interface['label'] = $interface['ifDescr'];
   } else {
     $interface['label'] = $interface['ifName'];
