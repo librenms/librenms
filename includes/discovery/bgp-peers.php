@@ -42,7 +42,7 @@
         list($peer_ip_snmp, $peer_as) = split(" ",  $peer);
 
         # Magic! Basically, takes SNMP form and finds peer IPs from the walk OIDs.
-        $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.',array_slice(explode('.',$peer_ip_snmp),count($ipv6)-16))));
+        $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.',array_slice(explode('.',$peer_ip_snmp),count(explode('.',$peer_ip_snmp))-16))));
       
         if($peer) 
         {
@@ -118,12 +118,12 @@ $query = mysql_query($sql);
 while ($entry = mysql_fetch_array($query)) {
         unset($exists);
         $i = 0;
-        while ($i < count($peerlist) && !$exists) 
+        while ($i < count($peerlist) && !isset($exists)) 
         {
           if ($peerlist[$i]['ip'] == $entry['bgpPeerIdentifier']) { $exists = 1; }
           $i++;
         }
-        if(!$exists) { 
+        if(!isset($exists)) { 
           mysql_query("DELETE FROM bgpPeers WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'"); 
 	  mysql_query("DELETE FROM bgpPeers_cbgp WHERE bgpPeer_id = '" . $entry['bgpPeer_id'] . "'");
           echo("-");

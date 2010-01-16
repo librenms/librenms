@@ -30,7 +30,7 @@ echo("\nLLDP-MIB: ");
 
 unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, $lldp_array, "LLDP-MIB");
-$lldp_array = $lldp_array[$device[device_id]];
+$lldp_array = $lldp_array[$device['device_id']];
 if($lldp_array) {
   unset($lldp_links);
   foreach( array_keys($lldp_array) as $key) { 
