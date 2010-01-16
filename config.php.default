@@ -23,9 +23,10 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap
 
 # LDAP module configuration
 $config['auth_ldap_server'] = "ldap.yourserver.com";
-$config['auth_ldap_port'] = 389;
-$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+$config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
+$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+$config['auth_ldap_group']  = "cn=observer,ou=groups,dc=example,dc=com";
 
 ### Location of executables
 

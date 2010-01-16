@@ -4,7 +4,7 @@
 
 session_start();
 
-if($_GET['logout'] && $_SESSION['authenticated']) {
+if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
   session_destroy();
@@ -14,12 +14,12 @@ if($_GET['logout'] && $_SESSION['authenticated']) {
   $auth_message = "Logged Out";
 }
 
-if($_POST['username'] && $_POST['password']){
+if(isset($_POST['username']) && isset($_POST['password'])){
   $_SESSION['username'] = mres($_POST['username']);
   $_SESSION['password'] = mres($_POST['password']);
 }
 
-if($_COOKIE['username'] && $_COOKIE['password']){
+if(isset($_COOKIE['username']) && isset($_COOKIE['password'])){
   $_SESSION['username'] = mres($_COOKIE['username']);
   $_SESSION['password'] = mres($_COOKIE['password']);
 }
@@ -45,7 +45,17 @@ if ($_SESSION['username'])
     {
       if (ldap_bind($ds, $config['auth_ldap_prefix'] . $_SESSION['username'] . $config['auth_ldap_suffix'], $_SESSION['password']))
       {
-        $auth_success = 1;
+        if (!$config['auth_ldap_group'])
+        {
+          $auth_success = 1;
+        }
+        else
+        { 
+          if (ldap_compare($ds,$config['auth_ldap_group'],'memberUid',$_SESSION['username']))
+          {
+            $auth_success = 1;
+          }
+        }
       }
     }
   }
