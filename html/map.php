@@ -4,18 +4,16 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc");
 
-if ($_GET['device']) { $where = "WHERE device_id = ".$_GET['device']; } else { $where = ""; }
+if (isset($_GET['device'])) { $where = "WHERE device_id = ".$_GET['device']; } else { $where = ""; }
 $deviceresult = mysql_query("SELECT * from devices $where");
 
-if (preg_match("/^[a-z]*$/", $_GET['format']))
+if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 {
 
   $map = "digraph G { sep=0.01; size=\"12,5.5\"; pack=100; bgcolor=transparent; splines=true; overlap=scale; concentrate=0; epsilon=0.001; rankdir=0;
      node [ fontname=\"helvetica\", fontstyle=bold, style=filled, color=white, fillcolor=lightgrey, overlap=false;];
      edge [ bgcolor=white; fontname=\"helvetica\"; fontstyle=bold; arrowhead=dot; arrowtail=dot];
-     graph [bgcolor=transparent;];
-
-";
+     graph [bgcolor=transparent;];\n\n";
 
   if(!$_SESSION['authenticated']) 
   {
@@ -114,5 +112,14 @@ if (preg_match("/^[a-z]*$/", $_GET['format']))
   }
   echo("$img");
 }
-
+else
+{
+  if ($_SESSION['authenticated']) ## FIXME level 10 only?
+  {
+    echo '<center>
+    <object data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml">
+    </object>
+</center>';
+  }
+}
 ?>
