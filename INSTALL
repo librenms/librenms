@@ -38,3 +38,10 @@ Papouch TME
 
 Set your thermometer name (Option 1->0 in the telnet CLI) to the sensor name
 you want displayed in Observer.
+
+Supermicro monitoring
+=====================
+
+On Supermicro motherboards, install Superodoctor on your system and put the
+extend line into your snmpd.conf as instructed to enable SNMP readouts of
+sensor values.
