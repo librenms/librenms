@@ -41,7 +41,7 @@ if (preg_match("/^[a-z]*$/", $_GET['format']))
           $dst_if = $link['dst_if'];
 
           $i = 0; $done = 0;
-          while ($i < count($linkdone)) 
+          while (isset($linkdone) && $i < count($linkdone))
           {
             $thislink = "$dst_if $src_if";
             if ($linkdone[$i] == $thislink) { $done = 1; }
