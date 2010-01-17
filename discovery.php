@@ -56,7 +56,7 @@ if (file_exists('.svn'))
   {
     echo("Applying database updates to from r$db_rev to r" . trim($dbu_rev) . "...\n");
     shell_exec("scripts/update-sql.php database-update.sql");
-    if ($dbrev == 0)
+    if ($db_rev == 0)
     {
       mysql_query("INSERT INTO dbSchema VALUES ($dbu_rev)");
     }
