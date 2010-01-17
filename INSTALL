@@ -3,3 +3,38 @@ Unfortunately this documentation hasn't been written yet.
 Please see http://www.observernms.org for installation instructions.
 
 Please also contact me via adama@memetic.org if you run in to any issues.
+
+-------
+
+Some notes about how to set up your systems, as there are no real other docs:
+
+Customer port parsing
+=====================
+
+Set your port description to:
+
+Cust: CustomerName {CircuitDesc} (OptionalNotes) [Speed]
+
+Transit/peering/core port parsing
+=================================
+
+Set your port description to:
+
+Transit: whateveryoulike
+Peering: whateveryoulike
+Core: whateveryoulike
+
+LM-Sensors setup
+================
+
+For lm-sensors/net-snmp to put your temperatures in the "Temp" group (as
+opposed to the "Misc" group, their name needs to start with "temp"; for
+Observer to see the interface the name should start with "temp-" (i.e.
+temp-CPU, temp-System). You can change this in /etc/sensors.conf - change
+the label descriptions if necessary, under your specific chipset block.
+
+Papouch TME
+===========
+
+Set your thermometer name (Option 1->0 in the telnet CLI) to the sensor name
+you want displayed in Observer.
