@@ -32,7 +32,7 @@ unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, array(), "LLDP-MIB");
 $lldp_array = $lldp_array[$device['device_id']];
 if($lldp_array) {
-  unset($lldp_links);
+  $lldp_links = "";
   foreach( array_keys($lldp_array) as $key) { 
     $lldp_if_array = $lldp_array[$key]; 
     foreach( array_keys($lldp_if_array) as $entry_key) {
@@ -109,12 +109,12 @@ $query = mysql_query($sql);
 while ($test_link = mysql_fetch_array($query)) {
   unset($exists);
   $i = 0;
-  while ($i < count($link_exists) && !$exists) {
+  while ($i < count($link_exists) && !isset($exists)) {
     $this_link = $test_link['src_if'] . ",". $test_link['dst_if'];
     if ($link_exists[$i] == $this_link) { $exists = 1; }
     $i++;
   }
-  if(!$exists) {
+  if(!isset($exists)) {
     echo("-");
     mysql_query("DELETE FROM `links` WHERE `src_if` = '".$test_link['src_if']."' AND `dst_if` = '".$test_link['dst_if']."'");
     if($debug) { echo($link_exists[$i] . " REMOVED \n"); }
