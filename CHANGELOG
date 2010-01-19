@@ -1,3 +1,6 @@
+For more granular updates check http://twitter.com/observernms or 
+http://www.observernms.org/websvn/listing.php?repname=observer
+
 Release 0.10 ( Pre-Release )
 
 Changed netstats (icmp, udp, tcp, snmp, ip) stats collection
