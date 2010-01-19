@@ -22,8 +22,6 @@ Observer is an auto-discovering network monitoring system.
 
 It's designed to be an easily-navigable interface to the health of your network.
 
-
-
 Planned Features
 ----------------
 
@@ -44,5 +42,3 @@ Please see http://www.observernms.org.
 
 Please email adama@memetic.org with any feature requests, bug reports or just to tell me
 that you're using observer!
-
-
