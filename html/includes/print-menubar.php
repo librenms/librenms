@@ -64,6 +64,11 @@ if ($_SESSION['userlevel'] >= '10') {
         </ul>
         </td></tr></table>
 </li>
+<?php
+## Display Services entry if $config['show_services']
+if (!isset($config['show_services']) || $config['show_services'])
+{
+?>
 <li><a class="menu2four" href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> Services</a>
         <table><tr><td>
         <ul>
@@ -86,6 +91,8 @@ if ($_SESSION['userlevel'] >= '10') {
 </li>
 
 <?php
+}
+
 ## Display Locations entry if $config['show_locations']
 if ($config['show_locations']) { echo('<li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a></li>'); }
 ?>
