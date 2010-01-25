@@ -41,7 +41,7 @@
   if($device['os'] == "papouch-tme") {
     echo("Papouch TME ");
     $descr = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));
-    $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.1.0"));
+    $temp = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.1.0")) / 10;
     if(!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0") 
     {
       $temp_oid = "SNMPv2-SMI::enterprises.18248.1.1.1.0";
@@ -127,7 +127,7 @@
           $split_oid = explode('.',$oid);
           $temp_id = $split_oid[count($split_oid)-1];
           $temp_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temp_id";
-          $temp  = shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid");
+          $temp  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid")) / 1000;
           $descr = str_ireplace("temp-", "", $descr);
           $descr = trim($descr);
           if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') {
