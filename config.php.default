@@ -138,6 +138,10 @@ $config['ignore_mount_string'] = array("/.*\/dev\/?$/");
 
 # $config['astext'][65333] = "Cymru Bogon Feed";
 
+### Default warning settings
+
+$config['defaults']['temp_limit'] = 60;
+
 ### Style Options
 
 $list_colour_a = "#ffffff";
