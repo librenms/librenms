@@ -36,9 +36,12 @@
       <?php
         $query = mysql_query("SELECT `ifSpeed` FROM `interfaces` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
         while($data = mysql_fetch_array($query)) {
-          echo("<option value='".$data['ifSpeed']."'");
-          if($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
-          echo(">".humanspeed($data['ifSpeed'])."</option>");
+          if ($data['ifSpeed'])
+          {
+            echo("<option value='".$data['ifSpeed']."'");
+            if($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
+            echo(">".humanspeed($data['ifSpeed'])."</option>");
+          }
         }
       ?>
        </select>
@@ -49,9 +52,12 @@
       <?php
         $query = mysql_query("SELECT `ifType` FROM `interfaces` GROUP BY `ifType` ORDER BY `ifType`");
         while($data = mysql_fetch_array($query)) {
-          echo("<option value='".$data['ifType']."'");
-          if($data['ifType'] == $_POST['ifType']) { echo("selected"); }
-          echo(">".$data['ifType']."</option>");
+          if ($data['ifType'])
+          {
+            echo("<option value='".$data['ifType']."'");
+            if($data['ifType'] == $_POST['ifType']) { echo("selected"); }
+            echo(">".$data['ifType']."</option>");
+          }
         }
       ?>
        </select>
