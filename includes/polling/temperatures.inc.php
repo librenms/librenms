@@ -4,10 +4,21 @@ $query = "SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] 
 $temp_data = mysql_query($query);
 while($temperature = mysql_fetch_array($temp_data)) {
 
-  $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'] . "|grep -v \"No Such Instance\"";
-  $temp = shell_exec($temp_cmd);
-
   echo("Checking temp " . $temperature['temp_descr'] . "... ");
+
+  for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading;
+  {
+    if ($debug) echo "Attempt $i ";
+    $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'] . "|grep -v \"No Such Instance\"";
+    $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
+    if($temperature['temp_tenths']) { $temp = $temp / 10; }
+    else
+    {
+      if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
+    }
+
+    if ($temp != 999.9) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+  }
 
   $temprrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
   $temprrd  = str_replace(")", "_", $temprrd);
@@ -21,13 +32,6 @@ while($temperature = mysql_fetch_array($temp_data)) {
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \
      RRA:AVERAGE:0.5:12:2400`;
-  }
-
-  $temp = trim(str_replace("\"", "", $temp));
-  if($temperature['temp_tenths']) { $temp = $temp / 10; }
-  else
-  {
-    if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
   }
 
   echo($temp . "C\n");
