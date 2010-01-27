@@ -41,11 +41,12 @@ print_optionbar_end();
      $query .= " AND D.device_id = I.device_id";
      $ipv6_host = mysql_fetch_array(mysql_query($query));
 
-     if($ipv4_host) { 
-       $peerhost = $ipv4_host;
-     } elseif($ipv6_host) {
-       $peerhost = $ipv6_host;
-     }
+    if($ipv4_host) { 
+      $peerhost = $ipv4_host;
+    } elseif($ipv6_host) {
+      $peerhost = $ipv6_host;
+    } else { unset($peerhost); }
+
     if($peerhost) {
       $peername = generatedevicelink($peerhost); 
     } else { 
