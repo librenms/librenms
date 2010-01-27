@@ -31,13 +31,31 @@ print_optionbar_end();
 
      if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
-     $query = "SELECT * FROM ipv4_addresses AS A, ipv6_addresses AS S, interfaces AS I, devices AS D WHERE ";
+     $query = "SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE ";
      $query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
-     $query .= " OR (S.ipv6_compressed = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = S.interface_id)";
      $query .= " AND D.device_id = I.device_id";
-     $peerhost = mysql_fetch_array(mysql_query($query));
+     $ipv4_host = mysql_fetch_array(mysql_query($query));
 
-     if($peerhost) { $peername = generatedevicelink($peerhost); } else { $peername = '<i>' . gethostbyaddr($peer['bgpPeerIdentifier']) . '</i>'; if ($peername == '<i>'.$peer['bgpPeerIdentifier'].'</i>') $peername = "";}
+     $query = "SELECT * FROM ipv6_addresses AS A, interfaces AS I, devices AS D WHERE ";
+     $query .= "(A.ipv6_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
+     $query .= " AND D.device_id = I.device_id";
+     $ipv6_host = mysql_fetch_array(mysql_query($query));
+
+     if($ipv4_host) { 
+       $peerhost = $ipv4_host;
+     } elseif($ipv6_host) {
+       $peerhost = $ipv6_host;
+     }
+    if($peerhost) {
+      $peername = generatedevicelink($peerhost); 
+    } else { 
+      $peername = gethostbyaddr($peer['bgpPeerIdentifier']);
+      if($peername == $peer['bgpPeerIdentifier']) { 
+        unset ($peername);
+      } else {
+        $peername = "<i>".$peername."<i>";
+      }
+    }
 
      $af_query = mysql_query("SELECT * FROM `bgpPeers_cbgp` WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['bgpPeerIdentifier']."'");
      unset($peer_af);
@@ -48,6 +66,7 @@ print_optionbar_end();
        $sep = "<br />";
        $valid_afi_safi[$afi][$safi] = 1; ## Build a list of valid AFI/SAFI for this peer
      }
+
      unset($sep);
      echo("<tr bgcolor=$bg_colour>
              <td width=20><span class=list-large>$i</span></td>
