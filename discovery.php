@@ -142,6 +142,11 @@ while ($device = mysql_fetch_array($device_query)) {
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
   }
 
+  if ($device['os'] == "dell-laser")
+  {
+    if ($device['type'] == "unknown") { $device['type'] = 'printer'; }
+  }
+
   $update_query  = "UPDATE `devices` SET ";
   $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
   $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";

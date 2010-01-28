@@ -50,6 +50,14 @@
         <li><a href="devices/server/"><img src="images/16/server.png" border="0" align="absmiddle" /> Servers</a></li>
         <li><a href="devices/network/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Network</a></li>
         <li><a href="devices/firewall/"><img src="images/16/shield.png" border="0" align="absmiddle" /> Firewalls</a></li>
+<?php
+if (isset($config['show_printers']) && $config['show_printers'])
+{
+?>
+        <li><a href="devices/printer/"><img src="images/16/printer.png" border="0" align="absmiddle" /> Printers</a></li>
+<?php
+}
+?>
         <li><hr width="140" /></li>
         <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo $device_alerts ?>)</a></li>
 <?php
