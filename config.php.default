@@ -135,6 +135,7 @@ $config['allow_entity_sensor']['specialEnum'] = 1;
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/proc/bus/usb");
 $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_string'] = array("/.*\/dev\/?$/");
+$config['ignore_mount_removable'] = 0; # Ignore removable disk storage
 
 ### Hardcoded ASN descriptions
 

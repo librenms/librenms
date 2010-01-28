@@ -19,6 +19,7 @@
     foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $allow = 0; if ($debug) echo("$bi == $descr \n"); } }
     foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $allow = 0; if ($debug) echo("$descr, $bi \n"); } }
     foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $allow = 0; if ($debug) echo("$bi, $descr \n"); } }
+    if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == "hrStorageRemovableDisk") { $allow = 0; if ($debug) echo("removable, skipping\n"); }
     $descr = str_replace("mounted on: ", "", $descr);
     $descr = str_replace(": var file system", "", $descr);
 
