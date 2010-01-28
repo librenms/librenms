@@ -13,6 +13,8 @@ list($days, $hours, $mins, $secs) = explode(":", $hrSystemUptime);
 list($secs, $microsecs) = explode(".", $secs);
 $uptime = $secs + ($mins * 60) + ($hours * 60 * 60) + ($days * 24 * 60 * 60);
 
+if ($device['os'] == "windows") { $uptime /= 10; }
+
 if (!is_file($hrSystem_rrd)) {
   shell_exec($config['rrdtool'] . " create $hrSystem_rrd \
     --step 300 \
