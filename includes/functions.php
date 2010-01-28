@@ -502,7 +502,7 @@ function formatUptime($diff, $format="long")
     if($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
   } else {
     if($yearsDiff > '0'){ $uptime .= $yearsDiff . " years, "; }
-    if($daysDiff > '0'){ $uptime .= $daysDiff   . " days, "; }
+    if($daysDiff > '0'){ $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
     if($hrsDiff > '0'){ $uptime .= $hrsDiff     . "h "; }
     if($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
     if($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
