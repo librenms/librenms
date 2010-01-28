@@ -87,6 +87,7 @@ $config['int_l2tp'] 		= 0;  # Enable L2TP Port Types
 
 $config['show_locations'] 	= 1;  # Enable Locations on menu
 $config['show_services']        = 1;  # Enable Services on menu
+$config['show_printers']        = 0;  # Enable Printers Device Type on menu
 
 $config['ports_page_default']	= "details/";  
 # Default devices ports page display type. "details/", "graphs/bits/", etc
