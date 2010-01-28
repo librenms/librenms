@@ -129,7 +129,7 @@
 
       foreach ($stat_oids as $oid) {  /// Copy values from array to global variables and force numeric.
         $$oid = $this_port[$oid];      
-        $$oid = $$oid+0;
+        if(!is_numeric($$oid)) { $$oid = "0"; }
       }
 
       $woo = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
