@@ -136,6 +136,7 @@ $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/dev", "/dev/pts", "/pro
 $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_string'] = array("/.*\/dev\/?$/");
 $config['ignore_mount_removable'] = 0; # Ignore removable disk storage
+$config['ignore_mount_network'] = 0; # Ignore network mounted storage
 
 ### Hardcoded ASN descriptions
 
