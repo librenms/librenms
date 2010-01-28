@@ -13,6 +13,8 @@ Create includes/polling/device-$osname.inc.php, for device specific polling.
 Create html/pages/device/graphs/os-$osname.inc.php to display a custom graph
 set for this device type.
 
+Add an OS text name in includes/static-config.php
+
 If desired, create a 32x32 logo, in html/images/os/$osname.png.
 
 When tested and satisfied, please submit a patch to the development team! ;-)
