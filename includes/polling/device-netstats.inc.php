@@ -15,16 +15,23 @@ if($device[os] != "Snom") {
                  'icmpOutTimestamps','icmpOutTimestampReps','icmpOutAddrMasks','icmpOutAddrMaskReps');
 
   $oids['snmp'] = array ('snmpInPkts','snmpOutPkts','snmpInBadVersions','snmpInBadCommunityNames','snmpInBadCommunityUses','snmpInASNParseErrs',
-'snmpInTooBigs','snmpInNoSuchNames','snmpInBadValues','snmpInReadOnlys','snmpInGenErrs','snmpInTotalReqVars','snmpInTotalSetVars',
-'snmpInGetRequests','snmpInGetNexts','snmpInSetRequests','snmpInGetResponses','snmpInTraps','snmpOutTooBigs','snmpOutNoSuchNames',
-'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps','snmpSilentDrops','snmpProxyDrops');
+   'snmpInTooBigs','snmpInNoSuchNames','snmpInBadValues','snmpInReadOnlys','snmpInGenErrs','snmpInTotalReqVars','snmpInTotalSetVars',
+   'snmpInGetRequests','snmpInGetNexts','snmpInSetRequests','snmpInGetResponses','snmpInTraps','snmpOutTooBigs','snmpOutNoSuchNames',
+   'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps','snmpSilentDrops','snmpProxyDrops');
 
   $oids['tcp'] = array ('tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab', 
-'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts', 'tcpHCInSegs', 'tcpHCOutSegs');
+    'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts', 'tcpHCInSegs', 'tcpHCOutSegs');
 
   $oids['udp'] = array ('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');
 
   $protos = array('ip','icmp', 'snmp', 'udp', 'tcp');
+
+#  /// Copy ifHC[In|Out]Octets values to non-HC if they exist
+#  if($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {
+#     echo("HC ");
+#     $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
+#     $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
+#  }
 
   foreach($protos as $proto) {
     unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
