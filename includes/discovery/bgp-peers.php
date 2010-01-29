@@ -1,6 +1,6 @@
 <?php
 
-### Discover BGP peers on Cisco and Juniper devices
+### Discover BGP peers
 
   echo("BGP Sessions : ");
 

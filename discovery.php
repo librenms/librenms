@@ -117,6 +117,12 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/discovery/bgp-peers.php"); 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
+  
+  if ($device['os'] == "linux")
+  {
+    # Also discover quagga peers
+    include("includes/discovery/bgp-peers.php");
+  }
 
   if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
     include("includes/discovery/cisco-vlans.php");
