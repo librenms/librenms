@@ -1,12 +1,15 @@
 
 <?php
 
-if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
+
+$syslog_iter++;
+if(!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+
 
   if(!$entry['processed']) { $entry = process_syslog($entry, 1); }
   if(!$entry['deleted']) {
 
-  echo("<tr style=\"background-color: $bg\">
+  echo("<tr style=\"background-color: $bg_colour\">
     <td width=0></td>");
 
   echo("<td class=syslog width=125>" . $entry['date'] . "</td>");
