@@ -75,4 +75,4 @@ ALTER TABLE `temperature` ADD `temp_precision` INT(11) NULL DEFAULT '1';
 UPDATE temperature SET temp_precision=10 WHERE temp_tenths=1;
 ALTER TABLE `temperature` DROP `temp_tenths`;
 CREATE TABLE IF NOT EXISTS `dbSchema` ( `revision` int(11) NOT NULL default '0', PRIMARY KEY (`revision`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-    
+ALTER TABLE `storage` ADD `storage_perc_warn` INT(11) NULL DEFAULT '60';
