@@ -5,6 +5,7 @@ $config['ifname']['asa'] = true;
 $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
 $config['ifname']['speedtouch'] = true;
+$config['ifname']['dell-laser'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
