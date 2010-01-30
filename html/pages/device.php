@@ -103,16 +103,16 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
 </li>');
 }
 
-if(@mysql_result(mysql_query("SELECT count(*) FROM nagios_hosts WHERE address = '".$device['hostname']."'", $nagios_link), 0) > '0') {
-  echo('<li class="' . $select['nagios'] . '">
-  <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/nagios/">
-    <img src="images/16/transmit_blue.png" align="absmiddle" border="0" /> Nagios
-  </a>
-</li>');
-}
+#if(@mysql_result(mysql_query("SELECT count(*) FROM nagios_hosts WHERE address = '".$device['hostname']."'", $nagios_link), 0) > '0') {
+#  echo('<li class="' . $select['nagios'] . '">
+#  <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/nagios/">
+#    <img src="images/16/transmit_blue.png" align="absmiddle" border="0" /> Nagios
+#  </a>
+#</li>');
+#}
 
 
-if($_SESSION[userlevel] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.src_if"),0)) {
+if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.src_if"),0)) {
   echo('<li class="' . $select['map'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/map/">
     <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map
@@ -171,8 +171,8 @@ echo('<li class="' . $select['syslog'] . '">
 '); 
 }
 
-if($_SESSION[userlevel] >= "5" && is_file($config['rancid_configs'] . $device['hostname'])) {
-  echo('<li class=' . $select['showconfig'] . '">
+if($_SESSION['userlevel'] >= "5" && is_file($config['rancid_configs'] . $device['hostname'])) {
+  echo('<li class="' . $select['showconfig'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/showconfig/">
     <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
   </a>
@@ -180,7 +180,7 @@ if($_SESSION[userlevel] >= "5" && is_file($config['rancid_configs'] . $device['h
 ');
 }
 
-if($_SESSION[userlevel] >= "5") {
+if($_SESSION['userlevel'] >= "5") {
   echo('<li class="' . $select['edit'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/edit/">
     <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
