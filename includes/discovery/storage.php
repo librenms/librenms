@@ -22,7 +22,7 @@
     if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == "hrStorageRemovableDisk") { $allow = 0; if ($debug) echo("removable, skipping\n"); }
     if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == "hrStorageNetworkDisk") { $allow = 0; if ($debug) echo("network, skipping\n"); }
     $descr = str_replace("mounted on: ", "", $descr);
-    $descr = str_replace(": var file system", "", $descr);
+    $descr = preg_replace("/: [A-Za-z0-9_]+ file system, /", ", ", $descr);
 
     if($size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
