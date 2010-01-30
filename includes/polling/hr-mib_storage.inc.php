@@ -15,7 +15,7 @@ while ($dr = mysql_fetch_array($dq)) {
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
   $old_storage_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
   $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrStorage-" . $hrStorageIndex . ".rrd";
-  if(is_file($old_storage_rrd)) { shell_exec("mv $old_storage_rrd $storage_rrd"); }
+  if(is_file($old_storage_rrd)) { rename($old_storage_rrd,$storage_rrd); }
   if (!is_file($storage_rrd)) {
     shell_exec($config['rrdtool'] . " create $storage_rrd \
      --step 300 \
