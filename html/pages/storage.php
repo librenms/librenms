@@ -38,7 +38,7 @@ while($drive = mysql_fetch_array($query)) {
 
     $drv_colour = percent_colour($perc);
 
-    echo("<tr bgcolor='$row_colour'><th>" . generatedevicelink($drive) . "</td><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td>
+    echo("<tr bgcolor='$row_colour'><td>" . generatedevicelink($drive) . "</td><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td>
           <a href='#' $store_popup><img src='percentage.php?per=" . $perc . "&width=350'></a>
           </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
 
