@@ -104,6 +104,8 @@ $config['enable_pseudowires']   = 1; # Enable Pseudowires
 $config['enable_ports_etherlike']     = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
 
 #$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
+$config['rancid_ignorecomments'] = 0; # Ignore lines starting with #
+
 #$config['collectd_dir']         = '/var/lib/collectd/rrd';
 
 ## If a syslog entry contails these strings it is deleted from the database
