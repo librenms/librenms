@@ -9,7 +9,7 @@ while ($service = mysql_fetch_array($query)) {
 
   unset($check, $service_status, $time, $status);
   $service_status = $service['service_status'];
-  $service_type = strtolower($service[service_type]);
+  $service_type = strtolower($service['service_type']);
   $service_param = $service['service_param'];
   $checker_script = "includes/services/" . $service_type . "/check.inc";
   if(is_file($checker_script)) {

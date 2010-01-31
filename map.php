@@ -44,7 +44,7 @@ while($loc_data = mysql_fetch_array($loc_result)) {
 	if(strpos($host, "vax")) { $hostinfo = "shape=rect style=filled fillcolor=skyblue"; }
         if(strpos($host, "vsx")) { $hostinfo = "shape=box3d style=filled fillcolor=skyblue"; }
 
-        $host = $dev_data[hostname];
+        $host = $dev_data['hostname'];
 	$host = str_replace("." . $config['mydomain'],"", $host);
 	echo("\"$host\" [$hostinfo]
         ");	
@@ -94,18 +94,18 @@ while($link_data = mysql_fetch_array($links_result)) {
 
 	$i = 0;
 	while ($i < count($linkdone)) {
-	    $thislink = "$dst $link_data[dif] $src $link_data[sif]";
+	    $thislink = "$dst ".$link_data['dif']." $src ".$link_data['sif'];
             if ($linkdone[$i] == $thislink) { $die = "yes"; }
 	    $i++;
 	}
 
-	$sif = makeshortif($link_data[sif]);
-	$dif = makeshortif($link_data[dif]);
+	$sif = makeshortif($link_data['sif']);
+	$dif = makeshortif($link_data['dif']);
 
 	if(!$die){	
 	echo("\"$src\" -> \"$dst\" [taillabel=\"$dif\"  headlabel=\"$sif\" arrowhead=dot arrowtail=dot $info];\n");
 #       echo("\"$src\" -> \"$dst\" [ arrowhead=none arrowtail=none $info];\n");
-	$linkdone[] = "$src $link_data[sif] $dst $link_data[dif]";
+	$linkdone[] = "$src ".$link_data['sif']." $dst ".$link_data['dif'];
 	$x++;
         }
 }

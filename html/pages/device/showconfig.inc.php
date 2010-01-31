@@ -6,6 +6,7 @@ if($_SESSION['userlevel'] >= "5" && is_file($config['rancid_configs'] . $device[
   $file = $config['rancid_configs'] . $device['hostname'];
   $fh = fopen($file, 'r') or die("Can't open file");
   $text = fread($fh, filesize($file));
+  fclose($fh);
   if ($config['rancid_ignorecomments'])
   {
     $lines = split("\n",$text);
@@ -20,11 +21,9 @@ if($_SESSION['userlevel'] >= "5" && is_file($config['rancid_configs'] . $device[
   $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
   $geshi->set_overall_style('color: black;');
 #  $geshi->set_line_style('color: #999999'); 
- echo $geshi->parse_code();
-  fclose($fh);
+  echo $geshi->parse_code();
 } else {
   print_error("Error : Insufficient access.");
 }
-
 
 ?>
