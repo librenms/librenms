@@ -74,7 +74,11 @@ $devices_discovered = 0;
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query)) {
+  $devices[] = $device;
+}
 
+foreach ($devices as $device)
+{
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
   if($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
   echo("\n");
@@ -118,7 +122,7 @@ while ($device = mysql_fetch_array($device_query)) {
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
   
-  if ($device['os'] == "linux")
+  if ($device['os_group'] == "unix")
   {
     # Also discover quagga peers
     include("includes/discovery/bgp-peers.php");
