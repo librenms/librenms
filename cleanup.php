@@ -50,7 +50,7 @@ $query = "SELECT * FROM interfaces AS I, devices as D
           WHERE I.device_id = D.device_id AND D.status = '1'";
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
-  $index = $row[ifIndex];
+  $index = $row['ifIndex'];
   $hostname = $row['hostname'];
   $community = $row['community']; 
   $port = $row['port'];

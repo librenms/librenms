@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION[userlevel] < '5') {
+if($_SESSION['userlevel'] < '5') {
   print_error("Insufficient Privileges");
 } else {
 
