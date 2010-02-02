@@ -28,6 +28,8 @@ $os_groups['iosxr']     = "ios";
 $os_groups['ios']	= "ios";
 $os_groups['asa']       = "ios";
 
+$os_groups['printers']  = "dell-laser";
+
 ##
 $os_text['linux']	 = "Linux";
 $os_text['ios']       	 = "Cisco IOS";
