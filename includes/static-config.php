@@ -6,6 +6,8 @@ $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
 $config['ifname']['speedtouch'] = true;
 $config['ifname']['dell-laser'] = true;
+$config['ifalias']['adva'] = true;
+#$config['appendifindex']['adva'] = true;
 
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
@@ -49,6 +51,7 @@ $os_text['junos']        = "Juniper JunOS";
 $os_text['procurve']     = "HP ProCurve";
 $os_text['speedtouch']   = "Thomson Speedtouch";
 $os_text['dell-laser']   = "Dell Laser Printer";
+$os_text['adva']	 = "Adva";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');

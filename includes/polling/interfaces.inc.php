@@ -10,7 +10,7 @@ if($device['os_group'] == "ios") {
     list($slotport, $ifIndex) = explode(" ", $entry);
     $portifIndex[$ifIndex] = $slotport;
   }
-#  print_r($portifIndex);
+  if($debug) { print_r($portifIndex); }
 }
 
 $interface_query = mysql_query("SELECT * FROM `interfaces` $where");

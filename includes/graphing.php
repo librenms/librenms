@@ -163,7 +163,7 @@ function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height
 
   }
   if($width <= "300") { $options .= " --font LEGEND:7:".$config['mono_font']." --font AXIS:6:".$config['mono_font']." --font-render-mode normal"; }
-#  echo($config['rrdtool'] . " graph $graph $options");
+  echo($config['rrdtool'] . " graph $graph $options");
   $thing = shell_exec($config['rrdtool'] . " graph $graph $options");
   return $graph;
 }
@@ -175,7 +175,7 @@ function graph_multi_bits_duo ($interfaces, $graph, $from, $to, $width, $height,
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; }
   $i = 1;
-  foreach(explode(",", $interfaces[1]) as $ifid) {
+  foreach(explode(",", $interfaces[0]) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
@@ -190,7 +190,7 @@ function graph_multi_bits_duo ($interfaces, $graph, $from, $to, $width, $height,
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $interfaces[0]) as $ifid) {
+  foreach(explode(",", $interfaces[1]) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {

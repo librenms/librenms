@@ -123,8 +123,8 @@
  while($acc = mysql_fetch_array($query)) { 
    if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
-   #$name = gethostbyaddr($addy['ipv4_address']);
-   #if($name == $addy['ipv4_address']) { unset ($name); }
+   $name = gethostbyaddr($addy['ipv4_address']);
+   if($name == $addy['ipv4_address']) { unset ($name); }
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
      $peer_info = mysql_fetch_array($peer_query);
