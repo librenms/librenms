@@ -12,7 +12,7 @@
 
   $stat_oids_db = array('ifInOctets', 'ifOutOctets', 'ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts'); // From above for DB
 
- $etherlike_oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
+  $etherlike_oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
                           'dot3StatsSQETestErrors', 'dot3StatsDeferredTransmissions', 'dot3StatsLateCollisions', 'dot3StatsExcessiveCollisions',
                           'dot3StatsInternalMacTransmitErrors', 'dot3StatsCarrierSenseErrors', 'dot3StatsFrameTooLongs', 'dot3StatsInternalMacReceiveErrors',
                           'dot3StatsSymbolErrors');
@@ -39,8 +39,9 @@
   #foreach ($pagp_oids as $oid)      { $array = snmp_cache_oid($oid, $device, $array, "CISCO-PAGP-MIB"); }
 
   if($device['os_group'] == "ios") {
-    #$array = snmp_cache_portIfIndex ($device, $array);
-    #$array = snmp_cache_portName ($device, $array);
+    $array = snmp_cache_portIfIndex ($device, $array);
+    $array = snmp_cache_portName ($device, $array);
+    $data_oids[] = "portName";
     #$array = snmp_cache_oid("vmVlan", $device, $array, "CISCO-VLAN-MEMBERSHIP-MIB");
     #$array = snmp_cache_oid("vlanTrunkPortEncapsulationOperType", $device, $array, "CISCO-VTP-MIB");
     #$array = snmp_cache_oid("vlanTrunkPortNativeVlan", $device, $array, "CISCO-VTP-MIB");

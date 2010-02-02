@@ -9,9 +9,9 @@
   $interface['device_id'] = $device['device_id'];
   $interface['hostname'] = $device['hostname'];
 
-  $interface = ifNameDescr($interface);
-
   $if_id = $interface['interface_id'];
+
+  $interface = ifLabel($interface);
 
   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
@@ -27,7 +27,7 @@
            <td valign=top width=300>");
 
   echo("        <span class=list-large>
-                " . generateiflink($interface, $interface['ifIndex'] . ". ".fixifName($interface['label'])) . " $error_img $mac
+                " . generateiflink($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
 
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
