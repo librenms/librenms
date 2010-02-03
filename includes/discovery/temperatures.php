@@ -121,7 +121,7 @@
     foreach(explode("\n", $oids) as $data) {
       $data = trim($data);
       if($data) {
-        list($oid,$descr) = explode(" ", $data);
+        list($oid,$descr) = explode(" ", $data,2);
         if (substr($descr,0,5) == "temp-")
         {
           $split_oid = explode('.',$oid);
