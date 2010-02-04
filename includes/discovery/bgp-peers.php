@@ -81,7 +81,9 @@ if (isset($peerlist))
       unset($af_list);
       $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
       $af_cmd .= "cbgpPeerAddrFamilyName." . $peer['ip'];
-      $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", `$af_cmd`));
+      $af_data = shell_exec($af_cmd);
+      if($debug) { echo("afi data :: $af_data \n"); }
+      $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", $af_data));
       foreach (explode("\n", $afs) as $af)  
       {
         if($debug) { echo("AFISAFI = $af\n"); }
