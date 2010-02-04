@@ -20,7 +20,7 @@
     $peers_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $peers_cmd .= "BGP4-MIB::bgpPeerRemoteAs"; 
     $peers_data = shell_exec($peers_cmd);
-    if($debug) { echo("Peers : $peers_cmd --> \n$peers_data \n");
+    if($debug) { echo("Peers : $peers_cmd --> \n$peers_data \n"); }
     $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", $peers_data));  
 
     foreach (explode("\n", $peers) as $peer)  
