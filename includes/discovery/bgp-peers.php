@@ -19,7 +19,10 @@
 
     $peers_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $peers_cmd .= "BGP4-MIB::bgpPeerRemoteAs"; 
-    $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", `$peers_cmd`));  
+    $peers_data = shell_exec($peers_cmd);
+    if($debug) { echo("Peers : $peers_cmd --> \n$peers_data \n");
+    $peers = trim(str_replace("BGP4-MIB::bgpPeerRemoteAs.", "", $peers_data));  
+
     foreach (explode("\n", $peers) as $peer)  
     {
       list($peer_ip, $peer_as) = split(" ",  $peer);
@@ -82,7 +85,7 @@ if (isset($peerlist))
       $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
       $af_cmd .= "cbgpPeerAddrFamilyName." . $peer['ip'];
       $af_data = shell_exec($af_cmd);
-      if($debug) { echo("afi data :: $af_data \n"); }
+      if($debug) { echo("afi data :: $af_cmd --> \n $af_data \n"); }
       $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", $af_data));
       foreach (explode("\n", $afs) as $af)  
       {
