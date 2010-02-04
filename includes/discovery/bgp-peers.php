@@ -84,6 +84,7 @@ if (isset($peerlist))
       $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", `$af_cmd`));
       foreach (explode("\n", $afs) as $af)  
       {
+        if($debug) { echo("AFISAFI = $af\n"); }
         list($afisafi, $text) = explode(" = ", $af);
         list($afi, $safi) = explode(".", $afisafi);
         if($afi && $safi) 
