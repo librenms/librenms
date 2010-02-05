@@ -122,6 +122,10 @@ foreach ($devices as $device)
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
   
+  if($device['os'] == "junose") { 
+    include("includes/discovery/bgp-peers.php"); 
+  }
+  
   if ($device['os_group'] == "unix")
   {
     # Also discover quagga peers
