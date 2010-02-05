@@ -15,7 +15,7 @@ include("common.inc.php");
     $mempool['descr_fixed'] = str_pad($mempool['descr_fixed'], 28);
     $mempool['descr_fixed'] = substr($mempool['descr_fixed'],0,28);
     $oid = $mempool['Index'];
-    $rrd  = $config['rrd_dir'] . "/".$mempool['hostname']."/cmp-$oid.rrd";
+    $rrd  = $config['rrd_dir'] . "/".$mempool['hostname']."/" . safename("cmp-$oid.rrd");
     $rrd_options .= " DEF:mempool" . $oid . "free=$rrd:free:AVERAGE ";
     $rrd_options .= " DEF:mempool" . $oid . "used=$rrd:used:AVERAGE ";
     $rrd_options .= " CDEF:mempool" . $oid . "total=mempool" . $oid . "used,mempool" . $oid . "used,mempool" . $oid . "free,+,/,100,* ";

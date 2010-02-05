@@ -13,7 +13,7 @@ while($temperature = mysql_fetch_array($sql)) {
   } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
   $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 22);
   $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,22);
-  $temprrd  = addslashes($config['rrd_dir'] . "/$hostname/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
+  $temprrd  = $config['rrd_dir'] . "/$hostname/".safename("temp-" . $temperature['temp_descr'] . ".rrd");
   $temprrd  = str_replace(")", "_", $temprrd);
   $temprrd  = str_replace("(", "_", $temprrd);
   $rrd_options .= " DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE ";

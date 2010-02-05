@@ -4,8 +4,8 @@
 
 $query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE `ifAlias` LIKE 'Cust: ".mres($_GET['cust'])."%' AND D.device_id = I.device_id");
 while($int = mysql_fetch_array($query)) {
-  if(is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/" . $int['ifIndex'] . ".rrd")) {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int['hostname'] . "/" . $int['ifIndex'] . ".rrd";
+  if(is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd"))) {
+    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");
   }
 }
 

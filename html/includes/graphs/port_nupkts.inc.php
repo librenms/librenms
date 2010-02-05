@@ -9,8 +9,8 @@ $query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.in
                       AND I.device_id = D.device_id");
 
 $port = mysql_fetch_array($query);
-if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . $port['ifIndex'] . ".rrd")) {
-  $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/" . $port['ifIndex'] . ".rrd";
+if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) {
+  $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
 }
 
 $rra_in = "INNUCASTPKTS";

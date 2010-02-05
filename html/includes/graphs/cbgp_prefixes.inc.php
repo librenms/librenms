@@ -6,7 +6,7 @@ $scale_min = "0";
 
 $data = mysql_fetch_array(mysql_query("SELECT * FROM bgpPeers AS B, devices AS D WHERE bgpPeer_id = '".$_GET['peer']."' AND D.device_id = B.device_id"));
 
-$rrd_filename = $config['rrd_dir'] . "/" . $data['hostname'] . "/cbgp-" . $data['bgpPeerIdentifier'] . ".".$_GET['afi'].".".$_GET['safi'].".rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $data['hostname'] . "/". safename("cbgp-" . $data['bgpPeerIdentifier'] . ".".$_GET['afi'].".".$_GET['safi'].".rrd");
 
 $rra = "AcceptedPrefixes";
 

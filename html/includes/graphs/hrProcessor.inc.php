@@ -15,7 +15,7 @@ include("common.inc.php");
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
     $proc['descr_fixed'] = substr(str_pad(short_hrDeviceDescr($proc['hrDeviceDescr']), 28),0,28);
     $proc['descr_fixed'] = str_replace(":", "\:", $proc['descr_fixed']);
-    $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd";
+    $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
     $rrd_options .= " DEF:proc" . $proc['hrDeviceIndex'] . "=$rrd:usage:AVERAGE ";
     $rrd_options .= " LINE1:proc" . $proc['hrDeviceIndex'] . "#" . $colour . ":'" . $proc['descr_fixed'] . "' ";
     $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":LAST:%3.0lf";

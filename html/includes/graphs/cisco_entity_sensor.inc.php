@@ -13,7 +13,7 @@ case 'amperes':
 
 include("common.inc.php");
 
-$rrd_filename = $config['rrd_dir'] . "/" . $sensor['hostname'] . "/ces-" . $sensor['entPhysicalIndex'] . ".rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $sensor['hostname'] . "/" . safename("ces-" . $sensor['entPhysicalIndex'] . ".rrd");
 
 $type = str_pad($sensor['entSensorType'], 8);
 $type = substr($type,0,8);

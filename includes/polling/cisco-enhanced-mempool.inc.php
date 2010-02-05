@@ -25,7 +25,7 @@ while($mempool = mysql_fetch_array($pool_data)) {
   echo(round(($cempMemPoolUsed/($cempMemPoolFree+$cempMemPoolUsed))*100) . "% ");
 
 
-  $poolrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/cempMemPool-" . $oid . ".rrd");
+  $poolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cempMemPool-" . $oid . ".rrd");
 
   if (!is_file($poolrrd)) {
     `rrdtool create $poolrrd \

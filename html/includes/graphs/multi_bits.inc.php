@@ -8,8 +8,8 @@ $i = 1;
 foreach(explode(",", $interfaces) as $ifid) {
   $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
   $int = mysql_fetch_row($query);
-  if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd";
+  if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . safename($int[0] . ".rrd"))) {
+    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int[1] . "/" . safename($int[0] . ".rrd");
     $i++;
   }
 }
