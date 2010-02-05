@@ -7,8 +7,8 @@
   $as_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $as_cmd .= ".1.3.6.1.2.1.15.2";
   $bgpLocalAs = trim(shell_exec($as_cmd));
-
-  if($bgpLocalAs && !strstr($bgpLocalAs, " ")) 
+  
+  if(is_numeric($bgpLocalAs))
   {
     echo("AS$bgpLocalAs ");
 
