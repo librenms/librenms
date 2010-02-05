@@ -27,22 +27,23 @@ $cpu_usage = trim(shell_exec($cpu_cmd));
 
 if (is_numeric($cpu_usage))
 {
-  if (!is_file($cpurrd)) {
-    shell_exec($config['rrdtool'] . " create $cpurrd \
-    --step 300 \
-     DS:cpu:GAUGE:600:0:100 \
-     RRA:AVERAGE:0.5:1:800 \
-     RRA:AVERAGE:0.5:6:800 \
-     RRA:AVERAGE:0.5:24:800 \
-     RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 \
-     RRA:MAX:0.5:6:800 \
-     RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800");
+  if (!is_file($cpurrd)) 
+  {
+    $rrdcreate = shell_exec($config['rrdtool'] ." create $cpurrd --step 300 DS:LOAD:GAUGE:600:-1:100 RRA:AVERAGE:0.5:1:1200                  RRA:AVERAGE:0.5:1:2000 \
+                    RRA:AVERAGE:0.5:6:2000 \
+                    RRA:AVERAGE:0.5:24:2000 \
+                    RRA:AVERAGE:0.5:288:2000 \
+                    RRA:MAX:0.5:1:2000 \
+                    RRA:MAX:0.5:6:2000 \
+                    RRA:MAX:0.5:24:2000 \
+                    RRA:MAX:0.5:288:2000 \
+                    RRA:MIN:0.5:1:2000 \
+                    RRA:MIN:0.5:6:2000 \
+                    RRA:MIN:0.5:24:2000 \
+                    RRA:MIN:0.5:288:2000");
   }
-
-  if ($cpu_usage) { echo "CPU: $cpu_usage%\n"; }
-  shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu_usage");
+  echo "CPU: $cpu_usage%\n";
+  rrdtool_update($cpurrd, " N:$cpu_usage");
 }
 
 include("hr-mib.inc.php");
