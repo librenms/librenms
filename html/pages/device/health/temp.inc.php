@@ -13,8 +13,8 @@ while($temp = mysql_fetch_array($query)) {
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
           <td width=350>" . $temp['temp_descr'] . "</td>
-          <td>" . print_temperature($temp['temp_current'], $temp['temp_limit']) . "</td>
-          <td>" . $temp['temp_limit'] . "</td>
+          <td>" . print_temperature($temp['temp_current'], $temp['temp_limit']) . " &deg;C</td>
+          <td>" . $temp['temp_limit'] . " &deg;C</td>
           <td>" . $temp['temp_notes'] . "</td>
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
