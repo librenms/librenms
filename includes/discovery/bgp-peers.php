@@ -74,7 +74,7 @@ if (isset($peerlist))
       $add = mysql_query("INSERT INTO bgpPeers (`device_id`, `bgpPeerIdentifier`, `bgpPeerRemoteAS`) VALUES ('".$device['device_id']."','".$peer['ip']."','".$peer['as']."')");
       echo("+"); 
     } else { 
-      $update = mysql_query("UPDATE `bgpPeers` SET bgpPeerRemoteAs = " . $peer['as'] . ", astext = '" . mysql_escape_string($astext) . "' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
+      $update = mysql_query("UPDATE `bgpPeers` SET bgpPeerRemoteAs = " . $peer['as'] . ", astext = '" . mysql_real_escape_string($astext) . "' WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
       echo(".");
     }
 
