@@ -61,7 +61,7 @@ if($_GET['debug']) {
     $thing = shell_exec($config['rrdtool'] . " graph $graphfile $rrd_options");
     if(is_file($graphfile)) {
       header('Content-type: image/png');
-      echo(`cat $graphfile`);
+      $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
     } else {
       header('Content-type: image/png');
       $string = "Graph Generation Error";
@@ -76,7 +76,7 @@ if($_GET['debug']) {
 
   if($graph) {
     header('Content-type: image/png');
-    echo(`cat $graphfile`);
+    $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
   } else {  
     header('Content-type: image/png');
     $string = "Graph Generation Error";
