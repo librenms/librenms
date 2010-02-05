@@ -25,8 +25,10 @@ $cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] 
 $cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
 $cpu_usage = trim(shell_exec($cpu_cmd));
 
-if (!is_file($cpurrd)) {
-   shell_exec($config['rrdtool'] . " create $cpurrd \
+if (is_numeric($cpu_usage))
+{
+  if (!is_file($cpurrd)) {
+    shell_exec($config['rrdtool'] . " create $cpurrd \
     --step 300 \
      DS:cpu:GAUGE:600:0:100 \
      RRA:AVERAGE:0.5:1:800 \
@@ -37,9 +39,11 @@ if (!is_file($cpurrd)) {
      RRA:MAX:0.5:6:800 \
      RRA:MAX:0.5:24:800 \
      RRA:MAX:0.5:288:800");
-}
+  }
 
-shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu_usage");
+  if ($cpu_usage) { echo "CPU: $cpu_usage%\n"; }
+  shell_exec($config['rrdtool'] . " update $cpurrd N:$cpu_usage");
+}
 
 include("hr-mib.inc.php");
 
