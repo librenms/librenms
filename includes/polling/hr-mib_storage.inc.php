@@ -13,8 +13,8 @@ while ($dr = mysql_fetch_array($dq)) {
   $used = $used_units * $hrStorageAllocationUnits;
   $perc = round($used / $hrStorageSize * 100, 2);
   $filedesc = str_replace("\"", "", str_replace("/", "_", $hrStorageDescr));
-  $old_storage_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/storage-" . $filedesc . ".rrd";
-  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrStorage-" . $hrStorageIndex . ".rrd";
+  $old_storage_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $filedesc . ".rrd");
+  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("hrStorage-" . $hrStorageIndex . ".rrd");
   if(is_file($old_storage_rrd)) { rename($old_storage_rrd,$storage_rrd); }
   if (!is_file($storage_rrd)) {
     shell_exec($config['rrdtool'] . " create $storage_rrd \

@@ -15,7 +15,7 @@ include("common.inc.php");
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
     $proc['descr_fixed'] = str_pad($proc['entPhysicalDescr'], 28);
     $proc['descr_fixed'] = substr($proc['descr_fixed'],0,28);
-    $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd";
+    $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/" . safename("cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd");
     $rrd_options .= " DEF:proc" . $proc['cpmCPU_oid'] . "=$rrd:usage:AVERAGE ";
     $rrd_options .= " LINE1:proc" . $proc['cpmCPU_oid'] . "#" . $colour . ":'" . $proc['descr_fixed'] . "' ";
     $rrd_options .= " GPRINT:proc" . $proc['cpmCPU_oid'] . ":LAST:%3.0lf";

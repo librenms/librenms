@@ -21,7 +21,7 @@ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cempMemPool` WHERE `device_id
     $mempool['descr_fixed'] = str_pad($mempool['descr_fixed'], 20);
     $mempool['descr_fixed'] = substr($mempool['descr_fixed'],0,20);
     $oid = $mempool['entPhysicalIndex'] . "." . $mempool['Index'];
-    $rrd  = $config['rrd_dir'] . "/$hostname/cempMemPool-$oid.rrd";
+    $rrd  = $config['rrd_dir'] . "/$hostname/" . safename("cempMemPool-$oid.rrd");
     $rrd_options .= " DEF:mempool" . $iter . "free=$rrd:free:AVERAGE";
     $rrd_options .= " DEF:mempool" . $iter . "used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:mempool" . $iter . "free_m=$rrd:free:MAX";
@@ -46,7 +46,7 @@ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cempMemPool` WHERE `device_id
     $mempool['descr_fixed'] = str_pad($mempool['descr_fixed'], 20);
     $mempool['descr_fixed'] = substr($mempool['descr_fixed'],0,20);
     $oid = $mempool['Index'];
-    $rrd = $config['rrd_dir'] . "/$hostname/cmp-$oid.rrd";
+    $rrd = $config['rrd_dir'] . "/$hostname/" . safename("cmp-$oid.rrd");
     $rrd_options .= " DEF:mempool" . $iter . "free=$rrd:free:AVERAGE";
     $rrd_options .= " DEF:mempool" . $iter . "used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:mempool" . $iter . "free_m=$rrd:free:MAX";

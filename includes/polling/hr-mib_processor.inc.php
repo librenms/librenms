@@ -18,7 +18,7 @@ while ($hrDevice = mysql_fetch_array($query)) {
   $update_query .= " WHERE hrDevice_id = '".$hrDevice['hrDevice_id']."'";
   @mysql_query($update_query); $mysql++; echo(".");
 
-  $procrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/hrProcessor-" . $hrDevice['hrDeviceIndex'] . ".rrd");
+  $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("hrProcessor-" . $hrDevice['hrDeviceIndex'] . ".rrd");
 
   if (!is_file($procrrd)) {
     shell_exec($config['rrdtool'] . " create $procrrd \

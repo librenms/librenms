@@ -14,17 +14,15 @@ include("common.inc.php");
   $temperature['temp_descr_fixed'] = str_pad($temperature['temp_descr'], 28);
   $temperature['temp_descr_fixed'] = substr($temperature['temp_descr_fixed'],0,28);
 
-  $filename = str_replace(")", "_", str_replace("(", "_", str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr']))));
-
-  $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/temp-" . $filename . ".rrd";
+  $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
   $rrd_options .= " DEF:temp=$rrd_filename:temp:AVERAGE";
-  $rrd_options .= " CDEF:tempwarm=temp,".$temperature[temp_limit].",GT,temp,UNKN,IF";
+  $rrd_options .= " CDEF:tempwarm=temp,".$temperature['temp_limit'].",GT,temp,UNKN,IF";
   $rrd_options .= " CDEF:tempcold=temp,20,LT,temp,UNKN,IF";
   $rrd_options .= " AREA:temp#FFFF99";
   $rrd_options .= " AREA:tempwarm#FF9999";
   $rrd_options .= " AREA:tempcold#CCCCFF";
-  $rrd_options .= " LINE1.5:temp#cc0000:'" . quotemeta($temperature[temp_descr_fixed]."'");
+  $rrd_options .= " LINE1.5:temp#cc0000:'" . str_replace(':','\:',quotemeta($temperature['temp_descr_fixed'])."'");
   $rrd_options .= " LINE1.5:tempwarm#660000";
   $rrd_options .= " GPRINT:temp:LAST:%3.0lfC";
   $rrd_options .= " GPRINT:temp:MAX:%3.0lfC\\\\l";

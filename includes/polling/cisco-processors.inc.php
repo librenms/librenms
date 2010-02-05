@@ -9,7 +9,7 @@ while($processor = mysql_fetch_array($proc_data)) {
 
   echo("Checking CPU " . $processor['entPhysicalDescr'] . "... ");
 
-  $procrrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/cpmCPU-" . $processor['cpmCPU_oid'] . ".rrd");
+  $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cpmCPU-" . $processor['cpmCPU_oid'] . ".rrd");
 
   if (!is_file($procrrd)) {
     `rrdtool create $procrrd \

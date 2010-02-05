@@ -7,8 +7,8 @@ $hostname = gethostbyid($device);
 
 $query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
 while($int = mysql_fetch_row($query)) {
-  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . $int[0] . ".rrd")) {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $hostname . "/" . $int[0] . ".rrd";
+  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd"))) {
+    $rrd_filenames[] = $config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd");
   }
 }
 

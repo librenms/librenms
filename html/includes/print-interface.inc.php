@@ -207,7 +207,7 @@ echo("</td>");
      echo("</td></tr>");
 
      // If we're showing graphs, generate the graph and print the img tags
-     if($graph_type && is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/". $interface['ifIndex'] . ".rrd")) {
+     if($graph_type && is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex'] . ".rrd"))) {
  
           $type = $graph_type;
 

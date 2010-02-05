@@ -20,7 +20,7 @@ include("common.inc.php");
     $mempool['descr_fixed'] = str_pad($mempool['descr_fixed'], 28);
     $mempool['descr_fixed'] = substr($mempool['descr_fixed'],0,28);
     $oid = $mempool['entPhysicalIndex'] . "." . $mempool['Index'];
-    $rrd  = $config['rrd_dir'] . "/".$mempool['hostname']."/cempMemPool-$oid.rrd";
+    $rrd  = $config['rrd_dir'] . "/".$mempool['hostname']."/" . safename("cempMemPool-$oid.rrd");
     $id = $mempool['entPhysicalIndex'] . "-" . $mempool['Index'];
     $rrd_options .= " DEF:mempool" . $id . "free=$rrd:free:AVERAGE ";
     $rrd_options .= " DEF:mempool" . $id . "used=$rrd:used:AVERAGE ";

@@ -50,7 +50,7 @@ while ($acc = mysql_fetch_array($mac_accounting_query)) {
     }
 
     if($debug) {echo("\n" . $acc['hostname']." ".$acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");}
-    $rrdfile = $host_rrd . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+    $rrdfile = $host_rrd . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
 
     if(!is_file($rrdfile)) {
       $woo = shell_exec($config['rrdtool'] ." create $rrdfile \

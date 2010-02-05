@@ -20,7 +20,7 @@ while($mempool = mysql_fetch_array($pool_data)) {
 
   echo(round(($cmpUsed/($cmpFree+$cmpUsed))*100) . "% ");
 
-  $poolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/cmp-" . $mempool['Index'] . ".rrd";
+  $poolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cmp-" . $mempool['Index'] . ".rrd");
 
   if (!is_file($poolrrd)) {
     shell_exec ($config['rrdtool'] . " create $poolrrd \

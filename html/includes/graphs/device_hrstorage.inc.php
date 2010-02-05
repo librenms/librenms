@@ -14,7 +14,7 @@ include("common.inc.php");
     } elseif($iter=="7") {$colour="FF0084"; $iter = "0"; }
     $descr = substr(str_pad($fs[hrStorageDescr], 12),0,12);
     $descr = str_replace(":","\:",$descr);
-    $rrd = $config['rrd_dir'] . "/$hostname/hrStorage-".$fs['hrStorageIndex'].".rrd";
+    $rrd = $config['rrd_dir'] . "/$hostname/" . safename("hrStorage-".$fs['hrStorageIndex'].".rrd");
     $rrd_options .= " DEF:$fs[storage_id]=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:$fs[storage_id]s=$rrd:size:AVERAGE";
     $rrd_options .= " DEF:$fs[storage_id]p=$rrd:perc:AVERAGE";

@@ -30,7 +30,7 @@ if($device['os_group'] == "ios") {
       echo(" --> " . $port['ifDescr'] . " POE");
 
       /// Update RRDs
-      $rrdfile = $host_rrd . "/" . $port['ifIndex'] . ".rrd";
+      $rrdfile = $host_rrd . "/" . safename($port['ifIndex'] . ".rrd");
       if(!is_file($rrdfile)) {
         $woo = shell_exec($config['rrdtool'] . " create $rrdfile -s 300 \
         DS:PortPwrAllocated:GAUGE:600:0:12500000000 \

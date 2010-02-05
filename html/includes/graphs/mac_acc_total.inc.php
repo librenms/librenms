@@ -40,7 +40,7 @@ if(is_numeric($_GET['topn'])) { $topn = $_GET['topn']; } else { $topn = '10'; }
   $pluses = ""; $iter = '0';
   $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
   while($acc = mysql_fetch_array($query)) {
-   $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+   $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
    if(is_file($this_rrd)) {
    $name = $acc['mac'];
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."' AND interface_id = '".$acc['interface_id']."'"));

@@ -20,9 +20,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
     if ($temp != 999.9) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
   }
 
-  $temprrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . str_replace("/", "_", str_replace(" ", "_",$temperature['temp_descr'])) . ".rrd");
-  $temprrd  = str_replace(")", "_", $temprrd);
-  $temprrd  = str_replace("(", "_", $temprrd);
+  $temprrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
   if (!is_file($temprrd)) {
     `rrdtool create $temprrd \
@@ -38,6 +36,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   $updatecmd = "rrdtool update $temprrd N:$temp";
 
+  if ($debug) { echo "$updatecmd\n"; }
   shell_exec($updatecmd);
 
   if($temperature['temp_current'] < $temperature['temp_limit'] && $temp >= $temperature['temp_limit']) {

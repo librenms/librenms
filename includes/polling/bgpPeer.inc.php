@@ -91,7 +91,7 @@ if ($device['os'] == "junos")
     }
   }
 
-  $peerrrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/bgp-" . $peer['bgpPeerIdentifier'] . ".rrd";
+  $peerrrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("bgp-" . $peer['bgpPeerIdentifier'] . ".rrd");
   if(!is_file($peerrrd)) {
     $woo = shell_exec($config['rrdtool'] . " create $peerrrd \
       DS:bgpPeerOutUpdates:COUNTER:600:U:100000000000 \
@@ -153,7 +153,7 @@ if ($device['os'] == "junos")
 
      mysql_query($update);
 
-     $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd";
+     $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd");
      if(!is_file($cbgp_rrd)) {
        $woo = shell_exec($config['rrdtool'] . " create $cbgp_rrd \
          DS:AcceptedPrefixes:GAUGE:600:U:100000000000 \

@@ -17,7 +17,7 @@ while($sensor = mysql_fetch_array($sensors)) {
 
   list($entSensorValue, $entSensorStatus) = explode("\n", $sensor_data);
 
-  $rrd  = addslashes($config['rrd_dir'] . "/" . $device['hostname'] . "/ces-" . $oid . ".rrd");
+  $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ces-" . $oid . ".rrd");
 
   if (!is_file($rrd)) {
     `rrdtool create $rrd \

@@ -2,7 +2,7 @@
 
     echo("Collecting Apache statistics...");
 
-    $apacherrd = "rrd/" . $device['hostname'] . "-apache.rrd";
+    $apacherrd = "rrd/" . safename($device['hostname'] . "-apache.rrd");
     if(!is_file($apacherrd)) {
       $woo= `rrdtool create $apacherrd         \
            DS:bits:COUNTER:600:U:10000000   \

@@ -61,7 +61,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if($config[ifname][$device[os]]) { $ifDescr = $ifName; }
 
-   $rrdfile = $host_rrd . "/" . $interface['ifIndex'] . ".rrd"; 
+   $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd"); 
 
    if(!is_file($rrdfile)) {
      $woo = shell_exec($config['rrdtool'] . " create $rrdfile \

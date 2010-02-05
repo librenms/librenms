@@ -4,7 +4,7 @@
 
       $this_port = &$array[$device[device_id]][$port[ifIndex]];
 
-      $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-".$port['ifIndex'].".rrd";
+      $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("etherlike-".$port['ifIndex'].".rrd");
 
       $rrd_create = $config['rrdtool'] . " create $rrdfile ";
       $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \

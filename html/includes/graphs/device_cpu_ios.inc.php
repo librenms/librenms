@@ -4,7 +4,7 @@ $query = mysql_query("SELECT * FROM `cpmCPU` where `device_id` = '".mres($device
 
 $i=0;
 while($proc = mysql_fetch_array($query)) {
-  $rrd_filename  = $config['rrd_dir'] . "/$hostname/cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd";
+  $rrd_filename  = $config['rrd_dir'] . "/$hostname/" . safename("cpmCPU-" . $proc['cpmCPU_oid'] . ".rrd");
   if(is_file($rrd_filename)) {
     $descr = str_pad($proc['entPhysicalDescr'], 8);
     $descr = substr($descr,0,8);

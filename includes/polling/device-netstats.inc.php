@@ -35,7 +35,7 @@ if($device[os] != "Snom") {
 
   foreach($protos as $proto) {
     unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
-    $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-".$proto.".rrd";
+    $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("netstats-".$proto.".rrd");
 
     $rrd_create = $config['rrdtool'] . " create $rrdfile ";
     $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 \
