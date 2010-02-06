@@ -114,8 +114,6 @@ if ($_GET['status'] == "alerted") {
   $sql = "SELECT * FROM devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";  
 }
 
-echo $sql;
-
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
 <tr class="tablehead"><th></th><th>Device</th><th>Operating System</th><th>Platform</th><th>Uptime</th></tr>');
 
