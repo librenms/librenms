@@ -18,8 +18,8 @@ function process_syslog ($entry, $update) {
     $device_id_ip = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE 
     A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id"),0);
 
-    echo("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE
-    A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
+    #echo("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE
+    #A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
 
     if($device_id_ip) { 
       $entry['device_id'] = $device_id_ip;
@@ -66,7 +66,7 @@ function process_syslog ($entry, $update) {
     }
     $x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mysql_real_escape_string($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
     $entry['processed'] = 1;
-    if($update) { mysql_query($x); echo($x); }
+    if($update) { mysql_query($x); }
     unset ($fix);
   } else {
      $x = "DELETE FROM `syslog` where `seq` = '" . $entry['seq'] . "'"; 

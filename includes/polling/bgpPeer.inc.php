@@ -124,7 +124,7 @@ if ($device['os'] == "junos")
    
      $afi = $peer_afi['afi'];
      $safi = $peer_afi['safi'];
-     #echo($config['afi'][$afi][$safi]. " ");
+     if($debug) { echo("$afi $safi". $config['afi'][$afi][$safi]. "\n"); }
 
      $cbgp_cmd  = $config['snmpget'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
      $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
@@ -135,9 +135,9 @@ if ($device['os'] == "junos")
      $cbgp_cmd .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     #echo("\n$cbgp_cmd\n");
+     if($debug) { echo("$cbgp_cmd\n"); }
      $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
-
+     if($debug) { echo("$cbgp_data\n"); }
      list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
 
      $update  = "UPDATE bgpPeers_cbgp SET";
@@ -150,7 +150,7 @@ if ($device['os'] == "junos")
      $update .= ", `cbgpPeerSuppressedPrefixes` = '$cbgpPeerSuppressedPrefixes'";
      $update .= ", `cbgpPeerWithdrawnPrefixes` = '$cbgpPeerWithdrawnPrefixes'";
      $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "' AND afi = '$afi' AND safi = '$safi'";
-
+     if($debug) { echo("MYSQL: $update\n"); }
      mysql_query($update);
 
      $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd");
