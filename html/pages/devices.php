@@ -16,7 +16,7 @@
               if ($data['os'])
               {
                 echo("<option value='".$data['os']."'");
-                if ($data['os'] == $_POST['os']) { echo("selected"); }
+                if ($data['os'] == $_POST['os']) { echo(" selected"); }
                 echo(">".$data['os']."</option>");
               }
             }
@@ -32,7 +32,7 @@
               if ($data['version'])
               {
                 echo("<option value='".$data['version']."'");
-                if ($data['version'] == $_POST['version']) { echo("selected"); }
+                if ($data['version'] == $_POST['version']) { echo(" selected"); }
                 echo(">".$data['version']."</option>");
               }
             }
@@ -49,7 +49,7 @@
               if ($data['hardware'])
               {
                 echo('<option value="'.$data['hardware'].'"');
-                if ($data['hardware'] == $_POST['hardware']) { echo("selected"); }
+                if ($data['hardware'] == $_POST['hardware']) { echo(" selected"); }
                 echo(">".$data['hardware']."</option>");
               }
             }
@@ -65,7 +65,7 @@
               if ($data['features'])
               {
                 echo('<option value="'.$data['features'].'"');
-                if ($data['features'] == $_POST['features']) { echo("selected"); }
+                if ($data['features'] == $_POST['features']) { echo(" selected"); }
                 echo(">".$data['features']."</option>");
               }
             }
@@ -82,7 +82,7 @@
               if ($data['location'])
               {
                 echo('<option value="'.$data['location'].'"');
-                if ($data['location'] == $_POST['location']) { echo("selected"); }
+                if ($data['location'] == $_POST['location']) { echo(" selected"); }
                 echo(">".$data['location']."</option>");
               }
             }
@@ -105,7 +105,7 @@ if ($_POST['version'])  { $where .= " AND version = '".$_POST['version']."'"; }
 if ($_POST['hardware']) { $where .= " AND hardware = '".$_POST['hardware']."'"; }
 if ($_POST['features']) { $where .= " AND features = '".$_POST['features']."'"; }
 if ($_POST['location']) { $where .= " AND location = '".$_POST['location']."'"; }
-if ($_GET['location'])  { $where .= " AND location = '".$_GET['location']."'"; }
+if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location = '".$_GET['location']."'"; }
 if ($_GET['type'])      { $where = "AND type = '$_GET[type]'"; }
 if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
 
@@ -113,6 +113,8 @@ $sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostn
 if ($_GET['status'] == "alerted") { 
   $sql = "SELECT * FROM devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";  
 }
+
+echo $sql;
 
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
 <tr class="tablehead"><th></th><th>Device</th><th>Operating System</th><th>Platform</th><th>Uptime</th></tr>');
