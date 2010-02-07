@@ -68,7 +68,6 @@ while ($acc = mysql_fetch_array($mac_accounting_query)) {
         RRA:MAX:0.5:288:797");
     }
     $woo = "N:".($b_in+0).":".($b_out+0).":".($p_in+0).":".($p_out+0);
-    if($debug) {echo("\n rrdtool update $rrdfile $woo");}
     $ret = rrdtool_update("$rrdfile", $woo);
 
       if ($update) { /// Do Updates

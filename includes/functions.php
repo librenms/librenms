@@ -24,9 +24,11 @@ require('collectd/config.php');
 require('collectd/functions.php');
 require('collectd/definitions.php');
 
-function device_by_id_cache($device_id) {
+function device_by_id_cache($device_id)
+{
   global $device_cache;
-  if(is_array($device_cache[$device_id])) {
+  if (is_array($device_cache[$device_id]))
+  {
     $device = $device_cache[$device_id];
   } else {
     $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
@@ -35,54 +37,63 @@ function device_by_id_cache($device_id) {
   return $device;
 }
 
-function mac_clean_to_readable($mac){
+function mac_clean_to_readable($mac)
+{
+  $r = substr($mac, 0, 2);
+  $r .= ":".substr($mac, 2, 2);
+  $r .= ":".substr($mac, 4, 2);
+  $r .= ":".substr($mac, 6, 2);
+  $r .= ":".substr($mac, 8, 2);
+  $r .= ":".substr($mac, 10, 2);
 
-   $r = substr($mac, 0, 2);
-   $r .= ":".substr($mac, 2, 2);
-   $r .= ":".substr($mac, 4, 2);
-   $r .= ":".substr($mac, 6, 2);
-   $r .= ":".substr($mac, 8, 2);
-   $r .= ":".substr($mac, 10, 2);
-
-   return($r);
+  return($r);
 }
 
 function zeropad($num)
 {
-    return (strlen($num) == 1) ? '0'.$num : $num;
+  return (strlen($num) == 1) ? '0'.$num : $num;
 }
 
 function zeropad_lineno($num, $length)
 {
-    while (strlen($num) < $length)
-        $num = '0'.$num;
-   
-    return $num;
+  while (strlen($num) < $length)
+  {
+    $num = '0'.$num;
+  }
+ 
+  return $num;
 }
 
 function only_alphanumeric( $string )
 {
-        return preg_replace('/[^a-zA-Z0-9]/', '', $string);
+  return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
 
 
-function validate_hostip($host) {
-
+function validate_hostip($host)
+{
+  // FIXME
 }
 
-function write_dev_attrib($device_id, $attrib_type, $attrib_value) {
+function write_dev_attrib($device_id, $attrib_type, $attrib_value)
+{
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
-  if(mysql_result(mysql_query($count_sql),0)) {
+  if (mysql_result(mysql_query($count_sql),0)) 
+  {
     $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '$device_id' AND `attrib_type` = '$attrib_type'";
     mysql_query($update_sql);
-  } else {
+  }
+  else
+  {
     $insert_sql = "INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('$device_id', '$attrib_type', '$attrib_value')";
     mysql_query($insert_sql);
   }
+  
   return mysql_affected_rows();
 }
 
-function shorthost($hostname, $len=16) {
+function shorthost($hostname, $len=16)
+{
   $parts = explode(".", $hostname);
   $shorthost = $parts[0];
   $i=1;
@@ -94,59 +105,73 @@ function shorthost($hostname, $len=16) {
   return ($shorthost);
 }
 
-function rrdtool_update($rrdfile, $rrdupdate) {
-  global $config;
-  global $debug;
-  if($debug) { echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n"); }
+function rrdtool_update($rrdfile, $rrdupdate)
+{
+  global $config, $debug;
+  
+  if ($debug) { echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n"); }
   return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
 }
 
-function rrdtool($command, $file, $options) {
+function rrdtool($command, $file, $options)
+{
   global $config;
-  if($config['debug']) { echo($config['rrdtool'] . " $command $file $options \n"); }
+  
+  if ($config['debug']) { echo($config['rrdtool'] . " $command $file $options \n"); }
   return shell_exec($config['rrdtool'] . " $command $file $options");
 }
 
-function device_array($device_id) {
+function device_array($device_id)
+{
   $sql = "SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'";
   $query = mysql_query($sql);
   $device = mysql_fetch_array($query);
   return $device;
 }
 
-function getHostOS($device) {
-    global $config;
-    $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " sysDescr.0";
-    $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
-    $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
-    while ($file = readdir($dir_handle)) {
-      if( preg_match("/^discover-([a-z0-9\-]*).php/", $file) ) {
-        include($config['install_dir'] . "/includes/osdiscovery/" . $file);
-      }
+function getHostOS($device)
+{
+  global $config;
+  
+  $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " sysDescr.0";
+  $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
+  $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
+  while ($file = readdir($dir_handle))
+  {
+    if ( preg_match("/^discover-([a-z0-9\-]*).php/", $file) )
+    {
+      include($config['install_dir'] . "/includes/osdiscovery/" . $file);
     }
-    closedir($dir_handle);
-    if($os) { return $os; } else { return FALSE; }
+  }
+  closedir($dir_handle);
+  
+  if ($os) { return $os; } else { return FALSE; }
 }
 
 function billpermitted($bill_id) 
 {
   global $_SESSION;
-  if($_SESSION['userlevel'] >= "5") {
+  if ($_SESSION['userlevel'] >= "5") 
+  {
     $allowed = TRUE;
-  } elseif (@mysql_result(mysql_query("SELECT count(*) FROM bill_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `bill_id` = $bill_id"), 0) > '0') {
+  } 
+  elseif (@mysql_result(mysql_query("SELECT count(*) FROM bill_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `bill_id` = $bill_id"), 0) > '0') 
+  {
     $allowed = TRUE;
-  } else {
+  }
+  else 
+  {
     $allowed = FALSE;
   }
-  return $allowed;
 
+  return $allowed;
 }
 
 
 function interfacepermitted($interface_id) 
 {
   global $_SESSION;
-  if($_SESSION['userlevel'] >= "5") { 
+  if ($_SESSION['userlevel'] >= "5") { 
     $allowed = TRUE; 
   } elseif ( devicepermitted(mysql_result(mysql_query("SELECT `device_id` FROM `interfaces` WHERE `interface_id` = '$interface_id'"),0))) {
     $allowed = TRUE;
@@ -161,7 +186,7 @@ function interfacepermitted($interface_id)
 function devicepermitted($device_id) 
 {
   global $_SESSION;
-  if($_SESSION['userlevel'] >= "5") { 
+  if ($_SESSION['userlevel'] >= "5") { 
     $allowed = true; 
   } elseif ( @mysql_result(mysql_query("SELECT * FROM devices_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `device_id` = $device_id"), 0) > '0' ) {
     $allowed = true;
@@ -206,7 +231,7 @@ function arguments($argv)
     foreach ($argv as $arg) {
       if (ereg('--([^=]+)=(.*)',$arg,$reg)) {
         $_ARG[$reg[1]] = $reg[2];
-      } elseif(ereg('-([a-zA-Z0-9])',$arg,$reg)) {
+      } elseif (ereg('-([a-zA-Z0-9])',$arg,$reg)) {
             $_ARG[$reg[1]] = 'true';
         }
    
@@ -277,22 +302,22 @@ function interface_packets ($rrd_file) // Returns the last in/out pps value in R
 
 function geteventicon ($message) 
 {
-  if($message == "Device status changed to Down") { $icon = "server_connect.png"; }
-  if($message == "Device status changed to Up") { $icon = "server_go.png"; }
-  if($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
-  if($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
-  if($message == "Interface disabled") { $icon = "if-disable.png"; }
-  if($message == "Interface enabled") { $icon = "if-enable.png"; }
-  if($icon) { return $icon; } else { return false; }
+  if ($message == "Device status changed to Down") { $icon = "server_connect.png"; }
+  if ($message == "Device status changed to Up") { $icon = "server_go.png"; }
+  if ($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
+  if ($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
+  if ($message == "Interface disabled") { $icon = "if-disable.png"; }
+  if ($message == "Interface enabled") { $icon = "if-enable.png"; }
+  if ($icon) { return $icon; } else { return false; }
 }
 
 function generateiflink($interface, $text=0, $type = '') 
 {
   global $twoday; global $now; global $config; global $day; global $month;
   $interface = ifNameDescr($interface);
-  if(!$text) { $text = fixIfName($interface['label']); }
-  if(isset($type)) { $interface['graph_type'] = $type; }
-  if(!$interface['graph_type']) { $interface['graph_type'] = 'port_bits'; }
+  if (!$text) { $text = fixIfName($interface['label']); }
+  if (isset($type)) { $interface['graph_type'] = $type; }
+  if (!$interface['graph_type']) { $interface['graph_type'] = 'port_bits'; }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$day&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
   $graph_url_month = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$month&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
@@ -300,7 +325,7 @@ function generateiflink($interface, $text=0, $type = '')
   $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/' ";
   $link .= "onmouseover=\" return overlib('";
   $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>', CAPTION, '<span class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['label']) . "</span>";
-  if($interface['ifAlias']) { $link .= "<br />" . htmlentities($interface['ifAlias']); }
+  if ($interface['ifAlias']) { $link .= "<br />" . htmlentities($interface['ifAlias']); }
   $link .= "' ";
   $link .= $config['overlib_defaults'].");\" onmouseout=\"return nd();\" >$text</a>";
 
@@ -310,10 +335,10 @@ function generateiflink($interface, $text=0, $type = '')
 function generatedevicelink($device, $text=0, $start=0, $end=0) 
 {
   global $twoday; global $day; global $now; global $config;
-  if(!$start) { $start = $day; }
-  if(!$end) { $end = $now; }
+  if (!$start) { $start = $day; }
+  if (!$end) { $end = $now; }
   $class = devclass($device);
-  if(!$text) { $text = $device['hostname']; }
+  if (!$text) { $text = $device['hostname']; }
   $graph_url = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=device_cpu";
   $graph_url_b = $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=device_memory";
   $link  = "<a class=$class href='".$config['base_url']."/device/" . $device['device_id'] . "/' ";
@@ -345,13 +370,13 @@ function getImage($host)
   $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
   $data = mysql_fetch_array(mysql_query($sql));
   $type = strtolower($data['os']);
-  if(file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
-  } elseif(file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
-  if($type == "linux") {
+  if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
+  } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
+  if ($type == "linux") {
     $features = strtolower(trim($data['features']));
     list($distro) = split(" ", $features);
-    if(file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
-    } elseif(file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
+    if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
+    } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
   }
   return $image;
 }
@@ -476,7 +501,7 @@ function humanmedia($media)
 function humanspeed($speed) 
 {
   $speed = formatRates($speed);
-  if($speed == "") { $speed = "-"; }
+  if ($speed == "") { $speed = "-"; }
   return $speed;
 }
 
@@ -505,18 +530,18 @@ function formatUptime($diff, $format="long")
   
   $uptime = "";
   
-  if($format == "short") {
-    if($yearsDiff > '0'){ $uptime .= $yearsDiff . "y "; }
-    if($daysDiff > '0'){ $uptime .= $daysDiff . "d "; }
-    if($hrsDiff > '0'){ $uptime .= $hrsDiff . "h "; }
-    if($minsDiff > '0'){ $uptime .= $minsDiff . "m "; }
-    if($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
+  if ($format == "short") {
+    if ($yearsDiff > '0'){ $uptime .= $yearsDiff . "y "; }
+    if ($daysDiff > '0'){ $uptime .= $daysDiff . "d "; }
+    if ($hrsDiff > '0'){ $uptime .= $hrsDiff . "h "; }
+    if ($minsDiff > '0'){ $uptime .= $minsDiff . "m "; }
+    if ($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
   } else {
-    if($yearsDiff > '0'){ $uptime .= $yearsDiff . " years, "; }
-    if($daysDiff > '0'){ $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
-    if($hrsDiff > '0'){ $uptime .= $hrsDiff     . "h "; }
-    if($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
-    if($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
+    if ($yearsDiff > '0'){ $uptime .= $yearsDiff . " years, "; }
+    if ($daysDiff > '0'){ $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
+    if ($hrsDiff > '0'){ $uptime .= $hrsDiff     . "h "; }
+    if ($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
+    if ($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
   }
   return trim($uptime);
 }
@@ -525,7 +550,7 @@ function isSNMPable($hostname, $community, $snmpver, $port)
 {
      global $config;
      $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
-     if($pos == '') {
+     if ($pos == '') {
        return false;
      } else {
        return true;
@@ -535,7 +560,7 @@ function isSNMPable($hostname, $community, $snmpver, $port)
 function isPingable($hostname) {
    global $config;
    $status = shell_exec($config['fping'] . " $hostname");
-   if(strstr($status, "alive")) {
+   if (strstr($status, "alive")) {
      return TRUE;
    } else {
      return FALSE;
@@ -614,7 +639,8 @@ function fixIOSFeatures($features)
 	return $features;
 }
 
-function fixIOSHardware($hardware){
+function fixIOSHardware($hardware)
+{
 
         $hardware = preg_replace("/C([0-9]+)/", "Cisco \\1", $hardware);
 	$hardware = preg_replace("/CISCO([0-9]+)/", "Cisco \\1", $hardware);
@@ -633,20 +659,29 @@ function fixIOSHardware($hardware){
 
 }
 
-function createHost ($host, $community, $snmpver, $port = 161){
-        $host = trim(strtolower($host));
-        $device = array('hostname' => $host, 'community' => $community, 'snmpver' => $snmpver, 'port' => $port);
-        $host_os = getHostOS($device); 
-        if($host_os) {
-           $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1','$snmpver')");
-           if(mysql_affected_rows()) {
-	     $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
-	     mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
-             return("Created host : $host (id:$device_id) (os:$host_os)");
-           } else { return FALSE; }
-        } else {
-	   return FALSE;
-	}
+function createHost ($host, $community, $snmpver, $port = 161)
+{
+  $host = trim(strtolower($host));
+  $device = array('hostname' => $host, 'community' => $community, 'snmpver' => $snmpver, 'port' => $port);
+  $host_os = getHostOS($device); 
+  if ($host_os)
+  {
+    $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1','$snmpver')");
+    if (mysql_affected_rows())
+    {
+      $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
+      mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
+      return("Created host : $host (id:$device_id) (os:$host_os)");
+    } 
+    else 
+    { 
+      return FALSE;
+    }
+  }
+  else
+  {
+    return FALSE;
+  }
 }
 
 function isDomainResolves($domain)
@@ -658,10 +693,12 @@ function hoststatus($id)
 {
   $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
   $result = @mysql_result($sql, 0);
+  
   return $result;
 }
 
-function match_network ($nets, $ip, $first=false) {
+function match_network ($nets, $ip, $first=false)
+{
    $return = false;
    if (!is_array ($nets)) $nets = array ($nets);
    foreach ($nets as $net) {
@@ -679,6 +716,7 @@ function match_network ($nets, $ip, $first=false) {
            if ($first && $return) return true;
        }
    }
+   
    return $return;
 }
 
@@ -687,6 +725,7 @@ function snmp2ipv6($ipv6_snmp)
   $ipv6 = explode('.',$ipv6_snmp);
   for ($i = 0;$i <= 15;$i++) { $ipv6[$i] = zeropad(dechex($ipv6[$i])); }
   for ($i = 0;$i <= 15;$i+=2) { $ipv6_2[] = $ipv6[$i] . $ipv6[$i+1]; }
+  
   return implode(':',$ipv6_2);
 }
 
@@ -696,6 +735,7 @@ function ipv62snmp($ipv6)
   for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad_lineno($ipv6_ex[$i],4); }
   $ipv6_ip = implode('',$ipv6_ex);
   for ($i = 0;$i < 32;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
+  
   return implode('.',$ipv6_split);
 }
 
