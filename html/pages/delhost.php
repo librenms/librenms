@@ -30,7 +30,7 @@ while($data = mysql_fetch_array($query)) {
 ?>
     </select>
   
-    <input type="submit" name="Submit" value="Delete Host">
+    <input type="submit" class="submit" name="Submit" value="Delete Host">
 </p>
 </form>
 
