@@ -88,7 +88,7 @@ if($_GET['debug']) {
     imagedestroy($im);
   }
 
-  $delete = `rm $graphfile`; 
+  unlink($graphfile);
 
 #  } // End IF
 
