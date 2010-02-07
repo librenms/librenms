@@ -88,7 +88,7 @@
             }
           ?>
         </select>
-        <input class="submit" type="submit" value="Search">
+        <input class="submit" type="submit" class="submit" value="Search">
       </td>
       <td width="10"></td>
     </tr>

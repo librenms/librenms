@@ -67,7 +67,7 @@
         Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if($_POST['deleted']) { echo("checked"); } ?> ></input>
         </td>
         <td style="text-align: right;">
-        <input style="align:right;" type=submit value=Search></div>
+        <input style="align:right;" type=submit class=submit value=Search></div>
              </td>
            </form>
          </tr>

@@ -37,7 +37,7 @@
     </select>
   </label>
 
-  <input type=submit value=Search>
+  <input type=submit class=submit value=Search>
 
 </form>
 

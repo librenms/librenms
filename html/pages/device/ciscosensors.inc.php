@@ -1,15 +1,6 @@
-<?php // vim:fenc=utf-8:filetype=php:ts=4
+<?php 
 
-echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
-");
+print_optionbar_start();
 
  unset ($sep);
  $query = mysql_query("SELECT `entSensorType` FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%' GROUP BY `entSensorType` ORDER BY `entSensorType`");
@@ -23,16 +14,8 @@ echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-botto
    $sep = ' | ';
  }
  unset ($sep);
- echo("</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
-");    
+
+print_optionbar_end();
 
  $query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' and entSensorType = '".$_GET['opta']."' ORDER BY `entPhysicalName`");
  while($data = mysql_fetch_array($query)) {

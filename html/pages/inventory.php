@@ -39,7 +39,7 @@
     </select>
   </label>
   <input type="text" size=24 name="device_string" id="device_string" value="<?php  echo($_POST['device_string']); ?>" />
-  <input style type=submit value=Search>
+  <input style type=submit class=submit value=Search>
 
 <?php
 

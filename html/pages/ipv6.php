@@ -1,12 +1,5 @@
-<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 5px 5px; padding-left: 10px; clear: both; display:block;'>
+<?php print_optionbar_start(28); ?>
+
 <table cellpadding=0 cellspacing=0 class=devicetable width=100%>
   <tr>
   <form method='post' action=''>
@@ -34,22 +27,14 @@
     </td>
     <td width=400>
      <input type="text" name="address" id="address" size=40 value="<?php  echo($_POST['address']); ?>" />
-     <input style="align:right;" type=submit value=Search></div>
+     <input style="align:right;" type=submit class=submit value=Search></div>
     </td>
   </form>
 
   </tr>
 </table>
 
-</div>
-</div>
-  <b class='rounded'>
-  <b class='rounded5'></b>
-  <b class='rounded4'></b>
-  <b class='rounded3'></b>
-  <b class='rounded2'></b>
-  <b class='rounded1'></b></b>
-</div>
+<?php print_optionbar_end(); ?>
 
 
 <?php

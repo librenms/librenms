@@ -52,7 +52,7 @@ echo("<p class='errorbox'><b>Error:</b> A hostname is required.</p>");
     </td>
   </tr>
   <tr>
-    <td></td><td><input type="submit" name="Submit" value="Add Host"></td>
+    <td></td><td><input type="submit" class="submit" name="Submit" value="Add Host"></td>
   </tr>   
   </table>
  </div>

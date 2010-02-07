@@ -46,7 +46,7 @@ print_optionbar_start('40');
        </select>
      </td>
 		 <td>
-         <input type=submit value=Search>
+         <input type=submit class=submit value=Search>
              </td>
              <td width='80' style='font-weight:bold; font-size: 12px;'>
 						   <a href='bills/add/'><img src="images/16/add.png" align=absmiddle alt="Add"> Add Bill</a>

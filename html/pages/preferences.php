@@ -19,7 +19,7 @@ echo("<form method='post' action='".$config['baseurl']."/preferences/'><input ty
         <tr><td>Old Password</td><td><input type=password name=old_pass autocomplete='off'></input></td></tr>
         <tr><td>New Password</td><td><input type=password name=new_pass autocomplete='off'></input></td></tr>
         <tr><td>New Password</td><td><input type=password name=new_pass2 autocomplete='off'></input></td></tr>
-        <tr><td></td><td align=right><input type=submit></td></tr></table></form>");
+        <tr><td></td><td align=right><input type=submit class=submit></td></tr></table></form>");
 echo("</div>");
 
 

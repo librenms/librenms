@@ -1,4 +1,4 @@
-<?php // vim:fenc=utf-8:filetype=php:ts=4
+<?php
 
 $temp = mysql_result(mysql_query("select count(*) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0);
 $storage = mysql_result(mysql_query("select count(*) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0);
@@ -22,19 +22,6 @@ $type_text['cpm'] = "Processor Usage";
 $type_text['storage'] = "Disk Usage";
 $type_text['hrprocessors'] = "Processor Usage";
 
-
-/*
- echo("<div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px;'>
-  <b class='rounded'>
-  <b class='rounded1'></b>
-  <b class='rounded2'></b>
-  <b class='rounded3'></b>
-  <b class='rounded4'></b>
-  <b class='rounded5'></b></b>
-  <div class='roundedfg' style='padding: 0px 5px;'>
-  <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:20px;'>
-");
-*/
 
 print_optionbar_start();
 

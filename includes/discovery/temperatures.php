@@ -116,6 +116,7 @@
   ## LMSensors Temperatures
   if($device['os'] == "linux") {
     $oids = shell_exec($config['snmpwalk'] . " -m LM-SENSORS-MIB -$snmpver -CI -Osqn -c $community $hostname:$port lmTempSensorsDevice");
+    if($debug) { echo($oids."\n"); }
     $oids = trim($oids);
     if ($oids) echo("LM-SENSORS ");
     foreach(explode("\n", $oids) as $data) {

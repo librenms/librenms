@@ -22,7 +22,7 @@ print_optionbar_start('25');
       ?>
     </select>
   </label>
-  <input type=submit value=Search>
+  <input class=submit type=submit value=Search>
 </form>
 
 <?php

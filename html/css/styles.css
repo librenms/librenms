@@ -1,6 +1,7 @@
 .submit {
   background-image:url('/images/submitbg.png');
   background-position:0 100%;
+  border-color:#B2B2B2 #525252 #525252 #B2B2B2;
 }
 input,select {
   padding:2px 5px;
@@ -10,7 +11,7 @@ input,select {
   border:1px solid #B2B2B2
   bbackground-color:cornsilk;
   border:1px solid #B2B2B2;
-  bborder-color:#B2B2B2 #000000 #000000 #B2B2B2;
+  border-color:#B2B2B2 #d2d2d2 #d2d2d2 #B2B2B2;
   border-style:solid;
   border-width:1px;
   font-family:'Trebuchet MS','Lucida Grande',Verdana,Arial,sans-serif;

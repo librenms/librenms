@@ -21,7 +21,7 @@
                   <font size="2">Remember Me</font></td>
                 </tr>
                 <tr>
-                  <td colspan="2" align="right"><input name="submit" type="submit" value="Login" /></td>
+                  <td colspan="2" align="right"><input class="submit" name="submit" type="submit" value="Login" /></td>
                 </tr>
 <?php
 if($auth_message) {
