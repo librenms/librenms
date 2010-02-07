@@ -34,10 +34,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   echo($temp . "C\n");
 
-  $updatecmd = "rrdtool update $temprrd N:$temp";
-
-  if ($debug) { echo "$updatecmd\n"; }
-  shell_exec($updatecmd);
+  rrdtool_update($temprrd,"N:$temp");
 
   if($temperature['temp_current'] < $temperature['temp_limit'] && $temp >= $temperature['temp_limit']) {
     $updated = ", `service_changed` = '" . time() . "' ";
