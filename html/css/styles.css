@@ -4,10 +4,9 @@
   border-color:#B2B2B2 #525252 #525252 #B2B2B2;
 }
 input,select {
-  padding:2px 5px;
   background:#FFFFFF url('/images/textbg.png') repeat-x scroll 0 0;
   font-size:1em;
-  wwidth:92%;
+  width:92%;
   border:1px solid #B2B2B2
   bbackground-color:cornsilk;
   border:1px solid #B2B2B2;
