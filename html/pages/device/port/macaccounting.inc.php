@@ -124,6 +124,10 @@
    if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    $name = gethostbyaddr($addy['ipv4_address']);
+
+   $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE A.ipv4_address = '".$addy['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+   if($arp_host) { $arp_name = generatedevicelink($arp_host); $arp_name .= " ".generateiflink($arp_host); } else { unset($arp_if); }
+
    if($name == $addy['ipv4_address']) { unset ($name); }
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {
      $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
@@ -163,7 +167,7 @@
        <tr>
          <td class=list-large width=200>".mac_clean_to_readable($acc['mac'])."</td>
          <td class=list-large width=200>".$addy['ipv4_address']."</td>
-         <td class=list-large width=500>".$name."</td>
+         <td class=list-large width=500>".$name." ".$arp_name . "</td>
          <td class=list-large width=100>".formatRates($acc['cipMacHCSwitchedBytes_input_rate'] / 8)."</td>
          <td class=list-large width=100>".formatRates($acc['cipMacHCSwitchedBytes_output_rate'] / 8)."</td>
        </tr>
