@@ -6,9 +6,9 @@ if ($_SESSION['userlevel'] < '5')
 }
 else
 {
-  echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=2 width=100%>");
+  echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 
-  echo '<tr style="height: 30px"><th></th><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
+  echo '<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>';
 
   $i = "1";
 
@@ -26,7 +26,7 @@ else
 
     if(!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
 
-    if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; if ($_GET['opta'] != "alerts") { $bg_colour = "#ffcccc"; } }
+    if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; if ($_GET['opta'] != "alerts") { $bg_image = "images/warning-background.png"; } }
     if($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
 
     if($peer['bgpPeerRemoteAs'] == $peer['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; 
@@ -37,8 +37,8 @@ else
 
     if($peerhost) { $peername = generatedevicelink($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
-    echo("<tr bgcolor=$bg_colour>
-	     <td width=10></td>
+    echo("<tr bgcolor=$bg_colour background=$bg_image>
+            <td></td>
             <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generatedevicelink($peer, shorthost($peer['hostname']))."</td>
 	     <td width=30>-></td>
             <td width=150><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>

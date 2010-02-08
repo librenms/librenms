@@ -53,11 +53,11 @@
 
   if($port_details) {
     $interface['graph_type'] = "port_bits";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_bits&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    echo(generateiflink($interface, "<img src='graph.php?type=port_bits&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>", $interface['graph_type']));
     $interface['graph_type'] = "port_upkts";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_upkts&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    echo(generateiflink($interface, "<img src='graph.php?type=port_upkts&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>",$interface['graph_type']));
     $interface['graph_type'] = "port_errors";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_errors&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+    echo(generateiflink($interface, "<img src='graph.php?type=port_errors&port=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>",$interface['graph_type']));
   }
 
   echo("</td><td width=120>");
