@@ -1,9 +1,12 @@
 <?php
-      echo("<div class=graphhead>Processor Utilisation</div>");
+
+      $graph_title = "Processor Utilisation";
       $graph_type = "netscreen_cpu";            include ("includes/print-device-graph.php");
-      echo("<div class=graphhead>Memory Usage</div>");
+
+      $graph_title = "Memory Usage</div>";
       $graph_type = "netscreen_memory";        	include ("includes/print-device-graph.php");
-      echo("<div class=graphhead>Firewall Sessions</div>");
+
+      $graph_title = "Firewall Sessions";
       $graph_type = "netscreen_sessions";       include ("includes/print-device-graph.php");
 
 

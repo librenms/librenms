@@ -1,5 +1,12 @@
 <?php
 
+  $g_i++;
+  if(!is_integer($g_i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+
+  echo("<div style='background-color: $row_colour;'>");
+
+  echo('<div style="padding:4px 0px 0px 8px;" class=graphhead>'.$graph_title.'</div>');
+
   $daily_traffic   = "graph.php?device=" . $device['device_id'] . "&type=$graph_type&from=$day&to=$now&width=215&height=100";
   $daily_traffic  .= $args;
   $daily_url       = "graph.php?device=" . $device['device_id'] . "&type=$graph_type&from=$day&to=$now&width=400&height=150";
@@ -28,6 +35,8 @@
         <img src='$monthly_traffic' border=0></a> ");
   echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$yearly_traffic' border=0></a>");
+
+  echo("</div>");
 
 ?>
 

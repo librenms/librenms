@@ -24,6 +24,9 @@ while ($device = mysql_fetch_array($device_query))
     echo("No graph definitions found for OS " . $device['os'] . "!");
   }
 
+
+
+/**
    if ($memgraph) {
      echo("<img src=\"$memgraph\"> <img src=\"$memgraphm\">");
    }
@@ -60,6 +63,9 @@ while ($device = mysql_fetch_array($device_query))
    if ($uptimegraph) {
      echo("<img src=\"$uptimegraph\"> <img src=\"$uptimegraphm\">");
    }
+
+**/
+
    echo("</div>");
 }
 
