@@ -22,7 +22,7 @@ include("common.inc.php");
   $rrd_options .= " AREA:temp#FFFF99";
   $rrd_options .= " AREA:tempwarm#FF9999";
   $rrd_options .= " AREA:tempcold#CCCCFF";
-  $rrd_options .= " LINE1.5:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['temp_descr_fixed']))."'"); # Ugly hack :(
+  $rrd_options .= " LINE1.5:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['temp_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " LINE1.5:tempwarm#660000";
   $rrd_options .= " GPRINT:temp:LAST:%3.0lfC";
   $rrd_options .= " GPRINT:temp:MAX:%3.0lfC\\\\l";
