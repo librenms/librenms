@@ -32,7 +32,7 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE temp_h
     $temp_link_a = $temp_link . $temp['temp_descr'] . "</a>";
 
     $temp['temp_descr'] = truncate($temp['temp_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td><strong>$temp_link_a</strong></td><td width=140 class=tablehead>$temp_link_b</td></tr>");
+    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$temp_link_a</strong></td><td width=140 class=tablehead>$temp_link_b</td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
