@@ -3,6 +3,10 @@
   background-position:0 100%;
   border-color:#B2B2B2 #525252 #525252 #B2B2B2;
 }
+.submit#hover {
+ border-color:#000;
+}
+
 input,select {
   background:#FFFFFF url('/images/textbg.png') repeat-x scroll 0 0;
   font-size:1em;

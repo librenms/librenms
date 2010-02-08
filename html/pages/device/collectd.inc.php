@@ -57,6 +57,8 @@ print_optionbar_start();
 
 print_optionbar_end();
 
+   $i=0;
+
     $pinsts = collectd_list_pinsts($device['hostname'], $_GET['opta']);
     foreach ($pinsts as &$instance) {
 
@@ -67,12 +69,20 @@ print_optionbar_end();
  
      if($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
+     
+
      foreach ($typeinstances as &$tinst) {
+       $i++;
+       if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+ 
+       echo('<div style="background-color: '.$row_colour.';">');
+       echo('<div class="graphhead" style="padding:4px 0px 0px 8px;">');
        if($tinst) {
-       echo("<div><h3>".$_GET['opta']." $instance - $type - $tinst</h3>");
+       echo($_GET['opta']." $instance - $type - $tinst");
        } else {
-        echo("<div><h3>".$_GET['opta']." $instance - $type</h3>");
+        echo($_GET['opta']." $instance - $type");
        }
+       echo("</div>");
 
        $daily_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=day&to=$now&width=215&height=100";
        $daily_traffic  .= $args;
