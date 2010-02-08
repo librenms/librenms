@@ -1,5 +1,23 @@
 <?php
 
+function snmp_walk($hostname, $port,$snmpver, $community, $oid, $options, $mib) {
+  global $debug; global $config; global $runtime_stats;
+  $cmd  = ($snmpver == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " ";
+  if($options) { $cmd .= "-$options "; }
+  if($mib) { $cmd .= "-m $mib "; }
+  $cmd .= $oid;
+  if($debug) { echo("$cmd\n"); }
+  $data = trim(shell_exec($cmd));
+  $runtime_stats['snmpwalk']++;
+  if($debug) { echo("$data\n"); }
+  if (is_string($result) && (preg_match("/No Such (Object|Instance)/i", $result) || preg_match("/No more variables left/i", $result)))
+  {
+    $result = false;
+  } else {
+    return $data;
+  }
+}
+
 function snmp_cache_cip($oid, $device, $array, $mib = 0) {
   global $config;
   $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
