@@ -25,11 +25,15 @@
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
+        $descr = str_replace("sensor", "", $descr);
         $descr = trim($descr);
         if(mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') {
           $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
           mysql_query($query);
           echo("+");
+        } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
+          mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+          echo("U");
         } else { echo("."); }
         $temp_exists[] = "$id $temp_oid";
       }
