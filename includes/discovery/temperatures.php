@@ -156,31 +156,28 @@ if ($device['os'] == "linux")
     if ($data) 
     {
       list($oid,$descr) = explode(" ", $data,2);
-      if (substr($descr,0,5) == "temp-")
+      $split_oid = explode('.',$oid);
+      $temp_id = $split_oid[count($split_oid)-1];
+      $temp_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temp_id";
+      $temp  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid")) / 1000;
+      $descr = str_ireplace("temp-", "", $descr);
+      $descr = trim($descr);
+      if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
       {
-        $split_oid = explode('.',$oid);
-        $temp_id = $split_oid[count($split_oid)-1];
-        $temp_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temp_id";
-        $temp  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid")) / 1000;
-        $descr = str_ireplace("temp-", "", $descr);
-        $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
-        {
-          $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',1000, " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
-          mysql_query($query);
-          echo("+");
-        } 
-        elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) 
-        {
-          echo("U");
-          mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
-        } 
-        else 
-        {
-          echo("."); 
-        } 
-        $temp_exists[] = "$id $temp_oid";
-      }
+        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',1000, " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
+        mysql_query($query);
+        echo("+");
+      } 
+      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) 
+      {
+        echo("U");
+        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+      } 
+      else 
+      {
+        echo("."); 
+      } 
+      $temp_exists[] = "$id $temp_oid";
     }
   }
 }
