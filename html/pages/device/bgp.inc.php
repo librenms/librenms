@@ -26,8 +26,8 @@ print_optionbar_end();
    while($peer = mysql_fetch_array($peer_query)) {
      if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
      #if($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
-     if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_colour = "#ffcccc"; }
-     if($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "red"; $bg_colour = "#cccccc"; }
+     if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_image = "images/warning-background.png"; }
+     if($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "red"; $bg_image = "images/warning-background.png"; }
 
      if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
@@ -69,7 +69,7 @@ print_optionbar_end();
      }
 
      unset($sep);
-     echo("<tr bgcolor=$bg_colour>
+     echo("<tr bgcolor=$bg_colour background=$bg_image>
              <td width=20><span class=list-large>$i</span></td>
              <td><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
 	     <td>$peer_type</td>
