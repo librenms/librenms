@@ -24,6 +24,7 @@ print_optionbar_end();
    $i = "1";
    $peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");
    while($peer = mysql_fetch_array($peer_query)) {
+     unset($bg_image);
      if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
      #if($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
      if($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_image = "images/warning-background.png"; }
@@ -104,9 +105,9 @@ print_optionbar_end();
   }
   if ($_GET['opta'] == "macaccounting") {
     if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0)) {
-      $acc = mysql_fetch_array(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"));
-      $graph_type = "mac_acc";    
-      $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/mac-accounting/" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
+      $acc = mysql_fetch_array(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, interfaces AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
+      $graph_type = "mac_acc_bits";    
+      $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
       if ( is_file($database) ) {
         $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
         $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
@@ -116,7 +117,6 @@ print_optionbar_end();
         $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
         $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100";
         $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
-
         echo("<tr bgcolor=$bg_colour><td colspan=7>");
         echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
           <img src='$daily_traffic' border=0></a> ");
