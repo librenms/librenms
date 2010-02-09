@@ -26,9 +26,6 @@ while($temp = mysql_fetch_array($query))
 {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  $speed = humanspeed($temp['ifSpeed']);
-  $type = humanmedia($temp['ifType']);
-
   $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&amp;type=temperature&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
   $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_temp\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $temp['temp_descr'] . "</a>";
@@ -54,7 +51,7 @@ while($temp = mysql_fetch_array($query))
 	  <td width=100>$alert</td>
           <td style='color: $temp_colour; text-align: center; font-weight: bold;'>" . $temp['temp_current'] . " &deg;C</td>
           <td style='text-align: center'>" . $temp['temp_limit'] . " &deg;C</td>
-          <td>" . $temp['temp_notes'] . "</td>
+          <td>" . (isset($temp['temp_notes']) ? $temp['temp_notes'] : '') . "</td>
         </tr>\n");
 
   $row++;

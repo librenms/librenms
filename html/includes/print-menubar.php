@@ -153,7 +153,18 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
 </ul></td></tr></table>
 </li>
 
-<li><a class="menu2four" href="/temperatures/"><img src="images/16/weather_sun.png" border="0" align="absmiddle" /> Temps</a></li>
+<ul>
+<li><a class="menu2four" href="sensors/temperatures/"><img src="images/16/contrast.png" border="0" align="absmiddle" /> Sensors</a>
+        <table><tr><td>
+        <ul>
+        <li><a href="sensors/temperatures/"><img src="images/16/weather_sun.png" border="0" align="absmiddle" /> Temperatures</a></li>
+        <li><a href="sensors/fans/"><img src="images/16/chart_curve.png" border="0" align="absmiddle" /> Fans</a></li>
+        <li><a href="sensors/voltages/"><img src="images/16/chart_bar.png" border="0" align="absmiddle" /> Voltages</a></li>
+        </ul>
+        </td></tr></table>
+
+</li>
+</ul>
 
 <li><a class="menu2four" href="/storage/"><img src="images/16/database.png" border="0" align="absmiddle" /> Storage</a></li>
 
