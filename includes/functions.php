@@ -317,6 +317,7 @@ function generateiflink($interface, $text=0, $type = NULL)
   $interface = ifNameDescr($interface);
   if (!$text) { $text = fixIfName($interface['label']); }
   if (isset($type)) { $interface['graph_type'] = $type; } else { $interface['graph_type'] = 'port_bits'; }
+  if(!isset($interface['hostname'])) { $interface = array_merge($interface, device_by_id_cache($interface['device_id'])); }
   $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
   $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$day&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
   $graph_url_month = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$month&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
