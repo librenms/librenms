@@ -7,6 +7,8 @@
   $oid_cmd = $config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher";
   $oids = shell_exec($oid_cmd);
 
+  if($debug) { echo("$oid_cmd -> $oids \n"); }
+
   $oids = str_replace(".1.3.6.1.3.118.1.2.2.1.3.", "", $oids);
   $oids = str_replace(" \"", "||", $oids);
   $oids = str_replace("\"", "", $oids);
