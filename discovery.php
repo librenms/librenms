@@ -98,8 +98,10 @@ foreach ($devices as $device)
   ## Discovery IPv6 Addresses
   include("includes/discovery/ipv6-addresses.php");
 
-  ## Discover Temperatures
+  ## Discover Temperatures/Voltages/Fanspeeds
   include("includes/discovery/temperatures.php");
+  include("includes/discovery/voltages.php");
+  include("includes/discovery/fanspeeds.php");
 
   ## Discover Storage
   include("includes/discovery/storage.php");
