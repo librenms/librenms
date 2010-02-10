@@ -1,7 +1,7 @@
 <?php
 
-## Have a look in defaults.php for examples of settinsg you can set here. DO NOT defaults.php!
-include("includes/defaults.php");
+## Have a look in defaults.inc.php for examples of settinsg you can set here. DO NOT defaults.inc.php!
+include("includes/defaults.inc.php");
 
 ### Database config
 $config['db_host'] = "localhost";
