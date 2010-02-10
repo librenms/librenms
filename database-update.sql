@@ -98,3 +98,4 @@ CREATE TABLE `fanspeed` (
   PRIMARY KEY  (`fan_id`),
   KEY `fan_host` (`fan_host`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+ALTER TABLE `voltage` ADD `volt_limit_low` int(11) NULL DEFAULT NULL AFTER `volt_limit`;
