@@ -11,14 +11,16 @@ while($temperature = mysql_fetch_array($temp_data)) {
     if ($debug) echo "Attempt $i ";
     $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'] . "|grep -v \"No Such Instance\"";
     $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
-    if($temperature['temp_tenths']) { $temp = $temp / 10; }
-    else
-    {
-      if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
-    }
 
-    if ($temp != 999.9) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+    if ($temp != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
   }
+
+  if($temperature['temp_tenths']) { $temp = $temp / 10; }
+  else
+  {
+    if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
+  }
+  #FIXME also divide the limit here
 
   $temprrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
@@ -37,7 +39,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
   rrdtool_update($temprrd,"N:$temp");
 
   if($temperature['temp_current'] < $temperature['temp_limit'] && $temp >= $temperature['temp_limit']) {
-    $updated = ", `service_changed` = '" . time() . "' ";
+    $updated = ", `service_changed` = '" . time() . "' "; # FIXME what's this
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'] . " is " . $temp . " (Limit " . $temperature['temp_limit'];
     $msg .= ") at " . date('l dS F Y h:i:s A');
