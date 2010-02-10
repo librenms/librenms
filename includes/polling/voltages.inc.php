@@ -32,7 +32,6 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   if($voltage['volt_current'] > $voltage['volt_limit_low'] && $volt <= $voltage['volt_limit_low']) 
   {
-    $updated = ", `service_changed` = '" . time() . "' "; # FIXME what's this?
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'] . " is " . $volt . "V (Limit " . $voltage['volt_limit'];
     $msg .= "V) at " . date('l dS F Y h:i:s A');
@@ -42,7 +41,6 @@ while($voltage = mysql_fetch_array($volt_data)) {
   }
   else if($voltage['volt_current'] < $voltage['volt_limit'] && $volt >= $voltage['volt_limit']) 
   {
-    $updated = ", `service_changed` = '" . time() . "' "; # FIXME what's this?
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'] . " is " . $volt . "V (Limit " . $voltage['volt_limit'];
     $msg .= "V) at " . date('l dS F Y h:i:s A');
