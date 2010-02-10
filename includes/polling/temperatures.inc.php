@@ -39,7 +39,6 @@ while($temperature = mysql_fetch_array($temp_data)) {
   rrdtool_update($temprrd,"N:$temp");
 
   if($temperature['temp_current'] < $temperature['temp_limit'] && $temp >= $temperature['temp_limit']) {
-    $updated = ", `service_changed` = '" . time() . "' "; # FIXME what's this
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'] . " is " . $temp . " (Limit " . $temperature['temp_limit'];
     $msg .= ") at " . date('l dS F Y h:i:s A');
