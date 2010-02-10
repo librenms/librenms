@@ -67,11 +67,11 @@ if ($device['os'] == "linux")
         $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10$oid";
         $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5$oid";
         $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
-        $descr    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-        $volt     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid"));
-        $monitor  = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid"));
-        $limit    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid"));
-        $lowlimit = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $lowlimit_oid"));
+        $descr    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid")) / 1000;
+        $volt     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / 1000;
+        $monitor  = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid")) / 1000;
+        $limit    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid")) / 1000;
+        $lowlimit = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $lowlimit_oid")) / 1000;
         if ($monitor == 'true')
         {
           $descr   = trim(str_ireplace("Voltage", "", $descr));
