@@ -8,11 +8,10 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   $volt_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $voltage['volt_oid'] . "|grep -v \"No Such Instance\"";
   $volt = trim(str_replace("\"", "", shell_exec($volt_cmd)));
+
   if ($voltage['volt_precision']) 
   {
     $volt = $volt / $voltage['volt_precision'];
-    $voltage['volt_limit'] = $voltage['volt_limit'] / $voltage['volt_precision'];
-    $voltage['volt_limit_low'] = $voltage['volt_limit_low'] / $voltage['volt_precision'];
   }
 
   $voltrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
