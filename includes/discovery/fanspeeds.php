@@ -62,25 +62,31 @@ if ($device['os'] == "linux")
       list($oid,$type) = explode(" ", $data);
       if ($type == 0)
       {
-        $fan_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
-        $descr_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
-        $limit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
-        $descr = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-        $fan   = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $fan_oid"));
-        $limit = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid"));
-        $descr = str_ireplace("Speed", "", $descr);
-        $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND fan_host = '$id'"),0) == '0') 
+        $fan_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
+        $descr_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
+        $limit_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
+        $divisor_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$oid";
+        $monitor_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.10$oid";
+        $descr   = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
+        $fan     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $fan_oid"));
+        $limit   = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid"));
+        $divisor = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $divisor_oid"));
+        $monitor = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid"));
+        if ($monitor == 'true')
         {
-          $query = "INSERT INTO fanspeed (`fan_host`, `fan_oid`, `fan_descr`, `fan_current`, `fan_limit`) values ('$id', '$fan_oid', '$descr', '$fan', '$limit')";
-          mysql_query($query);
-          echo("+");
-        } 
-        else 
-        { 
-          echo("."); 
+          $descr = trim(str_replace(" Fan","",str_ireplace("Speed", "", $descr)));
+          if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND fan_host = '$id'"),0) == '0') 
+          {
+            $query = "INSERT INTO fanspeed (`fan_host`, `fan_oid`, `fan_descr`, `fan_current`, `fan_limit`) values ('$id', '$fan_oid', '$descr', '$fan', '$limit')";
+            mysql_query($query);
+            echo("+");
+          } 
+          else 
+          { 
+            echo("."); 
+          }
+          $fan_exists[] = "$id $fan_oid";
         }
-        $fan_exists[] = "$id $fan_oid";
       }
     }
   }

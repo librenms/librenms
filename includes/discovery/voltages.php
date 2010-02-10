@@ -62,23 +62,31 @@ if ($device['os'] == "linux")
       list($oid,$type) = explode(" ", $data);
       if ($type == 1)
       {
-        $volt_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
-        $descr_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
-        $descr = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-        $volt  = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid"));
-        $descr = str_ireplace("Voltage", "", $descr);
-        $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND volt_host = '$id'"),0) == '0') 
+        $volt_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
+        $descr_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
+        $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10$oid";
+        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5$oid";
+        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
+        $descr    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
+        $volt     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid"));
+        $monitor  = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid"));
+        $limit    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid"));
+        $lowlimit = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $lowlimit_oid"));
+        if ($monitor == 'true')
         {
-          $query = "INSERT INTO voltage (`volt_host`, `volt_oid`, `volt_descr`, `volt_current`, `volt_limit`) values ('$id', '$volt_oid', '$descr', '$volt', '-1')";
-          mysql_query($query);
-          echo("+");
-        } 
-        else 
-        { 
-          echo("."); 
+          $descr   = trim(str_ireplace("Voltage", "", $descr));
+          if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND volt_host = '$id'"),0) == '0') 
+          {
+            $query = "INSERT INTO voltage (`volt_host`, `volt_oid`, `volt_descr`, `volt_current`, `volt_limit`, `volt_limit_low`, `volt_precision`) values ('$id', '$volt_oid', '$descr', '$volt', '$limit','$lowlimit','1000')";
+            mysql_query($query);
+            echo("+");
+          } 
+          else 
+          { 
+            echo("."); 
+          }
+          $volt_exists[] = "$id $volt_oid";
         }
-        $volt_exists[] = "$id $volt_oid";
       }
     }
   }
