@@ -95,23 +95,24 @@ if ($device['os'] == "linux")
 ## Delete removed sensors
 
 $sql = "SELECT * FROM fanspeed AS V, devices AS D WHERE V.fan_host = D.device_id AND D.device_id = '".$device['device_id']."'";
-$query = mysql_query($sql);
-
-while ($sensor = mysql_fetch_array($query)) 
+if ($query = mysql_query($sql))
 {
-  unset($exists);
-  $i = 0;
-  while ($i < count($fan_exists) && !$exists) 
+  while ($sensor = mysql_fetch_array($query)) 
   {
-    $thisfan = $sensor['fan_host'] . " " . $sensor['fan_oid'];
-    if ($fan_exists[$i] == $thisfan) { $exists = 1; }
-    $i++;
-  }
-  
-  if (!$exists) 
-  { 
-    echo("-");
-    mysql_query("DELETE FROM fanspeed WHERE fan_id = '" . $sensor['fan_id'] . "'"); 
+    unset($exists);
+    $i = 0;
+    while ($i < count($fan_exists) && !$exists) 
+    {
+      $thisfan = $sensor['fan_host'] . " " . $sensor['fan_oid'];
+      if ($fan_exists[$i] == $thisfan) { $exists = 1; }
+      $i++;
+    }
+    
+    if (!$exists) 
+    { 
+      echo("-");
+      mysql_query("DELETE FROM fanspeed WHERE fan_id = '" . $sensor['fan_id'] . "'"); 
+    }
   }
 }
 
