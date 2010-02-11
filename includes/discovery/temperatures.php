@@ -267,23 +267,25 @@ if ($device['os'] == "ios")
 ## Delete removed sensors
 
 $sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.temp_host = D.device_id AND D.device_id = '".$device['device_id']."'";
-$query = mysql_query($sql);
 
-while ($sensor = mysql_fetch_array($query)) 
+if ($query = mysql_query($sql))
 {
-  unset($exists);
-  $i = 0;
-  while ($i < count($temp_exists) && !$exists) 
+  while ($sensor = mysql_fetch_array($query)) 
   {
-    $thistemp = $sensor['temp_host'] . " " . $sensor['temp_oid'];
-    if ($temp_exists[$i] == $thistemp) { $exists = 1; }
-    $i++;
-  }
+    unset($exists);
+    $i = 0;
+    while ($i < count($temp_exists) && !$exists) 
+    {
+      $thistemp = $sensor['temp_host'] . " " . $sensor['temp_oid'];
+      if ($temp_exists[$i] == $thistemp) { $exists = 1; }
+      $i++;
+    }
   
-  if (!$exists) 
-  { 
-    echo("-");
-    mysql_query("DELETE FROM temperature WHERE temp_id = '" . $sensor['temp_id'] . "'"); 
+    if (!$exists) 
+    { 
+      echo("-");
+      mysql_query("DELETE FROM temperature WHERE temp_id = '" . $sensor['temp_id'] . "'"); 
+    }
   }
 }
 
