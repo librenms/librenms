@@ -4,7 +4,7 @@ $scale_min = "0";
 
 include("common.inc.php");
 
-  $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
+  $rrd_options .= " COMMENT:'                                 Last     Max\\n'";
 
   $fanspeed = mysql_fetch_array(mysql_query("SELECT * FROM fanspeed where fan_id = '".mres($_GET['id'])."'"));
 
