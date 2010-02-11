@@ -10,6 +10,8 @@ $config['snmpwalk']     = "/usr/bin/snmpwalk";
 $config['snmpget']      = "/usr/bin/snmpget";
 $config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
 
+$config['nagios_plugins'] = "/usr/lib/nagios/plugins";
+
 ### Local Specifics
 
 $config['title_image']  = "images/observer-logo.gif";

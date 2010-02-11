@@ -1,6 +1,6 @@
 <?php
 
-$check = `scripts/services/check_simap -H $service[hostname]`;
+$check = shell_exec($config['nagios_plugins'] . "/check_simap -H ".$service['hostname']);
 
 list($check, $time) = split("\|", $check);
 
