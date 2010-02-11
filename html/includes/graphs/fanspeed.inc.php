@@ -21,7 +21,7 @@ include("common.inc.php");
   $rrd_options .= " AREA:fanwarm#FF9999";
   $rrd_options .= " LINE1.5:fan#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($fanspeed['fan_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " LINE1.5:fanwarm#660000";
-  $rrd_options .= " GPRINT:fan:LAST:%3.0lfC";
-  $rrd_options .= " GPRINT:fan:MAX:%3.0lfC\\\\l";
+  $rrd_options .= " GPRINT:fan:LAST:%3.0lfrpm";
+  $rrd_options .= " GPRINT:fan:MAX:%3.0lfrpm\\\\l";
 
 ?>
