@@ -21,7 +21,7 @@ include("common.inc.php");
   $rrd_options .= " AREA:voltwarm#FF9999";
   $rrd_options .= " LINE1.5:volt#cc0000:'" . $voltage['volt_descr_fixed']."'";
   $rrd_options .= " LINE1.5:voltwarm#660000";
-  $rrd_options .= " GPRINT:volt:LAST:%3.0lfC";
-  $rrd_options .= " GPRINT:volt:MAX:%3.0lfC\\\\l";
+  $rrd_options .= " GPRINT:volt:LAST:%3.0lfV";
+  $rrd_options .= " GPRINT:volt:MAX:%3.0lfV\\\\l";
 
 ?>
