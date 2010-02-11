@@ -154,7 +154,7 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
 </li>
 
 <ul>
-<li><a class="menu2four" href="sensors/temperatures/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors</a>
+<li><a class="menu2four" href="sensors/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors</a>
         <table><tr><td>
         <ul>
         <li><a href="sensors/temperatures/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperatures</a></li>
