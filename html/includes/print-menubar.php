@@ -154,7 +154,8 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
 </li>
 
 <ul>
-<li><a class="menu2four" href="sensors/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors</a>
+<li><a class="menu2four" href="sensors/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors
+<!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
         <li><a href="sensors/temperatures/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperatures</a></li>
@@ -162,7 +163,7 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
         <li><a href="sensors/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>
         </ul>
         </td></tr></table>
-
+<!--[if lte IE 6]></a><![endif]-->
 </li>
 </ul>
 
