@@ -95,23 +95,25 @@ if ($device['os'] == "linux")
 ## Delete removed sensors
 
 $sql = "SELECT * FROM voltage AS V, devices AS D WHERE V.volt_host = D.device_id AND D.device_id = '".$device['device_id']."'";
-$query = mysql_query($sql);
 
-while ($sensor = mysql_fetch_array($query)) 
+if ($query = mysql_query($sql))
 {
-  unset($exists);
-  $i = 0;
-  while ($i < count($volt_exists) && !$exists) 
+  while ($sensor = mysql_fetch_array($query)) 
   {
-    $thisvolt = $sensor['volt_host'] . " " . $sensor['volt_oid'];
-    if ($volt_exists[$i] == $thisvolt) { $exists = 1; }
-    $i++;
-  }
+    unset($exists);
+    $i = 0;
+    while ($i < count($volt_exists) && !$exists) 
+    {
+      $thisvolt = $sensor['volt_host'] . " " . $sensor['volt_oid'];
+      if ($volt_exists[$i] == $thisvolt) { $exists = 1; }
+      $i++;
+    }
   
-  if (!$exists) 
-  { 
-    echo("-");
-    mysql_query("DELETE FROM voltage WHERE volt_id = '" . $sensor['volt_id'] . "'"); 
+    if (!$exists) 
+    { 
+      echo("-");
+      mysql_query("DELETE FROM voltage WHERE volt_id = '" . $sensor['volt_id'] . "'"); 
+    }
   }
 }
 
