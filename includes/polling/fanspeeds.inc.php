@@ -16,7 +16,7 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
   if (!is_file($fanrrd)) {
     `rrdtool create $fanrrd \
      --step 300 \
-     DS:fan:GAUGE:600:-273:1000 \
+     DS:fan:GAUGE:600:0:20000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \
