@@ -76,28 +76,8 @@ UPDATE temperature SET temp_precision=10 WHERE temp_tenths=1;
 ALTER TABLE `temperature` DROP `temp_tenths`;
 CREATE TABLE IF NOT EXISTS `dbSchema` ( `revision` int(11) NOT NULL default '0', PRIMARY KEY (`revision`)) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 ALTER TABLE `storage` ADD `storage_perc_warn` INT(11) NULL DEFAULT '60';
-CREATE TABLE `voltage` (
-  `volt_id` int(11) NOT NULL auto_increment,
-  `volt_host` int(11) NOT NULL default '0',
-  `volt_oid` varchar(64) NOT NULL,
-  `volt_descr` varchar(32) NOT NULL default '',
-  `volt_precision` int(11) NOT NULL default '1',
-  `volt_current` int(11) NOT NULL default '0',
-  `volt_limit` int(11) NOT NULL default '60',
-  PRIMARY KEY  (`volt_id`),
-  KEY `volt_host` (`volt_host`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
-CREATE TABLE `fanspeed` (
-  `fan_id` int(11) NOT NULL auto_increment,
-  `fan_host` int(11) NOT NULL default '0',
-  `fan_oid` varchar(64) NOT NULL,
-  `fan_descr` varchar(32) NOT NULL default '',
-  `fan_precision` int(11) NOT NULL default '1',
-  `fan_current` int(11) NOT NULL default '0',
-  `fan_limit` int(11) NOT NULL default '60',
-  PRIMARY KEY  (`fan_id`),
-  KEY `fan_host` (`fan_host`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `voltage` (  `volt_id` int(11) NOT NULL auto_increment,  `volt_host` int(11) NOT NULL default '0',  `volt_oid` varchar(64) NOT NULL,  `volt_descr` varchar(32) NOT NULL default '',  `volt_precision` int(11) NOT NULL default '1',  `volt_current` int(11) NOT NULL default '0',  `volt_limit` int(11) NOT NULL default '60',  PRIMARY KEY  (`volt_id`),  KEY `volt_host` (`volt_host`)) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `fanspeed` (   `fan_id` int(11) NOT NULL auto_increment,  `fan_host` int(11) NOT NULL default '0',  `fan_oid` varchar(64) NOT NULL,  `fan_descr` varchar(32) NOT NULL default '',  `fan_precision` int(11) NOT NULL default '1',  `fan_current` int(11) NOT NULL default '0',  `fan_limit` int(11) NOT NULL default '60',  PRIMARY KEY  (`fan_id`),  KEY `fan_host` (`fan_host`)) ENGINE=InnoDB  DEFAULT CHARSET=latin1;
 ALTER TABLE `voltage` ADD `volt_limit_low` int(11) NULL DEFAULT NULL AFTER `volt_limit`;
 ALTER TABLE `voltage` CHANGE `volt_current` `volt_current` FLOAT(3) NULL DEFAULT NULL;
 ALTER TABLE `voltage` CHANGE `volt_limit` `volt_limit` FLOAT(3) NULL DEFAULT NULL;
