@@ -1,9 +1,8 @@
 <?php
 
-if($service[service_port]) { $port = $service[service_port]; } else { $port = '23'; }
+if($service['service_port']) { $port = $service['service_port']; } else { $port = '23'; }
 
-
-$check = `scripts/services/check_tcp -H $service[hostname] -p $port`;
+$check = shell_exec($config['nagios_plugins'] . "/check_dns -H ".$service['hostname']." -p ".$port);
 
 list($check, $time) = split("\|", $check);
 

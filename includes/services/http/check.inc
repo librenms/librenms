@@ -1,6 +1,6 @@
 <?php
 
-$check = `scripts/services/check_http -H $service[hostname] $service[service_param]`;
+$check = shell_exec($config['nagios_plugins'] . "/check_http -H ".$service['hostname']." ".$service['service_param']);
 
 list($check, $time) = split("\|", $check);
 
