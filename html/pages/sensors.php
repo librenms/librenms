@@ -1,5 +1,25 @@
 <?php
 
+$datas = array('Temperatures', 'Voltages', 'Fans');
+
+print_optionbar_start();
+
+unset ($sep);
+foreach ($datas as $texttype) {
+  $type = strtolower($texttype);
+  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+  echo($sep);
+  if ($_GET['opta'] == $type) { echo("<strong>"); }
+  echo("<a href='".$config['base_url']."/sensors/" . $type . "/'> " . $texttype ."</a>\n");
+  if ($_GET['opta'] == $type) { echo("</strong>"); }
+  $sep = ' | ';
+}
+unset ($sep);
+
+print_optionbar_end();
+
+
+
 switch ($_GET['opta'])
 {
   case 'temperatures':
