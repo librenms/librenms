@@ -153,7 +153,7 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
 </ul></td></tr></table>
 </li>
 
-<ul>
+
 <li><a class="menu2four" href="sensors/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
@@ -165,7 +165,7 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
         </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->
 </li>
-</ul>
+
 
 <li><a class="menu2four" href="/storage/"><img src="images/16/database.png" border="0" align="absmiddle" /> Storage</a></li>
 
