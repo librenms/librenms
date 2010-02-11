@@ -1,6 +1,6 @@
 <?php
 
-$datas = array('Temperatures', 'Voltages', 'Fanpeeds');
+$datas = array('Temperatures', 'Voltages', 'Fanspeeds');
 
 print_optionbar_start();
 
