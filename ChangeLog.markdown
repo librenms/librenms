@@ -1,6 +1,5 @@
 # Mouse Wheel ChangeLog
 
-
 # 3.0.2
 
 * Fixed delta being opposite value in latest Opera
