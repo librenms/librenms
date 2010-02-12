@@ -6,6 +6,8 @@ $cemp = mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_
 $cmp = mysql_result(mysql_query("select count(*) from cmpMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $cpm  = mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $hrprocessor  = mysql_result(mysql_query("select count(*) from hrDevice WHERE device_id = '" . $device['device_id'] . "' AND `hrDeviceType` = 'hrDeviceProcessor'"), 0);
+$fans = mysql_result(mysql_query("select count(*) from fanspeed WHERE fan_host = '" . $device['device_id'] . "'"), 0);
+$volts = mysql_result(mysql_query("select count(*) from voltage WHERE volt_host = '" . $device['device_id'] . "'"), 0);
 
 
 if ($temp) { $datas[] = 'temp'; }
@@ -14,6 +16,8 @@ if ($cemp) { $datas[] = 'cemp'; }
 if ($cpm) { $datas[] = 'cpm'; }
 if ($cmp) { $datas[] = 'cmp'; }
 if ($hrprocessor) { $datas[] = 'hrprocessors'; }
+if ($fans) { $datas[] = 'fanspeeds'; }
+if ($volts) { $datas[] = 'voltages'; }
 
 $type_text['temp'] = "Temperatures";
 $type_text['cmp'] = "Memory Pools";
@@ -21,6 +25,8 @@ $type_text['cemp'] = "Memory Enh Pools";
 $type_text['cpm'] = "Processor Usage";
 $type_text['storage'] = "Disk Usage";
 $type_text['hrprocessors'] = "Processor Usage";
+$type_text['voltages'] = "Voltages";
+$type_text['fanspeeds'] = "Fanspeeds";
 
 
 print_optionbar_start();
