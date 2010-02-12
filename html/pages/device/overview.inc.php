@@ -37,6 +37,8 @@ include("overview/cemp.inc.php");
 include("overview/cmp.inc.php");
 include("overview/hrStorage.inc.php");
 include("overview/temperatures.inc.php");
+include("overview/fanspeeds.inc.php");
+include("overview/voltages.inc.php");
 
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
