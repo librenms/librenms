@@ -1,0 +1,570 @@
+
+-- *****************************************************************************
+-- Juniper-REDUNDANCY-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   REDUNDANCY MIB
+--
+-- Copyright (c) 2003 Juniper Networks Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-REDUNDANCY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION, DateAndTime
+        FROM SNMPv2-TC
+    sysUpTime
+        FROM SNMPv2-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP  
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniRedundancyMIB  MODULE-IDENTITY
+    LAST-UPDATED "200312122104Z"  -- 12-Dec-03 04:04 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Road
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The redundancy configuration MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200312120000Z"  -- 12-Dec-03               - JUNOSe 6.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 74 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniRedundancyState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The current state of redundancy subsystem:
+             notKnown          - Redundancy state is unknown.
+             fileSystemSyncing - Redundancy operation is based on file system
+                                 synchronization.  SRP switchover stops forwarding.
+             disabled          - Redundancy operation is based on high availability
+                                 model but high availability is not yet operational.
+                                 SRP switchover stops forwarding.
+             initializing      - Redundancy operation is based on high availability
+                                 model and standby SRP is being bulk synchronized from 
+                                 active SRP.  SRP switchover stops forwarding.
+             pending           - Redundancy operation is based on high availability
+                                 model and bulk synchronization of standby SRP completed.
+                                 SRP switchover stops forwarding.
+             active            - Redundancy operation is based on high availability model
+                                 and high availability is fully operational.  SRP 
+                                 switchover does not stop forwarding."
+    SYNTAX     INTEGER {
+                   notKnown(1),
+                   fileSystemSyncing(2),
+                   disabled(3),
+                   initializing(4),
+                   pending(5),
+                   active(6) }
+
+JuniRedundancyMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The mode of the redundancy subsystem:
+             fileSystemSynchronization  - SRP synchronization is based on file synchronization.
+             highAvailability           - SRP synchronization is based on high availability
+                                          model that allows non-stop forwarding."
+    SYNTAX     INTEGER {
+                   fileSystemSynchronization(1),
+                   highAvailability(2) }
+                     
+JuniRedundancyResetReason ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+         "Reason codes for the reset of active SRP or a line card that might result
+         in switch of control to standby SRP or spare line card. 
+             none          - No reset or switchover has occurred and indicates 'power-on'
+                             situation.
+             notKnown      - Reason is unknown.
+             userInitiated - A safe, manual reset was initiated by the user."
+    SYNTAX     INTEGER {
+                   none(1),
+                   notKnown(2),
+                   userInitiated(3) }
+                     
+JuniRedundancySystemActivationType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+          "Various kinds of system activation:
+              reload      - System has reloaded, i.e., no switchover has occurred.
+              coldSwitch  - System switched over from active to standby SRP and the 
+                            switchover involved reloading of line cards interrupting 
+                            forwarding.
+              warmSwitch  - System switched over from active to standby SRP; line cards were
+                            not reloaded during switchover and forwarding was uninterrupted."
+    SYNTAX     INTEGER {
+                   reload(1),
+                   coldSwitch(2),
+                   warmSwitch(3) }
+                     
+JuniRedundancyResetType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Identifies the nature of the reset and slot types involved since the
+           system is powered on.
+               notKnown            - Reset type is unknown.
+               srpReload           - The reset involved reloading SRP slot(s).
+               srpSwitchover       - The reset involved switchover of SRP slot(s).
+               linecardReload      - The reset involved reloading the line card slot(s).
+               linecardSwitchover  - The reset involved line card redundancy."
+    SYNTAX     INTEGER {
+                   notKnown(1),
+                   srpReload(2),
+                   srpSwitchover(3),
+                   linecardReload(4),
+                   linecardSwitchover(5) }
+                     
+JuniRedundancyHistoryCommand ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION 
+           "Identifies the command to be performed on the system activation
+           history table.
+               keep   - Retain history in persistent storage.
+               clear  - Erase the current entries of juniRedundancySystemActivationHistoryTable."
+    SYNTAX     INTEGER {
+                   keep(1),
+                   clear(2) }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRedundancyNotifications    OBJECT IDENTIFIER ::= { juniRedundancyMIB 0 }
+juniRedundancyObjects          OBJECT IDENTIFIER ::= { juniRedundancyMIB 1 }
+juniRedundancyMIBConformance   OBJECT IDENTIFIER ::= { juniRedundancyMIB 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRedundancyStatus               OBJECT IDENTIFIER ::= {juniRedundancyObjects 1 }
+juniRedundancyCfg                  OBJECT IDENTIFIER ::= {juniRedundancyObjects 2 }
+juniRedundancyHistory              OBJECT IDENTIFIER ::= {juniRedundancyObjects 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Redundancy 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Status sub group definitions
+--
+juniRedundancyActiveSlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique identifier for active SRP slot."
+    ::= { juniRedundancyStatus 1 }
+
+juniRedundancyActiveSlotState OBJECT-TYPE
+    SYNTAX     JuniRedundancyState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current state of redundancy on active SRP."
+    ::= { juniRedundancyStatus 2 }
+    
+juniRedundancyStandbySlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique identifier for standby SRP slot."
+    ::= { juniRedundancyStatus 3 }
+    
+juniRedundancyStandbySlotState OBJECT-TYPE
+    SYNTAX     JuniRedundancyState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current state of redundancy on standby SRP."
+    ::= { juniRedundancyStatus 4 }
+    
+juniRedundancyLastResetReason OBJECT-TYPE
+    SYNTAX     JuniRedundancyResetReason
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The reason for the last SRP reset."
+    ::= { juniRedundancyStatus 5 }
+
+juniRedundancyLastSystemActivationTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUptime when the system is operational either
+        following a reload or a switchover. The value 0 is a special
+        value to indicate 'from reset'."
+    ::= { juniRedundancyStatus 6 }
+
+juniRedundancyLastSystemActivationType OBJECT-TYPE
+    SYNTAX     JuniRedundancySystemActivationType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of last SRP activation when the system became operational."
+    ::= { juniRedundancyStatus 7 }
+
+juniRedundancyHaActiveTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUptime when active SRP enters 'active' state as
+        indicated in juniRedundancyActiveSlotState object. The value is 0 in 
+        file system synchronization redundancy mode."
+    ::= { juniRedundancyStatus 8 }
+    
+--
+-- Cfg sub group definitions
+--
+juniRedundancyNotifsEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Allows enabling and disabling of redundancy subsystem notifications."
+    DEFVAL   { true }
+    ::= { juniRedundancyCfg 1 }
+
+juniRedundancyCfgRedundancyMode OBJECT-TYPE
+    SYNTAX     JuniRedundancyMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates the redundancy mode configured on the system."
+    DEFVAL   { fileSystemSynchronization }
+    ::= { juniRedundancyCfg 2 }
+    
+--
+-- History sub group definitions
+--
+juniRedundancySystemActivationHistoryTableMaxLength OBJECT-TYPE
+    SYNTAX     Integer32(0..50)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Maximum number of entries allowed in juniRedundancySystemActivationHistoryTable. 
+        A value of 0 will result in no history being displayed in 
+        juniRedundancySystemActivationHistoryTable."
+    DEFVAL   { 0 }
+    ::= { juniRedundancyHistory 1 }
+    
+juniRedundancySystemActivationHistoryCommand OBJECT-TYPE
+    SYNTAX     JuniRedundancyHistoryCommand
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "A control variable to perform certain operations on 
+        juniRedundancySystemActivationHistoryTable."
+    DEFVAL  { keep }
+    ::= { juniRedundancyHistory 2 }
+
+juniRedundancySystemActivationHistoryTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JuniRedundancySystemActivationHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table that tracks the history of all reloads and switchovers that have
+        occurred since system is powered on.  The maximum number of entries permissible
+        in this table is defined by juniRedundancySystemActivationHistoryTableMaxLength. 
+        When the number of entries in the table reaches the maximum limit, the next 
+        entry would replace the oldest existing entry in the table."
+    ::= { juniRedundancyHistory 3 }
+    
+juniRedundancySystemActivationHistoryEntry OBJECT-TYPE
+    SYNTAX     JuniRedundancySystemActivationHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The entries in this table contain the reload and switchover information. 
+        Each entry in the table is indexed by juniRedundancySystemActivationHistoryIndex.
+        The index wraps around to 1 after reaching the maximum value."
+    INDEX    { juniRedundancySystemActivationHistoryIndex }
+    ::= { juniRedundancySystemActivationHistoryTable 1 }
+
+JuniRedundancySystemActivationHistoryEntry ::= SEQUENCE {
+    juniRedundancySystemActivationHistoryIndex   Integer32,
+    juniRedundancyHistoryResetType               JuniRedundancyResetType,
+    juniRedundancyHistoryActivationType          JuniRedundancySystemActivationType,
+    juniRedundancyHistoryPrevActiveSlot          Integer32,
+    juniRedundancyHistoryPrevActiveRelease       DisplayString,
+    juniRedundancyHistoryCurrActiveSlot          Integer32,
+    juniRedundancyHistoryCurrActiveRelease       DisplayString,
+    juniRedundancyHistoryResetReason             JuniRedundancyResetReason,
+    juniRedundancyHistoryActivationTime          DateAndTime }
+    
+juniRedundancySystemActivationHistoryIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An integer value for the purpose of indexing system
+        activation history table.  After reaching maximum value as
+        indicated by juniRedundancySystemActivationHistoryTableMaxLength, 
+        it wraps around to 1."
+    ::= { juniRedundancySystemActivationHistoryEntry 1 }
+
+juniRedundancyHistoryResetType OBJECT-TYPE
+    SYNTAX     JuniRedundancyResetType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the nature of the reset - reload or switchover - and the slot
+        types involved.  Depending on the value of this object, certain elements 
+        of JuniRedundancySystemActivationHistoryEntry will not be applicable."
+    ::= { juniRedundancySystemActivationHistoryEntry 2 }
+
+juniRedundancyHistoryActivationType OBJECT-TYPE
+    SYNTAX     JuniRedundancySystemActivationType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the activation type of the particular historical system 
+        activation entry with respect to the slot types involved."
+    ::= { juniRedundancySystemActivationHistoryEntry 3 }
+
+juniRedundancyHistoryPrevActiveSlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the slot number of active SRP or line card that went down."
+    ::= { juniRedundancySystemActivationHistoryEntry 4 }
+         
+juniRedundancyHistoryPrevActiveRelease OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the system-wide boot release file name of the slot indicated
+        by juniRedundancyHistoryPrevActiveSlot."
+    ::= { juniRedundancySystemActivationHistoryEntry 5 }
+
+juniRedundancyHistoryCurrActiveSlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the slot number of standby SRP or spare line card that took over."
+    ::= { juniRedundancySystemActivationHistoryEntry 6 }
+
+juniRedundancyHistoryCurrActiveRelease OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the system-wide boot release file name of the slot indicated
+        by juniRedundancyHistoryCurrActiveSlot."
+    ::= { juniRedundancySystemActivationHistoryEntry 7 }
+    
+juniRedundancyHistoryResetReason OBJECT-TYPE
+    SYNTAX     JuniRedundancyResetReason
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the reason for reload or switchover of the slots involved."
+    ::= { juniRedundancySystemActivationHistoryEntry 8 }
+
+juniRedundancyHistoryActivationTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the date and time when the reload or switchover of the slots
+        occurred."
+    ::= { juniRedundancySystemActivationHistoryEntry 9 }
+
+juniRedundancyHistoryReloads OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the number of reloads since the system is powered on."
+    ::= { juniRedundancyHistory 4 }
+
+juniRedundancyHistoryColdSwitchovers OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the number of cold switchovers since the system is powered on."
+    ::= { juniRedundancyHistory 5 }
+
+juniRedundancyHistoryWarmSwitchovers OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the number of warm switchovers since the system is powered on."
+    ::= { juniRedundancyHistory 6 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRedundancyColdSwitchoverNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot,
+        juniRedundancyLastResetReason
+    }
+    STATUS     current
+    DESCRIPTION
+        "This notification is generated in a dual SRP system when control
+        transfers from one to SRP to the other in file system synchronization
+        mode or when high availability is not operational.  This notification
+        is sent by the newly active SRP immediately following the switchover
+        in which configuration is preserved but volatile state is lost." 
+    ::= { juniRedundancyNotifications 1 }
+
+juniRedundancyWarmSwitchoverNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot,
+        juniRedundancyLastResetReason
+    }
+    STATUS     current
+    DESCRIPTION
+        "This notification is generated in a dual SRP system when control
+        transfers from one SRP to the other and high availability is 
+        operational.  This notification is sent by the newly active SRP 
+        immediately following the switchover in which configuration and 
+        volatile state are preserved." 
+    ::= { juniRedundancyNotifications 2 }
+    
+juniRedundancyStateEnabledNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot
+     }
+    STATUS     current
+    DESCRIPTION
+        "A state change notification sent by active SRP whenever system enters 
+        'active' state." 
+    ::= { juniRedundancyNotifications 3 }
+
+juniRedundancyStateDisabledNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot
+     }
+    STATUS     current
+    DESCRIPTION
+        "A state change notification sent by active SRP whenever system enters 
+        'disabled' state." 
+    ::= { juniRedundancyNotifications 4 }
+
+juniRedundancyStatePendingNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot
+    }
+    STATUS     current
+    DESCRIPTION
+        "A state change notification sent by active SRP whenever system enters 
+        'pending' state." 
+    ::= { juniRedundancyNotifications 5 }
+
+juniRedundancyModeNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniRedundancyActiveSlot,
+        juniRedundancyCfgRedundancyMode
+    }
+    STATUS     current
+    DESCRIPTION
+        "A mode change notification sent by active SRP whenever redundancy mode
+        of the system is changed from 'fileSystemSynchronization' to 'highAvailability'
+        and vice versa." 
+    ::= { juniRedundancyNotifications 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRedundancyMIBCompliances  OBJECT IDENTIFIER ::= { juniRedundancyMIBConformance 1 }
+juniRedundancyMIBGroups       OBJECT IDENTIFIER ::= { juniRedundancyMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniRedundancyMIBCompliance  MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for system redundancy support."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRedundancyStatusGroup,
+            juniRedundancyCfgGroup,
+            juniRedundancyHistoryGroup,
+            juniRedundancyNotificationGroup
+            }
+    ::= { juniRedundancyMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+juniRedundancyStatusGroup OBJECT-GROUP
+    OBJECTS {
+        juniRedundancyActiveSlot,
+        juniRedundancyActiveSlotState,
+        juniRedundancyStandbySlot,
+        juniRedundancyStandbySlotState,
+        juniRedundancyLastResetReason,
+        juniRedundancyLastSystemActivationTime,
+        juniRedundancyLastSystemActivationType,
+        juniRedundancyHaActiveTime }
+    STATUS     current
+    DESCRIPTION
+        "The collection of redundancy status objects."
+    ::= { juniRedundancyMIBGroups 1 }
+
+juniRedundancyCfgGroup OBJECT-GROUP
+    OBJECTS {
+        juniRedundancyNotifsEnabled,
+        juniRedundancyCfgRedundancyMode }
+    STATUS     current
+    DESCRIPTION
+        "The collection of redundancy configuration objects."
+    ::= { juniRedundancyMIBGroups 2 }
+
+juniRedundancyHistoryGroup OBJECT-GROUP
+    OBJECTS {
+        juniRedundancySystemActivationHistoryTableMaxLength,
+        juniRedundancySystemActivationHistoryCommand,
+        juniRedundancyHistoryResetType,
+        juniRedundancyHistoryActivationType,
+        juniRedundancyHistoryPrevActiveSlot,
+        juniRedundancyHistoryPrevActiveRelease,
+        juniRedundancyHistoryCurrActiveSlot,
+        juniRedundancyHistoryCurrActiveRelease,
+        juniRedundancyHistoryResetReason,
+        juniRedundancyHistoryActivationTime,
+        juniRedundancyHistoryReloads,
+        juniRedundancyHistoryColdSwitchovers,
+        juniRedundancyHistoryWarmSwitchovers }
+    STATUS     current
+    DESCRIPTION
+        "The collection of redundancy history objects."
+    ::= { juniRedundancyMIBGroups 3 }
+
+juniRedundancyNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniRedundancyColdSwitchoverNotification,
+        juniRedundancyWarmSwitchoverNotification,
+        juniRedundancyStateEnabledNotification,
+        juniRedundancyStateDisabledNotification,
+        juniRedundancyStatePendingNotification,
+        juniRedundancyModeNotification }
+    STATUS     current
+    DESCRIPTION
+        "The collection of notifications for redundancy events."
+    ::= { juniRedundancyMIBGroups 4 }
+
+END

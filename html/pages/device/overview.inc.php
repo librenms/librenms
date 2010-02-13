@@ -19,9 +19,7 @@ $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM 
 if($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
 if($interfaces['down']) { $interfaces_colour = $warn_colour_a; } else { $interfaces_colour = $list_colour_a; }
 
-echo("
-<table width=100% cellspacing=0 cellpadding=0>
-  <tr><td width=50% valign=top>");
+echo("<div style='width: 50%; float: left;'>");
 
 #if(file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
@@ -31,32 +29,6 @@ echo("
   echo("</div>");
 #}
 
-include("overview/hrProcessors.inc.php");
-include("overview/cpmCPU.inc.php");
-include("overview/cemp.inc.php");
-include("overview/cmp.inc.php");
-include("overview/hrStorage.inc.php");
-include("overview/temperatures.inc.php");
-include("overview/fanspeeds.inc.php");
-include("overview/voltages.inc.php");
-
-
-echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-echo("<p class=sectionhead>Recent Events</p>");
-
-$query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,10";
-$data = mysql_query($query);
-
-echo("<table cellspacing=0 cellpadding=2 width=100%>");
-
-while($entry = mysql_fetch_array($data)) {
-
-include("includes/print-event-short.inc");
-
-}
-echo("</table></div>");
-
-echo("</td><td width=50% valign=top>");
 
 include("overview/ports.inc.php");
 
@@ -93,6 +65,34 @@ echo("
 
 }
 
-echo("</td></tr></table>");
+echo("</div>");
 
+echo("<div style='float:right; width: 50%;'>");
+
+
+### Right Pane
+include("overview/processors.inc.php");
+include("overview/hrProcessors.inc.php");
+include("overview/cemp.inc.php");
+include("overview/cmp.inc.php");
+include("overview/hrStorage.inc.php");
+include("overview/temperatures.inc.php");
+include("overview/fanspeeds.inc.php");
+include("overview/voltages.inc.php");
+
+echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+echo("<p class=sectionhead>Recent Events</p>");
+
+$query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,10";
+$data = mysql_query($query);
+
+echo("<table cellspacing=0 cellpadding=2 width=100%>");
+
+while($entry = mysql_fetch_array($data)) {
+  include("includes/print-event-short.inc");
+}
+
+echo("</table>");
+
+echo("</div>");
 ?>

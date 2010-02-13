@@ -1,0 +1,174 @@
+
+-- *****************************************************************************
+-- Juniper Networks Enterprise Product MIB
+--
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2005-2006 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Products-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    juniperUni
+        FROM Juniper-UNI-SMI;
+
+juniProducts  MODULE-IDENTITY
+
+    LAST-UPDATED "200611240913Z" -- 24-Nov-06 04:13 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The sysObjectID registry for Juniper Networks products.  This is the
+        top-level registry for object identifiers for SNMP managed products that
+        are manufactured or distibuted by Juniper Networks."
+    -- Revision History
+    
+    REVISION    "200611240913Z"  -- 24-Nov-06 04:13 AM EST  - JUNOSe 8.2
+    DESCRIPTION
+        "Added E120 product."
+    REVISION    "200505250604Z"  -- 25-May-05 01:04 AM EST
+    DESCRIPTION
+        "Renamed E360 product family as E320 product family."
+    REVISION    "200312161854Z"  -- 16-Dec-03 01:54 PM EST
+    DESCRIPTION
+        "Added the REX product family."
+    REVISION    "200211132018Z"  -- 13-Nov-02 03:18 PM EST
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added ERX-310 product."
+    REVISION    "200112071536Z"  -- 07-Dec-01 10:36 AM EST
+    DESCRIPTION
+        "Added nodes for the ERX-1440, ERX-705 and SSX-1440 products."
+    REVISION    "200103011527Z"  -- 01-Mar-01 10:27 AM EST
+    DESCRIPTION
+        "Added nodes for Marconi products."
+    REVISION    "200005240000Z"  -- 24-May-00
+    DESCRIPTION
+        "Added nodes for UMC System Manamagent"
+    REVISION    "9912131936Z"    -- 13-Dec-99 2:36 PM EST
+    DESCRIPTION
+        "Added MODULE-IDENTITY."
+    REVISION    "9911160000Z"    -- 16-Nov-99
+    DESCRIPTION
+        "Added Service Ready Switch 3000."
+    REVISION    "9909280000Z"    -- 28-Sep-99
+    DESCRIPTION
+        "The initial release of this information module."
+    ::= { juniperUni 1 }
+
+
+-- *****************************************************************************
+-- Top-level Juniper Product OBJECT IDENTIFIER assignments.
+-- *****************************************************************************
+juniperUniProductFamilies  OBJECT IDENTIFIER
+    ::= { juniProducts 1 }
+
+juniProductFamilies  OBJECT IDENTIFIER
+    ::= { juniperUniProductFamilies 1 }
+
+
+-- *****************************************************************************
+-- Juniper first generation E-series edge router product family.
+-- *****************************************************************************
+juniErx  OBJECT IDENTIFIER
+    ::= { juniProductFamilies 1 }
+
+-- ERX-1400
+juniErx1400  OBJECT IDENTIFIER
+    ::= { juniErx 1 }
+-- ERX-700
+juniErx700  OBJECT IDENTIFIER
+    ::= { juniErx 2 }
+-- ERX-1440
+juniErx1440  OBJECT IDENTIFIER
+    ::= { juniErx 3 }
+-- ERX-705
+juniErx705  OBJECT IDENTIFIER
+    ::= { juniErx 4 }
+-- ERX-310
+juniErx310  OBJECT IDENTIFIER
+    ::= { juniErx 5 }
+
+
+-- *****************************************************************************
+-- Juniper second generation E-series edge router product family.
+-- *****************************************************************************
+juniEseries2 OBJECT IDENTIFIER
+    ::= { juniProductFamilies 6 }
+
+-- E320
+juniE320  OBJECT IDENTIFIER
+    ::= { juniEseries2 1 }
+
+-- E120
+juniE120  OBJECT IDENTIFIER
+    ::= { juniEseries2 2 }
+
+
+-- *****************************************************************************
+-- Juniper UMC management center product family.
+-- *****************************************************************************
+juniUmc  OBJECT IDENTIFIER
+    ::= { juniProductFamilies 5 }
+
+-- UMC System Management
+juniUmcSystemManagement  OBJECT IDENTIFIER
+    ::= { juniUmc 1 }
+
+
+-- *****************************************************************************
+-- OEM'd versions of Juniper Networks product families/products are rooted
+-- under the oemProductFamilies node.
+-- *****************************************************************************
+juniOemProductFamilies  OBJECT IDENTIFIER
+    ::= { juniProductFamilies 2 }
+
+
+--
+-- Marconi versions of Juniper Networks product families/products are rooted
+-- under the juniOemProductFamilies node.
+--
+juniMarconiProductFamilies  OBJECT IDENTIFIER
+    ::= { juniOemProductFamilies 1 }
+
+juniSsx  OBJECT IDENTIFIER
+    ::= { juniMarconiProductFamilies 1 }
+
+-- SSX-1400
+juniSsx1400  OBJECT IDENTIFIER
+    ::= { juniSsx 1 }
+-- SSX-700
+juniSsx700  OBJECT IDENTIFIER
+    ::= { juniSsx 2 }
+-- SSX-1440
+juniSsx1440  OBJECT IDENTIFIER
+    ::= { juniSsx 3 }
+
+
+-- *****************************************************************************
+-- Obsolete product OIDs.
+--   These OIDs are for former Unisphere Networks products that now belong to
+--   another company and therefore are listed here only as OID placeholders.
+-- *****************************************************************************
+usSmx  OBJECT IDENTIFIER
+    ::= { juniProductFamilies 3 }
+
+usServiceMediationSwitch2100  OBJECT IDENTIFIER
+    ::= { usSmx 1 }
+
+usSrx  OBJECT IDENTIFIER
+    ::= { juniProductFamilies 4 }
+
+usServiceReadySwitch3000  OBJECT IDENTIFIER
+    ::= { usSrx 1 }
+
+END

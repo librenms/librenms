@@ -1,0 +1,892 @@
+--
+-- Juniper Enterprise Specific MIB: Collector PIC MIB
+-- 
+-- Copyright (c) 2003, 2005-2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-COLLECTOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Gauge32, Integer32,
+    NOTIFICATION-TYPE, OBJECT-IDENTITY, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    ifIndex, ifDescr
+        FROM IF-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB            -- RFC2851
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    jnxMibs, jnxCollectorNotifications
+        FROM JUNIPER-SMI;
+
+jnxCollectorMIB  MODULE-IDENTITY
+    LAST-UPDATED "200311130000Z" -- Nov 13, 2003
+    ORGANIZATION "Juniper Networks, Inc." 
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "Provides data about each of the Collector PICs on a router."
+
+    -- revision history
+    REVISION  "200311130000Z"
+    DESCRIPTION
+            "Initial revision."
+    ::= { jnxMibs 28 }
+
+JnxCollPicStateDef ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Identifies specific error conditions that may exist on a
+             Collector PIC."
+    SYNTAX   BITS {
+                 jnxCollStateSoftOverload(0),    -- soft flow overload
+                 jnxCollStateHardOverload(1),    -- hard flow overload
+                 jnxCollStateMemoryUnavail(2)    -- unavailable memory
+             }
+
+--
+-- Global Stats
+--
+
+    jnxCollGlobalStats OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Global, router-wide collector stats."
+        ::= { jnxCollectorMIB 1 }
+
+
+    jnxCollGlobalCreatedFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of file created by all the
+            collector pics on the router since the last 
+            time the router was reset."
+        ::= { jnxCollGlobalStats 1 }
+
+    jnxCollGlobalOpenFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of open collector files currently
+            present on the router."
+        ::= { jnxCollGlobalStats 2 }
+
+--
+-- Per-Collector PIC data
+--
+
+    jnxCollPicIfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxCollPicEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Data about each collector pic currently present
+            on the router." 
+        ::= { jnxCollectorMIB 2 }
+
+    jnxCollPicIfEntry OBJECT-TYPE
+        SYNTAX     JnxCollPicEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry provides information about a single Collector PIC.
+            Each Collector PIC contains a single interface and is 
+            identified by its ifIndex."
+        INDEX   { ifIndex }
+        ::= { jnxCollPicIfTable 1 }
+
+    JnxCollPicEntry ::=
+        SEQUENCE {
+
+            --
+            -- File statistics
+            --
+            jnxCollPicIfCreatedFiles          Counter64,
+            jnxCollPicIfCreatedFileRate       Gauge32,
+            jnxCollPicIfPeakCreatedFileRate   Gauge32,
+            jnxCollPicIfExportedFiles         Counter64,
+            jnxCollPicIfExportedFileRate      Gauge32,
+            jnxCollPicIfPeakExportedFileRate  Gauge32,
+            jnxCollPicIfDestroyedFiles        Counter64,
+            jnxCollPicIfDestroyedFileRate     Gauge32,
+            jnxCollPicIfPeakDestroyedFileRate Gauge32,
+
+            --
+            -- Record statistics
+            --
+            jnxCollPicIfProcRecords         Counter64,
+            jnxCollPicIfProcRecordsRate     Gauge32,
+            jnxCollPicIfPeakProcRecordsRate Gauge32,
+
+            --
+            -- Memory statistics
+            --
+            jnxCollPicIfMemoryUsed          CounterBasedGauge64,
+            jnxCollPicIfMemoryFree          CounterBasedGauge64,
+
+            --
+            -- Ftp statistics
+            --
+            jnxCollPicIfFtpBytes            Counter64,
+            jnxCollPicIfFtpByteRate         Gauge32,
+            jnxCollPicIfPeakFtpByteRate     Gauge32,
+            jnxCollPicIfFtpFiles            Counter64,
+            jnxCollPicIfFtpFileRate         Gauge32,
+            jnxCollPicIfPeakFtpFileRate     Gauge32,
+            jnxCollPicIfFtpFailures         CounterBasedGauge64,
+
+            --
+            -- Error state information
+            --
+            jnxCollPicIfCurrentState        JnxCollPicStateDef,
+            jnxCollPicIfLastStateChange     JnxCollPicStateDef,
+            jnxCollPicIfStateChangeTime     TimeTicks,
+            jnxCollPicIfStateChangeDate     DateAndTime,
+            jnxCollPicIfStateChangeType     INTEGER
+        }
+
+    --
+    -- File statistics
+    --
+    jnxCollPicIfCreatedFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of files created by this Collector PIC
+            since the last time the PIC was reset."
+        ::= { jnxCollPicIfEntry 1 }
+
+    jnxCollPicIfCreatedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of files created per second, measured over the
+            current 10 second interval."
+        ::= { jnxCollPicIfEntry 2 }
+
+    jnxCollPicIfPeakCreatedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of files created per second."
+        ::= { jnxCollPicIfEntry 3 }
+
+    jnxCollPicIfExportedFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of files exported by this Collector PIC."
+        ::= { jnxCollPicIfEntry 4 }
+
+    jnxCollPicIfExportedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of files exported per second, measured over
+            the current 10 second interval."
+        ::= { jnxCollPicIfEntry 5 }
+
+    jnxCollPicIfPeakExportedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of files exported per second."
+        ::= { jnxCollPicIfEntry 6 }
+
+    jnxCollPicIfDestroyedFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of files destroyed by this Collector PIC."
+        ::= { jnxCollPicIfEntry 7 }
+
+    jnxCollPicIfDestroyedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of files destroyed per second, as measured over
+            the current 10 second interval."
+        ::= { jnxCollPicIfEntry 8 }
+
+    jnxCollPicIfPeakDestroyedFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of files destroyed per second."
+        ::= { jnxCollPicIfEntry 9 }
+
+    --
+    -- Record statistics
+    --
+    jnxCollPicIfProcRecords OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of flow records processed by this Collector PIC."
+        ::= { jnxCollPicIfEntry 10 }
+
+    jnxCollPicIfProcRecordsRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of flow records processed per seconds, measured
+            during the current 10 second interval."
+        ::= { jnxCollPicIfEntry 11 }
+
+    jnxCollPicIfPeakProcRecordsRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of flow records processed."
+        ::= { jnxCollPicIfEntry 12 }
+
+    --
+    -- Memory statistics
+    --
+    jnxCollPicIfMemoryUsed OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory used, in bytes, by this Collector PIC."
+        ::= { jnxCollPicIfEntry 13 }
+
+    jnxCollPicIfMemoryFree OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The amount of memory free, in bytes, on this Collector PIC."
+        ::= { jnxCollPicIfEntry 14 }
+
+    --
+    -- Ftp statistics
+    --
+    jnxCollPicIfFtpBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes transferred via FTP by this 
+            Collector PIC."
+        ::= { jnxCollPicIfEntry 15 }
+
+    jnxCollPicIfFtpByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of bytes per second transfered via FTP measured
+            during the current 10 second interval."
+        ::= { jnxCollPicIfEntry 16 }
+
+    jnxCollPicIfPeakFtpByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of bytes per second transferred via FTP."
+        ::= { jnxCollPicIfEntry 17 }
+
+    jnxCollPicIfFtpFiles OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of files transferred via FTP by this
+            Collector PIC."
+        ::= { jnxCollPicIfEntry 18 }
+
+    jnxCollPicIfFtpFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of files per second transferred via FTP."
+        ::= { jnxCollPicIfEntry 19 }
+
+    jnxCollPicIfPeakFtpFileRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of files per second transferred via FTP."
+        ::= { jnxCollPicIfEntry 20 }
+
+    jnxCollPicIfFtpFailures OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of FTP transfer failures on this Collector
+            PIC."
+        ::= { jnxCollPicIfEntry 21 }
+
+    --
+    -- Error State Information
+    --
+    jnxCollPicIfCurrentState OBJECT-TYPE
+        SYNTAX      JnxCollPicStateDef
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current state of various error conditions on this
+            Collector PIC."
+        ::= { jnxCollPicIfEntry 22 }
+
+    jnxCollPicIfLastStateChange OBJECT-TYPE
+        SYNTAX      JnxCollPicStateDef
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Identifies the error condition that last changed state."
+        ::= { jnxCollPicIfEntry 23 }
+
+    jnxCollPicIfStateChangeTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the management subsystem last
+            learned of a change to the value of jnxCollPicIfCurrentState
+            for this Collector PIC."
+        ::= { jnxCollPicIfEntry 24 }
+
+    jnxCollPicIfStateChangeDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system date and time when the management subsystem last
+            learned of a change to the value of jnxCollPicIfCurrentState
+            for this Collector PIC."
+        ::= { jnxCollPicIfEntry 25 }
+
+    jnxCollPicIfStateChangeType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none    (1),
+                        set     (2),
+                        cleared (3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This indicates whether the last state change set a new
+            error condition or cleared an existing one."
+        ::= { jnxCollPicIfEntry 26 }
+
+
+
+
+--
+-- Per Collector file data
+--
+
+    jnxCollFileTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF JnxCollFileEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Data about each collector file currently present
+            on the router." 
+        ::= { jnxCollectorMIB 3 }
+
+    jnxCollFileEntry OBJECT-TYPE
+        SYNTAX     JnxCollFileEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "Each entry provides information about a single file currently
+            open on this Collector PIC.  Each Collector PIC File is 
+            identified by the ifIndex associated with the Collector PIC 
+            and the name of the file."
+        INDEX   { ifIndex, jnxCollFileName }
+        ::= { jnxCollFileTable 1 }
+
+    JnxCollFileEntry ::=
+        SEQUENCE {
+            jnxCollFileName               DisplayString,
+            jnxCollFileFname              DisplayString,
+            jnxCollFileRecords            CounterBasedGauge64,
+            jnxCollFileRecordRate         Gauge32,
+            jnxCollFilePeakRecordRate     Gauge32,
+
+            jnxCollFileUncompBytes        CounterBasedGauge64,
+            jnxCollFileUncompByteRate     Gauge32,
+            jnxCollFilePeakUncompByteRate Gauge32,
+            jnxCollFileCompBytes          CounterBasedGauge64,
+            jnxCollFileCompByteRate       Gauge32,
+            jnxCollFilePeakCompByteRate   Gauge32,
+            jnxCollFileBlocks             Gauge32,
+            jnxCollFileCompBlocks         Gauge32,
+            jnxCollFileTransferAttempts   Gauge32,
+            jnxCollFileState              INTEGER
+        }
+
+    jnxCollFileName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..115))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The name of a Collector File on this Collector PIC."
+        ::= { jnxCollFileEntry 1 }
+
+    jnxCollFileFname OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of a Collector File on this Collector PIC.  This
+            object is included for those NM applications that can't
+            parse the file name from the instance portion of the OIDs
+            and provides the value of jnxCollFileName explicitly."
+        ::= { jnxCollFileEntry 2 }
+
+    jnxCollFileRecords OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of flow records in this file."
+        ::= { jnxCollFileEntry 3 }
+
+    jnxCollFileRecordRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of flow records per second added to this file,
+            measured during the current 10 second interval."
+        ::= { jnxCollFileEntry 4 }
+
+    jnxCollFilePeakRecordRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of flow records per second added to this file."
+        ::= { jnxCollFileEntry 5 }
+
+    jnxCollFileUncompBytes OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of uncompressed bytes in this file."
+        ::= { jnxCollFileEntry 6 }
+
+    jnxCollFileUncompByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of uncompressed bytes per second added to this file."
+        ::= { jnxCollFileEntry 7 }
+
+    jnxCollFilePeakUncompByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of uncompressed bytes per second added to this 
+            file."
+        ::= { jnxCollFileEntry 8 }
+
+    jnxCollFileCompBytes OBJECT-TYPE
+        SYNTAX      CounterBasedGauge64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of compressed bytes in this file."
+        ::= { jnxCollFileEntry 9 }
+
+    jnxCollFileCompByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of compressed bytes per second added to this file,
+            measured during the current 10 second interval."
+        ::= { jnxCollFileEntry 10 }
+
+    jnxCollFilePeakCompByteRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peak number of compressed bytes per second added to this file."
+        ::= { jnxCollFileEntry 11 }
+
+    jnxCollFileBlocks OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of blocks in this file."
+        ::= { jnxCollFileEntry 12 }
+
+    jnxCollFileCompBlocks OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of compressed blocks in this file."
+        ::= { jnxCollFileEntry 14 }
+
+    jnxCollFileTransferAttempts OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of FTP transfer attempts for this file."
+        ::= { jnxCollFileEntry 15 }
+
+    jnxCollFileState OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unknown(1),
+            active (2), -- file is actively receiving flow records
+            wait   (3), -- file is waiting for export
+            export1(4), -- file is being exported to the primary server
+            export2(5)  -- file is being exported to the secondary server
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current state of this file."
+        ::= { jnxCollFileEntry 16 }
+
+
+--
+-- Collector PIC Notification objects
+--
+
+    jnxCollNotifyVars OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Notification object definitions."
+        ::= { jnxCollectorMIB 4 }
+
+    jnxCollNotifyUrl OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The URL associated with a file transfer destination."
+        ::= { jnxCollNotifyVars 1 }
+
+    jnxCollNotifyInetType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Used with jnxCollNotifyInetAddress to identify a specific
+            file transfer destination."
+        ::= { jnxCollNotifyVars 2 }
+ 
+    jnxCollNotifyInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Used with jnxCollNotifyInetType to identify a specific
+            file transfer destination."
+        ::= { jnxCollNotifyVars 3 }
+ 
+    jnxCollNotifyError OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Description of error encountered when trying to transfer a file."
+        ::= { jnxCollNotifyVars 4 }
+
+    jnxCollNotifyFile OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Identifies a specific file for notifications that refer to a file."
+        ::= { jnxCollNotifyVars 5 }
+ 
+    jnxCollNotifyFtpResultCode OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the FTP result code for file transfer notifications."
+        ::= { jnxCollNotifyVars 6 }
+ 
+    jnxCollNotifyFtpErrorText OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the FTP error text for file transfer notifications."
+        ::= { jnxCollNotifyVars 7 }
+
+    jnxCollNotifyMemUtil OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the current memory utilization for pic overload 
+            notifications."
+        ::= { jnxCollNotifyVars 8 }
+ 
+    jnxCollNotifyMemFree OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the current amount of free memory for pic overload 
+            notifications."
+        ::= { jnxCollNotifyVars 9 }
+ 
+    jnxCollNotifyMemThresh OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the current memory threshold used for determining
+            memory unavailable conditions."
+        ::= { jnxCollNotifyVars 10 }
+
+    jnxCollNotifyNewRecordRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the current number of new records per second created
+            on this Collector PIC."
+        ::= { jnxCollNotifyVars 11 }
+ 
+    jnxCollNotifyOverloadType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            softOverload (1),
+            hardOverload (2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Identifies a specific type of flow overload condition
+            on this Collector PIC."
+        ::= { jnxCollNotifyVars 12 }
+ 
+    jnxCollNotifyDate OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Provides the current system date and time."
+        ::= { jnxCollNotifyVars 13 }
+
+    jnxCollNotifyFromFtpServerInetType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Used with jnxCollNotifyFromFtpServerInetAddress to identify
+            a specific FTP server address."
+        ::= { jnxCollNotifyVars 14 }
+
+    jnxCollNotifyFromFtpServerInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The FTP server address from which the switchover occurs."
+        ::= { jnxCollNotifyVars 15 }
+
+    jnxCollNotifyFromFtpServerType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            primary (1),
+            secondary (2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The FTP server Type from which the switchover occurs."
+        ::= { jnxCollNotifyVars 16 }
+
+    jnxCollNotifyToFtpServerInetType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Used with jnxCollNotifyToFtpServerInetAddress to identify
+            a specific FTP server address."
+        ::= { jnxCollNotifyVars 17 }
+
+    jnxCollNotifyToFtpServerInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The FTP server address to which the switchover occurs."
+        ::= { jnxCollNotifyVars 18 }
+
+    jnxCollNotifyToFtpServerType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            primary (1),
+            secondary (2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The FTP server Type to which the switchover occurs."
+        ::= { jnxCollNotifyVars 19 }
+
+    jnxCollNotifyInitiatedBy OBJECT-TYPE
+        SYNTAX      INTEGER {
+            cli (1),
+            automatic (2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Identify what initiates the FTP switchover."
+        ::= { jnxCollNotifyVars 20 }
+
+ 
+--
+-- Collector PIC Notification definitions
+--
+
+    jnxCollNotificationPrefix OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "All collector notifications are registered under this branch."
+        ::= { jnxCollectorNotifications 0 }
+
+
+    jnxCollUnavailableDest NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollNotifyDate,
+                  jnxCollNotifyUrl, 
+                  jnxCollNotifyInetType,
+		  jnxCollNotifyInetAddress }
+        STATUS  current
+        DESCRIPTION
+            "Notification of an unavailable destination failure encountered
+            while transferring a collector file."
+        ::= { jnxCollNotificationPrefix 1 }
+
+    jnxCollUnavailableDestCleared NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollNotifyDate,
+                  jnxCollNotifyUrl, 
+                  jnxCollNotifyInetType,
+		  jnxCollNotifyInetAddress }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a previous unavailable destination failure 
+            has been resolved."
+        ::= { jnxCollNotificationPrefix 2 }
+
+    jnxCollUnsuccessfulTransfer NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollNotifyDate,
+                  jnxCollNotifyFile,
+                  jnxCollNotifyUrl, 
+                  jnxCollNotifyInetType,
+		  jnxCollNotifyInetAddress,
+                  jnxCollNotifyError,
+                  jnxCollNotifyFtpResultCode,
+                  jnxCollNotifyFtpErrorText }
+        STATUS  current
+        DESCRIPTION
+            "This indicates an error was encountered while attempting
+            a file transfer."
+        ::= { jnxCollNotificationPrefix 3 }
+
+    jnxCollFlowOverload NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollPicIfStateChangeDate,
+                  jnxCollNotifyOverloadType,
+                  jnxCollNotifyNewRecordRate, 
+                  jnxCollPicIfCreatedFiles,
+                  jnxCollPicIfDestroyedFiles}
+        STATUS  current
+        DESCRIPTION
+            "This indicates a soft or hard flow overload condition has been
+            triggered."
+        ::= { jnxCollNotificationPrefix 4 }
+
+    jnxCollFlowOverloadCleared NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollPicIfStateChangeDate,
+                  jnxCollNotifyOverloadType,
+                  jnxCollNotifyNewRecordRate, 
+                  jnxCollPicIfCreatedFiles,
+                  jnxCollPicIfDestroyedFiles }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a soft or hard flow overload condition has been
+            cleared."
+        ::= { jnxCollNotificationPrefix 5 }
+
+    jnxCollMemoryUnavailable NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollPicIfStateChangeDate,
+                  jnxCollNotifyMemThresh,
+                  jnxCollNotifyMemUtil, 
+                  jnxCollNotifyMemFree }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a memory unavailable condition has been
+            triggered."
+        ::= { jnxCollNotificationPrefix 6 }
+
+    jnxCollMemoryAvailable NOTIFICATION-TYPE
+        OBJECTS { ifDescr,
+                  jnxCollPicIfStateChangeDate,
+                  jnxCollNotifyMemThresh,
+                  jnxCollNotifyMemUtil, 
+                  jnxCollNotifyMemFree }
+        STATUS  current
+        DESCRIPTION
+            "This indicates a memory unavailable condition has been
+            cleared."
+        ::= { jnxCollNotificationPrefix 7 }
+
+    jnxCollFtpSwitchover NOTIFICATION-TYPE
+        OBJECTS { ifDescr, 
+                  jnxCollNotifyDate,
+                  jnxCollNotifyFromFtpServerInetType,
+                  jnxCollNotifyFromFtpServerInetAddress,
+                  jnxCollNotifyFromFtpServerType,
+                  jnxCollNotifyToFtpServerInetType,
+                  jnxCollNotifyToFtpServerInetAddress,
+                  jnxCollNotifyToFtpServerType,
+                  jnxCollNotifyInitiatedBy }
+        STATUS  current
+        DESCRIPTION
+            "This indicates an FTP server switchover has occurred." 
+        ::= { jnxCollNotificationPrefix 8 }
+
+END

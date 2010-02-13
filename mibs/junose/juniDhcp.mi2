@@ -1,0 +1,3556 @@
+
+-- *****************************************************************************
+-- Juniper-DHCP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DHCP MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2004 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DHCP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32, Unsigned32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, PhysAddress, TruthValue, TimeInterval,
+    DisplayString, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    juniRouterName
+        FROM Juniper-ROUTER-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    InterfaceIndex
+        FROM IF-MIB
+    JuniEnable, JuniLogSeverity, JuniInterfaceLocation
+        FROM Juniper-TC;
+
+juniDhcpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200701312038Z"  -- 31-Jan-07 04:38 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The DHCP MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200701312038Z"  -- 31-Jan-07 04:38 PM EDT  - JUNOSe 8.0
+    DESCRIPTION
+        "Added DHCP Option 60 support, and following objects become obsoleted:
+         juniDhcpLocalServerCableModemServerTable,
+	 juniDhcpLocalServerCableModemRequestIn,
+         juniDhcpLocalServerCableModemResponseIn,
+         juniDhcpLocalServerCableModemRequestOut,
+         juniDhcpLocalServerCableModemResponseOut,
+         juniDhcpLocalServerCableModemRequestDropped,
+         juniDhcpLocalServerCableModemResponseDropped,
+         juniDhcpLocalServerCableModemRequestBad,
+         juniDhcpLocalServerCableModemResponseBad,
+         juniDhcpLocalServerCableModemRequestDeleted,
+         juniDhcpLocalServerCableModemPacketsIn,
+         juniDhcpLocalServerCableModemPacketsOut,
+         juniDhcpLocalServerCableModemPacketsDropped.
+         Added juniDhcpRelayBroadcastFlagReplies to control unicast/broadcast
+         delivery of DHCP reply packets.
+         Added juniDhcpRelayGiaddrSelectsInterface for enable/diable of DHCP Relay 
+         Giaddr Selects Interface operation mode.
+         Added juniDhcpRelayAgentVendorSpecificSuboption to configure the
+         Vendor-Specific sub-option of the Relay Agent Info option." 
+    REVISION    "200511041953Z"  -- 04-Nov-05 02:53 PM EST  - JUNOSe 7.2
+    DESCRIPTION
+        "Added new DHCP Relay statistics to juniDhcpRelayScalars."
+    REVISION    "200509272125Z"  -- 27-Sep-05 05:25 PM EDT  - JUNOSe 7.1
+    DESCRIPTION
+        "Changed juniDhcpLocalServerSubInterfaceName to be DisplayString type.
+         Made index non-accessible. Added juniDhcpLocalServerSubInterfaceTable
+         to support per interface address limits.  Added notification objects
+         for pool groups."
+    REVISION    "200512052131Z"  -- 05-Dec-05 04:31 PM EST  - JUNOSe 7.0
+    DESCRIPTION
+         "Added juniDhcpLocalServerBindingsLeaseInterval,
+         juniDhcpLocalServerBindingsLeaseStartTime and
+         juniDhcpLocalServerBindingsInitialLeaseStartTime.
+         Update definition of juniDhcpLocalServerBindingsExpireTime.
+         Added juniDhcpLocalServerBindingsRowStatus to permit administrative
+         clearing of an address binding.
+         Added juniDhcpLocalServerPoolSharedInUse to indicate sharing of DHCP pool
+         addresses.
+         Added statistics for renews, rebinds, errors, and discards.
+         Added juniDhcpRelayLayer2UnicastReplies to control
+         L2 ucast L3 bcast of DHCP reply packets."
+    REVISION    "200411081616Z"  -- 08-Nov-04 11:16 AM EST  - JUNOSe 6.2
+    DESCRIPTION
+        "Added ability to administratively delete DHCP local server
+        address bindings."
+    REVISION    "200510192147Z"  -- 19-Oct-05 05:47 PM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "Added new attributes juniDhcpLocalServerSnmpTrap and 
+         juniDhcpLocalServerInhibitRoaming.  Also added
+         juniDhcpLocalServerDuplicateClient notification."
+    REVISION    "200409092002Z"  -- 09-Sep-04 04:02 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Added juniDhcpLocalServerHealth notification and the 
+         juniDhcpLocalServerSubInterfaceStatisticsTable."
+    REVISION    "200401030059Z"  -- 02-Jan-04 07:59 PM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Added DHCP local server pool exhaustion variables and notifications for
+         high pool utilization and pool exhaustion."
+    REVISION    "200309051859Z"  -- 05-Sep-03 02:59 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added support to exclude the subinterafce ID from option 82 circuit
+         ID."
+    REVISION    "200212171659Z"  -- 17-Dec-02 11:59 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Added hostname and vrname scalars to DHCP Relay object.
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200205101927Z"  -- 10-May-02 03:27 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added local server reservation and cable modem support.
+         Refined agent info enable into agent circuit ID enable and agent remote
+         ID enable."
+    REVISION    "200103301809Z"  -- 30-Mar-01 01:09 PM EST  - JUNOSe 3.1
+    DESCRIPTION
+        "Added Local Server support."
+    REVISION    "200002031950Z"  --  3-Feb-00  2:50 PM EST  - JUNOSe 1.3
+    DESCRIPTION
+        "Added support for DHCP Proxy Client under juniDhcpProxyClient node.
+         Added additional error/discard statistics for DHCP Relay."
+    REVISION      "9906010000Z"  --  1-Jun-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 22 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniDhcpLocalServerPoolName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS      current
+    DESCRIPTION
+        "DHCP Local Server Pool name.  Represents textual information taken from
+        the NVT ASCII character set."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..64))
+
+JuniDhcpLocalServerPoolGroupName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS      current
+    DESCRIPTION
+        "DHCP Local Server Pool group name.  Represents textual information 
+        taken from the NVT ASCII character set.  The pool group name is created
+        by appending -Group to the name of the first pool in the group."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..64))
+
+JuniDhcpLocalServerPoolDomainName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS      current
+    DESCRIPTION
+        "DHCP Local Server Pool domain name.  Represents textual information
+        taken from the NVT ASCII character set."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..64))
+
+JuniDhcpLocalServerPoolNetBiosNodeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of netbios node types that may be assigned to the DHCP local
+         server pool."
+    SYNTAX      INTEGER {
+                    netBiosNodeTypeNone(1),
+                    netBiosNodeTypeBroadcast(2),
+                    netBiosNodeTypePeerToPeer(3),
+                    netBiosNodeTypeMixed(4),
+                    netBiosNodeTypeHybrid(5) }
+
+JuniDhcpLocalServerModeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The set of DHCP Local Server operational Mode types."
+    SYNTAX      INTEGER {
+                    localServerModeTypeEqualAccess(1),
+                    localServerModeTypeStandalone(2) }
+
+JuniDhcpLocalServerPhysAddressString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "48a"
+    STATUS      current
+    DESCRIPTION
+        "DHCP local server MAC address.  Represents the physical address in
+        textual form, eg. 00-d0-b7-09-e0-00-00-00-00-00-00-00-00-00-00-00.  Only
+        hexidecimal digits (0-9, a-f) and the dash (-) from the NVT ASCII
+        character set are valid."
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..48))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpObjects              OBJECT IDENTIFIER ::= { juniDhcpMIB 1 }
+juniDhcpRelay                OBJECT IDENTIFIER ::= { juniDhcpObjects 1 }
+juniDhcpProxy                OBJECT IDENTIFIER ::= { juniDhcpObjects 2 }
+juniDhcpLocalServerObjects   OBJECT IDENTIFIER ::= { juniDhcpObjects 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for DHCP Relay
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- DHCP Relay Scalars
+--
+juniDhcpRelayScalars  OBJECT IDENTIFIER ::= { juniDhcpRelay 1 }
+
+juniDhcpRelayAgentInfoEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Enable/disable use of the DHCP relay agent information option."
+    ::= { juniDhcpRelayScalars 1 }
+
+juniDhcpRelayBadMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay messages that were discarded
+        because their message operation (e.g. BOOTREQUEST, BOOTREPLY)
+        was unknown, possibly due to corruption."
+    ::= { juniDhcpRelayScalars 2 }
+
+juniDhcpRelayUnknownMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay messages that were discarded
+        because their message type (e.g. Discover, Offer, Ack) was
+        unknown, possibly due to corruption.  This value is the sum
+        of received request and reply messages with this error."
+    ::= { juniDhcpRelayScalars 3 }
+
+juniDhcpRelayAgentInfoAlreadyPresents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests that were discarded
+        because they already contained the Relay Agent Info option
+        when this agent was configured to insert it."
+    ::= { juniDhcpRelayScalars 4 }
+
+juniDhcpRelayGatewayAddrSpoofs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests that were discarded
+        because the gateway IP address field already contained this
+        agent's IP address."
+    ::= { juniDhcpRelayScalars 5 }
+
+juniDhcpRelayAgentCircuitIdEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable use of the DHCP Relay Agent Info option
+        Circuit Id suboption."
+    ::= { juniDhcpRelayScalars 6 }
+
+juniDhcpRelayAgentRemoteIdEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable use of the DHCP Relay Agent Info option
+        Remote Id suboption."
+    ::= { juniDhcpRelayScalars 7 }
+
+juniDhcpRelayAgentHostnameEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable addition of Host Name to the DHCP Relay Agent
+        Info option Circuit Id suboption."
+    ::= { juniDhcpRelayScalars 8 }
+
+juniDhcpRelayAgentVrnameEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable addition of Virtual Router Name to the DHCP
+        Relay Agent Info option Circuit Id suboption."
+    ::= { juniDhcpRelayScalars 9 }
+
+juniDhcpRelayAgentExcludeSubIdEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable excluding of the subinterface identifier in
+        the DHCP Relay Agent Info option Circuit Id suboption."
+    ::= { juniDhcpRelayScalars 10 }
+
+juniDhcpRelayAgentTrustAllEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable Trust-all processing of the DHCP Relay Agent
+        Info option."
+    DEFVAL    { disable }
+    ::= { juniDhcpRelayScalars 11 }
+
+juniDhcpRelayAgentInfoAlreadyPresentForwards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests forwarded to DHCP
+        server(s) that already contain the Relay Agent Info option."
+    ::= { juniDhcpRelayScalars 12 }
+
+juniDhcpRelayAgentGiaddrOverrides OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests whose giaddr field
+        was overridden with IP address 0.0.0.0."
+    ::= { juniDhcpRelayScalars 13 }
+
+juniDhcpRelayAgentOptionOverrides OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests whose Relay Agent Info
+        option was overridden with one created by this agent."
+    ::= { juniDhcpRelayScalars 14 }
+
+juniDhcpRelayDiscoverDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay Discover messages that were
+        discarded because of lack of resources in this agent."
+    ::= { juniDhcpRelayScalars 15 }
+
+juniDhcpRelayPacketDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay messages, other than Discover
+        messages, that were discarded because of lack of resource in
+        this agent."
+    ::= { juniDhcpRelayScalars 16 }
+
+juniDhcpRelayUnknownRequestMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay request messages that were
+        discarded because their message type (e.g. Discover, Offer, Ack)
+        was unknown, possibly due to corruption."
+    ::= { juniDhcpRelayScalars 17 }
+
+juniDhcpRelayUnknownReplyMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay reply messages that were
+        discarded because their message type (e.g. Discover, Offer, Ack)
+        was unknown, possibly due to corruption."
+    ::= { juniDhcpRelayScalars 18 }
+
+juniDhcpRelayDuplicateRequestDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received DHCP relay requests that were discarded
+        because they had a matching server address and XID of an
+        outstanding DHCP server request."
+    ::= { juniDhcpRelayScalars 19 }
+
+juniDhcpRelayPacketsTransmitted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP relay requests successfully transmitted
+        to DHCP servers."
+    ::= { juniDhcpRelayScalars 20 }
+
+juniDhcpRelayPacketsReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP relay replies successfully received from
+        DHCP servers."
+    ::= { juniDhcpRelayScalars 21 }
+
+juniDhcpRelayUnknownXidDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP relay replies received from DHCP servers
+        that were discarded because their server address and XID
+        did not match an outstanding DHCP server request."
+    ::= { juniDhcpRelayScalars 22 }
+
+juniDhcpRelayDroppedStaleRequestDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP relay requests sent to DHCP server that were
+        discarded because their replies timed out."
+    ::= { juniDhcpRelayScalars 23 }
+
+juniDhcpRelayLayer2UnicastReplies OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the layer 2 unicast / layer 3 broadcast of DHCP reply
+        packets to DHCP clients. Mutually exclusive with broadcast flag
+        replies setting."
+    DEFVAL    { disable }
+    ::= { juniDhcpRelayScalars 24}
+
+juniDhcpRelayGiaddrSelectsInterface OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the determination of the client interface by the giaddr in the 
+        ACK message."
+    DEFVAL    { disable }
+    ::= { juniDhcpRelayScalars 25}
+
+juniDhcpRelayAgentVendorSpecificSuboption OBJECT-TYPE
+    SYNTAX      BITS {
+        juniDhcpRelayAgentVendorSpecificLayer2CircuitId(0), 
+        juniDhcpRelayAgentVendorSpecificUserPacketClass(1) } 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable addition of the Layer 2 Circuit ID and/or
+        User Packet Class to the Vendor-Specific sub-option of the
+        DHCP Relay Agent Info option."
+    DEFVAL    { { } }
+    ::= { juniDhcpRelayScalars 26 }
+
+juniDhcpRelayBroadcastFlagReplies OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable using broadcast flag from the packet when sending
+        DHCP reply packets to DHCP clients. Mutually exclusive with layer2
+        unicast replies setting."
+    DEFVAL    { disable }
+    ::= { juniDhcpRelayScalars 27}
+
+--
+-- DHCP Relay Server Table
+--
+juniDhcpRelayServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpRelayServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the DHCP Relay servers."
+    ::= { juniDhcpRelay 2 }
+
+juniDhcpRelayServerEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpRelayServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing a DHCP Relay server."
+    INDEX     { juniDhcpRelayServerAddress }
+    ::= { juniDhcpRelayServerTable 1 }
+
+JuniDhcpRelayServerEntry ::= SEQUENCE {
+    juniDhcpRelayServerAddress       IpAddress,
+    juniDhcpRelayServerRowStatus     RowStatus }
+
+juniDhcpRelayServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the DHCP server to which DHCP requests received from
+        attached DHCP clients are forwarded."
+    ::= { juniDhcpRelayServerEntry 1 }
+
+juniDhcpRelayServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniDhcpRelayServerEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for DHCP Proxy
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpProxyClient   OBJECT IDENTIFIER
+    ::= { juniDhcpProxy 1 }
+juniDhcpProxyServer   OBJECT IDENTIFIER
+    ::= { juniDhcpProxy 2 }    -- reserved for future use
+
+--
+-- DHCP Proxy Client Scalars
+--
+juniDhcpProxyClientScalars  OBJECT IDENTIFIER ::= { juniDhcpProxyClient 1 }
+
+juniDhcpProxyClientUnknownServers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of DHCP Proxy messages received from servers not listed
+        in the juniDhcpProxyClientServerTable."
+    ::= { juniDhcpProxyClientScalars 1 }
+
+
+--
+-- DHCP Proxy Client Server Table
+--
+juniDhcpProxyClientServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpProxyClientServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the DHCP Proxy servers known to the
+        client."
+    ::= { juniDhcpProxyClient 2 }
+
+juniDhcpProxyClientServerEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpProxyClientServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing a DHCP Proxy server known to the
+        client."
+    INDEX     { juniDhcpProxyClientServerAddress }
+    ::= { juniDhcpProxyClientServerTable 1 }
+
+JuniDhcpProxyClientServerEntry ::= SEQUENCE {
+    juniDhcpProxyClientServerAddress         IpAddress,
+    juniDhcpProxyClientServerRowStatus       RowStatus,
+    juniDhcpProxyClientServerAdminStatus     INTEGER,
+    juniDhcpProxyClientServerOperStatus      INTEGER,
+    juniDhcpProxyClientServerLeases          Counter32,
+    juniDhcpProxyClientServerDiscovers       Counter32,
+    juniDhcpProxyClientServerOffers          Counter32,
+    juniDhcpProxyClientServerRequests        Counter32,
+    juniDhcpProxyClientServerAcks            Counter32,
+    juniDhcpProxyClientServerNaks            Counter32,
+    juniDhcpProxyClientServerDeclines        Counter32,
+    juniDhcpProxyClientServerReleases        Counter32,
+    juniDhcpProxyClientServerInforms         Counter32,
+    juniDhcpProxyClientServerBadMessages     Counter32,
+    juniDhcpProxyClientServerUnknownMessages Counter32 }
+
+juniDhcpProxyClientServerAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of a DHCP server with which DHCP transactions are
+        conducted by this client."
+    ::= { juniDhcpProxyClientServerEntry 1 }
+
+juniDhcpProxyClientServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniDhcpProxyClientServerEntry 2 }
+
+juniDhcpProxyClientServerAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    drain(1),
+                    enable(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Permits configuration of the client's operation status with respect
+        to this server:
+            disable     Bar the client from using this server to obtain new
+                        address leases; and cause any leases from that server,
+                        that are currently in use by the client, to be released.
+            drain       Bar the client from using this server to obtain new
+                        address leases; but permit any leases from that server,
+                        that are currently in use by the client, to remain in
+                        use until they expire naturally.
+            enabled     Allow the client to use the server to obtain new address
+                        leases.
+
+        Implementations that don't support administrative control of the server
+        always report the value of enable(2), and disallow setting this object
+        to any other value."
+    ::= { juniDhcpProxyClientServerEntry 3 }
+
+juniDhcpProxyClientServerOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    draining(1),
+                    enabled(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the client's current operation status with respect to this
+        server:
+            disabled    The client is barred from using this server to obtain
+                        new address leases; and any leases from that server,
+                        that were in use by the client, have been released.
+            draining    The client is barred from using this server to obtain
+                        new address leases, but one or more leases from that
+                        server, that are in use by the client, will remain in
+                        use until they expire naturally.
+            enabled     The client may use the server to obtain new address
+                        leases, and may have one or more leases currently in
+                        use.
+
+        Implementations that don't support administrative control of the server
+        always report the value enabled(2)."
+    ::= { juniDhcpProxyClientServerEntry 4 }
+
+juniDhcpProxyClientServerLeases OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of address leases granted to the client by this server
+        (including those that have expired).  The number of active leases from
+        this server is determined by subtracting the value of
+        juniDhcpProxyClientServerReleases from the value of this object."
+    ::= { juniDhcpProxyClientServerEntry 5 }
+
+juniDhcpProxyClientServerDiscovers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Discovers directed (i.e. nonbroadcast) by the client to
+        this server."
+    ::= { juniDhcpProxyClientServerEntry 6 }
+
+juniDhcpProxyClientServerOffers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Offers received by the client from this server."
+    ::= { juniDhcpProxyClientServerEntry 7 }
+
+juniDhcpProxyClientServerRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Requests sent by the client to this server."
+    ::= { juniDhcpProxyClientServerEntry 8 }
+
+juniDhcpProxyClientServerAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP ACKS received by the client from this server."
+    ::= { juniDhcpProxyClientServerEntry 9 }
+
+juniDhcpProxyClientServerNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP NAKS received by the client from this server."
+    ::= { juniDhcpProxyClientServerEntry 10 }
+
+juniDhcpProxyClientServerDeclines OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Declines sent by the client to this server."
+    ::= { juniDhcpProxyClientServerEntry 11 }
+
+juniDhcpProxyClientServerReleases OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Releases sent by the client to this server."
+    ::= { juniDhcpProxyClientServerEntry 12 }
+
+juniDhcpProxyClientServerInforms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Informs sent by the client to this server."
+    ::= { juniDhcpProxyClientServerEntry 13 }
+
+juniDhcpProxyClientServerBadMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Proxy messages received by the client from this server,
+        that were discarded because of apparent corruption."
+    ::= { juniDhcpProxyClientServerEntry 14 }
+
+juniDhcpProxyClientServerUnknownMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of DHCP Proxy messages received by the client from this server,
+        that were discarded because they contained information or options
+        not recognized by the client."
+    ::= { juniDhcpProxyClientServerEntry 15 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for DHCP Local Server
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerStatistics OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 1 }
+juniDhcpLocalServerBindings   OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 2 }
+juniDhcpLocalServerPool       OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 3 }
+juniDhcpLocalServerAttributes OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 4 }
+juniDhcpLocalServerReserves   OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 5 }
+juniDhcpLocalServerCableModemServers OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 6 }
+juniDhcpLocalServerCableModemStatistics OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 7 }
+juniDhcpLocalServerPoolGroup  OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 8 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerMemUsage OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount (in bytes) of memory currently allocated to this local
+        server."
+    ::= { juniDhcpLocalServerStatistics 1 }
+
+juniDhcpLocalServerNumBindings OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of address bindings maintained by this local server."
+    ::= { juniDhcpLocalServerStatistics 2 }
+
+juniDhcpLocalServerRxDiscovers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 3 }
+
+juniDhcpLocalServerRxAccepts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of accept messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 4 }
+
+juniDhcpLocalServerRxRenews OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 5 }
+
+juniDhcpLocalServerRxDeclines OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 6 }
+
+juniDhcpLocalServerRxReleases OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 7 }
+
+juniDhcpLocalServerRxInforms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 8 }
+
+juniDhcpLocalServerTxOffers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 9 }
+
+juniDhcpLocalServerTxAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of accept ack messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 10 }
+
+juniDhcpLocalServerTxNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of nak messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 11 }
+
+juniDhcpLocalServerUnknownMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of unknown messages processed by this local server.
+        This object is deprecated and will return 0."
+    ::= { juniDhcpLocalServerStatistics 12 }
+
+juniDhcpLocalServerBadMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of bad messages processed by this local server.
+        This object is deprecated and will return 0."
+    ::= { juniDhcpLocalServerStatistics 13 }
+
+juniDhcpLocalServerPacketsIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of input packets processed by this local server."
+    ::= { juniDhcpLocalServerStatistics 14 }
+
+juniDhcpLocalServerPacketsOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of output packets processed by this local server."
+    ::= { juniDhcpLocalServerStatistics 15 }
+
+juniDhcpLocalServerRxRebinds OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind messages received by this local server."
+    ::= { juniDhcpLocalServerStatistics 16 }
+
+juniDhcpLocalServerRxUnknownClients OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of non-request messages received by this local server that
+        have no matching entry in the server database."
+    ::= { juniDhcpLocalServerStatistics 17 }
+
+juniDhcpLocalServerRxInErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by this local server that can not be
+        processed due to protocol or configuration errors."
+    ::= { juniDhcpLocalServerStatistics 18 }
+
+juniDhcpLocalServerRxInDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received by this local server that can not be
+        processed due to system resource issues."
+    ::= { juniDhcpLocalServerStatistics 19 }
+
+juniDhcpLocalServerTxRenewAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew ack messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 20 }
+
+juniDhcpLocalServerTxRebindAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind ack messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 21 }
+
+juniDhcpLocalServerTxRenewNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew nak messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 22 }
+
+juniDhcpLocalServerTxRebindNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind nak messages sent by this local server."
+    ::= { juniDhcpLocalServerStatistics 23 }
+
+juniDhcpLocalServerTxOutErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that could not be transmitted by this
+        local server due to protocol or configuration errors."
+    ::= { juniDhcpLocalServerStatistics 24 }
+
+juniDhcpLocalServerTxOutDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that could not be transmitted by this
+        local server due to system resource issues."
+    ::= { juniDhcpLocalServerStatistics 25 }
+
+juniDhcpLocalServerRxOtherRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of requests for which the request type cannot be
+         determined. For example, a request from an unknown client."
+    ::= { juniDhcpLocalServerStatistics 26 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server SubInterface Statistics Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerSubInterfaceStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerSubInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of subinterface statistics maintained by this DHCP Local Server."
+    ::= { juniDhcpLocalServerStatistics 30 }
+
+juniDhcpLocalServerSubInterfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerSubInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding maintained by
+        this DHCP Local Server."
+    INDEX     { InterfaceIndex }
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsTable 1 }
+
+JuniDhcpLocalServerSubInterfaceStatisticsEntry ::= SEQUENCE {
+    juniDhcpLocalServerSubInterfaceMemUsage          Counter32, 
+    juniDhcpLocalServerSubInterfaceNumBindings       Counter32,
+    juniDhcpLocalServerSubInterfaceRxDiscovers       Counter32,
+    juniDhcpLocalServerSubInterfaceRxAccepts         Counter32,
+    juniDhcpLocalServerSubInterfaceRxRenews          Counter32,
+    juniDhcpLocalServerSubInterfaceRxDeclines        Counter32,
+    juniDhcpLocalServerSubInterfaceRxReleases        Counter32,
+    juniDhcpLocalServerSubInterfaceRxInforms         Counter32,
+    juniDhcpLocalServerSubInterfaceTxOffers          Counter32,
+    juniDhcpLocalServerSubInterfaceTxAcks            Counter32,
+    juniDhcpLocalServerSubInterfaceTxNaks            Counter32,
+    juniDhcpLocalServerSubInterfaceUnknownMessages   Counter32,
+    juniDhcpLocalServerSubInterfaceBadMessages       Counter32,
+    juniDhcpLocalServerSubInterfacePacketsIn         Counter32,
+    juniDhcpLocalServerSubInterfacePacketsOut        Counter32,
+    juniDhcpLocalServerSubInterfaceClientCount       Counter32,
+    juniDhcpLocalServerSubInterfaceDeniedLogins      Counter32,
+    juniDhcpLocalServerSubInterfaceDeniedTotal       Counter32,
+    juniDhcpLocalServerSubInterfaceRxRebinds         Counter32,
+    juniDhcpLocalServerSubInterfaceRxUnknownClients  Counter32,
+    juniDhcpLocalServerSubInterfaceRxInErrors        Counter32,
+    juniDhcpLocalServerSubInterfaceRxInDiscards      Counter32,
+    juniDhcpLocalServerSubInterfaceTxRenewAcks       Counter32,
+    juniDhcpLocalServerSubInterfaceTxRebindAcks      Counter32,
+    juniDhcpLocalServerSubInterfaceTxRenewNaks       Counter32,
+    juniDhcpLocalServerSubInterfaceTxRebindNaks      Counter32,
+    juniDhcpLocalServerSubInterfaceTxOutErrors       Counter32,
+    juniDhcpLocalServerSubInterfaceTxOutDiscards     Counter32,
+    juniDhcpLocalServerSubInterfaceRxOtherRequests   Counter32}
+     
+juniDhcpLocalServerSubInterfaceMemUsage OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount (in bytes) of memory currently allocated to this local
+        server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 1 }
+
+juniDhcpLocalServerSubInterfaceNumBindings OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of address bindings maintained by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 2 }
+
+juniDhcpLocalServerSubInterfaceRxDiscovers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of discover messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 3 }
+
+juniDhcpLocalServerSubInterfaceRxAccepts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of accept messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 4 }
+
+juniDhcpLocalServerSubInterfaceRxRenews OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 5 }
+
+juniDhcpLocalServerSubInterfaceRxDeclines OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of decline messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 6 }
+
+juniDhcpLocalServerSubInterfaceRxReleases OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of release messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 7 }
+
+juniDhcpLocalServerSubInterfaceRxInforms OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of inform messages received by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 8 }
+
+juniDhcpLocalServerSubInterfaceTxOffers OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of offer messages sent by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 9 }
+
+juniDhcpLocalServerSubInterfaceTxAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ack messages sent by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 10 }
+
+juniDhcpLocalServerSubInterfaceTxNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of nak messages sent by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 11 }
+
+juniDhcpLocalServerSubInterfaceUnknownMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of unknown messages processed by this local server.
+        This object has been deprecated and will return 0."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 12 }
+
+juniDhcpLocalServerSubInterfaceBadMessages OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of bad messages processed by this local server.
+        This object has been deprecated and will return 0."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 13 }
+
+juniDhcpLocalServerSubInterfacePacketsIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of input packets processed by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 14 }
+
+juniDhcpLocalServerSubInterfacePacketsOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of output packets processed by this local server."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 15 }
+
+juniDhcpLocalServerSubInterfaceClientCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of clients active on this subinterface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 16 }
+
+juniDhcpLocalServerSubInterfaceDeniedLogins OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of logins denied on this subinterface since the last
+        allowed login."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 17 }
+
+juniDhcpLocalServerSubInterfaceDeniedTotal OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of logins denied on this subinterface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 18 }
+
+juniDhcpLocalServerSubInterfaceRxRebinds OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind messages received on this interface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 19 }
+
+juniDhcpLocalServerSubInterfaceRxUnknownClients OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of non-request messages received on this interface that
+        have no matching entry in the server database."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 20 }
+
+juniDhcpLocalServerSubInterfaceRxInErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received on this interface that can not be
+        processed due to protocol or configuration errors."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 21 }
+
+juniDhcpLocalServerSubInterfaceRxInDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received on this interface that can not be
+        processed due to system resource issues."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 22 }
+
+juniDhcpLocalServerSubInterfaceTxRenewAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew ack messages sent on this interface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 23 }
+
+juniDhcpLocalServerSubInterfaceTxRebindAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind ack messages sent on this interface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 24 }
+
+juniDhcpLocalServerSubInterfaceTxRenewNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of renew nak messages sent on this interface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 25 }
+
+juniDhcpLocalServerSubInterfaceTxRebindNaks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of rebind nak messages sent on this interface."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 26 }
+
+juniDhcpLocalServerSubInterfaceTxOutErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that could not be transmitted on this
+        interface due to protocol or configuration errors."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 27 }
+
+juniDhcpLocalServerSubInterfaceTxOutDiscards OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets that could not be transmitted on this
+        interface due to system resource issues."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 28 }
+
+juniDhcpLocalServerSubInterfaceRxOtherRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of requests for which the request type cannot be
+         determined. For example, a request from an unknown client."
+    ::= { juniDhcpLocalServerSubInterfaceStatisticsEntry 29 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Bindings Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerBindingsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address bindings maintained by this DHCP Local Server."
+    ::= { juniDhcpLocalServerBindings 1 }
+
+juniDhcpLocalServerBindingsEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerBindingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address binding maintained by
+        this DHCP Local Server."
+    INDEX     { juniDhcpLocalServerBindingsIpAddress }
+    ::= { juniDhcpLocalServerBindingsTable 1 }
+
+JuniDhcpLocalServerBindingsEntry ::= SEQUENCE {
+    juniDhcpLocalServerBindingsIpAddress             IpAddress,
+    juniDhcpLocalServerBindingsPhysAddress           PhysAddress,
+    juniDhcpLocalServerBindingsInfinite              TruthValue,
+    juniDhcpLocalServerBindingsExpireTime            Unsigned32,
+    juniDhcpLocalServerBindingsRowStatus             RowStatus,
+    juniDhcpLocalServerBindingsLeaseInterval         Unsigned32,
+    juniDhcpLocalServerBindingsLeaseStartTime        DateAndTime,
+    juniDhcpLocalServerBindingsInitialLeaseStartTime DateAndTime
+    }
+
+juniDhcpLocalServerBindingsIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in the bindings table."
+    ::= { juniDhcpLocalServerBindingsEntry 1 }
+
+juniDhcpLocalServerBindingsPhysAddress OBJECT-TYPE
+    SYNTAX      PhysAddress (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical (MAC) Address associated with this entry in the bindings
+        table and corresponding to the IP Address denoted by the table index."
+    ::= { juniDhcpLocalServerBindingsEntry 2 }
+
+juniDhcpLocalServerBindingsInfinite OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, then this binding will be maintained indefinitely.  If false,
+        then this binding will expire in accordance with the value of
+        juniDhcpLocalServerBindingsExpireTime."
+    ::= { juniDhcpLocalServerBindingsEntry 3 }
+
+juniDhcpLocalServerBindingsExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If juniDhcpLocalServerBindingsInfinite is false, then this is the time
+        remaining prior to expiration of the address binding associated with
+        this entry."
+    ::= { juniDhcpLocalServerBindingsEntry 4 }
+
+juniDhcpLocalServerBindingsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Entries in this table are created only via DHCP operation, never via SNMP.
+
+        Has the value active(1) when an entry exists.
+
+        Set to destroy(6) to cause this IP address binding and user-specific
+        routes to be removed. The effect is the same as if the user had
+        released his address binding, or his address lease had expired.
+
+        No other RowStatus enumeration values are supported."
+    ::= { juniDhcpLocalServerBindingsEntry 5 }
+
+juniDhcpLocalServerBindingsLeaseInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If juniDhcpLocalServerBindingsInfinite is false, then this object
+        is the time, in seconds, of the current lease."
+    ::= { juniDhcpLocalServerBindingsEntry 6 }
+
+juniDhcpLocalServerBindingsLeaseStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time the current lease was started."
+    ::= { juniDhcpLocalServerBindingsEntry 7 }
+
+juniDhcpLocalServerBindingsInitialLeaseStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The initial time the lease was offered."
+    ::= { juniDhcpLocalServerBindingsEntry 8 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Pool Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address pools associated this DHCP Local Server.  A DHCP
+        Local Server may have multiple uniquely-named pools configured; however,
+        only a single pool (with the name 'default') may have a network address
+        and mask assigned."
+    ::= { juniDhcpLocalServerPool 1 }
+
+juniDhcpLocalServerPoolEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address pool associated this
+        DHCP Local Server."
+    INDEX     { juniDhcpLocalServerPoolName }
+    ::= { juniDhcpLocalServerPoolTable 1 }
+
+JuniDhcpLocalServerPoolEntry ::= SEQUENCE {
+    juniDhcpLocalServerPoolName
+        JuniDhcpLocalServerPoolName,
+    juniDhcpLocalServerPoolDomainName
+        JuniDhcpLocalServerPoolDomainName,
+    juniDhcpLocalServerPoolNetworkIpAddress             IpAddress,
+    juniDhcpLocalServerPoolNetworkMask                  IpAddress,
+    juniDhcpLocalServerPoolNetBiosNodeType
+        JuniDhcpLocalServerPoolNetBiosNodeType,
+    juniDhcpLocalServerPoolLeaseTime                    TimeInterval,
+    juniDhcpLocalServerPoolPrimaryDnsServer             IpAddress,
+    juniDhcpLocalServerPoolSecondaryDnsServer           IpAddress,
+    juniDhcpLocalServerPoolPrimaryNetBiosNameServer     IpAddress,
+    juniDhcpLocalServerPoolSecondaryNetBiosNameServer   IpAddress,
+    juniDhcpLocalServerPoolPrimaryDefaultRouter         IpAddress,
+    juniDhcpLocalServerPoolSecondaryDefaultRouter       IpAddress,
+    juniDhcpLocalServerPoolLinkName
+        JuniDhcpLocalServerPoolName,
+    juniDhcpLocalServerPoolRowStatus                    RowStatus,
+    juniDhcpLocalServerPoolHighUtilThreshold            Integer32,
+    juniDhcpLocalServerPoolAbatedUtilThreshold          Integer32,
+    juniDhcpLocalServerPoolUtilPct                      Integer32,
+    juniDhcpLocalServerPoolTrapEnable                   TruthValue,
+    juniDhcpLocalServerPoolInUse                        Integer32,
+    juniDhcpLocalServerPoolSize                         Integer32,
+    juniDhcpLocalServerPoolSharedInUse                  Integer32 }
+juniDhcpLocalServerPoolName OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the local server pool to which this entry belongs.  Only an
+        entry with the name 'default' may have a network address and mask
+        assigned."
+    ::= { juniDhcpLocalServerPoolEntry 1 }
+
+juniDhcpLocalServerPoolDomainName OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolDomainName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The domain name assigned to this local server pool.  Modification of
+        extant values for this object require that it first be cleared (via set
+        to null string) and then modified (via set to new string)."
+    DEFVAL    { "" }
+    ::= { juniDhcpLocalServerPoolEntry 2 }
+
+juniDhcpLocalServerPoolNetworkIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP Address assigned to this local server pool.  This object must be
+        set in conjunction with juniDhcpLocalServerPoolNetworkMask.
+        Modification of extant values for this object require that it first be
+        cleared (via set to null IP address) and then modified (via set to new
+        IP address).  Only configurable/valid for entries with the index name
+        (juniDhcpLocalServerPoolName) 'default'."
+    DEFVAL   { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 3 }
+
+juniDhcpLocalServerPoolNetworkMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The network mask assigned to this local server pool.  This object must
+        be set in conjunction with juniDhcpLocalServerPoolNetworkIpAddress.
+        Modification of extant values for this object require that it first be
+        cleared (via set to null IP mask) and then modified (via set to new IP
+        mask).  Only configurable/valid for entries with the index name
+        (juniDhcpLocalServerPoolName) 'default'."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 4 }
+
+juniDhcpLocalServerPoolNetBiosNodeType OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolNetBiosNodeType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The NetBios node type assigned to this local server pool."
+    DEFVAL    { netBiosNodeTypeHybrid }
+    ::= { juniDhcpLocalServerPoolEntry 5 }
+
+juniDhcpLocalServerPoolLeaseTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time interval for address renewal required of a client using the
+        address associated with this local server pool entry.  Setting a zero
+        value will effect an infinite lease, which in turn is indicated by the
+        value -1 returned via a get."
+    ::= { juniDhcpLocalServerPoolEntry 6 }
+
+juniDhcpLocalServerPoolPrimaryDnsServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the primary DNS Server associated with this local server
+        pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolSecondaryDnsServer.  Modification of extant
+        values for this object require that it first be cleared (via set to null
+        IP address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 7 }
+
+juniDhcpLocalServerPoolSecondaryDnsServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the secondary DNS Server associated with this local
+        server pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolPrimaryDnsServer.  Modification of extant values
+        for this object require that it first be cleared (via set to null IP
+        address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 8 }
+
+juniDhcpLocalServerPoolPrimaryNetBiosNameServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the primary NetBios Name Server associated with this
+        local server pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer.  Modification of
+        extant values for this object require that it first be cleared (via set
+        to null IP address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 9 }
+
+juniDhcpLocalServerPoolSecondaryNetBiosNameServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the secondary NetBios Name Server associated with this
+        local server pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer.  Modification of extant
+        values for this object require that it first be cleared (via set to null
+        IP address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 10 }
+
+juniDhcpLocalServerPoolPrimaryDefaultRouter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the primary Default Router associated with this local
+        server pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolSecondaryDefaultRouter.  Modification of extant
+        values for this object require that it first be cleared (via set to null
+        IP address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 11 }
+
+juniDhcpLocalServerPoolSecondaryDefaultRouter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The address of the secondary Default Router associated with this local
+        server pool.  This object must be set in conjunction with
+        juniDhcpLocalServerPoolPrimaryDefaultRouter.  Modification of extant
+        values for this object require that it first be cleared (via set to null
+        IP address) and then modified (via set to new IP address)."
+    DEFVAL    { '00000000'H } -- 0.0.0.0
+    ::= { juniDhcpLocalServerPoolEntry 12 }
+
+juniDhcpLocalServerPoolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniDhcpLocalServerPoolEntry 13 }
+
+juniDhcpLocalServerPoolLinkName OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of this local server pool's backup pool."
+    DEFVAL    { "" }
+    ::= { juniDhcpLocalServerPoolEntry 14 }
+
+juniDhcpLocalServerPoolHighUtilThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of address pool utilization, where if reached for the first
+        time, will generate a high address pool utilization event to the
+        management entity on this system.
+
+        The value of this object must be greater than the value of
+        juniDhcpLocalServerPoolAbatedUtilThreshold.
+
+        The following pseudo-code states when high address pool utilization
+        notification will be generated comparing this object value to the value
+        of juniDhcpLocalServerPoolUtilPct object.  Address pool utilization
+        state will be set to 'ok' when the pool was created first time and after
+        that it will only be set in the context of and while triggering high and
+        abated threshold notifications.
+
+        if ( percentageOfAddressPoolUtil >=
+             percentageOfAddressPoolHighUtilThreshold )
+        {
+            if ( addressPoolUtilState == addressPoolUtilStateOk )
+            {
+                addressPoolUtilState = addressPoolUtilStateWarning;
+                if ( addressPoolUtilTrapsEnabled )
+                    triggerAddressPoolHighUtilTrap();
+            }
+        } "
+    DEFVAL    { 85 }
+    ::= { juniDhcpLocalServerPoolEntry 15 }
+
+juniDhcpLocalServerPoolAbatedUtilThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of address pool utilization that is used to determine when to
+        generate an abated address pool utilization event notification to the
+        management entity on this system.
+
+        The value of this object must be less than the value of the
+        juniDhcpLocalServerPoolHighUtilThreshold.
+
+        The abated address pool utilization event is sent once if the high
+        address pool utilization threshold is reached and utilization falls to
+        the value of this object.
+
+        The following pseudo-code states when abated address pool utilization
+        notification will be generated comparing this object value to the value
+        of juniDhcpLocalServerPoolUtilPct object.  Address pool utilization
+        state will be set to 'ok' when the pool was created first time and after
+        that it will only be set in the context of and while triggering high and
+        abated threshold notifications.
+
+        if ( percentageOfAddressPoolUtil >=
+             percentageOfAddressPoolAbatedUtilThreshold )
+        {
+            if ( addressPoolUtilState == addressPoolUtilStateWarning )
+            {
+                addressPoolUtilState = addressPoolUtilStateOk;
+                if ( addressPoolUtilTrapsEnabled )
+                    triggerAddressPoolAbatedUtilTrap();
+            }
+        } "
+    DEFVAL    { 75 }
+    ::= { juniDhcpLocalServerPoolEntry 16 }
+
+juniDhcpLocalServerPoolUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current address utilization for this pool.  When all the addresses
+        in the pool are exhausted this object value becomes 100, i.e, poolUtil =
+        100%.  When the pool reaches this stage, there won't be anymore
+        addresses available from the pool.  Any attempt to allocate an address
+        from the pool will each time result in a
+        juniDhcpLocalServerPoolNoAddresses notification."
+    ::= { juniDhcpLocalServerPoolEntry 17 }
+
+juniDhcpLocalServerPoolTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configuration setting for address pool notifications.  Setting this
+        object to true(1) will enable the sending of address pool event
+        notifications to the management entity on this device.  Setting this
+        object to false(2) will disable event notification reports."
+    DEFVAL    { false }
+    ::= { juniDhcpLocalServerPoolEntry 18 }
+
+juniDhcpLocalServerPoolInUse OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses currently allocated from this pool."
+    ::= { juniDhcpLocalServerPoolEntry 19 }
+
+juniDhcpLocalServerPoolSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses available in this pool."
+    ::= { juniDhcpLocalServerPoolEntry 20 }
+
+juniDhcpLocalServerPoolSharedInUse OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of addresses currently allocated from this pool to
+         an application other than DHCP."
+    ::= { juniDhcpLocalServerPoolEntry 21 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Attributes
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerAttributesMode OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An object representing the mode in which the DHCP Local Server is
+        operating."
+    ::= { juniDhcpLocalServerAttributes 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server SubInterface Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerSubInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerSubInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of subinterface configuration maintained by this DHCP Local
+        Server."
+    ::= { juniDhcpLocalServerAttributes 2 }
+
+juniDhcpLocalServerSubInterfaceEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerSubInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing a subinterface binding for
+        this DHCP Local Server.  Rows in this table cannot be created via
+        SNMP.  They are created at run time by the Local Server"
+    INDEX     { juniDhcpLocalServerSubInterfaceIndex }
+    ::= { juniDhcpLocalServerSubInterfaceTable 1 }
+
+JuniDhcpLocalServerSubInterfaceEntry ::= SEQUENCE {
+    juniDhcpLocalServerSubInterfaceIndex           InterfaceIndex,
+    juniDhcpLocalServerSubInterfaceName            DisplayString,
+    juniDhcpLocalServerSubInterfaceLimit           Integer32}
+    
+juniDhcpLocalServerSubInterfaceIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value of this table entry."
+    ::= { juniDhcpLocalServerSubInterfaceEntry 1 }
+
+juniDhcpLocalServerSubInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(0..64))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The string that identifies the subinterface for this entry."
+    ::= { juniDhcpLocalServerSubInterfaceEntry 2 }
+ 
+juniDhcpLocalServerSubInterfaceLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of clients allowed by the local server on this
+        subinterface."
+    ::= { juniDhcpLocalServerSubInterfaceEntry 3 }
+
+juniDhcpLocalServerSnmpTrap OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An object that determines whether or not the DHCP Local Server
+        generates SNMP traps when conditions that trigger traps occur."
+    DEFVAL    { disable }
+    ::= { juniDhcpLocalServerAttributes 3 }
+
+juniDhcpLocalServerInhibitRoaming OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "An object representing the mode in which the DHCP Local Server is
+        operating as it pertains to roaming clients."
+    DEFVAL    { disable }
+    ::= { juniDhcpLocalServerAttributes 4 }
+    
+juniDhcpLocalServerUniqueClientIds OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An object representing the mode in which the DHCP Local Server is
+        operating as it pertains to allowing multiple clients having
+        identical client IDs or hardware addresses."
+    DEFVAL    { disable }
+    ::= { juniDhcpLocalServerAttributes 5 }
+    
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Pool Group Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerPoolGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerPoolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of address pool groups associated this DHCP Local Server.
+        A DHCP Local Server may have multiple uniquely-named pool groups
+        configured.  This table is only used for pool group traps."
+    ::= { juniDhcpLocalServerPoolGroup 1 }
+
+juniDhcpLocalServerPoolGroupEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an address pool group
+        associated this DHCP Local Server."
+    INDEX     { juniDhcpLocalServerPoolGroupName }
+    ::= { juniDhcpLocalServerPoolGroupTable 1 }
+
+JuniDhcpLocalServerPoolGroupEntry ::= SEQUENCE {
+    juniDhcpLocalServerPoolGroupName
+        JuniDhcpLocalServerPoolGroupName,
+    juniDhcpLocalServerPoolGroupSize        Integer32,
+    juniDhcpLocalServerPoolGroupInUse       Integer32,
+    juniDhcpLocalServerPoolGroupUtilPct     Integer32}
+        
+
+juniDhcpLocalServerPoolGroupName OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolGroupName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the local server pool group to which this entry belongs."
+    ::= { juniDhcpLocalServerPoolGroupEntry 1 }
+
+juniDhcpLocalServerPoolGroupSize  OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Total number of addresses in the pool group for utilization events."
+    ::= { juniDhcpLocalServerPoolGroupEntry 2 }
+
+juniDhcpLocalServerPoolGroupInUse  OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Total number of addresses in use for pool group for utilization 
+        events."
+    ::= { juniDhcpLocalServerPoolGroupEntry 3 }
+
+juniDhcpLocalServerPoolGroupUtilPct  OBJECT-TYPE
+    SYNTAX       Integer32 (0..100)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Percentage of pool addresses in use for pool group for utilization 
+        events."
+    ::= { juniDhcpLocalServerPoolGroupEntry 4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Reserves
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerReservesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerReservesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of pool name, MAC address, and IP address reservation groups
+        that are maintained by this DHCP Local Server."
+    ::= { juniDhcpLocalServerReserves 1 }
+
+juniDhcpLocalServerReservesEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerReservesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an MAC address, IP address, pool
+        name reservation maintained by this DHCP Local Server."
+    INDEX     { juniDhcpLocalServerReservesEntryIpAddress }
+    ::= { juniDhcpLocalServerReservesTable 1 }
+
+JuniDhcpLocalServerReservesEntry ::= SEQUENCE {
+    juniDhcpLocalServerReservesEntryIpAddress    IpAddress,
+    juniDhcpLocalServerReservesEntryPoolName     JuniDhcpLocalServerPoolName,
+    juniDhcpLocalServerReservesEntryPhysAddress
+        JuniDhcpLocalServerPhysAddressString,
+    juniDhcpLocalServerReservesEntryRowStatus    RowStatus }
+
+juniDhcpLocalServerReservesEntryIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address associated with this entry in reserves table."
+    ::= { juniDhcpLocalServerReservesEntry 1 }
+
+juniDhcpLocalServerReservesEntryPoolName OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPoolName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the local server pool associated with this entry in the
+        reserves table and corresponding to the IP Address denoted by the table
+        index."
+    ::= { juniDhcpLocalServerReservesEntry 2 }
+
+juniDhcpLocalServerReservesEntryPhysAddress OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerPhysAddressString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The physical (MAC) address string associated with this entry in the
+        reserves table and corresponding to the IP Address denoted by the table
+        index."
+    ::= { juniDhcpLocalServerReservesEntry 3 }
+
+juniDhcpLocalServerReservesEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniDhcpLocalServerReservesEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Cable Modem Servers
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerCableModemServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDhcpLocalServerCableModemServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The (conceptual) table listing the DHCP Cable Modem Relay servers."
+    ::= { juniDhcpLocalServerCableModemServers 1 }
+
+juniDhcpLocalServerCableModemServerEntry OBJECT-TYPE
+    SYNTAX      JuniDhcpLocalServerCableModemServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "An entry (conceptual row) representing a DHCP Cable Modem DHCP server."
+    INDEX     { juniDhcpLocalServerCableModemServerEntryAddress }
+    ::= { juniDhcpLocalServerCableModemServerTable 1 }
+
+JuniDhcpLocalServerCableModemServerEntry ::= SEQUENCE {
+    juniDhcpLocalServerCableModemServerEntryAddress      IpAddress,
+    juniDhcpLocalServerCableModemServerEntryRowStatus    RowStatus }
+
+juniDhcpLocalServerCableModemServerEntryAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The IP address of the DHCP server to which DHCP requests received from
+        attached Cable Modem DHCP clients are forwarded."
+    ::= { juniDhcpLocalServerCableModemServerEntry 1 }
+
+juniDhcpLocalServerCableModemServerEntryRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      obsolete
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniDhcpLocalServerCableModemServerEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- DHCP Local Server Cable Modem Statistics
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerCableModemRequestIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Client Requests that are received."
+    ::= { juniDhcpLocalServerCableModemStatistics 1 }
+
+juniDhcpLocalServerCableModemResponseIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Server Responses that are received."
+    ::= { juniDhcpLocalServerCableModemStatistics 2 }
+
+juniDhcpLocalServerCableModemRequestOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Client Request that are transmitted."
+    ::= { juniDhcpLocalServerCableModemStatistics 3 }
+
+juniDhcpLocalServerCableModemResponseOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Server Responses that are transmitted."
+    ::= { juniDhcpLocalServerCableModemStatistics 4 }
+
+juniDhcpLocalServerCableModemRequestDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Client Request that are dropped."
+    ::= { juniDhcpLocalServerCableModemStatistics 5 }
+
+juniDhcpLocalServerCableModemResponseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Server Responses that are dropped."
+    ::= { juniDhcpLocalServerCableModemStatistics 6 }
+
+juniDhcpLocalServerCableModemRequestBad OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Client Request that are bad."
+    ::= { juniDhcpLocalServerCableModemStatistics 7 }
+
+juniDhcpLocalServerCableModemResponseBad OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Server Responses that are bad."
+    ::= { juniDhcpLocalServerCableModemStatistics 8 }
+
+juniDhcpLocalServerCableModemRequestDeleted OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Requests that were deleted because they
+        were stale."
+    ::= { juniDhcpLocalServerCableModemStatistics 9 }
+
+juniDhcpLocalServerCableModemPacketsIn OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Packets received."
+    ::= { juniDhcpLocalServerCableModemStatistics 10 }
+
+juniDhcpLocalServerCableModemPacketsOut OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Packets transmitted."
+    ::= { juniDhcpLocalServerCableModemStatistics 11 }
+
+juniDhcpLocalServerCableModemPacketsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Cable Modem DHCP Packets dropped."
+    ::= { juniDhcpLocalServerCableModemStatistics 12 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpTrapControl             OBJECT IDENTIFIER ::= { juniDhcpMIB 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpLocalServerRelayTraps   OBJECT IDENTIFIER
+    ::= { juniDhcpRelay 0 }
+juniDhcpLocalServerProxyTraps   OBJECT IDENTIFIER
+    ::= { juniDhcpProxy 0 }
+juniDhcpLocalServerTraps    OBJECT IDENTIFIER
+    ::= { juniDhcpLocalServerObjects 0 }
+
+juniDhcpLocalServerPoolHighAddrUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolUtilPct }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool utilization has reached the configured
+        high utilization threshold.  See the DESCRIPTIONs for the
+        juniDhcpLocalServerPoolTable elements for details on what conditions
+        trigger a high pool utilization notification."
+    ::= { juniDhcpLocalServerTraps 1 }
+
+juniDhcpLocalServerPoolAbatedAddrUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolUtilPct
+    }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool utilization has fallen to the configured
+        abated threshold level.  See the DESCRIPTIONs for the
+        juniDhcpLocalServerPoolTable elements for details on what conditions
+        trigger a abated pool utilization notification."
+    ::= { juniDhcpLocalServerTraps 2 }
+
+juniDhcpLocalServerPoolNoAddresses  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolSize }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool has exhausted its supply of addresses.
+        This trap is issued every time a request is made to allocate an address
+        from a fully utilized pool.  See the DESCRIPTIONs for the
+        juniDhcpLocalServerPoolTable elements for details on what conditions
+        trigger a no address pool utilization notification."
+    ::= { juniDhcpLocalServerTraps 3 }
+
+juniDhcpLocalServerHealth  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerEventSeverity,
+        juniDhcpLocalServerEventString }
+    STATUS      current
+    DESCRIPTION
+        "Reports when a health event occurs in the DhcpLocalServer application on the router
+         identified by juniRouterName."
+    ::= { juniDhcpLocalServerTraps 4 }
+
+juniDhcpLocalServerPoolGroupHighAddrUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolGroupSize,
+        juniDhcpLocalServerPoolGroupInUse,
+        juniDhcpLocalServerPoolGroupUtilPct }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool group utilization has reached the
+        configured high utilization threshold.  See the DESCRIPTIONs for the
+        juniDhcpLocalServerPoolTable elements for details on what conditions
+        trigger a high pool group utilization notification."
+    ::= { juniDhcpLocalServerTraps 5 }
+
+juniDhcpLocalServerPoolGroupAbatedAddrUtil  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolGroupSize,
+        juniDhcpLocalServerPoolGroupInUse,
+        juniDhcpLocalServerPoolGroupUtilPct
+    }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool group utilization has fallen to the
+        configured abated threshold level.  See the DESCRIPTIONs for the
+        juniDhcpLocalServerPoolTable elements for details on what conditions
+        trigger a abated pool group utilization notification."
+    ::= { juniDhcpLocalServerTraps 6 }
+
+juniDhcpLocalServerPoolGroupNoAddresses  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerPoolGroupSize }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the address pool group has exhausted its supply of
+        addresses.  This trap is issued every time a request is made to
+        allocate an address from a fully utilized pool.  See the DESCRIPTIONs
+        for the juniDhcpLocalServerPoolTable elements for details on what
+        conditions trigger a no address pool group utilization notification."
+    ::= { juniDhcpLocalServerTraps 7 }
+
+juniDhcpLocalServerInterfaceLimitExceeded  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerSubInterfaceName,
+        juniDhcpLocalServerSubInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when a subinterface has exceeded the limit of clients
+        allowed on that subinterface."
+    ::= { juniDhcpLocalServerTraps 8 }
+
+juniDhcpLocalServerInterfaceLimitAbated  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerSubInterfaceName,
+        juniDhcpLocalServerSubInterfaceLimit }
+    STATUS      current
+    DESCRIPTION
+        "Reports when the number of clients on a subinterface has fallen
+        below the limit allowed on that subinterface."
+    ::= { juniDhcpLocalServerTraps 9 }
+
+juniDhcpLocalServerDuplicateClient  NOTIFICATION-TYPE
+    OBJECTS {
+        juniRouterName,
+        juniDhcpLocalServerMacAddress,
+        juniDhcpLocalServerInterfaceString,
+        juniDhcpLocalServerLastDetected }
+    STATUS      current
+    DESCRIPTION
+        "Reports the first occurance of detection of a DHCP client that
+         changed interfaces."
+    ::= { juniDhcpLocalServerTraps 10 }
+
+juniDhcpLocalServerEventSeverity OBJECT-TYPE
+    SYNTAX       JuniLogSeverity
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The syslog severity of this server health event"
+    ::= { juniDhcpTrapControl 1 }
+ 
+juniDhcpLocalServerEventString  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The text of the event string associated with the server health event"
+    ::= { juniDhcpTrapControl 2 }
+
+juniDhcpLocalServerMacAddress  OBJECT-TYPE
+    SYNTAX       JuniDhcpLocalServerPhysAddressString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The MAC address of the client that changed interfaces."
+    ::= { juniDhcpTrapControl 3 }
+
+juniDhcpLocalServerInterfaceString  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The interface where the DHCP client was detected"
+    ::= { juniDhcpTrapControl 4 }
+
+juniDhcpLocalServerLastDetected  OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The time the duplicate client was last detected"
+    ::= { juniDhcpTrapControl 5 }
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDhcpMIBConformance  OBJECT IDENTIFIER ::= { juniDhcpMIB 4 }
+juniDhcpMIBCompliances  OBJECT IDENTIFIER ::= { juniDhcpMIBConformance 1 }
+juniDhcpMIBGroups       OBJECT IDENTIFIER ::= { juniDhcpMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniDhcpRelayCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP Relay.  This
+        statement became obsolete when Local Server support objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDhcpRelayGroup,
+            juniDhcpProxyGroup }
+    ::= { juniDhcpMIBCompliances 1 }                               -- JUNOSe 1.3
+
+juniDhcpProxyCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP Proxy.  This
+        statement became obsolete when Local Server support objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDhcpProxyGroup }
+    ::= { juniDhcpMIBCompliances 2 }                               -- JUNOSe 1.3
+
+juniDhcpCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for
+        reservations and cable modem servers."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 3 }                               -- JUNOSe 3.1
+
+juniDhcpCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for adding
+        host name or virtual router name to relay agent option 82."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup2
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup2
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 4 }                               -- JUNOSe 4.0
+
+juniDhcpCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for
+        excluding the subinterface ID from relay agent option 82."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup3
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup2
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 5 }                               -- JUNOSe 5.0
+
+juniDhcpCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for DHCP
+        local address pool utilizations support."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup4
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup2
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 6 }                               -- JUNOSe 5.1
+
+juniDhcpCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for the DHCP
+        Relay Trust-all mode."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup4
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup3
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 7 }                               -- JUNOSe 5.2
+
+juniDhcpCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added to
+        administratively delete entries in juniDhcpLocalServerBindingsTable."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup4
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup5
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 8 }                               -- JUNOSe 5.3
+
+
+juniDhcpCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup4
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup5
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 9 }                               -- JUNOSe 6.1
+
+juniDhcpCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP.  This
+        compliance statement became obsolete when support was added for
+        new DHCP Relay statistics in juniDhcpRelayScalars."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup4
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup6
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 10 }                               -- JUNOSe 7.1
+
+juniDhcpCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting DHCP."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup6
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup6
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 11 }                               -- JUNOSe 7.2
+
+juniDhcpCompliance10  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for systems supporting DHCP."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup7
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup6
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 12 }                               -- JUNOSe 7.0
+
+juniDhcpCompliance11  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for systems supporting DHCP."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup8
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup6
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 13 }                               -- JUNOSe 7.2
+
+juniDhcpCompliance12  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting DHCP."
+    MODULE   -- this module
+        GROUP       juniDhcpRelayGroup10
+            DESCRIPTION
+                "The DHCP Relay group is mandatory for systems supporting DHCP
+                Relay."
+        GROUP       juniDhcpProxyGroup
+            DESCRIPTION
+                "The DHCP Proxy group is mandatory for systems supporting DHCP
+                Proxy."
+        GROUP       juniDhcpLocalServerGroup8
+            DESCRIPTION
+                "The DHCP Local Server group is mandatory for systems supporting
+                DHCP Local Servers."
+        GROUP       juniDhcpLocalServerPoolTrapGroup
+            DESCRIPTION
+                "The DHCP Local Server pool trap group is mandatory for systems
+                supporting DHCP Local Servers."
+    ::= { juniDhcpMIBCompliances 14 }                               -- JUNOSe 8.0
+
+
+--
+-- units of conformance
+--
+juniDhcpRelayGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayAgentInfoEnable,
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayServerRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of basic objects providing management of DHCP Relay
+        functionality.  This group became obsolete when the agent info enable
+        was divided into agent circuit ID enable and agent remote ID enable."
+    ::= { juniDhcpMIBGroups 1 }                                    -- JUNOSe 1.3
+
+juniDhcpProxyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpProxyClientUnknownServers,
+        juniDhcpProxyClientServerRowStatus,
+        juniDhcpProxyClientServerAdminStatus,
+        juniDhcpProxyClientServerOperStatus,
+        juniDhcpProxyClientServerLeases,
+        juniDhcpProxyClientServerDiscovers,
+        juniDhcpProxyClientServerOffers,
+        juniDhcpProxyClientServerRequests,
+        juniDhcpProxyClientServerAcks,
+        juniDhcpProxyClientServerNaks,
+        juniDhcpProxyClientServerDeclines,
+        juniDhcpProxyClientServerReleases,
+        juniDhcpProxyClientServerInforms,
+        juniDhcpProxyClientServerBadMessages,
+        juniDhcpProxyClientServerUnknownMessages }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of DHCP Proxy
+        functionality."
+    ::= { juniDhcpMIBGroups 2 }                                    -- JUNOSe 1.3
+
+juniDhcpLocalServerGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Local
+        Server functionality.  This group became obsolete when support was added
+        for reservations and cable modem servers."
+    ::= { juniDhcpMIBGroups 3 }                                    -- JUNOSe 3.1
+
+juniDhcpLocalServerGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Local
+        Server functionality.  This group became obsolete when support was added
+        for DHCP local pool utilization."
+    ::= { juniDhcpMIBGroups 4 }                                    -- JUNOSe 4.0
+
+juniDhcpRelayGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayServerRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality.  This group became obsolete when support was added for
+        adding host name or virtual router name to Option 82 circuit ID field."
+    ::= { juniDhcpMIBGroups 5 }                                    -- JUNOSe 4.0
+
+juniDhcpRelayGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayServerRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DHCP Relay
+        functionality.  This group became obsolete when support was added for
+        excluding the subinterface ID in the Option 82 circuit ID field."
+    ::= { juniDhcpMIBGroups 6 }                                    -- JUNOSe 5.0
+
+juniDhcpRelayGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayServerRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DHCP Relay
+        functionality.  This group became obsolete when support was added for 
+        the Trust-all mode."
+    ::= { juniDhcpMIBGroups 7 }                                    -- JUNOSe 5.1
+
+juniDhcpRelayDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayAgentInfoEnable }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated object providing management of DHCP Relay functionality.
+        This group became deprecated when the agent info enable was divided into
+        agent circuit ID enable and agent remote ID enable."
+    ::= { juniDhcpMIBGroups 8 }                                    -- JUNOSe 4.0
+
+juniDhcpLocalServerGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped }
+    STATUS      obsolete
+    DESCRIPTION
+        "The basic collection of objects providing management of DHCP Local
+        Server functionality."
+    ::= { juniDhcpMIBGroups 9 }                                    -- JUNOSe 5.2
+
+juniDhcpLocalServerGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped,
+        juniDhcpLocalServerSubInterfaceMemUsage, 
+        juniDhcpLocalServerSubInterfaceNumBindings,
+        juniDhcpLocalServerSubInterfaceRxDiscovers,
+        juniDhcpLocalServerSubInterfaceRxRenews, 
+        juniDhcpLocalServerSubInterfaceRxDeclines,
+        juniDhcpLocalServerSubInterfaceRxReleases,
+        juniDhcpLocalServerSubInterfaceRxInforms,
+        juniDhcpLocalServerSubInterfaceTxOffers,
+        juniDhcpLocalServerSubInterfaceTxAcks,
+        juniDhcpLocalServerSubInterfaceTxNaks,
+        juniDhcpLocalServerSubInterfaceUnknownMessages,
+        juniDhcpLocalServerSubInterfaceBadMessages,
+        juniDhcpLocalServerSubInterfacePacketsIn,
+        juniDhcpLocalServerSubInterfacePacketsOut }
+    STATUS      obsolete
+    DESCRIPTION
+        "Deprecated DHCP Local Server group of objects providing management of 
+        DHCP Local Server functionality.  This object became deprecated when
+        the Duplicate Client trap was added"
+    ::= { juniDhcpMIBGroups 11 }                                    -- JUNOSe 5.3
+
+juniDhcpLocalServerPoolTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniDhcpLocalServerPoolHighAddrUtil,
+        juniDhcpLocalServerPoolAbatedAddrUtil,
+        juniDhcpLocalServerPoolNoAddresses,
+        juniDhcpLocalServerHealth }
+    STATUS      obsolete
+    DESCRIPTION
+        "Deprecated notifications providing alarms for high pool utilization and pool
+        exhaustion of DHCP local address pools.  This was deprecated when the 
+        roaming client trap was added."
+    ::= { juniDhcpMIBGroups 10 }                                   -- JUNOSe 5.2
+
+juniDhcpRelayGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 12 }                                   -- JUNOSe 6.1  
+
+juniDhcpLocalServerGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerBindingsRowStatus,
+        juniDhcpLocalServerBindingsLeaseInterval,
+        juniDhcpLocalServerBindingsLeaseStartTime,
+        juniDhcpLocalServerBindingsInitialLeaseStartTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolSharedInUse,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerSnmpTrap,
+        juniDhcpLocalServerInhibitRoaming,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped,
+        juniDhcpLocalServerSubInterfaceMemUsage, 
+        juniDhcpLocalServerSubInterfaceNumBindings,
+        juniDhcpLocalServerSubInterfaceRxDiscovers,
+        juniDhcpLocalServerSubInterfaceRxRenews, 
+        juniDhcpLocalServerSubInterfaceRxDeclines,
+        juniDhcpLocalServerSubInterfaceRxReleases,
+        juniDhcpLocalServerSubInterfaceRxInforms,
+        juniDhcpLocalServerSubInterfaceTxOffers,
+        juniDhcpLocalServerSubInterfaceTxAcks,
+        juniDhcpLocalServerSubInterfaceTxNaks,
+        juniDhcpLocalServerSubInterfaceUnknownMessages,
+        juniDhcpLocalServerSubInterfaceBadMessages,
+        juniDhcpLocalServerSubInterfacePacketsIn,
+        juniDhcpLocalServerSubInterfacePacketsOut }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Local
+        Server functionality."
+    ::= { juniDhcpMIBGroups 13 }                                    -- JUNOSe 7.0
+
+juniDhcpLocalServerGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerRxRebinds,
+        juniDhcpLocalServerRxUnknownClients,
+        juniDhcpLocalServerRxInErrors,
+        juniDhcpLocalServerRxInDiscards,
+        juniDhcpLocalServerTxRenewAcks,
+        juniDhcpLocalServerTxRebindAcks,
+        juniDhcpLocalServerTxRenewNaks,
+        juniDhcpLocalServerTxRebindNaks,
+        juniDhcpLocalServerTxOutErrors,
+        juniDhcpLocalServerTxOutDiscards,
+        juniDhcpLocalServerRxOtherRequests,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerBindingsRowStatus,
+        juniDhcpLocalServerBindingsLeaseInterval,
+        juniDhcpLocalServerBindingsLeaseStartTime,
+        juniDhcpLocalServerBindingsInitialLeaseStartTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolSharedInUse,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerSnmpTrap,
+        juniDhcpLocalServerInhibitRoaming,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped,
+        juniDhcpLocalServerSubInterfaceMemUsage, 
+        juniDhcpLocalServerSubInterfaceNumBindings,
+        juniDhcpLocalServerSubInterfaceRxDiscovers,
+        juniDhcpLocalServerSubInterfaceRxRenews, 
+        juniDhcpLocalServerSubInterfaceRxDeclines,
+        juniDhcpLocalServerSubInterfaceRxReleases,
+        juniDhcpLocalServerSubInterfaceRxInforms,
+        juniDhcpLocalServerSubInterfaceTxOffers,
+        juniDhcpLocalServerSubInterfaceTxAcks,
+        juniDhcpLocalServerSubInterfaceTxNaks,
+        juniDhcpLocalServerSubInterfaceUnknownMessages,
+        juniDhcpLocalServerSubInterfaceBadMessages,
+        juniDhcpLocalServerSubInterfacePacketsIn,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceName,
+        juniDhcpLocalServerSubInterfaceLimit,
+        juniDhcpLocalServerSubInterfaceClientCount,
+        juniDhcpLocalServerSubInterfaceDeniedLogins,
+        juniDhcpLocalServerSubInterfaceDeniedTotal,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceRxRebinds,
+        juniDhcpLocalServerSubInterfaceRxUnknownClients,
+        juniDhcpLocalServerSubInterfaceRxInErrors,
+        juniDhcpLocalServerSubInterfaceRxInDiscards,
+        juniDhcpLocalServerSubInterfaceTxRenewAcks,
+        juniDhcpLocalServerSubInterfaceTxRebindAcks,
+        juniDhcpLocalServerSubInterfaceTxRenewNaks,
+        juniDhcpLocalServerSubInterfaceTxRebindNaks,
+        juniDhcpLocalServerSubInterfaceTxOutErrors,
+        juniDhcpLocalServerSubInterfaceTxOutDiscards,
+        juniDhcpLocalServerSubInterfaceRxOtherRequests }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Local
+        Server functionality."
+    ::= { juniDhcpMIBGroups 14 }                                    -- JUNOSe 7.1
+
+juniDhcpLocalServerPoolTrapGroup2  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniDhcpLocalServerPoolHighAddrUtil,
+        juniDhcpLocalServerPoolAbatedAddrUtil,
+        juniDhcpLocalServerPoolNoAddresses,
+        juniDhcpLocalServerHealth,
+        juniDhcpLocalServerPoolGroupHighAddrUtil,
+        juniDhcpLocalServerPoolGroupAbatedAddrUtil,
+        juniDhcpLocalServerPoolGroupNoAddresses,
+        juniDhcpLocalServerInterfaceLimitExceeded,
+        juniDhcpLocalServerInterfaceLimitAbated,
+        juniDhcpLocalServerDuplicateClient }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete notifications providing alarms for high pool utilization and pool
+        exhaustion of DHCP local address pools and interface limit events."
+    ::= { juniDhcpMIBGroups 15 }                                   -- JUNOSe 7.1
+
+juniDhcpLocalServerTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniDhcpLocalServerPoolHighAddrUtil,
+        juniDhcpLocalServerPoolAbatedAddrUtil,
+        juniDhcpLocalServerPoolNoAddresses,
+        juniDhcpLocalServerHealth,
+        juniDhcpLocalServerPoolGroupHighAddrUtil,
+        juniDhcpLocalServerPoolGroupAbatedAddrUtil,
+        juniDhcpLocalServerPoolGroupNoAddresses,
+        juniDhcpLocalServerInterfaceLimitExceeded,
+        juniDhcpLocalServerInterfaceLimitAbated,
+        juniDhcpLocalServerDuplicateClient }
+    STATUS      current
+    DESCRIPTION
+        "The notifications providing alarms for high pool utilization and pool
+        exhaustion of DHCP local address pools and interface limit events and
+        duplicate (roaming) clients."
+    ::= { juniDhcpMIBGroups 16 }                                   -- JUNOSe 7.1
+
+juniDhcpRelayGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus,
+        juniDhcpRelayAgentGiaddrOverrides,
+        juniDhcpRelayAgentOptionOverrides,
+        juniDhcpRelayDiscoverDiscards,
+        juniDhcpRelayPacketDiscards,
+        juniDhcpRelayUnknownRequestMessages,
+        juniDhcpRelayUnknownReplyMessages,
+        juniDhcpRelayDuplicateRequestDiscards,
+        juniDhcpRelayPacketsTransmitted,
+        juniDhcpRelayPacketsReceived,
+        juniDhcpRelayUnknownXidDiscards,
+        juniDhcpRelayDroppedStaleRequestDiscards }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 17 }                                   -- JUNOSe 7.2
+
+juniDhcpRelayGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus,
+        juniDhcpRelayLayer2UnicastReplies }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 18 }                                   -- JUNOSe 7.0  
+
+juniDhcpRelayGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus,
+        juniDhcpRelayAgentGiaddrOverrides,
+        juniDhcpRelayAgentOptionOverrides,
+        juniDhcpRelayDiscoverDiscards,
+        juniDhcpRelayPacketDiscards,
+        juniDhcpRelayUnknownRequestMessages,
+        juniDhcpRelayUnknownReplyMessages,
+        juniDhcpRelayDuplicateRequestDiscards,
+        juniDhcpRelayPacketsTransmitted,
+        juniDhcpRelayPacketsReceived,
+        juniDhcpRelayUnknownXidDiscards,
+        juniDhcpRelayDroppedStaleRequestDiscards,
+        juniDhcpRelayLayer2UnicastReplies }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 19 }                                   -- JUNOSe 7.2
+
+juniDhcpRelayGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus,
+        juniDhcpRelayAgentGiaddrOverrides,
+        juniDhcpRelayAgentOptionOverrides,
+        juniDhcpRelayDiscoverDiscards,
+        juniDhcpRelayPacketDiscards,
+        juniDhcpRelayUnknownRequestMessages,
+        juniDhcpRelayUnknownReplyMessages,
+        juniDhcpRelayDuplicateRequestDiscards,
+        juniDhcpRelayPacketsTransmitted,
+        juniDhcpRelayPacketsReceived,
+        juniDhcpRelayUnknownXidDiscards,
+        juniDhcpRelayDroppedStaleRequestDiscards,
+        juniDhcpRelayLayer2UnicastReplies,
+        juniDhcpRelayGiaddrSelectsInterface,
+        juniDhcpRelayAgentVendorSpecificSuboption }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 20 }                                   -- JUNOSe 8.0
+
+juniDhcpLocalServerGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerRxRebinds,
+        juniDhcpLocalServerRxUnknownClients,
+        juniDhcpLocalServerRxInErrors,
+        juniDhcpLocalServerRxInDiscards,
+        juniDhcpLocalServerTxRenewAcks,
+        juniDhcpLocalServerTxRebindAcks,
+        juniDhcpLocalServerTxRenewNaks,
+        juniDhcpLocalServerTxRebindNaks,
+        juniDhcpLocalServerTxOutErrors,
+        juniDhcpLocalServerTxOutDiscards,
+        juniDhcpLocalServerRxOtherRequests,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerBindingsRowStatus,
+        juniDhcpLocalServerBindingsLeaseInterval,
+        juniDhcpLocalServerBindingsLeaseStartTime,
+        juniDhcpLocalServerBindingsInitialLeaseStartTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolSharedInUse,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerSnmpTrap,
+        juniDhcpLocalServerInhibitRoaming,
+        juniDhcpLocalServerUniqueClientIds,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerCableModemServerEntryRowStatus,
+        juniDhcpLocalServerCableModemRequestIn,
+        juniDhcpLocalServerCableModemResponseIn,
+        juniDhcpLocalServerCableModemRequestOut,
+        juniDhcpLocalServerCableModemResponseOut,
+        juniDhcpLocalServerCableModemRequestDropped,
+        juniDhcpLocalServerCableModemResponseDropped,
+        juniDhcpLocalServerCableModemRequestBad,
+        juniDhcpLocalServerCableModemResponseBad,
+        juniDhcpLocalServerCableModemRequestDeleted,
+        juniDhcpLocalServerCableModemPacketsIn,
+        juniDhcpLocalServerCableModemPacketsOut,
+        juniDhcpLocalServerCableModemPacketsDropped,
+        juniDhcpLocalServerSubInterfaceMemUsage, 
+        juniDhcpLocalServerSubInterfaceNumBindings,
+        juniDhcpLocalServerSubInterfaceRxDiscovers,
+        juniDhcpLocalServerSubInterfaceRxRenews, 
+        juniDhcpLocalServerSubInterfaceRxDeclines,
+        juniDhcpLocalServerSubInterfaceRxReleases,
+        juniDhcpLocalServerSubInterfaceRxInforms,
+        juniDhcpLocalServerSubInterfaceTxOffers,
+        juniDhcpLocalServerSubInterfaceTxAcks,
+        juniDhcpLocalServerSubInterfaceTxNaks,
+        juniDhcpLocalServerSubInterfaceUnknownMessages,
+        juniDhcpLocalServerSubInterfaceBadMessages,
+        juniDhcpLocalServerSubInterfacePacketsIn,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceName,
+        juniDhcpLocalServerSubInterfaceLimit,
+        juniDhcpLocalServerSubInterfaceClientCount,
+        juniDhcpLocalServerSubInterfaceDeniedLogins,
+        juniDhcpLocalServerSubInterfaceDeniedTotal,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceRxRebinds,
+        juniDhcpLocalServerSubInterfaceRxUnknownClients,
+        juniDhcpLocalServerSubInterfaceRxInErrors,
+        juniDhcpLocalServerSubInterfaceRxInDiscards,
+        juniDhcpLocalServerSubInterfaceTxRenewAcks,
+        juniDhcpLocalServerSubInterfaceTxRebindAcks,
+        juniDhcpLocalServerSubInterfaceTxRenewNaks,
+        juniDhcpLocalServerSubInterfaceTxRebindNaks,
+        juniDhcpLocalServerSubInterfaceTxOutErrors,
+        juniDhcpLocalServerSubInterfaceTxOutDiscards,
+        juniDhcpLocalServerSubInterfaceRxOtherRequests }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete the basic collection of objects providing management of DHCP Local
+        Server functionality. This group has been obsoleted when support for DHCP 
+        Option 60 feature was added to achieve the obsoleted cable-modem
+        functionality."
+    ::= { juniDhcpMIBGroups 21 }                                    -- JUNOSe 8.0
+
+juniDhcpRelayGroup10  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpRelayBadMessages,
+        juniDhcpRelayUnknownMessages,
+        juniDhcpRelayAgentInfoAlreadyPresents,
+        juniDhcpRelayGatewayAddrSpoofs,
+        juniDhcpRelayAgentCircuitIdEnable,
+        juniDhcpRelayAgentRemoteIdEnable,
+        juniDhcpRelayAgentHostnameEnable,
+        juniDhcpRelayAgentVrnameEnable,
+        juniDhcpRelayAgentExcludeSubIdEnable,
+        juniDhcpRelayAgentTrustAllEnable,
+        juniDhcpRelayAgentInfoAlreadyPresentForwards,
+        juniDhcpRelayServerRowStatus,
+        juniDhcpRelayAgentGiaddrOverrides,
+        juniDhcpRelayAgentOptionOverrides,
+        juniDhcpRelayDiscoverDiscards,
+        juniDhcpRelayPacketDiscards,
+        juniDhcpRelayUnknownRequestMessages,
+        juniDhcpRelayUnknownReplyMessages,
+        juniDhcpRelayDuplicateRequestDiscards,
+        juniDhcpRelayPacketsTransmitted,
+        juniDhcpRelayPacketsReceived,
+        juniDhcpRelayUnknownXidDiscards,
+        juniDhcpRelayDroppedStaleRequestDiscards,
+        juniDhcpRelayLayer2UnicastReplies,
+        juniDhcpRelayGiaddrSelectsInterface,
+        juniDhcpRelayAgentVendorSpecificSuboption,
+	juniDhcpRelayBroadcastFlagReplies }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of DHCP Relay
+        functionality."
+    ::= { juniDhcpMIBGroups 22 }                                   -- JUNOSe 8.0
+
+juniDhcpLocalServerGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniDhcpLocalServerMemUsage,
+        juniDhcpLocalServerNumBindings,
+        juniDhcpLocalServerRxDiscovers,
+        juniDhcpLocalServerRxAccepts,
+        juniDhcpLocalServerRxRenews,
+        juniDhcpLocalServerRxDeclines,
+        juniDhcpLocalServerRxReleases,
+        juniDhcpLocalServerRxInforms,
+        juniDhcpLocalServerTxOffers,
+        juniDhcpLocalServerTxAcks,
+        juniDhcpLocalServerTxNaks,
+        juniDhcpLocalServerUnknownMessages,
+        juniDhcpLocalServerBadMessages,
+        juniDhcpLocalServerPacketsIn,
+        juniDhcpLocalServerPacketsOut,
+        juniDhcpLocalServerRxRebinds,
+        juniDhcpLocalServerRxUnknownClients,
+        juniDhcpLocalServerRxInErrors,
+        juniDhcpLocalServerRxInDiscards,
+        juniDhcpLocalServerTxRenewAcks,
+        juniDhcpLocalServerTxRebindAcks,
+        juniDhcpLocalServerTxRenewNaks,
+        juniDhcpLocalServerTxRebindNaks,
+        juniDhcpLocalServerTxOutErrors,
+        juniDhcpLocalServerTxOutDiscards,
+        juniDhcpLocalServerRxOtherRequests,
+        juniDhcpLocalServerBindingsPhysAddress,
+        juniDhcpLocalServerBindingsInfinite,
+        juniDhcpLocalServerBindingsExpireTime,
+        juniDhcpLocalServerBindingsRowStatus,
+        juniDhcpLocalServerBindingsLeaseInterval,
+        juniDhcpLocalServerBindingsLeaseStartTime,
+        juniDhcpLocalServerBindingsInitialLeaseStartTime,
+        juniDhcpLocalServerPoolDomainName,
+        juniDhcpLocalServerPoolNetworkIpAddress,
+        juniDhcpLocalServerPoolNetworkMask,
+        juniDhcpLocalServerPoolNetBiosNodeType,
+        juniDhcpLocalServerPoolLeaseTime,
+        juniDhcpLocalServerPoolPrimaryDnsServer,
+        juniDhcpLocalServerPoolSecondaryDnsServer,
+        juniDhcpLocalServerPoolPrimaryNetBiosNameServer,
+        juniDhcpLocalServerPoolSecondaryNetBiosNameServer,
+        juniDhcpLocalServerPoolPrimaryDefaultRouter,
+        juniDhcpLocalServerPoolSecondaryDefaultRouter,
+        juniDhcpLocalServerPoolRowStatus,
+        juniDhcpLocalServerPoolLinkName,
+        juniDhcpLocalServerPoolHighUtilThreshold,
+        juniDhcpLocalServerPoolAbatedUtilThreshold,
+        juniDhcpLocalServerPoolUtilPct,
+        juniDhcpLocalServerPoolTrapEnable,
+        juniDhcpLocalServerPoolInUse,
+        juniDhcpLocalServerPoolSize,
+        juniDhcpLocalServerPoolSharedInUse,
+        juniDhcpLocalServerAttributesMode,
+        juniDhcpLocalServerSnmpTrap,
+        juniDhcpLocalServerInhibitRoaming,
+        juniDhcpLocalServerUniqueClientIds,
+        juniDhcpLocalServerReservesEntryPoolName,
+        juniDhcpLocalServerReservesEntryPhysAddress,
+        juniDhcpLocalServerReservesEntryRowStatus,
+        juniDhcpLocalServerSubInterfaceMemUsage, 
+        juniDhcpLocalServerSubInterfaceNumBindings,
+        juniDhcpLocalServerSubInterfaceRxDiscovers,
+        juniDhcpLocalServerSubInterfaceRxRenews, 
+        juniDhcpLocalServerSubInterfaceRxDeclines,
+        juniDhcpLocalServerSubInterfaceRxReleases,
+        juniDhcpLocalServerSubInterfaceRxInforms,
+        juniDhcpLocalServerSubInterfaceTxOffers,
+        juniDhcpLocalServerSubInterfaceTxAcks,
+        juniDhcpLocalServerSubInterfaceTxNaks,
+        juniDhcpLocalServerSubInterfaceUnknownMessages,
+        juniDhcpLocalServerSubInterfaceBadMessages,
+        juniDhcpLocalServerSubInterfacePacketsIn,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceName,
+        juniDhcpLocalServerSubInterfaceLimit,
+        juniDhcpLocalServerSubInterfaceClientCount,
+        juniDhcpLocalServerSubInterfaceDeniedLogins,
+        juniDhcpLocalServerSubInterfaceDeniedTotal,
+        juniDhcpLocalServerSubInterfacePacketsOut,
+        juniDhcpLocalServerSubInterfaceRxRebinds,
+        juniDhcpLocalServerSubInterfaceRxUnknownClients,
+        juniDhcpLocalServerSubInterfaceRxInErrors,
+        juniDhcpLocalServerSubInterfaceRxInDiscards,
+        juniDhcpLocalServerSubInterfaceTxRenewAcks,
+        juniDhcpLocalServerSubInterfaceTxRebindAcks,
+        juniDhcpLocalServerSubInterfaceTxRenewNaks,
+        juniDhcpLocalServerSubInterfaceTxRebindNaks,
+        juniDhcpLocalServerSubInterfaceTxOutErrors,
+        juniDhcpLocalServerSubInterfaceTxOutDiscards,
+        juniDhcpLocalServerSubInterfaceRxOtherRequests }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of DHCP Local
+        Server functionality."
+    ::= { juniDhcpMIBGroups 23 }                                    -- JUNOSe 8.0
+
+END

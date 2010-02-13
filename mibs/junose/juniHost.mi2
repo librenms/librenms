@@ -1,0 +1,186 @@
+
+-- *****************************************************************************
+-- Juniper-HOST-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   HOST MIB
+--
+-- Copyright (c) 2000, 2001 Unisphere Networks Inc.
+-- Copyright (c) 2002, 2004 Juniper Networks Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-HOST-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP  
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniHostMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Road
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The host configuration MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200411260000Z"  -- 26-Nov-04               - JUNOSe 6.1
+    DESCRIPTION
+        "Added Tftp option in juniHostProtocol object."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200105071702Z"  -- 07-May-01 01:02 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Increase the max lenght of the host name."
+    REVISION    "200001260000Z"  -- 26-Jan-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 33 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHostObjects              OBJECT IDENTIFIER ::= {juniHostMIB 1}
+juniHost                     OBJECT IDENTIFIER ::= {juniHostObjects 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for Host 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table describe host configuration information." 
+    ::= { juniHost 1 }
+
+juniHostEntry OBJECT-TYPE
+    SYNTAX      JuniHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing the configuration of a host."
+    INDEX     { IMPLIED juniHostName }
+    ::= { juniHostTable 1 }
+
+JuniHostEntry ::= SEQUENCE {
+    juniHostName            DisplayString,
+    juniHostIpAddress       IpAddress,
+    juniHostProtocol        INTEGER,
+    juniHostUserName        DisplayString,
+    juniHostUserPassword    DisplayString,
+    juniHostRowStatus       RowStatus }
+
+juniHostName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hostname identifier associated with this host entry."
+    ::= { juniHostEntry 1 }
+
+juniHostIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress 
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The IP address associated with this host entry."
+    ::= { juniHostEntry 2 }
+
+juniHostProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniHostFtp(1),
+                    juniHostTftp(2) }
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The file transfer protocol associated with this host entry."
+    ::= { juniHostEntry 3 }
+
+juniHostUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The username associated with this host entry."
+    ::= { juniHostEntry 4 }
+
+juniHostUserPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..25))
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The password associated with this host entry.  Reading this object
+        returns a null DisplayString to avoid security breaches.  However, a
+        null string is not accepted for create or write operations."
+    ::= { juniHostEntry 5 }
+
+juniHostRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table.  Only the values
+        'createAndGo' and 'destroy' may be SET."
+    ::= { juniHostEntry 6 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniHostTrapControl      OBJECT IDENTIFIER ::= { juniHostMIB 2 }
+-- juniHostTraps            OBJECT IDENTIFIER ::= { juniHostMIB 3 }
+-- juniHostTrapPrefix       OBJECT IDENTIFIER ::= { juniHostTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniHostMIBConformance  OBJECT IDENTIFIER ::= { juniHostMIB 4 }
+juniHostMIBCompliances  OBJECT IDENTIFIER ::= { juniHostMIBConformance 1 }
+juniHostMIBGroups       OBJECT IDENTIFIER ::= { juniHostMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniHostCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting host configuration."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniHostGroup }
+    ::= { juniHostMIBCompliances 1 }                               -- JUNOSe 1.3
+
+--
+-- units of conformance
+--
+juniHostGroup OBJECT-GROUP
+    OBJECTS {
+        juniHostName,
+        juniHostIpAddress,
+        juniHostProtocol,
+        juniHostUserName,
+        juniHostUserPassword,
+        juniHostRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of host
+        configuration functionality in a Juniper product."
+    ::= { juniHostMIBGroups 1 }
+
+END

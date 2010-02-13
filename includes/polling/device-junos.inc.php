@@ -7,8 +7,8 @@ if(strpos($sysDescr, "olive")) {
   $hardware = "Olive";
   $serial = "";
 } else {
-  $hardware = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -OQv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.2.0")));
-  $serial   = trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m JUNIPER-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2636.3.1.3.0")));
+  $hardware = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.2.0", "OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
+  $serial   = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.3.0", "OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
   list(,$hardware,) = explode(" ", $hardware);
   $hardware = "Juniper " . $hardware;
 }
@@ -21,9 +21,9 @@ echo("$hardware - $version - $features - $serial\n");
 
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junos-cpu.rrd";
 
-$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-$cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
-$cpu_usage = trim(shell_exec($cpu_cmd));
+#$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+#$cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
+#$cpu_usage = trim(shell_exec($cpu_cmd));
 
 if (is_numeric($cpu_usage))
 {

@@ -1,0 +1,243 @@
+--
+-- Juniper Enterprise Specific MIB: Firewalls MIB
+-- 
+-- Copyright (c) 2000-2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    jnxMibs
+        FROM JUNIPER-SMI;
+
+jnxFirewalls MODULE-IDENTITY
+    LAST-UPDATED "200307182153Z" -- Fri Jul 18 21:53:50 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+		     Juniper Networks, Inc.
+		     1194 N. Mathilda Avenue
+		     Sunnyvale, CA 94089
+		     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for firewalls filters/policers."
+    ::= { jnxMibs 5 }
+
+
+    jnxFirewallsTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF JnxFirewallsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      deprecated
+	DESCRIPTION
+		"A list of firewalls entries.
+		NOTE:  This table is deprecated and exists for backward
+		compatibility.  The user is encouraged to use
+		jnxFirewallCounterTable.  This table does not handle: 
+		1) counter and filter names greater than 24 characters 
+		2) counters with same names but different types (the first 
+		  duplicate is returned only)"
+
+
+	::= { jnxFirewalls 1 }
+
+    jnxFirewallsEntry      OBJECT-TYPE
+	SYNTAX      JnxFirewallsEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry of firewalls table."
+	INDEX	{ jnxFWFilter,
+		  jnxFWCounter }
+	::= { jnxFirewallsTable 1 }
+
+    JnxFirewallsEntry ::=
+	SEQUENCE {
+	    jnxFWFilter		   	DisplayString,
+	    jnxFWCounter		DisplayString,
+	    jnxFWType			INTEGER,
+	    jnxFWPackets		Counter64,
+	    jnxFWBytes			Counter64
+	}
+
+    jnxFWFilter OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..24))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the firewall filter."
+	::= { jnxFirewallsEntry 1 }
+
+    jnxFWCounter OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..24))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the counter or policer.  This name is 
+		specific within the firewall filter.  Whether this 
+		object is associated with a counter or a policer 
+		is indicated by jnxFWType.
+		See DESCRIPTION of jnxFirewallsTable for details
+		on this assumption."
+	::= { jnxFirewallsEntry 2 }
+
+    jnxFWType OBJECT-TYPE
+	SYNTAX      INTEGER {
+		other(1),
+		counter(2),
+		policer(3)
+	}		
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The type of the object jnxFWCounter.  What it is 
+		associated with - a counter or a policer."
+	::= { jnxFirewallsEntry 3 }
+
+    jnxFWPackets OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of packets being counted pertaining to
+		the specified counter or policer."
+	::= { jnxFirewallsEntry 4 }
+
+    jnxFWBytes OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes being counted pertaining to
+		the specified counter.  For policers, this field
+		is always zero because policers do not count 
+		number of bytes."
+	::= { jnxFirewallsEntry 5 }
+
+
+    jnxFirewallCounterTable   OBJECT-TYPE
+	SYNTAX      SEQUENCE OF JnxFirewallCounterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of firewall filter counters."
+
+
+	::= { jnxFirewalls 2 }
+
+    jnxFirewallCounterEntry      OBJECT-TYPE
+	SYNTAX      JnxFirewallCounterEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry of firewalls table."
+	INDEX	{ jnxFWCounterFilterName,
+		  jnxFWCounterName,
+		  jnxFWCounterType }
+	::= { jnxFirewallCounterTable 1 }
+
+    JnxFirewallCounterEntry ::=
+	SEQUENCE {
+	    jnxFWCounterFilterName	DisplayString,
+	    jnxFWCounterName		DisplayString,
+	    jnxFWCounterType		INTEGER,
+	    jnxFWCounterPacketCount	Counter64,
+	    jnxFWCounterByteCount	Counter64,
+	    jnxFWCounterDisplayFilterName DisplayString,
+	    jnxFWCounterDisplayName	DisplayString,
+	    jnxFWCounterDisplayType	INTEGER
+	}
+
+    jnxFWCounterFilterName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..127))
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The name of the firewall filter."
+	::= { jnxFirewallCounterEntry 1 }
+
+    jnxFWCounterName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..127))
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The name of the counter or policer.  Whether this 
+		object is associated with a counter or a policer 
+		is indicated by jnxFWCounterType."
+	::= { jnxFirewallCounterEntry 2 }
+
+    jnxFWCounterType OBJECT-TYPE
+	SYNTAX      INTEGER {
+		other(1),
+		counter(2),
+		policer(3)
+	}		
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The type of the object jnxFWCounterName identifies.  What it
+		is associated with - a counter or a policer.  It is possible
+		to have two counters of the same name and different type."
+	::= { jnxFirewallCounterEntry 3 }
+
+    jnxFWCounterPacketCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of packets being counted pertaining to
+		the specified counter or policer."
+	::= { jnxFirewallCounterEntry 4 }
+
+    jnxFWCounterByteCount OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of bytes being counted pertaining to
+		the specified counter.  For policers, this field
+		is always zero because policers do not count 
+		number of bytes."
+	::= { jnxFirewallCounterEntry 5 }
+
+    jnxFWCounterDisplayFilterName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..127))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the firewall filter."
+	::= { jnxFirewallCounterEntry 6 }
+
+    jnxFWCounterDisplayName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..127))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the counter or policer.  Whether this 
+		object is associated with a counter or a policer 
+		is indicated by jnxFWCounterType."
+	::= { jnxFirewallCounterEntry 7 }
+
+    jnxFWCounterDisplayType OBJECT-TYPE
+	SYNTAX      INTEGER {
+		other(1),
+		counter(2),
+		policer(3)
+	}		
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The type of the object jnxFWCounterName identifies.  What it
+		is associated with - a counter or a policer.  It is possible
+		to have two counters of the same name and different type."
+	::= { jnxFirewallCounterEntry 8 }
+
+END

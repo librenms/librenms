@@ -1,0 +1,772 @@
+
+-- *****************************************************************************
+-- Juniper-DS1-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   DS1/E1 MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DS1-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniTimeSlotMap, JuniNextIfIndex
+        FROM Juniper-TC;
+
+juniDs1MIB  MODULE-IDENTITY
+    LAST-UPDATED "200302101507Z"  -- 10-Feb-03 10:07 AM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The DS1/E1 MIB for the Juniper enterprise.  This MIB contains managed
+        objects to supplement those found in RFC1406 DS1/E1 MIB."
+    -- Revision History
+    REVISION    "200302101507Z"  -- 10-Feb-03 10:07 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200209121659Z"  -- 12-Sep-02 12:59 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added support for FDL transmit mode, remote FDL strings and far end FDL
+        carrier."
+    REVISION    "200205131601Z"  -- 13-May-02 12:01 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added support for FDL."
+    REVISION    "200107311825Z"  -- 31-Jul-01 02:25 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Change access on juniDsx1Ds1ChannelNumber."
+    REVISION    "200104041805Z"  -- 04-Apr-01 02:05 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added dynamic DS1 interface support."
+    REVISION      "9906170000Z"  -- 17-Jun-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Updated version of this MIB module."
+    REVISION      "9811130000Z"  -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDs1Objects     OBJECT IDENTIFIER ::= { juniDs1MIB 1 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- DS1 Interfaces
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The DS1 Configuration Table
+--
+juniDsx1ConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx1ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS1/E1 interfaces present in the
+        system."
+    ::= { juniDs1Objects 1 }
+
+juniDsx1ConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx1ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an DS1/E1 interface."
+    INDEX     { ifIndex }
+    ::= { juniDsx1ConfigTable 1 }
+
+JuniDsx1ConfigEntry ::= SEQUENCE {
+        juniDsx1TimeSlotMap              JuniTimeSlotMap,
+        juniDsx1Ds1ChannelNumber         Integer32,
+        juniDsx1Capabilities             Integer32,
+        juniDsx1Mode                     INTEGER,
+        juniDsx1LineBuildOutCapabilities Integer32,
+        juniDsx1LineBuildOutType         INTEGER,
+        juniDsx1LineAttenuation          INTEGER,
+        juniDsx1LineLength               Integer32,
+        juniDsx1LowerIfIndex             InterfaceIndexOrZero,
+        juniDsx1RowStatus                RowStatus,
+        juniDsx1SendCode                 INTEGER,
+        juniDsx1YellowAlarm              INTEGER,
+        juniDsx1RemoteLoopback           INTEGER,
+        juniDsx1FdlCarrier               INTEGER,
+        juniDsx1FdlEic                   DisplayString,
+        juniDsx1FdlLic                   DisplayString,
+        juniDsx1FdlFic                   DisplayString,
+        juniDsx1FdlUnit                  DisplayString,
+        juniDsx1FdlPfi                   DisplayString,
+        juniDsx1FdlPort                  DisplayString,
+        juniDsx1FdlGenerator             DisplayString,
+        juniDsx1FdlTransmit              BITS }
+
+juniDsx1TimeSlotMap  OBJECT-TYPE
+    SYNTAX      JuniTimeSlotMap
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing the timeslots on the DS1/E1 interface that have
+        been allocated for service.
+
+        For channelized DS1/E1, set bits reflect the union of timeslot
+        allocations across all fractional arrangements operating over this
+        DS1/E1 interface.
+
+        For unchannelized DS1/E1, all relevant timeslot bits will be set."
+    ::= { juniDsx1ConfigEntry 1 }
+
+juniDsx1Ds1ChannelNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..28)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the channel number of the DS1/E1 on its parent
+        DS3/E3.  A value of 0 indicates this DS1/E1 does not have a parent
+        DS3/E3."
+    ::= { juniDsx1ConfigEntry 2 }
+
+juniDsx1Capabilities  OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value which indicates the set of capabilities of the DS1/E1
+        interface.
+
+        The value is a sum.  This sum initially takes the value zero.  Then, for
+        each capability, C, in the range 1 through 3, that this interface
+        supports, 2 raised to (C - 1) is added to the sum.  For example, an
+        interface which is only E1 capable would have a value of 2 (2^(2-1)).
+        In contrast, an interface which is both T1 and J1 capable would have a
+        value of 5 (2^(1-1) + 2^(3-1)).  The values for DS1/E1 interface
+        capabilities are as follows:
+            capability  function
+                1       T1
+                2       E1
+                3       J1 "
+    ::= { juniDsx1ConfigEntry 3 }
+
+juniDsx1Mode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    t1(1),
+                    e1(2),
+                    j1(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the DS1/E1 interface mode.  The value of the
+        juniDsx1Capabilities object for the DS1/E1 interface indicates the valid
+        set of values for this object."
+    ::= { juniDsx1ConfigEntry 4 }
+
+juniDsx1LineBuildOutCapabilities  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value which indicates the set of line build out capabilities of the
+        DS1/E1 interface.
+
+        The value is a sum.  This sum initially takes the value zero.  Then, for
+        each line build out capability, C, in the range 1 or 2, that this
+        interface supports, 2 raised to (C - 1) is added to the sum.  For
+        example, an interface which is only short haul capable would have a
+        value of 2 (2^(2-1)).  In contrast, an interface which is both short
+        haul and long haul capable would have a value of 3 (2^(1-1) + 2^(2-1)).
+        The values for DS1/E1 interface line build out capabilities are as
+        follows:
+            line build out capability   function
+                1                       short haul
+                2                       long haul"
+    ::= { juniDsx1ConfigEntry 5 }
+
+juniDsx1LineBuildOutType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    shortHaul(1),
+                    longHaul(2),
+                    notSupported(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the configured line build out type of the
+        DS1/E1 interface.  The value of the juniDsx1LineBuildOutCapabilities
+        object for the DS1/E1 interface indicates the valid set of values for
+        this object."
+    ::= { juniDsx1ConfigEntry 6 }
+
+juniDsx1LineAttenuation  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    db0(1),
+                    dbMinus7Point5(2),
+                    dbMinus15(3),
+                    dbMinus22Point5(4),
+                    notSupported(5) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the configured line attenuation of the DS1/E1
+        interface.  Note that the value of this object only takes effect when
+        the value of the juniDsx1LineBuildOutType for the DS1/E1 interface is
+        set to longHaul(2)."
+    ::= { juniDsx1ConfigEntry 7 }
+
+juniDsx1LineLength  OBJECT-TYPE
+    SYNTAX      Integer32 (0..64000)
+    UNITS       "meters"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the length of the DS1/E1 line in meters.  Note
+        that the value of this object only takes effect when the value of the
+        juniDsx1LineBuildOutType for the DS1/E1 interface is set to
+        shortHaul(1)."
+    ::= { juniDsx1ConfigEntry 8 }
+
+juniDsx1LowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface over which this Dsx1 interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniDsx1ConfigEntry 9 }
+
+juniDsx1RowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniDsx1RowStatus
+            juniDsx1LowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for ifIndex must have been determined previously, by reading
+            juniDsx1NextIfIndex.
+
+            The interface identified by juniDsx1hLowerIfIndex must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniDsx1ConfigEntry 10 }
+
+juniDsx1SendCode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sendInbandLineCode(1),
+                    sendBellcoreLineCode(2),
+                    sendBellcoreInbandLineCode(3),
+                    sendQRSPattern(4),
+                    sendAllZerosPattern(5),
+                    sendAllOnesPattern(6),
+                    sendAltZeroOnePattern(7),
+                    sendTwo11Pattern(8),
+                    sendTwo15Pattern(9),
+                    sendTwo20Pattern(10),
+                    sendTwo23Pattern(11),
+                    sendUnfrQRSPattern(12),
+                    sendUnfrAllZerosPattern(13),
+                    sendUnfrAllOnesPattern(14),
+                    sendUnfrAltZeroOnePattern(15),
+                    sendUnfrTwo11Pattern(16),
+                    sendUnfrTwo15Pattern(17),
+                    sendUnfrTwo20Pattern(18),
+                    sendUnfrTwo23Pattern(19),
+                    otherPattern(20) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates what type of code is being sent across the DS1
+        interface by the device."
+    DEFVAL    { otherPattern }
+    ::= { juniDsx1ConfigEntry 11 }
+
+juniDsx1YellowAlarm  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    generate(1),
+                    detect(2),
+                    generateAndDetect(3),
+                    none(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This bitmap indicates the yellow alarm settings, and is the sum of the
+        capabilities."
+    ::= { juniDsx1ConfigEntry 12 }
+
+juniDsx1RemoteLoopback  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the remote loopback setting."
+    DEFVAL    { disabled }
+    ::= { juniDsx1ConfigEntry 13 }
+
+juniDsx1FdlCarrier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface is used in carrier environment."
+    DEFVAL    { disabled }
+    ::= { juniDsx1ConfigEntry 14 }
+
+juniDsx1FdlEic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the equipment identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx1ConfigEntry 15 }
+
+juniDsx1FdlLic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..11))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the location identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx1ConfigEntry 16 }
+
+juniDsx1FdlFic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the frame identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx1ConfigEntry 17 }
+
+juniDsx1FdlUnit  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the unit identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx1ConfigEntry 18 }
+
+juniDsx1FdlPfi  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the facility identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx1ConfigEntry 19 }
+
+juniDsx1FdlPort  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..4))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the equipment port number."
+    ::= { juniDsx1ConfigEntry 20 }
+
+juniDsx1FdlGenerator  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the generator number."
+    ::= { juniDsx1ConfigEntry 21 }
+
+juniDsx1FdlTransmit  OBJECT-TYPE
+    SYNTAX      BITS {
+                    path(0),
+                    idlesignal(1),
+                    testsignal(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies transmission enabling.
+            path       - Bit 0 for path transmit.  When this bit is set
+                         indicates path transmit is enabled; otherwise
+                         path transmit disabled.
+            idlesignal - Bit 1 for idlesignal transmit.  When this bit
+                         is set idlesingal transmit is enabled; otherwise
+                         idlesignal transmit disabled.
+            testsignal - Bit 2 for testsignal transmit.  When this bit
+                         is set testsignal transmit is enabled; otherwise
+                         testsignal transmit disabled.
+
+        The value of this object defaults to zero, indicating that none of FDL
+        transmit methods are enabled."
+    DEFVAL    { { } }
+    ::= { juniDsx1ConfigEntry 22 }
+
+juniDs1NextIfIndex  OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniDsx1ConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniDs1Objects 2 }
+
+
+--
+-- The DS1 Far End Configuration Table contains
+-- configuration information reported from the remote end.
+--
+juniDsx1FarEndConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx1FarEndConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The DS1 Far End Configuration table."
+    ::= { juniDs1Objects 3 }
+
+juniDsx1FarEndConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx1FarEndConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the DS1 Far End Configuration table."
+    INDEX     { juniDsx1FarEndLineIndex }
+    ::= { juniDsx1FarEndConfigTable 1 }
+
+JuniDsx1FarEndConfigEntry ::= SEQUENCE {
+        juniDsx1FarEndLineIndex         INTEGER,
+        juniDsx1FarEndEquipCode         DisplayString,
+        juniDsx1FarEndLocationIDCode    DisplayString,
+        juniDsx1FarEndFrameIDCode       DisplayString,
+        juniDsx1FarEndUnitCode          DisplayString,
+        juniDsx1FarEndFacilityIDCode    DisplayString,
+        juniDsx1FarEndPortNumber        DisplayString,
+        juniDsx1FarEndGeneratorNumber   DisplayString,
+        juniDsx1FarEndCarrier           INTEGER }
+
+juniDsx1FarEndLineIndex  OBJECT-TYPE
+    SYNTAX      INTEGER (1..'7fffffff'h)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index value which uniquely identifies the DS1 interface to which
+        this entry is applicable.  The interface identified by a particular
+        value of this index is the same interface as identified by the same
+        value a dsx1LineIndex object instance."
+    ::= { juniDsx1FarEndConfigEntry 1 }
+
+juniDsx1FarEndEquipCode  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Far End Equipment Identification code that describes the
+        specific piece of equipment.  It is sent within the Path Identification
+        Message."
+    ::= { juniDsx1FarEndConfigEntry 2 }
+
+juniDsx1FarEndLocationIDCode  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..11))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Far End Location Identification code that describes the
+        specific location of the equipment.  It is sent within the Path
+        Identification Message."
+    ::= { juniDsx1FarEndConfigEntry 3 }
+
+juniDsx1FarEndFrameIDCode  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Far End Frame Identification code that identifies where the
+        equipment is located within a building at a given location.  It is sent
+        within the Path Identification Message."
+    ::= { juniDsx1FarEndConfigEntry 4 }
+
+juniDsx1FarEndUnitCode  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the Far End code that identifies the equipment location within
+        a bay.  It is sent within the Path Identification Message."
+    ::= { juniDsx1FarEndConfigEntry 5 }
+
+juniDsx1FarEndFacilityIDCode  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..38))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This code identifies a specific Far End DS1 path.  It is sent within
+        the Path Identification Message."
+    ::= { juniDsx1FarEndConfigEntry 6 }
+
+juniDsx1FarEndPortNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This code identifies the port number of the Far End DS1.  It is sent
+        within the Idle Signal Message."
+    ::= { juniDsx1FarEndConfigEntry 7 }
+
+juniDsx1FarEndGeneratorNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..38))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This code identifies the Far End DS1 Generator Number.  It is sent
+        within the Test Signal Message."
+    ::= { juniDsx1FarEndConfigEntry 8 }
+
+juniDsx1FarEndCarrier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface is used in carrier environment.  It is sent
+        with all FDL messages."
+    ::= { juniDsx1FarEndConfigEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniDs1TrapControl      OBJECT IDENTIFIER ::= { juniDs1MIB 2 }
+-- juniDs1Traps            OBJECT IDENTIFIER ::= { juniDs1MIB 3 }
+-- juniDs1TrapPrefix       OBJECT IDENTIFIER ::= { juniDs1Traps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDs1Conformance OBJECT IDENTIFIER ::= { juniDs1MIB 4 }
+juniDs1Compliances OBJECT IDENTIFIER ::= { juniDs1Conformance 1 }
+juniDs1Groups      OBJECT IDENTIFIER ::= { juniDs1Conformance 2 }
+
+--
+-- compliance statements
+--
+juniDs1Compliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS1/E1 MIB.  This statement became obsolete when new objects were
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs1Group }
+    ::= { juniDs1Compliances 1 }                                   -- JUNOSe 1.0
+
+juniDs1Compliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS1/E1 MIB.  This statement became obsolete when dynamic DS1 interface
+        support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs1Group2 }
+    ::= { juniDs1Compliances 2 }                                   -- JUNOSe 1.1
+
+juniDs1Compliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS1/E1 MIB.  This statement became obsolete when FDL support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs1Group3 }
+    ::= { juniDs1Compliances 3 }                                   -- JUNOSe 3.0
+
+juniDs1Compliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS1/E1 MIB. This statement became obsolete when support for remote FDL
+        strings and FDL transmit mode was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs1Group4 }
+    ::= { juniDs1Compliances 4 }                                   -- JUNOSe 4.0
+
+juniDs1Compliance5  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        DS1/E1 MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs1Group5 }
+    ::= { juniDs1Compliances 5 }                                   -- JUNOSe 4.1
+
+
+--
+-- units of conformance
+--
+juniDs1Group  OBJECT-GROUP
+    OBJECTS {
+        juniDsx1TimeSlotMap,
+        juniDsx1Ds1ChannelNumber }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS1/E1
+        interfaces in a Juniper product.  This group became obsolete when new
+        objects where added to the MIB."
+    ::= { juniDs1Groups 1 }
+
+juniDs1Group2  OBJECT-GROUP
+    OBJECTS {
+        juniDsx1TimeSlotMap,
+        juniDsx1Ds1ChannelNumber,
+        juniDsx1Capabilities,
+        juniDsx1Mode,
+        juniDsx1LineBuildOutCapabilities,
+        juniDsx1LineBuildOutType,
+        juniDsx1LineAttenuation,
+        juniDsx1LineLength }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS1/E1
+        interfaces in a Juniper product.  This group became obsolete when
+        dynamic DS1 interface support was added."
+    ::= { juniDs1Groups 2 }
+
+juniDs1Group3  OBJECT-GROUP
+    OBJECTS {
+        juniDsx1TimeSlotMap,
+        juniDsx1Ds1ChannelNumber,
+        juniDsx1Capabilities,
+        juniDsx1Mode,
+        juniDsx1LineBuildOutCapabilities,
+        juniDsx1LineBuildOutType,
+        juniDsx1LineAttenuation,
+        juniDsx1LineLength,
+        juniDsx1LowerIfIndex,
+        juniDsx1RowStatus,
+
+        juniDs1NextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS1/E1
+        interfaces in a Juniper product.  This group became obsolete when FDL
+        support was added."
+    ::= { juniDs1Groups 3 }
+
+juniDs1Group4  OBJECT-GROUP
+    OBJECTS {
+        juniDsx1TimeSlotMap,
+        juniDsx1Ds1ChannelNumber,
+        juniDsx1Capabilities,
+        juniDsx1Mode,
+        juniDsx1LineBuildOutCapabilities,
+        juniDsx1LineBuildOutType,
+        juniDsx1LineAttenuation,
+        juniDsx1LineLength,
+        juniDsx1LowerIfIndex,
+        juniDsx1RowStatus,
+        juniDsx1SendCode,
+        juniDsx1YellowAlarm,
+        juniDsx1RemoteLoopback,
+        juniDsx1FdlCarrier,
+        juniDsx1FdlEic,
+        juniDsx1FdlLic,
+        juniDsx1FdlFic,
+        juniDsx1FdlUnit,
+        juniDsx1FdlPfi,
+        juniDsx1FdlPort,
+        juniDsx1FdlGenerator,
+
+        juniDs1NextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS1/E1
+        interfaces in a Juniper product.  This group became obsolete when
+        support for remote FDL strings and FDL transmit mode was added."
+    ::= { juniDs1Groups 4 }
+
+juniDs1Group5  OBJECT-GROUP
+    OBJECTS {
+        juniDsx1TimeSlotMap,
+        juniDsx1Ds1ChannelNumber,
+        juniDsx1Capabilities,
+        juniDsx1Mode,
+        juniDsx1LineBuildOutCapabilities,
+        juniDsx1LineBuildOutType,
+        juniDsx1LineAttenuation,
+        juniDsx1LineLength,
+        juniDsx1LowerIfIndex,
+        juniDsx1RowStatus,
+        juniDsx1SendCode,
+        juniDsx1YellowAlarm,
+        juniDsx1RemoteLoopback,
+        juniDsx1FdlCarrier,
+        juniDsx1FdlEic,
+        juniDsx1FdlLic,
+        juniDsx1FdlFic,
+        juniDsx1FdlUnit,
+        juniDsx1FdlPfi,
+        juniDsx1FdlPort,
+        juniDsx1FdlGenerator,
+        juniDsx1FdlTransmit,
+        juniDsx1FarEndEquipCode,
+        juniDsx1FarEndLocationIDCode,
+        juniDsx1FarEndFrameIDCode,
+        juniDsx1FarEndUnitCode,
+        juniDsx1FarEndFacilityIDCode,
+        juniDsx1FarEndPortNumber,
+        juniDsx1FarEndGeneratorNumber,
+        juniDsx1FarEndCarrier,
+
+        juniDs1NextIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of DS1/E1 interfaces in a
+        Juniper product."
+    ::= { juniDs1Groups 5 }
+
+END

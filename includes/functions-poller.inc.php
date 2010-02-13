@@ -1,24 +1,39 @@
 <?php
 
-function snmp_walk($hostname, $port,$snmpver, $community, $oid, $options, $mib) {
+function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
+{
   global $debug; global $config; global $runtime_stats;
-  $cmd  = ($snmpver == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -" . $snmpver . " -c " . $community . " " . $hostname.":".$port . " ";
-  if($options) { $cmd .= "-$options "; }
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $config['snmpget'] . " -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($options) { $cmd .= " " . $options; }
+  if($mib) { $cmd .= " -m " . $mib; }
+  if($mibdir) { $cmd .= " -M " . $mibdir; }
+  $cmd .= " ".$oid;
+  if($debug) { echo("$cmd\n"); }
+  $data = trim(shell_exec($cmd));
+  $runtime_stats['snmpget']++;
+  if($debug) { echo("$data\n"); }
+  if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data) || preg_match("/No more variables left/i", $data)))
+  { $data = false; } else { return $data; }
+}
+
+function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
+{
+  global $debug; global $config; global $runtime_stats;
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($options) { $cmd .= " $options "; }
+  if($mib) { $cmd .= " -m $mib"; }
+  if($mibdir) { $cmd .= " -M " . $mibdir; }
+  $cmd .= " ".$oid;
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
   $runtime_stats['snmpwalk']++;
   if($debug) { echo("$data\n"); }
-  if (is_string($result) && (preg_match("/No Such (Object|Instance)/i", $result) || preg_match("/No more variables left/i", $result)))
-  {
-    $result = false;
-  } else {
-    return $data;
-  }
+  if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data) || preg_match("/No more variables left/i", $data)))
+  { $data = false; } else { return $data; }
 }
 
-function snmp_cache_cip($oid, $device, $array, $mib = 0) {
+function snmp_cache_cip($oid, $device, $array, $mib = 0) 
+{
   global $config;
   $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
@@ -47,10 +62,8 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0) {
   return $array;
 }
 
-
 function snmp_cache_ifIndex($device) {
-
-global $config;
+  global $config;
   $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $cmd .= "-m IF-MIB ifIndex";
   $data = trim(shell_exec($cmd));
@@ -68,13 +81,9 @@ global $config;
   return $array;
 }
 
-function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = 0) {
+function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = NULL, $mibdir = NULL) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
-                                    $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $poll_oid;
-  $data = trim(shell_exec($cmd));
+  $data = snmp_walk($device, $poll_oid, "-OQUs", $mib, $mibdir);
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
     list($oid,$value) = explode("=", $entry);
@@ -87,9 +96,23 @@ function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = 0) {
   return $array;
 }
 
+function snmpwalk_cache_double_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL) {
+  $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
+  foreach(explode("\n", $data) as $entry) {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $first, $second) = explode(".", $oid);
+    if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
+      $double = $first.".".$second;
+      $array[$device[device_id]][$double][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
@@ -108,7 +131,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   global $config, $debug;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
@@ -128,7 +151,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
+  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
                                     $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;

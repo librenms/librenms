@@ -1,0 +1,3680 @@
+
+-- *****************************************************************************
+-- Juniper-L2TP-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Layer Two Tunneling Protocol (L2TP) MIB
+--
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-L2TP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, TimeStamp
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable
+        FROM Juniper-TC;
+
+juniL2tpMIB  MODULE-IDENTITY
+    LAST-UPDATED "200604201804Z"  -- 20-Apr-06 02:04 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The L2TP MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200604201804Z"  -- 20-Apr-06 02:04 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+    	"Added juniL2tpSysConfigFailoverResync and
+        juniL2tpTunnelStatusEffectiveFailoverResync."
+    REVISION    "200508241600Z"  -- 24-Aug-05 12:00 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+   	"juniL2tpSessionStatusProxyLcp will present session status for both LAC and LNS.
+      Added juniL2tpSysConfigDestinationLockoutTimeout,
+      juniL2tpSysConfigDestinationLockoutTestEnabled,
+      juniL2tpDestConfigLockoutAction."
+    REVISION    "200504111822Z"  -- 11-Apr-05 02:22 PM EDT  - JUNOSe 7.1
+    DESCRIPTION
+        "Added juniL2tpSysStatusTotalSwitchedSessions,
+        juniL2tpSysStatusFailedSwitchedSessions,
+        juniL2tpSysStatusActiveSwitchedSessions,
+        juniL2tpSysStatusIfCounterDiscontinuityTime,
+        juniL2tpSysConfigRejectTxAddressChange and
+        juniL2tpSysConfigShortDrainTimeout.
+        Added values to juniL2tpSysConfigIgnoreTxAddressChange."         
+    REVISION    "200409022347Z"  -- 02-Sep-04 07:47 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added juniL2tpSysConfigEnableRxSpeedAvpWhenEqual."
+    REVISION    "200405041431Z"  -- 04-May-04 10:31 AM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Added juniL2tpSysConfigReceiveWindowSize."
+    REVISION    "200403081804Z"  -- 08-Mar-04 01:04 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added juniL2tpSysConfigEnableDisconnectCauseAvp."
+    REVISION    "200403081804Z"  -- 08-Mar-04 01:04 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added juniL2tpSysConfigIgnoreTxAddressChange.
+         Added juniL2tpUdpIpTunnelRemoteReceiveAddress and
+         juniL2tpUdpIpTunnelRemoteReceivePort."
+    REVISION    "200302132112Z"  -- 13-Feb-03 04:12 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added new objects
+            juniL2tpSysConfigControlRetransmissionsEstablished,
+            juniL2tpSysConfigControlRetransmissionsNotEstablished,
+            juniL2tpSysConfigDisableChallenge,
+         Deprecated juniL2tpSysConfigControlRetransmissions."
+    REVISION    "200302122103Z"  -- 12-Feb-03 04:03 PM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Added new objects
+            juniL2tpSysConfigFailoverWithinPreference,
+            juniL2tpSysConfigWeightedLoadBalancing."
+    REVISION    "200302072226Z"  -- 07-Feb-03 05:26 PM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Added juniL2tpSysConfigDisableCallingNumberAvp."
+    REVISION    "200110171451Z"  -- 17-Oct-01 10:51 AM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Added new objects
+            juniL2tpSysConfigTunnelSwitchingEnabled,
+            juniL2tpSysConfigControlRetransmissions,
+            juniL2tpSysConfigTunnelIdleTimeout."
+    REVISION    "200110171355Z"  -- 17-Oct-01 09:55 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added juniL2tpSysConfigReceiveDataSequencingIgnore."
+    REVISION    "200106182000Z"  -- 18-Jun-01 04:00 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added juniL2tpSessionStatusLacTunneledIfIndex as long-term
+        replacement for juniL2tpSessionStatusLacPppIfIndex.
+        Added new objects
+            juniL2tpTunnelStatusCumEstabTime,
+            juniL2tpSessionStatusCumEstabTime,
+            juniL2tpSessionStatPayLostPackets.
+        Changed range of juniL2tpSysConfigDestructTimeout to 10-3600."
+    REVISION    "200002110000Z"  -- 11-Feb-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Initial revision, based in part on IETF L2TP Working Group
+        draft-ietf-l2tpext-l2tp-mib-01."
+    ::= { juniMibs 35 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniL2tpTunnelId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An L2TP Tunnel ID.  Implementation constraints may restrict the range
+        of values actually used."
+    SYNTAX      Integer32 (0..65535)
+
+JuniL2tpSessionId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An L2TP Session ID. Implementation constraints may restrict the range
+        of values actually used."
+    SYNTAX      Integer32 (0..65535)
+
+JuniL2tpAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The administrative state exerted on L2TP tunnels sessions at some scope
+        of control.
+            enabled     New tunnels/sessions may be instantiated.
+            disabled    All tunnels/sessions are terminated.
+            drain       No new tunnels/sessions may be instantiated, but any
+                        existing tunnels/sessions may persist until they expire
+                        by other means.
+
+        The DESCRIPTION clause of an object defined to have this syntax must
+        describe the scope of control that object exerts (e.g., all
+        tunnels/sessions across the system, sessions within a single tunnel,
+        etc.)."
+    SYNTAX      INTEGER {
+                    enabled(0),
+                    disabled(1),
+                    drain(2) }
+
+JuniL2tpTransport ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Transport type over which L2TP is carried."
+    SYNTAX      INTEGER {
+                    other(0),
+                    udpIp(1) }
+
+
+JuniL2tpLockoutAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The lockout action applied to an L2TP destinations.
+            none        No action
+            test        Test and unlock if successful
+            unlock      Unconditional unlock"
+    SYNTAX      INTEGER {
+                    none(0),
+                    test(1),
+                    unlock(2) }
+
+JuniL2tpLockoutState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The lockout state of an L2TP destination.
+            notLocked        not locked
+            waitLockTimeout  waiting for lockout timeout expiration
+            waitTestStart    waiting for lockout test start
+            testing          lockout test active"
+    SYNTAX      INTEGER {
+                    notLocked(0),
+                    waitLockTimeout(1),
+                    waitTestStart(2),
+                    testing(3) }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpTraps           OBJECT IDENTIFIER  ::= { juniL2tpMIB 0 }
+juniL2tpObjects         OBJECT IDENTIFIER  ::= { juniL2tpMIB 1 }
+juniL2tpTrapControl     OBJECT IDENTIFIER  ::= { juniL2tpMIB 2 }
+juniL2tpConformance     OBJECT IDENTIFIER  ::= { juniL2tpMIB 3 }
+
+--
+-- Major subtrees
+--
+juniL2tpSystem          OBJECT IDENTIFIER  ::= { juniL2tpObjects 1 }
+juniL2tpDestination     OBJECT IDENTIFIER  ::= { juniL2tpObjects 2 }
+juniL2tpTunnel          OBJECT IDENTIFIER  ::= { juniL2tpObjects 3 }
+juniL2tpSession         OBJECT IDENTIFIER  ::= { juniL2tpObjects 4 }
+juniL2tpTransport       OBJECT IDENTIFIER  ::= { juniL2tpObjects 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- L2TP System Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpSystemConfig      OBJECT IDENTIFIER   ::= { juniL2tpSystem 1 }
+juniL2tpSystemStatus      OBJECT IDENTIFIER   ::= { juniL2tpSystem 2 }
+
+--
+-- L2TP System-level Configuration
+--
+juniL2tpSysConfigAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Exerts control over all L2TP tunnels/sessions in the system."
+    ::= { juniL2tpSystemConfig 1 }
+
+juniL2tpSysConfigDestructTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount of time, in seconds, to preserve dynamic tunnels/sessions
+        after they become inactive, e.g. to poll their statistics."
+    ::= { juniL2tpSystemConfig 2 }
+
+juniL2tpSysConfigIpChecksumEnable  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable IP checksumming for tunnels with UDP/IP transport."
+    ::= { juniL2tpSystemConfig 3 }
+
+juniL2tpSysConfigTunnelSwitchingEnabled  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tunnel switching enabled/disable."
+    DEFVAL    { disable }
+    ::= { juniL2tpSystemConfig 4 }
+
+juniL2tpSysConfigControlRetransmissions  OBJECT-TYPE
+    SYNTAX      Integer32 (2..7)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of retransmission retries allowed before control connection
+        goes down.
+
+        This object has been replaced by
+        juniL2tpSysConfigControlRetransmissionsEstablished and
+        juniL2tpSysConfigControlRetransmissionsNotEstablished."
+    DEFVAL    { 5 }
+    ::= { juniL2tpSystemConfig 5 }
+
+juniL2tpSysConfigTunnelIdleTimeout  OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Idle tunnel remains active for the specified amount of time; value 0
+        disables the timer i.e. tunnel becomes persistent."
+    DEFVAL    { 60 }
+    ::= { juniL2tpSystemConfig 6 }
+
+juniL2tpSysConfigReceiveDataSequencingIgnore  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ignoring of receive sequencing of L2TP data packets."
+    ::= { juniL2tpSystemConfig 7 }
+
+juniL2tpSysConfigFailoverWithinPreference  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable fail-over within a preference level."
+    ::= { juniL2tpSystemConfig 8 }
+
+juniL2tpSysConfigWeightedLoadBalancing  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable weighted load balancing."
+    ::= { juniL2tpSystemConfig 9 }
+
+juniL2tpSysConfigControlRetransmissionsEstablished  OBJECT-TYPE
+    SYNTAX      Integer32 (2..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It represents number of retries allowed for established tunnels before
+        control connection goes down."
+    DEFVAL    { 5 }
+    ::= { juniL2tpSystemConfig 10 }
+
+juniL2tpSysConfigControlRetransmissionsNotEstablished  OBJECT-TYPE
+    SYNTAX      Integer32 (2..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It represents number of retries allowed for unestablished tunnels
+        before control connection goes down."
+    DEFVAL    { 5 }
+    ::= { juniL2tpSystemConfig 11 }
+
+juniL2tpSysConfigDisableChallenge  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Disable inclusion of chap challenge in the outgoing packets."
+    DEFVAL    { disable }
+    ::= { juniL2tpSystemConfig 12 }
+
+juniL2tpSysConfigDisableCallingNumberAvp OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable inclusion of calling number avp in ICRQ packet."
+    ::= { juniL2tpSystemConfig 13 }
+
+juniL2tpSysConfigIgnoreTxAddressChange OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    ipAddressAndUdpPort(1),
+                    ipAddress(2),
+                    udpPort(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure L2TP to ignore IP address and/or UDP port changes on incoming
+        SCCRP messages. When this feature is enabled the L2TP tunnel may have
+        separate receive and transmit address and/or port values to the
+        remote host. 
+            disable(0) - change is not ignored
+            ipAddressAndUdpPort(1)- ignore both address and port changes
+            ipAddress(2) - ignore address changes only
+            udpPort(3) - ignore port changes only."
+    DEFVAL { disable }
+    ::= { juniL2tpSystemConfig 14 }
+
+juniL2tpSysConfigEnableDisconnectCauseAvp OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable inclusion of L2TP PPP Disconnect Cause AVP in CDN
+        packet."
+    DEFVAL    { disable }
+    ::= { juniL2tpSystemConfig 15 }
+
+juniL2tpSysConfigReceiveWindowSize OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the global L2TP receive window size.  A value
+         of 0 indicates the system chooses the RWS.  This object
+         may be overwritten by other more specific RWS settings."
+    DEFVAL    {0}
+    ::= { juniL2tpSystemConfig 16 }
+
+
+juniL2tpSysConfigEnableRxSpeedAvpWhenEqual OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable generation of L2TP RX speed AVP when RX and TX speeds
+         are equal.  Note the RX speed is always generated when the
+         RX and TX speeds differ."
+    DEFVAL    { disable }
+    ::= { juniL2tpSystemConfig 17 }
+
+juniL2tpSysConfigRejectTxAddressChange OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    ipAddressAndUdpPort(1),
+                    ipAddress(2),
+                    udpPort(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Configure L2TP to reject IP address and/or UDP port changes on incomming
+       SCCRP messages. 
+           disable(0) - address change is allowed
+           ipAddressAndUdpPort(1)- reject both address and port changes
+           ipAddress(2) - reject address changes only
+           udpPort(3) - reject port changes only."
+    DEFVAL { disable }
+    ::= { juniL2tpSystemConfig 18 }
+
+juniL2tpSysConfigShortDrainTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Configure the L2TP short drain interval.  This interval represents the
+        time a tunnel, that is already draining, will continue to drain upon
+        receiving a start request."
+    DEFVAL { 2 }
+    ::= { juniL2tpSystemConfig 19 }
+
+juniL2tpSysConfigDestinationLockoutTestEnabled OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable testing of failed destiantion before removing lockout."
+    DEFVAL    { disable }
+    ::= { juniL2tpSystemConfig 20 }
+
+juniL2tpSysConfigDestinationLockoutTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (60..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Failed destination remains locked out for the specified amount of time."
+    DEFVAL    { 300 }
+    ::= { juniL2tpSystemConfig 21 }
+
+juniL2tpSysConfigFailoverResync OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disable(0),
+                    failoverProtocol(1),
+                    silentFailover(2),
+                    failoverProtocolFallbackToSilentFailover(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Configure L2TP failover resync mechanism.
+           disable(0) - Disable failover resync
+           failoverProtocol(1) - Use  the L2TP Failover Protocol
+           silentFailover(2) - Use the JUNOSe Silent Failover Mechanism
+           failoverProtocolFallbackToSilentFailover(3) - (Default) Use the
+           L2TP Failover Protocol and fall back to Silent Failover."
+    DEFVAL { failoverProtocolFallbackToSilentFailover }
+    ::= { juniL2tpSystemConfig 22 }
+
+--
+-- L2TP System-level Status and Statistics
+--
+juniL2tpSysStatusProtocolVersion  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(2..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vector of supported L2TP protocol version and revision numbers.
+        Supported versions are identified via a two octet pairing where the
+        first octet indicates the version and the second octet contains the
+        revision."
+    ::= { juniL2tpSystemStatus 1 }
+
+juniL2tpSysStatusVendorName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vendor name of the L2TP protocol stack."
+    ::= { juniL2tpSystemStatus 2 }
+
+juniL2tpSysStatusFirmwareRev  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware revision for the L2TP protocol stack."
+    ::= { juniL2tpSystemStatus 3 }
+
+juniL2tpSysStatusTotalDestinations  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of destination creations attempted."
+    ::= { juniL2tpSystemStatus 4 }
+
+juniL2tpSysStatusFailedDestinations  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of destination creation attempts that failed."
+    ::= { juniL2tpSystemStatus 5 }
+
+juniL2tpSysStatusActiveDestinations  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of destinations having at least one active tunnel."
+    ::= { juniL2tpSystemStatus 6 }
+
+juniL2tpSysStatusTotalTunnels  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creations attempted."
+    ::= { juniL2tpSystemStatus 7 }
+
+juniL2tpSysStatusFailedTunnels  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creation attempts that failed to reach the established
+        state."
+    ::= { juniL2tpSystemStatus 8 }
+
+juniL2tpSysStatusFailedTunnelAuthens  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creation attempts that failed authentication."
+    ::= { juniL2tpSystemStatus 9 }
+
+juniL2tpSysStatusActiveTunnels  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnels currently established."
+    ::= { juniL2tpSystemStatus 10 }
+
+juniL2tpSysStatusTotalSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session creations attempted."
+    ::= { juniL2tpSystemStatus 11 }
+
+juniL2tpSysStatusFailedSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session creation attempts that failed to reach the
+        established state."
+    ::= { juniL2tpSystemStatus 12 }
+
+juniL2tpSysStatusActiveSessions  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sessions currently established."
+    ::= { juniL2tpSystemStatus 13 }
+
+juniL2tpSysStatusTotalSwitchedSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of switched session creations attempted."
+    ::= { juniL2tpSystemStatus 14 }
+
+juniL2tpSysStatusFailedSwitchedSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of switched session creation attempts that failed to reach the
+        established state."
+    ::= { juniL2tpSystemStatus 15 }
+
+juniL2tpSysStatusActiveSwitchedSessions  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of switched sessions currently established."
+    ::= { juniL2tpSystemStatus 16 }
+
+juniL2tpSysStatusIfCounterDiscontinuityTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime on the most recent occasion at  which any one or
+         more of the system-level status and statistics suffered a discontinuity.
+         If no such discontinuities have occurred since the last re-
+         initialization of the local management subsystem, then this object
+         contains a zero value."
+    ::= { juniL2tpSystemStatus 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- L2TP Destination Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpDestConfig      OBJECT IDENTIFIER   ::= { juniL2tpDestination 1 }
+juniL2tpDestStatus      OBJECT IDENTIFIER   ::= { juniL2tpDestination 2 }
+juniL2tpDestStatistics  OBJECT IDENTIFIER   ::= { juniL2tpDestination 3 }
+
+--
+-- Destination-level Configuration
+--
+-- { juniL2tpDestConfig 1 } reserved for "next ifIndex" acquisition
+--
+juniL2tpDestConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDestConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP destination configuration table.  Each entry in this table has
+        a corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpDestStatsTable."
+    ::= { juniL2tpDestConfig 2 }
+
+juniL2tpDestConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpDestConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the configuration attributes of an L2TP destination."
+    INDEX     { juniL2tpDestConfigIfIndex }
+    ::= { juniL2tpDestConfigTable 1 }
+
+JuniL2tpDestConfigEntry ::= SEQUENCE {
+    juniL2tpDestConfigIfIndex       InterfaceIndex,
+    juniL2tpDestConfigRowStatus     RowStatus,
+    juniL2tpDestConfigAdminState    JuniL2tpAdminState,
+    juniL2tpDestConfigLockoutAction JuniL2tpLockoutAction }
+
+juniL2tpDestConfigIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpDestConfigEntry 1 }
+
+juniL2tpDestConfigRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An implementation may choose not to support administrative
+        configuration of tunnels."
+    ::= { juniL2tpDestConfigEntry 2 }
+
+juniL2tpDestConfigAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured administrative state."
+    DEFVAL { enabled }
+    ::= { juniL2tpDestConfigEntry 3 }
+
+juniL2tpDestConfigLockoutAction OBJECT-TYPE
+    SYNTAX      JuniL2tpLockoutAction
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The lockout action to be applied to a destination."
+    DEFVAL { none }
+    ::= { juniL2tpDestConfigEntry 4 }
+
+
+--
+-- Destination-level Status
+--
+juniL2tpDestStatusTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDestStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP destination status table.  Each entry in this table has a
+        corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpDestConfigTable."
+    ::= { juniL2tpDestStatus 1 }
+
+juniL2tpDestStatusEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpDestStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the status attributes of an L2TP destination."
+    INDEX     { juniL2tpDestStatusIfIndex }
+    ::= { juniL2tpDestStatusTable 1 }
+
+JuniL2tpDestStatusEntry ::= SEQUENCE {
+    juniL2tpDestStatusIfIndex                InterfaceIndex,
+    juniL2tpDestStatusTransport              JuniL2tpTransport,
+    juniL2tpDestStatusEffectiveAdminState    JuniL2tpAdminState,
+    juniL2tpDestStatusTotalTunnels           Counter32,
+    juniL2tpDestStatusFailedTunnels          Counter32,
+    juniL2tpDestStatusFailedTunnelAuthens    Counter32,
+    juniL2tpDestStatusActiveTunnels          Gauge32,
+    juniL2tpDestStatusTotalSessions          Counter32,
+    juniL2tpDestStatusFailedSessions         Counter32,
+    juniL2tpDestStatusActiveSessions         Gauge32,
+    juniL2tpDestStatusLockoutState           JuniL2tpLockoutState,
+    juniL2tpDestStatusLockoutTimeRemaining   Gauge32 }
+
+juniL2tpDestStatusIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpDestStatusEntry 1 }
+
+juniL2tpDestStatusTransport  OBJECT-TYPE
+    SYNTAX      JuniL2tpTransport
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The underlying transport over which this L2TP destination is carried."
+    ::= { juniL2tpDestStatusEntry 2 }
+
+juniL2tpDestStatusEffectiveAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative state currently in effect.  This could be the
+        configured admin state for this destination, or an overriding admin
+        state exerted from a higher hierarchical level (system)."
+    ::= { juniL2tpDestStatusEntry 3 }
+
+juniL2tpDestStatusTotalTunnels  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creations attempted."
+    ::= { juniL2tpDestStatusEntry 4 }
+
+juniL2tpDestStatusFailedTunnels  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creation attempts that failed to reach the established
+        state."
+    ::= { juniL2tpDestStatusEntry 5 }
+
+juniL2tpDestStatusFailedTunnelAuthens  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnel creation attempts that failed authentication."
+    ::= { juniL2tpDestStatusEntry 6 }
+
+juniL2tpDestStatusActiveTunnels  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of tunnels currently established."
+    ::= { juniL2tpDestStatusEntry 7 }
+
+juniL2tpDestStatusTotalSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session creations attempted."
+    ::= { juniL2tpDestStatusEntry 8 }
+
+juniL2tpDestStatusFailedSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of session creation attempts that failed to reach the
+        established state."
+    ::= { juniL2tpDestStatusEntry 9 }
+
+juniL2tpDestStatusActiveSessions  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of sessions currently established."
+    ::= { juniL2tpDestStatusEntry 10 }
+
+juniL2tpDestStatusLockoutState OBJECT-TYPE
+    SYNTAX      JuniL2tpLockoutState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lockout state of destination."
+    ::= { juniL2tpDestStatusEntry 11 }
+
+juniL2tpDestStatusLockoutTimeRemaining OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lockout timeout remaining."
+    ::= { juniL2tpDestStatusEntry 12 }
+
+
+--
+-- Destination-level Statistics
+--
+juniL2tpDestStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpDestStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP destination statistics table.  Describes the aggregate control
+        and payload statistics for all L2TP tunnels configured on each
+        destination.  Each entry in this table has a corresponding entry in the
+        Interfaces MIB ifTable, and in juniL2tpDestConfigTable."
+    ::= { juniL2tpDestStatistics 1 }
+
+juniL2tpDestStatEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpDestStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the aggregate L2TP control and payload statistics for all
+        L2TP tunnels on an L2TP destination."
+    INDEX     { juniL2tpDestStatIfIndex }
+    ::= { juniL2tpDestStatTable 1 }
+
+JuniL2tpDestStatEntry ::= SEQUENCE {
+    juniL2tpDestStatIfIndex          InterfaceIndex,
+    juniL2tpDestStatCtlRecvOctets    Counter32,
+    juniL2tpDestStatCtlRecvPackets   Counter32,
+    juniL2tpDestStatCtlRecvErrors    Counter32,
+    juniL2tpDestStatCtlRecvDiscards  Counter32,
+    juniL2tpDestStatCtlSendOctets    Counter32,
+    juniL2tpDestStatCtlSendPackets   Counter32,
+    juniL2tpDestStatCtlSendErrors    Counter32,
+    juniL2tpDestStatCtlSendDiscards  Counter32,
+    juniL2tpDestStatPayRecvOctets    Counter32,
+    juniL2tpDestStatPayRecvPackets   Counter32,
+    juniL2tpDestStatPayRecvErrors    Counter32,
+    juniL2tpDestStatPayRecvDiscards  Counter32,
+    juniL2tpDestStatPaySendOctets    Counter32,
+    juniL2tpDestStatPaySendPackets   Counter32,
+    juniL2tpDestStatPaySendErrors    Counter32,
+    juniL2tpDestStatPaySendDiscards  Counter32 }
+
+juniL2tpDestStatIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpDestStatEntry 1 }
+
+juniL2tpDestStatCtlRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control octets received."
+    ::= { juniL2tpDestStatEntry 2 }
+
+juniL2tpDestStatCtlRecvPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets received."
+    ::= { juniL2tpDestStatEntry 3 }
+
+juniL2tpDestStatCtlRecvErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets incurring reception errors."
+    ::= { juniL2tpDestStatEntry 4 }
+
+juniL2tpDestStatCtlRecvDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets discarded after reception."
+    ::= { juniL2tpDestStatEntry 5 }
+
+juniL2tpDestStatCtlSendOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control octets sent."
+    ::= { juniL2tpDestStatEntry 6 }
+
+juniL2tpDestStatCtlSendPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets sent."
+    ::= { juniL2tpDestStatEntry 7 }
+
+juniL2tpDestStatCtlSendErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets incurring transmission errors."
+    ::= { juniL2tpDestStatEntry 8 }
+
+juniL2tpDestStatCtlSendDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets discarded before transmission."
+    ::= { juniL2tpDestStatEntry 9 }
+
+juniL2tpDestStatPayRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets received."
+    ::= { juniL2tpDestStatEntry 10 }
+
+juniL2tpDestStatPayRecvPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets received."
+    ::= { juniL2tpDestStatEntry 11 }
+
+juniL2tpDestStatPayRecvErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring reception errors."
+    ::= { juniL2tpDestStatEntry 12 }
+
+juniL2tpDestStatPayRecvDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded after reception."
+    ::= { juniL2tpDestStatEntry 13 }
+
+juniL2tpDestStatPaySendOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets sent."
+    ::= { juniL2tpDestStatEntry 14 }
+
+juniL2tpDestStatPaySendPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets sent."
+    ::= { juniL2tpDestStatEntry 15 }
+
+juniL2tpDestStatPaySendErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring transmission errors."
+    ::= { juniL2tpDestStatEntry 16 }
+
+juniL2tpDestStatPaySendDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded before transmission."
+    ::= { juniL2tpDestStatEntry 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- L2TP Tunnel Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpTunnelConfig      OBJECT IDENTIFIER   ::= { juniL2tpTunnel 1 }
+juniL2tpTunnelStatus      OBJECT IDENTIFIER   ::= { juniL2tpTunnel 2 }
+juniL2tpTunnelStatistics  OBJECT IDENTIFIER   ::= { juniL2tpTunnel 3 }
+juniL2tpTunnelMap         OBJECT IDENTIFIER   ::= { juniL2tpTunnel 4 }
+
+--
+-- Tunnel-level Configuration
+--
+-- { juniL2tpTunnelConfig 1 } reserved for "next ifIndex" acquisition
+--
+juniL2tpTunnelConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpTunnelConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP tunnel configuration table.  Each entry in this table has a
+        corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpTunnelStatsTable."
+    ::= { juniL2tpTunnelConfig 2 }
+
+juniL2tpTunnelConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the configuration attributes of an L2TP tunnel."
+    INDEX     { juniL2tpTunnelConfigIfIndex }
+    ::= { juniL2tpTunnelConfigTable 1 }
+
+JuniL2tpTunnelConfigEntry ::= SEQUENCE {
+    juniL2tpTunnelConfigIfIndex      InterfaceIndex,
+    juniL2tpTunnelConfigRowStatus    RowStatus,
+    juniL2tpTunnelConfigAdminState   JuniL2tpAdminState }
+
+juniL2tpTunnelConfigIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpTunnelConfigEntry 1 }
+
+juniL2tpTunnelConfigRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An implementation may choose not to support administrative
+        configuration of tunnels."
+    ::= { juniL2tpTunnelConfigEntry 2 }
+
+juniL2tpTunnelConfigAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured administrative state."
+    DEFVAL    { enabled }
+    ::= { juniL2tpTunnelConfigEntry 3 }
+
+
+--
+-- Tunnel-level Status and Statistics
+--
+juniL2tpTunnelStatusTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpTunnelStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP tunnel status and statistics table.  Each entry in this table
+        has a corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpTunnelConfigTable."
+    ::= { juniL2tpTunnelStatus 1 }
+
+juniL2tpTunnelStatusEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An L2TP tunnel interface stats entry."
+    INDEX     { juniL2tpTunnelStatusIfIndex }
+    ::= { juniL2tpTunnelStatusTable 1 }
+
+JuniL2tpTunnelStatusEntry ::= SEQUENCE {
+    juniL2tpTunnelStatusIfIndex                      InterfaceIndex,
+    juniL2tpTunnelStatusTransport                    JuniL2tpTransport,
+    juniL2tpTunnelStatusLocalTunnelId                JuniL2tpTunnelId,
+    juniL2tpTunnelStatusRemoteTunnelId               JuniL2tpTunnelId,
+    juniL2tpTunnelStatusEffectiveAdminState          JuniL2tpAdminState,
+    juniL2tpTunnelStatusState                        INTEGER,
+    juniL2tpTunnelStatusInitiated                    INTEGER,
+    juniL2tpTunnelStatusRemoteHostName               DisplayString,
+    juniL2tpTunnelStatusRemoteVendorName             DisplayString,
+    juniL2tpTunnelStatusRemoteFirmwareRevision       Integer32,
+    juniL2tpTunnelStatusRemoteProtocolVersion        OCTET STRING,
+    juniL2tpTunnelStatusRemoteBearerCapabilities     INTEGER,
+    juniL2tpTunnelStatusRemoteFramingCapabilities    INTEGER,
+    juniL2tpTunnelStatusRecvWindowSize               Gauge32,
+    juniL2tpTunnelStatusSendWindowSize               Gauge32,
+    juniL2tpTunnelStatusSendQueueDepth               Gauge32,
+    juniL2tpTunnelStatusRecvSeq                      Integer32,
+    juniL2tpTunnelStatusRecvSeqAck                   Integer32,
+    juniL2tpTunnelStatusSendSeq                      Integer32,
+    juniL2tpTunnelStatusSendSeqAck                   Integer32,
+    juniL2tpTunnelStatusTotalSessions                Counter32,
+    juniL2tpTunnelStatusFailedSessions               Counter32,
+    juniL2tpTunnelStatusActiveSessions               Gauge32,
+    juniL2tpTunnelStatusLastResultCode               Integer32,
+    juniL2tpTunnelStatusLastErrorCode                Integer32,
+    juniL2tpTunnelStatusLastErrorMessage             DisplayString,
+    juniL2tpTunnelStatusCumEstabTime                 Unsigned32,
+    juniL2tpTunnelStatusEffectiveFailoverResync      Integer32 }
+    
+
+juniL2tpTunnelStatusIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same as the value of ifIndex for the corresponding entry in Interfaces
+        MIB ifTable."
+    ::= { juniL2tpTunnelStatusEntry 1 }
+
+juniL2tpTunnelStatusTransport  OBJECT-TYPE
+    SYNTAX      JuniL2tpTransport
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The underlying transport over which this L2TP tunnel is carried."
+    ::= { juniL2tpTunnelStatusEntry 2 }
+
+juniL2tpTunnelStatusLocalTunnelId  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local tunnel identifier."
+    ::= { juniL2tpTunnelStatusEntry 3 }
+
+juniL2tpTunnelStatusRemoteTunnelId  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote tunnel identifier."
+    ::= { juniL2tpTunnelStatusEntry 4 }
+
+juniL2tpTunnelStatusEffectiveAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative state currently in effect.  This could be the
+        configured admin state for this tunnel, or an overriding admin state
+        exerted from a higher hierarchical level (system, destination)."
+    ::= { juniL2tpTunnelStatusEntry 5 }
+
+juniL2tpTunnelStatusState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    idle(0),
+                    connecting(1),
+                    established(2),
+                    disconnecting(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the tunnel."
+    ::= { juniL2tpTunnelStatusEntry 6 }
+
+juniL2tpTunnelStatusInitiated  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    local(1),
+                    remote(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the tunnel was initiated locally, or by the remote
+        tunnel peer."
+    ::= { juniL2tpTunnelStatusEntry 7 }
+
+juniL2tpTunnelStatusRemoteHostName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host name obtained during the tunnel establishment phase (via the
+        Host Name AVP) of the L2TP peer.  If the tunnel is idle, this object
+        should maintain its value from the last time it was connected, or a
+        zero-length string if no name was previously known."
+    ::= { juniL2tpTunnelStatusEntry 8 }
+
+juniL2tpTunnelStatusRemoteVendorName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the vendor name of the peer's L2TP implementation. If the
+        tunnel is idle, this object should maintain its value from the last time
+        it was connected, of a zero-length string if no name was previously
+        known."
+    ::= { juniL2tpTunnelStatusEntry 9 }
+
+juniL2tpTunnelStatusRemoteFirmwareRevision  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel peer's firmware revision number.  If the tunnel is idle,
+        this object should maintain its value from the last time it was
+        connected, or a zero value if no revision was previously known."
+    ::= { juniL2tpTunnelStatusEntry 10 }
+
+juniL2tpTunnelStatusRemoteProtocolVersion  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version and revision of the tunnel peer's implementation.
+        The first octet contains the protocol version.  The second octet
+        contains the protocol revision."
+    ::= { juniL2tpTunnelStatusEntry 11 }
+
+juniL2tpTunnelStatusRemoteBearerCapabilities  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    digital(1),
+                    analog(2),
+                    digitalAnalog(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Bearer Capabilities of the tunnel peer.  If the tunnel is idle this
+        object should maintain its value from the last time it was connected, or
+        'none' if not previously known."
+    ::= { juniL2tpTunnelStatusEntry 12 }
+
+juniL2tpTunnelStatusRemoteFramingCapabilities  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    sync(1),
+                    async(2),
+                    syncAsync(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Framing Capabilities of the tunnel peer.  If the tunnel is idle
+        this object should maintain its value from the last time it was
+        connected, or 'none' if not previously known."
+    ::= { juniL2tpTunnelStatusEntry 13 }
+
+juniL2tpTunnelStatusRecvWindowSize  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The receive window size."
+    ::= { juniL2tpTunnelStatusEntry 14 }
+
+juniL2tpTunnelStatusSendWindowSize  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tunnel peer's receive window size."
+    ::= { juniL2tpTunnelStatusEntry 15 }
+
+juniL2tpTunnelStatusSendQueueDepth  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets on transmit queue."
+    ::= { juniL2tpTunnelStatusEntry 16 }
+
+juniL2tpTunnelStatusRecvSeq  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next sequence number expected in a received control packet."
+    ::= { juniL2tpTunnelStatusEntry 17 }
+
+juniL2tpTunnelStatusRecvSeqAck  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last received sequence number that was acknowledged back to the
+        tunnel peer."
+    ::= { juniL2tpTunnelStatusEntry 18 }
+
+juniL2tpTunnelStatusSendSeq  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next sequence number to be sent in a transmitted control packet."
+    ::= { juniL2tpTunnelStatusEntry 19 }
+
+juniL2tpTunnelStatusSendSeqAck  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The send sequence number that the tunnel peer has acknowledged.
+        The flow control state can be determined by subtracting the
+        juniL2tpTunnelStatusSendSeq from juniL2tpTunnelStatusSendSeqAck and
+        comparing this value to juniL2tpTunnelStatusSendWindowSize."
+    ::= { juniL2tpTunnelStatusEntry 20 }
+
+juniL2tpTunnelStatusTotalSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of sessions that this tunnel has successfully
+        connected through to its tunnel peer since this tunnel was created,
+        including those that have since terminated."
+    ::= { juniL2tpTunnelStatusEntry 21 }
+
+juniL2tpTunnelStatusFailedSessions  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of sessions that were initiated but failed to reach the
+        established phase."
+    ::= { juniL2tpTunnelStatusEntry 22 }
+
+juniL2tpTunnelStatusActiveSessions  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of sessions in the established state."
+    ::= { juniL2tpTunnelStatusEntry 23 }
+
+juniL2tpTunnelStatusLastResultCode  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last value of the result code as described in the Result Code AVP
+        which caused the tunnel to disconnect."
+    ::= { juniL2tpTunnelStatusEntry 24 }
+
+juniL2tpTunnelStatusLastErrorCode  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last value of the error code as described in the Result Code AVP
+        which caused the tunnel to disconnect."
+    ::= { juniL2tpTunnelStatusEntry 25 }
+
+juniL2tpTunnelStatusLastErrorMessage  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last value of the optional message as described in the Result Code
+        AVP which caused the tunnel to disconnect."
+    ::= { juniL2tpTunnelStatusEntry 26 }
+
+juniL2tpTunnelStatusCumEstabTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The cumulative time in seconds that this tunnel, since first being
+        created, has spent in the established state (which may be punctuated by
+        intervals outside the established state)."
+    ::= { juniL2tpTunnelStatusEntry 27 }
+
+juniL2tpTunnelStatusEffectiveFailoverResync OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mechanism employed following failover to resynchronize with the
+        L2TP peer."
+    ::= { juniL2tpTunnelStatusEntry 28 }
+
+
+--
+-- Tunnel-level Statistics
+--
+juniL2tpTunnelStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpTunnelStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP tunnel statistics table.  Describes the control and payload
+        statistics for each L2TP tunnel.  Each entry in this table has a
+        corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpTunnelConfigTable."
+    ::= { juniL2tpTunnelStatistics 1 }
+
+juniL2tpTunnelStatEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the L2TP control and payload statistics for an L2TP tunnel."
+    INDEX     { juniL2tpTunnelStatIfIndex }
+    ::= { juniL2tpTunnelStatTable 1 }
+
+JuniL2tpTunnelStatEntry ::= SEQUENCE {
+    juniL2tpTunnelStatIfIndex                InterfaceIndex,
+    juniL2tpTunnelStatCtlRecvOctets          Counter32,
+    juniL2tpTunnelStatCtlRecvPackets         Counter32,
+    juniL2tpTunnelStatCtlRecvErrors          Counter32,
+    juniL2tpTunnelStatCtlRecvDiscards        Counter32,
+    juniL2tpTunnelStatCtlSendOctets          Counter32,
+    juniL2tpTunnelStatCtlSendPackets         Counter32,
+    juniL2tpTunnelStatCtlSendErrors          Counter32,
+    juniL2tpTunnelStatCtlSendDiscards        Counter32,
+    juniL2tpTunnelStatPayRecvOctets          Counter32,
+    juniL2tpTunnelStatPayRecvPackets         Counter32,
+    juniL2tpTunnelStatPayRecvErrors          Counter32,
+    juniL2tpTunnelStatPayRecvDiscards        Counter32,
+    juniL2tpTunnelStatPaySendOctets          Counter32,
+    juniL2tpTunnelStatPaySendPackets         Counter32,
+    juniL2tpTunnelStatPaySendErrors          Counter32,
+    juniL2tpTunnelStatPaySendDiscards        Counter32,
+    juniL2tpTunnelStatCtlRecvZLB             Counter32,
+    juniL2tpTunnelStatCtlRecvOutOfSequence   Counter32,
+    juniL2tpTunnelStatCtlRecvOutOfWindow     Counter32,
+    juniL2tpTunnelStatCtlSendZLB             Counter32,
+    juniL2tpTunnelStatCtlSendRetransmits     Counter32 }
+
+juniL2tpTunnelStatIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpTunnelStatEntry 1 }
+
+juniL2tpTunnelStatCtlRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control octets received."
+    ::= { juniL2tpTunnelStatEntry 2 }
+
+juniL2tpTunnelStatCtlRecvPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets received."
+    ::= { juniL2tpTunnelStatEntry 3 }
+
+juniL2tpTunnelStatCtlRecvErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets incurring reception errors."
+    ::= { juniL2tpTunnelStatEntry 4 }
+
+juniL2tpTunnelStatCtlRecvDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets discarded after reception."
+    ::= { juniL2tpTunnelStatEntry 5 }
+
+juniL2tpTunnelStatCtlSendOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control octets sent."
+    ::= { juniL2tpTunnelStatEntry 6 }
+
+juniL2tpTunnelStatCtlSendPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets sent."
+    ::= { juniL2tpTunnelStatEntry 7 }
+
+juniL2tpTunnelStatCtlSendErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets incurring transmission errors."
+    ::= { juniL2tpTunnelStatEntry 8 }
+
+juniL2tpTunnelStatCtlSendDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets discarded before transmission."
+    ::= { juniL2tpTunnelStatEntry 9 }
+
+juniL2tpTunnelStatPayRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets received."
+    ::= { juniL2tpTunnelStatEntry 10 }
+
+juniL2tpTunnelStatPayRecvPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets received."
+    ::= { juniL2tpTunnelStatEntry 11 }
+
+juniL2tpTunnelStatPayRecvErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring reception errors."
+    ::= { juniL2tpTunnelStatEntry 12 }
+
+juniL2tpTunnelStatPayRecvDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded after reception."
+    ::= { juniL2tpTunnelStatEntry 13 }
+
+juniL2tpTunnelStatPaySendOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets sent."
+    ::= { juniL2tpTunnelStatEntry 14 }
+
+juniL2tpTunnelStatPaySendPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets sent."
+    ::= { juniL2tpTunnelStatEntry 15 }
+
+juniL2tpTunnelStatPaySendErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring transmission errors."
+    ::= { juniL2tpTunnelStatEntry 16 }
+
+juniL2tpTunnelStatPaySendDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded before transmission."
+    ::= { juniL2tpTunnelStatEntry 17 }
+
+
+--
+-- additional granularity
+--
+juniL2tpTunnelStatCtlRecvZLB  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Zero Length Body control packet acknowledgement packets that
+        were received."
+    ::= { juniL2tpTunnelStatEntry 18 }
+
+juniL2tpTunnelStatCtlRecvOutOfSequence  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets not received in the
+        correct sequence number order."
+    ::= { juniL2tpTunnelStatEntry 19 }
+
+juniL2tpTunnelStatCtlRecvOutOfWindow  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packets received outside the offered receive window."
+    ::= { juniL2tpTunnelStatEntry 20 }
+
+juniL2tpTunnelStatCtlSendZLB  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Zero Length Body control packets sent."
+    ::= { juniL2tpTunnelStatEntry 21 }
+
+juniL2tpTunnelStatCtlSendRetransmits  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of control packet send retransmissions."
+    ::= { juniL2tpTunnelStatEntry 22 }
+
+
+--
+-- Tunnel Mappings
+--
+-- TunnelIf/SessionId -> SessionIf Mapping
+--
+juniL2tpMapTifSidToSifTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpMapTifSidToSifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of TunnelIf/SessionId -> SessionIf mappings."
+    ::= { juniL2tpTunnelMap 1 }
+
+juniL2tpMapTifSidToSifEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpMapTifSidToSifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of TunnelIf/SessionId to SessionIf."
+    INDEX     { juniL2tpMapTifSidToSifTunnelIfIndex,
+                juniL2tpMapTifSidToSifLocalSessionId }
+    ::= { juniL2tpMapTifSidToSifTable 1 }
+
+JuniL2tpMapTifSidToSifEntry ::= SEQUENCE {
+    juniL2tpMapTifSidToSifTunnelIfIndex     InterfaceIndex,
+    juniL2tpMapTifSidToSifLocalSessionId    JuniL2tpSessionId,
+    juniL2tpMapTifSidToSifSessionIfIndex    InterfaceIndex }
+
+juniL2tpMapTifSidToSifTunnelIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a tunnel interface."
+    ::= { juniL2tpMapTifSidToSifEntry 1 }
+
+juniL2tpMapTifSidToSifLocalSessionId  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A local session ID on the associated tunnel interface."
+    ::= { juniL2tpMapTifSidToSifEntry 2 }
+
+juniL2tpMapTifSidToSifSessionIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the session interface identified by this entry's Tunnel
+        ifIndex and local Session ID pair."
+    ::= { juniL2tpMapTifSidToSifEntry 3 }
+
+
+--
+-- Tunnel ID -> Tunnel If
+--
+juniL2tpMapTidToTifTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpMapTidToTifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Map L2TP tunnel IDs to tunnel interfaces."
+    ::= { juniL2tpTunnelMap 2 }
+
+juniL2tpMapTidToTifEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpMapTidToTifEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of L2TP tunnel ID to tunnel interface."
+    INDEX     { juniL2tpMapTidToTifLocalTunnelId }
+    ::= { juniL2tpMapTidToTifTable 1 }
+
+JuniL2tpMapTidToTifEntry ::= SEQUENCE {
+    juniL2tpMapTidToTifLocalTunnelId    JuniL2tpTunnelId,
+    juniL2tpMapTidToTifIfIndex          InterfaceIndex }
+
+juniL2tpMapTidToTifLocalTunnelId  OBJECT-TYPE
+    SYNTAX      JuniL2tpTunnelId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A local tunnel identifier."
+    ::= { juniL2tpMapTidToTifEntry 1 }
+
+juniL2tpMapTidToTifIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the tunnel interface having the associated tunnel
+        identifier."
+    ::= { juniL2tpMapTidToTifEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- L2TP Session Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpSessionConfig     OBJECT IDENTIFIER   ::= { juniL2tpSession 1 }
+juniL2tpSessionStatus     OBJECT IDENTIFIER   ::= { juniL2tpSession 2 }
+juniL2tpSessionStatistics OBJECT IDENTIFIER   ::= { juniL2tpSession 3 }
+
+--
+-- Session-level Configuration
+--
+-- { juniL2tpSessionConfig 1 } reserved for "next ifIndex" acquisition
+--
+juniL2tpSessionConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpSessionConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP session configuration table.  Each entry in this table has a
+        corresponding entry in the Interfaces MIB ifTable, and in
+        juniL2tpSessionStatsTable."
+    ::= { juniL2tpSessionConfig 2 }
+
+juniL2tpSessionConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the configuration attributes of an L2TP session."
+    INDEX     { juniL2tpSessionConfigIfIndex }
+    ::= { juniL2tpSessionConfigTable 1 }
+
+JuniL2tpSessionConfigEntry ::= SEQUENCE {
+    juniL2tpSessionConfigIfIndex     InterfaceIndex,
+    juniL2tpSessionConfigRowStatus   RowStatus,
+    juniL2tpSessionConfigAdminState  JuniL2tpAdminState }
+
+juniL2tpSessionConfigIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpSessionConfigEntry 1 }
+
+juniL2tpSessionConfigRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An implementation may choose not to support administrative
+        configuration of tunnels."
+    ::= { juniL2tpSessionConfigEntry 2 }
+
+juniL2tpSessionConfigAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured administrative state."
+    DEFVAL    { enabled }
+    ::= { juniL2tpSessionConfigEntry 3 }
+
+
+--
+-- L2TP Session-level Status and Statistics
+--
+juniL2tpSessionStatusTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpSessionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP session status and statistics table."
+    ::= { juniL2tpSessionStatus 1 }
+
+juniL2tpSessionStatusEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An L2TP session interface status and statistics entry."
+    INDEX     { juniL2tpSessionStatusIfIndex }
+    ::= { juniL2tpSessionStatusTable 1 }
+
+JuniL2tpSessionStatusEntry ::= SEQUENCE {
+    juniL2tpSessionStatusIfIndex             InterfaceIndex,
+    juniL2tpSessionStatusLacPppIfIndex       InterfaceIndexOrZero,
+    juniL2tpSessionStatusLocalSessionId      JuniL2tpSessionId,
+    juniL2tpSessionStatusRemoteSessionId     JuniL2tpSessionId,
+    juniL2tpSessionStatusUserName            DisplayString,
+    juniL2tpSessionStatusEffectiveAdminState JuniL2tpAdminState,
+    juniL2tpSessionStatusState               INTEGER,
+    juniL2tpSessionStatusCallType            INTEGER,
+    juniL2tpSessionStatusCallSerialNumber    Integer32,
+    juniL2tpSessionStatusTxConnectSpeed      Integer32,
+    juniL2tpSessionStatusRxConnectSpeed      Integer32,
+    juniL2tpSessionStatusCallBearerType      INTEGER,
+    juniL2tpSessionStatusFramingType         INTEGER,
+    juniL2tpSessionStatusPhysChanId          Integer32,
+    juniL2tpSessionStatusDnis                DisplayString,
+    juniL2tpSessionStatusClid                DisplayString,
+    juniL2tpSessionStatusSubAddress          DisplayString,
+    juniL2tpSessionStatusPrivateGroupId      DisplayString,
+    juniL2tpSessionStatusProxyLcp            TruthValue,
+    juniL2tpSessionStatusAuthMethod          INTEGER,
+    juniL2tpSessionStatusSequencingState     INTEGER,
+    juniL2tpSessionStatusSendSeq             Integer32,
+    juniL2tpSessionStatusRecvSeq             Integer32,
+    juniL2tpSessionStatusLacTunneledIfIndex  InterfaceIndexOrZero,
+    juniL2tpSessionStatusCumEstabTime        Unsigned32 }
+
+juniL2tpSessionStatusIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an L2TP session interface."
+    ::= { juniL2tpSessionStatusEntry 1 }
+
+juniL2tpSessionStatusLacPppIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "For pass-through PPP sessions (conventional LAC), the ifIndex of an
+        associated local PPP interface through which the remote LAC client was
+        connected.  If unknown, this object contains a value of zero.
+
+        For locally originated PPP sessions (LNS-like), this object has a value
+        of zero.
+
+        This object is deprecated in favor of
+        juniL2tpSessionStatusLacTunneledIfIndex."
+    ::= { juniL2tpSessionStatusEntry 2 }
+
+juniL2tpSessionStatusLocalSessionId  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local session ID for the session."
+    ::= { juniL2tpSessionStatusEntry 3 }
+
+juniL2tpSessionStatusRemoteSessionId  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionId
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote session ID for the session."
+    ::= { juniL2tpSessionStatusEntry 4 }
+
+juniL2tpSessionStatusUserName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer session name on this interface, typically the login name of
+        the remote user.  If the user name is unknown this object will contain a
+        zero-length string."
+    ::= { juniL2tpSessionStatusEntry 5 }
+
+juniL2tpSessionStatusEffectiveAdminState  OBJECT-TYPE
+    SYNTAX      JuniL2tpAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative state currently in effect.  This could be the
+        configured admin state for this session, or an overriding admin state
+        exerted from a higher hierarchical level (system, destination, tunnel)."
+    ::= { juniL2tpSessionStatusEntry 6 }
+
+juniL2tpSessionStatusState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    idle(0),
+                    connecting(1),
+                    established(2),
+                    disconnecting(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the session."
+    ::= { juniL2tpSessionStatusEntry 7 }
+
+juniL2tpSessionStatusCallType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    lacIncoming(1),
+                    lnsIncoming(2),
+                    lacOutgoing(3),
+                    lnsOutgoing(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of call and role this tunnel peer is providing for this
+        session.  For example, lacIncoming(1) indicates this tunnel peer is
+        acting as a LAC and generated a Incoming-Call-Request to the tunnel peer
+        (the LNS).  Note that tunnel peers can be both LAC and LNS
+        simultaneously."
+    ::= { juniL2tpSessionStatusEntry 8 }
+
+juniL2tpSessionStatusCallSerialNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number assigned to this  session."
+    ::= { juniL2tpSessionStatusEntry 9 }
+
+juniL2tpSessionStatusTxConnectSpeed  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last known transmit baud rate for this session."
+    ::= { juniL2tpSessionStatusEntry 10 }
+
+juniL2tpSessionStatusRxConnectSpeed  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last known receive baud rate for this session."
+    ::= { juniL2tpSessionStatusEntry 11 }
+
+juniL2tpSessionStatusCallBearerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    digital(1),
+                    analog(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bearer type of this session."
+    ::= { juniL2tpSessionStatusEntry 12 }
+
+juniL2tpSessionStatusFramingType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    sync(1),
+                    async(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The framing type of this session."
+    ::= { juniL2tpSessionStatusEntry 13 }
+
+juniL2tpSessionStatusPhysChanId  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical channel identifier for the session.
+
+        For pass-through PPP sessions, typically the ifIndex of the access
+        interface lying below the PPP interface identified by
+        juniL2tpSessionStatusLacTunneledIfIndex."
+    ::= { juniL2tpSessionStatusEntry 14 }
+
+juniL2tpSessionStatusDnis  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Dialed Number Information String that the LAC obtained from the
+        network for the session.  If no DNIS was provided, a zero-length string
+        will be returned."
+    ::= { juniL2tpSessionStatusEntry 15 }
+
+juniL2tpSessionStatusClid  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Calling Line ID that the LAC obtained from the network for the
+        session.  If no CLID was provided, a zero-length string will be
+        returned."
+    ::= { juniL2tpSessionStatusEntry 16 }
+
+juniL2tpSessionStatusSubAddress  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SubAddress that the LAC obtained from the network for the session.
+        If no SubAddress was provided, a zero-length string will be returned."
+    ::= { juniL2tpSessionStatusEntry 17 }
+
+juniL2tpSessionStatusPrivateGroupId  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Private Group Identifier used for this tunneled session.  If no
+        Private Group Identifier was provided, a zero-length string will be
+        returned."
+    ::= { juniL2tpSessionStatusEntry 18 }
+
+juniL2tpSessionStatusProxyLcp  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether proxy LCP was provided for this session."
+    ::= { juniL2tpSessionStatusEntry 19 }
+
+juniL2tpSessionStatusAuthMethod  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    pppChap(1),
+                    pppPap(2),
+                    pppMsChap(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The proxy authentication method employed by the LAC for the session.
+        If juniL2tpSessionProxyLcp is false(2) this object reports a value of
+        'none' and should be ignored."
+    ::= { juniL2tpSessionStatusEntry 20 }
+
+juniL2tpSessionStatusSequencingState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    remote(1),
+                    local(2),
+                    both(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates which tunnel peers have requested payload sequencing."
+    ::= { juniL2tpSessionStatusEntry 21 }
+
+juniL2tpSessionStatusSendSeq  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next send sequence number."
+    ::= { juniL2tpSessionStatusEntry 22 }
+
+juniL2tpSessionStatusRecvSeq  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next receive sequence number expected."
+    ::= { juniL2tpSessionStatusEntry 23 }
+
+juniL2tpSessionStatusLacTunneledIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For pass-through remote client sessions (conventional LAC), the ifIndex
+        of an associated local interface through which the remote LAC client was
+        connected.  If unknown, this object contains a value of zero.
+
+        For locally originated sessions (LNS-like), this object has a value of
+        zero."
+    ::= { juniL2tpSessionStatusEntry 24 }
+
+juniL2tpSessionStatusCumEstabTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The cumulative time in seconds that this session, since first being
+        created, has spent in the established state (which may be punctuated by
+        intervals outside the established state)."
+    ::= { juniL2tpSessionStatusEntry 25 }
+
+
+--
+-- L2TP Session-level Statistics
+--
+juniL2tpSessionStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpSessionStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP session statistics table."
+    ::= { juniL2tpSessionStatistics 1 }
+
+juniL2tpSessionStatEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpSessionStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An L2TP session interface statistics entry."
+    INDEX     { juniL2tpSessionStatIfIndex }
+    ::= { juniL2tpSessionStatTable 1 }
+
+JuniL2tpSessionStatEntry ::= SEQUENCE {
+    juniL2tpSessionStatIfIndex               InterfaceIndex,
+    juniL2tpSessionStatPayRecvOctets         Counter32,
+    juniL2tpSessionStatPayRecvPackets        Counter32,
+    juniL2tpSessionStatPayRecvErrors         Counter32,
+    juniL2tpSessionStatPayRecvDiscards       Counter32,
+    juniL2tpSessionStatPaySendOctets         Counter32,
+    juniL2tpSessionStatPaySendPackets        Counter32,
+    juniL2tpSessionStatPaySendErrors         Counter32,
+    juniL2tpSessionStatPaySendDiscards       Counter32,
+    juniL2tpSessionStatRecvOutOfSequence     Counter32,
+    juniL2tpSessionStatResequencingTimeouts  Counter32,
+    juniL2tpSessionStatPayLostPackets        Unsigned32 }
+
+juniL2tpSessionStatIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an L2TP session interface."
+    ::= { juniL2tpSessionStatEntry 1 }
+
+juniL2tpSessionStatPayRecvOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets received."
+    ::= { juniL2tpSessionStatEntry 2 }
+
+juniL2tpSessionStatPayRecvPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets received."
+    ::= { juniL2tpSessionStatEntry 3 }
+
+juniL2tpSessionStatPayRecvErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring reception errors."
+    ::= { juniL2tpSessionStatEntry 4 }
+
+juniL2tpSessionStatPayRecvDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded after reception."
+    ::= { juniL2tpSessionStatEntry 5 }
+
+juniL2tpSessionStatPaySendOctets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload octets sent."
+    ::= { juniL2tpSessionStatEntry 6 }
+
+juniL2tpSessionStatPaySendPackets  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets sent."
+    ::= { juniL2tpSessionStatEntry 7 }
+
+juniL2tpSessionStatPaySendErrors  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets incurring transmission errors."
+    ::= { juniL2tpSessionStatEntry 8 }
+
+juniL2tpSessionStatPaySendDiscards  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of payload packets discarded before transmission."
+    ::= { juniL2tpSessionStatEntry 9 }
+
+--
+-- other
+--
+juniL2tpSessionStatRecvOutOfSequence  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received out of sequence."
+    ::= { juniL2tpSessionStatEntry 10 }
+
+juniL2tpSessionStatResequencingTimeouts  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of reassembly timeouts that have occurred."
+    ::= { juniL2tpSessionStatEntry 11 }
+
+juniL2tpSessionStatPayLostPackets  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When sequence numbers are enabled, this value represents the estimated
+        number of payload packets lost, based on observed gaps in sequence
+        numbers.  This estimate is subject to correction (decrement) upon
+        receipt of out-of-sequence packets that fill previously observed gaps."
+    ::= { juniL2tpSessionStatEntry 12 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- L2TP Transport Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- UDP/IP Transport
+--
+juniL2tpTransportUdpIp      OBJECT IDENTIFIER   ::= { juniL2tpTransport 1 }
+juniL2tpUdpIpSystem         OBJECT IDENTIFIER   ::= { juniL2tpTransportUdpIp 1 }
+juniL2tpUdpIpDestination    OBJECT IDENTIFIER   ::= { juniL2tpTransportUdpIp 2 }
+juniL2tpUdpIpTunnel         OBJECT IDENTIFIER   ::= { juniL2tpTransportUdpIp 3 }
+juniL2tpUdpIpSession        OBJECT IDENTIFIER   ::= { juniL2tpTransportUdpIp 4 }
+
+--
+-- UDP/IP Destination
+--
+juniL2tpUdpIpDestTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpUdpIpDestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP UDP/IP destination table.  Reports the UDP/IP characteristics
+        of a L2TP UDP/IP destination.
+
+        A L2TP UDP/IP destination is associated with a local router, a local IP
+        address, and with a remote IP address for the L2TP peer.  More specific
+        UDP/IP detail per tunnel is reported in the juniL2tpUdpIpTunnelTable."
+    ::= { juniL2tpUdpIpDestination 1 }
+
+juniL2tpUdpIpDestEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpUdpIpDestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes the UDP/IP attributes of an L2TP destination."
+    INDEX     { juniL2tpUdpIpDestIfIndex }
+    ::= { juniL2tpUdpIpDestTable 1 }
+
+JuniL2tpUdpIpDestEntry ::= SEQUENCE {
+    juniL2tpUdpIpDestIfIndex         InterfaceIndex,
+    juniL2tpUdpIpDestRouterIndex     Unsigned32,
+    juniL2tpUdpIpDestLocalAddress    IpAddress,
+    juniL2tpUdpIpDestRemoteAddress   IpAddress }
+
+juniL2tpUdpIpDestIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same value as ifIndex for the corresponding entry in Interfaces MIB
+        ifTable."
+    ::= { juniL2tpUdpIpDestEntry 1 }
+
+juniL2tpUdpIpDestRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of an entry in the juniRouterTable for the local router with
+        which this L2TP destination interface is associated."
+    ::= { juniL2tpUdpIpDestEntry 2 }
+
+juniL2tpUdpIpDestLocalAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This L2TP destination's local IP address."
+    ::= { juniL2tpUdpIpDestEntry 3 }
+
+juniL2tpUdpIpDestRemoteAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the remote L2TP endpoint."
+    ::= { juniL2tpUdpIpDestEntry 4 }
+
+
+--
+-- UDP/IP Tunnel
+--
+juniL2tpUdpIpTunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniL2tpUdpIpTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The L2TP UDP/IP tunnel table.  Reports the UDP/IP characteristics of
+        L2TP UDP/IP tunnels.
+
+        A L2TP UDP/IP tunnel is defined in terms of the local and remote IP
+        addresses and UDP ports."
+    ::= { juniL2tpUdpIpTunnel 1 }
+
+juniL2tpUdpIpTunnelEntry  OBJECT-TYPE
+    SYNTAX      JuniL2tpUdpIpTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An L2TP UDP/IP tunnel entry."
+    INDEX     { juniL2tpUdpIpTunnelIfIndex }
+    ::= { juniL2tpUdpIpTunnelTable 1 }
+
+JuniL2tpUdpIpTunnelEntry ::= SEQUENCE {
+    juniL2tpUdpIpTunnelIfIndex       InterfaceIndex,
+    juniL2tpUdpIpTunnelRouterIndex   Unsigned32,
+    juniL2tpUdpIpTunnelLocalAddress  IpAddress,
+    juniL2tpUdpIpTunnelLocalPort     Integer32,
+    juniL2tpUdpIpTunnelRemoteAddress IpAddress,
+    juniL2tpUdpIpTunnelRemotePort    Integer32,
+    juniL2tpUdpIpTunnelRemoteReceiveAddress IpAddress,
+    juniL2tpUdpIpTunnelRemoteReceivePort    Integer32 }
+
+juniL2tpUdpIpTunnelIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Same as the value of ifIndex for the corresponding entry in Interfaces
+        MIB ifTable."
+    ::= { juniL2tpUdpIpTunnelEntry 1 }
+
+juniL2tpUdpIpTunnelRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of an entry in the juniRouterTable for the local router with
+        which this L2TP tunnel interface is associated."
+    ::= { juniL2tpUdpIpTunnelEntry 2 }
+
+juniL2tpUdpIpTunnelLocalAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local IP address for this UDP/IP tunnel."
+    ::= { juniL2tpUdpIpTunnelEntry 3 }
+
+juniL2tpUdpIpTunnelLocalPort  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local UDP port for this UDP/IP tunnel."
+    ::= { juniL2tpUdpIpTunnelEntry 4 }
+
+juniL2tpUdpIpTunnelRemoteAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote IP address for this UDP/IP tunnel."
+    ::= { juniL2tpUdpIpTunnelEntry 5 }
+
+juniL2tpUdpIpTunnelRemotePort  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote UDP port for this UDP/IP tunnel."
+    ::= { juniL2tpUdpIpTunnelEntry 6 }
+
+juniL2tpUdpIpTunnelRemoteReceiveAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote receive IP address for this UDP/IP tunnel. This object will
+         differ from juniL2tpUdpIpTunnelRemoteAddress when the tunnel uses
+         separate transmit and receive addresses to the remote peer."
+    ::= { juniL2tpUdpIpTunnelEntry 7 }
+
+juniL2tpUdpIpTunnelRemoteReceivePort  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote receive UDP port for this UDP/IP tunnel. This object will
+         differ from juniL2tpUdpIpTunnelRemotePort when the tunnel uses
+         separate transmit and receive ports to the remote peer."
+    ::= { juniL2tpUdpIpTunnelEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniL2tpGroups      OBJECT IDENTIFIER ::= { juniL2tpConformance 1 }
+juniL2tpCompliances OBJECT IDENTIFIER ::= { juniL2tpConformance 2 }
+
+--
+-- compliance statements
+--
+juniL2tpCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when
+        juniL2tpTunnelStatusCumEstabTime, juniL2tpSessionStatusCumEstabTime and
+        juniL2tpSessionStatPayLostPackets were added, and
+        juniL2tpSessionStatusLacTunneledIfIndex replaced
+        juniL2tpSessionStatusLacPppIfIndex."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup,
+            juniL2tpStatusGroup,
+            juniL2tpStatGroup,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 1 }                                  -- JUNOSe 2.0
+
+juniL2tpCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when a new object was added to
+        the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 2 }                                  -- JUNOSe 3.0
+
+juniL2tpCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup2,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 3 }                                  -- JUNOSe 3.2
+
+juniL2tpCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup3,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 4 }                                  -- JUNOSe 3.3
+
+juniL2tpCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup4,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 5 }                                  -- JUNOSe 3.4
+
+juniL2tpCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup5,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 6 }                                  -- JUNOSe 4.1
+
+juniL2tpCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup6,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 7 }                                  -- JUNOSe 5.0
+
+juniL2tpCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup7,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 8 }                                  -- JUNOSe 5.1
+
+juniL2tpCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup8,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 9 }                                  -- JUNOSe 5.3
+
+juniL2tpCompliance10  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the configuration group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup9,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 10 }                                  -- JUNOSe 6.0
+
+juniL2tpCompliance11  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the status group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup10,
+            juniL2tpStatusGroup2,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 11 }                                  -- JUNOSe 7.0
+
+juniL2tpCompliance12  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the config and status groups."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup11,
+            juniL2tpStatusGroup3,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 12 }                                  -- JUNOSe 7.1
+
+juniL2tpCompliance13  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Obsolete compliance statement for SNMPv2 entities which implement the
+        L2TP MIB.  This statement became obsolete when new objects were added
+        to the config and status group."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup12,
+            juniL2tpStatusGroup4,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 13 }                                  -- JUNOSe 7.2
+
+juniL2tpCompliance14  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which implement the L2TP
+        MIB."
+    MODULE   -- this module
+        -- unconditionally mandatory groups
+        MANDATORY-GROUPS {
+            juniL2tpConfigGroup13,
+            juniL2tpStatusGroup5,
+            juniL2tpStatGroup2,
+            juniL2tpMapGroup }
+        -- conditionally mandatory group
+        GROUP       juniL2tpUdpIpGroup1
+            DESCRIPTION
+                "The juniL2tpUdpIp group is mandatory only when L2TP is running
+                over UDP/IP."
+    ::= { juniL2tpCompliances 14 }                                  -- JUNOSe 7.3
+
+
+--
+-- units of conformance
+--
+juniL2tpConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when juniL2tpSysConfigReceiveDataSequencingIgnore was added."
+    ::= { juniL2tpGroups 1 }                                       -- JUNOSe 2.0
+
+juniL2tpStatusGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysStatusProtocolVersion,
+        juniL2tpSysStatusVendorName,
+        juniL2tpSysStatusFirmwareRev,
+        juniL2tpSysStatusTotalDestinations,
+        juniL2tpSysStatusFailedDestinations,
+        juniL2tpSysStatusActiveDestinations,
+        juniL2tpSysStatusTotalTunnels,
+        juniL2tpSysStatusFailedTunnels,
+        juniL2tpSysStatusFailedTunnelAuthens,
+        juniL2tpSysStatusActiveTunnels,
+        juniL2tpSysStatusTotalSessions,
+        juniL2tpSysStatusFailedSessions,
+        juniL2tpSysStatusActiveSessions,
+
+        juniL2tpDestStatusEffectiveAdminState,
+        juniL2tpDestStatusTotalTunnels,
+        juniL2tpDestStatusFailedTunnels,
+        juniL2tpDestStatusFailedTunnelAuthens,
+        juniL2tpDestStatusActiveTunnels,
+        juniL2tpDestStatusTotalSessions,
+        juniL2tpDestStatusFailedSessions,
+        juniL2tpDestStatusActiveSessions,
+
+        juniL2tpTunnelStatusEffectiveAdminState,
+        juniL2tpTunnelStatusLocalTunnelId,
+        juniL2tpTunnelStatusRemoteTunnelId,
+        juniL2tpTunnelStatusState,
+        juniL2tpTunnelStatusInitiated,
+        juniL2tpTunnelStatusRemoteHostName,
+        juniL2tpTunnelStatusRemoteVendorName,
+        juniL2tpTunnelStatusRemoteFirmwareRevision,
+        juniL2tpTunnelStatusRemoteProtocolVersion,
+        juniL2tpTunnelStatusRemoteBearerCapabilities,
+        juniL2tpTunnelStatusRemoteFramingCapabilities,
+        juniL2tpTunnelStatusRecvWindowSize,
+        juniL2tpTunnelStatusSendWindowSize,
+        juniL2tpTunnelStatusSendQueueDepth,
+        juniL2tpTunnelStatusRecvSeq,
+        juniL2tpTunnelStatusRecvSeqAck,
+        juniL2tpTunnelStatusSendSeq,
+        juniL2tpTunnelStatusSendSeqAck,
+        juniL2tpTunnelStatusTotalSessions,
+        juniL2tpTunnelStatusFailedSessions,
+        juniL2tpTunnelStatusActiveSessions,
+        juniL2tpTunnelStatusLastResultCode,
+        juniL2tpTunnelStatusLastErrorCode,
+        juniL2tpTunnelStatusLastErrorMessage,
+
+        juniL2tpSessionStatusLacPppIfIndex,
+        juniL2tpSessionStatusLocalSessionId,
+        juniL2tpSessionStatusRemoteSessionId,
+        juniL2tpSessionStatusUserName,
+        juniL2tpSessionStatusState,
+        juniL2tpSessionStatusCallType,
+        juniL2tpSessionStatusCallSerialNumber,
+        juniL2tpSessionStatusTxConnectSpeed,
+        juniL2tpSessionStatusRxConnectSpeed,
+        juniL2tpSessionStatusCallBearerType,
+        juniL2tpSessionStatusFramingType,
+        juniL2tpSessionStatusPhysChanId,
+        juniL2tpSessionStatusDnis,
+        juniL2tpSessionStatusClid,
+        juniL2tpSessionStatusSubAddress,
+        juniL2tpSessionStatusPrivateGroupId,
+        juniL2tpSessionStatusProxyLcp,
+        juniL2tpSessionStatusAuthMethod,
+        juniL2tpSessionStatusSequencingState,
+        juniL2tpSessionStatusSendSeq,
+        juniL2tpSessionStatusRecvSeq }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing status of the L2TP protocol at
+        the system, destination, tunnel, and session levels.  This group became
+        obsolete when new objects were added."
+    ::= { juniL2tpGroups 2 }                                       -- JUNOSe 2.0
+
+juniL2tpStatGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDestStatCtlRecvOctets,
+        juniL2tpDestStatCtlRecvPackets,
+        juniL2tpDestStatCtlRecvErrors,
+        juniL2tpDestStatCtlRecvDiscards,
+        juniL2tpDestStatCtlSendOctets,
+        juniL2tpDestStatCtlSendPackets,
+        juniL2tpDestStatCtlSendErrors,
+        juniL2tpDestStatCtlSendDiscards,
+        juniL2tpDestStatPayRecvOctets,
+        juniL2tpDestStatPayRecvPackets,
+        juniL2tpDestStatPayRecvErrors,
+        juniL2tpDestStatPayRecvDiscards,
+        juniL2tpDestStatPaySendOctets,
+        juniL2tpDestStatPaySendPackets,
+        juniL2tpDestStatPaySendErrors,
+        juniL2tpDestStatPaySendDiscards,
+
+        juniL2tpTunnelStatCtlRecvOctets,
+        juniL2tpTunnelStatCtlRecvPackets,
+        juniL2tpTunnelStatCtlRecvErrors,
+        juniL2tpTunnelStatCtlRecvDiscards,
+        juniL2tpTunnelStatCtlSendOctets,
+        juniL2tpTunnelStatCtlSendPackets,
+        juniL2tpTunnelStatCtlSendErrors,
+        juniL2tpTunnelStatCtlSendDiscards,
+        juniL2tpTunnelStatPayRecvOctets,
+        juniL2tpTunnelStatPayRecvPackets,
+        juniL2tpTunnelStatPayRecvErrors,
+        juniL2tpTunnelStatPayRecvDiscards,
+        juniL2tpTunnelStatPaySendOctets,
+        juniL2tpTunnelStatPaySendPackets,
+        juniL2tpTunnelStatPaySendErrors,
+        juniL2tpTunnelStatPaySendDiscards,
+        juniL2tpTunnelStatCtlRecvZLB,
+        juniL2tpTunnelStatCtlRecvOutOfSequence,
+        juniL2tpTunnelStatCtlRecvOutOfWindow,
+        juniL2tpTunnelStatCtlSendZLB,
+        juniL2tpTunnelStatCtlSendRetransmits,
+
+        juniL2tpSessionStatPayRecvOctets,
+        juniL2tpSessionStatPayRecvPackets,
+        juniL2tpSessionStatPayRecvErrors,
+        juniL2tpSessionStatPayRecvDiscards,
+        juniL2tpSessionStatPaySendOctets,
+        juniL2tpSessionStatPaySendPackets,
+        juniL2tpSessionStatPaySendErrors,
+        juniL2tpSessionStatPaySendDiscards,
+        juniL2tpSessionStatRecvOutOfSequence,
+        juniL2tpSessionStatResequencingTimeouts }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing statistics of the L2TP
+        protocol at the destination, tunnel, and session levels.  This group
+        became obsolete when new objects were added."
+    ::= { juniL2tpGroups 3 }                                       -- JUNOSe 2.0
+
+juniL2tpMapGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpMapTifSidToSifSessionIfIndex,
+        juniL2tpMapTidToTifIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing mapping associations among L2TP
+        components."
+    ::= { juniL2tpGroups 4 }                                       -- JUNOSe 2.0
+
+juniL2tpUdpIpGroup  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpUdpIpDestRouterIndex,
+        juniL2tpUdpIpDestLocalAddress,
+        juniL2tpUdpIpDestRemoteAddress,
+
+        juniL2tpUdpIpTunnelRouterIndex,
+        juniL2tpUdpIpTunnelLocalAddress,
+        juniL2tpUdpIpTunnelLocalPort,
+        juniL2tpUdpIpTunnelRemoteAddress,
+        juniL2tpUdpIpTunnelRemotePort }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing UDP/IP transport information
+        for L2TP components."
+    ::= { juniL2tpGroups 5 }                                       -- JUNOSe 2.0
+
+juniL2tpStatusGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysStatusProtocolVersion,
+        juniL2tpSysStatusVendorName,
+        juniL2tpSysStatusFirmwareRev,
+        juniL2tpSysStatusTotalDestinations,
+        juniL2tpSysStatusFailedDestinations,
+        juniL2tpSysStatusActiveDestinations,
+        juniL2tpSysStatusTotalTunnels,
+        juniL2tpSysStatusFailedTunnels,
+        juniL2tpSysStatusFailedTunnelAuthens,
+        juniL2tpSysStatusActiveTunnels,
+        juniL2tpSysStatusTotalSessions,
+        juniL2tpSysStatusFailedSessions,
+        juniL2tpSysStatusActiveSessions,
+
+        juniL2tpDestStatusTransport,
+        juniL2tpDestStatusEffectiveAdminState,
+        juniL2tpDestStatusTotalTunnels,
+        juniL2tpDestStatusFailedTunnels,
+        juniL2tpDestStatusFailedTunnelAuthens,
+        juniL2tpDestStatusActiveTunnels,
+        juniL2tpDestStatusTotalSessions,
+        juniL2tpDestStatusFailedSessions,
+        juniL2tpDestStatusActiveSessions,
+
+        juniL2tpTunnelStatusTransport,
+        juniL2tpTunnelStatusLocalTunnelId,
+        juniL2tpTunnelStatusRemoteTunnelId,
+        juniL2tpTunnelStatusEffectiveAdminState,
+        juniL2tpTunnelStatusState,
+        juniL2tpTunnelStatusInitiated,
+        juniL2tpTunnelStatusRemoteHostName,
+        juniL2tpTunnelStatusRemoteVendorName,
+        juniL2tpTunnelStatusRemoteFirmwareRevision,
+        juniL2tpTunnelStatusRemoteProtocolVersion,
+        juniL2tpTunnelStatusRemoteBearerCapabilities,
+        juniL2tpTunnelStatusRemoteFramingCapabilities,
+        juniL2tpTunnelStatusRecvWindowSize,
+        juniL2tpTunnelStatusSendWindowSize,
+        juniL2tpTunnelStatusSendQueueDepth,
+        juniL2tpTunnelStatusRecvSeq,
+        juniL2tpTunnelStatusRecvSeqAck,
+        juniL2tpTunnelStatusSendSeq,
+        juniL2tpTunnelStatusSendSeqAck,
+        juniL2tpTunnelStatusTotalSessions,
+        juniL2tpTunnelStatusFailedSessions,
+        juniL2tpTunnelStatusActiveSessions,
+        juniL2tpTunnelStatusLastResultCode,
+        juniL2tpTunnelStatusLastErrorCode,
+        juniL2tpTunnelStatusLastErrorMessage,
+        juniL2tpTunnelStatusCumEstabTime,
+
+        juniL2tpSessionStatusLocalSessionId,
+        juniL2tpSessionStatusRemoteSessionId,
+        juniL2tpSessionStatusUserName,
+        juniL2tpSessionStatusEffectiveAdminState,
+        juniL2tpSessionStatusState,
+        juniL2tpSessionStatusCallType,
+        juniL2tpSessionStatusCallSerialNumber,
+        juniL2tpSessionStatusTxConnectSpeed,
+        juniL2tpSessionStatusRxConnectSpeed,
+        juniL2tpSessionStatusCallBearerType,
+        juniL2tpSessionStatusFramingType,
+        juniL2tpSessionStatusPhysChanId,
+        juniL2tpSessionStatusDnis,
+        juniL2tpSessionStatusClid,
+        juniL2tpSessionStatusSubAddress,
+        juniL2tpSessionStatusPrivateGroupId,
+        juniL2tpSessionStatusProxyLcp,
+        juniL2tpSessionStatusAuthMethod,
+        juniL2tpSessionStatusSequencingState,
+        juniL2tpSessionStatusSendSeq,
+        juniL2tpSessionStatusRecvSeq,
+        juniL2tpSessionStatusLacTunneledIfIndex,
+        juniL2tpSessionStatusCumEstabTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing status of the L2TP protocol
+        at the system, destination, tunnel, and session levels."
+    ::= { juniL2tpGroups 6 }                                       -- JUNOSe 3.0
+
+juniL2tpStatGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpDestStatCtlRecvOctets,
+        juniL2tpDestStatCtlRecvPackets,
+        juniL2tpDestStatCtlRecvErrors,
+        juniL2tpDestStatCtlRecvDiscards,
+        juniL2tpDestStatCtlSendOctets,
+        juniL2tpDestStatCtlSendPackets,
+        juniL2tpDestStatCtlSendErrors,
+        juniL2tpDestStatCtlSendDiscards,
+        juniL2tpDestStatPayRecvOctets,
+        juniL2tpDestStatPayRecvPackets,
+        juniL2tpDestStatPayRecvErrors,
+        juniL2tpDestStatPayRecvDiscards,
+        juniL2tpDestStatPaySendOctets,
+        juniL2tpDestStatPaySendPackets,
+        juniL2tpDestStatPaySendErrors,
+        juniL2tpDestStatPaySendDiscards,
+
+        juniL2tpTunnelStatCtlRecvOctets,
+        juniL2tpTunnelStatCtlRecvPackets,
+        juniL2tpTunnelStatCtlRecvErrors,
+        juniL2tpTunnelStatCtlRecvDiscards,
+        juniL2tpTunnelStatCtlSendOctets,
+        juniL2tpTunnelStatCtlSendPackets,
+        juniL2tpTunnelStatCtlSendErrors,
+        juniL2tpTunnelStatCtlSendDiscards,
+        juniL2tpTunnelStatPayRecvOctets,
+        juniL2tpTunnelStatPayRecvPackets,
+        juniL2tpTunnelStatPayRecvErrors,
+        juniL2tpTunnelStatPayRecvDiscards,
+        juniL2tpTunnelStatPaySendOctets,
+        juniL2tpTunnelStatPaySendPackets,
+        juniL2tpTunnelStatPaySendErrors,
+        juniL2tpTunnelStatPaySendDiscards,
+        juniL2tpTunnelStatCtlRecvZLB,
+        juniL2tpTunnelStatCtlRecvOutOfSequence,
+        juniL2tpTunnelStatCtlRecvOutOfWindow,
+        juniL2tpTunnelStatCtlSendZLB,
+        juniL2tpTunnelStatCtlSendRetransmits,
+
+        juniL2tpSessionStatPayRecvOctets,
+        juniL2tpSessionStatPayRecvPackets,
+        juniL2tpSessionStatPayRecvErrors,
+        juniL2tpSessionStatPayRecvDiscards,
+        juniL2tpSessionStatPaySendOctets,
+        juniL2tpSessionStatPaySendPackets,
+        juniL2tpSessionStatPaySendErrors,
+        juniL2tpSessionStatPaySendDiscards,
+        juniL2tpSessionStatRecvOutOfSequence,
+        juniL2tpSessionStatResequencingTimeouts,
+        juniL2tpSessionStatPayLostPackets }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing statistics of the L2TP protocol at
+        the destination, tunnel, and session levels."
+    ::= { juniL2tpGroups 7 }                                       -- JUNOSe 3.0
+
+juniL2tpConfigGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when new objects were added."
+    ::= { juniL2tpGroups 8 }                                       -- JUNOSe 3.2
+
+juniL2tpConfigGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigControlRetransmissions,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when juniL2tpSysConfigDisableCallingNumberAvp was added."
+    ::= { juniL2tpGroups 9 }                                       -- JUNOSe 3.3
+
+juniL2tpConfigGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigControlRetransmissions,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS          obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when new objects were added."
+    ::= { juniL2tpGroups 10 }                                      -- JUNOSe 3.4
+
+juniL2tpConfigGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigControlRetransmissions,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when new objects were added."
+    ::= { juniL2tpGroups 11 }                                      -- JUNOSe 4.1
+
+juniL2tpConfigGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions.  This group became obsolete
+        when new objects were added."
+    ::= { juniL2tpGroups 12 }                                      -- JUNOSe 5.0
+
+juniL2tpConfigGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing configuration information of the L2TP
+        protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 13 }                                      -- JUNOSe 5.1
+
+juniL2tpUdpIpGroup1  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpUdpIpDestRouterIndex,
+        juniL2tpUdpIpDestLocalAddress,
+        juniL2tpUdpIpDestRemoteAddress,
+
+        juniL2tpUdpIpTunnelRouterIndex,
+        juniL2tpUdpIpTunnelLocalAddress,
+        juniL2tpUdpIpTunnelLocalPort,
+        juniL2tpUdpIpTunnelRemoteAddress,
+        juniL2tpUdpIpTunnelRemotePort,
+        juniL2tpUdpIpTunnelRemoteReceiveAddress,
+        juniL2tpUdpIpTunnelRemoteReceivePort }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing UDP/IP transport information for L2TP
+        components."
+    ::= { juniL2tpGroups 14 }                                       -- JUNOSe 5.1
+
+
+juniL2tpConfigGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 15 }                                      -- JUNOSe 5.3
+
+juniL2tpConfigGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+        juniL2tpSysConfigReceiveWindowSize,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 16 }                                      -- JUNOSe 6.0
+
+juniL2tpConfigGroup10  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+        juniL2tpSysConfigReceiveWindowSize,
+        juniL2tpSysConfigEnableRxSpeedAvpWhenEqual,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 17 }                                      -- JUNOSe 7.0
+
+juniL2tpStatusGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysStatusProtocolVersion,
+        juniL2tpSysStatusVendorName,
+        juniL2tpSysStatusFirmwareRev,
+        juniL2tpSysStatusTotalDestinations,
+        juniL2tpSysStatusFailedDestinations,
+        juniL2tpSysStatusActiveDestinations,
+        juniL2tpSysStatusTotalTunnels,
+        juniL2tpSysStatusFailedTunnels,
+        juniL2tpSysStatusFailedTunnelAuthens,
+        juniL2tpSysStatusActiveTunnels,
+        juniL2tpSysStatusTotalSessions,
+        juniL2tpSysStatusFailedSessions,
+        juniL2tpSysStatusActiveSessions,
+        juniL2tpSysStatusTotalSwitchedSessions,
+        juniL2tpSysStatusFailedSwitchedSessions,
+        juniL2tpSysStatusActiveSwitchedSessions,
+        juniL2tpSysStatusIfCounterDiscontinuityTime,
+
+        juniL2tpDestStatusTransport,
+        juniL2tpDestStatusEffectiveAdminState,
+        juniL2tpDestStatusTotalTunnels,
+        juniL2tpDestStatusFailedTunnels,
+        juniL2tpDestStatusFailedTunnelAuthens,
+        juniL2tpDestStatusActiveTunnels,
+        juniL2tpDestStatusTotalSessions,
+        juniL2tpDestStatusFailedSessions,
+        juniL2tpDestStatusActiveSessions,
+
+        juniL2tpTunnelStatusTransport,
+        juniL2tpTunnelStatusLocalTunnelId,
+        juniL2tpTunnelStatusRemoteTunnelId,
+        juniL2tpTunnelStatusEffectiveAdminState,
+        juniL2tpTunnelStatusState,
+        juniL2tpTunnelStatusInitiated,
+        juniL2tpTunnelStatusRemoteHostName,
+        juniL2tpTunnelStatusRemoteVendorName,
+        juniL2tpTunnelStatusRemoteFirmwareRevision,
+        juniL2tpTunnelStatusRemoteProtocolVersion,
+        juniL2tpTunnelStatusRemoteBearerCapabilities,
+        juniL2tpTunnelStatusRemoteFramingCapabilities,
+        juniL2tpTunnelStatusRecvWindowSize,
+        juniL2tpTunnelStatusSendWindowSize,
+        juniL2tpTunnelStatusSendQueueDepth,
+        juniL2tpTunnelStatusRecvSeq,
+        juniL2tpTunnelStatusRecvSeqAck,
+        juniL2tpTunnelStatusSendSeq,
+        juniL2tpTunnelStatusSendSeqAck,
+        juniL2tpTunnelStatusTotalSessions,
+        juniL2tpTunnelStatusFailedSessions,
+        juniL2tpTunnelStatusActiveSessions,
+        juniL2tpTunnelStatusLastResultCode,
+        juniL2tpTunnelStatusLastErrorCode,
+        juniL2tpTunnelStatusLastErrorMessage,
+        juniL2tpTunnelStatusCumEstabTime,
+
+        juniL2tpSessionStatusLocalSessionId,
+        juniL2tpSessionStatusRemoteSessionId,
+        juniL2tpSessionStatusUserName,
+        juniL2tpSessionStatusEffectiveAdminState,
+        juniL2tpSessionStatusState,
+        juniL2tpSessionStatusCallType,
+        juniL2tpSessionStatusCallSerialNumber,
+        juniL2tpSessionStatusTxConnectSpeed,
+        juniL2tpSessionStatusRxConnectSpeed,
+        juniL2tpSessionStatusCallBearerType,
+        juniL2tpSessionStatusFramingType,
+        juniL2tpSessionStatusPhysChanId,
+        juniL2tpSessionStatusDnis,
+        juniL2tpSessionStatusClid,
+        juniL2tpSessionStatusSubAddress,
+        juniL2tpSessionStatusPrivateGroupId,
+        juniL2tpSessionStatusProxyLcp,
+        juniL2tpSessionStatusAuthMethod,
+        juniL2tpSessionStatusSequencingState,
+        juniL2tpSessionStatusSendSeq,
+        juniL2tpSessionStatusRecvSeq,
+        juniL2tpSessionStatusLacTunneledIfIndex,
+        juniL2tpSessionStatusCumEstabTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing status information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 18 }                                      -- JUNOSe 7.1
+
+juniL2tpConfigGroup11  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+        juniL2tpSysConfigReceiveWindowSize,
+        juniL2tpSysConfigEnableRxSpeedAvpWhenEqual,
+        juniL2tpSysConfigRejectTxAddressChange,
+        juniL2tpSysConfigShortDrainTimeout,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 19 }                                      -- JUNOSe 7.1
+
+juniL2tpConfigGroup12  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+        juniL2tpSysConfigReceiveWindowSize,
+        juniL2tpSysConfigEnableRxSpeedAvpWhenEqual,
+        juniL2tpSysConfigRejectTxAddressChange,
+        juniL2tpSysConfigShortDrainTimeout,
+        juniL2tpSysConfigDestinationLockoutTimeout,
+        juniL2tpSysConfigDestinationLockoutTestEnabled,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+        juniL2tpDestConfigLockoutAction,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 20 }                                      -- JUNOSe 7.2
+
+juniL2tpStatusGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysStatusProtocolVersion,
+        juniL2tpSysStatusVendorName,
+        juniL2tpSysStatusFirmwareRev,
+        juniL2tpSysStatusTotalDestinations,
+        juniL2tpSysStatusFailedDestinations,
+        juniL2tpSysStatusActiveDestinations,
+        juniL2tpSysStatusTotalTunnels,
+        juniL2tpSysStatusFailedTunnels,
+        juniL2tpSysStatusFailedTunnelAuthens,
+        juniL2tpSysStatusActiveTunnels,
+        juniL2tpSysStatusTotalSessions,
+        juniL2tpSysStatusFailedSessions,
+        juniL2tpSysStatusActiveSessions,
+        juniL2tpSysStatusTotalSwitchedSessions,
+        juniL2tpSysStatusFailedSwitchedSessions,
+        juniL2tpSysStatusActiveSwitchedSessions,
+        juniL2tpSysStatusIfCounterDiscontinuityTime,
+
+        juniL2tpDestStatusTransport,
+        juniL2tpDestStatusEffectiveAdminState,
+        juniL2tpDestStatusTotalTunnels,
+        juniL2tpDestStatusFailedTunnels,
+        juniL2tpDestStatusFailedTunnelAuthens,
+        juniL2tpDestStatusActiveTunnels,
+        juniL2tpDestStatusTotalSessions,
+        juniL2tpDestStatusFailedSessions,
+        juniL2tpDestStatusActiveSessions,
+        juniL2tpDestStatusLockoutState,
+        juniL2tpDestStatusLockoutTimeRemaining,
+
+        juniL2tpTunnelStatusTransport,
+        juniL2tpTunnelStatusLocalTunnelId,
+        juniL2tpTunnelStatusRemoteTunnelId,
+        juniL2tpTunnelStatusEffectiveAdminState,
+        juniL2tpTunnelStatusState,
+        juniL2tpTunnelStatusInitiated,
+        juniL2tpTunnelStatusRemoteHostName,
+        juniL2tpTunnelStatusRemoteVendorName,
+        juniL2tpTunnelStatusRemoteFirmwareRevision,
+        juniL2tpTunnelStatusRemoteProtocolVersion,
+        juniL2tpTunnelStatusRemoteBearerCapabilities,
+        juniL2tpTunnelStatusRemoteFramingCapabilities,
+        juniL2tpTunnelStatusRecvWindowSize,
+        juniL2tpTunnelStatusSendWindowSize,
+        juniL2tpTunnelStatusSendQueueDepth,
+        juniL2tpTunnelStatusRecvSeq,
+        juniL2tpTunnelStatusRecvSeqAck,
+        juniL2tpTunnelStatusSendSeq,
+        juniL2tpTunnelStatusSendSeqAck,
+        juniL2tpTunnelStatusTotalSessions,
+        juniL2tpTunnelStatusFailedSessions,
+        juniL2tpTunnelStatusActiveSessions,
+        juniL2tpTunnelStatusLastResultCode,
+        juniL2tpTunnelStatusLastErrorCode,
+        juniL2tpTunnelStatusLastErrorMessage,
+        juniL2tpTunnelStatusCumEstabTime,
+
+        juniL2tpSessionStatusLocalSessionId,
+        juniL2tpSessionStatusRemoteSessionId,
+        juniL2tpSessionStatusUserName,
+        juniL2tpSessionStatusEffectiveAdminState,
+        juniL2tpSessionStatusState,
+        juniL2tpSessionStatusCallType,
+        juniL2tpSessionStatusCallSerialNumber,
+        juniL2tpSessionStatusTxConnectSpeed,
+        juniL2tpSessionStatusRxConnectSpeed,
+        juniL2tpSessionStatusCallBearerType,
+        juniL2tpSessionStatusFramingType,
+        juniL2tpSessionStatusPhysChanId,
+        juniL2tpSessionStatusDnis,
+        juniL2tpSessionStatusClid,
+        juniL2tpSessionStatusSubAddress,
+        juniL2tpSessionStatusPrivateGroupId,
+        juniL2tpSessionStatusProxyLcp,
+        juniL2tpSessionStatusAuthMethod,
+        juniL2tpSessionStatusSequencingState,
+        juniL2tpSessionStatusSendSeq,
+        juniL2tpSessionStatusRecvSeq,
+        juniL2tpSessionStatusLacTunneledIfIndex,
+        juniL2tpSessionStatusCumEstabTime }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing configuration information of
+        the L2TP protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 21 }                                      -- JUNOSe 7.2
+
+juniL2tpConfigGroup13  OBJECT-GROUP
+    OBJECTS {
+
+        juniL2tpSysConfigAdminState,
+        juniL2tpSysConfigDestructTimeout,
+        juniL2tpSysConfigIpChecksumEnable,
+        juniL2tpSysConfigTunnelSwitchingEnabled,
+        juniL2tpSysConfigTunnelIdleTimeout,
+        juniL2tpSysConfigReceiveDataSequencingIgnore,
+        juniL2tpSysConfigFailoverWithinPreference,
+        juniL2tpSysConfigWeightedLoadBalancing,
+        juniL2tpSysConfigControlRetransmissionsEstablished,
+        juniL2tpSysConfigControlRetransmissionsNotEstablished,
+        juniL2tpSysConfigDisableChallenge,
+        juniL2tpSysConfigDisableCallingNumberAvp,
+        juniL2tpSysConfigIgnoreTxAddressChange,
+        juniL2tpSysConfigEnableDisconnectCauseAvp,
+        juniL2tpSysConfigReceiveWindowSize,
+        juniL2tpSysConfigEnableRxSpeedAvpWhenEqual,
+        juniL2tpSysConfigRejectTxAddressChange,
+        juniL2tpSysConfigShortDrainTimeout,
+        juniL2tpSysConfigDestinationLockoutTimeout,
+        juniL2tpSysConfigDestinationLockoutTestEnabled,
+        juniL2tpSysConfigFailoverResync,
+
+        juniL2tpDestConfigRowStatus,
+        juniL2tpDestConfigAdminState,
+        juniL2tpDestConfigLockoutAction,
+
+        juniL2tpTunnelConfigRowStatus,
+        juniL2tpTunnelConfigAdminState,
+
+        juniL2tpSessionConfigRowStatus,
+        juniL2tpSessionConfigAdminState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing configuration information of the L2TP
+        protocol, tunnels and sessions."
+    ::= { juniL2tpGroups 22 }                                      -- JUNOSe 7.3
+
+juniL2tpStatusGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniL2tpSysStatusProtocolVersion,
+        juniL2tpSysStatusVendorName,
+        juniL2tpSysStatusFirmwareRev,
+        juniL2tpSysStatusTotalDestinations,
+        juniL2tpSysStatusFailedDestinations,
+        juniL2tpSysStatusActiveDestinations,
+        juniL2tpSysStatusTotalTunnels,
+        juniL2tpSysStatusFailedTunnels,
+        juniL2tpSysStatusFailedTunnelAuthens,
+        juniL2tpSysStatusActiveTunnels,
+        juniL2tpSysStatusTotalSessions,
+        juniL2tpSysStatusFailedSessions,
+        juniL2tpSysStatusActiveSessions,
+        juniL2tpSysStatusTotalSwitchedSessions,
+        juniL2tpSysStatusFailedSwitchedSessions,
+        juniL2tpSysStatusActiveSwitchedSessions,
+        juniL2tpSysStatusIfCounterDiscontinuityTime,
+
+        juniL2tpDestStatusTransport,
+        juniL2tpDestStatusEffectiveAdminState,
+        juniL2tpDestStatusTotalTunnels,
+        juniL2tpDestStatusFailedTunnels,
+        juniL2tpDestStatusFailedTunnelAuthens,
+        juniL2tpDestStatusActiveTunnels,
+        juniL2tpDestStatusTotalSessions,
+        juniL2tpDestStatusFailedSessions,
+        juniL2tpDestStatusActiveSessions,
+        juniL2tpDestStatusLockoutState,
+        juniL2tpDestStatusLockoutTimeRemaining,
+
+        juniL2tpTunnelStatusTransport,
+        juniL2tpTunnelStatusLocalTunnelId,
+        juniL2tpTunnelStatusRemoteTunnelId,
+        juniL2tpTunnelStatusEffectiveAdminState,
+        juniL2tpTunnelStatusState,
+        juniL2tpTunnelStatusInitiated,
+        juniL2tpTunnelStatusRemoteHostName,
+        juniL2tpTunnelStatusRemoteVendorName,
+        juniL2tpTunnelStatusRemoteFirmwareRevision,
+        juniL2tpTunnelStatusRemoteProtocolVersion,
+        juniL2tpTunnelStatusRemoteBearerCapabilities,
+        juniL2tpTunnelStatusRemoteFramingCapabilities,
+        juniL2tpTunnelStatusRecvWindowSize,
+        juniL2tpTunnelStatusSendWindowSize,
+        juniL2tpTunnelStatusSendQueueDepth,
+        juniL2tpTunnelStatusRecvSeq,
+        juniL2tpTunnelStatusRecvSeqAck,
+        juniL2tpTunnelStatusSendSeq,
+        juniL2tpTunnelStatusSendSeqAck,
+        juniL2tpTunnelStatusTotalSessions,
+        juniL2tpTunnelStatusFailedSessions,
+        juniL2tpTunnelStatusActiveSessions,
+        juniL2tpTunnelStatusLastResultCode,
+        juniL2tpTunnelStatusLastErrorCode,
+        juniL2tpTunnelStatusLastErrorMessage,
+        juniL2tpTunnelStatusCumEstabTime,
+        juniL2tpTunnelStatusEffectiveFailoverResync,
+
+        juniL2tpSessionStatusLocalSessionId,
+        juniL2tpSessionStatusRemoteSessionId,
+        juniL2tpSessionStatusUserName,
+        juniL2tpSessionStatusEffectiveAdminState,
+        juniL2tpSessionStatusState,
+        juniL2tpSessionStatusCallType,
+        juniL2tpSessionStatusCallSerialNumber,
+        juniL2tpSessionStatusTxConnectSpeed,
+        juniL2tpSessionStatusRxConnectSpeed,
+        juniL2tpSessionStatusCallBearerType,
+        juniL2tpSessionStatusFramingType,
+        juniL2tpSessionStatusPhysChanId,
+        juniL2tpSessionStatusDnis,
+        juniL2tpSessionStatusClid,
+        juniL2tpSessionStatusSubAddress,
+        juniL2tpSessionStatusPrivateGroupId,
+        juniL2tpSessionStatusProxyLcp,
+        juniL2tpSessionStatusAuthMethod,
+        juniL2tpSessionStatusSequencingState,
+        juniL2tpSessionStatusSendSeq,
+        juniL2tpSessionStatusRecvSeq,
+        juniL2tpSessionStatusLacTunneledIfIndex,
+        juniL2tpSessionStatusCumEstabTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing status of the L2TP protocol at the
+        system, destination, tunnel, and session levels."
+    ::= { juniL2tpGroups 23 }                                      -- JUNOSe 7.3
+
+END

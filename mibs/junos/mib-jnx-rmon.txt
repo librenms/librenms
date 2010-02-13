@@ -1,0 +1,178 @@
+--
+-- Juniper Enterprise Specific MIB: RMON MIB Extension
+-- 
+-- Copyright (c) 2001-2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-RMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, TimeTicks, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    alarmEntry, alarmIndex, alarmVariable
+        FROM RMON-MIB
+    jnxMibs, jnxRmonTraps
+        FROM JUNIPER-SMI;
+
+jnxRmon MODULE-IDENTITY
+    LAST-UPDATED "200511230000Z" -- Wed Nov 23 00:00:00 2005 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "The MIB modules extends the Rmon as defined in RMON-MIB."
+
+    REVISION      "200511230000Z"
+    DESCRIPTION
+               "Updated jnxRmonAlarmGetFailReason enum."
+    REVISION      "200201100000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxMibs 13 }
+
+
+--
+-- This table augments the rmon alarmTable 
+--
+    jnxRmonAlarmTable   OBJECT-TYPE
+	SYNTAX          SEQUENCE OF JnxRmonAlarmEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"Extensions to the rmon Alarm Table"
+	::= { jnxRmon 1 }
+
+    jnxRmonAlarmEntry   OBJECT-TYPE
+	SYNTAX          JnxRmonAlarmEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+	DESCRIPTION
+		"Each entry containing additional management information
+		applicable to a particular rmon alarm entry."
+	AUGMENTS    { alarmEntry }
+	::= { jnxRmonAlarmTable 1 }
+
+    JnxRmonAlarmEntry ::=
+	SEQUENCE {
+	    jnxRmonAlarmGetFailCnt     Counter32,
+	    jnxRmonAlarmGetFailTime    TimeTicks,
+	    jnxRmonAlarmGetFailReason  INTEGER,
+	    jnxRmonAlarmGetOkTime      TimeTicks,
+	    jnxRmonAlarmState	       INTEGER
+	}
+
+    jnxRmonAlarmGetFailCnt OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The number of times the internal get request for the
+                variable monitored by this entry has failed."
+        ::= { jnxRmonAlarmEntry 1 }
+
+    jnxRmonAlarmGetFailTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime when an internal get request for the
+                variable monitored by this entry last failed."
+        ::= { jnxRmonAlarmEntry 2 }
+
+    jnxRmonAlarmGetFailReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other          (1),
+                        noError        (2),
+                        noSuchObject   (3),
+                        outOfView      (4),
+                        noSuchInstance (5),
+                        badReqId       (6),
+                        oidMatchErr    (7),
+                        oidBindErr     (8),
+                        createPktErr   (9),
+                        badObjType     (10),
+                        processRestarted (11),
+                        lostInstance   (12)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The reason why an internal get request for the variable 
+                monitored by this entry last failed."
+        ::= { jnxRmonAlarmEntry 3 }
+
+    jnxRmonAlarmGetOkTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The value of sysUpTime when an internal get request for the
+                variable monitored by this entry succeeded and the entry left 
+                the getFailure state."
+        ::= { jnxRmonAlarmEntry 4 }
+
+    jnxRmonAlarmState OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown          (1),
+                        underCreation    (2),
+                        active           (3),
+                        startup          (4),
+                        risingThreshold  (5),
+                        fallingThreshold (6),
+                        getFailure       (7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The current state of this rmon alarm entry.  The states
+                 and their definitions are:
+
+                    underCreation   ... entry has not been activated
+                    active          ... entry is active & within thresholds
+                    startup         ... entry still waiting for 1st value
+                    risingThreshold ... entry has crossed the rising threshold
+                    fallingThreshold... entry has crossed the falling threshold
+                    getFailure      ... internal get request failed"
+        ::= { jnxRmonAlarmEntry 5 }
+
+
+--
+-- define branches for jnx rmon traps
+--
+-- Note that we need jnxRmonTrapPrefix with the 0
+-- sub-identifier to make this MIB translate to
+-- an SNMPv1 format in a reversible way. For example
+-- it is needed for proxies that convert SNMPv1 traps
+-- to SNMPv2 notifications without MIB knowledge.
+--
+
+jnxRmonTrapPrefix   OBJECT IDENTIFIER ::= { jnxRmonTraps 0 }
+
+jnxRmonAlarmGetFailure NOTIFICATION-TYPE
+    OBJECTS  { alarmIndex, alarmVariable, jnxRmonAlarmGetFailReason }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the get request for an alarm
+        variable returns an error.  The specific error is identified by
+        jnxRmonAlarmGetFailReason."
+    ::= { jnxRmonTrapPrefix 1 }
+
+jnxRmonGetOk NOTIFICATION-TYPE
+    OBJECTS  { alarmIndex, alarmVariable }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap that is generated when the get request for an alarm
+        variable is successful.  This is only sent after previous attempts
+        were unsuccessful."
+    ::= { jnxRmonTrapPrefix 2 }
+
+
+END

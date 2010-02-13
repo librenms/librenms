@@ -1,0 +1,851 @@
+
+-- *****************************************************************************
+-- Juniper-ATM-1483-Profile-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   ATM 1483 Profile MIB
+--
+-- Copyright (c) 2004 Juniper Networks, Inc.  All Rights Reserved.
+-- Copyright (c) 2003, 2004 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ATM-1483-Profile-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Gauge32, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniSetMap
+        FROM Juniper-TC
+    JuniProfileIfEncaps
+        FROM Juniper-PROFILE-MIB;
+
+juniAtm1483ProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED "200511181407Z"  -- 18-Nov-05 2:07 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The ATM Profile MIB for the Juniper Networks, Inc. enterprise."
+    -- Revision History
+	REVISION 	"200511181407Z"  -- 18-Nov-05 2:07 PM EST  - JUNOSe 7.3
+	DESCRIPTION
+		"Added ATM VC class support."
+    REVISION    "200411022107Z"  -- 02-Nov-04 04:07 PM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added Encapsulation Type Lockout objects."
+    REVISION    "200411022107Z"  -- 02-Nov-04 04:07 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added ifALias support to profile entries.
+        Added advisoryRxSpeed to profile entries."
+    REVISION    "200411022107Z"  -- 02-Nov-04 04:07 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Initial version of this MIB module.
+        Added OAM support to profile entries."
+    ::= { juniMibs 58 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAtm1483ProfileObjects  OBJECT IDENTIFIER ::= { juniAtm1483ProfileMIB 1 }
+juniAtm1483Profile         OBJECT IDENTIFIER ::= { juniAtm1483ProfileObjects 1 }
+
+--
+-- This MIB defines configuration profile structure for ATM interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The ATM 1483 Profile Table
+--
+juniAtm1483ProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAtm1483ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains profiles for configuring bulk ATM circuits.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniAtm1483Profile 1 }
+
+juniAtm1483ProfileEntry OBJECT-TYPE
+    SYNTAX      JuniAtm1483ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing VCC configuration of an ATM subinterface."
+    INDEX     { juniAtm1483ProfileId }
+    ::= { juniAtm1483ProfileTable 1 }
+
+JuniAtm1483ProfileEntry ::= SEQUENCE {
+    juniAtm1483ProfileId                      Unsigned32,
+    juniAtm1483ProfileSetMap                  JuniSetMap,
+    juniAtm1483ProfileVccType                 INTEGER,
+    juniAtm1483ProfileVccServiceCategory      INTEGER,
+    juniAtm1483ProfileVccPcr                  Gauge32,
+    juniAtm1483ProfileVccScr                  Gauge32,
+    juniAtm1483ProfileVccMbs                  Gauge32,
+    juniAtm1483ProfileIfAlias                 DisplayString,
+    juniAtm1483ProfileAdvisoryRxSpeed         Integer32,
+    juniAtm1483ProfileVccOamAdminStatus       INTEGER,
+    juniAtm1483ProfileVccOamLoopbackFrequency Unsigned32,
+	juniAtm1483ProfileVcClassName             DisplayString
+ }
+
+juniAtm1483ProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniAtm1483ProfileEntry 1 }
+
+juniAtm1483ProfileSetMap OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniAtm1483ProfileEntry 2 }
+
+juniAtm1483ProfileVccType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rfc1483VcMux(0),
+                    rfc1483Llc(1),
+                    autoconfig(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the encapsulation used by the circuit to carry IP datagrams.
+        Encapsulations are as specified in RFC1483 Multiprotocol Interconnect
+        over ATM.  'autoconfig' will recognize both VcMux and LLC formats."
+    DEFVAL    { rfc1483VcMux }
+    ::= { juniAtm1483ProfileEntry 3 }
+
+juniAtm1483ProfileVccServiceCategory OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ubr(0),
+                    ubrPcr(1),
+                    nrtVbr(2),
+                    cbr(3),
+                    rtVbr(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Service category for this circuit:
+            ubr         Unspecified Bit Rate (best effort).
+            ubrPcr      Unspecified Bit Rate with Peak Cell Rate limit.
+            nrtVbr      Non-realtime Variable Bit Rate.
+            cbr         Constant Bit Rate.
+            rtVbr       Realtime Variable Bit Rate."
+    DEFVAL    { ubr }
+    ::= { juniAtm1483ProfileEntry 4 }
+
+juniAtm1483ProfileVccPcr OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilo-bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Peak Cell Rate, in kilo-bits per second (kbps), of this circuit.
+
+        This parameter is only required when
+        juniAtm1483ProfileVccServiceCategory is configured to have one of the
+        following values:
+            ubrPcr
+            nrtVbr
+            cbr
+            rtVbr "
+    DEFVAL    { 0 }
+    ::= { juniAtm1483ProfileEntry 5 }
+
+juniAtm1483ProfileVccScr OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilo-bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sustained Cell Rate, in kilo-bits per second (kbps), of this circuit.
+
+        This parameter is only required when
+        juniAtm1483ProfileVccServiceCategory is configured to have one of the
+        following values:
+            nrtVbr
+            rtVbr "
+    DEFVAL    { 0 }
+    ::= { juniAtm1483ProfileEntry 6 }
+
+juniAtm1483ProfileVccMbs OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "cells"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum Burst Size, in cells, of this circuit.
+
+        This parameter is only required when
+        juniAtm1483ProfileVccServiceCategory is configured to have one of the
+        following values:
+            nrtVbr
+            rtVbr "
+    DEFVAL    { 0 }
+    ::= { juniAtm1483ProfileEntry 7 }
+
+juniAtm1483ProfileIfAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is an 'alias' name for the interface as specified by a
+        network manager, and provides a non-volatile 'handle' for the interface.
+        This object initializes ifAlias for the interface.  Note, all
+        interfaces created through the same profile entry will have identical
+        values for ifAlias."
+    ::= { juniAtm1483ProfileEntry 8 }
+
+juniAtm1483ProfileAdvisoryRxSpeed OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "kilo-bits per second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Advisory receive speed, in kilobits per second (kbps),
+        of this subinterface. This object has no impact on
+        forwarding performance but may be used as a hint for the
+        underlying circuit receive speed.  A value of 0 indicates
+        that this feature is not enabled."
+DEFVAL    { 0 }
+::= { juniAtm1483ProfileEntry 9 }
+
+juniAtm1483ProfileVccOamAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    oamAdminStateDisabled(1),
+                    oamAdminStateEnabled(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of OAM for the interface identified by this
+        entry."
+    DEFVAL    { oamAdminStateDisabled }
+    ::= { juniAtm1483ProfileEntry 10 }
+
+juniAtm1483ProfileVccOamLoopbackFrequency OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OAM loopback frequency for the interface identified by this entry."
+    DEFVAL    { 10 }
+    ::= { juniAtm1483ProfileEntry 11 }
+
+juniAtm1483ProfileVcClassName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The name of the ATM VC class assigned to this profile."
+    ::= { juniAtm1483ProfileEntry 12 }
+
+--
+-- ATM 1483 Auto-configuration Table
+--
+juniAtm1483ProfileAutoConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAtm1483ProfileAutoConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures recognition of incoming data encapsulation types that
+        trigger autoconfiguration on an interface."
+    ::= { juniAtm1483Profile 2 }
+
+juniAtm1483ProfileAutoConfEntry OBJECT-TYPE
+    SYNTAX      JuniAtm1483ProfileAutoConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures recognition of an incoming data encapsulation type that
+        triggers autoconfiguration on an interface."
+    INDEX     { juniAtm1483ProfileAutoConfId,
+                juniAtm1483ProfileAutoConfEncaps }
+    ::= { juniAtm1483ProfileAutoConfTable 1 }
+
+JuniAtm1483ProfileAutoConfEntry ::= SEQUENCE {
+    juniAtm1483ProfileAutoConfId                 Unsigned32,
+    juniAtm1483ProfileAutoConfEncaps             JuniProfileIfEncaps,
+    juniAtm1483ProfileAutoConfEnable             JuniEnable,
+    juniAtm1483ProfileAutoConfLockoutMin         Integer32,
+    juniAtm1483ProfileAutoConfLockoutMax         Integer32 }
+
+juniAtm1483ProfileAutoConfId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniAtm1483ProfileAutoConfEntry 1 }
+
+juniAtm1483ProfileAutoConfEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulating protocol type to which the autconfiguration
+        information in this entry applies.
+
+        The valid values are:
+            ip(0),
+            ppp(1),
+            pppoe(17),
+            bridgedEthernet(19) "
+    ::= { juniAtm1483ProfileAutoConfEntry 2 }
+
+juniAtm1483ProfileAutoConfEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, permits autoconfiguration of the specified interface when
+        the specified encapsulation is recognized in an incoming data frame.
+
+        This parameter can only be set when juniAtm1483ProfileAutoConfEncaps is
+        configured to one of the following values:
+            ip(0),
+            ppp(1)
+            pppoe(17),
+            bridgedEthernet(19) "
+    ::= { juniAtm1483ProfileAutoConfEntry 3 }
+
+juniAtm1483ProfileAutoConfLockoutMin OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lower bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the encapsulation type from 
+        recognition for the specified interface.  This only takes effect
+        if juniAtm1483ProfileAutoConfEnable is set to enable for the
+        encapsulation type for this interface.
+        The ability to lockout the specified encapsulation type from
+        recognition in the event of an error in creating an interface of
+        the encapsulation type is enabled by default.  The initial lockout
+        duration is this object's value and increases exponentially for 
+        each failure that occurs for the specified encapsulation type
+        for the specified interface within the greater of 15 minutes and
+        juniAtm1483ProfileAutoConfLockoutMax.  The lockout duration for the
+        specified encapsulation type will not exceed 
+        juniAtm1483ProfileAutoConfLockoutMax.  If the time between creation
+        errors for the specified encapsulation type for the specified
+        interface is greater than the greater of 15 minutes and
+        juniAtm1483ProfileAutoConfLockoutMax, then the lockout duration
+        reverts to this object's value. 
+        To disable the ability to lockout the specified encapsulation type 
+        from recognition in the event of an error in creating an interface
+        of the encapsulation type for the specified interface, the value of
+        this object and juniAtm1483ProfileAutoConfLockoutMax must be set to 0.
+        It is not recommended that this lockout feature be disabled except 
+        for debugging purposes."
+    DEFVAL    { 1 }
+    ::= { juniAtm1483ProfileAutoConfEntry 4 }
+
+juniAtm1483ProfileAutoConfLockoutMax OBJECT-TYPE
+    SYNTAX      Integer32 (0..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The upper bound, in seconds, of the time range used to specify 
+        the duration of the lockout of the encapsulation type from 
+        recognition for the specified interface.  This value must equal
+        or exceed the value for juniAtm1483ProfileAutoConfLockoutMin.  This
+        only takes effect if juniAtm1483ProfileAutoConfEnable is set to 
+        enable for the encapsulation type for this interface.
+        The ability to lockout the specified encapsulation type from
+        recognition in the event of an error in creating an interface of
+        the encapsulation type is enabled by default.  The initial lockout
+        duration is juniAtm1483ProfileAutoConfLockoutMin and increases
+        exponentially for each failure that occurs for the specified
+        encapsulation type for the specified interface within the greater 
+        of 15 minutes and this object's value.  The lockout duration for
+        the specified encapsulation type will not exceed this object's
+        value.  If the time between creation errors for the specified
+        encapsulation type for the specified interface is greater than
+        the greater of 15 minutes and this object's value, then the
+        lockout duration reverts to juniAtm1483ProfileAutoConfLockoutMin. 
+        To disable the ability to lockout the specified encapsulation type 
+        from recognition in the event of an error in creating an interface
+        of the encapsulation type for the specified interface, the value of
+        this object and juniAtm1483ProfileAutoConfLockoutMin must be set to 0.
+        It is not recommended that this lockout feature be disabled except 
+        for debugging purposes."
+    DEFVAL    { 300 }
+    ::= { juniAtm1483ProfileAutoConfEntry 5 }
+
+--
+-- ATM 1483 Profile Nested Profile Table
+--
+juniAtm1483ProfileNestedProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAtm1483ProfileNestedProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies nested profiles for incoming data encapsulation types.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniAtm1483Profile 3 }
+
+juniAtm1483ProfileNestedProfileEntry OBJECT-TYPE
+    SYNTAX      JuniAtm1483ProfileNestedProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies nested profile for incoming data encapsulation type."
+    INDEX     { juniAtm1483ProfileNestedProfileId,
+                juniAtm1483ProfileNestedProfileEncaps }
+    ::= { juniAtm1483ProfileNestedProfileTable 1 }
+
+JuniAtm1483ProfileNestedProfileEntry ::= SEQUENCE {
+    juniAtm1483ProfileNestedProfileId                   Unsigned32,
+    juniAtm1483ProfileNestedProfileEncaps               JuniProfileIfEncaps,
+    juniAtm1483ProfileNestedProfileUpperIfProfileName   DisplayString }
+
+juniAtm1483ProfileNestedProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniAtm1483ProfileNestedProfileEntry 1 }
+
+juniAtm1483ProfileNestedProfileEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulating protocol type to which the nested profile specified
+        in this entry applies.
+
+        The valid values are:
+            ip(0),
+            ppp(1),
+            pppoe(17),
+            bridgedEthernet(19) "
+    ::= { juniAtm1483ProfileNestedProfileEntry 2 }
+
+juniAtm1483ProfileNestedProfileUpperIfProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of profile used for the protocol type specified by
+        juniAtm1483ProfileNestedProfileEncaps."
+    ::= { juniAtm1483ProfileNestedProfileEntry 3 }
+
+
+--
+-- ATM 1483 Profile Subscriber Table
+--
+juniAtm1483ProfileSubscriberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniAtm1483ProfileSubscriberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures subscriber identity used in circumstances where the remote
+        subscriber's identity cannot be queried directly (e.g. dynamic IPoA
+        operation).
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniAtm1483Profile 4 }
+
+juniAtm1483ProfileSubscriberEntry OBJECT-TYPE
+    SYNTAX      JuniAtm1483ProfileSubscriberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configures subscriber identity used in circumstances where the remote
+        subscriber's identity cannot be queried directly (e.g. dynamic IPoA
+        operation)."
+    INDEX     { juniAtm1483ProfileSubscriberId,
+                juniAtm1483ProfileSubscriberEncaps }
+    ::= { juniAtm1483ProfileSubscriberTable 1 }
+
+JuniAtm1483ProfileSubscriberEntry ::= SEQUENCE {
+    juniAtm1483ProfileSubscriberId              Unsigned32,
+    juniAtm1483ProfileSubscriberEncaps          JuniProfileIfEncaps,
+    juniAtm1483ProfileSubscriberNamePrefix      JuniEnable,
+    juniAtm1483ProfileSubscriberName            DisplayString,
+    juniAtm1483ProfileSubscriberPasswordPrefix  JuniEnable,
+    juniAtm1483ProfileSubscriberPassword        DisplayString,
+    juniAtm1483ProfileSubscriberDomain          DisplayString }
+
+juniAtm1483ProfileSubscriberId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniAtm1483ProfileSubscriberEntry 1 }
+
+juniAtm1483ProfileSubscriberEncaps OBJECT-TYPE
+    SYNTAX      JuniProfileIfEncaps
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The encapsulating protocol type to which the subscriber information in
+        this entry applies.
+
+        The valid values are:
+            ip(0),
+            bridgedEthernet(19) "
+    ::= { juniAtm1483ProfileSubscriberEntry 2 }
+
+juniAtm1483ProfileSubscriberNamePrefix OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, indicates whether the value of juniSubscriberName is a
+        prefix rather than a full name.
+
+        This parameter is valid only when juniAtm1483ProfileSubscriberEncaps is
+        configured to one of the following values:
+            ip(0),
+            bridgedEthernet(19)
+
+        For all other values of juniAtm1483ProfileSubscriberEncaps it returns
+        'disable'."
+    ::= { juniAtm1483ProfileSubscriberEntry 3 }
+
+juniAtm1483ProfileSubscriberName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If juniAtm1483ProfileSubscriberNamePrefix has the value 'enabled', the
+        value of this object serves as the prefix of a full subscriber name.
+        The full name is constructed by appending local geographic information
+        (slot, port, etc.) that uniquely distinguishes the subscriber.
+
+        This parameter is valid only when juniAtm1483ProfileSubscriberEncaps is
+        configured to one of the following values:
+            ip(0),
+            bridgedEthernet(19)
+
+        For all other values of juniAtm1483ProfileSubscriberEncaps it returns an
+        empty string."
+    ::= { juniAtm1483ProfileSubscriberEntry 4 }
+
+juniAtm1483ProfileSubscriberPasswordPrefix OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, indicates whether the value of
+        juniAtm1483ProfileSubscriberPassword is a prefix rather than a full
+        password.
+
+        This parameter is valid only when juniAtm1483ProfileSubscriberEncaps is
+        configured to one of the following values:
+            ip(0),
+            bridgedEthernet(19)
+
+        For all other values of juniAtm1483ProfileSubscriberEncaps it returns an
+        empty string."
+    ::= { juniAtm1483ProfileSubscriberEntry 5 }
+
+juniAtm1483ProfileSubscriberPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The subscriber's password.
+
+        If juniAtm1483ProfileSubscriberPasswordPrefix has the value 'enabled',
+        the value of this object serves as the prefix of a full subscriber
+        password.  The full password is constructed by appending local
+        geographic information (slot, port, etc.) that uniquely distinguishes
+        the subscriber.
+
+        This parameter is valid only when juniAtm1483ProfileSubscriberEncaps is
+        configured to one of the following values:
+            ip(0),
+            bridgedEthernet(19)
+
+        For all other values of juniAtm1483ProfileSubscriberEncaps it returns an
+        empty string."
+    ::= { juniAtm1483ProfileSubscriberEntry 6 }
+
+juniAtm1483ProfileSubscriberDomain OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The subscriber's domain.
+
+        This parameter is valid only when juniAtm1483ProfileSubscriberEncaps is
+        configured to one of the following values:
+            ip(0),
+            bridgedEthernet(19)
+
+        For all other values of juniAtm1483ProfileSubscriberEncaps it returns an
+        empty string."
+    ::= { juniAtm1483ProfileSubscriberEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniAtm1483ProfileConformance  OBJECT IDENTIFIER
+    ::= { juniAtm1483ProfileMIB 4 }
+juniAtm1483ProfileCompliances  OBJECT IDENTIFIER
+    ::= { juniAtm1483ProfileConformance 1 }
+juniAtm1483ProfileGroups       OBJECT IDENTIFIER
+    ::= { juniAtm1483ProfileConformance 2 }
+
+--
+-- compliance statements
+--
+juniAtm1483ProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        ATM Profile MIB.  This statement became obsolete when ifALias support
+        was added to profile entries."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAtm1483ProfileGroup }
+    ::= { juniAtm1483ProfileCompliances 1 }                        -- JUNOSe 5.1
+
+juniAtm1483ProfileCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        ATM Profile MIB.  This statement became obsolete when lockout objects
+        were added to juniAtm1483ProfileAutoConfTable."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAtm1483ProfileGroup2 }
+    ::= { juniAtm1483ProfileCompliances 2 }                        -- JUNOSe 5.3
+
+juniAtm1483ProfileCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper ATM
+        Profile MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAtm1483ProfileGroup3 }
+    ::= { juniAtm1483ProfileCompliances 3 }                        -- JUNOSe 7.0
+
+juniAtm1483ProfileCompliance4  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper ATM
+        Profile MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniAtm1483ProfileGroup6 }
+    ::= { juniAtm1483ProfileCompliances 4 }                        -- JUNOSe 7.3
+
+--
+-- units of conformance
+--
+juniAtm1483ProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for ATM subinterfaces in a Juniper product.  This group
+        became obsolete when ifALias support was added to profile entries."
+    ::= { juniAtm1483ProfileGroups 1 }
+
+juniAtm1483ProfileGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileIfAlias,
+        juniAtm1483ProfileAdvisoryRxSpeed,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obolete collection of objects providing management of profile 
+        functionalityfor ATM subinterfaces in a Juniper product.  This group
+        became obsolete when OAM support was added to profile entries."
+    ::= { juniAtm1483ProfileGroups 2 }
+
+juniAtm1483ProfileGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileVccOamAdminStatus,  
+        juniAtm1483ProfileVccOamLoopbackFrequency,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile 
+        functionality for ATM subinterfaces in a Juniper product.  This group
+        became obsolete when ifALias support was added to profile entries."
+    ::= { juniAtm1483ProfileGroups 3 }
+
+juniAtm1483ProfileGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileIfAlias,
+        juniAtm1483ProfileAdvisoryRxSpeed,
+        juniAtm1483ProfileVccOamAdminStatus,  
+        juniAtm1483ProfileVccOamLoopbackFrequency,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile 
+        functionality for ATM subinterfaces in a Juniper product. This group
+        became obsolete when Encapsulation Type Lockout objects were added
+        to profile entries."
+    ::= { juniAtm1483ProfileGroups 4 }
+
+juniAtm1483ProfileGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileIfAlias,
+        juniAtm1483ProfileAdvisoryRxSpeed,
+        juniAtm1483ProfileVccOamAdminStatus,  
+        juniAtm1483ProfileVccOamLoopbackFrequency,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileAutoConfLockoutMin,
+        juniAtm1483ProfileAutoConfLockoutMax,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile functionality
+        for ATM subinterfaces in a Juniper product."
+    ::= { juniAtm1483ProfileGroups 5 }
+
+juniAtm1483ProfileGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniAtm1483ProfileSetMap,
+        juniAtm1483ProfileVccType,
+        juniAtm1483ProfileVccServiceCategory,
+        juniAtm1483ProfileVccPcr,
+        juniAtm1483ProfileVccScr,
+        juniAtm1483ProfileVccMbs,
+        juniAtm1483ProfileIfAlias,
+        juniAtm1483ProfileAdvisoryRxSpeed,
+        juniAtm1483ProfileVccOamAdminStatus,  
+        juniAtm1483ProfileVccOamLoopbackFrequency,
+		juniAtm1483ProfileVcClassName,
+        juniAtm1483ProfileAutoConfEnable,
+        juniAtm1483ProfileAutoConfLockoutMin,
+        juniAtm1483ProfileAutoConfLockoutMax,
+        juniAtm1483ProfileNestedProfileUpperIfProfileName,
+        juniAtm1483ProfileSubscriberNamePrefix,
+        juniAtm1483ProfileSubscriberName,
+        juniAtm1483ProfileSubscriberPasswordPrefix,
+        juniAtm1483ProfileSubscriberPassword,
+        juniAtm1483ProfileSubscriberDomain }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for ATM subinterfaces in a Juniper product."
+    ::= { juniAtm1483ProfileGroups 6 }
+
+END

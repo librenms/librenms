@@ -1,0 +1,375 @@
+
+-- *****************************************************************************
+-- Juniper-FILE-XFER-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   File Transfer MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-FILE-XFER-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    JuniName
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniFileXferMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The File Transfer MIB for Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103281346Z"  -- 28-Mar-01 08:46 AM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION    "200005010000Z"  --  1-May-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Key revisions include:
+          o  Obsoleted juniFileXferRemoteUserName.
+          o  Obsoleted juniFileXferRemoteUserPassword.
+          o  Added juniFileXferRouterName.
+          o  Added juniFileXferCopyRunningCfgFailed(9) to juniFileXferStatus."
+    REVISION      "9908180000Z"  -- 18-Aug-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 23 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFileXferObjects    OBJECT IDENTIFIER ::= { juniFileXferMIB 1 }
+
+
+juniFileXferTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniFileXferTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of entries which describe file transfers."
+    ::= { juniFileXferObjects 1 }
+
+juniFileXferTableEntry OBJECT-TYPE
+    SYNTAX      JuniFileXferTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A description of a particular file transfer entry."
+    INDEX     { juniFileXferIndex }
+    ::= { juniFileXferTable 1 }
+
+JuniFileXferTableEntry ::= SEQUENCE {
+    juniFileXferIndex               INTEGER,
+    juniFileXferDirection           INTEGER,
+    juniFileXferFileType            INTEGER,
+    juniFileXferRemoteFileName      DisplayString,
+    juniFileXferRemoteUserName      DisplayString,
+    juniFileXferRemoteUserPassword  OCTET STRING,
+    juniFileXferLocalFileName       DisplayString,
+    juniFileXferProtocol            INTEGER,
+    juniFileXferStatus              INTEGER,
+    juniFileXferRowStatus           RowStatus,
+    juniFileXferTimeStamp           TimeTicks,
+    juniFileXferRouterName          JuniName }
+
+juniFileXferIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index used to identify this entry."
+    ::= { juniFileXferTableEntry 1 }
+
+juniFileXferDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniFileXferLocalToRemote(1),
+                    juniFileXferRemoteToLocal(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the direction of the file transfer."
+    DEFVAL    { juniFileXferRemoteToLocal }
+    ::= { juniFileXferTableEntry 2 }
+
+juniFileXferFileType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniFileXferSoftwareRelease(1),
+                    juniFileXferSystemConfig(2),
+                    juniFileXferRunningConfig(3),
+                    juniFileXferSystemLog(4),
+                    juniFileXferScript(5),
+                    juniFileXferRebootHistory(6),
+                    juniFileXferBulkStatistics(7) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the file type of the file transfer."
+    DEFVAL    { juniFileXferBulkStatistics }
+    ::= { juniFileXferTableEntry 3 }
+
+juniFileXferRemoteFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The full path name of the source/destination file on the remote
+        system."
+    DEFVAL    { "" }
+    ::= { juniFileXferTableEntry 4 }
+
+juniFileXferRemoteUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The user name to use when requesting the file transfer to/from the
+        remote system.
+
+        This object has been obsoleted.  Use the enterprise host mib in order to
+        configure the username."
+    DEFVAL    { "anonymous" }
+    ::= { juniFileXferTableEntry 5 }
+
+juniFileXferRemoteUserPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+
+        "The password to use when requesting the file transfer to/from the
+        remote system.  When read, this object returns a zero string.  Note
+        that, for security reasons, some FTP servers may insist on a non-zero
+        length user password.
+
+        This object has been obsoleted.  Use the enterprise host MIB in order to
+        configure the password."
+    DEFVAL    { "anonymous" }
+    ::= { juniFileXferTableEntry 6 }
+
+juniFileXferLocalFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The local file name to transfer or to create as a result of an incoming
+        transfer."
+    DEFVAL    { "" }
+    ::= { juniFileXferTableEntry 7 }
+
+juniFileXferProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniFileXferFtp(1),
+                    juniFileXferTftp(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the file transfer protocol type."
+    DEFVAL    { juniFileXferFtp }
+    ::= { juniFileXferTableEntry 8 }
+
+juniFileXferStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniFileXferSuccessfulCompletion(1),
+                    juniFileXferInProgress(2),
+                    juniFileXferRemoteUnreachable(3),
+                    juniFileXferUserAuthFailed(4),
+                    juniFileXferFileNotFound(5),
+                    juniFileXferFileTooBig(6),
+                    juniFileXferFileIncompatible(7),
+                    juniFileXferPended(8),
+                    juniFileXferCopyRunningCfgFailed(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the file transfer."
+    ::= { juniFileXferTableEntry 9 }
+
+juniFileXferRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The row status object controls the creation/deletion of rows in this
+        table.  Its semantics are the same as those for the RowStatus textual
+        convention specified for SNMPv2.
+
+        Setting this object to createAndGo(4) is allowed.  If required objects
+        are missing, the agent will create the row and set its status to
+        notReady(3).  If all of the required objects are present and valid, the
+        agent will create the row, set it to active and commence the file
+        transfer.  Upon completion of the file transfer, the agent will set the
+        rowStatus to notInService(2), indicating that the row is valid and
+        useable by a management client.  To commence another transfer, a
+        management client should set the rowStatus to active(1).
+
+        Setting this object to createAndWait(5) causes an entry to be created
+        with juniFileXferRowStatus value of notInService(2) if all of the
+        required objects are present and valid.  Or, if some of the required
+        objects are missing or invalid, the agent will create the row and sets
+        its status to notReady(3).
+
+        Setting this object to active(1) causes the transfer to start for the
+        given row.  Objects within the row cannot be modified once a row has
+        been set to active(1),
+
+        Setting this object to destroy(6) causes the corresponding row to be
+        deleted.
+
+        Note that only a single instance of a row can be active at at any given
+        moment, although several rows can exist in the table."
+    ::= { juniFileXferTableEntry 10 }
+
+juniFileXferTimeStamp OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at the last status change for this entry."
+    ::= { juniFileXferTableEntry 11 }
+
+juniFileXferRouterName OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the router to be used when resolving the hostname portion
+        of the juniFileXferRemoteFileName object.  If this object contains an
+        invalid or empty value, the default router will be used."
+    ::= { juniFileXferTableEntry 12 }
+
+juniFileXferTrapEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    true(1),
+                    false(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether the juniFileXferTrap trap is enabled."
+    ::= { juniFileXferObjects 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFileXferNotifications OBJECT IDENTIFIER ::= { juniFileXferMIB 2 }
+juniFileXferNotifyPrefix OBJECT IDENTIFIER ::= { juniFileXferNotifications 0 }
+
+
+juniFileXferTrap NOTIFICATION-TYPE
+    OBJECTS {
+        juniFileXferStatus,
+        juniFileXferTimeStamp }
+    STATUS      current
+    DESCRIPTION
+        "An indication that the status associated with a particular file
+        transfer entry has changed."
+    ::= { juniFileXferNotifyPrefix 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniFileXferConformance OBJECT IDENTIFIER ::= { juniFileXferMIB 4 }
+juniFileXferCompliances OBJECT IDENTIFIER ::= { juniFileXferConformance 1 }
+juniFileXferGroups      OBJECT IDENTIFIER ::= { juniFileXferConformance 2 }
+
+--
+-- compliance statements
+--
+juniFileXferCompliance1  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        file transfer MIB.  This compliance statement became obsolete when
+        remote user information was removed and router name was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFileXferGroup1,
+            juniFileXferTrapGroup }
+    ::= { juniFileXferCompliances 2 }                              -- JUNOSe 1.1
+
+juniFileXferCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper file
+        transfer MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniFileXferGroup2,
+            juniFileXferTrapGroup }
+    ::= { juniFileXferCompliances 3 }                              -- JUNOSe 2.0
+
+--
+-- units of conformance
+--
+juniFileXferGroup1 OBJECT-GROUP
+    OBJECTS {
+        juniFileXferIndex,
+        juniFileXferDirection,
+        juniFileXferFileType,
+        juniFileXferRemoteFileName,
+        juniFileXferRemoteUserName,
+        juniFileXferRemoteUserPassword,
+        juniFileXferLocalFileName,
+        juniFileXferProtocol,
+        juniFileXferStatus,
+        juniFileXferRowStatus,
+        juniFileXferTimeStamp,
+        juniFileXferTrapEnabled }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of file transfers
+        in a Juniper product.  This group became obsolete when remote user
+        information was removed and juniFileXferRouterName was added."
+    ::= { juniFileXferGroups 2 }
+
+juniFileXferGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniFileXferIndex,
+        juniFileXferDirection,
+        juniFileXferFileType,
+        juniFileXferRemoteFileName,
+        juniFileXferLocalFileName,
+        juniFileXferProtocol,
+        juniFileXferStatus,
+        juniFileXferRowStatus,
+        juniFileXferTimeStamp,
+        juniFileXferRouterName,
+        juniFileXferTrapEnabled }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of file transfers in a
+        Juniper product."
+    ::= { juniFileXferGroups 3 }
+
+juniFileXferTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniFileXferTrap }
+    STATUS      current
+    DESCRIPTION
+        "A management notification pertaining to file transfers."
+    ::= { juniFileXferGroups 4 }
+
+END

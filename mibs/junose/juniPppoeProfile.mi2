@@ -1,0 +1,532 @@
+
+-- *****************************************************************************
+-- Juniper-PPPOE-PROFILE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Point-to-Point Protocol over Ethernet (PPPoE) Profile MIB
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2005 Juniper Networks, Inc.
+-- Copyright (c) 2008 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PPPOE-PROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniSetMap, JuniEnable
+        FROM Juniper-TC;
+
+juniPppoeProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED "200806181029Z"  -- 18-Jun-08 03:59 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The point-to-point protocol over Ethernet (PPPoE) profile MIB for the
+        Juniper enterprise."
+    -- Revision History
+    REVISION    "200806181029Z"  -- 18-Jun-08 03:59 PM EST  - JUNOSe 9.3
+    DESCRIPTION
+        "Added juniPppoeProfileMaxSessionOverride object."
+    REVISION    "200507131140Z"  -- 13-Jul-05 11:40 AM EDT  - JUNOSe 7.0.1
+    DESCRIPTION
+        "Added MTU control object."
+    REVISION    "200406101925Z"  -- 10-Jun-04 03:25 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added Remote Circuit Id Capture object."
+    REVISION    "200303112158Z"  -- 11-Mar-03 04:58 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added Service Name Table object."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200208152034Z"  -- 15-Aug-02 04:34 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added PADI flag and packet trace support."
+    REVISION    "200208151907Z"  -- 15-Aug-02 03:07 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added duplicate MAC address indicator and AC-NAME tag objects."
+    REVISION    "200103211832Z"  -- 21-Mar-01 01:32 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 46 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppoeProfileObjects     OBJECT IDENTIFIER ::= { juniPppoeProfileMIB 1 }
+juniPppoeProfile            OBJECT IDENTIFIER ::= { juniPppoeProfileObjects 1 }
+
+--
+-- This MIB defines configuration profile structure for PPPoE interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The PPPoE Profile Table
+--
+juniPppoeProfileTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppoeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains profiles for configuring PPPoE interfaces/sessions.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniPppoeProfile 1 }
+
+juniPppoeProfileEntry  OBJECT-TYPE
+    SYNTAX      JuniPppoeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing configuration of a PPPoE interface and its
+        subinterfaces (sessions)."
+    INDEX     { juniPppoeProfileId }
+    ::= { juniPppoeProfileTable 1 }
+
+JuniPppoeProfileEntry ::= SEQUENCE {
+    juniPppoeProfileId               Unsigned32,
+    juniPppoeProfileSetMap           JuniSetMap,
+    juniPppoeProfileMaxNumSessions   Integer32,
+    juniPppoeProfileSubMotm          DisplayString,
+    juniPppoeProfileSubUrl           DisplayString,
+    juniPppoeProfileDupProtect       JuniEnable,
+    juniPppoeProfileAcName           DisplayString,
+    juniPppoeProfilePadiFlag         JuniEnable,
+    juniPppoeProfilePacketTrace      JuniEnable,
+	juniPppoeProfileServiceNameTableName DisplayString,
+    juniPppoeProfilePadrRemoteCircuitIdCapture JuniEnable,
+    juniPppoeProfileMtu Integer32,
+    juniPppoeProfileMaxSessionOverride INTEGER }
+
+juniPppoeProfileId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniPppoeProfileEntry 1 }
+
+juniPppoeProfileSetMap  OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniPppoeProfileEntry 2 }
+
+
+--
+-- PPPoE main interface parameters
+--
+juniPppoeProfileMaxNumSessions  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of PPPoE sessions (subinterfaces) that can be
+        configured on the main PPPoE interface created using this profile.  A
+        value of zero indicates no bound is configured."
+    DEFVAL    { 0 }
+    ::= { juniPppoeProfileEntry 3 }
+
+
+--
+-- Other major parameters follow the sub interface parameters
+--
+--
+-- PPPoE subinterface parameters
+--
+juniPppoeProfileSubMotm  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A message to send via a PADM on the sub-interface when this profile is
+        applied to the IP interface above this PPPoE sub- interface.  A client
+        may choose to display this message to the user."
+    ::= { juniPppoeProfileEntry 4 }
+
+juniPppoeProfileSubUrl  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A URL to be sent via a PADM on the sub-interface when this profile is
+        applied to the IP interface above this PPPoE sub-interface.  The string
+        entered here can have several substitutions applied:
+                %D   is replaced with the profile name
+                %d   is replaced with the domain name
+                %u   is replaced with the user name
+                %U   is replaced with the user/domain name together
+                %%   is replaced with the % character
+
+        The resulting string must not be greater than 127 octets long.  The
+        client may use this URL as the initial web-page for the user."
+    ::= { juniPppoeProfileEntry 5 }
+
+juniPppoeProfileDupProtect  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Flag to control whether duplicate MAC addresses are allowed"
+    DEFVAL    { disable }
+    ::= { juniPppoeProfileEntry 6 }
+
+juniPppoeProfileAcName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name to use for the AC-NAME tag that is sent in any PADO that is
+        sent on this interface."
+    ::= { juniPppoeProfileEntry 7 }
+
+juniPppoeProfilePadiFlag  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PPPoE major interface parameter PADI flag controls whether to
+        always repsond to a PADI with a PADO regardless of the ability to create
+        the session and allow the session establish phase to resolve it."
+    DEFVAL    { disable }
+    ::= { juniPppoeProfileEntry 8 }
+
+juniPppoeProfilePacketTrace  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PPPoE major interface parameter packet tracing flag controls
+        whether packet tracing is enable or not."
+    DEFVAL    { disable }
+    ::= { juniPppoeProfileEntry 9 }
+
+juniPppoeProfileServiceNameTableName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PPPoE Service name table controls behavior of PADO control
+        packets."
+    ::= { juniPppoeProfileEntry 10 }
+
+juniPppoeProfilePadrRemoteCircuitIdCapture OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PPPoE major interface parameter PADR remote circuit id capture flag
+        controls whether the remote circuit id string possibly contained
+        in the PADR packet will be saved and used by AAA to replace the NAS-PORT-ID
+        field."
+    DEFVAL    { disable }
+    ::= { juniPppoeProfileEntry 11 }
+
+juniPppoeProfileMtu  OBJECT-TYPE
+    SYNTAX      Integer32 (1|2|66..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initial Maximum Transmit Unit (MTU) that the PPPoE major interface
+        entity will advertise to the remote entity.
+
+        If the value of this variable is 1 then the local PPPoE entity will
+        use an MTU value determined by its underlying media interface.
+
+        If the value of this variable is 2 then the local PPPoE entity will
+        use a value determined by the PPPoE Max-Mtu-Tag transmitted from the
+        client in the PADR packet.  If no Max-Mtu-Tag is received, the value
+        defaults to a maximum of 1494.
+
+		The operational MTU is limited by the MTU of the underlying media
+        interface minus the PPPoE frame overhead."
+    DEFVAL    { 1494 }
+    ::= { juniPppoeProfileEntry 12 }
+
+juniPppoeProfileMaxSessionOverride OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 override(1),
+                 ignore(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the action to be taken by PPPoE when RADIUS server returns
+        the PPPoE max-session value:
+         override    Override the current PPPoE max-session value with the
+                     value returned by RADIUS server
+         Ignore      Ignore the max-session value returned by RADIUS server" 
+    DEFVAL    { ignore }
+    ::= { juniPppoeProfileEntry 13 }
+    
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppoeProfileConformance  OBJECT IDENTIFIER
+    ::= { juniPppoeProfileMIB 4 }
+juniPppoeProfileCompliances  OBJECT IDENTIFIER
+    ::= { juniPppoeProfileConformance 1 }
+juniPppoeProfileGroups  OBJECT IDENTIFIER
+    ::= { juniPppoeProfileConformance 2 }
+
+--
+-- compliance statements
+--
+juniPppoeProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE Profile MIB.  This statement became obsolete when the duplicate
+        MAC address indicator and AC-NAME tag were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup }
+    ::= { juniPppoeProfileCompliances 1 }                          -- JUNOSe 3.0
+
+juniPppoeCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE profile MIB.  This statement became obsolete when PADI flag,
+        AC-name and packet trace objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup2 }
+    ::= { juniPppoeProfileCompliances 2 }                          -- JUNOSe 3.2
+
+juniPppoeCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE profile MIB.  This statement became obsolete when the service
+        name table was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup3 }
+    ::= { juniPppoeProfileCompliances 3 }                          -- JUNOSe 4.0
+
+juniPppoeCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE profile MIB.  This statement became obsolete when the remote
+        circuit id capture was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup4 }
+    ::= { juniPppoeProfileCompliances 4 }                          -- JUNOSe 5.1
+
+juniPppoeCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE MIB.  This statement became obsolete when support was added for
+        MTU configuration."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup5 }
+    ::= { juniPppoeProfileCompliances 5 }                          -- JUNOSe 7.0
+
+juniPppoeCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPPoE MIB.  This statement became obsolete when support was added for
+        juniPppoeProfileMaxSessionOverride."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup6 }
+    ::= { juniPppoeProfileCompliances 6 }                          -- JUNOSe 7.1
+
+juniPppoeCompliance7  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPPoE
+        Profile MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppoeProfileGroup7 }
+    ::= { juniPppoeProfileCompliances 7 }                          -- JUNOSe 9.3
+
+--
+-- units of conformance
+--
+juniPppoeProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPPoE interfaces in a Juniper product.  This group
+        became obsolete when the duplicate MAC address indicator and AC-NAME tag
+        objects were added."
+    ::= { juniPppoeProfileGroups 1 }
+
+juniPppoeProfileGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPPOE interfaces in a Juniper product.  This group
+        became obsolete when PADI flag, AC-name and packet trace objects were
+        added."
+    ::= { juniPppoeProfileGroups 2 }
+
+juniPppoeProfileGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName,
+        juniPppoeProfilePadiFlag,
+        juniPppoeProfilePacketTrace }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPPOE interfaces in a Juniper product."
+    ::= { juniPppoeProfileGroups 3 }
+
+juniPppoeProfileGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName,
+        juniPppoeProfilePadiFlag,
+        juniPppoeProfilePacketTrace,
+        juniPppoeProfileServiceNameTableName }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPPOE interfaces in a Juniper product."
+    ::= { juniPppoeProfileGroups 4 }
+
+juniPppoeProfileGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName,
+        juniPppoeProfilePadiFlag,
+        juniPppoeProfilePacketTrace,
+        juniPppoeProfileServiceNameTableName,
+		juniPppoeProfilePadrRemoteCircuitIdCapture }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPPOE interfaces in a Juniper product."
+    ::= { juniPppoeProfileGroups 5 }
+
+juniPppoeProfileGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName,
+        juniPppoeProfilePadiFlag,
+        juniPppoeProfilePacketTrace,
+        juniPppoeProfileServiceNameTableName,
+		juniPppoeProfilePadrRemoteCircuitIdCapture,
+		juniPppoeProfileMtu }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPPOE interfaces in a Juniper product."
+    ::= { juniPppoeProfileGroups 6 }
+
+juniPppoeProfileGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniPppoeProfileSetMap,
+
+        juniPppoeProfileMaxNumSessions,
+
+        juniPppoeProfileSubMotm,
+        juniPppoeProfileSubUrl,
+        juniPppoeProfileDupProtect,
+        juniPppoeProfileAcName,
+        juniPppoeProfilePadiFlag,
+        juniPppoeProfilePacketTrace,
+        juniPppoeProfileServiceNameTableName,
+        juniPppoeProfilePadrRemoteCircuitIdCapture,
+        juniPppoeProfileMtu,
+        juniPppoeProfileMaxSessionOverride }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPPOE interfaces in a Juniper product."
+    ::= { juniPppoeProfileGroups 7 }
+END
