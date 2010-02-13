@@ -9,7 +9,7 @@ include("common.inc.php");
   $sql = mysql_query("SELECT * FROM temperature where temp_id = '$temp'");
   $temperature = mysql_fetch_array(mysql_query("SELECT * FROM temperature where temp_id = '".mres($_GET['id'])."'"));
 
-  $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['temp_host'] . "'"),0);
+  $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['device_id'] . "'"),0);
 
   $temperature['temp_descr_fixed'] = substr(str_pad($temperature['temp_descr'], 28),0,28);
 

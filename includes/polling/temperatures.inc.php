@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM temperature WHERE temp_host = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM temperature WHERE device_id = '" . $device['device_id'] . "'";
 $temp_data = mysql_query($query);
 while($temperature = mysql_fetch_array($temp_data)) {
 

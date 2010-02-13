@@ -8,7 +8,7 @@ include("common.inc.php");
 
   $voltage = mysql_fetch_array(mysql_query("SELECT * FROM voltage where volt_id = '".mres($_GET['id'])."'"));
 
-  $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $voltage['volt_host'] . "'"),0);
+  $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $voltage['device_id'] . "'"),0);
 
   $voltage['volt_descr_fixed'] = substr(str_pad($voltage['volt_descr'], 28),0,28);
 

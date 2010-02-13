@@ -1,9 +1,9 @@
 <?php
 
 if($_SESSION['userlevel'] >= '5') {
-  $sql = "SELECT * FROM `fanspeed` AS F, `devices` AS D WHERE F.fan_host = D.device_id ORDER BY D.hostname, F.fan_descr";
+  $sql = "SELECT * FROM `fanspeed` AS F, `devices` AS D WHERE F.device_id = D.device_id ORDER BY D.hostname, F.fan_descr";
 } else {
-  $sql = "SELECT * FROM `fanspeed` AS F, `devices` AS D, devices_perms as P WHERE F.fan_host = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, F.fan_descr";
+  $sql = "SELECT * FROM `fanspeed` AS F, `devices` AS D, devices_perms as P WHERE F.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, F.fan_descr";
 }
 
 $query = mysql_query($sql);

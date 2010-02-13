@@ -27,16 +27,16 @@ if ($device['os'] == "linux")
       $fan  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $fan_oid")) / 1000;
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
-      if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND fan_host = '$id'"),0) == '0') 
+      if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND device_id = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO fanspeed (`fan_host`, `fan_oid`, `fan_descr`, `fan_precision`, `fan_limit`, `fan_current`) values ('$id', '$fan_oid', '$descr',1000, " . ($config['defaults']['fan_limit'] ? $config['defaults']['fan_limit'] : '60') . ", '$fan')";
+        $query = "INSERT INTO fanspeed (`device_id`, `fan_oid`, `fan_descr`, `fan_precision`, `fan_limit`, `fan_current`) values ('$id', '$fan_oid', '$descr',1000, " . ($config['defaults']['fan_limit'] ? $config['defaults']['fan_limit'] : '60') . ", '$fan')";
         mysql_query($query);
         echo("+");
       } 
-      elseif (mysql_result(mysql_query("SELECT `fan_descr` FROM fanspeed WHERE `fan_host` = '$id' AND `fan_oid` = '$fan_oid'"), 0) != $descr) 
+      elseif (mysql_result(mysql_query("SELECT `fan_descr` FROM fanspeed WHERE `device_id` = '$id' AND `fan_oid` = '$fan_oid'"), 0) != $descr) 
       {
         echo("U");
-        mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr' WHERE `fan_host` = '$id' AND `fan_oid` = '$fan_oid'");
+        mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr' WHERE `device_id` = '$id' AND `fan_oid` = '$fan_oid'");
       } 
       else 
       {
@@ -75,9 +75,9 @@ if ($device['os'] == "linux")
         if ($monitor == 'true')
         {
           $descr = trim(str_replace(" Fan","",str_ireplace("Speed", "", $descr)));
-          if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND fan_host = '$id'"),0) == '0') 
+          if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND device_id = '$id'"),0) == '0') 
           {
-            $query = "INSERT INTO fanspeed (`fan_host`, `fan_oid`, `fan_descr`, `fan_current`, `fan_limit`) values ('$id', '$fan_oid', '$descr', '$fan', '$limit')";
+            $query = "INSERT INTO fanspeed (`device_id`, `fan_oid`, `fan_descr`, `fan_current`, `fan_limit`) values ('$id', '$fan_oid', '$descr', '$fan', '$limit')";
             mysql_query($query);
             echo("+");
           } 
@@ -94,7 +94,7 @@ if ($device['os'] == "linux")
 
 ## Delete removed sensors
 
-$sql = "SELECT * FROM fanspeed AS V, devices AS D WHERE V.fan_host = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM fanspeed AS V, devices AS D WHERE V.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
   while ($sensor = mysql_fetch_array($query)) 
@@ -103,7 +103,7 @@ if ($query = mysql_query($sql))
     $i = 0;
     while ($i < count($fan_exists) && !$exists) 
     {
-      $thisfan = $sensor['fan_host'] . " " . $sensor['fan_oid'];
+      $thisfan = $sensor['device_id'] . " " . $sensor['fan_oid'];
       if ($fan_exists[$i] == $thisfan) { $exists = 1; }
       $i++;
     }

@@ -24,7 +24,7 @@
   } else { $mac = ""; }
 
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
-           <td valign=top width=300>");
+           <td valign=top width=350>");
 
   echo("        <span class=list-large>
                 " . generateiflink($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
@@ -66,10 +66,10 @@
     $interface['out_rate'] = $interface['ifOutOctets_rate'] * 8;
     $in_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
     $out_perc = @round($interface['in_rate']/$interface['ifSpeed']*100);
-    echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>" . 
-      formatRates($interface['in_rate']) . "<br />".format_bi($interface['ifInUcastPkts_rate'])."pps</span><br />");
-    echo("<img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>" . 
-      formatRates($interface['out_rate']) . "<br />".format_bi($interface['ifOutUcastPkts_rate'])."pps</span>");  
+    echo("<img src='images/16/arrow_left.png' align=absmiddle> <span style='color: " . percent_colour($in_perc) . "'>".formatRates($interface['in_rate'])."<br />
+          <img align=absmiddle src='images/16/arrow_out.png'> <span style='color: " . percent_colour($out_perc) . "'>".formatRates($interface['out_rate']) . "<br />
+          <img src='images/icons/arrow_pps_in.png' align=absmiddle> ".format_bi($interface['ifInUcastPkts_rate'])."pps</span><br />
+          <img src='images/icons/arrow_pps_out.png' align=absmiddle> ".format_bi($interface['ifOutUcastPkts_rate'])."pps</span>");  
   }
 
   echo("</td><td width=75>");

@@ -1,13 +1,13 @@
 <?php
 
 unset($volt_seperator);
-if(mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE volt_host = '" . $device['device_id'] . "'"),0)) {
-  $total = mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE volt_host = '" . $device['device_id'] . "'"),0);
+if(mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE device_id = '" . $device['device_id'] . "'"),0)) {
+  $total = mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE device_id = '" . $device['device_id'] . "'"),0);
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p class=sectionhead>Voltages</p>");
   $i = '1';
-  $volts = mysql_query("SELECT * FROM voltage WHERE volt_host = '" . $device['device_id'] . "'");
+  $volts = mysql_query("SELECT * FROM voltage WHERE device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
   echo("<tr><td width=50%>");
   echo("<table width=100% cellspacing=0 cellpadding=2>");

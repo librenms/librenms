@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM voltage WHERE volt_host = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM voltage WHERE device_id = '" . $device['device_id'] . "'";
 $volt_data = mysql_query($query);
 while($voltage = mysql_fetch_array($volt_data)) {
 
