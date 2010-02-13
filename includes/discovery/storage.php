@@ -23,6 +23,7 @@
     if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == "hrStorageNetworkDisk") { $allow = 0; if ($debug) echo("network, skipping\n"); }
     $descr = str_replace("mounted on: ", "", $descr);
     $descr = preg_replace("/: [A-Za-z0-9_]+ file system, /", ", ", $descr);
+    echo("$fstype");
 
     if($size > '0' && $allow) {
       if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
@@ -32,10 +33,12 @@
 	echo("+");
       } else {
         $data = mysql_fetch_array(mysql_query("SELECT * FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"));
-	if($data['hrStorageDescr'] != $descr || $data['hrStorageSize'] != $size || $data['hrStorageAllocationUnits'] != $units ) {
+	if($data['hrStorageDescr'] != $descr || $data['hrStorageSize'] != $size || $data['hrStorageAllocationUnits'] != $units || $data['hrStorageType'] != $fstype) {
           $query  = "UPDATE storage SET `hrStorageDescr` = '$descr', `hrStorageType` = '$fstype', `hrStorageSize` = '$size', `hrStorageAllocationUnits` = '$units' ";
+          $query .= ", `hrStorageType` = '$fstype' ";
           $query .= "WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'";
 	  echo("U");
+          if($debug) { echo("$query \n"); }
 	  mysql_query($query);
         } else { echo("."); }
       }

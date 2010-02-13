@@ -19,15 +19,22 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
     $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $text_descr = $proc['processor_descr'];
-#    $text_descr = short_processor_descr($proc['processor_descr']);
+    $text_descr = short_hrDeviceDescr($proc['processor_descr']);
 
-    if($proc['processor_usage'] > '60') { $proc_colour='#cc0000'; } else { $proc_colour='#0000cc';  }
-    echo("<tr bgcolor=$row_colour><td class=tablehead width=350><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
-           <td width=100><a href='".$proc_url."'><img src='$mini_url'></a></td>
-           <td width=160><a href='".$proc_url."' $proc_popup>
-             <img src='percentage.php?per=" . $proc['processor_usage'] . "&width=150'></a></td>
-           <td style='font-weight: bold; color: $proc_colour'>
-           " . $proc['processor_usage'] . "%</td>
+    $perc = $proc['processor_usage'];
+
+    if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
+    } elseif($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
+    } elseif($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
+    } elseif($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
+    } else { $left_background='9abf5b'; $right_background='bbd392'; }
+
+
+    echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
+           <td width=90><a href='".$proc_url."'  $proc_popup><img src='$mini_url'></a></td>
+           <td width=200><a href='".$proc_url."' $proc_popup>
+           ".print_percentage_bar (200, 16, $perc, NULL, "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."
+           </a></td>
          </tr>");
     $processor_rows++;    
   }
