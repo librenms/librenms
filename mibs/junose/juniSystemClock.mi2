@@ -1,0 +1,1677 @@
+
+-- *****************************************************************************
+-- Juniper-System-Clock-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   System Clock MIB
+--
+-- Copyright (c) 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-System-Clock-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DateAndTime, DisplayString, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    JuniEnable
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniSysClockMIB  MODULE-IDENTITY
+    LAST-UPDATED "200512141401Z"  -- 14-Dec-05 10:01 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The System Clock and Network Time Protocol (NTP) MIB for the Juniper
+        Networks enterprise.
+
+        The System Clock section of the MIB allows setting the system clock
+        time, date and timezone.  All definitions are based on the Gregorian
+        calendar.
+
+        The NTP portion of the MIB provides management for the local NTP
+        client/server, which adheres to RFC 1305, the 'Network Time Protocol
+        (Version 3) Specification, Implementation and Analysis'."
+    -- Revision History
+    REVISION    "200703221400Z"  -- 22-Mar-07 10:00 AM EDT  - JUNOSe7.1
+    DESCRIPTION
+        "Incorporate 2007 U.S.A. Daylight Saving Time changes."
+    REVISION    "200512141401Z"  -- 14-Dec-05 10:01 AM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added juniNtpPeerLastUpdateTime to Peer Table."
+    REVISION    "200309151401Z"  -- 15-Sep-03 10:01 AM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200309121337Z"  -- 12-Sep-03 09:37 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added an indicator to stratum number that no stratum is set.
+         Added traps for significant NTP state changes.
+         Added replacement clock offset and frequency error objects with
+         DisplaySting syntax."
+    REVISION    "200204041456Z"  -- 04-Apr-02 09:56 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 56 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniSysClockMonth ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The month of the year."
+    SYNTAX      INTEGER {
+                    january(1),
+                    february(2),
+                    march(3),
+                    april(4),
+                    may(5),
+                    june(6),
+                    july(7),
+                    august(8),
+                    september(9),
+                    october(10),
+                    november(11),
+                    december(12) }
+
+JuniSysClockWeekOfTheMonth ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The week of the month."
+    SYNTAX      INTEGER {
+                    weekFirst(0),
+                    weekOne(1),
+                    weekTwo(2),
+                    weekThree(3),
+                    weekFour(4),
+                    weekFive(5),
+                    weekLast(6) }
+
+JuniSysClockDayOfTheWeek ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The day of the week."
+    SYNTAX      INTEGER {
+                    sunday(0),
+                    monday(1),
+                    tuesday(2),
+                    wednesday(3),
+                    thursday(4),
+                    friday(5),
+                    saturday(6) }
+
+JuniSysClockHour ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The hour of the day.  Uses 24-hour clock format."
+    SYNTAX      Integer32 (0..23)
+
+JuniSysClockMinute ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The minute of the hour."
+    SYNTAX      Integer32 (0..59)
+
+--
+-- NTP textual-conventions
+--
+JuniNtpTimeStamp ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The ASCII character representation of time in 64-bit unsigned long
+        format, where the integer part is the first 32 bits and the fraction
+        part is the last 32 bits.  This represents the time stamp as defined in
+        the NTP packet header format, which is the number of seconds since 1
+        January 1900.  The textual form of an unsigned decimal number is taken
+        from the NVT ASCII graphics character set (codes 46 and 48 through 57)."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992.
+         J. Postel & J. Reynolds, 'NVT ASCII character set', RFC-854, May 1983."
+    SYNTAX      OCTET STRING (SIZE(0..21))
+
+JuniNtpClockSignedTime ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The ASCII character representation of NTP clock error time in seconds
+        as a signed value.  The first 16 bits represents integer part of the
+        signed value and the last 16 bits represents the fraction part of the
+        signed value.  The textual form of a signed decimal number is taken from
+        the NVT ASCII graphics character set (codes 43, 45, 46 and 48 through
+        57)."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992.
+         J. Postel & J. Reynolds, 'NVT ASCII character set', RFC-854, May 1983."
+    SYNTAX      OCTET STRING (SIZE(0..11))
+
+JuniNtpClockUnsignedTime ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The ASCII character representation of NTP clock error time in seconds
+        as an unsigned value.  The first 8 bits represents the integer part of
+        the unsigned value and the last 48 bits represents the fraction part of
+        the unsigned value.  The textual form of an unsigned decimal number is
+        taken from the NVT ASCII graphics character set (codes 46 and 48 through
+        57)."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992.
+         J. Postel & J. Reynolds, 'NVT ASCII character set', RFC-854, May 1983"
+    SYNTAX      OCTET STRING (SIZE(0..11))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSysClockObjects   OBJECT IDENTIFIER ::= { juniSysClockMIB 1 }
+juniNtpObjects        OBJECT IDENTIFIER ::= { juniSysClockMIB 2 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- System clock time, date and timezone configurations.
+--
+-- This section of the MIB allows setting the system clock time, date and
+-- timezone.  All definitions are based on the Gregorian calendar.
+--
+-- Time and date fields to be set in juniSysClockDateAndTime object:
+--   field  octets  contents                  range
+--   =====  ======  ========                  =====
+--     1      1-2   year                      0..65536 - may be restricted
+--     2       3    month                     1..12
+--     3       4    day                       1..31
+--     4       5    hour                      0..23
+--     5       6    minutes                   0..59
+--     6       7    seconds                   0..60    - use 60 for leap-second
+--     7       8    deci-seconds              0..9     - ignored
+--     8       9    direction from UTC        '+' / '-'
+--     9      10    hours from UTC            0..13
+--    10      11    minutes from UTC          0..59
+--
+-- /////////////////////////////////////////////////////////////////////////////
+
+--
+-- The system clock object definitions are organized into the following
+-- functional sections:
+--
+juniSysClockTime OBJECT IDENTIFIER ::= { juniSysClockObjects 1 }
+juniSysClockDst  OBJECT IDENTIFIER ::= { juniSysClockObjects 2 }
+
+--//////////////////////////////////////////////////////////////////////////////
+--
+-- System time settings.
+--
+--//////////////////////////////////////////////////////////////////////////////
+juniSysClockDateAndTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to manage the system clock time, date and timezone.
+        If the Network Time Protocol (NTP) is enabled, attempts to set this
+        object will result in an inconsistantValue error.  For sets, the
+        implementation may check the value of the year and if it is outside of a
+        'reasonable' range (e.g., 1999..2035) it may return an inconsistantValue
+        error.  Only system clock time and date will be set if the timezone
+        offset is not set along with the timezone name."
+    ::= { juniSysClockTime 1 }
+
+juniSysClockTimeZoneName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of the timezone.  Timezone name take effects only with its offset
+        set along with it."
+    ::= { juniSysClockTime 2 }
+
+
+--//////////////////////////////////////////////////////////////////////////////
+--
+-- Summer time daylight savings time (DST) settings.
+--
+-- This group of objects are used to manage day light saving time in two modes.
+-- 1. Absolute mode  - This can only be set for a single year at a time.
+-- 2. Recurrent mode - Remains in effect until it is reset.
+-- 3. RecognizedUS   - Use defaults for known USA timezones.
+--
+-- The above modes are mutually exclusive.
+--
+--//////////////////////////////////////////////////////////////////////////////
+juniSysClockDstName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the daylight savings time (DST) zone.  Setting any standard
+        US DST timezone name with recurrent mode will result in turning on
+        corresponding DST recurrent mode values for the timezone."
+    ::= { juniSysClockDst 1 }
+
+juniSysClockDstOffset  OBJECT-TYPE
+    SYNTAX      Integer32 (1..1440)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The offset, in minutes, from the base timezone for the DST."
+    DEFVAL    { 60 }
+    ::= { juniSysClockDst 2 }
+
+juniSysClockDstStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    recurrent(1),
+                    absolute(2),
+                    recognizedUS(3)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The state of DST.  With each state, only corresponding objects can be
+        set.  When the state is off(0), set values will be ignored."
+    ::= { juniSysClockDst 3 }
+
+
+--
+-- Absolute daylight savings time (DST) objects
+--
+juniSysClockDstAbsoluteStartTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the start time for absolute DST.  Only the year,
+        month, day, hour and minutes fields of the object are used.  The other
+        fields will be ignored for a Set operation and will return zeroes for a
+        Get operation."
+    ::= { juniSysClockDst 4 }
+
+juniSysClockDstAbsoluteStopTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the stop time for absolute DST.  Only the year,
+        month, day, hour and minutes fields of the object are used.  The other
+        fields will be ignored for a Set operation and will return zeroes when
+        read."
+    ::= { juniSysClockDst 5 }
+
+
+--
+-- Recurrent daylight savings time (DST)
+--
+-- The default values are based on the 1987 law for the USA.
+-- If none of the recurrent objects are not set below, if all other
+-- conditions are ok, appropriate default values will take effect.
+--
+juniSysClockDstRecurStartMonth  OBJECT-TYPE
+    SYNTAX      JuniSysClockMonth
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The start month for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { march }
+    ::= { juniSysClockDst 6 }
+
+juniSysClockDstRecurStartWeek  OBJECT-TYPE
+    SYNTAX      JuniSysClockWeekOfTheMonth
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The start week of the month for DST recurrence.  The default value is
+        based on the 2007 law for the USA."
+    DEFVAL    { weekTwo }
+    ::= { juniSysClockDst 7 }
+
+juniSysClockDstRecurStartDay  OBJECT-TYPE
+    SYNTAX      JuniSysClockDayOfTheWeek
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The start day of the week for DST recurrence.  The default value is
+        based on the 2007 law for the USA."
+    DEFVAL    { sunday }
+    ::= { juniSysClockDst 8 }
+
+juniSysClockDstRecurStartHour  OBJECT-TYPE
+    SYNTAX      JuniSysClockHour
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The start hour for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { 1 }
+    ::= { juniSysClockDst 9 }
+
+juniSysClockDstRecurStartMinute  OBJECT-TYPE
+    SYNTAX      JuniSysClockMinute
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The start minute for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { 0 }
+    ::= { juniSysClockDst 10 }
+
+juniSysClockDstRecurStopMonth  OBJECT-TYPE
+    SYNTAX      JuniSysClockMonth
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The stop month for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { november }
+    ::= { juniSysClockDst 11 }
+
+juniSysClockDstRecurStopWeek  OBJECT-TYPE
+    SYNTAX      JuniSysClockWeekOfTheMonth
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The stop week of the month for DST recurrence.  The default value is
+        based on the 2007 law for the USA."
+    DEFVAL    { weekFirst }
+    ::= { juniSysClockDst 12 }
+
+juniSysClockDstRecurStopDay  OBJECT-TYPE
+    SYNTAX      JuniSysClockDayOfTheWeek
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The stop day of the week for DST recurrence.  The default value is
+        based on the 2007 law for the USA."
+    DEFVAL    { sunday }
+    ::= { juniSysClockDst 13 }
+
+juniSysClockDstRecurStopHour  OBJECT-TYPE
+    SYNTAX      JuniSysClockHour
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The stop hour for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { 2 }
+    ::= { juniSysClockDst 14 }
+
+juniSysClockDstRecurStopMinute  OBJECT-TYPE
+    SYNTAX      JuniSysClockMinute
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The stop minutes for DST recurrence.  The default value is based on the
+        2007 law for the USA."
+    DEFVAL    { 0 }
+    ::= { juniSysClockDst 15 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP MIB object definitions are organized into the following functional
+-- sections:
+--
+-- /////////////////////////////////////////////////////////////////////////////
+juniNtpSysClock      OBJECT IDENTIFIER ::= { juniNtpObjects 1 }
+juniNtpClient        OBJECT IDENTIFIER ::= { juniNtpObjects 2 }
+juniNtpServer        OBJECT IDENTIFIER ::= { juniNtpObjects 3 }
+juniNtpPeers         OBJECT IDENTIFIER ::= { juniNtpObjects 4 }
+juniNtpAccessGroup   OBJECT IDENTIFIER ::= { juniNtpObjects 5 }
+
+--
+-- Note: 1. juniNtpSysClock, juniNtpClient and juniNtpPeers object groups are
+--          system wide configurations.
+--       2. juniNtpServer and juniNtpAccessGroup are per router configurations.
+--
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP system clock status data
+--
+-- /////////////////////////////////////////////////////////////////////////////
+juniNtpSysClockState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    neverFrequencyCalibrated(0),
+                    frequencyCalibrated(1),
+                    setToServerTime(2),
+                    frequencyCalibrationIsGoingOn(3),
+                    synchronized(4),
+                    spikeDetected(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the state of the NTP on the system clock.  Clock states are:
+           0 - Clock has never been calibrated for frequency errors
+           1 - Clock frequency errors calibration has done
+           2 - Clock time has set to server time
+           3 - Clock frequency errors calibration is going on
+           4 - Clock has synchronized its time
+           5 - Clock has detected spike "
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpSysClock 1 }
+
+juniNtpSysClockOffsetError  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Displays the estimated offset error of the system clock relative to the
+        master clock in seconds.  This variable can take on both positive and
+        negative values; the value will be positive if the system clock is ahead
+        of the master clock; the value will be negative if the system clock is
+        behind the master clock.  This offset value will be used by the internal
+        NTP filter algorithm to adjust the system clock to correct any error it
+        may have.
+
+        This object has been deprecated in favor of the
+        juniNtpSysClockOffsetErrorNew object, which uses DisplayString for its
+        SYNTAX."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpSysClock 2 }
+
+juniNtpSysClockFrequencyError  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "ppm"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Displays the system clock frequency error in parts per million (ppm).
+        It will always be a positive value.  This error adjustment happens when
+        the system reboots or the NTP is enabled for the first time and it may
+        take up to fifteen minutes to complete.
+
+        Each system clock oscillator interrupts to update its clock.  If, for
+        example, it interrupts one million time per second then it has a
+        resolution of microseconds.  This is also the frequency of the clock
+        update.  Frequency error means that this system clock failed to update
+        by parts per millionth of a second.
+
+        For example, if the frequency error is 1ppm, it means the clock is ahead
+        by 0.864 second in a day, and therefore the clock will need to be
+        corrected by that amount in the next 24 hours for the clock to be
+        accurate.
+
+        The frequency error varies with temperature.  Therefore the system clock
+        will usually need to be corrected when the system boots, based on the
+        temperature at which it is operating.
+
+        This object has been deprecated in favor of the
+        juniNtpSysClockFrequencyErrorNew object, which uses DisplayString for
+        its SYNTAX."
+    ::= { juniNtpSysClock 3 }
+
+juniNtpSysClockRootDelay  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates the NTP time message total Network roundtrip delay to
+        the primary reference source at the root of the synchronization subnet,
+        in seconds.  Note that this variable can take on both positive and
+        negative values, depending on clock precision and skew."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpSysClock 4 }
+
+juniNtpSysClockRootDispersion  OBJECT-TYPE
+    SYNTAX      JuniNtpClockUnsignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This indicates the maximum error relative to the primary reference
+        source at the root of the synchronization subnet, in seconds.  Only
+        positive values greater than zero are possible."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpSysClock 5 }
+
+juniNtpSysClockStratumNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the stratum number of the system clock.
+            -1  - shows stratum is not set
+            1   - primary reference (e.g. calibrated atomic clock, radio clock)
+          2-255 - secondary reference (via NTP) "
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpSysClock 6 }
+
+juniNtpSysClockLastUpdateTime  OBJECT-TYPE
+    SYNTAX      JuniNtpTimeStamp
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the time of the system clock at the time when it was last
+        updated by any associated NTP server(peer)."
+    ::= { juniNtpSysClock 7 }
+
+juniNtpSysClockLastUpdateServer  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the IP address of the NTP server (peer) which done last update
+        to the system clock."
+    ::= { juniNtpSysClock 8 }
+
+juniNtpSysClockOffsetErrorNew  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..25))
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the estimated offset error of the system clock relative to the
+        master clock in seconds.  This variable can take on both positive and
+        negative values; the value will be positive if the system clock is ahead
+        of the master clock; the value will be negative if the system clock is
+        behind the master clock.  This offset value will be used by the internal
+        NTP filter algorithm to adjust the system clock to correct any error it
+        may have."
+    ::= { juniNtpSysClock 9 }
+
+juniNtpSysClockFrequencyErrorNew  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..25))
+    UNITS       "ppm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the system clock frequency error in parts per million (ppm).
+        It will always be a positive value.  This error adjustment happens when
+        the system reboots or the NTP is enabled for the first time and it may
+        take up to fifteen minutes to complete.
+
+        Each system clock oscillator interrupts to update its clock.  If, for
+        example, it interrupts one million time per second then it has a
+        resolution of microseconds.  This is also the frequency of the clock
+        update.  Frequency error means that this system clock failed to update
+        by parts per millionth of a second.
+
+        For example, if the frequency error is 1ppm, it means the clock is ahead
+        by 0.864 second in a day, and therefore the clock will need to be
+        corrected by that amount in the next 24 hours for the clock to be
+        accurate.
+
+        The frequency error varies with temperature.  Therefore the system clock
+        will usually need to be corrected when the system boots, based on the
+        temperature at which it is operating."
+    ::= { juniNtpSysClock 10 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP client configurations
+--
+-- Note: Any router can be enabled as a NTP client and but one at time for whole
+--       of the system.
+-- /////////////////////////////////////////////////////////////////////////////
+juniNtpClientAdminStatus  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "By enabling/disabling the NTP admin status, the router is enabled/
+        disabled to run as NTP client for the correction and synchronization of
+        the system clock time with the reliable time sources (stratum time
+        servers).  At any given time, only one NTP client can run on any router
+        on the system.
+
+        Sets the NTP admin status along with the routerIndex where NTP client
+        has be enabled in that router context."
+    DEFVAL    { disable }
+    ::= { juniNtpClient 1 }
+
+juniNtpClientSystemRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the router to be enabled or disabled as the system-wide
+        NTP client.  Always set along with juniNtpClientAdminStatus.
+
+        This is also the router context when NTP is enabled."
+    ::= { juniNtpClient 2 }
+
+juniNtpClientPacketSourceIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the NTP client sends an NTP packet, the source IP address is
+        normally set to the address of the interface through which the NTP
+        packet is sent.
+
+        Sets all the outgoing NTP packets' source ifIndex to one specific
+        ifIndex on the NTP client from which the source ifIndex is taken.  This
+        ifIndex will be the index of the IP interface as NTP is IP/UDP based.
+        If the value is zero, it means no interface has configured."
+    ::= { juniNtpClient 3 }
+
+juniNtpClientBroadcastDelay  OBJECT-TYPE
+    SYNTAX      Integer32 (0..999999)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allows to set the estimated round-trip broadcast delay between the
+        system client and broadcast servers (peers)."
+    DEFVAL    { 3000 }
+    ::= { juniNtpClient 4 }
+
+juniNtpClientIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNtpClientIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Lists all the NTP client's interfaces enabled for NTP.  All the IP
+        interfaces on the NTP client are by default enabled for NTP
+        communications and can be disabled individually on each IP interface.
+        If desired, any IP interface can be blocked from participating in NTP
+        communication."
+    ::= { juniNtpClient 5 }
+
+juniNtpClientIfEntry  OBJECT-TYPE
+    SYNTAX      JuniNtpClientIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry is per interface config for NTP."
+    INDEX     { juniNtpClientIfRouterIndex,
+                juniNtpClientIfIfIndex }
+    ::= { juniNtpClientIfTable 1 }
+
+JuniNtpClientIfEntry ::= SEQUENCE {
+    juniNtpClientIfRouterIndex       Unsigned32,
+    juniNtpClientIfIfIndex           Integer32,
+    juniNtpClientIfDisable            TruthValue,
+    juniNtpClientIfIsBroadcastClient TruthValue,
+    juniNtpClientIfIsBroadcastServer TruthValue,
+    juniNtpClientIfIsBroadcastServerVersion Integer32,
+    juniNtpClientIfIsBroadcastServerDelay Integer32}
+
+juniNtpClientIfRouterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the router to be enabled or disabled as an NTP client."
+    ::= { juniNtpClientIfEntry 1 }
+
+juniNtpClientIfIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface on the NTP client."
+    ::= { juniNtpClientIfEntry 2 }
+
+juniNtpClientIfDisable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable NTP on the interface."
+    ::= { juniNtpClientIfEntry 3 }
+
+juniNtpClientIfIsBroadcastClient  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable NTP client's interface as broadcast client.  As NTP
+        client's broadcast interface, it receives the broadcast NTP messages
+        from the associated servers (peers)."
+    ::= { juniNtpClientIfEntry 4 }
+
+juniNtpClientIfIsBroadcastServer  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable NTP interface as broadcast server.  As NTP server's 
+	broadcast interface, it broadcast NTP messages on the interfac."
+    ::= { juniNtpClientIfEntry 5 }
+
+juniNtpClientIfIsBroadcastServerVersion  OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "NTP Server Version on the NTP broadcast server interface. Default
+	version is 3"
+    DEFVAL	{ 3}
+    ::= { juniNtpClientIfEntry 6 }
+
+
+juniNtpClientIfIsBroadcastServerDelay  OBJECT-TYPE
+    SYNTAX      Integer32 (4..17)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Poll Interval for broadcasting NTP messages in seconds as a power of 
+	two. Default value is 6(64s). Minimal value is 4(16s) and maximum value
+	is 17 (36.4h)."
+    DEFVAL	{6}
+    ::= { juniNtpClientIfEntry 7 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP server configurations on the system
+--  Note: Any and every router can be NTP server on the system
+--        and all servers' common time source is system clock
+-- /////////////////////////////////////////////////////////////////////////////
+juniNtpServerStratumNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the stratum number (level) of the NTP server.  Due to one
+        system clock, setting the stratum number have a effect of setting all
+        the NTP servers' stratum to one stratum number(level) on the system."
+    DEFVAL    { 8 }
+   ::= { juniNtpServer 1 }
+
+juniNtpServerAdminStatus  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable the NTP server on the router."
+   ::= { juniNtpServer 2 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP  peers' associations
+--  Note: These are the NTP servers running on different hosts associated with
+--        one NTP client on the system for time synchronisation.
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- Peer config table
+--
+juniNtpPeerCfgTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNtpPeerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information on the peers with which the NTP client
+        has associations. The associated peers(servers) to client will be
+        running different hosts."
+    ::= { juniNtpPeers 1 }
+
+juniNtpPeerCfgEntry  OBJECT-TYPE
+    SYNTAX      JuniNtpPeerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides one NTP server's configuration information.  Each
+        peer is uniquely identified by the routerIndex of the client to which it
+        has to be associated and the Ip address of the remote server(peer)
+        itself.
+
+        Entries are automatically created when the user configures the remote
+        peer NTP server info on the system which has to be associated with the
+        NTP client and deleted when the user removes the peer association from
+        the NTP server."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    INDEX     { juniNtpClientIfRouterIndex,
+                juniNtpPeerCfgIpAddress }
+    ::= { juniNtpPeerCfgTable 1 }
+
+JuniNtpPeerCfgEntry ::= SEQUENCE {
+    juniNtpPeerCfgIpAddress              IpAddress,
+    juniNtpPeerCfgNtpVersion             Integer32,
+    juniNtpPeerCfgPacketSourceIfIndex    Integer32,
+    juniNtpPeerCfgIsPreferred            TruthValue,
+    juniNtpPeerCfgRowStatus              RowStatus }
+
+juniNtpPeerCfgIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Peer's IP address."
+    ::= { juniNtpPeerCfgEntry 1 }
+
+juniNtpPeerCfgNtpVersion  OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server NTP software version."
+    ::= { juniNtpPeerCfgEntry 2 }
+
+juniNtpPeerCfgPacketSourceIfIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "All the outgoing NTP packets' source address can be configured to one
+        specific interface address on the NTP peer server.
+
+        This object allows to configure all the outgoing NTP packets' source IP
+        ifIndex to one specific IP ifIndex on the NTP server."
+    ::= { juniNtpPeerCfgEntry 3 }
+
+juniNtpPeerCfgIsPreferred  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Select whether this NTP server is a preferred time source to the
+         NTP client to which it has association."
+    ::= { juniNtpPeerCfgEntry 4 }
+
+juniNtpPeerCfgRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Controls creation/deletion of entries in this table according to the
+       RowStatus textual convention, constrained to support the following
+       values only:
+          createAndGo
+          destroy
+
+      To create an entry in this table, the following entry objects MUST be
+      explicitly configured:
+          juniNtpPeerCfgRowStatus "
+    ::= { juniNtpPeerCfgEntry 5 }
+
+
+--
+-- Peer data table
+--
+juniNtpPeerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNtpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information on the peers with which the NTP client
+        has associations.  The associated peers (servers) to client will be
+        running different hosts."
+    ::= { juniNtpPeers 2 }
+
+juniNtpPeerEntry  OBJECT-TYPE
+    SYNTAX      JuniNtpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides one NTP server (peer) information.  Each peer is
+        uniquely identified by the routerIndex of the client to which it has to
+        be associated and the Ip address of the remote server (peer) itself.
+
+        Entries are automatically created when the user configures the remote
+        peer NTP server info on the system which has to be associated with the
+        NTP client and deleted when the user removes the peer association from
+        the NTP server."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    INDEX     { juniNtpClientIfRouterIndex,
+                juniNtpPeerCfgIpAddress }
+    ::= { juniNtpPeerTable 1 }
+
+JuniNtpPeerEntry ::= SEQUENCE {
+    juniNtpPeerState                 OCTET STRING,
+    juniNtpPeerStratumNumber         Integer32,
+    juniNtpPeerAssociationMode       INTEGER,
+    juniNtpPeerBroadcastInterval     Integer32,
+    juniNtpPeerPolledInterval        Integer32,
+    juniNtpPeerPollingInterval       Integer32,
+    juniNtpPeerDelay                 JuniNtpClockSignedTime,
+    juniNtpPeerDispersion            JuniNtpClockUnsignedTime,
+    juniNtpPeerOffsetError           JuniNtpClockSignedTime,
+    juniNtpPeerReachability          OCTET STRING,
+    juniNtpPeerPrecision             JuniNtpClockSignedTime,
+    juniNtpPeerRootDelay             JuniNtpClockSignedTime,
+    juniNtpPeerRootDispersion        JuniNtpClockUnsignedTime,
+    juniNtpPeerRootSyncDistance      JuniNtpClockSignedTime,
+    juniNtpPeerRootTime              JuniNtpTimeStamp,
+    juniNtpPeerRootTimeUpdateServer  IpAddress,
+    juniNtpPeerReceiveTime           JuniNtpTimeStamp,
+    juniNtpPeerTransmitTime          JuniNtpTimeStamp,
+    juniNtpPeerRequestTime           JuniNtpTimeStamp,
+    juniNtpPeerLastUpdateTime        Unsigned32 }
+
+juniNtpPeerState  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server association state to NTP client on the system.
+
+         Bit  Peer State           Description
+         --- ----------  ------------------------------------------------
+          0   master      Means NTP client on the system has chosen this peer
+                          server as the master.
+          1   configured  Confirms peer server configured for the  NTP client.
+          2   selected    NTP client will consider this peer server when it
+                          chooses the master.
+          3   unusable    Indication that the server does not meet the initial
+                          criteria for the master
+          4   preferred   Indicates as preferred  time source.
+          5   correct     NTP client considers the  peer server's clock is
+                          reasonably correct.
+          6   incorrect   NTP client considers the  peer server's clock is
+                          not reasonably correct
+          7   reserved
+
+        Each bit position value of 0 and 1 disables and enables that peer
+        state respectively. "
+    ::= { juniNtpPeerEntry 1 }
+
+juniNtpPeerStratumNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server system clock stratum number."
+    ::= { juniNtpPeerEntry 2 }
+
+juniNtpPeerAssociationMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    broacastServer(0),
+                    multicastServer(1),
+                    unicastServer(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server association mode to the NTP client on the
+        router.
+            broadcastServer - Broadcast only NTP messages.
+            multicastServer - Broadcast only NTP messages for IGMP multicast
+                              Network.
+            unicastServer   - Only sends NTP poll messages to the peer servers."
+    ::= { juniNtpPeerEntry 3 }
+
+juniNtpPeerBroadcastInterval  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the broadcast time interval of the NTP time messages from the
+        peer when the peer is enabled either as broadcast server or multicast
+        server."
+    ::= { juniNtpPeerEntry 4 }
+
+juniNtpPeerPolledInterval  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the time interval at which peer will be polled by NTP client
+        with which peer has associations when it is enabled as unicast server."
+    ::= { juniNtpPeerEntry 5 }
+
+juniNtpPeerPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the time interval at which peer will poll the servers with
+        which peer has associations when it is enabled as unicast server."
+    ::= { juniNtpPeerEntry 6 }
+
+juniNtpPeerDelay  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server broadcast delay."
+    ::= { juniNtpPeerEntry 7 }
+
+juniNtpPeerDispersion  OBJECT-TYPE
+    SYNTAX      JuniNtpClockUnsignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server dispersion."
+    ::= { juniNtpPeerEntry 8 }
+
+juniNtpPeerOffsetError  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server offset error."
+    ::= { juniNtpPeerEntry 9 }
+
+juniNtpPeerReachability  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer reachability status.  An 8-bit number that shows
+        whether or not the peer server responded to the last eight requests to
+        the server to which it has association; one indicates a response, zero
+        indicates no response.  Count from rightmost to leftmost as latest to
+        later requests as reachability states.
+
+        For example, 0b11111111 indicates that the peer server responded to the
+        last eight requests.  If the system client reaches one peer server less
+        often than it does other peer servers, that server is not a good choice
+        for the master"
+    ::= { juniNtpPeerEntry 10 }
+
+juniNtpPeerRootDelay  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server root delay."
+    ::= { juniNtpPeerEntry 11 }
+
+juniNtpPeerRootDispersion  OBJECT-TYPE
+    SYNTAX      JuniNtpClockUnsignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server root dispersion."
+    ::= { juniNtpPeerEntry 12 }
+
+juniNtpPeerRootSyncDistance  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the peer server synchronization distance.  Measure of the
+        total time error since the update in the path to the stratum 1 server."
+    ::= { juniNtpPeerEntry 13 }
+
+juniNtpPeerRootTime  OBJECT-TYPE
+    SYNTAX      JuniNtpTimeStamp
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last time at which the stratum 1 server sent clock update reply to the
+        this peer server."
+    ::= { juniNtpPeerEntry 14 }
+
+juniNtpPeerRootTimeUpdateServer  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the stratum 1 server last updated the peer server."
+    ::= { juniNtpPeerEntry 15 }
+
+juniNtpPeerReceiveTime  OBJECT-TYPE
+    SYNTAX      JuniNtpTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the peer server is either broadcast or multicast server, this will
+        represent time stamp at which NTP client received the broadcast message.
+        If it is unicast server, it represents the time stamp at which the peer
+        has sent the response to the NTP client poll message."
+    ::= { juniNtpPeerEntry 16 }
+
+juniNtpPeerTransmitTime  OBJECT-TYPE
+    SYNTAX      JuniNtpTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the peer server is either broadcast or multicast server, this will
+        represent time stamp at which peer sent the broadcast message.  If it is
+        unicast server, it represents the time stamp at which the NTP client has
+        received response from the peer."
+    ::= { juniNtpPeerEntry 17 }
+
+juniNtpPeerRequestTime  OBJECT-TYPE
+    SYNTAX      JuniNtpTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "For unicast server, it represents the time stamp at which the system
+        client sent NTP request to the peer."
+    ::= { juniNtpPeerEntry 18 }
+
+juniNtpPeerPrecision  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Length of the clock tick (interrupt interval) of the server's clock."
+    ::= { juniNtpPeerEntry 19 }
+
+juniNtpPeerLastUpdateTime  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the seconds since the last update from the NTP server"
+    ::= { juniNtpPeerEntry 20 }
+--
+-- NTP peer filter register table
+--  Note: There will one table instance for each peer server associated with
+--        the NTP client on the system.
+juniNtpPeerFilterRegisterTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniNtpPeerFilterRegisterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The following table contains NTP state variables used by the NTP clock
+        filter and selection algorithms.  This table depicts a shift register.
+        Each stage in the shift register is a 3-tuple consisting of the measured
+        clock offset, measured clock delay and measured clock dispersion
+        associated with a single observation.
+
+        The NTP clock-filter and selection algorithms are designed to minimize
+        the error in the calculated time by using the objects values in the
+        filter table."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpPeers 3 }
+
+juniNtpPeerFilterRegisterEntry  OBJECT-TYPE
+    SYNTAX      JuniNtpPeerFilterRegisterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry corresponds to one stage of the shift register and reading
+        one set of values clock delay, clock offset and clock dispersion.
+
+        Entries are automatically created whenever a peer is configured and
+        deleted when the peer is removed."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    INDEX     { juniNtpPeerCfgIpAddress,
+                juniNtpPeerFilterIndex }
+    ::= { juniNtpPeerFilterRegisterTable 1 }
+
+JuniNtpPeerFilterRegisterEntry ::= SEQUENCE {
+    juniNtpPeerFilterIndex       Unsigned32,
+    juniNtpPeerFilterOffset      JuniNtpClockSignedTime,
+    juniNtpPeerFilterDelay       JuniNtpClockSignedTime,
+    juniNtpPeerFilterDispersion  JuniNtpClockUnsignedTime }
+
+juniNtpPeerFilterIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An integer value in the specified range that is used to index into the
+        table.  The size of the table is fixed at 8.  Each entry identifies a
+        particular reading of the clock filter variables in the shift register.
+
+        Entries are added starting at index 1.  The index wraps back to 1 when
+        it reaches 8.  When the index wraps back, the new entries will overwrite
+        the old entries effectively deleting the old entry."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpPeerFilterRegisterEntry 1 }
+
+juniNtpPeerFilterOffset  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The offset of the peer clock relative to the system clock in seconds."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpPeerFilterRegisterEntry 2 }
+
+juniNtpPeerFilterDelay  OBJECT-TYPE
+    SYNTAX      JuniNtpClockSignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Roundtrip delay of the peer clock relative to the system clock over the
+        network path between them, in seconds.  This variable can take on both
+        positive and negative values, depending on clock precision and
+        skew-error accumulation."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+    ::= { juniNtpPeerFilterRegisterEntry 3 }
+
+juniNtpPeerFilterDispersion  OBJECT-TYPE
+    SYNTAX      JuniNtpClockUnsignedTime
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum error of the peer clock relative to the system clock over
+        the network path between them, in seconds.  Only positive values greater
+        than zero are possible."
+    REFERENCE
+        "D.L. Mills, 'Network Time Protocol (Version 3)', RFC-1305, March 1992"
+::= { juniNtpPeerFilterRegisterEntry 4 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- NTP router access group options
+--
+--    Order of the access group scanning done from least restrictive to
+--    most restrive in following order:
+--      1. Peer       - Allows time requests and NTP control queries and
+--                      allows the system to synchrozise itself to a system
+--                      whose address passes the access list criteria.
+--      2. Serve      - Allows time requests and NTP control queries and, but
+--                      does not allow the system to synchronize itself to
+--                      a system whose address passes the access list criteria.
+--      3. Serve only - Allows only time requests from a system whose address
+--                      passes the access list criteria.
+--      4. Query only - Allows only NTP control queries from a system whose
+--                      address passes the access list criteria."
+-- /////////////////////////////////////////////////////////////////////////////
+
+juniNtpRouterAccessGroupPeer  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the name of the peer access list for the NTP enabled router."
+    ::= { juniNtpAccessGroup 1 }
+
+juniNtpRouterAccessGroupServe  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the name of the serve access list for the NTP enabled
+        router."
+    ::= { juniNtpAccessGroup 2  }
+
+juniNtpRouterAccessGroupServeOnly  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the name of the serve-only access list for the NTP enabled
+        router."
+    ::= { juniNtpAccessGroup 3 }
+
+juniNtpRouterAccessGroupQueryOnly  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the name of the peer query-only list for the NTP enabled
+        router."
+    ::= { juniNtpAccessGroup 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniNtpTraps           OBJECT IDENTIFIER ::= { juniNtpObjects 0 }
+
+juniNtpFrequencyCalibrationStart  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpSysClockFrequencyError }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated at the start of frequency synchronization."
+    ::= { juniNtpTraps 1 }
+
+juniNtpFrequencyCalibrationEnd  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpSysClockFrequencyError }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated when frequency synchronization completes
+        successfully."
+    ::= { juniNtpTraps 2 }
+
+juniNtpTimeSynUp  NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates that some kind of time synchronization has started.
+        This trap will be generated at the start of time synchronization with
+        the configured time servers irrespective of whether time synchronization
+        is done with all the configured time servers or any one of them (there
+        may be reachability or other problems) when NTP is enabled on the
+        router."
+    ::= { juniNtpTraps 3 }
+
+juniNtpTimeSynDown  NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated when the NTP client is not able to time
+        synchronize with any of the configured time servers for any reasons when
+        NTP is enabled on the router."
+    ::= { juniNtpTraps 4 }
+
+juniNtpTimeServerSynUp  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpPeerCfgIsPreferred }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated to report the time synchronization status
+        of each configured time server on the router when it starts time
+        synchronization with the NTP client."
+    ::= { juniNtpTraps 5 }
+
+juniNtpTimeServerSynDown  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpPeerCfgIsPreferred }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated to report the time synchronization status
+        of each configured time server on the router when it stops time
+        synchronization with the NTP client for any reasons."
+    ::= { juniNtpTraps 6 }
+
+juniNtpFirstSystemClockSet  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpSysClockOffsetError,
+        juniNtpSysClockState }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated to report when the system clock offset
+        error is set for the first time from the good time sample taken,
+        enabling the time synchronization.  This is usually the case after a
+        system reboot."
+    ::= { juniNtpTraps 7 }
+
+juniNtpClockOffSetLimitCrossed  NOTIFICATION-TYPE
+    OBJECTS {
+        juniNtpSysClockOffsetError,
+        juniNtpSysClockState }
+    STATUS      current
+    DESCRIPTION
+        "This trap will be generated whenever the system clock's offset error is
+        more than 15 minutes.  This is an indication that something is not set
+        properly, since an offset of 15 minutes is not considered to be a normal
+        offset error compared to the accuracy of the time servers and system
+        clock.  For example, it may indicate an improper setting of the
+        timezone."
+    ::= { juniNtpTraps 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSysClockConformance OBJECT IDENTIFIER ::= { juniSysClockMIB 3 }
+juniSysClockCompliances OBJECT IDENTIFIER ::= { juniSysClockConformance 1 }
+juniSysClockGroups      OBJECT IDENTIFIER ::= { juniSysClockConformance 2 }
+
+--
+-- compliance statements
+--
+juniSysClockCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        System Clock MIB.  This statement became obsolete when NTP traps were
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSysClockTimeGroup,
+            juniSysClockDstGroup,
+            juniNtpSysClockGroup,
+            juniNtpClientGroup,
+            juniNtpServerGroup,
+            juniNtpPeersGroup,
+            juniNtpAccessGroupGroup }
+    ::= { juniSysClockCompliances 1 }                              -- JUNOSe 4.0
+
+juniSysClockCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        System Clock MIB.  This statement became obsolete when new offset and
+        frequency error objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSysClockTimeGroup,
+            juniSysClockDstGroup,
+            juniNtpSysClockGroup,
+            juniNtpClientGroup,
+            juniNtpServerGroup,
+            juniNtpPeersGroup,
+            juniNtpAccessGroupGroup,
+            juniNtpNotificationGroup }
+    ::= { juniSysClockCompliances 2 }                              -- JUNOSe 4.1
+
+juniSysClockCompliance3  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper System
+        Clock MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSysClockTimeGroup,
+            juniSysClockDstGroup,
+            juniNtpSysClockGroup2,
+            juniNtpClientGroup,
+            juniNtpServerGroup,
+            juniNtpPeersGroup,
+            juniNtpAccessGroupGroup,
+            juniNtpNotificationGroup }
+    ::= { juniSysClockCompliances 3 }                              -- JUNOSe 4.1
+
+
+--
+-- units of conformance
+--
+juniSysClockTimeGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSysClockDateAndTime,
+        juniSysClockTimeZoneName }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the System Clock current date and
+        time."
+    ::= { juniSysClockGroups 1 }                                   -- JUNOSe 4.0
+
+juniSysClockDstGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSysClockDstName,
+        juniSysClockDstOffset,
+        juniSysClockDstStatus,
+        juniSysClockDstAbsoluteStartTime,
+        juniSysClockDstAbsoluteStopTime,
+        juniSysClockDstRecurStartMonth,
+        juniSysClockDstRecurStartWeek,
+        juniSysClockDstRecurStartDay,
+        juniSysClockDstRecurStartHour,
+        juniSysClockDstRecurStartMinute,
+        juniSysClockDstRecurStopMonth,
+        juniSysClockDstRecurStopWeek,
+        juniSysClockDstRecurStopDay,
+        juniSysClockDstRecurStopHour,
+        juniSysClockDstRecurStopMinute }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the System Clock daylight savings
+        time information."
+    ::= { juniSysClockGroups 2 }                                   -- JUNOSe 4.0
+
+juniNtpSysClockGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpSysClockState,
+        juniNtpSysClockOffsetError,
+        juniNtpSysClockFrequencyError,
+        juniNtpSysClockRootDelay,
+        juniNtpSysClockRootDispersion,
+        juniNtpSysClockStratumNumber,
+        juniNtpSysClockLastUpdateTime,
+        juniNtpSysClockLastUpdateServer }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete management objects pertaining to the system clock when NTP is
+        configured on the system.  This group became obsolete when replacement
+        clock offset and frequency error objects with DisplaySting syntax were
+        added."
+    ::= { juniSysClockGroups 3 }                                   -- JUNOSe 4.0
+
+juniNtpClientGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpClientAdminStatus,
+        juniNtpClientSystemRouterIndex,
+        juniNtpClientPacketSourceIfIndex,
+        juniNtpClientBroadcastDelay,
+
+        juniNtpClientIfDisable,
+        juniNtpClientIfIsBroadcastClient }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the NTP client group."
+    ::= { juniSysClockGroups 4 }                                   -- JUNOSe 4.0
+
+juniNtpServerGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpServerAdminStatus,
+        juniNtpServerStratumNumber }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the NTP server group."
+    ::= { juniSysClockGroups 5 }                                   -- JUNOSe 4.0
+
+juniNtpPeersGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpPeerState,
+        juniNtpPeerStratumNumber,
+        juniNtpPeerAssociationMode,
+        juniNtpPeerBroadcastInterval,
+        juniNtpPeerPolledInterval,
+        juniNtpPeerPollingInterval,
+        juniNtpPeerDelay,
+        juniNtpPeerDispersion,
+        juniNtpPeerOffsetError,
+        juniNtpPeerReachability,
+        juniNtpPeerPrecision,
+        juniNtpPeerRootDelay,
+        juniNtpPeerRootDispersion,
+        juniNtpPeerRootSyncDistance,
+        juniNtpPeerRootTime,
+        juniNtpPeerRootTimeUpdateServer,
+        juniNtpPeerReceiveTime,
+        juniNtpPeerTransmitTime,
+        juniNtpPeerRequestTime,
+        juniNtpPeerFilterOffset,
+        juniNtpPeerFilterDelay,
+        juniNtpPeerFilterDispersion,
+        juniNtpPeerCfgNtpVersion,
+        juniNtpPeerCfgPacketSourceIfIndex,
+        juniNtpPeerCfgIsPreferred,
+        juniNtpPeerCfgRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "The management objects pertaining to the NTP peers group."
+    ::= { juniSysClockGroups 6 }                                   -- JUNOSe 4.0
+
+juniNtpAccessGroupGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpRouterAccessGroupPeer,
+        juniNtpRouterAccessGroupServe,
+        juniNtpRouterAccessGroupServeOnly,
+        juniNtpRouterAccessGroupQueryOnly }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the NTP per router access group."
+    ::= { juniSysClockGroups 7 }                                   -- JUNOSe 4.0
+
+juniNtpNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniNtpFrequencyCalibrationStart,
+        juniNtpFrequencyCalibrationEnd,
+        juniNtpTimeSynUp,
+        juniNtpTimeSynDown,
+        juniNtpTimeServerSynUp,
+        juniNtpTimeServerSynDown,
+        juniNtpFirstSystemClockSet,
+        juniNtpClockOffSetLimitCrossed }
+    STATUS      current
+    DESCRIPTION
+        "The management notifications pertaining to NTP state changes."
+    ::= { juniSysClockGroups 8 }                                   -- JUNOSe 4.1
+
+juniNtpSysClockGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniNtpSysClockState,
+        juniNtpSysClockRootDelay,
+        juniNtpSysClockRootDispersion,
+        juniNtpSysClockStratumNumber,
+        juniNtpSysClockLastUpdateTime,
+        juniNtpSysClockLastUpdateServer,
+        juniNtpSysClockOffsetErrorNew,
+        juniNtpSysClockFrequencyErrorNew }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the system clock when NTP is
+        configured on the system."
+    ::= { juniSysClockGroups 9 }                                   -- JUNOSe 4.1
+
+juniNtpSysClockDeprecatedGroup  OBJECT-GROUP
+    OBJECTS {
+        juniNtpSysClockOffsetError,
+        juniNtpSysClockFrequencyError }
+    STATUS      deprecated
+    DESCRIPTION
+        "Deprecated management objects pertaining to the system clock when NTP
+        is configured on the system."
+    ::= { juniSysClockGroups 10 }                                  -- JUNOSe 4.1
+    
+juniNtpPeersGroup1  OBJECT-GROUP
+    OBJECTS {
+        juniNtpPeerState,
+        juniNtpPeerStratumNumber,
+        juniNtpPeerAssociationMode,
+        juniNtpPeerBroadcastInterval,
+        juniNtpPeerPolledInterval,
+        juniNtpPeerPollingInterval,
+        juniNtpPeerDelay,
+        juniNtpPeerDispersion,
+        juniNtpPeerOffsetError,
+        juniNtpPeerReachability,
+        juniNtpPeerPrecision,
+        juniNtpPeerRootDelay,
+        juniNtpPeerRootDispersion,
+        juniNtpPeerRootSyncDistance,
+        juniNtpPeerRootTime,
+        juniNtpPeerRootTimeUpdateServer,
+        juniNtpPeerReceiveTime,
+        juniNtpPeerTransmitTime,
+        juniNtpPeerRequestTime,
+        juniNtpPeerFilterOffset,
+        juniNtpPeerFilterDelay,
+        juniNtpPeerFilterDispersion,
+        juniNtpPeerCfgNtpVersion,
+        juniNtpPeerCfgPacketSourceIfIndex,
+        juniNtpPeerCfgIsPreferred,
+        juniNtpPeerCfgRowStatus,
+        juniNtpPeerLastUpdateTime }
+    STATUS      current
+    DESCRIPTION
+        "The management objects pertaining to the NTP peers group."
+    ::= { juniSysClockGroups 11 }                                   -- JUNOSe 7.0    
+
+END

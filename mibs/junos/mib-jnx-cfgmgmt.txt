@@ -1,0 +1,308 @@
+--
+-- Juniper Enterprise Specific MIB: Configuration Management MIB Extension
+-- 
+-- Copyright (c) 2002-2003, 2006, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-CFGMGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime, TEXTUAL-CONVENTION
+          FROM SNMPv2-TC
+    jnxMibs, jnxCmNotifications
+        FROM JUNIPER-SMI;
+
+jnxCfgMgmt MODULE-IDENTITY
+    LAST-UPDATED "200310240000Z" -- Wed Nov 19 00:00:00 2003 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This MIB module defines objects used for managing the 
+            configuration of Juniper products."
+    REVISION      "200311190000Z"
+    DESCRIPTION
+               "Added Rescue Configuration Management."
+    REVISION      "200310240000Z" 
+    DESCRIPTION
+               "Added JnxCmCfChgSource TEXTUAL-CONVENTION."
+    REVISION      "200205100000Z" 
+    DESCRIPTION
+               "Initial revision."
+    ::= { jnxMibs 18 }
+
+
+--
+-- Textual Conventions
+-- 
+JnxCmCfChgSource ::= TEXTUAL-CONVENTION
+        STATUS       current 
+        DESCRIPTION  "Identifies the source of config event."
+        SYNTAX       INTEGER {
+                         other       (1),
+                         cli         (2),
+                         junoscript  (3),
+                         synchronize (4),
+                         snmp        (5),
+                         button      (6),
+                         autoinstall (7),
+                         unknown     (8)
+                     }
+
+JnxCmRescueCfgState ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION  "Identifies the state of the rescue configuration."
+        SYNTAX       INTEGER {
+                         nonexistant (1),
+                         updated     (2)
+                     }
+                      
+--
+-- Configuration Change Management
+--
+
+jnxCmCfgChg OBJECT IDENTIFIER ::= { jnxCfgMgmt 1 }
+
+jnxCmCfgChgLatestIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The index in jnxCmCfgChgEventTable for the latest configuration
+                change event."
+        ::= { jnxCmCfgChg 1 }
+
+jnxCmCfgChgLatestTime OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The value of sysUpTime when the configuration was last 
+                changed.
+
+                If the management subsystem was reset after the last
+		configuration change, this object will return 0."
+	::= { jnxCmCfgChg 2 }
+
+jnxCmCfgChgLatestDate OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The date and time when the configuration was last changed."
+	::= { jnxCmCfgChg 3 }
+
+jnxCmCfgChgLatestSource OBJECT-TYPE
+        SYNTAX     JnxCmCfChgSource 
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The source of the configuration event."
+        ::= { jnxCmCfgChg 4 }
+                
+jnxCmCfgChgLatestUser OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only  
+        STATUS     current
+        DESCRIPTION
+                "The name of the logged in user.  The length is zero if
+                not available or not applicable."
+        ::= { jnxCmCfgChg 5 }
+
+jnxCmCfgChgMaxEventEntries OBJECT-TYPE
+	SYNTAX     Integer32 (0..2147483647)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The maximum number of entries that can be held in
+		jnxCmCfgChgEventTable."
+	::= { jnxCmCfgChg 6 }
+
+--
+-- The folowing table provides a history of the most recent configuration
+-- change events.  The number of events stored in the table is identified
+-- by jnxCmCfgChgMaxEventEntries.  When the number of entries exceeds
+-- jnxCmCfgChgMaxEventEntries, each new entry will push the oldest entry
+-- out of the table.
+--
+
+jnxCmCfgChgEventTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF JnxCmCfgChgEventEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A table of configuration events on this router."
+	::= { jnxCmCfgChg 7 }
+
+jnxCmCfgChgEventEntry OBJECT-TYPE
+	SYNTAX     JnxCmCfgChgEventEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Information about a configuration event on this router."
+	INDEX	{ jnxCmCfgChgEventIndex }
+	::= { jnxCmCfgChgEventTable 1 }
+
+JnxCmCfgChgEventEntry ::=
+    SEQUENCE {
+	jnxCmCfgChgEventIndex
+		Integer32,
+	jnxCmCfgChgEventTime
+		TimeTicks,
+	jnxCmCfgChgEventDate
+		DateAndTime,
+	jnxCmCfgChgEventSource
+		JnxCmCfChgSource,
+	jnxCmCfgChgEventUser
+		DisplayString,
+	jnxCmCfgChgEventLog
+		DisplayString
+    }
+
+jnxCmCfgChgEventIndex OBJECT-TYPE
+	SYNTAX     Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This object identifies a specific configuration change
+                event.  Monotonically increasing values will be assigned
+                by the snmp subsystem to each event as it occurs.  If the
+                snmp subsystem is reset, these index values will be reset
+                as well."
+	::= { jnxCmCfgChgEventEntry 1 }
+
+jnxCmCfgChgEventTime OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The value of sysUpTime when the event occurred."
+	::= { jnxCmCfgChgEventEntry 2 }
+
+jnxCmCfgChgEventDate OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The system date and time when the event occurred."
+	::= { jnxCmCfgChgEventEntry 3 }
+
+jnxCmCfgChgEventSource OBJECT-TYPE
+	SYNTAX     JnxCmCfChgSource 
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The source of the configuration event."
+	::= { jnxCmCfgChgEventEntry 4 }
+
+jnxCmCfgChgEventUser OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the logged in user.  The length is zero if
+		not available or not applicable."
+	::= { jnxCmCfgChgEventEntry 5 }
+
+jnxCmCfgChgEventLog OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The log of the configuration event.  The length is zero
+                if not available."
+        ::= { jnxCmCfgChgEventEntry 6 }
+
+--
+-- Configuration Rescue Change Management
+--
+
+jnxCmRescueChg OBJECT IDENTIFIER ::= { jnxCfgMgmt 2 }
+
+jnxCmRescueChgTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The value of sysUpTime when the rescue configuration was
+                last changed.
+
+                If the management subsystem was reset after the last
+                configuration change, this object will return 0."
+        ::= { jnxCmRescueChg 1 }
+
+jnxCmRescueChgDate OBJECT-TYPE
+        SYNTAX     DateAndTime
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The date and time when the rescue configuration was last
+                changed."
+        ::= { jnxCmRescueChg 2 }
+
+jnxCmRescueChgSource OBJECT-TYPE
+        SYNTAX     JnxCmCfChgSource
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The source of the rescue configuration event."
+        ::= { jnxCmRescueChg 3 }
+
+jnxCmRescueChgUser OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only 
+        STATUS     current
+        DESCRIPTION
+                "The name of the logged in user.  The length is zero if
+                not available or not applicable."
+        ::= { jnxCmRescueChg 4 }
+
+jnxCmRescueChgState OBJECT-TYPE
+        SYNTAX     JnxCmRescueCfgState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The current state of the rescue configuration."
+        ::= { jnxCmRescueChg 5 }
+
+--
+-- Configuration Management Notifications
+--
+
+jnxCmNotificationsPrefix   OBJECT IDENTIFIER ::= { jnxCmNotifications 0 }
+
+jnxCmCfgChange NOTIFICATION-TYPE
+       OBJECTS { jnxCmCfgChgEventTime,
+                 jnxCmCfgChgEventDate, 
+                 jnxCmCfgChgEventSource,
+		 jnxCmCfgChgEventUser,
+		 jnxCmCfgChgEventLog }
+       STATUS  current
+       DESCRIPTION
+		"Notification of a configuration management event as
+		recorded in jnxCmCfgChgEventTable."
+	::= { jnxCmNotificationsPrefix 1 }
+
+jnxCmRescueChange NOTIFICATION-TYPE
+       OBJECTS { jnxCmRescueChgTime,
+                 jnxCmRescueChgDate,
+                 jnxCmRescueChgSource,
+                 jnxCmRescueChgUser,
+                 jnxCmRescueChgState }
+       STATUS  current
+       DESCRIPTION
+                "Notification of the latest rescue configuration 
+                change."
+        ::= { jnxCmNotificationsPrefix 2 }
+
+END

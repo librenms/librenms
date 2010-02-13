@@ -1,0 +1,319 @@
+
+-- *****************************************************************************
+-- Juniper-IP-TUNNEL-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Extensions for IP Tunnel management
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IP-TUNNEL-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    RowStatus, DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    JuniNextIfIndex, JuniName
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIpTunnelMIB  MODULE-IDENTITY
+    LAST-UPDATED "200309291729Z"  -- 29-Sep-03 01:29 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IP Tunnel MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200309291729Z"  -- 29-Sep-03 01:29 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Product rebranding (JUNOSe)."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200201141816Z"  -- 14-Jan-02 01:16 PM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Added juniIpTunnelSequenceNumbers."
+    REVISION    "200107232057Z"  -- 23-Jul-01 04:57 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 51 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpTunnelInterfaceObjects    OBJECT IDENTIFIER ::= { juniIpTunnelMIB 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- IP Tunnel Interface Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- IfIndex selection for creating IP tunnel interfaces
+--
+juniIpTunnelNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniIpTunnelIfTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniIpTunnelInterfaceObjects 1 }
+
+
+--
+-- The IP Tunnel Interface Table
+--
+juniIpTunnelInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpTunnelInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of IP Tunnel interfaces."
+    ::= { juniIpTunnelInterfaceObjects 2 }
+
+juniIpTunnelInterfaceEntry OBJECT-TYPE
+    SYNTAX      JuniIpTunnelInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a single IP Tunnel
+        interface.
+
+        Creating/deleting entries in this table causes corresponding entries for
+        be created/deleted in ifTable/ifXTable/juniIfTable."
+    INDEX     { juniIpTunnelIfIndex }
+    ::= { juniIpTunnelInterfaceTable 1 }
+
+JuniIpTunnelInterfaceEntry ::= SEQUENCE {
+    juniIpTunnelIfIndex          InterfaceIndex,
+    juniIpTunnelName             DisplayString,
+    juniIpTunnelMode             INTEGER,
+    juniIpTunnelVirtualRouter    JuniName,
+    juniIpTunnelChecksum         TruthValue,
+    juniIpTunnelMtu              Integer32,
+    juniIpTunnelSource           IpAddress,
+    juniIpTunnelDestination      IpAddress,
+    juniIpTunnelRowStatus        RowStatus,
+    juniIpTunnelSequenceNumbers  TruthValue }
+
+juniIpTunnelIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the IP tunnel interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniIpTunnelNextIfIndex."
+    ::= { juniIpTunnelInterfaceEntry 1 }
+
+juniIpTunnelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name for this IP Tunnel interface."
+    ::= { juniIpTunnelInterfaceEntry 2 }
+
+juniIpTunnelMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ipTunnelModeGre(0),
+                    ipTunnelModeDvmrp(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The configured mode for this IP Tunnel interface."
+    ::= { juniIpTunnelInterfaceEntry 3 }
+
+juniIpTunnelVirtualRouter OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The transport virtual router associated with this IP tunnel interface.
+        This object need not be set when creating row entries.  Note that the
+        default when this object is not specified is the router associated with
+        the agent acting on the management request."
+    DEFVAL    { "default" }
+    ::= { juniIpTunnelInterfaceEntry 4 }
+
+juniIpTunnelChecksum OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Tunnel checksum configuration for this entry.  Setting this object
+        to true(1) will enabled end-to-end checksumming and will cause the
+        system to drop packets with bad checksums received on this interface.
+        Setting this object to false(2) will disable this feature.
+        Note:  This configuration object is not supported for DVMRP tunnels."
+    DEFVAL    { false }
+    ::= { juniIpTunnelInterfaceEntry 5 }
+
+juniIpTunnelMtu OBJECT-TYPE
+    SYNTAX      Integer32 (1024..10240)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel MTU."
+    DEFVAL    { 10240 }
+    ::= { juniIpTunnelInterfaceEntry 6 }
+
+juniIpTunnelDestination OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel destination IP address."
+    DEFVAL    { 0 }
+    ::= { juniIpTunnelInterfaceEntry 7 }
+
+juniIpTunnelSource OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel source IP address."
+    DEFVAL    { 0 }
+    ::= { juniIpTunnelInterfaceEntry 8 }
+
+juniIpTunnelRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniIpTunnelIfRowStatus
+            juniIpTunnelName
+            juniIpTunnelMode
+
+        In addition, when creating an entry the following condition must hold:
+
+            A value for juniIpTunnelIfIndex must have been determined
+            previously, typically by reading juniIpTunnelNextIfIndex.
+
+        Once created, the following objects may not be modified:
+            juniIpTunnelName
+            juniIpTunnelMode
+            juniIpTunnelVirtualRouter
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniIpTunnelInterfaceEntry 9 }
+
+juniIpTunnelSequenceNumbers OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The tunnel sequence number configuration for this entry.  Setting this
+        object to true(1) will enable sequence number generation.  Setting this
+        object to false(2) will disable this feature.
+        Note:  This configuration object is not supported for DVMRP tunnels."
+    DEFVAL    { false }
+    ::= { juniIpTunnelInterfaceEntry 10 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpTunnelConformance  OBJECT IDENTIFIER ::= { juniIpTunnelMIB 2 }
+juniIpTunnelCompliances  OBJECT IDENTIFIER ::= { juniIpTunnelConformance 1 }
+juniIpTunnelGroups       OBJECT IDENTIFIER ::= { juniIpTunnelConformance 2 }
+
+--
+-- compliance statements
+--
+juniIpTunnnelCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper
+        IP Tunnel MIB.  This compliance statement became obsolete when
+        juniIpTunnelSequenceNumbers was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpTunnelInterfaceGroup }
+    ::= { juniIpTunnelCompliances 1 }                              -- JUNOSe 3.2
+
+juniIpTunnnelCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper IP
+        Tunnel MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpTunnelInterfaceGroup2 }
+    ::= { juniIpTunnelCompliances 2 }                              -- JUNOSe 4.1
+
+--
+-- units of conformance
+--
+juniIpTunnelInterfaceGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpTunnelNextIfIndex,
+        juniIpTunnelName,
+        juniIpTunnelMode,
+        juniIpTunnelVirtualRouter,
+        juniIpTunnelChecksum,
+        juniIpTunnelMtu,
+        juniIpTunnelSource,
+        juniIpTunnelDestination,
+        juniIpTunnelRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects for managing IP Tunnel capabilities in a
+        Juniper product.  This group became obsolete when
+        juniIpTunnelSequenceNumbers was added."
+    ::= { juniIpTunnelGroups 1 }                                   -- JUNOSe 3.2
+
+juniIpTunnelInterfaceGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIpTunnelNextIfIndex,
+        juniIpTunnelName,
+        juniIpTunnelMode,
+        juniIpTunnelVirtualRouter,
+        juniIpTunnelChecksum,
+        juniIpTunnelMtu,
+        juniIpTunnelSource,
+        juniIpTunnelDestination,
+        juniIpTunnelRowStatus,
+        juniIpTunnelSequenceNumbers }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing IP Tunnel capabilities in a
+        Juniper product."
+    ::= { juniIpTunnelGroups 2 }                                   -- JUNOSe 4.1
+
+END

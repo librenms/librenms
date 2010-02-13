@@ -1,0 +1,2392 @@
+JUNIPER-MIMSTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE,MODULE-IDENTITY, Integer32,
+    enterprises,Counter32, TimeTicks,NOTIFICATION-TYPE FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    TruthValue        FROM SNMPv2-TC
+    jnxXstpMibs FROM JUNIPER-SMI;
+
+
+jnxMIMstMIB MODULE-IDENTITY
+    LAST-UPDATED "200705030000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Juniper Technical Assistance Center
+         Juniper Networks, Inc.
+         1194 N. Mathilda Avenue
+         Sunnyvale, CA 94089
+         E-mail: support@juniper.net"
+    DESCRIPTION 
+        "This mib module is for Juniper Networks Proprietory
+         Multiple Instance MSTP mib" 
+    REVISION     "200705030000Z"
+    DESCRIPTION
+               "Updated DESCRIPTION for jnxMIMstInstanceUpCount and
+                jnxMIMstInstanceDownCount"
+    REVISION     "200705240000Z"
+    DESCRIPTION
+               "Updated DESCRIPTION for jnxMIMstNewRootTrap"
+    REVISION     "200712180000Z"
+    DESCRIPTION
+               "Defined new tables jnxMIMstCistPortProtectTable and 
+                jnxMIMstMstiPortProtectTable and new notifications under 
+                jnxMIMstTraps to support Root Protect and Loop Protect."
+    ::= { jnxXstpMibs 1 }
+
+VlanId ::= TEXTUAL-CONVENTION 
+    STATUS      current 
+    DESCRIPTION 
+        "A 12-bit VLAN ID used in the VLAN Tag header."
+    SYNTAX      Integer32 (1..4094)
+
+BridgeId ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        " Identifier of Bridge in 8 byte format"
+    SYNTAX          OCTET STRING (SIZE (8))
+
+Timeout ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d4"
+    STATUS       current
+    DESCRIPTION
+        " Time out value in 4 byte"
+    SYNTAX       Integer32
+
+EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "A simple status value for the object." 
+    SYNTAX      INTEGER { enabled(1), disabled(2) } 
+      
+      
+jnxMIDot1sJuniperMst     OBJECT IDENTIFIER   ::= { jnxMIMstMIB 1 }
+jnxMIDot1sJnxMstTrapsControl OBJECT IDENTIFIER ::= { jnxMIMstMIB 2 }
+jnxMIDot1sJuniperMstTraps OBJECT IDENTIFIER ::= { jnxMIMstMIB 3 }
+
+-- jnxMIDot1qJuniperMst group
+
+jnxMIMstGlobalTrace OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to enable Global Trace 
+         Statements in the MSTP Module."
+    ::= { jnxMIDot1sJuniperMst 1 }
+
+jnxMIMstGlobalDebug OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to enable Global Debug 
+         Statements in the MSTP Module."
+    ::= { jnxMIDot1sJuniperMst 2 }
+
+jnxMIDot1sJuniperMstTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF JnxMIDot1sJuniperMstEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "List of per Virtual Context Mst Module Parameters."
+    ::= { jnxMIDot1sJuniperMst 3 }
+
+jnxMIDot1sJuniperMstEntry OBJECT-TYPE
+    SYNTAX       JnxMIDot1sJuniperMstEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Virtual Context Mst Module Parameters."
+    INDEX { jnxMIDot1sJuniperMstContextId }
+    ::= { jnxMIDot1sJuniperMstTable 1 }
+
+JnxMIDot1sJuniperMstEntry ::=
+    SEQUENCE {
+        jnxMIDot1sJuniperMstContextId
+            Integer32,
+        jnxMIMstSystemControl
+            INTEGER,
+        jnxMIMstModuleStatus
+            EnabledStatus,
+        jnxMIMstMaxMstInstanceNumber
+            Integer32,
+        jnxMIMstNoOfMstiSupported
+            Integer32,
+        jnxMIMstMaxHopCount
+            Integer32,
+        jnxMIMstBrgAddress
+            MacAddress,
+        jnxMIMstCistRoot
+            BridgeId,
+        jnxMIMstCistRegionalRoot
+            BridgeId,
+        jnxMIMstCistRootCost
+            Integer32,
+        jnxMIMstCistRegionalRootCost
+            Integer32,
+        jnxMIMstCistRootPort
+            Integer32,
+        jnxMIMstCistBridgePriority
+            Integer32,
+        jnxMIMstCistBridgeMaxAge
+            Timeout,
+        jnxMIMstCistBridgeForwardDelay
+            Timeout,
+        jnxMIMstCistHoldTime
+            Integer32,
+        jnxMIMstCistMaxAge
+            Timeout,
+        jnxMIMstCistForwardDelay
+            Timeout,
+        jnxMIMstMstpUpCount
+            Counter32,
+        jnxMIMstMstpDownCount
+            Counter32,
+        jnxMIMstPathCostDefaultType
+            INTEGER,
+        jnxMIMstTrace
+            Integer32,
+        jnxMIMstDebug
+            Integer32,
+        jnxMIMstForceProtocolVersion
+            INTEGER,
+        jnxMIMstTxHoldCount
+            INTEGER,
+        jnxMIMstMstiConfigIdSel
+            Integer32,
+        jnxMIMstMstiRegionName
+            OCTET STRING,
+        jnxMIMstMstiRegionVersion
+            Integer32,
+        jnxMIMstMstiConfigDigest
+            OCTET STRING,
+        jnxMIMstBufferOverFlowCount
+            Counter32,
+        jnxMIMstMemAllocFailureCount
+            Counter32,
+        jnxMIMstRegionConfigChangeCount
+            Counter32,
+        jnxMIMstCistBridgeRoleSelectionSemState
+            INTEGER,
+        jnxMIMstCistTimeSinceTopologyChange
+            TimeTicks,
+        jnxMIMstCistTopChanges
+            Counter32,
+        jnxMIMstCistNewRootBridgeCount
+            Counter32,
+        jnxMIMstCistHelloTime
+            Timeout,
+        jnxMIMstCistBridgeHelloTime
+            Timeout,
+        jnxMIMstCistDynamicPathcostCalculation
+            TruthValue
+    }
+
+jnxMIDot1sJuniperMstContextId OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Identifies the Virtual Context."
+    ::= { jnxMIDot1sJuniperMstEntry 1 }
+
+jnxMIMstSystemControl OBJECT-TYPE
+    SYNTAX      INTEGER { start(1), shutdown(2) } 
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative shutdown status requested by management for the MST  
+         feature. The value start (1) indicates that MST should be active in 
+         the device on all ports. The value shutdown (2) indicates that MST 
+         should be shutdown in the device on all ports. All memory should 
+         be released on all ports."
+    ::= { jnxMIDot1sJuniperMstEntry 2 }  
+
+jnxMIMstModuleStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative status requested by management for the MST  
+         feature. The value enabled(1) indicates that Mst should be enabled  
+         in the device on all ports. The value disabled(2) indicates that 
+         Mst should be disabled in the device on all ports. The object can 
+         be set to enabled(1) if and only if, jnxMIMstSystemControl set to start."
+    ::= { jnxMIDot1sJuniperMstEntry 3 }  
+
+jnxMIMstMaxMstInstanceNumber OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximun number of spanning trees to be allowed.
+         A User may limit the Number of Spanning Tree instance 
+         to be allowed in the Bridge."
+    ::= { jnxMIDot1sJuniperMstEntry 4 }  
+
+jnxMIMstNoOfMstiSupported OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates Maximum number of spanning tree Instances supported."
+    ::= { jnxMIDot1sJuniperMstEntry 5 } 
+
+jnxMIMstMaxHopCount OBJECT-TYPE
+    SYNTAX      Integer32 (600..4000)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Maximum Hop Count value.
+        The granularity of this timer is specified 
+        to be 1 second.  An agent may return a badValue 
+        error if a set is attempted to a value which is 
+        not a whole number of seconds."
+    DEFVAL { 2000 }
+    ::= { jnxMIDot1sJuniperMstEntry 6 }  
+
+jnxMIMstBrgAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address used by this bridge when it must
+        be referred to in a unique fashion.   It is
+        recommended that this be the numerically smallest
+        MAC address of all ports that belong to this
+        bridge.  However it is only required to be unique.
+        When concatenated with jnxMIMstCistBridgePriority or 
+        jnxMIMstMstiBridgePriority a unique BridgeIdentifier 
+        is formed which is used in the Spanning Tree Protocol."
+    ::= { jnxMIDot1sJuniperMstEntry 7 } 
+
+jnxMIMstCistRoot OBJECT-TYPE
+    SYNTAX      BridgeId  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge identifier of the Root of the common spanning
+        tree as determined by the Spanning Tree Protocol
+        as executed by this node.  This value is used as
+        the CIST Root Identifier parameter in all Configuration
+        Bridge PDUs originated by this node."
+    ::= { jnxMIDot1sJuniperMstEntry 8 } 
+
+jnxMIMstCistRegionalRoot OBJECT-TYPE
+    SYNTAX      BridgeId  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The bridge identifier of the Root of the Multiple
+        spanning tree region as determined by the Spanning Tree
+        Protocol as executed by this node.  This value is used as
+        the CIST Regional Root Identifier parameter in all Configuration
+        Bridge PDUs originated by this node."
+    ::= { jnxMIDot1sJuniperMstEntry 9 } 
+
+jnxMIMstCistRootCost OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Cost of the path to the CIST Root as seen 
+        from this bridge."
+    ::= { jnxMIDot1sJuniperMstEntry 10 } 
+
+jnxMIMstCistRegionalRootCost OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Cost of the path to the CIST Regional Root 
+        as seen from this bridge."
+    ::= { jnxMIDot1sJuniperMstEntry 11 } 
+
+jnxMIMstCistRootPort OBJECT-TYPE
+    SYNTAX      Integer32  
+    MAX-ACCESS  read-only      
+    STATUS      current 
+    DESCRIPTION 
+        "The Port Number of the Port which offers the lowest    
+        path cost from this bridge to the CIST Root Bridge."
+    ::= { jnxMIDot1sJuniperMstEntry 12 } 
+
+jnxMIMstCistBridgePriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..61440) 
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The Value of the writable portion of the Bridge
+        Identifier comprising of the first two octets.
+        The values that are set for Bridge Priority must be 
+        in steps of 4096."
+    DEFVAL {32768}
+    ::= { jnxMIDot1sJuniperMstEntry 13 } 
+
+jnxMIMstCistBridgeMaxAge OBJECT-TYPE
+    SYNTAX      Timeout (600..4000)  
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The value that all bridges use for MaxAge when
+        this bridge is acting as the root. The granularity 
+        of this timer is specified to be 1 second.
+        An agent may return a badValue error if a set is
+        attempted to a value which is not a whole number
+        of seconds."
+    DEFVAL {2000}
+    ::= { jnxMIDot1sJuniperMstEntry 14 } 
+
+jnxMIMstCistBridgeForwardDelay OBJECT-TYPE
+    SYNTAX      Timeout (400..3000)  
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The value that all bridges use for ForwardDelay
+        when this bridge is acting as the root.  Note that
+        802.1D specifies that the range for this
+        parameter is related to the value of
+        BridgeMaxAge.  The granularity of this
+        timer is specified to be 1 second.
+        An agent may return a badValue error if a set is
+        attempted to a value which is not a whole number
+        of seconds."
+    DEFVAL {1500}
+    ::= { jnxMIDot1sJuniperMstEntry 15 } 
+
+jnxMIMstCistHoldTime OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "This time value determines the interval length
+        during which no more than two Configuration bridge
+        PDUs shall be transmitted by this node, in units
+        of hundredths of a second."
+    ::= { jnxMIDot1sJuniperMstEntry 16 } 
+
+jnxMIMstCistMaxAge OBJECT-TYPE
+    SYNTAX      Timeout
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The maximum age of Spanning Tree Protocol
+        information learned from the network on any port
+        before it is discarded, in units of hundredths of
+        a second.  This is the actual value that this
+        bridge is currently using."
+    ::= { jnxMIDot1sJuniperMstEntry 17 } 
+
+jnxMIMstCistForwardDelay OBJECT-TYPE
+    SYNTAX      Timeout
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "This time value, measured in units of hundredths
+        of a second, controls how fast a port changes its
+        spanning state when moving towards the Forwarding
+        state.  The value determines how long the port
+        stays in a particular state before moving to the
+        next state."
+    ::= { jnxMIDot1sJuniperMstEntry 18 } 
+
+jnxMIMstMstpUpCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times MSTP Module has been enabled."
+    ::= { jnxMIDot1sJuniperMstEntry 19 } 
+
+jnxMIMstMstpDownCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times MSTP Module has been disabled."
+    ::= { jnxMIDot1sJuniperMstEntry 20 } 
+
+jnxMIMstPathCostDefaultType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        stp8021d1998(1),
+        stp8021t2001(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the Spanning Tree default Path Costs that
+        are to be used by this Bridge.  A value of 8021d1998(1)
+        uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+        A value of stp8021t2001(2) uses the 32-bit default Path
+        Costs from IEEE Std. 802.1t."
+    ::= { jnxMIDot1sJuniperMstEntry 21 } 
+
+jnxMIMstTrace OBJECT-TYPE
+    SYNTAX      Integer32 (0..255) 
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to enable Trace Statements in the MSTP
+        Module.
+
+        A FOUR BYTE integer is used for enabling the level of tracing. 
+        Each BIT in the four byte integer, represents a particular 
+        level of Trace. 
+
+        The mapping between the bit positions & the level of trace is 
+        as follows: 
+        0 - Init and Shutdown Traces
+        1 - Management Traces
+        2 - Data Path Traces
+        3 - Control Plane Traces
+        4 - Packet Dump Traces
+        5 - Traces related to All Resources except Buffers
+        6 - All Failure Traces
+        7 - Buffer Traces
+
+        The remaining bits are unused. Combination of trace levels are 
+        also allowed.
+
+        For example if the bits 0 and 1 are set, then the Trace
+        statements related to Init-Shutdown and management 
+        will be printed.
+
+        The user has to enter the corresponding INTEGER VALUE for the
+        bits set. For example if bits 0 and 1 are to be set then user has
+        to give the value for this object as 3.
+        
+        Setting the Trace Option to any value will cause the Debug Option
+        to be set to 0 (i.e.) the Trace Option and Debug Option are mutually
+        exclusive."
+    
+    DEFVAL  { 0 }
+    ::= { jnxMIDot1sJuniperMstEntry 22 } 
+
+jnxMIMstDebug OBJECT-TYPE
+    SYNTAX      Integer32 (0..131071)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to enable Debug Statements in the MSTP
+        Module.
+
+        A FOUR BYTE integer is used for enabling the level of debugging. 
+        Each BIT in the four byte integer, represents a particular 
+        level of Debug. 
+
+        The mapping between the bit positions & the level of debug is 
+        as follows: 
+        0 - Init and Shutdown Debug statements
+        1 - Management Debug statements
+        2 - Memory related Debug statements
+        3 - BPDU related Debug statements
+        4 - Event Handling Debug statements
+        5 - Timer Module Debug statements
+        6 - Port Information SEM Debug statements
+        7 - Port Receive SEM Debug statements (valid in the case of MSTP alone)
+        8 - Role Selection SEM Debug statements
+        9 - Role Transition SEM Debug statements
+        10 - State Transition SEM Debug statements
+        11 - Protocol Migration SEM Debug statements
+        12 - Topology Change SEM Debug statements
+        13 - Port Transmit SEM Debug statements
+        14 - Bridge Detection SEM Debug statements
+        15 - All Failure Debug statements
+        16 - Redundancy code flow Debug statements
+
+        The remaining bits are unused. Combination of debug levels are 
+        also allowed.
+
+        For example if the bits 0 and 1 are set, then the Debug
+        statements related to Init-Shutdown and management 
+        will be printed.
+
+        The user has to enter the corresponding INTEGER VALUE for the
+        bits set. For example if bits 0 and 1 are to be set then user has
+        to give the value for this object as 3.
+        
+        Setting the Debug Option to any value will cause the Trace Option
+        to be set to 0 (i.e.) the Trace Option and Debug Option are mutually
+        exclusive."
+    DEFVAL  { 0 }
+    ::= { jnxMIDot1sJuniperMstEntry 23 } 
+
+jnxMIMstForceProtocolVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+        stpCompatible(0),
+        rstp(2),
+        mstp(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of Spanning Tree Protocol the bridge is
+        currently running.  The value 'stpCompatible(0)'
+        indicates the Spanning Tree Protocol specified in
+        IEEE 802.1D and 'rstp(2)' indicates the Rapid Spanning
+        Tree Protocol specified in IEEE 802.1w and 'mstp(3)'
+        indicates the Multiple Spanning Tree Protocol Specified
+        in IEEE 802.1s." 
+
+    DEFVAL { mstp }
+    ::= { jnxMIDot1sJuniperMstEntry 24 } 
+
+jnxMIMstTxHoldCount OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The value used by the Port Transmit state machine to limit
+        the maximum transmission rate."
+    DEFVAL  { 3 }
+    ::= { jnxMIDot1sJuniperMstEntry 25 } 
+
+jnxMIMstMstiConfigIdSel OBJECT-TYPE
+    SYNTAX      Integer32 (0..255) 
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The Configuration Identifier Format Selector used 
+        by the Bridge. This has a fixed value of 0 to indicate
+        RegionName, RegionVersion are specified as in Standard."
+    ::= { jnxMIDot1sJuniperMstEntry 26 } 
+
+jnxMIMstMstiRegionName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The Name for the Region's configuration. By Default 
+        Region Name will be equal to the Bridge Mac Address."
+    ::= { jnxMIDot1sJuniperMstEntry 27 } 
+
+jnxMIMstMstiRegionVersion OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Version of the MST Region."
+    ::= { jnxMIDot1sJuniperMstEntry 28 } 
+
+jnxMIMstMstiConfigDigest OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "The Configuration Digest value for this Region."
+    ::= { jnxMIDot1sJuniperMstEntry 29 } 
+
+jnxMIMstBufferOverFlowCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times Buffer overflows/failures have occured.
+        A Trap is generated on the occurence of this event." 
+    ::= { jnxMIDot1sJuniperMstEntry 30 } 
+
+jnxMIMstMemAllocFailureCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times memory allocation failures have occured.
+        A Trap is generated on the occurence of this event." 
+    ::= { jnxMIDot1sJuniperMstEntry 31 } 
+
+jnxMIMstRegionConfigChangeCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times a Region Configuration Identifier Change 
+        was detected. 
+        A Trap is generated on the occurence of this event." 
+    ::= { jnxMIDot1sJuniperMstEntry 32 } 
+
+jnxMIMstCistBridgeRoleSelectionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        initbridge (0),
+        roleselection (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Role Selection State Machine          
+        of this bridge in Common Spanning Tree context"           
+    ::= { jnxMIDot1sJuniperMstEntry 33 } 
+
+jnxMIMstCistTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+        TcWhile Timer for any port in this Bridge was 
+        non-zero for Common Spanning Tree context."
+    ::= { jnxMIDot1sJuniperMstEntry 34 } 
+
+jnxMIMstCistTopChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that there have been atleast
+        one non-zero TcWhile Timer on this Bridge for Common
+        Spanning Tree context."
+    ::= { jnxMIDot1sJuniperMstEntry 35 } 
+
+jnxMIMstCistNewRootBridgeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times this Bridge has detected a Root
+        Bridge change for Common Spanning Tree context.
+        A Trap is generated on the occurence of this event."
+    ::= { jnxMIDot1sJuniperMstEntry 36 } 
+
+jnxMIMstCistHelloTime OBJECT-TYPE
+    SYNTAX      Timeout
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "This time value, measured in units of hundredths
+        of a second, specifies the amount of time between
+        the transmission of configuration BPDUs by this node
+        on any port when it is the root of the spanning tree 
+        or trying to become so."
+    ::= { jnxMIDot1sJuniperMstEntry 37 } 
+
+jnxMIMstCistBridgeHelloTime OBJECT-TYPE
+    SYNTAX      Timeout (100..1000)  
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time between the transmission of
+        Configuration bridge PDUs by this node in units 
+        of hundredths of a second."
+    ::= { jnxMIDot1sJuniperMstEntry 38 }
+
+jnxMIMstCistDynamicPathcostCalculation OBJECT-TYPE
+    SYNTAX      TruthValue               
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to determine whether dynamic pathcost
+        calculation is allowed or not.The value is determined by 
+        management. If set to true, pathcost is calculated dynamically 
+        from port speed, otherwise the link speed at the time of port 
+        creation is used for calculating the path cost. In both cases
+        if the user has configured a pathcost for the port that will be 
+        used. By default dynamic pathcost calculation is set to false."
+    DEFVAL { false }
+    ::= { jnxMIDot1sJuniperMstEntry 39 }
+
+-- -------------------------------------
+-- jnxMIDot1sJuniperMstTable - End
+-- -------------------------------------
+
+-- -----------------------------------------------------------------
+-- Juniper Mst Multiple Spanning Tree Instance Bridge Table
+-- -----------------------------------------------------------------
+
+jnxMIMstMstiBridgeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstMstiBridgeEntry      
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION
+        "Table containing Bridge Information specific to Spanning 
+        Tree Instance. This table maintains context ID as one 
+        more index to support Multiple Instances."
+    ::= { jnxMIDot1sJuniperMst 4 } 
+
+jnxMIMstMstiBridgeEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstMstiBridgeEntry       
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry indicating the Bridge Information."
+    INDEX { jnxMIDot1sJuniperMstContextId, jnxMIMstMstiInstanceIndex }
+    ::= { jnxMIMstMstiBridgeTable 1 }
+
+JnxMIMstMstiBridgeEntry ::=
+    SEQUENCE {
+        jnxMIMstMstiInstanceIndex 
+            Integer32,
+        jnxMIMstMstiBridgeRegionalRoot 
+            BridgeId,
+        jnxMIMstMstiBridgePriority 
+            Integer32,
+        jnxMIMstMstiRootCost 
+            Integer32,
+        jnxMIMstMstiRootPort 
+            Integer32,
+        jnxMIMstMstiTimeSinceTopologyChange 
+            TimeTicks,
+        jnxMIMstMstiTopChanges 
+            Counter32,
+        jnxMIMstMstiNewRootBridgeCount 
+            Counter32,
+        jnxMIMstMstiBridgeRoleSelectionSemState 
+            INTEGER,
+        jnxMIMstInstanceUpCount 
+            Counter32,
+        jnxMIMstInstanceDownCount 
+            Counter32,
+        jnxMIMstOldDesignatedRoot 
+            BridgeId
+    }
+
+jnxMIMstMstiInstanceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  read-only 
+    STATUS      current 
+    DESCRIPTION 
+        "Spanning Tree Instance to which the information belongs."
+    ::= { jnxMIMstMstiBridgeEntry 1 }
+
+jnxMIMstMstiBridgeRegionalRoot OBJECT-TYPE
+    SYNTAX      BridgeId  
+    MAX-ACCESS  read-only      
+    STATUS      current 
+    DESCRIPTION 
+        "MSTI Regional Root Identifier value for the Instance. This value 
+        is used as the MSTI Regional Root Identifier parameter in all
+        Configuration Bridge PDUs originated by this node"
+    ::= { jnxMIMstMstiBridgeEntry 2 }
+
+jnxMIMstMstiBridgePriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..61440) 
+    MAX-ACCESS    read-only
+    STATUS      current 
+    DESCRIPTION 
+        "The writable portion of the MSTI Bridge Identifier.
+        comprising of the first two octets.
+        The values that are set for Bridge Priority must be 
+        in steps of 4096."
+    DEFVAL {32768}
+    ::= { jnxMIMstMstiBridgeEntry 3 }
+
+jnxMIMstMstiRootCost OBJECT-TYPE
+    SYNTAX      Integer32  
+    MAX-ACCESS  read-only      
+    STATUS      current 
+    DESCRIPTION 
+        "The Cost of the path to the MSTI Regional Root as seen 
+        by this bridge." 
+    ::= { jnxMIMstMstiBridgeEntry 4 }
+
+jnxMIMstMstiRootPort OBJECT-TYPE
+    SYNTAX      Integer32  
+    MAX-ACCESS  read-only      
+    STATUS      current 
+    DESCRIPTION 
+        "The Port Number of the Port which offers the lowest    
+        path cost from this bridge to the MSTI Region Root Bridge."
+    ::= { jnxMIMstMstiBridgeEntry 5 }
+
+jnxMIMstMstiTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+        TcWhile Timer for any port in this Bridge was 
+        non-zero for this spanning tree instance."
+    ::= { jnxMIMstMstiBridgeEntry 6 }
+
+jnxMIMstMstiTopChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that there have been atleast
+        one non-zero TcWhile Timer on this Bridge for this
+        spanning tree instance."
+    ::= { jnxMIMstMstiBridgeEntry 7 }
+
+jnxMIMstMstiNewRootBridgeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times this Bridge has detected a Root
+        Bridge change for this spanning tree instance.
+        A Trap is generated on the occurence of this event."
+    ::= { jnxMIMstMstiBridgeEntry 8 }
+
+jnxMIMstMstiBridgeRoleSelectionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        initbridge (0),
+        roleselection (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Role Selection State Machine          
+        for this spanning tree instance for this bridge."           
+    ::= { jnxMIMstMstiBridgeEntry 9 }
+
+jnxMIMstInstanceUpCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times a new spanning tree instance has
+        been created. This counter is incremented whenever a new
+        spanning tree instance is created and also whenever a 
+        vlan is mapped to the instance.
+        A Trap is generated on the occurence of this event."
+    ::= { jnxMIMstMstiBridgeEntry 10 }
+
+jnxMIMstInstanceDownCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times a spanning tree instance has
+        been deleted. This counter is incremented whenever a 
+        spanning tree instance is deleted and also whenever a 
+        vlan is unmapped from the instance.
+        A Trap is generated on the occurence of this event."
+    ::= { jnxMIMstMstiBridgeEntry 11 }
+
+jnxMIMstOldDesignatedRoot OBJECT-TYPE
+    SYNTAX  BridgeId
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The bridge identifier of the old root of the spanning
+        tree instance as determined by the Spanning Tree Protocol
+        as executed by this node. "
+    ::= { jnxMIMstMstiBridgeEntry 12 }
+
+-- -----------------------------------------------------------------
+-- Juniper Mst VlanId to Instance Mapping Table              
+-- -----------------------------------------------------------------
+
+jnxMIMstVlanInstanceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstVlanInstanceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+          "This table contains one entry for each instance of MSTP. 
+          This table maintains context ID as one more index to 
+          support Multiple Instances." 
+     ::= { jnxMIDot1sJuniperMst 5 }
+
+jnxMIMstVlanInstanceMappingEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstVlanInstanceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A conceptual row containing the status of the MSTP instance."
+    INDEX  { jnxMIDot1sJuniperMstContextId, jnxMIMstInstanceIndex }
+    ::= { jnxMIMstVlanInstanceMappingTable 1 }
+
+JnxMIMstVlanInstanceMappingEntry ::= 
+    SEQUENCE {
+        jnxMIMstInstanceIndex  
+            Integer32,
+        jnxMIMstMapVlanIndex 
+            VlanId,
+        jnxMIMstUnMapVlanIndex 
+            VlanId,
+        jnxMIMstSetVlanList 
+            OCTET STRING,
+        jnxMIMstResetVlanList 
+            OCTET STRING,
+        jnxMIMstInstanceVlanMapped 
+            OCTET STRING,
+        jnxMIMstInstanceVlanMapped2k 
+            OCTET STRING,
+        jnxMIMstInstanceVlanMapped3k 
+            OCTET STRING,
+        jnxMIMstInstanceVlanMapped4k 
+            OCTET STRING
+    }
+
+jnxMIMstInstanceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..64)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary integer within the range from 1 to the value of
+        Max Instance Number that uniquely identifies an instance."
+    ::= { jnxMIMstVlanInstanceMappingEntry 1 }
+
+jnxMIMstMapVlanIndex OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION 
+        "The VlanId will get mapped to the spanning tree instance 
+        specified. All the Instance Specific information for the 
+        Member ports of the Vlan will be created.This object is 
+        used only for SET operation.GET Operation returns null values.
+        If the VlanId to Instance Mapping has to be known then any 
+        one of the VlanMapped object should be used."
+    ::= { jnxMIMstVlanInstanceMappingEntry 2 }
+
+jnxMIMstUnMapVlanIndex OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION 
+        "The VlanId will get unmapped from spanning tree instance
+        to which it it mapped. All the Instance Specific information
+        for the Member ports of the Vlan will get released.This object 
+        is used only for SET operation.GET Operation returns null values."
+    ::= { jnxMIMstVlanInstanceMappingEntry 3 }
+
+jnxMIMstSetVlanList OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..512))
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN. The
+        first octet corresponds to VLANs with VlanIndex values
+        1 through 8; the second octet to VLANs 9 through
+        16 etc.  The most significant bit of each octet
+        corresponds to the lowest VlanIndex value in that octet.
+        The set of vlans configured by management to map for this 
+        Instance.  If the VlanId to Instance Mapping has to be known
+        then any one of the VlanMapped object should be used.If a 
+        vlan is already mapped to this Instance, it may not be mapped 
+        again. This object is used only for SET operation.
+        GET Operation returns null values."
+    ::= { jnxMIMstVlanInstanceMappingEntry 4 }
+
+jnxMIMstResetVlanList OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..512))
+    MAX-ACCESS    read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN. The
+        first octet corresponds to VLANs with VlanIndex values
+        1 through 8; the second octet to VLANs 9 through
+        16 etc.  The most significant bit of each octet
+        corresponds to the lowest VlanIndex value in that octet.
+        The set of vlans configured by management to unmap from this 
+        Instance. A vlan may not be unmapped from this instance if 
+        it is not already mapped to this Instance. This object is
+        used only for SET operation.GET Operation returns null values."
+    ::= { jnxMIMstVlanInstanceMappingEntry 5 }
+
+jnxMIMstInstanceVlanMapped OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN. The
+        first octet corresponds to VLANs with VlanIndex values
+        1 through 8; the second octet to VLANs 9 through
+        16 etc.  The most significant bit of each octet
+        corresponds to the lowest VlanIndex value in that octet.
+
+        For each VLAN that is mapped to this MSTP instance,
+        the bit corresponding to that VLAN is set to '1'."
+    ::= { jnxMIMstVlanInstanceMappingEntry 6 }
+
+jnxMIMstInstanceVlanMapped2k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN for
+        VLANS with VlanIndex values 1024 through 2047. The
+        first octet corresponds to VLANs with VlanIndex values
+        1024 through 1031; the second octet to VLANs 1032
+        through 1039 etc.  The most significant bit of each
+        octet corresponds to the lowest VlanIndex value in that
+        octet.
+
+        For each VLAN that is mapped to this MSTP instance,
+        the bit corresponding to that VLAN is set to '1'.
+        
+        This object is only instantiated on devices with 
+        support for VlanIndex values up to 4095."
+    ::= { jnxMIMstVlanInstanceMappingEntry 7 }
+
+jnxMIMstInstanceVlanMapped3k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN for
+        VLANS with VlanIndex values 2048 through 3071. The
+        first octet corresponds to VLANs with VlanIndex values
+        of 2048 through 2055; the second octet to VLANs 2056
+        through 2063 etc.  The most significant bit of each
+        octet corresponds to the lowest VlanIndex value in that
+        octet.
+
+        For each VLAN that is mapped to this MSTP instance,
+        the bit corresponding to that VLAN is set to '1'.
+
+        This object is only instantiated on devices with 
+        support for VlanIndex values up to 4095."
+    ::= { jnxMIMstVlanInstanceMappingEntry 8 }
+
+jnxMIMstInstanceVlanMapped4k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A string of octets containing one bit per VLAN for
+        VLANS with VlanIndex values 3072 through 4095. The
+        first octet corresponds to VLANs with VlanIndex values
+        3072 through 3079; the second octet to VLANs 3080
+        through 3087 etc.  The most significant bit of each
+        octet corresponds to the lowest VlanIndex value in that
+        octet.
+
+        For each VLAN that is mapped to this MSTP instance,
+        the bit corresponding to that VLAN is set to '1'.
+
+        This object is only instantiated on devices with 
+        support for VlanIndex values up to 4095."
+    ::= { jnxMIMstVlanInstanceMappingEntry 9 }
+
+-- -----------------------------------------------------------------
+-- Juniper Mst Common Spanning Tree Port Table     
+-- -----------------------------------------------------------------
+
+jnxMIMstCistPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstCistPortEntry              
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains Common Spanning Tree Port
+        Information."
+    ::= { jnxMIDot1sJuniperMst 6 }
+
+jnxMIMstCistPortEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstCistPortEntry               
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of information maintained by every port for 
+        Common Spanning tree."
+    INDEX  { jnxMIMstCistPort }
+    ::= { jnxMIMstCistPortTable 1 }
+
+JnxMIMstCistPortEntry ::= 
+    SEQUENCE {
+        jnxMIMstCistPort  
+            Integer32,
+        jnxMIMstCistPortPathCost 
+            Integer32,
+        jnxMIMstCistPortPriority 
+            Integer32,
+        jnxMIMstCistPortDesignatedRoot 
+            BridgeId,
+        jnxMIMstCistPortDesignatedBridge 
+            BridgeId,
+        jnxMIMstCistPortDesignatedPort 
+            OCTET STRING,
+        jnxMIMstCistPortAdminP2P 
+            INTEGER,
+        jnxMIMstCistPortOperP2P 
+            TruthValue,
+        jnxMIMstCistPortAdminEdgeStatus 
+            TruthValue,
+        jnxMIMstCistPortOperEdgeStatus 
+            TruthValue,
+        jnxMIMstCistPortProtocolMigration 
+            TruthValue,
+        jnxMIMstCistPortState 
+            INTEGER,
+        jnxMIMstCistForcePortState 
+            INTEGER,
+        jnxMIMstCistPortForwardTransitions 
+            Counter32,
+        jnxMIMstCistPortRxMstBpduCount
+            Counter32,
+        jnxMIMstCistPortRxRstBpduCount
+            Counter32,
+        jnxMIMstCistPortRxConfigBpduCount
+            Counter32,
+        jnxMIMstCistPortRxTcnBpduCount
+            Counter32,
+        jnxMIMstCistPortTxMstBpduCount
+            Counter32,
+        jnxMIMstCistPortTxRstBpduCount
+            Counter32,
+        jnxMIMstCistPortTxConfigBpduCount
+            Counter32,
+        jnxMIMstCistPortTxTcnBpduCount
+            Counter32,
+        jnxMIMstCistPortInvalidMstBpduRxCount
+            Counter32,
+        jnxMIMstCistPortInvalidRstBpduRxCount
+            Counter32,
+        jnxMIMstCistPortInvalidConfigBpduRxCount
+            Counter32,
+        jnxMIMstCistPortInvalidTcnBpduRxCount
+            Counter32,
+        jnxMIMstCistPortTransmitSemState 
+            INTEGER,        
+        jnxMIMstCistPortReceiveSemState 
+            INTEGER,        
+        jnxMIMstCistPortProtMigrationSemState 
+            INTEGER,        
+        jnxMIMstCistProtocolMigrationCount 
+            Counter32,
+        jnxMIMstCistPortDesignatedCost 
+            Integer32,
+        jnxMIMstCistPortRegionalRoot 
+            BridgeId,
+        jnxMIMstCistPortRegionalPathCost 
+            Integer32,
+        jnxMIMstCistSelectedPortRole 
+            INTEGER,
+        jnxMIMstCistCurrentPortRole  
+            INTEGER,
+        jnxMIMstCistPortInfoSemState 
+            INTEGER,        
+        jnxMIMstCistPortRoleTransitionSemState 
+            INTEGER,        
+        jnxMIMstCistPortStateTransitionSemState 
+            INTEGER,         
+        jnxMIMstCistPortTopologyChangeSemState 
+            INTEGER,
+        jnxMIMstCistPortHelloTime 
+            Timeout,
+        jnxMIMstCistPortOperVersion
+            INTEGER,
+        jnxMIMstCistPortEffectivePortState
+            TruthValue,
+        jnxMIMstCistPortAutoEdgeStatus 
+            TruthValue
+ }
+
+jnxMIMstCistPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number of the port for which this entry contains   
+        spanning tree information."                                      
+    ::= { jnxMIMstCistPortEntry 1 }
+
+jnxMIMstCistPortPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..200000000)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+        paths towards the CIST Root which include this port."
+    ::= { jnxMIMstCistPortEntry 2 }
+
+jnxMIMstCistPortPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..240)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The four most significant bits of the Port Identifier 
+        of the Spanning Tree instance can be modified by setting 
+        the CistPortPriority value. The values that are set for Port 
+        Priority must be in steps of 16."
+    DEFVAL {128}
+    ::= { jnxMIMstCistPortEntry 3 }
+
+jnxMIMstCistPortDesignatedRoot OBJECT-TYPE
+    SYNTAX      BridgeId                 
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the bridge recorded as the  
+        CIST Root in the configuration BPDUs transmitted."      
+    ::= { jnxMIMstCistPortEntry 4 }
+
+jnxMIMstCistPortDesignatedBridge OBJECT-TYPE
+    SYNTAX      BridgeId                 
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the bridge which this port  
+        considers to be the Designated Bridge for the port's segment."   
+    ::= { jnxMIMstCistPortEntry 5 }
+
+jnxMIMstCistPortDesignatedPort OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The Port identifier of the port on the Designated Bridge    
+        for this port's segment."                                           
+    ::= { jnxMIMstCistPortEntry 6 }
+
+jnxMIMstCistPortAdminP2P OBJECT-TYPE
+    SYNTAX      INTEGER {               
+        forceTrue(0),
+        forceFalse(1),
+        auto(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative point-to-point status of the LAN segment
+        attached to this port.  A value of forceTrue(0) indicates that
+        this port should always be treated as if it is connected to
+        a point-to-point link.  A value of forceFalse(1) indicates
+        that this port should be treated as having a shared media
+        connection.  A value of auto(2) indicates that this port is
+        considered to have a point-to-point link if it is an Aggregator
+        and all of its members are aggregatable, or if the MAC entity
+        is configured for full duplex operation, either through
+        auto-negotiation or by management means."
+    ::= { jnxMIMstCistPortEntry 7 }
+
+jnxMIMstCistPortOperP2P OBJECT-TYPE
+    SYNTAX      TruthValue               
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The operational point-to-point status of the LAN segment
+        attached to this port.  It indicates whether a port is
+        considered to have a point-to-point connection or not.
+        The value is determined by management or by auto-detection,
+        as described in the jnxMIMstCistPortAdminP2P object."
+    ::= { jnxMIMstCistPortEntry 8 }
+
+jnxMIMstCistPortAdminEdgeStatus OBJECT-TYPE
+    SYNTAX      TruthValue               
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The administrative value of the Edge Port parameter.  A
+        value of TRUE(1) indicates that this port should be
+        assumed as an edge-port and a value of FALSE(2) indicates
+        that this port should be assumed as a non-edge-port."
+    ::= { jnxMIMstCistPortEntry 9 }
+
+jnxMIMstCistPortOperEdgeStatus OBJECT-TYPE
+    SYNTAX      TruthValue               
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The operational value of the Edge Port parameter.  The
+        object is initialized to the value of
+        jnxMIMstCistPortAdminEdgeStatus and is set FALSE on reception 
+        of a BPDU."
+    ::= { jnxMIMstCistPortEntry 10 }
+
+jnxMIMstCistPortProtocolMigration OBJECT-TYPE
+    SYNTAX      TruthValue                
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Protocol migration state of this Port.         
+        When operating in RSTP/MSTP (version >= 2) mode, writing 
+        TRUE(1) to this object forces this port to transmit MSTP 
+        BPDUs without instance information.
+        Any other operation on this object has no effect and
+        it always returns FALSE(2) when read."
+    ::= { jnxMIMstCistPortEntry 11 }
+
+jnxMIMstCistPortState OBJECT-TYPE
+    SYNTAX      INTEGER {              
+        disabled (1),
+        discarding (2),
+        learning (4),
+        forwarding (5)
+    }
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port as defined by the Common    
+        spanning tree protocol." 
+    ::= { jnxMIMstCistPortEntry 12 }
+
+jnxMIMstCistForcePortState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port which can be changed to either 
+        Disabled or Enabled for ALL spanning tree   
+        instances. Setting this object will override the port's
+        status in any of the MSTI contexts"                                        
+    ::= { jnxMIMstCistPortEntry 13 }
+
+jnxMIMstCistPortForwardTransitions OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of times this port has transitioned to the     
+        Forwarding State."                                     
+    ::= { jnxMIMstCistPortEntry 14 }
+
+jnxMIMstCistPortRxMstBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of MST BPDUs received on this port."     
+    ::= { jnxMIMstCistPortEntry 15 }
+
+jnxMIMstCistPortRxRstBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of RST BPDUs received on this port."     
+    ::= { jnxMIMstCistPortEntry 16 }
+
+jnxMIMstCistPortRxConfigBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Configuration BPDUs received on this port."     
+    ::= { jnxMIMstCistPortEntry 17 }
+
+jnxMIMstCistPortRxTcnBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of TCN BPDUs received on this port."     
+    ::= { jnxMIMstCistPortEntry 18 }
+
+jnxMIMstCistPortTxMstBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of MST BPDUs Transmitted from this port."     
+    ::= { jnxMIMstCistPortEntry 19 }
+
+jnxMIMstCistPortTxRstBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of RST BPDUs Transmitted from this port."     
+    ::= { jnxMIMstCistPortEntry 20 }
+
+jnxMIMstCistPortTxConfigBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Configuration BPDUs Transmitted from this port."     
+    ::= { jnxMIMstCistPortEntry 21 }
+
+jnxMIMstCistPortTxTcnBpduCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of TCN BPDUs Transmitted from this port."     
+    ::= { jnxMIMstCistPortEntry 22 }
+
+jnxMIMstCistPortInvalidMstBpduRxCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Invalid MST BPDUs Received on this port."     
+    ::= { jnxMIMstCistPortEntry 23 }
+
+jnxMIMstCistPortInvalidRstBpduRxCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Invalid RST BPDUs Received on this port."     
+    ::= { jnxMIMstCistPortEntry 24 }
+
+jnxMIMstCistPortInvalidConfigBpduRxCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Invalid Configuration BPDUs Received on this port."     
+    ::= { jnxMIMstCistPortEntry 25 }
+
+jnxMIMstCistPortInvalidTcnBpduRxCount OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Invalid TCN BPDUs Received on this port."     
+    ::= { jnxMIMstCistPortEntry 26 }
+
+jnxMIMstCistPortTransmitSemState OBJECT-TYPE 
+    SYNTAX      INTEGER {                 
+        transmitinit (0),
+        transmitperiodic (1),
+        transmitconfig (2),
+        transmittcn (3),
+        transmitrstp (4),
+        idle (5)
+    }
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Indicates current State of the Port Transmit state machine."
+    ::= { jnxMIMstCistPortEntry 27 }
+
+jnxMIMstCistPortReceiveSemState OBJECT-TYPE 
+    SYNTAX      INTEGER {                 
+        discard (0),
+        receive (1)
+    }
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Indicates current State of the Port Receive state machine."
+    ::= { jnxMIMstCistPortEntry 28 }
+
+jnxMIMstCistPortProtMigrationSemState OBJECT-TYPE 
+    SYNTAX      INTEGER {                 
+        init (0),
+        sendrstp (1),
+        sendingrstp (2),
+        sendstp (3),
+        sendingstp (4)
+    }
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Indicates current State of the Port Protocol Migration
+        State machine."
+    ::= { jnxMIMstCistPortEntry 29 }
+
+jnxMIMstCistProtocolMigrationCount OBJECT-TYPE
+    SYNTAX      Counter32 
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "The number of times this Port has migrated from one STP protocol 
+        version to another. The relevant protocols are STP-COMPATIBLE and 
+        RSTP/MSTP.
+        A Trap is generated on the occurence of this event."
+    ::= { jnxMIMstCistPortEntry 30 }
+
+jnxMIMstCistPortDesignatedCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only           
+    STATUS      current
+    DESCRIPTION
+        "The path cost of the Designated Port of the
+        segment connected to this port."
+    ::= { jnxMIMstCistPortEntry 31 }
+
+jnxMIMstCistPortRegionalRoot OBJECT-TYPE
+    SYNTAX      BridgeId                 
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the bridge recorded as the  
+        CIST Regional Root Identifier in the configuration BPDUs 
+        transmitted."      
+    ::= { jnxMIMstCistPortEntry 32 }
+
+jnxMIMstCistPortRegionalPathCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only           
+    STATUS      current
+    DESCRIPTION
+        "The contribution of this port to the path cost of paths     
+        towards the CIST Regional Root which include this port."         
+    ::= { jnxMIMstCistPortEntry 33 }
+
+jnxMIMstCistSelectedPortRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled(0),
+        alternate(1),
+        backup(2),
+        root(3),
+        designated(4)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Selected Port Role of the port for this spanning 
+        tree instance."                                      
+    ::= { jnxMIMstCistPortEntry 34 }
+
+jnxMIMstCistCurrentPortRole OBJECT-TYPE
+    SYNTAX      INTEGER {              
+        disabled(0),
+        alternate(1),
+        backup(2),
+        root(3),
+        designated(4)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current Port Role of the port for this spanning 
+        tree instance."                                      
+    ::= { jnxMIMstCistPortEntry 35 }
+
+jnxMIMstCistPortInfoSemState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled (0),
+        enabled (1),
+        aged (2),
+        update (3),
+        superiordesg (4),
+        repeatdesg (5),
+        root (6),
+        other (7),
+        present (8),
+        receive (9)
+    }                
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Information State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstCistPortEntry 36 }
+
+jnxMIMstCistPortRoleTransitionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        init (0),
+        blockport (1),
+        blockedport (2),
+        activeport (3)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Role Transition State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstCistPortEntry 37 }
+
+jnxMIMstCistPortStateTransitionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        discarding (0),
+        learning (1),
+        forwarding (2)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port State Transition State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstCistPortEntry 38 }
+
+jnxMIMstCistPortTopologyChangeSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        init (0),
+        inactive (1),
+        active (2),
+        detected (3),
+        notifiedtcn (4),
+        notifiedtc (5),
+        propagating (6),
+        acknowledged (7)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Topology Change State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstCistPortEntry 39 }
+
+jnxMIMstCistPortHelloTime OBJECT-TYPE
+    SYNTAX      Timeout (100..1000)  
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time between the transmission of
+        Configuration bridge PDUs by this node on this port
+        in units of hundredths of a second."
+    ::= { jnxMIMstCistPortEntry 40 }
+
+jnxMIMstCistPortOperVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+        stpCompatible(0),
+        rstp(2),
+        mstp(3)
+    }
+    MAX-ACCESS  read-only  
+    STATUS      current
+    DESCRIPTION
+        "This indicates whether the Port is operationally in the Mstp
+        mode, Rstp mode or the Stp-compatible mode i.e., whether the
+        Port is transmitting MST BPDUs, RST BPDUs or Config/TCN BPDUs."
+    ::= { jnxMIMstCistPortEntry 41 }
+
+jnxMIMstCistPortEffectivePortState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The effective operational state of the port for CIST. This will
+        TRUE only when the port is operationally up in the Interface level
+        and Protocol level for CIST. This is will be set to False for all 
+        other times."
+
+    ::= { jnxMIMstCistPortEntry 42 }
+
+jnxMIMstCistPortAutoEdgeStatus OBJECT-TYPE
+    SYNTAX      TruthValue               
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter when TRUE(1) indicates that detection 
+        of a port as Edge Port happens automatically
+        and FALSE(2) indicates that this feature is disabled."
+    ::= { jnxMIMstCistPortEntry 43 }
+
+
+
+
+-- -----------------------------------------------------------------
+-- Juniper Mst Multiple Spanning Tree Instance Port Table     
+-- -----------------------------------------------------------------
+jnxMIMstMstiPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstMstiPortEntry              
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains Spanning Tree Instance Specific Port
+        Information."
+    ::= { jnxMIDot1sJuniperMst 7 }
+
+jnxMIMstMstiPortEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstMstiPortEntry               
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of information maintained by every port for each 
+        and every spanning tree instance."
+    INDEX  { jnxMIMstMstiPort, jnxMIMstInstanceIndex }
+    ::= { jnxMIMstMstiPortTable 1 }
+
+JnxMIMstMstiPortEntry ::= 
+    SEQUENCE {
+        jnxMIMstMstiPort  
+            Integer32,
+        jnxMIMstMstiPortPathCost 
+            Integer32,
+        jnxMIMstMstiPortPriority 
+            Integer32,
+        jnxMIMstMstiPortDesignatedRoot 
+            BridgeId,
+        jnxMIMstMstiPortDesignatedBridge 
+            BridgeId,
+        jnxMIMstMstiPortDesignatedPort 
+            OCTET STRING,
+        jnxMIMstMstiPortState 
+            INTEGER,
+        jnxMIMstMstiForcePortState 
+            INTEGER,
+        jnxMIMstMstiPortForwardTransitions 
+            Counter32,
+        jnxMIMstMstiPortReceivedBPDUs 
+            Counter32,
+        jnxMIMstMstiPortTransmittedBPDUs 
+            Counter32,
+        jnxMIMstMstiPortInvalidBPDUsRcvd 
+            Counter32,
+        jnxMIMstMstiPortDesignatedCost 
+            Integer32,
+        jnxMIMstMstiSelectedPortRole 
+            INTEGER,
+        jnxMIMstMstiCurrentPortRole  
+            INTEGER,
+        jnxMIMstMstiPortInfoSemState 
+            INTEGER,        
+        jnxMIMstMstiPortRoleTransitionSemState 
+            INTEGER,        
+        jnxMIMstMstiPortStateTransitionSemState 
+            INTEGER,         
+        jnxMIMstMstiPortTopologyChangeSemState 
+            INTEGER,        
+        jnxMIMstMstiPortEffectivePortState
+            TruthValue
+    }
+
+jnxMIMstMstiPort OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number of the port for which this entry contains   
+        spanning tree information."                                      
+    ::= { jnxMIMstMstiPortEntry 1 }
+
+jnxMIMstMstiPortPathCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..200000000)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The contribution of this port to the path cost of
+        paths towards the MSTI Root which include this port."
+    ::= { jnxMIMstMstiPortEntry 2 }
+
+jnxMIMstMstiPortPriority OBJECT-TYPE
+    SYNTAX      Integer32 (0..240)
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "The four most significant bits of the Port Identifier 
+        for a given Spanning Tree instance can be modified 
+        independently for each Spanning Tree instance 
+        supported by the Bridge. The values that are set for Port 
+        Priority must be in steps of 16."
+    DEFVAL {128}
+    ::= { jnxMIMstMstiPortEntry 3 }
+
+jnxMIMstMstiPortDesignatedRoot OBJECT-TYPE
+    SYNTAX      BridgeId                 
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the bridge recorded as the  
+        MSTI Regional Root in the configuration BPDUs transmitted."      
+    ::= { jnxMIMstMstiPortEntry 4 }
+
+jnxMIMstMstiPortDesignatedBridge OBJECT-TYPE
+    SYNTAX      BridgeId                 
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The unique Bridge Identifier of the bridge which this port  
+        considers to be the Designated Bridge for the port's segment."   
+    ::= { jnxMIMstMstiPortEntry 5 }
+
+jnxMIMstMstiPortDesignatedPort OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The Port identifier of the port on the Designated Bridge    
+        for this port's segment."                                           
+    ::= { jnxMIMstMstiPortEntry 6 }
+
+jnxMIMstMstiPortState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled (1),
+        discarding (2),
+        learning (4),
+        forwarding (5)
+    }
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port as defined by the Multiple  
+        spanning tree protocol. Port which is Forwarding state
+        in one instance can be in Discarding (Blocking) state 
+        in another instance."
+    ::= { jnxMIMstMstiPortEntry 7 }
+
+jnxMIMstMstiForcePortState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port which can be changed to either 
+        Disabled or Enabled for the specific spanning tree   
+        instance. This object can be set to enabled only if the 
+        'jnxMIMstCistForcePortState' is set to 'enabled' for this port"                                            
+    ::= { jnxMIMstMstiPortEntry 8 }
+
+jnxMIMstMstiPortForwardTransitions OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of times this port has transitioned to the     
+        Forwarding State for specific instance."                                     
+    ::= { jnxMIMstMstiPortEntry 9 }
+
+jnxMIMstMstiPortReceivedBPDUs OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of BPDUs received by this port for this 
+        spanning tree instance."                            
+    ::= { jnxMIMstMstiPortEntry 10 }
+
+jnxMIMstMstiPortTransmittedBPDUs OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of BPDUs transmitted on this port for 
+        this spanning tree instance."                            
+    ::= { jnxMIMstMstiPortEntry 11 }
+
+jnxMIMstMstiPortInvalidBPDUsRcvd OBJECT-TYPE 
+    SYNTAX      Counter32                
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "Number of Invalid BPDUs received on this Port
+        for this spanning tree instance."                            
+    ::= { jnxMIMstMstiPortEntry 12 }
+
+jnxMIMstMstiPortDesignatedCost OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only           
+    STATUS      current
+    DESCRIPTION
+        "The path cost of the Designated Port of the
+        segment connected to this port."
+    ::= { jnxMIMstMstiPortEntry 13 }
+
+jnxMIMstMstiSelectedPortRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled(0),
+        alternate(1),
+        backup(2),
+        root(3),
+        designated(4),
+        master(5)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Selected Port Role of the port for this spanning 
+        tree instance."                                      
+    ::= { jnxMIMstMstiPortEntry 14 }
+
+jnxMIMstMstiCurrentPortRole OBJECT-TYPE
+    SYNTAX      INTEGER {              
+        disabled(0),
+        alternate(1),
+        backup(2),
+        root(3),
+        designated(4),
+        master(5)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current Port Role of the port for this spanning 
+        tree instance."                                      
+    ::= { jnxMIMstMstiPortEntry 15 }
+
+jnxMIMstMstiPortInfoSemState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled (0),
+        enabled (1),
+        aged (2),
+        update (3),
+        superiordesg (4),
+        repeatdesg (5),
+        root (6),
+        other (7),
+        present (8),
+        receive (9)
+    }                
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Information State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstMstiPortEntry 16 }
+
+jnxMIMstMstiPortRoleTransitionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        init (0),
+        blockport (1),
+        blockedport (2),
+        activeport (3)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port Role Transition State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstMstiPortEntry 17 }
+
+jnxMIMstMstiPortStateTransitionSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        discarding (0),
+        learning (1),
+        forwarding (2)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port State Transition State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstMstiPortEntry 18 }
+
+jnxMIMstMstiPortTopologyChangeSemState OBJECT-TYPE
+    SYNTAX      INTEGER {                
+        init (0),
+        inactive (1),
+        active (2),
+        detected (3),
+        notifiedtcn (4),
+        notifiedtc (5),
+        propagating (6),
+        acknowledged (7)
+    }
+    MAX-ACCESS  read-only        
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Topology Change State Machine          
+        for this port in this spanning tree context."                                      
+    ::= { jnxMIMstMstiPortEntry 19 }
+
+jnxMIMstMstiPortEffectivePortState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only            
+    STATUS      current
+    DESCRIPTION
+        "The effective operational stae of the port for specific instance.
+        This is will be TRUE only when the port is operationally up in the
+        interface level and Protocol level for the specific instance.
+        This is will be set to false at all other times."
+
+    ::= { jnxMIMstMstiPortEntry 20 }
+
+jnxMIMstCistPortProtectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstCistPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the jnxMIMstCist Port Table for providing extensions 
+         for Root Protect and Loop Protect to the corresponding 
+         jnxMIMstCistPortTable entry."
+   ::= { jnxMIDot1sJuniperMst 8 }
+
+jnxMIMstCistPortProtectEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstCistPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxMIMstCistPortProtectTable.  This essentially
+         augments the jnxMIMstCistPortEntry with additional objects."
+    AUGMENTS    { jnxMIMstCistPortEntry }
+    ::= { jnxMIMstCistPortProtectTable 1 }
+
+JnxMIMstCistPortProtectEntry ::=
+    SEQUENCE {
+        jnxMIMstCistPortRootProtectEnabled  TruthValue,
+        jnxMIMstCistPortRootProtectState    INTEGER,    
+        jnxMIMstCistPortLoopProtectEnabled  TruthValue,
+        jnxMIMstCistPortLoopProtectState    INTEGER    
+    }
+
+jnxMIMstCistPortRootProtectEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether Root protect 
+         functionality is enabled on the port. If TRUE causes the Port not
+         to be selected as Root Port for the CIST or any MSTI, even it has
+         the best spanning tree priority vector. This parameter should be 
+         FALSE by default. "
+
+    ::= {jnxMIMstCistPortProtectEntry 1}
+
+jnxMIMstCistPortRootProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    root-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the port was prevented from being a root port 
+         for CIST. This parameter will always return 'no-error (0)' if 
+         jnxMIMstCistPortRootProtectEnabled is FALSE. "
+
+    ::= {jnxMIMstCistPortProtectEntry 2}
+
+jnxMIMstCistPortLoopProtectEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A Boolean value set by management indicating whether Loop protect 
+         functionality is enabled on the port. If TRUE causes the Port not
+         to be selected as Designated Port for the CIST or any MSTI, when
+         the received superior BPDU is aged out. This parameter should be 
+         FALSE by default. "
+
+    ::= {jnxMIMstCistPortProtectEntry 3}
+
+jnxMIMstCistPortLoopProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    loop-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a potential Loop was prevented on the port for CIST.
+         This parameter will always return 'no-error (0)' if 
+         jnxMIMstCistPortLoopProtectEnabled is FALSE. "
+
+    ::= {jnxMIMstCistPortProtectEntry 4}
+
+jnxMIMstMstiPortProtectTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxMIMstMstiPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the jnxMIMstMsti Port Table for providing extensions 
+         for Root Protect and Loop Protect to the corresponding 
+         jnxMIMstMstiPortTable entry."
+   ::= { jnxMIDot1sJuniperMst 9 }
+
+jnxMIMstMstiPortProtectEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstMstiPortProtectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the jnxMIMstMstiPortProtectTable.  This essentially
+         augments the jnxMIMstMstiPortEntry with additional objects."
+    AUGMENTS    { jnxMIMstMstiPortEntry }
+    ::= { jnxMIMstMstiPortProtectTable 1 }
+
+JnxMIMstMstiPortProtectEntry ::=
+    SEQUENCE {
+        jnxMIMstMstiPortRootProtectState    INTEGER,    
+        jnxMIMstMstiPortLoopProtectState    INTEGER    
+    }
+
+jnxMIMstMstiPortRootProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    root-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the port was prevented from being a root port 
+         for CIST. This parameter will always return 'no-error (0)' if 
+         jnxMIMstCistPortRootProtectEnabled is FALSE. "
+
+    ::= {jnxMIMstMstiPortProtectEntry 1}
+
+jnxMIMstMstiPortLoopProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-error (0),
+                    loop-prevented (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a potential Loop was prevented on the port for CIST.
+         This parameter will always return 'no-error (0)' if 
+         jnxMIMstCistPortLoopProtectEnabled is FALSE. "
+
+    ::= {jnxMIMstMstiPortProtectEntry 2}
+
+-- TRAP MIB BEGIN
+
+jnxMIDot1sJnxMstSetGlobalTrapOption OBJECT-TYPE
+    SYNTAX   Integer32 (0..1)
+    MAX-ACCESS    read-only
+    STATUS   current
+    DESCRIPTION
+        "This object is used to enable and disable MSTP traps for memory
+        failure or buffer failure irrespective of the context in which
+        the failure occurs.
+        0 - Traps are not enabled.
+        1 - Memory and buffer failure traps enabled" 
+    ::= { jnxMIDot1sJnxMstTrapsControl 1 }
+
+jnxMIMstGlobalErrTrapType OBJECT-TYPE
+    SYNTAX   INTEGER   {
+        none (0),
+        memfail (1),
+        bufffail (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Used within the Trap Notification PDU. 
+        It denotes general events like 
+        none - none of the below values
+        memfail - memory allocation failure
+        bufffail - buffer allocation failure"
+    ::= { jnxMIDot1sJnxMstTrapsControl 2 }
+
+jnxMIDot1sJnxMstTrapsControlTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxMIDot1sJnxMstTrapsControlEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "List of per virtual bridge Trap Control Info."
+    ::= { jnxMIDot1sJnxMstTrapsControl 3 }
+
+jnxMIDot1sJnxMstTrapsControlEntry OBJECT-TYPE
+    SYNTAX        JnxMIDot1sJnxMstTrapsControlEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Virtual bridge TrapsControl information."
+    INDEX { jnxMIDot1sJuniperMstContextId }
+    ::= { jnxMIDot1sJnxMstTrapsControlTable 1 }
+
+JnxMIDot1sJnxMstTrapsControlEntry ::=
+    SEQUENCE {
+        jnxMIMstSetTraps
+            Integer32,
+        jnxMIMstGenTrapType
+            INTEGER
+    }
+
+jnxMIMstSetTraps OBJECT-TYPE
+    SYNTAX   Integer32 (0..3)
+    MAX-ACCESS    read-only  
+    STATUS   current
+    DESCRIPTION
+        "This object is used to enable and  disable context-specific
+        MSTP traps. Currently the following are defined
+        0 - Traps are not enabled.
+        1 - General Traps like protocol up or down 
+        2 - Exception Traps like port protocol migration or 
+        invalid packet rcvd in port
+        3 - All the above Traps "
+    ::= { jnxMIDot1sJnxMstTrapsControlEntry 1 }
+
+
+jnxMIMstGenTrapType OBJECT-TYPE
+    SYNTAX   INTEGER   {
+        none (0),
+        up (1),
+        down (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Used within the Trap Notification PDU. 
+        It denotes general events like 
+        none - none of the below values
+        up - protocol UP,
+        down - protocol DOWN" 
+    ::= { jnxMIDot1sJnxMstTrapsControlEntry 2 }
+
+
+
+jnxMIMstPortTrapNotificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF JnxMIMstPortTrapNotificationEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is used to store the notification information
+        occured in each of the port for protocol migration and 
+        invalid packet received. This table is maintained per virtual
+        context in the system."
+    ::= { jnxMIDot1sJnxMstTrapsControl 4 }
+
+jnxMIMstPortTrapNotificationEntry OBJECT-TYPE
+    SYNTAX      JnxMIMstPortTrapNotificationEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " This entry is used to store the notification information"
+    INDEX { jnxMIMstPortTrapIndex}
+    ::= { jnxMIMstPortTrapNotificationTable 1 }
+
+JnxMIMstPortTrapNotificationEntry ::=
+    SEQUENCE {
+        jnxMIMstPortTrapIndex
+            Integer32,
+        jnxMIMstPortMigrationType 
+            INTEGER,
+        jnxMIMstPktErrType
+            INTEGER,
+        jnxMIMstPktErrVal
+            INTEGER
+    }
+
+jnxMIMstPortTrapIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique value, greater than zero, indicating the Port number."
+    ::= { jnxMIMstPortTrapNotificationEntry 1 }
+
+jnxMIMstPortMigrationType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        sendstp (0),
+        sendrstp (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Port Protocol migration type occured in the port"
+    ::= { jnxMIMstPortTrapNotificationEntry 2 }
+
+jnxMIMstPktErrType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        protocolIdErr(0),
+        invalidBpdu(1),
+        configLengthErr(2),
+        tcnLengthErr(3),
+        rstpLengthErr(4),
+        maxAgeErr(5),
+        fwdDelayErr(6),
+        helloTimeErr(7),
+        mstpLengthErr(8)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Type of invalid packet received in each of the port "
+    ::= { jnxMIMstPortTrapNotificationEntry 3 }
+
+jnxMIMstPktErrVal OBJECT-TYPE
+    SYNTAX   INTEGER   
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Packet error value corresponding to the above type "
+    ::= { jnxMIMstPortTrapNotificationEntry 4 }
+
+jnxMIMstTraps OBJECT IDENTIFIER ::= { jnxMIDot1sJuniperMstTraps 0 }
+
+jnxMIMstGenTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstGenTrapType 
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when any of the general events like protocol up or 
+        protocol down occurs"
+    ::= { jnxMIMstTraps 1 }
+
+jnxMIMstErrTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstGlobalErrTrapType
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when any of the error events like memory failure or buffer failure
+        or protocol migration or new root or topology change occurs "
+    ::= { jnxMIMstTraps 2 }
+
+jnxMIMstNewRootTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstOldDesignatedRoot,
+        jnxMIMstMstiBridgeRegionalRoot,
+        jnxMIMstMstiInstanceIndex
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated whenever a new root bridge is selected in the topology. 
+         The jnxMIMstNewRootTrap indicates that the sending agent has become 
+         the new root of the Spanning Tree; the trap is sent by a bridge soon 
+         after its election as the new root"
+    ::= { jnxMIMstTraps 3 }
+
+jnxMIMstTopologyChgTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstMstiInstanceIndex
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when topology change is detected "
+    ::= { jnxMIMstTraps 4 }
+
+jnxMIMstProtocolMigrationTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstPortTrapIndex, 
+        jnxMIMstForceProtocolVersion,
+        jnxMIMstPortMigrationType 
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when port protocol migration happens in the port "
+    ::= { jnxMIMstTraps 5 }
+
+jnxMIMstInvalidBpduRxdTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress,
+        jnxMIMstPortTrapIndex,
+        jnxMIMstPktErrType,
+        jnxMIMstPktErrVal
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when the invalid packet is received for 
+        bpdu/stp/rstp/maximum age/forward delay/hello time"
+    ::= { jnxMIMstTraps 6 }
+
+jnxMIMstRegionConfigChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+        jnxMIMstBrgAddress, 
+        jnxMIMstMstiConfigIdSel, 
+        jnxMIMstMstiRegionName, 
+        jnxMIMstMstiRegionVersion,
+        jnxMIMstMstiConfigDigest
+    }
+    STATUS             current
+    DESCRIPTION
+        "Generated when the MST region's configuration     
+        identifier changes."
+    ::= { jnxMIMstTraps 7 }
+
+jnxMIMstCistPortRootProtectStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS {
+            jnxMIMstBrgAddress, 
+            jnxMIMstCistPortRootProtectState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the ports Root-protect state (no-error or root-prevented) 
+          for CIST changes."
+   ::= { jnxMIMstTraps 8 }
+
+jnxMIMstMstiPortRootProtectStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS {
+            jnxMIMstBrgAddress, 
+            jnxMIMstMstiPortRootProtectState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the ports Root-protect state (no-error or root-prevented) 
+          an MSTI changes."
+   ::= { jnxMIMstTraps 9 }
+
+jnxMIMstCistPortLoopProtectStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS {
+            jnxMIMstBrgAddress, 
+            jnxMIMstCistPortLoopProtectState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the ports Loop-protect state (no-error or loop-prevented) 
+          for CIST changes."
+   ::= { jnxMIMstTraps 10 }
+
+jnxMIMstMstiPortLoopProtectStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS {
+            jnxMIMstBrgAddress, 
+            jnxMIMstMstiPortLoopProtectState
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when the ports Loop-protect state (no-error or loop-prevented) 
+          an MSTI changes."
+   ::= { jnxMIMstTraps 11 }
+
+-- TRAP MIB END
+
+END

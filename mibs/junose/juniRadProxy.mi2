@@ -1,0 +1,283 @@
+
+-- *****************************************************************************
+-- Juniper-RADIUS-Proxy-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   RADIUS Proxy MIB
+--
+-- Copyright 2004 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-RADIUS-Proxy-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniRadiusProxyMIB  MODULE-IDENTITY
+    LAST-UPDATED "200401231932Z"  -- 23-Jan-04 02:32 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The RADIUS Proxy MIB for the Juniper Networks enterprise."
+    -- Revision History
+    REVISION    "200401231932Z"  -- 23-Jan-04 02:32 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 73 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusProxyObjects      OBJECT IDENTIFIER ::= { juniRadiusProxyMIB 1 }
+juniRadiusGeneralProxy      OBJECT IDENTIFIER ::= { juniRadiusProxyObjects 1 }
+juniRadiusAuthProxyCfg      OBJECT IDENTIFIER ::= { juniRadiusProxyObjects 2 }
+juniRadiusAcctProxyCfg      OBJECT IDENTIFIER ::= { juniRadiusProxyObjects 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for RADIUS General Proxy
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusProxyUdpChecksum  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/disables the checksum calculations on RADIUS UDP packets."
+    DEFVAL    { true }
+    ::= { juniRadiusGeneralProxy 1 }
+
+
+--
+-- Configuration of RADIUS authentication proxy servers
+--
+juniRadiusAuthProxyCfgPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The UDP port the RADIUS authentication proxy server will use.  The
+        server will first be created, if necessary.  A value of 0 indicates the
+        server should be deleted."
+    DEFVAL    { 0 }
+    ::= { juniRadiusAuthProxyCfg 1 }
+
+juniRadiusAuthProxyCfgClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusAuthProxyCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the clients with which the RADIUS authentication
+        proxy server shares a secret."
+    ::= { juniRadiusAuthProxyCfg 2 }
+
+juniRadiusAuthProxyCfgClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusAuthProxyCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (row) representing clients with which the RADIUS
+        authentication proxy server shares a secret."
+    INDEX     { juniRadiusAuthProxyCfgClientAddress,
+                juniRadiusAuthProxyCfgClientMask }
+    ::= { juniRadiusAuthProxyCfgClientTable 1 }
+
+JuniRadiusAuthProxyCfgClientEntry ::= SEQUENCE {
+    juniRadiusAuthProxyCfgClientAddress   IpAddress,
+    juniRadiusAuthProxyCfgClientMask      IpAddress,
+    juniRadiusAuthProxyCfgRowStatus       RowStatus,
+    juniRadiusAuthProxyCfgClientKey       DisplayString }
+
+juniRadiusAuthProxyCfgClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Network Address of the RADIUS authentication proxy server's
+        clients."
+    ::= { juniRadiusAuthProxyCfgClientEntry 1 }
+
+juniRadiusAuthProxyCfgClientMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Network Address Mask of the RADIUS authentication proxy server's
+        clients."
+    ::= { juniRadiusAuthProxyCfgClientEntry 2 }
+
+juniRadiusAuthProxyCfgRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniRadiusAuthProxyCfgClientEntry 3 }
+
+juniRadiusAuthProxyCfgClientKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The secret (RADIUS authenticator) used by the clients during exchanges
+        with this authentication proxy server."
+    DEFVAL    { ''H }
+    ::= { juniRadiusAuthProxyCfgClientEntry 4 }
+
+
+--
+-- Configuration of RADIUS accounting proxy servers
+--
+juniRadiusAcctProxyCfgPortNumber  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The UDP port the RADIUS accounting proxy server will use.  The server
+        will first be created, if necessary.  A value of 0 indicates the server
+        should be deleted."
+    DEFVAL    { 0 }
+    ::= { juniRadiusAcctProxyCfg 1 }
+
+juniRadiusAcctProxyCfgClientTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniRadiusAcctProxyCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table listing the clients with which the RADIUS accounting proxy
+        server shares a secret."
+    ::= { juniRadiusAcctProxyCfg 2 }
+
+juniRadiusAcctProxyCfgClientEntry  OBJECT-TYPE
+    SYNTAX      JuniRadiusAcctProxyCfgClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (row) representing clients with which the RADIUS accounting
+        proxy server shares a secret."
+    INDEX     { juniRadiusAcctProxyCfgClientAddress,
+                juniRadiusAcctProxyCfgClientMask }
+    ::= { juniRadiusAcctProxyCfgClientTable 1 }
+
+JuniRadiusAcctProxyCfgClientEntry ::= SEQUENCE {
+    juniRadiusAcctProxyCfgClientAddress   IpAddress,
+    juniRadiusAcctProxyCfgClientMask      IpAddress,
+    juniRadiusAcctProxyCfgRowStatus       RowStatus,
+    juniRadiusAcctProxyCfgClientKey       DisplayString }
+
+juniRadiusAcctProxyCfgClientAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Network Address of the RADIUS accounting proxy server's
+        clients."
+    ::= { juniRadiusAcctProxyCfgClientEntry 1 }
+
+juniRadiusAcctProxyCfgClientMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Network Address Mask of the RADIUS accounting proxy server's
+        clients."
+    ::= { juniRadiusAcctProxyCfgClientEntry 2 }
+
+juniRadiusAcctProxyCfgRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Supports 'createAndGo' and 'destroy' only."
+    ::= { juniRadiusAcctProxyCfgClientEntry 3 }
+
+juniRadiusAcctProxyCfgClientKey  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The secret (RADIUS authenticator) used by the clients during exchanges
+        with this accounting proxy server."
+    DEFVAL    { ''H }
+    ::= { juniRadiusAcctProxyCfgClientEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniRadiusProxyMIBConformance  OBJECT IDENTIFIER
+    ::= { juniRadiusProxyMIB 2 }
+juniRadiusProxyMIBCompliances  OBJECT IDENTIFIER
+    ::= { juniRadiusProxyMIBConformance 1 }
+juniRadiusProxyMIBGroups       OBJECT IDENTIFIER
+    ::= { juniRadiusProxyMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniRadiusProxyCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities implementing the JUNOSe RADIUS
+        Proxy Server MIB functionality."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniRadiusBasicProxyGroup }
+        GROUP       juniRadiusAuthProxyGroup
+            DESCRIPTION
+                "This group is mandatory only for those JUNOSe agents that
+                implement authentication support."
+        GROUP       juniRadiusAcctProxyGroup
+            DESCRIPTION
+                "This group is mandatory only for those JUNOSe agents that
+                implement accounting support."
+    ::= { juniRadiusProxyMIBCompliances 1 }                         -- RX 5.3
+
+
+--
+-- units of conformance
+--
+juniRadiusBasicProxyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRadiusProxyUdpChecksum }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing basic management of RADIUS Proxy
+        Servers."
+    ::= { juniRadiusProxyMIBGroups 1 }
+
+juniRadiusAuthProxyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRadiusAuthProxyCfgPortNumber,
+        juniRadiusAuthProxyCfgRowStatus,
+        juniRadiusAuthProxyCfgClientKey }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of RADIUS Authentication
+        Proxy Servers."
+    ::= { juniRadiusProxyMIBGroups 2 }
+
+juniRadiusAcctProxyGroup  OBJECT-GROUP
+    OBJECTS {
+        juniRadiusAcctProxyCfgPortNumber,
+        juniRadiusAcctProxyCfgRowStatus,
+        juniRadiusAcctProxyCfgClientKey }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of RADIUS Accounting Proxy
+        Servers."
+    ::= { juniRadiusProxyMIBGroups 3 }
+
+END

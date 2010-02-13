@@ -1,0 +1,208 @@
+
+-- *****************************************************************************
+-- Juniper Networks Enterprise SNMP Management Identifiers
+--
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-UNI-SMI  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+juniperUni  MODULE-IDENTITY
+    LAST-UPDATED "200307301903Z"  -- 30-Jul-03 03:03 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The SNMP Management Identifiers (SMI) for the Juniper Networks
+        enterprise.  This is the top-level registry for SNMP managed objects and
+        other SNMP related information modules under the Juniper Networks/
+        Unisphere SNMP management enterprise object identifier."
+    -- Revision History
+    REVISION    "200307301903Z"  -- 30-Jul-03 03:03 PM EDT
+    DESCRIPTION
+        "Product re-branding: changed UMC to SDX."
+    REVISION    "200211132014Z"  -- 13-Nov-02 03:14 PM EST
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200106012146Z"  -- 01-Jun-01 05:46 PM EDT
+    DESCRIPTION
+        "Replaced OBJECT-IDENTITYs with OBJECT IDENTIFIERs."
+    REVISION    "200006011430Z"  -- 01-Jun-00 10:30 AM EDT
+    DESCRIPTION
+        "Added usVoiceAdmin and usDataAdmin branchs."
+    REVISION    "200005240400Z"  -- 24-May-00 12:00 AM EDT
+    DESCRIPTION
+        "Added node for UMC MIB"   
+    REVISION      "9912131936Z"  -- 13-Dec-99 02:36 PM EST
+    DESCRIPTION
+        "Added REFERENCE clauses to OBJECT-IDENTITY definitions."
+    REVISION      "9911080000Z"  -- 08-Nov-99
+    DESCRIPTION
+        "The initial release of this management informaiton module."
+    ::= { enterprises 4874 }    -- assigned by IANA
+
+
+-- *****************************************************************************
+-- Top-level Juniper Networks management module object identifier assignments.
+-- *****************************************************************************
+juniProducts  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root object identifier under which sysObjectID values are
+--      assigned."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-Products-MIB module (in the
+--      juniProducts.mi2 file)."
+    ::= { juniperUni 1 }
+
+juniperUniMibs  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is the root object identifier under which Juniper Networks/
+        Unisphere SNMP managed object (MIB) modules are defined."
+    ::= { juniperUni 2 }
+
+usVoiceMibs  OBJECT IDENTIFIER
+--  STATUS      obsolete
+--  DESCRIPTION
+--      "This is a placeholder for the former Unisphere Networks voice
+--      communications products which are now owned by Siemens AG (ICN)."
+--  REFERENCE
+--      "www.Siemens.com"
+    ::= { juniperUniMibs 1 }
+
+juniMibs  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root object identifier under which SNMP managed object
+--      (MIB) modules specific to Juniper Networks E-series products are
+--      defined."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-MIBs module (in the
+--      juniMibs.mi2 file)."
+    ::= { juniperUniMibs 2 }
+
+juniperUniExperiment  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This object identifier roots experimental MIBs, which are defined as:
+
+         1) IETF work-in-process MIBs which have not been assigned a permanent
+            object identifier by the IANA.
+
+         2) Juniper work-in-process MIBs that have not achieved final production
+            quality or field experience.
+
+        NOTE: Support for MIBs under the juniperUniExperiment subtree is
+              temporary and changes to objects may occur without notice."
+    ::= { juniperUni 3 }
+
+usVoiceExperiment  OBJECT IDENTIFIER
+--  STATUS      obsolete
+--  DESCRIPTION
+--      "This is a placeholder for experimental SNMP managed object (MIB)
+--      modules for the former Unisphere Networks voice communications products
+--      which are now owned by Siemens AG (ICN)."
+--  REFERENCE
+--      "www.Siemens.com"
+    ::= { juniperUniExperiment 1 }
+
+juniExperiment  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root object identifier under which experimental SNMP
+--      managed object (MIB) modules specific to Juniper Networks E-series
+--      products are defined."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-Experiment module (in the
+--      juniExperiment.mi2 file)."
+    ::= { juniperUniExperiment 2 }
+
+juniperUniAdmin  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This is reserved for administratively assigned object identifiers, i.e.
+        those not associated with MIB objects.  Examples include items such as
+        chipset or ASIC identifiers."
+    ::= { juniperUni 4 }
+
+usVoiceAdmin  OBJECT IDENTIFIER
+--  STATUS      obsolete
+--  DESCRIPTION
+--      "This is a placeholder for administratively assigned object identifiers
+--      for the former Unisphere Networks voice communications products which
+--      are now owned by Siemens AG (ICN)."
+--  REFERENCE
+--      "www.Siemens.com"
+    ::= { juniperUniAdmin 1 }
+
+juniAdmin  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root for administratively assigned object identifiers for
+--      Juniper Networks E-series products."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-Registry module (in the
+--      juniRegistry.mi2 file)."
+    ::= { juniperUniAdmin 2 }
+
+juniAgentCapability  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This provides a root object identifier under which AGENT-CAPABILITIES
+        modules are assigned.  Each product's agent's capabilities definitions
+        appear in a collection of separate modules."
+    ::= { juniperUni 5 }
+
+usVoiceAgents  OBJECT IDENTIFIER
+--  STATUS      obsolete
+--  DESCRIPTION
+--      "This is a placeholder for agent capabilities modules for the former
+--      Unisphere Networks voice communications products which are now owned by
+--      Siemens AG (ICN)."
+--  REFERENCE
+--      "www.Siemens.com"
+    ::= { juniAgentCapability 1 }
+
+juniAgents  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root object identifier under which the agent capabilities
+--      modules for Juniper Networks' E-series products are defined."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-Agents module (in the
+--      juniAgents.mi2 file)."
+    ::= { juniAgentCapability 2 }
+
+juniNetMgmtProducts  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This provides a root object identifier for the definition of nodes
+        pertaining to Juniper Networks' network management products.  Examples
+        include:
+            SDX - Service Deployment System
+            NMC - Network Management Center
+            NMC-RX - E-series element manager "
+    ::= { juniperUni 6 }
+
+juniSdxMibs  OBJECT IDENTIFIER
+--  STATUS      current
+--  DESCRIPTION
+--      "This is the root object identifier for definitions of nodes pertaining
+--      to the Juniper SDX products."
+--  REFERENCE
+--      "Actual values are defined in the Juniper-SDX-MIBs module."
+    ::= { juniNetMgmtProducts 1 }
+
+END

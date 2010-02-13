@@ -1,0 +1,393 @@
+JUNIPER-SECURE-ACCESS-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, 
+    NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+  
+    TruthValue, TEXTUAL-CONVENTION, DisplayString
+	FROM SNMPv2-TC
+    
+    ifIndex
+        FROM IF-MIB
+
+    jnxExSecureAccessPort
+	FROM JUNIPER-EX-SMI;
+
+jnxExSecureAccessPortMIB MODULE-IDENTITY
+    LAST-UPDATED "200705151000Z"
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise specific
+	     MIB for configuration of Secure Access Port feature. DHCP Snooping 
+	     and Dynamic ARP Inspection are mechanisms to provide per interface 
+	     security capabilities. This MIB Module is also used to control 
+	     some layer 2 functions like MAC limiting. It also supports 
+	     IP Source Guard, Mac Source Guard and Storm Control features."
+    ::= { jnxExSecureAccessPort 1 }
+
+
+jnxSecAccessPortMIBNotifications
+    OBJECT IDENTIFIER ::= { jnxExSecureAccessPortMIB 0 }
+jnxSecAccessPortMIBObjects
+    OBJECT IDENTIFIER ::= { jnxExSecureAccessPortMIB 1 }
+
+-- TEXTUAL-CONVENTION
+	
+JnxMacLimitExceededAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "One of the following action will be taken by the system
+	 on an interface, when the system detects the current learned 
+	 number of MAC addresses in the forwarding table has exceeded 
+	 the limit number of MAC address.
+
+	 none : No action will be taken. It means Mac limit is not 
+	 enabled in the  specified interface.
+
+	 drop : The notification will be generated when MAC limit is 
+         exceeded and also the MAC limit is enforced for the interface. 
+	 The new address will not be learned in the entity and also the 
+	 traffic with new address will not be flooded in the entity. 
+	 The learning will be re-enabled in the interface if the number
+	 of MAC addresses falls below the limit.
+
+	 alarm : A notification will be generated if the Mac Limit is 
+	 exceeded.
+  
+	 shutdown : The notification will be generated as the Mac Limit is
+	 exceeded. The interface will be moved to blocked state, no traffic
+	 will be allowed in the entity. The traffic will be re-enabled in 
+	 the interface if the number of MAC addresses falls below the limit."
+    SYNTAX        INTEGER {
+       			none     (1),
+       			drop     (2),
+       			alarm    (3),
+       			shutdown (4)
+    		        }
+	
+-- The Port Security Table for Vlan 
+
+jnxSecAccessPortVlanTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF JnxSecAccessPortVlanEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table provides the mechanism to control DHCP Snooping
+        and Dynamic ARP Inspection per VLAN. When a VLAN is created 
+	in a device supporting this table, a corresponding entry will 
+	be added to this table."
+    ::= { jnxSecAccessPortMIBObjects 1 }
+
+jnxSecAccessPortVlanEntry OBJECT-TYPE
+    SYNTAX       JnxSecAccessPortVlanEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A row instance contains whether DHCP Snooping and Dynamic 
+	ARP Inspection at each existing VLAN is enabled or disabled."
+    INDEX { jnxSecAccessVlanName }
+    ::= { jnxSecAccessPortVlanTable 1 }
+  
+JnxSecAccessPortVlanEntry ::= SEQUENCE {
+    jnxSecAccessVlanName        	DisplayString, 
+    jnxSecAccessVlanDhcpSnoopStatus     TruthValue,
+    jnxSecAccessVlanDAIStatus        	TruthValue
+ }
+
+jnxSecAccessVlanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the VLAN name on which Dhcp Snooping
+         feature and Dynamic ARP Inspection is enabled."
+    ::= { jnxSecAccessPortVlanEntry 1 }
+
+jnxSecAccessVlanDhcpSnoopStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether Dhcp Snooping  is
+        enabled in this VLAN.
+ 
+        If this object is 'true', Dhcp Snooping is enabled in the
+	specified VLAN.
+
+        If this object is 'false', Dhcp Snooping is disabled in the
+	specified VLAN."
+    ::= { jnxSecAccessPortVlanEntry 2 }
+
+jnxSecAccessVlanDAIStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether Dynamic ARP Inspection is
+         enabled in this VLAN.
+
+         If this object is 'true', Dynamic ARP Inspection is enabled. 
+
+         If this object is 'false', Dynamic ARP Inspection is disabled."
+    ::= { jnxSecAccessPortVlanEntry 3 }
+
+
+-- The Port Security Table for Interface
+
+jnxSecAccessPortIfTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF JnxSecAccessPortIfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The table contains the trust state and rate limit of each interface
+	for DHCP Snooping purpose. The table also contains information on MAC 
+	address limit feature for each interface capable of this feature.
+        This table also specifies whether IP source guard and MAC source 
+	guard are enabled on each interface." 
+    ::= { jnxSecAccessPortMIBObjects 2 }
+ 
+jnxSecAccessPortIfEntry OBJECT-TYPE
+    SYNTAX       JnxSecAccessPortIfEntry 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A table entry contains the trust state and rate limit of an 
+	interface, MAC address limit for that Interface. It also contains
+	the action to be undertaken if MAC address limit is exceeded. A table
+	entry specifies whether IP source guard and MAC source guard are enabled
+	on the specified interface."
+    INDEX { ifIndex }
+    ::= { jnxSecAccessPortIfTable 1 }
+
+JnxSecAccessPortIfEntry ::= 
+    SEQUENCE {
+        jnxSecAccessdsIfTrustState               TruthValue,
+	jnxSecAccessdsIfRateLimit                Unsigned32,
+        jnxSecAccessIfMacLimit       	         Unsigned32,
+    	jnxSecAccessIfMacLimitExceed     	 JnxMacLimitExceededAction,
+	jnxSecAccessIfIpSrcGuardStatus        	 TruthValue,
+	jnxSecAccessIfMacSrcGuardStatus       	 TruthValue
+    }
+
+ 
+jnxSecAccessdsIfTrustState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the interface is trusted for
+        DHCP Snooping purpose. 
+
+        If this object is 'true', the interface is trusted.
+        DHCP packets coming to this interface will be forwarded without 
+	checking.
+
+        If this object is 'false', the interface is not trusted. DHCP
+        packets coming to this interface will be subjected to DHCP checks." 
+    ::= { jnxSecAccessPortIfEntry 1 }
+
+jnxSecAccessdsIfRateLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "packets per second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates rate limit value for DHCP Snooping purpose. 
+	If the value of this object is 0, no rate limit is applied for DHCP
+	traffic at this interface." 
+    ::= { jnxSecAccessPortIfEntry 2 }
+
+jnxSecAccessIfMacLimit OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "This object specifies the threshold limit for the number of 
+	  MAC address entries on this interface. 
+
+          When the instance value of this object is set to 0, no threshold 
+	  limit will be applied for this interfacew and the 
+          corresponding instance value of jnxIfMacLimitExceedAction 
+          of the same row has no effect."
+    DEFVAL { 5 }
+    ::= { jnxSecAccessPortIfEntry 3 }
+
+jnxSecAccessIfMacLimitExceed OBJECT-TYPE
+    SYNTAX        JnxMacLimitExceededAction
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "This object specifies the action to be taken by the system for this 
+	 interface while the number of MAC addresses has exceeded the value 
+	 of jnxIfMacLimit.
+
+         This object value is only effective when the corresponding instance
+         value of jnxIfMacLimit is not set to 0."
+    ::= { jnxSecAccessPortIfEntry 4 }
+
+jnxSecAccessIfIpSrcGuardStatus	OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This object indicates whether IP Source Guard is enabled on
+	the specified interface.
+   
+	If this object is 'true', then IP Source Guard is enabled on the
+	specified interface.
+    
+        If this object is 'false', then IP Source Guard is disabled on 
+	the specified interface."
+    ::= { jnxSecAccessPortIfEntry 5 }
+
+jnxSecAccessIfMacSrcGuardStatus	OBJECT-TYPE
+    SYNTAX	TruthValue
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This object indicates whether Mac Source Guard is enabled on
+        the specified interface.
+    
+	If this object is 'true', then Mac Source Guard is enabled on the
+        specified interface.
+    
+	If this object is 'false', then IP Source Guard is disabled on
+        the specified interface."
+    ::= { jnxSecAccessPortIfEntry 6 }
+
+
+-- Storm Control Table
+
+jnxStormCtlTable     OBJECT-TYPE
+    SYNTAX        SEQUENCE OF JnxStormCtlEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Storm control monitors each type of traffic level on an interface. 
+        If traffic level exceeds the threshold value(rising threshold),
+        switch will drop all packets of that type until traffic level drops 
+        to the threshold level (falling threshold). If traffic rate for a 
+        particular type exceeds the rising threshold, action will be taken 
+        to shutdown or add configured filter on the port.
+        
+        This table describes the traffic type for each interface, the rising 
+        threshold, falling threshold and the action to be taken if the traffic
+        exceeds the rising threshold."
+    ::= { jnxSecAccessPortMIBObjects 3 }
+
+jnxStormCtlEntry     OBJECT-TYPE
+    SYNTAX        JnxStormCtlEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry contains the interface index,traffic type for the interface,  
+        the rising threshold, falling threshold and the action to be taken 
+        if the traffic exceeds the rising threshold."
+    INDEX {ifIndex, jnxStormCtlIfTrafficType  }
+    ::= { jnxStormCtlTable 1 }
+
+JnxStormCtlEntry ::= SEQUENCE {
+    jnxStormCtlIfTrafficType		INTEGER,
+    jnxStormCtlRisingThreshold	      	Integer32,
+    jnxStormCtlFallingThreshold		Integer32,
+    jnxStormCtlAction	  		INTEGER
+  }
+
+jnxStormCtlIfTrafficType    OBJECT-TYPE
+    SYNTAX        INTEGER {
+    			broadcast(1),
+    			multicast(2),
+    			unicast (3)
+    			}
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the traffic type on the particular
+        interface. Value 1 specifies that it is broadcast traffic,
+        value 2 specifies that it is multicast traffic and 
+        value 3 specifies that it is unicast traffic."
+    ::= { jnxStormCtlEntry 1 }
+
+jnxStormCtlRisingThreshold    OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "packets per second"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the rising threshold value in packets
+        per second. The storm control action is occurs when the traffic 
+        exceeds this threshold value."
+    ::= { jnxStormCtlEntry 2 }     
+ 
+jnxStormCtlFallingThreshold	OBJECT-TYPE
+    SYNTAX 	  Integer32
+    UNITS         "packets per second"
+    MAX-ACCESS	  read-only
+    STATUS	  current
+    DESCRIPTION
+	"This object specifies the falling threshold value in packets
+        per second. The storm control action ceases when the traffic 
+        drops to this threshold value."
+	::= { jnxStormCtlEntry 3 }
+	
+jnxStormCtlAction  OBJECT-TYPE
+    SYNTAX		INTEGER {
+    			shutdown(1),
+    			filter (2)
+    			}
+    MAX-ACCESS	  read-only
+    STATUS		  current
+    DESCRIPTION
+        "This object specifies the action to be taken, when traffic exceeds 
+	rising threshold value. Value 1 specifies that the action taken is 
+	to shutdown the port. Value 2 specifies that the action taken is to 
+	apply a policy filter on the interface for the given packet type. 
+	Default is to shutdown(1) the port."
+    DEFVAL { 1 }
+    ::= { jnxStormCtlEntry 4 }
+    
+   
+ -- Definition of DHCP Snooping notifications
+
+jnxSecAccessdsRateLimitCrossed NOTIFICATION-TYPE
+    OBJECTS {  jnxSecAccessdsIfRateLimit }
+    STATUS current
+    DESCRIPTION
+	"A jnxdsRateLimitCrossed notification is generated when 
+	the number of DHCP packets from an untrusted interface exceeds 
+	jnxSecAccessdsIfRateLimit."
+    ::= { jnxSecAccessPortMIBNotifications 1 }
+
+-- Definition of MAC Limit Exceeded Notification
+
+jnxSecAccessIfMacLimitExceeded NOTIFICATION-TYPE
+    OBJECTS { jnxSecAccessIfMacLimit, jnxSecAccessIfMacLimitExceed }
+    STATUS current
+    DESCRIPTION
+        "Notification is sent when the number of MAC addresses learnt by 
+        the interface has crossed the limit of MAC addresses(jnxSecAccessIfMacLimit) 
+	and if MAC Limit Exceeded Action(jnxSecAccessIfMacLimitExceed) is 
+	drop or alarm or shutdown."
+    ::= { jnxSecAccessPortMIBNotifications 2 }
+
+-- Definition of Storm Event Notification
+
+jnxStormEventNotification NOTIFICATION-TYPE
+    OBJECTS { jnxStormCtlRisingThreshold }
+    STATUS current
+    DESCRIPTION
+	"Notification is sent when the traffic in the interface exceeds 
+	rising threshold(jnxStormCtlRisingThreshold)."
+    ::= { jnxSecAccessPortMIBNotifications 3 }
+END
+
+
+

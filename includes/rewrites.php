@@ -97,6 +97,19 @@ function translate_ifAdminStatus ($ifAdminStatus) {
   return $ifAdminStatus;
 }
 
+$rewrite_junose_hardware = array(
+  'juniErx1400' => 'ERX-1400',
+  'juniErx700' => 'ERX-700',
+  'juniErx1440' => 'ERX-1440',
+  'juniErx705' => 'ERX-705',
+  'juniErx310' => 'ERX-310',
+  'juniE320' => 'E320',
+  'juniE120' => 'E120',
+  'juniSsx1400' => 'SSX-1400',
+  'juniSsx700' => 'SSX-700',
+  'juniSsx1440' => 'SSX-1440',
+);
+
 $rewrite_ironware_hardware = array(
     'snFIWGSwitch' => 'Stackable FastIron workgroup',
     'snFIBBSwitch' => 'Stackable FastIron backbone',
@@ -655,6 +668,14 @@ function rewrite_ironware_hardware ($hardware)
   $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
   return ($hardware);
 }
+
+function rewrite_junose_hardware ($hardware)
+{
+  global $rewrite_junose_hardware;
+  $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
+  return ($hardware);
+}
+
 
 
 function fixiftype ($type)

@@ -87,3 +87,4 @@ ALTER TABLE  `fanspeed` ADD  `fan_index` INT NOT NULL AFTER  `fan_host` , ADD  `
 ALTER TABLE  `temperature` CHANGE  `temp_host`  `device_id` INT( 11 ) NOT NULL DEFAULT  '0'
 ALTER TABLE  `fanspeed` CHANGE  `fan_host`  `device_id` INT( 11 ) NOT NULL DEFAULT  '0'
 ALTER TABLE  `voltage` CHANGE  `volt_host`  `device_id` INT( 11 ) NOT NULL DEFAULT  '0'
+CREATE TABLE IF NOT EXISTS `processors` (  `processor_id` int(11) NOT NULL AUTO_INCREMENT,  `entPhysicalIndex` int(11) NOT NULL,  `device_id` int(11) NOT NULL,  `processor_oid` int(11) NOT NULL,  `processor_type` int(11) NOT NULL,  `processor_usage` int(11) NOT NULL,  `processor_description` varchar(64) NOT NULL,  PRIMARY KEY (`processor_id`),  KEY `cpuCPU_id` (`processor_id`,`device_id`) ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;

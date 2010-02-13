@@ -4,7 +4,7 @@
 
   echo("Interfaces : ");
 
-  $interfaces = snmp_walk($device['hostname'], $device['port'], $device['snmpver'], $device['community'], "ifDescr", "Onsq", "IF-MIB");
+  $interfaces = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
 
   $interfaces = str_replace("\"", "", $interfaces);
   $interfaces = str_replace("ifDescr.", "", $interfaces);

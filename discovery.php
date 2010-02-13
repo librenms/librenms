@@ -90,7 +90,9 @@ foreach ($devices as $device)
   include("includes/discovery/interfaces.php");
 
   ## Discovery ENTITY-MIB 
-  include("includes/discovery/entity-physical.inc.php");
+#  include("includes/discovery/entity-physical.inc.php");
+
+  include("includes/discovery/processors.inc.php");
 
   ## Discover IPv4 Addresses
   include("includes/discovery/ipv4-addresses.php");
@@ -126,6 +128,7 @@ foreach ($devices as $device)
   
   if($device['os'] == "junose") { 
     include("includes/discovery/bgp-peers.php"); 
+    include("includes/discovery/processors-junose.inc.php");
   }
   
   if ($device['os_group'] == "unix")
@@ -140,7 +143,7 @@ foreach ($devices as $device)
     include("includes/discovery/cisco-mac-accounting.php");
     include("includes/discovery/cisco-pw.php");
     include("includes/discovery/cisco-vrf.php");
-    include("includes/discovery/cisco-processors.php");
+    #include("includes/discovery/cisco-processors.php");
     include("includes/discovery/cemp-mib.php");
     include("includes/discovery/cmp-mib.php");
 

@@ -1,0 +1,474 @@
+
+-- *****************************************************************************
+-- Juniper-IPV6-PROFILE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   IPv6 Profile MIB
+--
+-- Copyright (c) 2003 Juniper Networks, Inc.  All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-IPV6-PROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    Ipv6AddressPrefix
+        FROM IPV6-TC
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniName, JuniSetMap
+        FROM Juniper-TC;
+
+juniIpv6ProfileMIB  MODULE-IDENTITY
+	LAST-UPDATED "200707191819Z"  -- 24-Jul-07 02:19 PM EDT
+    ORGANIZATION "Juniper Networks"
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The IPv6 Profile MIB for the Juniper Networks enterprise."
+    -- Revision History
+	REVISION    "200707191819Z"  -- 24-Jul-07 02:19 PM EDT  - JUNOSe 8.2
+    DESCRIPTION
+        "Added ND support on dynamic interface."
+    REVISION    "200309291758Z"  -- 29-Sep-03 01:58 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 68 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpv6ProfileObjects  OBJECT IDENTIFIER ::= { juniIpv6ProfileMIB 1 }
+juniIpv6Profile         OBJECT IDENTIFIER ::= { juniIpv6ProfileObjects 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects for IPv6 Profiles
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- This MIB defines configuration profile structure for IPv6 interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The IPv6 Profile Table
+--
+juniIpv6ProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIpv6ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table describe profiles for configuring IP
+        interfaces.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniIpv6Profile 1 }
+
+juniIpv6ProfileEntry OBJECT-TYPE
+    SYNTAX      JuniIpv6ProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing configuration of an IPv6 interface."
+    INDEX     { juniIpv6ProfileId }
+    ::= { juniIpv6ProfileTable 1 }
+
+JuniIpv6ProfileEntry ::= SEQUENCE {
+    juniIpv6ProfileId              			    Unsigned32,
+    juniIpv6ProfileSetMap           			    JuniSetMap,
+    juniIpv6ProfileRouterName         		    JuniName,
+    juniIpv6ProfileIpv6Addr           		    InetAddressIPv6,
+    juniIpv6ProfileIpv6MaskLen       			    Integer32,
+    juniIpv6ProfileMtu               			    Integer32,
+    juniIpv6ProfileSrcAddrValidEnable 		    JuniEnable,
+    juniIpv6ProfileInheritNumString  			    DisplayString, 
+    juniIpv6ProfileNdEnabled					    JuniEnable,
+    juniIpv6ProfileNdManagedConfig    		    JuniEnable,
+    juniIpv6ProfileNdOtherConfig 	     			JuniEnable,
+    juniIpv6ProfileNdSuppressRa		 			JuniEnable,
+    juniIpv6ProfileNdRaInterval		 			Integer32,	
+    juniIpv6ProfileNdRaLifeTime		 			Integer32,
+    juniIpv6ProfileNdReachableTime     			Integer32,
+    juniIpv6ProfileNdPrefix                       Ipv6AddressPrefix,
+    juniIpv6ProfileNdPrefixLength                 Integer32,
+    juniIpv6ProfileNdPrefixOnLinkFlag             JuniEnable,
+    juniIpv6ProfileNdPrefixAutonomousFlag         JuniEnable,
+    juniIpv6ProfileNdPrefixPreferredLifetime      Integer32,
+    juniIpv6ProfileNdPrefixValidLifetime          Integer32}
+
+juniIpv6ProfileId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        juniProfileNameTable."
+    ::= { juniIpv6ProfileEntry 1 }
+
+juniIpv6ProfileSetMap OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniIpv6ProfileEntry 2 }
+
+juniIpv6ProfileRouterName OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The virtual router to which an IPv6 interface configured by this
+        profile will be assigned, if other mechanisms do not otherwise specify a
+        virtual router assignment."
+    DEFVAL    { "" }
+    ::= { juniIpv6ProfileEntry 3 }
+
+juniIpv6ProfileIpv6Addr OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An IPv6 address to be used by an IPv6 interface configured by this
+        profile.  This object will have a value of 0::0 for an unnumbered
+        interface."
+    DEFVAL    { '00000000000000000000000000000000'H }
+    ::= { juniIpv6ProfileEntry 4 }
+
+juniIpv6ProfileIpv6MaskLen OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An IPv6 address mask length to be used by an IPv6 interface configured
+        by this profile.  This object will have a value of 0 for an unnumbered
+        interface."
+    DEFVAL    { 0 }
+    ::= { juniIpv6ProfileEntry 5 }
+
+juniIpv6ProfileMtu OBJECT-TYPE
+    SYNTAX      Integer32 (0|1280..10240)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured MTU size for this IPv6 network interface.  If set to
+        zero, the default MTU size, as determined by the underlying network
+        media, is used."
+    DEFVAL    { 0 }
+    ::= { juniIpv6ProfileEntry 6 }
+
+juniIpv6ProfileSrcAddrValidEnable OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable whether source addresses in received IPv6 packets are
+        validated.  Validation is performed by looking up the source IPv6
+        address in the routing database and determining whether the packet
+        arrived on the expected interface; if not, the packet is discarded."
+    DEFVAL    { disable }
+    ::= { juniIpv6ProfileEntry 7 }
+
+juniIpv6ProfileInheritNumString OBJECT-TYPE
+
+    SYNTAX      DisplayString (SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The text identifier of the numbered interface, associated with the
+        specified virtual router, whose IPv6 address is used as the source
+        address when transmitting IPv6 packets on unnumbered remote access user
+        links.  Types/formats/examples for this string include:
+
+            Loopback
+            loopback <id>
+            'loopback 0'
+
+            ATM Virtual Circuit
+            atm <slot>/<port>.<distinguisher>
+            'atm 3/1.100'
+
+            Ethernet
+            { fastEthernet | gigabitEthernet } <slot>/<port>
+            'fastEthernet 3/0'
+            'gigabitEthernet 3/0'
+
+            Ethernet VLAN
+            { fastEthernet | gigabitEthernet } <slot>/<port>:<vlanID>
+            'fastEthernet 3/0:1000'
+            'gigabitEthernet 3/0:1000'
+
+            Channelized Serial
+            serial <slot>/<port>:<channelSpecifier>[/<channelSpecifier>]*
+            'serial 3/0:4'            (T1/E1)
+            'serial 3/0:2/4'          (T3/E3)
+            'serial 3/0:2/1/1/4'      (OC3/OC12 - channelized DS3)
+            'serial 3/0:2/1/1/1/4'    (OC3/OC12 - virtual tributaries)
+
+        Other formats may be supported over time.
+
+        An empty string indicates the referenced interface is unspecified, e.g.,
+        when this IPv6 interface is numbered."
+    DEFVAL    { "" }
+    ::= { juniIpv6ProfileEntry 8 }
+
+juniIpv6ProfileNdEnabled OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ND for this IPv6 network interface."
+    DEFVAL    { disable }
+    ::= { juniIpv6ProfileEntry 9 }
+
+juniIpv6ProfileNdManagedConfig OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ND managed config for this IPv6 network interface."
+    DEFVAL    { disable }
+    ::= { juniIpv6ProfileEntry 10 }
+
+juniIpv6ProfileNdOtherConfig OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ND other config for this IPv6 network interface."
+    DEFVAL    { disable }
+    ::= { juniIpv6ProfileEntry 11 }
+
+juniIpv6ProfileNdSuppressRa OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/disable ND suppress RA for this IPv6 network interface."
+    DEFVAL    { disable }
+    ::= { juniIpv6ProfileEntry 12 }
+
+juniIpv6ProfileNdRaInterval OBJECT-TYPE
+    SYNTAX      Integer32 (3..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured interval between IPv6 RA transmissions on the interface."
+    DEFVAL    { 200 }
+    ::= { juniIpv6ProfileEntry 13 }
+
+juniIpv6ProfileNdRaLifeTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..1800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured RA lifetime for this IPv6 network interface."
+    DEFVAL    { 1800 }
+    ::= { juniIpv6ProfileEntry 14 }
+
+juniIpv6ProfileNdReachableTime OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured RA reachable time for this IPv6 network interface."
+    DEFVAL    { 0 }
+    ::= { juniIpv6ProfileEntry 15 }
+
+juniIpv6ProfileNdPrefix OBJECT-TYPE
+	SYNTAX      Ipv6AddressPrefix
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The prefix associated with the this interface."
+	::= { juniIpv6ProfileEntry 16 }
+
+juniIpv6ProfileNdPrefixLength OBJECT-TYPE
+	SYNTAX      Integer32 (1..128)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The length of the prefix (in bits)."
+	::= { juniIpv6ProfileEntry 17 }	
+
+juniIpv6ProfileNdPrefixOnLinkFlag OBJECT-TYPE
+	SYNTAX      JuniEnable
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"This object has the value 'true(1)', if this
+		prefix can be used  for on-link determination
+		and the value 'false(2)' otherwise."
+	DEFVAL    { enable }
+	::= { juniIpv6ProfileEntry 18 }
+
+juniIpv6ProfileNdPrefixAutonomousFlag OBJECT-TYPE
+	SYNTAX      JuniEnable
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Autonomous address configuration flag. When
+		true(1), indicates that this prefix can be used
+		for autonomous address configuration (i.e. can
+		be used to form a local interface address).
+		If false(2), it is not used to autoconfigure
+		a local interface address."
+	DEFVAL    { enable }
+	::= { juniIpv6ProfileEntry 19 }
+juniIpv6ProfileNdPrefixPreferredLifetime OBJECT-TYPE
+	SYNTAX      Integer32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"It is the length of time in seconds that this
+		prefix will remain preferred, i.e. time until
+		deprecation.  A value of 4,294,967,295 represents
+		infinity.
+		
+		The address generated from a deprecated prefix
+		should no longer be used as a source address in
+		new communications, but packets received on such
+		an interface are processed as expected."
+	DEFVAL    { 604800 }	
+	::= { juniIpv6ProfileEntry 20 }
+
+juniIpv6ProfileNdPrefixValidLifetime OBJECT-TYPE
+	SYNTAX      Integer32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"It is the length of time in seconds that this
+		prefix will remain valid, i.e. time until
+		invalidation.  A value of 4,294,967,295 represents
+		infinity.
+		
+		The address generated from an invalidated prefix
+		should not appear as the destination or source
+		address of a packet."
+	DEFVAL    { 2592000 }	
+	::= { juniIpv6ProfileEntry 21 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniIpv6ProfileTrapControl  OBJECT IDENTIFIER ::= { juniIpv6ProfileMIB 2 }
+-- juniIpv6ProfileTraps        OBJECT IDENTIFIER ::= { juniIpv6ProfileMIB 3 }
+-- juniIpv6ProfileTrapPrefix   OBJECT IDENTIFIER ::= { juniIpv6ProfileTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIpv6ProfileMIBConformance
+             OBJECT IDENTIFIER ::= { juniIpv6ProfileMIB 4 }
+juniIpv6ProfileMIBCompliances
+             OBJECT IDENTIFIER ::= { juniIpv6ProfileMIBConformance 1 }
+juniIpv6ProfileMIBGroups
+             OBJECT IDENTIFIER ::= { juniIpv6ProfileMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+juniIpv6ProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete Compliance statement for systems supporting IPv6 configuration
+        profiles.  This statement became obsolete when added ND support."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpv6ProfileGroup }
+    ::= { juniIpv6ProfileMIBCompliances 1 }                        -- JUNOSe 5.1
+
+juniIpv6ProfileCompliance1  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Compliance statement for systems supporting IPv6 configuration
+        profiles, incorporating support of ND on dynamical interface."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniIpv6ProfileGroup1 }
+    ::= { juniIpv6ProfileMIBCompliances 2 }                        -- JUNOSe 8.2
+
+--
+-- units of conformance
+--
+juniIpv6ProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIpv6ProfileSetMap,
+        juniIpv6ProfileRouterName,
+        juniIpv6ProfileIpv6Addr,
+        juniIpv6ProfileIpv6MaskLen,
+        juniIpv6ProfileMtu,
+        juniIpv6ProfileSrcAddrValidEnable,
+        juniIpv6ProfileInheritNumString }
+    STATUS      obsolete
+    DESCRIPTION
+        "An obsolete collection of objects providing management of IPv6 Profile
+        functionality in a Juniper product. This statement became obsolete 
+		when added ND support."
+    ::= { juniIpv6ProfileMIBGroups 1 }                             -- JUNOSe 5.1
+
+juniIpv6ProfileGroup1  OBJECT-GROUP
+    OBJECTS {
+        juniIpv6ProfileSetMap,
+        juniIpv6ProfileRouterName,
+        juniIpv6ProfileIpv6Addr,
+        juniIpv6ProfileIpv6MaskLen,
+        juniIpv6ProfileMtu,
+        juniIpv6ProfileSrcAddrValidEnable,
+        juniIpv6ProfileInheritNumString,
+        juniIpv6ProfileNdEnabled,	
+        juniIpv6ProfileNdManagedConfig,
+        juniIpv6ProfileNdOtherConfig,
+        juniIpv6ProfileNdSuppressRa,		
+        juniIpv6ProfileNdRaInterval,
+        juniIpv6ProfileNdRaLifeTime,
+        juniIpv6ProfileNdReachableTime,
+        juniIpv6ProfileNdPrefix,	
+        juniIpv6ProfileNdPrefixLength,
+        juniIpv6ProfileNdPrefixOnLinkFlag,
+        juniIpv6ProfileNdPrefixAutonomousFlag,
+        juniIpv6ProfileNdPrefixPreferredLifetime,
+        juniIpv6ProfileNdPrefixValidLifetime }
+    STATUS      current
+    DESCRIPTION
+        "The basic collection of objects providing management of IPv6 Profile
+        functionality in a Juniper product."
+    ::= { juniIpv6ProfileMIBGroups 2 }                             -- JUNOSe 8.2
+
+END

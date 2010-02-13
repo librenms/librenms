@@ -1,0 +1,1665 @@
+JNX-L2TP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+           Integer32, Unsigned32, Counter32, Gauge32,
+           Counter64, TimeTicks, transmission, MODULE-IDENTITY,
+           OBJECT-TYPE, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DateAndTime, RowStatus, StorageType, TEXTUAL-CONVENTION, 
+           TruthValue
+               FROM SNMPv2-TC
+           CounterBasedGauge64               -- RFC 2856
+               FROM HCNUM-TC
+           InetAddress, InetAddressType, InetPortNumber
+               FROM INET-ADDRESS-MIB
+           SnmpAdminString
+               FROM SNMP-FRAMEWORK-MIB
+           OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           jnxL2tpMibRoot
+               FROM JUNIPER-SMI;
+
+   jnxL2tp    MODULE-IDENTITY
+           LAST-UPDATED    "200701110000Z" -- 11 January 2007
+           ORGANIZATION    "Juniper Networks Inc."
+           CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1194 N. Mathilda Avenue
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+           DESCRIPTION
+              "Provides monitoring information regarding
+               the Layer Two Transport Protocol. This MIB
+               is based on the standard MIB defined in 
+               RFC 3371. However, there are significant differences
+               including the INDEX fields of l2tpTunnelStatsTable
+               and l2tpSessionStatsTable."
+
+           -- revision log
+
+           REVISION        "200701110000Z" -- 11 January 2007
+           DESCRIPTION
+              "Initial revision."
+
+           ::= { jnxL2tpMibRoot 1 }
+
+   --
+   --      Definitions of significant branches
+   --
+   jnxL2tpObjects         OBJECT IDENTIFIER  ::= { jnxL2tp 1 }
+   jnxL2tpScalar          OBJECT IDENTIFIER  ::= { jnxL2tpObjects 1 }
+   jnxL2tpStats           OBJECT IDENTIFIER  ::= { jnxL2tpScalar 1 }
+
+   --
+   --      The L2TP Scalar Status and Statistics Group
+   --
+
+   jnxL2tpStatsTotalTunnels OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the total number of tunnels
+               that are currently in the established state. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 1 }
+
+   jnxL2tpStatsTotalSessions OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the total number of sessions
+               that are currently in the established state. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 2 }
+
+   jnxL2tpStatsControlRxOctets OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of control channel
+               octets received by the existing tunnels. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 3 }
+
+   jnxL2tpStatsControlRxPkts OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of control packets
+               received by the existing tunnels. This is an
+               instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 4 }
+
+   jnxL2tpStatsControlTxOctets OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of control channel
+               octets that were transmitted to the existing tunnel 
+               endpoints. This is an instantaneously accumulated 
+               value which can increase or decrease depending on 
+               number of tunnels established at the time of querying."
+           ::= { jnxL2tpStats 5 }
+
+   jnxL2tpStatsControlTxPkts OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of control packets
+               that were transmitted to the existing tunnel endpoints.This 
+               is an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 6 }
+
+   jnxL2tpStatsPayloadRxOctets OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of payload channel
+               octets that were received on the exisiting tunnels. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 7 }
+
+   jnxL2tpStatsPayloadRxPkts OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of payload packets
+               that were received on the existing tunnels. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 8 }
+
+   jnxL2tpStatsPayloadTxOctets OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of payload channel
+               octets that were transmitted to the existing tunnel peers. 
+               This is an instantaneously accumulated value which can 
+               increase or decrease depending on number of tunnels 
+               established at the time of querying."
+           ::= { jnxL2tpStats 9 }
+
+   jnxL2tpStatsPayloadTxPkts OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of payload packets
+               that were transmitted to existing tunnel peers. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 10 }
+
+   jnxL2tpStatsErrorTxPkts OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of errored packet
+               transmission attempts to the existing tunnel peers. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 11 }
+
+   jnxL2tpStatsErrorRxPkts OBJECT-TYPE
+           SYNTAX          CounterBasedGauge64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the number of errored packets
+               that were received from the existing tunnel peers. This is 
+               an instantaneously accumulated value which can increase
+               or decrease depending on number of tunnels established
+               at the time of querying."
+           ::= { jnxL2tpStats 12 }
+
+   --
+   --      The L2TP Tunnel Group Status and Statistics Table
+   --
+
+
+   jnxL2tpTunnelGroupStatsTable    OBJECT-TYPE
+           SYNTAX          SEQUENCE OF JnxL2tpTunnelGroupStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "The L2TP tunnel group status and statistics table. This
+               table contains objects that can be used to describe
+               the current status and statistics of a single L2TP
+               tunnel group."
+           ::= { jnxL2tpObjects 2 }
+
+   jnxL2tpTunnelGroupStatsEntry    OBJECT-TYPE
+           SYNTAX          JnxL2tpTunnelGroupStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "An L2TP tunnel group stats entry."
+           INDEX { IMPLIED jnxL2tpTunnelGroupStatsTnlGrpName }
+           ::= { jnxL2tpTunnelGroupStatsTable 1 }
+
+   JnxL2tpTunnelGroupStatsEntry ::=
+           SEQUENCE {
+               jnxL2tpTunnelGroupStatsTnlGrpName
+                   OCTET STRING,
+               jnxL2tpTunnelGroupStatsGatewayAddrType
+                   InetAddressType,
+               jnxL2tpTunnelGroupStatsGatewayAddr
+                   InetAddress,
+               jnxL2tpTunnelGroupStatsSvcIntfName
+                   SnmpAdminString,
+               jnxL2tpTunnelGroupStatsTotalTunnels
+                   Gauge32,
+               jnxL2tpTunnelGroupStatsTotalSessions
+                   Gauge32
+           }
+
+   jnxL2tpTunnelGroupStatsTnlGrpName OBJECT-TYPE
+           SYNTAX          OCTET STRING (SIZE (1..128))
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of this tunnel
+               group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 1 }
+
+
+   jnxL2tpTunnelGroupStatsGatewayAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of local IP address 
+               for L2TP tunnels that are part of this group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 2 }
+
+   jnxL2tpTunnelGroupStatsGatewayAddr OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local IP address 
+               for L2TP tunnels that are part of this group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 3 }
+
+   jnxL2tpTunnelGroupStatsSvcIntfName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of the service
+               interface that is hosting this tunnel group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 4 }
+
+   jnxL2tpTunnelGroupStatsTotalTunnels OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the total number of tunnels
+               that are currently in the established state in this
+               tunnel group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 5 }
+
+   jnxL2tpTunnelGroupStatsTotalSessions OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the total number of sessions
+               that are currently in the established state in
+               this tunnel group."
+           ::= { jnxL2tpTunnelGroupStatsEntry 6 }
+
+   --
+   --      The L2TP Tunnel Status and Statistics Table
+   --
+
+
+   jnxL2tpTunnelStatsTable    OBJECT-TYPE
+           SYNTAX          SEQUENCE OF JnxL2tpTunnelStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "The L2TP tunnel status and statistics table. This
+               table contains objects that can be used to describe
+               the current status and statistics of a single L2TP
+               tunnel."
+           ::= { jnxL2tpObjects 3 }
+
+   jnxL2tpTunnelStatsEntry    OBJECT-TYPE
+           SYNTAX          JnxL2tpTunnelStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "An L2TP tunnel interface stats entry."
+           INDEX { jnxL2tpTunnelStatsLocalTID }
+           ::= { jnxL2tpTunnelStatsTable 1 }
+
+   JnxL2tpTunnelStatsEntry ::=
+           SEQUENCE {
+               jnxL2tpTunnelStatsLocalTID
+                   Integer32,
+               jnxL2tpTunnelStatsServiceInterface
+                   SnmpAdminString,
+               jnxL2tpTunnelStatsTunnelGroup
+                   SnmpAdminString,
+               jnxL2tpTunnelStatsRemoteTID
+                   Integer32,
+               jnxL2tpTunnelStatsRemoteIpAddrType
+                   InetAddressType,
+               jnxL2tpTunnelStatsRemoteIpAddress
+                   InetAddress,
+               jnxL2tpTunnelStatsRemoteUdpPort
+                   InetPortNumber,
+               jnxL2tpTunnelStatsActiveSessions
+                   Gauge32,
+               jnxL2tpTunnelStatsState
+                   INTEGER,
+               jnxL2tpTunnelStatsLocalIpAddrType
+                   InetAddressType,
+               jnxL2tpTunnelStatsLocalIpAddress
+                   InetAddress,
+               jnxL2tpTunnelStatsLocalUdpPort
+                   InetPortNumber,
+               jnxL2tpTunnelStatsLocalHostName
+                   SnmpAdminString,
+               jnxL2tpTunnelStatsRemoteHostName
+                   SnmpAdminString,
+               jnxL2tpTunnelMaxSessions
+                   Integer32,
+               jnxL2tpTunnelStatsWindowSize
+                   Integer32,
+               jnxL2tpTunnelStatsHelloInterval
+                   Integer32,
+               jnxL2tpTunnelStatsCreationTime
+                   DateAndTime,
+               jnxL2tpTunnelStatsUpTime
+                   TimeTicks,
+               jnxL2tpTunnelStatsIdleTime
+                   TimeTicks,
+               jnxL2tpTunnelStatsCollectionStart
+                   DateAndTime,
+               jnxL2tpTunnelStatsControlTxPkts
+                   Counter32,
+               jnxL2tpTunnelStatsControlTxBytes
+                   Counter64,
+               jnxL2tpTunnelStatsControlRxPkts
+                   Counter32,
+               jnxL2tpTunnelStatsControlRxBytes
+                   Counter64,
+               jnxL2tpTunnelStatsDataTxPkts
+                   Counter32,
+               jnxL2tpTunnelStatsDataTxBytes
+                   Counter64,
+               jnxL2tpTunnelStatsDataRxPkts
+                   Counter32,
+               jnxL2tpTunnelStatsDataRxBytes
+                   Counter64,
+               jnxL2tpTunnelStatsErrorTxPkts
+                   Counter32,
+               jnxL2tpTunnelStatsErrorRxPkts
+                   Counter32
+           }
+
+   jnxL2tpTunnelStatsLocalTID OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local tunnel Identifier."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpTunnelStatsEntry 1 }
+
+   jnxL2tpTunnelStatsServiceInterface OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of the service
+               interface on which this tunnel is being hosted."
+           ::= { jnxL2tpTunnelStatsEntry 2 }
+
+   jnxL2tpTunnelStatsTunnelGroup OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of the tunnel
+               group that this tunnel is part of."
+           ::= { jnxL2tpTunnelStatsEntry 3 }
+
+   jnxL2tpTunnelStatsRemoteTID OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote tunnel Identifier."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpTunnelStatsEntry 4 }
+
+   jnxL2tpTunnelStatsRemoteIpAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of the remote end 
+               address of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 5 }
+
+   jnxL2tpTunnelStatsRemoteIpAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote end address
+               of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 6 }
+
+   jnxL2tpTunnelStatsRemoteUdpPort OBJECT-TYPE
+           SYNTAX          InetPortNumber
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote end UDP
+               port of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 7 }
+
+   jnxL2tpTunnelStatsActiveSessions OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the total number of sessions
+               in the established state for this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 8 }
+
+   jnxL2tpTunnelStatsState    OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               cc-responder-accept-new(1),
+                               cc-responder-reject-new(2),
+                               cc-responder-idle(3),
+                               cc-responder-wait-ctl-conn(4),
+                               cleanup(5),
+                               closed(6),
+                               destroyed(7),
+                               established(8),
+                               terminate(9),
+                               unknown(10)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This field contains the current state of the
+               control tunnel - one of the internal tunnel
+               state names as described below:
+               cc_responder_accept_new 
+                 The tunnel has received and accepted the start 
+                 control connection request (SCCRQ)
+               cc_responder_reject_new 
+                 The tunnel has received and rejected the SCCRQ
+               cc_responder_idle
+                 The tunnel has just been created
+               cc_responder_wait_ctl_conn 
+                 The tunnel has sent the start control connection 
+                 response (SCCRP) and is waiting for the start 
+                 control connection connected (SCCCN) message
+               cleanup 
+                 The tunnel is being cleaned up
+               closed 
+                 The tunnel is being closed
+               destroyed 
+                 The tunnel is being destroyed
+               established 
+                 The tunnel is operating
+               terminate 
+                 The tunnel is terminating
+               Unknown 
+                 The tunnel is not connected to the router."
+           ::= { jnxL2tpTunnelStatsEntry 9 }
+
+   jnxL2tpTunnelStatsLocalIpAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of the local 
+               end address of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 10 }
+
+   jnxL2tpTunnelStatsLocalIpAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local end address
+               of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 11 }
+
+   jnxL2tpTunnelStatsLocalUdpPort OBJECT-TYPE
+           SYNTAX          InetPortNumber
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local end UDP port
+               of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 12 }
+
+
+   jnxL2tpTunnelStatsLocalHostName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local host name
+               of this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 13 }
+
+   jnxL2tpTunnelStatsRemoteHostName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the host name as discovered
+               during the tunnel establishment phase (via the Host
+               Name AVP) of the L2TP peer. If the tunnel is idle
+               this object should maintain its value from the last
+               time it was connected."
+           ::= { jnxL2tpTunnelStatsEntry 14 }
+
+   jnxL2tpTunnelMaxSessions OBJECT-TYPE
+           SYNTAX          Integer32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the maximum number of sessions
+               configured on this tunnel. It could be any positive 
+               number or unlimited (0)."
+           ::= { jnxL2tpTunnelStatsEntry 15 }
+
+   jnxL2tpTunnelStatsWindowSize OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the send window size for this
+               tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 16 }
+
+   jnxL2tpTunnelStatsHelloInterval OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the hello interval for this
+               tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 17 }
+
+   jnxL2tpTunnelStatsCreationTime OBJECT-TYPE
+           SYNTAX          DateAndTime
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time of creation of 
+               this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 18 }
+
+   jnxL2tpTunnelStatsUpTime OBJECT-TYPE
+           SYNTAX          TimeTicks
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time elapsed
+               since this tunnel was established."
+           ::= { jnxL2tpTunnelStatsEntry 19 }
+
+   jnxL2tpTunnelStatsIdleTime OBJECT-TYPE
+           SYNTAX          TimeTicks
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time elapsed
+               since this tunnel had last data activity 
+               (transmission or reception)."
+           ::= { jnxL2tpTunnelStatsEntry 20 }
+
+   jnxL2tpTunnelStatsCollectionStart OBJECT-TYPE
+           SYNTAX          DateAndTime
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time at which the
+               statistics gathering started for this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 21 }
+
+   jnxL2tpTunnelStatsControlTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               packets that were transmitted to the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 22 }
+
+   jnxL2tpTunnelStatsControlTxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were transmitted to the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 23 }
+
+   jnxL2tpTunnelStatsControlRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control packets
+               received on the tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 24 }
+
+   jnxL2tpTunnelStatsControlRxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were received from the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 25 }
+
+   jnxL2tpTunnelStatsDataTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               transmitted to the tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 26 }
+
+   jnxL2tpTunnelStatsDataTxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data
+               bytes that were transmitted to the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 27 }
+
+   jnxL2tpTunnelStatsDataRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               received from this tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 28 }
+
+   jnxL2tpTunnelStatsDataRxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data
+               bytes that were received from the tunnel
+               peer."
+           ::= { jnxL2tpTunnelStatsEntry 29 }
+
+   jnxL2tpTunnelStatsErrorTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of error
+               transmit packets on the tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 30 }
+
+   jnxL2tpTunnelStatsErrorRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of error
+               receive packets on the tunnel."
+           ::= { jnxL2tpTunnelStatsEntry 31 }
+
+   --
+   --      The L2TP Session Status and Statistics Table
+   --
+   jnxL2tpSessionStatsTable   OBJECT-TYPE
+           SYNTAX          SEQUENCE OF JnxL2tpSessionStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "The L2TP session status and statistics table. This
+               table contains the objects that can be used to
+               describe the current status and statistics of a
+               single L2TP tunneled session."
+           ::= { jnxL2tpObjects 4 }
+
+   jnxL2tpSessionStatsEntry   OBJECT-TYPE
+           SYNTAX          JnxL2tpSessionStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "An L2TP session interface stats entry."
+           INDEX { jnxL2tpSessionStatsLocalTID,
+                   jnxL2tpSessionStatsLocalSID }
+           ::= { jnxL2tpSessionStatsTable 1 }
+
+   JnxL2tpSessionStatsEntry ::=
+           SEQUENCE {
+               jnxL2tpSessionStatsLocalTID
+                   Integer32,
+               jnxL2tpSessionStatsLocalSID
+                   Integer32,
+               jnxL2tpSessionStatsServiceInterface
+                   SnmpAdminString,
+               jnxL2tpSessionStatsTunnelGroup
+                   SnmpAdminString,
+               jnxL2tpSessionStatsRemoteSID
+                   Integer32,
+               jnxL2tpSessionStatsInterfaceUnit
+                   Integer32,
+               jnxL2tpSessionStatsEncapType
+                   INTEGER,
+               jnxL2tpSessionStatsBundleID
+                   Integer32,
+               jnxL2tpSessionStatsState
+                   INTEGER,
+               jnxL2tpSessionStatsUserName
+                   SnmpAdminString,
+               jnxL2tpSessionStatsMode
+                   INTEGER,
+               jnxL2tpSessionStatsLocalAddrType
+                   InetAddressType,
+               jnxL2tpSessionStatsLocalAddress
+                   InetAddress,
+               jnxL2tpSessionStatsLocalUdpPort
+                   InetPortNumber,
+               jnxL2tpSessionStatsRemoteAddrType
+                   InetAddressType,
+               jnxL2tpSessionStatsRemoteAddress
+                   InetAddress,
+               jnxL2tpSessionStatsRemoteUdpPort
+                   InetPortNumber,
+               jnxL2tpSessionStatsLocalHostName
+                   SnmpAdminString,
+               jnxL2tpSessionStatsRemoteHostName
+                   SnmpAdminString,
+               jnxL2tpSessionAssignedIpAddrType
+                   InetAddressType,
+               jnxL2tpSessionAssignedIpAddress
+                   InetAddress,
+               jnxL2tpSessionLocalMRU
+                   INTEGER,
+               jnxL2tpSessionRemoteMRU
+                   INTEGER,
+               jnxL2tpSessionStatsTxSpeed
+                   Unsigned32,
+               jnxL2tpSessionStatsRxSpeed
+                   Unsigned32,
+               jnxL2tpSessionStatsCallBearerType
+                   INTEGER,
+               jnxL2tpSessionStatsFramingType
+                   INTEGER,
+               jnxL2tpSessionStatsLCPRenegotiation
+                   INTEGER,
+               jnxL2tpSessionStatsAuthMethod
+                   INTEGER,
+               jnxL2tpSessionStatsNasIpAddrType
+                   InetAddressType,
+               jnxL2tpSessionStatsNasIpAddress
+                   InetAddress,
+               jnxL2tpSessionStatsNasIpPort
+                   InetPortNumber,
+               jnxL2tpSessionStatsFramedProtocol
+                   INTEGER,
+               jnxL2tpSessionStatsFramedIpAddrType
+                   InetAddressType,
+               jnxL2tpSessionStatsFramedIpAddress
+                   InetAddress,
+               jnxL2tpSessionStatsCallingStationID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsCalledStationID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsAcctDelayTime
+                   Integer32,
+               jnxL2tpSessionStatsAcctSessionID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsAcctMethod
+                   INTEGER,
+               jnxL2tpSessionStatsAcctSessionTime
+                   Gauge32,
+               jnxL2tpSessionStatsAcctNasPortType
+                   INTEGER,
+               jnxL2tpSessionStatsAcctTnlClientEndPoint
+                   Integer32,
+               jnxL2tpSessionStatsAcctTnlServerEndPoint
+                   Integer32,
+               jnxL2tpSessionStatsAcctTnlClientAuthID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsAcctTnlServerAuthID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsUserProfileName
+                   SnmpAdminString,
+               jnxL2tpSessionStatsInterfaceID
+                   SnmpAdminString,
+               jnxL2tpSessionStatsCallSerialNumber
+                   Unsigned32,
+               jnxL2tpSessionStatsCreationTime
+                   DateAndTime,
+               jnxL2tpSessionStatsUpTime
+                   TimeTicks,
+               jnxL2tpSessionStatsIdleTime
+                   TimeTicks,
+               jnxL2tpSessionStatsCollectionStart
+                   DateAndTime,
+               jnxL2tpSessionStatsControlTxPkts
+                   Counter32,
+               jnxL2tpSessionStatsControlTxBytes
+                   Counter64,
+               jnxL2tpSessionStatsControlRxPkts
+                   Counter32,
+               jnxL2tpSessionStatsControlRxBytes
+                   Counter64,
+               jnxL2tpSessionStatsDataTxPkts
+                   Counter32,
+               jnxL2tpSessionStatsDataTxBytes
+                   Counter64,
+               jnxL2tpSessionStatsDataRxPkts
+                   Counter32,
+               jnxL2tpSessionStatsDataRxBytes
+                   Counter64,
+               jnxL2tpSessionStatsErrorTxPkts
+                   Counter32,
+               jnxL2tpSessionStatsErrorRxPkts
+                   Counter32
+           }
+
+   jnxL2tpSessionStatsLocalTID OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local tunnel Identifier."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpSessionStatsEntry 1 }
+
+   jnxL2tpSessionStatsLocalSID OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local session Identifier."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpSessionStatsEntry 2 }
+
+   jnxL2tpSessionStatsServiceInterface OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of the service
+               interface on which this session is being hosted."
+           ::= { jnxL2tpSessionStatsEntry 3 }
+
+   jnxL2tpSessionStatsTunnelGroup OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the name of the tunnel
+               group that this session is part of."
+           ::= { jnxL2tpSessionStatsEntry 4 }
+
+   jnxL2tpSessionStatsRemoteSID OBJECT-TYPE
+           SYNTAX          Integer32  (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote end assigned 
+               session identifier for this session. When a session 
+               is starting this value may be zero until the remote
+               tunnel endpoint has responded."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpSessionStatsEntry 5 }
+
+   jnxL2tpSessionStatsInterfaceUnit OBJECT-TYPE
+           SYNTAX          Integer32  (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the interface unit number
+               corresponding to the logical service interface
+               on which the session is being hosted."
+           ::= { jnxL2tpSessionStatsEntry 6 }
+
+   jnxL2tpSessionStatsEncapType OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               ppp(1),
+                               multilink-ppp(2),
+                               unknown(3)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the tunnel encapsulation
+               type."
+           ::= { jnxL2tpSessionStatsEntry 7 }
+               
+
+   jnxL2tpSessionStatsBundleID OBJECT-TYPE
+           SYNTAX          Integer32 (1..65536)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the bundle that this
+               session is a link of. This field is valid
+               only for tunnel encapsulation type multilink-ppp."
+           ::= { jnxL2tpSessionStatsEntry 8 }
+
+   jnxL2tpSessionStatsState    OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               established(1),
+                               closed(2),
+                               destroyed(3),
+                               cleanup(4),
+                               lns-ic-accept-new(5),
+                               lns-ic-idle(6),
+                               lns-ic-reject-new(7),
+                               lns-ic-wait-connect(8)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This field contains the current state of the
+               session - one of the internal session related
+               state names as described below:
+               established
+                 The session is operating
+               closed
+                 The session is being closed
+               destroyed
+                 The session is being destroyed
+               cleanup
+                 The session is being cleaned up
+               lns_ic_accept_new
+                 A new session is being accepted
+               lns_ic_idle
+                 The session has been created and is idle
+               lns_ic_reject_new
+                 The new session is being rejected
+               lns_ic_wait_connect
+                 The session is waiting for the peer's incoming 
+                 call connected (ICCN) message."
+           ::= { jnxL2tpSessionStatsEntry 9 }
+
+   jnxL2tpSessionStatsUserName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the peer session name on
+               this interface. This is typically the login name
+               of the remote user. If the user name is unknown to
+               the local tunnel peer then this object will contain
+               a null string."
+           ::= { jnxL2tpSessionStatsEntry 10 }
+
+   jnxL2tpSessionStatsMode OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               shared(1),
+                               dedicate(2),
+                               unknown(3)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the configured mode value for
+               this session."
+           ::= { jnxL2tpSessionStatsEntry 11 }
+
+   jnxL2tpSessionStatsLocalAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of the local 
+               end address of the tunnel that is hosting 
+               this session."
+           ::= { jnxL2tpSessionStatsEntry 12 }
+
+   jnxL2tpSessionStatsLocalAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local end address
+               of the tunnel that is hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 13 }
+
+   jnxL2tpSessionStatsLocalUdpPort OBJECT-TYPE
+           SYNTAX          InetPortNumber
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the UDP port of the 
+               local end of the tunnel that is hosting 
+               this session."
+           ::= { jnxL2tpSessionStatsEntry 14 }
+
+   jnxL2tpSessionStatsRemoteAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of the remote end 
+              address of the tunnel hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 15 }
+
+   jnxL2tpSessionStatsRemoteAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote end address
+               of the tunnel hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 16 }
+
+   jnxL2tpSessionStatsRemoteUdpPort OBJECT-TYPE
+           SYNTAX          InetPortNumber
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the UDP port of the 
+               remote end of the tunnel hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 17 }
+
+   jnxL2tpSessionStatsLocalHostName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local host name
+               of the tunnel that is hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 18 }
+
+   jnxL2tpSessionStatsRemoteHostName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the host name as discovered
+               during the tunnel establishment phase (via the Host
+               Name AVP) of the L2TP peer." 
+           ::= { jnxL2tpSessionStatsEntry 19 }
+
+   jnxL2tpSessionAssignedIpAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of IP address of PPP client
+               being tunneled as obtained from IPCP configuration
+               during session establishment."
+           ::= { jnxL2tpSessionStatsEntry 20 }
+
+   jnxL2tpSessionAssignedIpAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the IP address of the PPP client
+               being tunneled as obtained from IPCP configuration
+               during session establishment."
+           ::= { jnxL2tpSessionStatsEntry 21 }
+
+   jnxL2tpSessionLocalMRU     OBJECT-TYPE
+           SYNTAX          INTEGER(1..2147483647)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "The current value of the MRU for the local PPP
+               Entity. This value is the MRU that the remote
+               entity is using when sending packets to this
+               session."
+           ::= { jnxL2tpSessionStatsEntry 22 }
+
+   jnxL2tpSessionRemoteMRU    OBJECT-TYPE
+           SYNTAX          INTEGER(1..2147483647)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "The current value of the MRU for the remote
+               PPP Entity. This value is the MRU that the
+               local entity is using when sending packets to
+               the remote PPP client."
+           ::= { jnxL2tpSessionStatsEntry 23 }
+
+   jnxL2tpSessionStatsTxSpeed      OBJECT-TYPE
+           SYNTAX          Unsigned32
+           UNITS           "bits per second"
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the last known transmit
+               baud rate for this session."
+           ::= { jnxL2tpSessionStatsEntry 24 }
+
+   jnxL2tpSessionStatsRxSpeed      OBJECT-TYPE
+           SYNTAX          Unsigned32
+           UNITS           "bits per second"
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns the last known receive
+               baud rate for this session established."
+           ::= { jnxL2tpSessionStatsEntry 25 }
+
+   jnxL2tpSessionStatsCallBearerType OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               none(1),
+                               digital(2),
+                               analog(3)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object describes the bearer type of this
+               session."
+           ::= { jnxL2tpSessionStatsEntry 26 }
+
+   jnxL2tpSessionStatsFramingType OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               none(1),
+                               sync(2),
+                               async(3)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object describes the framing type of this
+               session."
+           ::= { jnxL2tpSessionStatsEntry 27 }
+
+   jnxL2tpSessionStatsLCPRenegotiation OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               off(1),
+                               on(2)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object returns whether LCP renegotiation
+               is on or off for this session."
+           ::= { jnxL2tpSessionStatsEntry 28 }
+
+   jnxL2tpSessionStatsAuthMethod OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               none(1),
+                               text(2),
+                               pppChap(3),
+                               pppPap(4),
+                               pppEap(5),
+                               pppMsChapV1(6),
+                               pppMsChapV2(7),
+                               other(8)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the proxy authentication
+               method employed by the LAC for the session."
+           ::= { jnxL2tpSessionStatsEntry 29 }
+
+   jnxL2tpSessionStatsNasIpAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the type of IP address of the RADIUS
+               network address server to which the accounting
+               records for this session are being sent to."
+           ::= { jnxL2tpSessionStatsEntry 30 }
+
+   jnxL2tpSessionStatsNasIpAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the IP address of the RADIUS
+               network address server to which the accounting
+               records for this session are being sent to."
+           ::= { jnxL2tpSessionStatsEntry 31 }
+
+   jnxL2tpSessionStatsNasIpPort OBJECT-TYPE
+           SYNTAX          InetPortNumber
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the port on which RADIUS
+               network address server accounting messages will
+               be sent."
+           ::= { jnxL2tpSessionStatsEntry 32 }
+
+   jnxL2tpSessionStatsFramedProtocol OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               ppp(1),
+                               slip(2),
+                               arap(3),
+                               gandalf(4),
+                               xylogicsIPX-SLIP(5),
+                               x75-sync(6),
+                               none(100)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the frame protocol attribute
+               obtained from RADIUS server for this session."
+           REFERENCE "RFC 2865, Section 5.7"
+           ::= { jnxL2tpSessionStatsEntry 33 }
+
+   jnxL2tpSessionStatsFramedIpAddrType OBJECT-TYPE
+           SYNTAX          InetAddressType
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This Attribute indicates the type of address to be 
+               configured for the user, as provided by the 
+               RADIUS server in response to authentication request."
+           REFERENCE "RFC 2865, Section 5.8"
+           ::= { jnxL2tpSessionStatsEntry 34 }
+
+   jnxL2tpSessionStatsFramedIpAddress OBJECT-TYPE
+           SYNTAX          InetAddress
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This Attribute indicates the address to be 
+               configured for the user, as provided by the 
+               RADIUS server in response to authentication request."
+           REFERENCE "RFC 2865, Section 5.8"
+           ::= { jnxL2tpSessionStatsEntry 35 }
+
+   jnxL2tpSessionStatsCallingStationID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This Attribute allows the RADIUS NAS to send in the 
+               Access-Request packet the phone number that the 
+               call came from, using Automatic Number 
+               Identification (ANI) or similar technology.  
+               It is only used in Access-Request packets."
+           REFERENCE "RFC 2865, Section 5.31"
+           ::= { jnxL2tpSessionStatsEntry 36 }
+
+   jnxL2tpSessionStatsCalledStationID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This Attribute allows the RADIUS NAS to send in the 
+               Access-Request packet the phone number that the 
+               user called, using Dialed Number Identification 
+               (DNIS) or similar technology. It is only used in
+               Access-Request packets."
+           REFERENCE "RFC 2865, Section 5.30"
+           ::= { jnxL2tpSessionStatsEntry 37 }
+
+   jnxL2tpSessionStatsAcctDelayTime OBJECT-TYPE
+           SYNTAX          Integer32(0..64)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This attribute indicates how many seconds the 
+               RADIUS accounting client has been trying 
+               to send a record for, and can be subtracted from the
+               time of arrival on the server to find the 
+               approximate time of the event generating this 
+               Accounting-Request."
+           REFERENCE "RFC 2866, Section 5.2"
+           ::= { jnxL2tpSessionStatsEntry 38 }
+                   
+   jnxL2tpSessionStatsAcctSessionID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This attribute is a unique Accounting ID to make 
+               it easy to match start and stop records in a log 
+               file."
+           REFERENCE "RFC 2866, Section 5.5"
+           ::= { jnxL2tpSessionStatsEntry 39 }
+
+   jnxL2tpSessionStatsAcctMethod OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               radius(1),
+                               local(2)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the accounting method
+               employed for this session."
+           ::= { jnxL2tpSessionStatsEntry 40 }
+
+   jnxL2tpSessionStatsAcctSessionTime OBJECT-TYPE
+           SYNTAX          Gauge32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This attribute indicates how many seconds the 
+               user has received service for."
+           REFERENCE "RFC 2866, Section 5.7"
+           ::= { jnxL2tpSessionStatsEntry 41 }
+
+   jnxL2tpSessionStatsAcctNasPortType OBJECT-TYPE
+           SYNTAX          INTEGER {
+                               async(1),
+                               sync(2),
+                               isdn-sync(3),
+                               isdn-asunc-v-120(4),
+                               isdn-async-v-110(5),
+                               virtual(6),
+                               piafs(7),
+                               hdlc-clear-channel(8),
+                               x-25(9),
+                               x-75(10),
+                               g-3-fax(11),
+                               sdsl(12),
+                               adsl-cap(13),
+                               adsl-dmt(14),
+                               idsl(15),
+                               ethernet(16),
+                               xdsl(17),
+                               cable(18),
+                               wireless-other(19),
+                               wireless-ieee-802-1(20)
+                           }
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This Attribute indicates the type of the physical 
+               port of the NAS which is performing accounting for
+               the user."
+           REFERENCE "RFC 2865, Section 5.41"
+           ::= { jnxL2tpSessionStatsEntry 42 }
+
+   jnxL2tpSessionStatsAcctTnlClientEndPoint OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the remote tunnel Identifier of
+               the tunnel hosting this session."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpSessionStatsEntry 43 }
+
+   jnxL2tpSessionStatsAcctTnlServerEndPoint OBJECT-TYPE
+           SYNTAX          Integer32 (0..65535)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local tunnel Identifier of
+               the tunnel hosting this session."
+           REFERENCE "RFC 2661, Section 3.1"
+           ::= { jnxL2tpSessionStatsEntry 44 }
+
+   jnxL2tpSessionStatsAcctTnlClientAuthID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the host name as discovered
+               during the tunnel establishment phase (via the Host
+               Name AVP) of the L2TP peer, for the tunnel that is
+               hosting this session." 
+           ::= { jnxL2tpSessionStatsEntry 45 }
+
+   jnxL2tpSessionStatsAcctTnlServerAuthID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the local host name
+               of the tunnel that is hosting this session."
+           ::= { jnxL2tpSessionStatsEntry 46 }
+
+   jnxL2tpSessionStatsUserProfileName OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the configured access
+               profile name that is being used for this session."
+           ::= { jnxL2tpSessionStatsEntry 47 }
+
+   jnxL2tpSessionStatsInterfaceID OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the interface identification
+               (name) for the session bearing service interface."
+           ::= { jnxL2tpSessionStatsEntry 48 }
+
+   jnxL2tpSessionStatsCallSerialNumber OBJECT-TYPE
+           SYNTAX          Unsigned32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the serial number that has
+               been assigned to this  session."
+           ::= { jnxL2tpSessionStatsEntry 49 }
+
+   jnxL2tpSessionStatsCreationTime OBJECT-TYPE
+           SYNTAX          DateAndTime
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time of creation of 
+               this session."
+           ::= { jnxL2tpSessionStatsEntry 50 }
+
+   jnxL2tpSessionStatsUpTime OBJECT-TYPE
+           SYNTAX          TimeTicks
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time elapsed
+               since this session was established."
+           ::= { jnxL2tpSessionStatsEntry 51 }
+
+   jnxL2tpSessionStatsIdleTime OBJECT-TYPE
+           SYNTAX          TimeTicks
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time elapsed
+               since this session had last data activity 
+               (transmission or reception)."
+           ::= { jnxL2tpSessionStatsEntry 52 }
+
+   jnxL2tpSessionStatsCollectionStart OBJECT-TYPE
+           SYNTAX          DateAndTime
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object represents the time at which the
+               statistics gathering started for this session."
+           ::= { jnxL2tpSessionStatsEntry 53 }
+
+   jnxL2tpSessionStatsControlTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               packets that were transmitted to the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 54 }
+
+   jnxL2tpSessionStatsControlTxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were transmitted to the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 55 }
+
+   jnxL2tpSessionStatsControlRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control packets
+               received on the session."
+           ::= { jnxL2tpSessionStatsEntry 56 }
+
+   jnxL2tpSessionStatsControlRxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of control
+               bytes that were received from the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 57 }
+
+   jnxL2tpSessionStatsDataTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               transmitted to the remote session peer."
+           ::= { jnxL2tpSessionStatsEntry 58 }
+
+   jnxL2tpSessionStatsDataTxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data
+               bytes that were transmitted to the session 
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 59 }
+
+   jnxL2tpSessionStatsDataRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data packets
+               received on this session."
+           ::= { jnxL2tpSessionStatsEntry 60 }
+
+   jnxL2tpSessionStatsDataRxBytes OBJECT-TYPE
+           SYNTAX          Counter64
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of data
+               bytes that were received from the session
+               peer."
+           ::= { jnxL2tpSessionStatsEntry 61 }
+
+   jnxL2tpSessionStatsErrorTxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of error
+               transmit packets on the session."
+           ::= { jnxL2tpSessionStatsEntry 62 }
+
+   jnxL2tpSessionStatsErrorRxPkts OBJECT-TYPE
+           SYNTAX          Counter32
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object contains the number of error
+               receive packets on the session."
+           ::= { jnxL2tpSessionStatsEntry 63 }
+
+
+   --
+   --      The L2TP Multilink PPP bundle statistics table
+   --
+   jnxL2tpMlpppBundleStatsTable   OBJECT-TYPE
+           SYNTAX          SEQUENCE OF JnxL2tpMlpppBundleStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "The L2TP MLPPP bundle status and statistics table. This
+               table contains the objects that can be used to
+               describe the current status and statistics of a
+               single L2TP tunneled multilink PPP bundle."
+           ::= { jnxL2tpObjects 5 }
+
+   jnxL2tpMlpppBundleStatsEntry   OBJECT-TYPE
+           SYNTAX          JnxL2tpMlpppBundleStatsEntry
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "An L2TP MLPPP bundle statistics entry."
+           INDEX { jnxL2tpMlpppBundleStatsBundleID }
+           ::= { jnxL2tpMlpppBundleStatsTable 1 }
+
+   JnxL2tpMlpppBundleStatsEntry ::=
+           SEQUENCE {
+               jnxL2tpMlpppBundleStatsBundleID
+                   Integer32,
+               jnxL2tpMlpppBundleStatsNumLinks
+                   Integer32,
+               jnxL2tpMlpppBundleStatsEndpoint
+                   SnmpAdminString,
+               jnxL2tpMlpppBundleStatsInputMrru
+                   Integer32,
+               jnxL2tpMlpppBundleStatsOutputMrru
+                   Integer32
+           }
+
+   jnxL2tpMlpppBundleStatsBundleID OBJECT-TYPE
+           SYNTAX          Integer32 (1..65536)
+           MAX-ACCESS      not-accessible
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the session's associated
+               bundle."
+           ::= { jnxL2tpMlpppBundleStatsEntry 1 }
+
+   jnxL2tpMlpppBundleStatsNumLinks OBJECT-TYPE
+           SYNTAX          Integer32 (1..8)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the current number
+               of links that have joined the bundle."
+           ::= { jnxL2tpMlpppBundleStatsEntry 2 }
+
+   jnxL2tpMlpppBundleStatsEndpoint OBJECT-TYPE
+           SYNTAX          SnmpAdminString
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the username
+               of the MLPPP bundle."
+           ::= { jnxL2tpMlpppBundleStatsEntry 3 }
+
+   jnxL2tpMlpppBundleStatsInputMrru OBJECT-TYPE
+           SYNTAX          Integer32 (64..4500)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the maximum 
+           packet size that the input inteface can 
+           process."
+           ::= { jnxL2tpMlpppBundleStatsEntry 4 }
+
+   jnxL2tpMlpppBundleStatsOutputMrru OBJECT-TYPE
+           SYNTAX          Integer32 (64..4500)
+           MAX-ACCESS      read-only
+           STATUS          current
+           DESCRIPTION
+              "This object identifies the maximum 
+           packet size that the output interface can 
+           process."
+           ::= { jnxL2tpMlpppBundleStatsEntry 5 }
+
+END

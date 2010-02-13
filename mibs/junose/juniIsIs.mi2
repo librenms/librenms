@@ -1,0 +1,3077 @@
+
+-- *****************************************************************************
+-- Juniper-ISIS-MIB
+--
+-- Juniper Networks Enterprise MIB
+-- Integrated IS-IS MIB
+--
+-- Copyright (c) 1997 The Internet Society.
+-- Copyright (c) 2000, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+                               
+Juniper-ISIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32, IpAddress, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniIsisMIB  MODULE-IDENTITY
+    LAST-UPDATED "200603131430Z"  -- 13-Mar-06 02:30 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The intermediate system to intermediate system (IS-IS) routing protocol
+        MIB for Juniper Networks E-series products.  This MIB provides
+        objects for management of the IS-IS Routing protocol, as described in
+        ISO 10589, when it is used to construct routing tables for IP networks,
+        as described in RFC 1195."
+    -- Revision History
+    REVISION    "200612131330Z"  -- 13-Dec-06 01:30 PM EST  - JUNOSe 8.0
+    DESCRIPTION
+	"Modifiled width of juniIsisMplsTeTunnelName from 32 to 40"
+    REVISION    "200603011430Z"  -- 13-Mar-06 02:30 PM EST  - JUNOSe 7.4
+    DESCRIPTION
+	"Added juniIsisSysReferenceBandwidth and juniIsisSysHighReferenceBandwidth
+         to juniIsisSysEntry"
+    REVISION    "200603011430Z"  -- 01-Mar-06 02:30 PM EST  - JUNOSe 7.4
+    DESCRIPTION
+	"Added juniIsisSysMplsTeSpfUseAnyBestPath to juniIsisSysEntry.
+	 Added juniIsisMplsTeTunnelTable to juniIsisSystemGroup"
+    REVISION    "200512261430Z"  -- 26-Dec-05 09:30 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+	"Default value for juniIsisSysLSPIgnoreErrors is changed from false to true.
+	Default value for juniIsisCircMeshGroup =1 is removed"
+    REVISION    "200510210810Z"  -- 21-Oct-05 03:10 AM EST  - RX 6.1.0
+    DESCRIPTION
+	"L2 Buffer Size is added and is made obsolete."
+	REVISION    "200503291430Z"  -- 29-Mar-05 09:30 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+	"Updated the SystemID TEXTUAL-CONVENTION to be inline with standard
+         - SystemID should now be exactly 6 bytes.
+         - SystemID description modified. All zeros are invalid."
+    REVISION    "200501170810Z"  -- 17-Jan-05 03:10 AM EST  - RX 6.1.0
+    DESCRIPTION
+	"Updated the upper bound for Max Split Paths and removed the 
+	 L2 Buffer Size"
+    REVISION    "200501060504Z"  -- 06-Jan-05 01:04 AM EST  - JUNOSe 7.0
+    DESCRIPTION
+	"Modified the default value for the juniIsisSysSetOverloadBitStartupDuration 
+         object. This object has a meaning only if the ISIS overload bit 
+		 is set."
+    REVISION    "200411020504Z"  -- 02-Nov-04 01:04 AM EST  - RX 5.2.2
+    DESCRIPTION
+	"Updated the upper bound for Authentication Key Id in Area 
+         Authentication, Domain Authentication, L1 Circuit and L2 Circuit 
+	 Tables."
+    REVISION    "200410181414Z"  -- 18-Oct-04 09:14 AM EST  - RX 5.0.4
+    DESCRIPTION
+        "Changed the lower bound value & default value of juniIsisSysSetOverloadBitStartupDuration
+         from 0 to 5."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200112102129Z"  -- 10-Dec-01 04:29 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added MPLS support."
+    REVISION    "200112071522Z"  -- 07-Dec-01 10:22 AM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Added support for simple password protection."
+    REVISION    "200104172126Z"  -- 17-Apr-01 05:26 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Add circuit state object."
+    REVISION    "200002220000Z"  -- 22-Feb-00               - JUNOSe 2.0
+    DESCRIPTION
+        "Initial version of this MIB module, based on draft-ietf-isis-wg-mib."
+    ::= { juniMibs 38 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Type definitions
+--
+OSINSAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "OSI Network Service Address, e.g. NSAP, Network Entity Title"
+    SYNTAX      OCTET STRING (SIZE(0..20))
+
+SystemID ::= TEXTUAL-CONVENTION
+    STATUS      current
+	DESCRIPTION
+		 "A system ID of exactly six bytes. 
+         Must not be all zeros."
+    SYNTAX      OCTET STRING (SIZE(6))
+    
+OperState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Type used in enabling and disabling a row."
+    SYNTAX      INTEGER {
+                    off(1),
+                    on(2) }
+
+AuthTime ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Then number of seconds since Jan. 1 1970."
+    SYNTAX      Integer32
+
+LSPBuffSize ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Integer sub range for LSP size."
+    SYNTAX      Integer32 (512..9180)
+
+LevelState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "States of the ISIS protocol."
+    SYNTAX      INTEGER {
+                    off(1),
+                    on(2),
+                    waiting(3) }
+
+SupportedProtocol ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Types of network protocol supported by Integrated ISIS.  The values for
+        ISO8473 and IP are those registered for these protocols in ISO TR9577."
+    SYNTAX      INTEGER {
+                    iso8473(129),
+                    ip(204),
+                    ipV6(205) }
+
+JuniDefaultMetric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Integer sub-range for default metric for single hop.  The value is
+        truncated to 63 when the juniIsisSysL1MetricStyle or
+        juniIsisSysL2MetricStyle is set to juniIsisMetricStyleNarrow "
+    SYNTAX      Integer32 (0..16777215)
+
+OtherMetric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Integer sub-range for metrics other than the default metric for single
+        hop."
+    SYNTAX      Integer32 (0..63)
+
+CircuitID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ID for a circuit."
+    SYNTAX      OCTET STRING (SIZE(2..9))
+
+ISPriority ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Integer sub-range for ISIS priority."
+    SYNTAX      Integer32 (1..127)
+
+
+-- Behaviour Definitions
+
+-- ResettingTimer behaviour definition
+-- "This object specifies the interval between certain events in
+-- the operation of the protocol state machine.  If the value of
+-- this object is set to a new value while the protocol state
+-- machine is in operation, the implementation shall take the
+-- necessary steps to ensure that for any time interval which
+-- was in progress when the value of the corresponding object
+-- was changed, the next expiration of that interval takes place
+-- the specified time after the original start of that interval,
+-- or immediately, whichever is later.  The precision with which
+-- this time shall be implemented shall be the same as that
+-- associated with the basic operation of the timer object."
+
+-- OperationalState behaviour definition
+-- "This object controls the enabling and disabling of the
+-- corresponding table row.  Setting this object to the value
+-- off has the effect of disabling the corresponding row.
+-- Setting this object to the value on has the effect of
+-- enabling the corresponding row.  Setting the value of this
+-- object to the same value as its current value has no effect.
+-- If the table entry also contains an object controlling the
+-- RowStatus then the object following the operationalState
+-- behaviour shall not be set to on when the object following
+-- the RowStatus behaviour has value off.  An attempt to do
+-- so is rejected."
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIsisObjects      OBJECT IDENTIFIER ::= { juniIsisMIB 1 }
+juniIsisTrapGroup    OBJECT IDENTIFIER ::= { juniIsisMIB 2 }
+juniIsisConformance  OBJECT IDENTIFIER ::= { juniIsisMIB 3 }
+
+juniIsisSystemGroup  OBJECT IDENTIFIER ::= { juniIsisObjects 1}
+juniIsisCircuitGroup OBJECT IDENTIFIER ::= { juniIsisObjects 2 }
+
+juniIsisSysTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The set of instances of the Integrated IS-IS protocol existing on the
+        system."
+    ::= { juniIsisSystemGroup 1 }
+
+juniIsisSysEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row defines information specific to a single instance of the
+        protocol existing on the system."
+    REFERENCE
+        "ISIS.poi cLNSISISBasic-P (1)"
+    INDEX     { juniIsisSysInstance }
+    ::= { juniIsisSysTable 1 }
+
+JuniIsisSysEntry ::= SEQUENCE {
+    juniIsisSysInstance                      Integer32,
+    juniIsisSysVersion                       DisplayString,
+    juniIsisSysType                          INTEGER,
+    juniIsisSysID                            SystemID,
+    juniIsisSysMaxPathSplits                 Integer32,
+    juniIsisSysMaxLSPGenInt                  Integer32,
+    juniIsisSysOrigLSPBuffSize               LSPBuffSize,
+    juniIsisSysMaxAreaAddresses              Integer32,
+    juniIsisSysMinL1LSPGenInt                Integer32,
+    juniIsisSysMinL2LSPGenInt                Integer32,
+    juniIsisSysPollESHelloRate               Integer32,
+    juniIsisSysWaitTime                      Integer32,
+    juniIsisSysOperState                     OperState,
+    juniIsisSysL1State                       LevelState,
+    juniIsisSysCorrLSPs                      Counter32,
+    juniIsisSysLSPL1DbaseOloads              Counter32,
+    juniIsisSysManAddrDropFromAreas          Counter32,
+    juniIsisSysAttmptToExMaxSeqNums          Counter32,
+    juniIsisSysSeqNumSkips                   Counter32,
+    juniIsisSysOwnLSPPurges                  Counter32,
+    juniIsisSysIDFieldLenMismatches          Counter32,
+    juniIsisSysMaxAreaAddrMismatches         Counter32,
+    juniIsisSysOrigL2LSPBuffSize             LSPBuffSize,
+    juniIsisSysL2State                       LevelState,
+    juniIsisSysLSPL2DbaseOloads              Counter32,
+    juniIsisSysAuthFails                     Counter32,
+    juniIsisSysLSPIgnoreErrors               TruthValue,
+    juniIsisSysMaxAreaCheck                  TruthValue,
+    juniIsisSysSetOverloadBit                TruthValue,
+    juniIsisSysSetOverloadBitStartupDuration Integer32,
+    juniIsisSysMaxLspLifetime                Integer32,
+    juniIsisSysL1SpfInterval                 Integer32,
+    juniIsisSysL2SpfInterval                 Integer32,
+    juniIsisSysIshHoldTime                   Integer32,
+    juniIsisSysIshConfigTimer                Integer32,
+    juniIsisSysDistributeDomainWide          TruthValue,
+    juniIsisSysDistance                      Integer32,
+    juniIsisSysL1MetricStyle                 INTEGER,
+    juniIsisSysL2MetricStyle                 INTEGER,
+    juniIsisSysIsoRouteTag                   OCTET STRING,
+    juniIsisSysMplsTeLevel                   INTEGER,
+    juniIsisSysMplsTeRtrIdIfIndex            InterfaceIndexOrZero,
+    juniIsisSysMplsTeSpfUseAnyBestPath       TruthValue,
+    juniIsisSysReferenceBandwidth            Gauge32,
+    juniIsisSysHighReferenceBandwidth        Gauge32 }
+
+juniIsisSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysEntry 1 }
+
+juniIsisSysVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of the IS-IS protocol to which this instance
+        conforms.  This value must be set by the implementation when the row is
+        valid."
+    REFERENCE
+        "ISIS.aoi version (1)"
+    ::= { juniIsisSysEntry 2 }
+
+juniIsisSysType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    level1IS(1),
+                    level1l2IS(2),
+                    level2Only(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of this instance of the Integrated IS-IS protocol.  This
+        object follows the replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi iSType (2)"
+    ::= { juniIsisSysEntry 3 }
+
+juniIsisSysID OBJECT-TYPE
+    SYNTAX      SystemID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID for this instance of the Integrated IS-IS protocol.  This value
+        is appended to each of the instance's area addresses to form the Network
+        Entity Titles valid for this instance.  The derivation of a value for
+        this object is implementation-specific.  Some implementations may assign
+        values and not permit write MAX-ACCESS, others may require the value to
+        be set manually."
+    REFERENCE
+        "ISIS.aoi systemId (119)"
+    ::= { juniIsisSysEntry 4 }
+
+juniIsisSysMaxPathSplits OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of paths with equal routing metric value which it is
+        permitted to split between.  This object follows the
+        replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi maximumPathSplits (3)"
+    DEFVAL    { 4 }
+    ::= { juniIsisSysEntry 5 }
+
+juniIsisSysMaxLSPGenInt OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum interval, in seconds, between generated LSPs by this instance.
+        This object follows the resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi maximumLSPGenerationInterval (6)"
+    DEFVAL    { 900 }
+    ::= { juniIsisSysEntry 6 }
+
+juniIsisSysOrigLSPBuffSize OBJECT-TYPE
+    SYNTAX      LSPBuffSize
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum size of LSPs and SNPs originated by this instance.
+        This object follows the replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi originatingLSPBufferSize (9)"
+    DEFVAL    { 1497 }
+    ::= { juniIsisSysEntry 7 }
+
+juniIsisSysMaxAreaAddresses OBJECT-TYPE
+    SYNTAX      Integer32 (0..254)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of area addresses to be permitted for the area in
+        which this instance exists.  Note that all Intermediate Systems in the
+        same area must have the same value configured for this attribute if
+        correct operation is to be assumed.  This object follows the
+        replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi maximumAreaAddresses (4)"
+    DEFVAL    { 3 }
+    ::= { juniIsisSysEntry 8 }
+
+juniIsisSysMinL1LSPGenInt OBJECT-TYPE
+    SYNTAX      Integer32 (0..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in seconds, between successive generation of L1 LSPs
+        with the same LSPID by this instance.  This object follows the
+        resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi minimumLSPGenerationInterval (11)"
+    DEFVAL    { 5 }
+    ::= { juniIsisSysEntry 9 }
+
+juniIsisSysMinL2LSPGenInt OBJECT-TYPE
+    SYNTAX      Integer32 (0..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in seconds, between successive generation of L2 LSPs
+        with the same LSPID by this instance.  This object follows the
+        resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi minimumLSPGenerationInterval (11)"
+    DEFVAL    { 5 }
+    ::= { juniIsisSysEntry 10 }
+
+juniIsisSysPollESHelloRate OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, to be used for the suggested ES configuration
+        timer in ISH PDUs when soliciting the ES configuration."
+    REFERENCE
+        "ISIS.aoi pollESHelloRate (13)"
+    DEFVAL    { 10 }
+    ::= { juniIsisSysEntry 11 }
+
+juniIsisSysWaitTime OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of seconds to delay in waiting state before entering on state.
+        This object follows the resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi waitingTime (15)"
+    DEFVAL    { 60 }
+    ::= { juniIsisSysEntry 12 }
+
+juniIsisSysOperState OBJECT-TYPE
+    SYNTAX      OperState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The operational state of this instance of the Integrated IS-IS
+        protocol.  Setting this object to the value on when its current value is
+        off enables operation of this instance of the Integrated IS-IS
+        protocol."
+    DEFVAL    { off }
+    ::= { juniIsisSysEntry 13 }
+
+juniIsisSysL1State OBJECT-TYPE
+    SYNTAX      LevelState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Level 1 database."
+    REFERENCE
+        "ISIS.aoi l1State (17)"
+    ::= { juniIsisSysEntry 14 }
+
+juniIsisSysCorrLSPs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of corrupted LSPs detected."
+    REFERENCE
+        "ISIS.aoi corruptedLSPsDetected (19)"
+    ::= { juniIsisSysEntry 15 }
+
+juniIsisSysLSPL1DbaseOloads OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times the LSP L1 database has become overloaded."
+    REFERENCE
+        "ISIS.aoi lSPL1DatabaseOverloads (20)"
+    ::= { juniIsisSysEntry 16 }
+
+juniIsisSysManAddrDropFromAreas OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a manual address has been dropped from the area."
+    REFERENCE
+        "ISIS.aoi manualAddressesDroppedFromArea (21)"
+    ::= { juniIsisSysEntry 17 }
+
+juniIsisSysAttmptToExMaxSeqNums OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times the IS has attempted to exceed the maximum sequence
+        number."
+    REFERENCE
+        "ISIS.aoi attemptsToExceedmaximumSequenceNumber (22)"
+    ::= { juniIsisSysEntry 18 }
+
+juniIsisSysSeqNumSkips OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a sequence number skip has occurred."
+    REFERENCE
+        "ISIS.aoi sequenceNumberSkips (23)"
+    ::= { juniIsisSysEntry 19 }
+
+juniIsisSysOwnLSPPurges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a zero-aged copy of the system's own LSP is received
+        from some other node."
+    REFERENCE
+        "ISIS.aoi ownLSPPurges (24)"
+    ::= { juniIsisSysEntry 20 }
+
+juniIsisSysIDFieldLenMismatches OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a PDU is received with a different value for ID field
+        length to that of the receiving system."
+    REFERENCE
+        "ISIS.aoi iDFieldLengthMismatches (25)"
+    ::= { juniIsisSysEntry 21 }
+
+juniIsisSysMaxAreaAddrMismatches OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a PDU is received with a different value for
+        MaximumAreaAddresses from that of the receiving system."
+    REFERENCE
+        "ISIS.aoi MaximumAreaAddressesMismatches (118)"
+    ::= { juniIsisSysEntry 22 }
+
+-- The following objects map those from the cLNSISISLevel2-P Package
+
+juniIsisSysOrigL2LSPBuffSize OBJECT-TYPE
+    SYNTAX      LSPBuffSize
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "The maximum size of Level 2 LSPs and SNPs originated by this system.
+        This object follows the replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi originatingL2LSPBufferSize (26)"
+    DEFVAL    { 1497 }
+    ::= { juniIsisSysEntry 23 }
+    
+juniIsisSysL2State OBJECT-TYPE
+    SYNTAX      LevelState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Level 2 database."
+    REFERENCE
+        "ISIS.aoi l2State (28)"
+    ::= { juniIsisSysEntry 24 }
+
+juniIsisSysLSPL2DbaseOloads OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times the Level 2 LSP database has become overloaded."
+    REFERENCE
+        "ISIS.aoi lSPL2DatabaseOverloads (32)"
+    ::= { juniIsisSysEntry 25 }
+
+juniIsisSysAuthFails OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication failures recognized by this instance of
+        the protocol."
+    ::= { juniIsisSysEntry 26 }
+
+juniIsisSysLSPIgnoreErrors OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, allow the router to ignore IS-IS link state packets (LSPs)
+        that are received with internal checksum errors rather than purging the
+        LSPs."
+    DEFVAL    { true }
+    ::= { juniIsisSysEntry 27 }
+
+juniIsisSysMaxAreaCheck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When on, enables checking of maximum area addresses per IS version of
+        ISO10589."
+    DEFVAL    { true }
+    ::= { juniIsisSysEntry 28 }
+
+juniIsisSysSetOverloadBit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Isis overload bit"
+    DEFVAL    { false }
+    ::= { juniIsisSysEntry 29 }
+
+juniIsisSysSetOverloadBitStartupDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0|5..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+
+        "Specifies the length in time of seconds to set the overload bit from
+        startup.  This object must be set together with
+        juniIsisSysSetOverloadBit, otherwise the agent will return zero.
+		Zero value for this object implies that the overload bit is not set.
+		Zero value does not have any meaning for this object."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysEntry 30 }
+
+juniIsisSysMaxLspLifetime  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum time (in seconds) a LSP will remain in the box
+        without being refreshed before being considered invalid."
+    DEFVAL    { 1200 }
+    ::= { juniIsisSysEntry 31 }
+
+juniIsisSysL1SpfInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in seconds, between level 1 SPF calculations."
+    DEFVAL    { 5 }
+    ::= { juniIsisSysEntry 32 }
+
+juniIsisSysL2SpfInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..120)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in seconds, between level 2 SPF calculations."
+    DEFVAL    { 5 }
+    ::= { juniIsisSysEntry 33 }
+
+juniIsisSysIshHoldTime OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify a holdtime advertised in ESH/ISH PDUs."
+    DEFVAL    { 30 }
+    ::= { juniIsisSysEntry 34 }
+
+juniIsisSysIshConfigTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the rate of transmission for ESH and ISH packets."
+    DEFVAL    { 10 }
+    ::= { juniIsisSysEntry 35 }
+
+juniIsisSysDistributeDomainWide OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When on, enables distribution of prefixes throughout a multi-level
+        domain."
+    DEFVAL    { false }
+    ::= { juniIsisSysEntry 36 }
+
+juniIsisSysDistance OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weight applied to IS-IS routes."
+    DEFVAL    { 115 }
+    ::= { juniIsisSysEntry 37 }
+
+juniIsisSysL1MetricStyle OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniIsisMetricStyleNarrow(2),
+                    juniIsisMetricStyleNarrowTransition(3),
+                    juniIsisMetricStyleTransition(4),
+                    juniIsisMetricStyleWide(5),
+                    juniIsisMetricStyleWideTransition(6) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of IP reachability TLV to advertise in level 1
+        LSPs."
+    DEFVAL    { juniIsisMetricStyleNarrow }
+    ::= { juniIsisSysEntry 38 }
+
+juniIsisSysL2MetricStyle OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniIsisMetricStyleNarrow(2),
+                    juniIsisMetricStyleNarrowTransition(3),
+                    juniIsisMetricStyleTransition(4),
+                    juniIsisMetricStyleWide(5),
+                    juniIsisMetricStyleWideTransition(6) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of IP reachability TLV to advertise in level 2
+        LSPs."
+    DEFVAL    { juniIsisMetricStyleNarrow }
+    ::= { juniIsisSysEntry 39 }
+
+juniIsisSysIsoRouteTag OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..19))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ISO routing area tag."
+    DEFVAL    { "" }
+    ::= { juniIsisSysEntry 40 }
+
+juniIsisSysMplsTeLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    levelNone(0),
+                    level1(1),
+                    level2(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Select flooding of MPLS traffic engineering link information into the
+        specified ISIS level."
+    ::= { juniIsisSysEntry 41 }
+
+juniIsisSysMplsTeRtrIdIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure the stable router interface ID to designate it as TE capable.
+        A value of zero is used to remove any configured router interface ID."
+    ::= { juniIsisSysEntry 42 }  
+    
+juniIsisSysMplsTeSpfUseAnyBestPath OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure whether or not to consider spf paths when alternate 
+         tunnel path exists"
+    ::= { juniIsisSysEntry 43 }
+
+juniIsisSysReferenceBandwidth OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure the reference bandwitdth used to calculate the link cost in 
+         bits per second.If the reference bandwidth is greater than the maximum 
+         value reportable by this object then this object should report its 
+         maximum value (4,294,967,295) and juniIsisSysHighReferenceBandwidth must 
+         be used to report the reference bandwidth. "
+    ::= { juniIsisSysEntry 44 }
+
+juniIsisSysHighReferenceBandwidth OBJECT-TYPE
+    SYNTAX       Gauge32(1..1000000)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Configure the reference bandwitdth in mega bits per second.
+         It is used to calculate the link cost."
+    ::= { juniIsisSysEntry 45 }
+
+--
+-- The Level 1 Manual Area Address Table contains the set of area addresses
+-- manually configured for each instance of the Integrated IS-IS protocol.
+-- At least one row in which the value of juniIsisManAreaAddRowStatus is on
+-- must be present for each instance of the protocol when juniIsisSysOperState
+-- is also on for that instance.  The maximum number of rows in this table for
+-- each instance of the protocol for which the object
+-- juniIsisManAreaAddrRowStatus has the value on is the value of
+-- maximumAreaAddresses (as defined in ISO 10589) for that instance.
+-- An Attempt to create a new row such that the number of rows with
+-- juniIsisManAreaAddrRowStatus set to on for that protocol instance exceeds
+-- maximumAreaAddresses is rejected.
+--
+juniIsisManAreaAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisManAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The set of manual area addresses configured on this Intermediate
+        System."
+    REFERENCE
+        "ISIS.aoi manualAreaAddresses (10)"
+    ::= { juniIsisSystemGroup 2 }
+
+juniIsisManAreaAddrEntry OBJECT-TYPE
+    SYNTAX      JuniIsisManAreaAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one area address manually configured on this
+        system."
+    INDEX     { juniIsisManAreaAddrSysInstance,
+                juniIsisManAreaAddr }
+    ::= { juniIsisManAreaAddrTable 1 }
+
+JuniIsisManAreaAddrEntry ::= SEQUENCE {
+    juniIsisManAreaAddrSysInstance   Integer32,
+    juniIsisManAreaAddr              OSINSAddress,
+    juniIsisManAreaAddrRowStatus     RowStatus }
+
+juniIsisManAreaAddrSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisManAreaAddrEntry 1 }
+
+juniIsisManAreaAddr OBJECT-TYPE
+    SYNTAX      OSINSAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A manually configured area address for this system.  This object
+        follows the index behaviour.
+
+        Note:  an index for the entry {1, {49.0001} active} in this table would
+        be the ordered pair (1, (0x03 0x49 0x00 0x01)), as the length of an
+        octet string is part of the OID."
+    ::= { juniIsisManAreaAddrEntry 2 }
+
+juniIsisManAreaAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The state of the juniIsisManAreaAddrEntry.  This object follows the
+        RowStatus behaviour.  If an attempt is made to set this object to the
+        value off when the corresponding juniIsisManAreaAddrEntry is the only
+        valid entry for this instance and when the corresponding IS-IS instance
+        has juniIsisSysOperState set to on then the attempt is rejected."
+    DEFVAL    { active }
+    ::= { juniIsisManAreaAddrEntry 3 }
+
+
+--
+-- The System Integrated Group
+--
+-- The System Integrated Group is present if the system supports Integrated ISIS
+-- at Level 1.
+--
+-- The System Protocol Supported Table
+--
+-- The System Protocol Supported Table contains the manually configured set of
+-- protocols supported by each instance of the Integrated ISIS protocol.
+--
+juniIsisSysProtSuppTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysProtSuppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of protocols supported
+        by each instance of the Integrated ISIS protocol."
+    ::= { juniIsisSystemGroup 3 }
+
+juniIsisSysProtSuppEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysProtSuppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one protocol supported by an instance of the
+        Integrated ISIS protocol."
+    INDEX     { juniIsisSysProtSuppSysInstance,
+                juniIsisSysProtSuppProtocol }
+    ::= { juniIsisSysProtSuppTable 1 }
+
+JuniIsisSysProtSuppEntry ::= SEQUENCE {
+    juniIsisSysProtSuppSysInstance   Integer32,
+    juniIsisSysProtSuppProtocol      SupportedProtocol,
+    juniIsisSysProtSuppRowStatus     RowStatus }
+
+juniIsisSysProtSuppSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysProtSuppEntry 1 }
+
+juniIsisSysProtSuppProtocol OBJECT-TYPE
+    SYNTAX      SupportedProtocol
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One supported protocol.  This object follows the index behaviour."
+    ::= { juniIsisSysProtSuppEntry 2 }
+
+juniIsisSysProtSuppRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the juniIsisSysProtSuppEntry.  This object follows the
+        RowStatus behavior."
+    DEFVAL    { active }
+    ::= { juniIsisSysProtSuppEntry 3 }
+
+
+--
+-- The Summary Address Table
+--
+-- The Summary Address Table contains the set of summary addresses manually
+-- configured for each instance of IP Integrated ISIS on the system.
+--
+juniIsisSummAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSummAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The set of IP summary addresses to use in forming the contents of Level
+        2 LSPs originated by this level 2 Intermediate System."
+    ::= { juniIsisSystemGroup 4 }
+
+juniIsisSummAddrEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSummAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one IP summary address."
+    INDEX     { juniIsisSummAddrSysInstance,
+                juniIsisSummAddress,
+                juniIsisSummAddrMask }
+    ::= { juniIsisSummAddrTable 1 }
+
+JuniIsisSummAddrEntry ::= SEQUENCE {
+    juniIsisSummAddrSysInstance      Integer32,
+    juniIsisSummAddress              IpAddress,
+    juniIsisSummAddrMask             IpAddress,
+    juniIsisSummAddrRowStatus        RowStatus,
+    juniIsisSummAddrOperState        OperState,
+    juniIsisSummAddrDefaultMetric    Integer32,
+    juniIsisSummAddrDelayMetric      OtherMetric,
+    juniIsisSummAddrExpenseMetric    OtherMetric,
+    juniIsisSummAddrErrorMetric      OtherMetric,
+    juniIsisSummLevel                INTEGER }
+
+juniIsisSummAddrSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviours."
+    ::= { juniIsisSummAddrEntry 1 }
+
+juniIsisSummAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP Address value for this summary address.  This object follows the
+        index behaviour."
+    ::= { juniIsisSummAddrEntry 2 }
+
+juniIsisSummAddrMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask value for this summary address.  This object follows the index
+        behaviour."
+    ::= { juniIsisSummAddrEntry 3 }
+
+juniIsisSummAddrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this summary address.  This object follows the
+        RowStatus behaviour."
+    ::= { juniIsisSummAddrEntry 4 }
+
+juniIsisSummAddrOperState OBJECT-TYPE
+    SYNTAX      OperState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The operational state of this entry.  This object follows the
+        operationalState behaviour.  When the operational state changes if this
+        would cause the contents of LSPs originated by the system to change then
+        those new LSPs must be generated and sent as soon as is permitted by the
+        ISIS protocol."
+    ::= { juniIsisSummAddrEntry 5 }
+
+juniIsisSummAddrDefaultMetric OBJECT-TYPE
+    SYNTAX      Integer32 (0..16777214)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+
+        "The default metric value to announce this summary address with in Level
+        1 or 2 LSPs generated by this system.  A Metric value of 0 indicates to
+        use the lowest metric value amongst the routes being summarized.  When
+        advertising a metric value into a narrow domain
+        (juniIsisSysL1MetricStyle or juniIsisSysL2MetricStyle is set to
+        juniIsisMetricStyleNarrow) the value will be truncated to 63."
+    ::= { juniIsisSummAddrEntry 6 }
+
+juniIsisSummAddrDelayMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The delay metric value to announce this summary address with in Level 2
+        LSPs generated by this system.  The value of zero is reserved to
+        indicate that this metric is not supported."
+    ::= { juniIsisSummAddrEntry 7 }
+
+juniIsisSummAddrExpenseMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The expense metric value to announce this summary address with in Level
+        2 LSPs generated by this system.  The value of zero is reserved to
+        indicate that this metric is not supported."
+    ::= { juniIsisSummAddrEntry 8 }
+
+juniIsisSummAddrErrorMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The error metric value to announce this summary address with in Level n
+        LSPs generated by this system.  The value of zero is reserved to
+        indicate that this metric is not supported."
+    ::= { juniIsisSummAddrEntry 9 }
+
+juniIsisSummLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    level1IS(1),
+                    level2IS(2),
+                    level1l2IS(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The level of database at which to annouce this summary."
+    ::= { juniIsisSummAddrEntry 10 }
+
+--
+-- The Circuit Group
+--
+-- The Circuit Group is current
+--
+-- The Circuit Table
+-- Each broadcast or point-to-point interface on the system corresponds to one
+-- entry in the Circuit table.
+--
+juniIsisCircTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisCircEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of circuits used by each instance of Integrated IS-IS on this
+        system."
+    ::= { juniIsisCircuitGroup 1 }
+
+juniIsisCircEntry OBJECT-TYPE
+    SYNTAX      JuniIsisCircEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An juniIsisCircEntry exists for each circuit used by Integrated IS-IS
+        on this system."
+    INDEX     { juniIsisCircSysInstance,
+                juniIsisCircIfIndex }
+    ::= { juniIsisCircTable 1 }
+
+JuniIsisCircEntry ::= SEQUENCE {
+    juniIsisCircSysInstance          Integer32,
+    juniIsisCircIfIndex              Integer32,
+    juniIsisCircLocalID              Integer32,
+    juniIsisCircOperState            OperState,
+    juniIsisCircRowStatus            RowStatus,
+    juniIsisCircType                 INTEGER,
+    juniIsisCircL1DefaultMetric      JuniDefaultMetric,
+    juniIsisCircL1DelayMetric        OtherMetric,
+    juniIsisCircL1ExpenseMetric      OtherMetric,
+    juniIsisCircL1ErrorMetric        OtherMetric,
+    juniIsisCircExtDomain            TruthValue,
+    juniIsisCircAdjChanges           Counter32,
+    juniIsisCircInitFails            Counter32,
+    juniIsisCircRejAdjs              Counter32,
+    juniIsisCircOutCtrlPDUs          Counter32,
+    juniIsisCircInCtrlPDUs           Counter32,
+    juniIsisCircIDFieldLenMismatches Counter32,
+    juniIsisCircL2DefaultMetric      JuniDefaultMetric,
+    juniIsisCircL2DelayMetric        OtherMetric,
+    juniIsisCircL2ExpenseMetric      OtherMetric,
+    juniIsisCircL2ErrorMetric        OtherMetric,
+    juniIsisCircManL2Only            TruthValue,
+    juniIsisCircL1ISPriority         ISPriority,
+    juniIsisCircL1CircID             CircuitID,
+    juniIsisCircL1DesIS              SystemID,
+    juniIsisCircLANL1DesISChanges    Counter32,
+    juniIsisCircL2ISPriority         ISPriority,
+    juniIsisCircL2CircID             CircuitID,
+    juniIsisCircL2DesIS              SystemID,
+    juniIsisCircLANL2DesISChanges    Counter32,
+    juniIsisCircMCAddr               INTEGER,
+    juniIsisCircPtToPtCircID         CircuitID,
+    juniIsisCircL1HelloTimer         Integer32,
+    juniIsisCircL2HelloTimer         Integer32,
+    juniIsisCircL1HelloMultiplier    Integer32,
+    juniIsisCircL2HelloMultiplier    Integer32,
+    juniIsisCircMinLSPTransInt       Unsigned32,
+    juniIsisCircMinLSPReTransInt     Integer32,
+    juniIsisCircL1CSNPInterval       Integer32,
+    juniIsisCircL2CSNPInterval       Integer32,
+    juniIsisCircLSPThrottle          Integer32,
+    juniIsisCircMeshGroupEnabled     INTEGER,
+    juniIsisCircMeshGroup            Unsigned32,
+    juniIsisCircLevel                INTEGER,
+    juniIsisCircState                INTEGER }
+
+juniIsisCircSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisCircEntry 1 }
+
+juniIsisCircIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of ifIndex for the interface to which this circuit
+        corresponds."
+    ::= { juniIsisCircEntry 2 }
+
+juniIsisCircLocalID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An identification that can be used in protocol packets to identify a
+        circuit.  Implementations may devise ways to assure that this value is
+        suitable for the circuit it is used on.  LAN packets only have space for
+        8 bits.
+
+        Values of juniIsisCircLocalID do not need to be unique.  They are only
+        required to differ on LANs where the Intermediate System is the
+        Designated Intermediate System."
+    ::= { juniIsisCircEntry 3 }
+
+juniIsisCircOperState OBJECT-TYPE
+    SYNTAX      OperState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the circuit.  This object follows the
+        operationalState behaviour."
+    DEFVAL    { off }
+    ::= { juniIsisCircEntry 4 }
+
+juniIsisCircRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this circuit.  This object follows the RowStatus
+        behaviour."
+    DEFVAL    { active }
+    ::= { juniIsisCircEntry 5 }
+
+juniIsisCircType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    broadcast(1),
+                    ptToPt(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the circuit.  This object follows the
+        replaceOnlyWhileDisabled behaviour.  The type specified must be
+        compatible with the type of the interface defined by the value of
+        juniIsisCircIfIndex."
+    REFERENCE
+        "ISIS.aoi type (33)"
+    ::= { juniIsisCircEntry 6 }
+
+juniIsisCircL1DefaultMetric OBJECT-TYPE
+    SYNTAX      JuniDefaultMetric
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default metric value of this circuit for Level 1 traffic."
+    REFERENCE
+        "ISIS.aoi l1DefaultMetric (35)"
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 7 }
+
+juniIsisCircL1DelayMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The delay metric value of this circuit for Level 1 traffic.  The value
+        of zero is reserved to indicate that this metric is not supported."
+    REFERENCE
+        "ISIS.aoi l1DelayMetric (36)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 8 }
+
+juniIsisCircL1ExpenseMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The expense metric value of this circuit for Level 1 traffic.  The
+        value of zero is reserved to indicate that this metric is not
+        supported."
+    REFERENCE
+        "ISIS.aoi l1ExpenseMetric (37)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 9 }
+
+juniIsisCircL1ErrorMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The error metric value of this circuit for Level 1 traffic.  The value
+        of zero is reserved to indicate that this metric is not supported."
+    REFERENCE
+        "ISIS.aoi l1ErrorMetric (38)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 10 }
+
+juniIsisCircExtDomain OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, suppress normal transmission of and interpretation of
+        Intra-domain ISIS PDUs on this circuit."
+    REFERENCE
+        "ISIS.aoi externalDomain (46)"
+    DEFVAL    { false }
+    ::= { juniIsisCircEntry 11 }
+
+juniIsisCircAdjChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times an adjacency state change has occurred on this
+        circuit."
+    REFERENCE
+        "ISIS.aoi changesInAdjacencyState (40)"
+    ::= { juniIsisCircEntry 12 }
+
+juniIsisCircInitFails OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times initialization of this circuit has failed."
+    REFERENCE
+        "ISIS.aoi initializationFailures (41)"
+    ::= { juniIsisCircEntry 13 }
+
+juniIsisCircRejAdjs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times an adjacency has been rejected on this circuit."
+    REFERENCE
+        "ISIS.aoi rejectedAdjacencies (42)"
+    ::= { juniIsisCircEntry 14 }
+
+juniIsisCircOutCtrlPDUs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IS-IS control PDUs sent on this circuit."
+    REFERENCE
+        "ISIS.aoi iSISControlPDUsSent (43)"
+    ::= { juniIsisCircEntry 15 }
+
+juniIsisCircInCtrlPDUs OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of IS-IS control PDUs received on this circuit."
+    REFERENCE
+        "ISIS.aoi controlPDUsReceived (44)"
+    ::= { juniIsisCircEntry 16 }
+
+juniIsisCircIDFieldLenMismatches OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times an IS-IS control PDU with an ID field length
+        different to that for this system has been received."
+    REFERENCE
+        "ISIS.aoi iDFieldLengthMismatches (25)"
+    ::= { juniIsisCircEntry 17 }
+
+
+--
+-- The following objects map those from the linkageISISLevel2-P package
+--
+juniIsisCircL2DefaultMetric OBJECT-TYPE
+    SYNTAX      JuniDefaultMetric
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default metric value of this circuit for level 2 traffic."
+    REFERENCE
+        "ISIS.aoi l2DefaultMetric (68)"
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 18 }
+
+juniIsisCircL2DelayMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The delay metric value of this circuit for level 2 traffic.  The value
+        of zero is reserved to indicate that this metric is not supported."
+    REFERENCE
+        "ISIS.aoi l2DelayMetric (69)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 19 }
+
+juniIsisCircL2ExpenseMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The expense metric value of this circuit for level 2 traffic.  The
+        value of zero is reserved to indicate that this metric is not
+        supported."
+    REFERENCE
+        "ISIS.aoi l2ExpenseMetric (70)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 20 }
+
+juniIsisCircL2ErrorMetric OBJECT-TYPE
+    SYNTAX      OtherMetric
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The error metric value of this circuit for level 2 traffic.  The value
+        of zero is reserved to indicate that this metric is not supported."
+    REFERENCE
+        "ISIS.aoi l2ErrorMetric (71)"
+    DEFVAL    { 0 }
+    ::= { juniIsisCircEntry 21 }
+
+juniIsisCircManL2Only OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When true, indicates that this circuit is to be used only for level 2.
+        This object follows the replaceOnlyWhileDisabled behaviour."
+    REFERENCE
+        "ISIS.aoi manualL2OnlyMode (72)"
+    DEFVAL    { false }
+    ::= { juniIsisCircEntry 22 }
+
+
+--
+-- The following objects map those from the linkageISISBroadcast-P package
+--
+juniIsisCircL1ISPriority OBJECT-TYPE
+    SYNTAX      ISPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority for becoming LAN Level 1 Deignated Intermediate System on
+        a broadcast circuit."
+    REFERENCE
+        "ISIS.aoi l1IntermediateSystemPriority (47)"
+    DEFVAL    { 64 }
+    ::= { juniIsisCircEntry 23 }
+
+juniIsisCircL1CircID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LAN ID allocated by the LAN Level 1 Designated Intermediate System.
+        Where this system is not aware of the value (because it is not
+        participating in the Level 1 Designated Intermediate System election),
+        this object has the value which would be proposed for this circuit (i.e.
+        the concatenation of the local system ID and the one octet local Circuit
+        ID for this circuit."
+    REFERENCE
+        "ISIS.aoi l1CircuitID (48)"
+    ::= { juniIsisCircEntry 24 }
+
+juniIsisCircL1DesIS OBJECT-TYPE
+    SYNTAX      SystemID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID of the LAN Level 1 Designated Intermediate System on this
+        circuit.  If, for any reason this system is not partaking in the
+        relevant Designated Intermediate System election process, then the value
+        returned is the zero length OCTET STRING."
+    REFERENCE
+        "ISIS.aoi l1DesignatedIntermediateSystem (49)"
+    ::= { juniIsisCircEntry 25 }
+
+juniIsisCircLANL1DesISChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the LAN Level 1 Designated Intermediate System has
+        changed."
+    REFERENCE
+        "ISIS.aoi lanL1DesignatedIntermediateSystemChanges (50)"
+    ::= { juniIsisCircEntry 26 }
+
+-- The following objects map those from the linkageISISLevel2Broadcast-P package
+
+juniIsisCircL2ISPriority OBJECT-TYPE
+    SYNTAX      ISPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority for becoming LAN level 2 Designated Intermediate System."
+    REFERENCE
+        "ISIS.aoi l2IntermediateSystemPriority (73)"
+    DEFVAL    { 64 }
+    ::= { juniIsisCircEntry 27 }
+
+juniIsisCircL2CircID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LAN ID allocated by the LAN Level 2 Designated Intermediate System.
+        Where this system is not aware of this value (because it is not
+        participating in the Level 2 Designated Intermediate System election),
+        this object has the value which would be proposed for this circuit
+        (i.e. the concatenation of the local system ID and the one octet local
+        Circuit ID for this circuit."
+    REFERENCE
+        "ISIS.aoi l2CircuitID (74)"
+    ::= { juniIsisCircEntry 28 }
+
+juniIsisCircL2DesIS OBJECT-TYPE
+    SYNTAX      SystemID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID of the LAN Level 2 Designated Intermediate System on this
+        circuit.  If, for any reason, this system is not partaking in the
+        relevant Designated Intermediate System election process, then the value
+        returned is the zero length OCTET STRING."
+    REFERENCE
+        "ISIS.aoi l2DesignatedIntermediateSystem (75)"
+    ::= { juniIsisCircEntry 29 }
+
+juniIsisCircLANL2DesISChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the LAN Level 2 Designated Intermediate System has
+        changed."
+    REFERENCE
+        "ISIS.aoi lanL2DesignatedIntermediateSystemChanges (76)"
+    ::= { juniIsisCircEntry 30 }
+
+juniIsisCircMCAddr OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    group(1),
+                    functional(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies which type of multicast address will be used for sending
+        HELLO PDUs on this circuit."
+    DEFVAL    { group }
+    ::= { juniIsisCircEntry 31 }
+
+juniIsisCircPtToPtCircID OBJECT-TYPE
+    SYNTAX      CircuitID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID of the circuit allocated during initialization.  If no value has
+        been negotiated (either because the adjacency is to an End System, or
+        because initialization has not yet successfully completed), this object
+        has the value which would be proposed for this circuit (i.e. the
+        concatenation of the local system ID and the one octet local Circuit ID
+        for this circuit."
+    REFERENCE
+        "ISIS.aoi ptPtCircuitID (51)"
+    ::= { juniIsisCircEntry 32 }
+
+juniIsisCircL1HelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum period, in seconds, between Level 1 IIH PDUs on multiaccess
+        networks.  It is also used as the period between Hellos on point to
+        point circuits.  This object follows the resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi iSISHelloTimer (45)"
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 33 }
+
+juniIsisCircL2HelloTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum period, in seconds, between Level 1 IIH PDUs on multiaccess
+        networks.  This object follows the resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi iSISHelloTimer (45)"
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 34 }
+
+juniIsisCircL1HelloMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (3..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value is multiplied by the corresponding HelloTimer and the result
+        in seconds (rounded up) is used as the holding time in transmitted
+        hellos, to be used by receivers of hello packets from this IS."
+    REFERENCE
+        "ISIS.aoi iSISHelloTimer (45)"
+    DEFVAL    { 3 }
+    ::= { juniIsisCircEntry 35 }
+
+juniIsisCircL2HelloMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (3..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value is multiplied by the corresponding HelloTimer and the result
+        in seconds (rounded up) is used as the holding time in transmitted
+        hellos, to be used by receivers of hello packets from this IS"
+    REFERENCE
+        "ISIS.aoi iSISHelloTimer (45)"
+    DEFVAL    { 3 }
+    ::= { juniIsisCircEntry 36 }
+
+juniIsisCircMinLSPTransInt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in milliseconds, between transmission of LSPs on a
+        circuit.  This object follows the resettingTimer behaviour.  This timer
+        shall be capable of a resolution not coarser than 10 milliseconds."
+    REFERENCE
+        "ISIS.aoi minimumBroadcastLSPTransmissionInterval (7)"
+    DEFVAL    { 33 }
+    ::= { juniIsisCircEntry 37 }
+
+juniIsisCircMinLSPReTransInt OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum interval, in seconds, between re-transmission of an Level 1 or
+        2 LSP.  This object follows the resettingTimer behaviour."
+    REFERENCE
+        "ISIS.aoi minimumLSPTransmissionInterval (5)"
+    DEFVAL    { 5 }
+    ::= { juniIsisCircEntry 38 }
+
+juniIsisCircL1CSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interval of time, in seconds, between transmission of Level 1 CSNPs on
+        multiaccess networks if this router is the designated router.  On
+        point-to-point networks the default is to not transmit CSNPs. Hence CSNP 
+        interval will be 0 for point-to-point networks."
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 39 }
+
+juniIsisCircL2CSNPInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interval of time, in seconds, between transmission of Level 2 CSNPs on
+        multiaccess networks if this router is the designated router. On
+        point-to-point networks the default is to not transmit CSNPs. Hence CSNP 
+        interval will be 0 for point-to-point networks."
+    DEFVAL    { 10 }
+    ::= { juniIsisCircEntry 40 }
+
+juniIsisCircLSPThrottle OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimal interval of time, in milliseconds, between retransmissions of
+        LSPs on a point to point interface."
+    DEFVAL    { 33 }
+    ::= { juniIsisCircEntry 41 }
+
+juniIsisCircMeshGroupEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inactive(1),
+                    blocked(2),
+                    set(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Is this port a member of a mesh group, or blocked?  Circuits in the
+        same mesh group act as a virtual multiaccess network.  LSPs seen on one
+        circuit in a mesh group will not be flooded to another circuit in the
+        same mesh group."
+    DEFVAL    { inactive }
+    ::= { juniIsisCircEntry 42 }
+
+juniIsisCircMeshGroup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Circuits in the same mesh group act as a virtual multiaccess network.
+        LSPs seen on one circuit in a mesh group will not be flooded to another
+        circuit in the same mesh group.  If juniIsisCircMeshGroupEnabled is
+        false, this value is ignored. Default value returned as 0 has no significance
+        for this variable."
+    ::= { juniIsisCircEntry 43 }
+
+juniIsisCircLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    level1IS(0),
+                    level1l2IS(1),
+                    level2Only(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The type of this circuit.  This object follows the
+        replaceOnlyWhileDisabled behavior."
+    REFERENCE
+        "ISIS.aoi iSType(2)"
+    ::= { juniIsisCircEntry 44 }
+
+juniIsisCircState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   isisCircuitDown(1),
+                   isisCircuitUp(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the circuit."
+    ::= { juniIsisCircEntry 45 }
+
+
+juniIsisCircBFDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisCircBFDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper ISIS circuit table describes the BFD-specific
+        characteristics of interfaces."
+    ::= { juniIsisCircuitGroup 4 }
+
+juniIsisCircBFDEntry OBJECT-TYPE
+    SYNTAX      JuniIsisCircBFDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Juniper ISIS circuit table describes the BFD-specific
+        characteristics of one interface."
+    AUGMENTS  { juniIsisCircEntry }
+    ::= { juniIsisCircBFDTable 1 }
+
+JuniIsisCircBFDEntry ::= SEQUENCE {
+    juniIsisCircBfdEnable	TruthValue,
+    juniIsisCircBfdMinRxInterval	Integer32,
+    juniIsisCircBfdMinTxInterval	Integer32,
+    juniIsisCircBfdMultiplier	Integer32
+}
+
+juniIsisCircBfdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether BFD session on the interface is active or not"
+    DEFVAL    { false }
+    ::= { juniIsisCircBFDEntry 1 }
+    
+juniIsisCircBfdMinRxInterval OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies upper-limit on rate local-system requires remote-system to
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }
+    ::= { juniIsisCircBFDEntry 2 }
+
+juniIsisCircBfdMinTxInterval OBJECT-TYPE
+    SYNTAX      Integer32 (100..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies lower-limit on rate local-system requires remote-system to 
+         transmit bfd control-packets [milliseconds]"
+    DEFVAL    { 300 }                 
+    ::= { juniIsisCircBFDEntry 3 }
+
+juniIsisCircBfdMultiplier OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies detection-multiplier "
+    DEFVAL    { 3 }                         
+    ::= { juniIsisCircBFDEntry 4 }    
+--
+-- The System Host Name Table
+--
+-- The System Host Name Table contains a manually configured set of host to
+-- system ID aliases supported by each instance of the Integrated ISIS protocol.
+--
+juniIsisSysHostNameTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysHostNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of host name to system
+        ID aliases supported by each instance of the Integrated ISIS protocol."
+    ::= { juniIsisSystemGroup 5 }
+
+juniIsisSysHostNameEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysHostNameEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one name to system ID alias supported by an
+        instance of the Integrated ISIS protocol."
+    INDEX     { juniIsisSysHostNameSysInstance,
+                juniIsisSysHostNameSysId }
+    ::= { juniIsisSysHostNameTable 1 }
+
+JuniIsisSysHostNameEntry ::= SEQUENCE {
+    juniIsisSysHostNameSysInstance   Integer32,
+    juniIsisSysHostNameSysId         SystemID,
+    juniIsisSysHostNameAreaAddr      OSINSAddress,
+    juniIsisSysHostNameName          OCTET STRING,
+    juniIsisSysHostNameType          INTEGER,
+    juniIsisSysHostNameRowStatus     RowStatus }
+
+juniIsisSysHostNameSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysHostNameEntry 1 }
+
+juniIsisSysHostNameSysId OBJECT-TYPE
+    SYNTAX      SystemID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID for the system which this name will be assigned."
+    ::= { juniIsisSysHostNameEntry 2 }
+
+juniIsisSysHostNameAreaAddr OBJECT-TYPE
+    SYNTAX      OSINSAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A configured area address for the system which this name will be
+        assigned.  This object follows the index behaviour.
+
+        Note: an index for the entry {1, {49.0001} active} in this table would
+        be the ordered pair (1, (0x03 0x49 0x00 0x01)), as the length of an
+        Octet string is part of the OID."
+    ::= { juniIsisSysHostNameEntry 3 }
+
+juniIsisSysHostNameName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A string to use when displaying system data with this system ID."
+    ::= { juniIsisSysHostNameEntry 4 }
+
+juniIsisSysHostNameType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    hostNameTypeStatic(1),
+                    hostNameTypeDynamic(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of host name entry."
+    ::= { juniIsisSysHostNameEntry 5 }
+
+juniIsisSysHostNameRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this host name entry.  This object follows the RowStatus
+        behaviour."
+    ::= { juniIsisSysHostNameEntry 6 }
+
+
+--
+-- The Area Authentication Table
+--
+-- The Area Authentication Table contains the manually configured set of
+-- authentication keys used to authenticate Level 1 LSPs and SNPs in each
+-- instance of the Integrated ISIS protocol.
+--
+juniIsisSysAreaAuthenticationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysAreaAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of area authentication
+        keys supported by each instance of the Integrated ISIS protocol."
+    ::= { juniIsisSystemGroup 6 }
+
+juniIsisSysAreaAuthenticationEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysAreaAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one area authentication key supported by an
+        instance of the Integrated ISIS protocol."
+    INDEX     { juniIsisSysAreaAuthenticationSysInstance,
+                juniIsisSysAreaAuthenticationKeyId }
+    ::= { juniIsisSysAreaAuthenticationTable 1 }
+
+JuniIsisSysAreaAuthenticationEntry ::= SEQUENCE {
+    juniIsisSysAreaAuthenticationSysInstance         Integer32,
+    juniIsisSysAreaAuthenticationKeyId               Integer32,
+    juniIsisSysAreaAuthenticationPwd                 OCTET STRING,
+    juniIsisSysAreaAuthenticationKeyType             INTEGER,
+    juniIsisSysAreaAuthenticationStartAcceptTime     AuthTime,
+    juniIsisSysAreaAuthenticationStartGenerateTime   AuthTime,
+    juniIsisSysAreaAuthenticationStopAcceptTime      AuthTime,
+    juniIsisSysAreaAuthenticationStopGenerateTime    AuthTime,
+    juniIsisSysAreaAuthenticationRowStatus           RowStatus }
+
+juniIsisSysAreaAuthenticationSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysAreaAuthenticationEntry 1 }
+
+juniIsisSysAreaAuthenticationKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the instance to which this row corresponds.
+        This object follows the index behaviour."
+    ::= { juniIsisSysAreaAuthenticationEntry 2 }
+
+juniIsisSysAreaAuthenticationPwd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value to be used as the Authentication Key in Level 1 Link State
+        Packets whenever the value of juniIsisSysAreaAuthenticationKeyType has a
+        value of plaintext or hmacMd5.  A modification of
+        juniIsisSysAreaAuthenticationKeyType does not modify the
+        juniIsisSysAreaAuthenticationPwd value.
+
+        Reading this object always results in an OCTET STRING of length zero;
+        authentication may not be bypassed by reading the MIB object."
+    DEFVAL    { "" }
+    ::= { juniIsisSysAreaAuthenticationEntry 3 }
+
+juniIsisSysAreaAuthenticationKeyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    plaintext(1),
+                    hmacMd5(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "What authentication scheme, if any, is used to protect Level 1 Link
+        State packets and sequence number packets"
+    DEFVAL    { hmacMd5 }
+    ::= { juniIsisSysAreaAuthenticationEntry 4 }
+
+juniIsisSysAreaAuthenticationStartAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        validate level 1 LSPs and SNPs received.  The Default value the start
+        accept time will be the current time when the key was created"
+    ::= { juniIsisSysAreaAuthenticationEntry 5 }
+
+juniIsisSysAreaAuthenticationStartGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        authenticate level 1 LSPs and SNPs transmitted.  The Default value the
+        start accept time will be the current time when the key was created + 2
+        minutes"
+    ::= { juniIsisSysAreaAuthenticationEntry 6 }
+
+juniIsisSysAreaAuthenticationStopAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being accepted
+        as a valid level 1 LSP and SNP key received.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysAreaAuthenticationEntry 7 }
+
+juniIsisSysAreaAuthenticationStopGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being used to
+        authenticate level 1 LSPs and SNPs transmitted.  A value of zero
+        indicates the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysAreaAuthenticationEntry 8 }
+
+juniIsisSysAreaAuthenticationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this authentication key.  This object follows
+        the RowStatus behaviour."
+    ::= { juniIsisSysAreaAuthenticationEntry 9 }
+
+-- The Domain Authentication Table
+
+-- The Domain Authentication Table contains the manually configured set of
+-- authentication keys used to authenticate Level 2 LSPs and SNPs in each
+-- instance of the Integrated ISIS protocol.
+--
+juniIsisSysDomainAuthenticationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysDomainAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of domain
+        authentication keys supported by each instance of the Integrated ISIS
+        protocol."
+    ::= { juniIsisSystemGroup 7 }
+
+juniIsisSysDomainAuthenticationEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysDomainAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one domain authentication key supported by an
+        instance of the Integrated ISIS protocol."
+    INDEX     { juniIsisSysDomainAuthenticationSysInstance,
+                juniIsisSysDomainAuthenticationKeyId }
+    ::= { juniIsisSysDomainAuthenticationTable 1 }
+
+JuniIsisSysDomainAuthenticationEntry ::= SEQUENCE {
+    juniIsisSysDomainAuthenticationSysInstance       Integer32,
+    juniIsisSysDomainAuthenticationKeyId             Integer32,
+    juniIsisSysDomainAuthenticationPwd               OCTET STRING,
+    juniIsisSysDomainAuthenticationKeyType           INTEGER,
+    juniIsisSysDomainAuthenticationStartAcceptTime   AuthTime,
+    juniIsisSysDomainAuthenticationStartGenerateTime AuthTime,
+    juniIsisSysDomainAuthenticationStopAcceptTime    AuthTime,
+    juniIsisSysDomainAuthenticationStopGenerateTime  AuthTime,
+    juniIsisSysDomainAuthenticationRowStatus         RowStatus }
+
+juniIsisSysDomainAuthenticationSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysDomainAuthenticationEntry 1 }
+
+juniIsisSysDomainAuthenticationKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the instance to which this row corresponds.
+        This object follows the index behaviour."
+    ::= { juniIsisSysDomainAuthenticationEntry 2 }
+
+juniIsisSysDomainAuthenticationPwd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value to be used as the Authentication Key in Level 2 Link State
+        Packets whenever the value of juniIsisSysDomainAuthenticationKeyType has
+        a value of plaintext or hmacMd5.  A modification of
+        juniIsisSysDomainAuthenticationKeyType does not modify the
+        juniIsisSysDomainAuthenticationPwd value.
+
+        Reading this object always results in an OCTET STRING of length zero;
+        authentication may not be bypassed by reading the MIB object."
+    DEFVAL    { "" }
+    ::= { juniIsisSysDomainAuthenticationEntry 3 }
+
+juniIsisSysDomainAuthenticationKeyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    plaintext(1),
+                    hmacMd5(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "What authentication scheme, if any, is used to protect Level 2 Link
+        State packets and Sequence Number packets"
+    DEFVAL    { hmacMd5 }
+    ::= { juniIsisSysDomainAuthenticationEntry 4 }
+
+juniIsisSysDomainAuthenticationStartAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        validate level 2 LSPs and SNPs received.  The Default value the start
+        accept time will be the current time when the key was created"
+    ::= { juniIsisSysDomainAuthenticationEntry 5 }
+
+juniIsisSysDomainAuthenticationStartGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        authenticate level 2 LSPs and SNPs transmitted.  The Default value the
+        start accept time will be the current time when the key was created + 2
+        minutes"
+    ::= { juniIsisSysDomainAuthenticationEntry 6 }
+
+juniIsisSysDomainAuthenticationStopAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being accepted
+        as a valid level 2 LSP and SNP key received.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysDomainAuthenticationEntry 7 }
+
+juniIsisSysDomainAuthenticationStopGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being used to
+        authenticate level 2 LSPs and SNPs transmitted.  A value of zero
+        indicates the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysDomainAuthenticationEntry 8 }
+
+juniIsisSysDomainAuthenticationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this authentication key.  This object follows
+        the RowStatus behaviour."
+    ::= { juniIsisSysDomainAuthenticationEntry 9 }
+
+
+--
+-- The Level 1 Circuit Authentication Table
+--
+-- The Level 1 Circuit Authentication Table contains the manually configured
+-- set of authentication keys used to authenticate Level 1 hello packets in each
+-- instance of the Integrated ISIS protocol.
+--
+juniIsisSysL1CircAuthenticationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysL1CircAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of Level 1 Circuit
+        authentication keys supported by each instance of the Integrated ISIS
+        protocol."
+    ::= { juniIsisCircuitGroup 2 }
+
+juniIsisSysL1CircAuthenticationEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysL1CircAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one Level 1 circuit authentication key supported by
+        an instance of the Integrated ISIS protocol."
+    INDEX     { juniIsisSysL1CircAuthenticationSysInstance,
+                juniIsisSysL1CircAuthenticationIfIndex,
+                juniIsisSysL1CircAuthenticationKeyId }
+    ::= { juniIsisSysL1CircAuthenticationTable 1 }
+
+JuniIsisSysL1CircAuthenticationEntry ::= SEQUENCE {
+    juniIsisSysL1CircAuthenticationSysInstance       Integer32,
+    juniIsisSysL1CircAuthenticationIfIndex           Integer32,
+    juniIsisSysL1CircAuthenticationKeyId             Integer32,
+    juniIsisSysL1CircAuthenticationPwd               OCTET STRING,
+    juniIsisSysL1CircAuthenticationKeyType           INTEGER,
+    juniIsisSysL1CircAuthenticationStartAcceptTime   AuthTime,
+    juniIsisSysL1CircAuthenticationStartGenerateTime AuthTime,
+    juniIsisSysL1CircAuthenticationStopAcceptTime    AuthTime,
+    juniIsisSysL1CircAuthenticationStopGenerateTime  AuthTime,
+    juniIsisSysL1CircAuthenticationRowStatus         RowStatus }
+
+juniIsisSysL1CircAuthenticationSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysL1CircAuthenticationEntry 1 }
+
+juniIsisSysL1CircAuthenticationIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of ifIndex for the interface to which this circuit
+        corresponds."
+    ::= { juniIsisSysL1CircAuthenticationEntry 2 }
+
+juniIsisSysL1CircAuthenticationKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the instance to which this row corresponds.
+        This object follows the index behaviour."
+    ::= { juniIsisSysL1CircAuthenticationEntry 3 }
+
+juniIsisSysL1CircAuthenticationPwd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value to be used as the Authentication Key in Level 1 Hello Packets
+        whenever the value of juniIsisSysL1CircAuthenticationKeyType has a value
+        of hmacMd5.  A modification of juniIsisSysL1CircAuthenticationKeyType
+        does not modify the juniIsisSysL1CircAuthenticationPwd value.
+
+        Reading this object always results in an OCTET STRING of length zero;
+        authentication may not be bypassed by reading the MIB object."
+    DEFVAL    { "" }
+    ::= { juniIsisSysL1CircAuthenticationEntry 4 }
+
+juniIsisSysL1CircAuthenticationKeyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    plaintext(1),
+                    hmacMd5(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "What authentication scheme, if any, is used to protect Level 1 hello
+        packets."
+    DEFVAL    { hmacMd5 }
+    ::= { juniIsisSysL1CircAuthenticationEntry 5 }
+
+juniIsisSysL1CircAuthenticationStartAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        validate level 1 IIH packets received.  The Default value the start
+        accept time will be the current time when the key was created."
+    ::= { juniIsisSysL1CircAuthenticationEntry 6 }
+
+juniIsisSysL1CircAuthenticationStartGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        authenticate level 1 IIH packets transmitted.  The Default value the
+        start accept time will be the current time when the key was created + 2
+        minutes."
+    ::= { juniIsisSysL1CircAuthenticationEntry 7 }
+
+juniIsisSysL1CircAuthenticationStopAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being accepted
+        as a valid level 1 IIH packets key received.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysL1CircAuthenticationEntry 8 }
+
+juniIsisSysL1CircAuthenticationStopGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being used to
+        authenticate level 1 IIH packets transmitted.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysL1CircAuthenticationEntry 9 }
+
+juniIsisSysL1CircAuthenticationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this authentication key.  This object follows
+        the RowStatus behaviour."
+    ::= { juniIsisSysL1CircAuthenticationEntry 10 }
+
+
+--
+-- The Level 2 Circuit Authentication Table
+--
+-- The Level 2 Circuit Authentication Table contains the manually configured set
+-- of authentication keys used to authenticate Level 2 hello packets in each
+-- instance of the Integrated ISIS protocol.
+--
+juniIsisSysL2CircAuthenticationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisSysL2CircAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the manually configured set of Level 2 Circuit
+        authentication keys supported by each instance of the Integrated ISIS
+        protocol."
+    ::= { juniIsisCircuitGroup 3 }
+
+juniIsisSysL2CircAuthenticationEntry OBJECT-TYPE
+    SYNTAX      JuniIsisSysL2CircAuthenticationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one Level 2 circuit authentication key supported by
+        an instance of the Integrated ISIS protocol."
+    INDEX     { juniIsisSysL2CircAuthenticationSysInstance,
+                juniIsisSysL2CircAuthenticationIfIndex,
+                juniIsisSysL2CircAuthenticationKeyId }
+    ::= { juniIsisSysL2CircAuthenticationTable 1 }
+
+JuniIsisSysL2CircAuthenticationEntry ::= SEQUENCE {
+    juniIsisSysL2CircAuthenticationSysInstance       Integer32,
+    juniIsisSysL2CircAuthenticationIfIndex           Integer32,
+    juniIsisSysL2CircAuthenticationKeyId             Integer32,
+    juniIsisSysL2CircAuthenticationPwd               OCTET STRING,
+    juniIsisSysL2CircAuthenticationKeyType           INTEGER,
+    juniIsisSysL2CircAuthenticationStartAcceptTime   AuthTime,
+    juniIsisSysL2CircAuthenticationStartGenerateTime AuthTime,
+    juniIsisSysL2CircAuthenticationStopAcceptTime    AuthTime,
+    juniIsisSysL2CircAuthenticationStopGenerateTime  AuthTime,
+    juniIsisSysL2CircAuthenticationRowStatus         RowStatus }
+
+juniIsisSysL2CircAuthenticationSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisSysL2CircAuthenticationEntry 1 }
+
+juniIsisSysL2CircAuthenticationIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of ifIndex for the interface to which this circuit
+        corresponds."
+    ::= { juniIsisSysL2CircAuthenticationEntry 2 }
+
+juniIsisSysL2CircAuthenticationKeyId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the instance to which this row corresponds.
+        This object follows the index behaviour."
+    ::= { juniIsisSysL2CircAuthenticationEntry 3 }
+juniIsisSysL2CircAuthenticationPwd OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value to be used as the Authentication Key in Level 2 Hello Packets
+        whenever the value of juniIsisSysL2CircAuthenticationKeyType has a value
+        of hmacMd5.  A modification of juniIsisSysL2CircAuthenticationKeyType
+        does not modify the juniIsisSysL2CircAuthenticationPwd value.
+
+        Reading this object always results in an OCTET STRING of length zero;
+        authentication may not be bypassed by reading the MIB object."
+    DEFVAL    { "" }
+    ::= { juniIsisSysL2CircAuthenticationEntry 4 }
+
+juniIsisSysL2CircAuthenticationKeyType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    plaintext(1),
+                    hmacMd5(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "What authentication scheme, if any, is used to protect Level 2 hello
+        packets."
+    DEFVAL    { hmacMd5 }
+    ::= { juniIsisSysL2CircAuthenticationEntry 5 }
+
+juniIsisSysL2CircAuthenticationStartAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        validate level 2 IIH packets received.  The Default value the start
+        accept time will be the current time when the key was created."
+    ::= { juniIsisSysL2CircAuthenticationEntry 6 }
+
+juniIsisSysL2CircAuthenticationStartGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will start to be used to
+        authenticate level 2 IIH packets transmitted.  The Default value the
+        start accept time will be the current time when the key was created + 2
+        minutes."
+    ::= { juniIsisSysL2CircAuthenticationEntry 7 }
+
+juniIsisSysL2CircAuthenticationStopAcceptTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being accepted
+        as a valid level 2 IIH packets key received.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysL2CircAuthenticationEntry 8 }
+
+juniIsisSysL2CircAuthenticationStopGenerateTime OBJECT-TYPE
+    SYNTAX      AuthTime
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this authentication key will stop being used to
+        authenticate level 2 IIH packets transmitted.  A value of zero indicates
+        the key will never stop being used to authenticate packets."
+    DEFVAL    { 0 }
+    ::= { juniIsisSysL2CircAuthenticationEntry 9 }
+
+juniIsisSysL2CircAuthenticationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The existence state of this authentication key.  This object follows
+        the RowStatus behaviour."
+    DEFVAL    { active }
+    ::= { juniIsisSysL2CircAuthenticationEntry 10 }    
+
+-- 
+-- The MPLS TE tunnel table contains the set of tunnels exported by MPLS into
+-- ISIS. 
+
+juniIsisMplsTeTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniIsisMplsTeTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The set of tunnels imported from MPLS."
+    REFERENCE
+        "ISIS.aoi mplsTeTunnels(6)"
+    ::= { juniIsisSystemGroup 8 }
+
+juniIsisMplsTeTunnelEntry OBJECT-TYPE
+    SYNTAX      JuniIsisMplsTeTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains metric details of an MPLS LSP"
+    INDEX     { juniIsisMplsTeTunnelSysInstance,
+                juniIsisMplsNextHopIndex }
+    ::= { juniIsisMplsTeTunnelTable 1 }
+
+JuniIsisMplsTeTunnelEntry ::= SEQUENCE {
+    juniIsisMplsTeTunnelSysInstance       Integer32,
+    juniIsisMplsNextHopIndex             Integer32,
+    juniIsisMplsTeSystemId               SystemID,
+    juniIsisMplsTeRouterId               IpAddress,
+    juniIsisMplsTeTunnelMetric           Integer32,
+    juniIsisMplsTeTunnelRelMetric        Integer32,
+    juniIsisMplsTeTunnelName             OCTET STRING
+ }
+ 
+
+juniIsisMplsTeTunnelSysInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier of the Integrated IS-IS instance to which this
+        row corresponds.  This object follows the index behaviour."
+    ::= { juniIsisMplsTeTunnelEntry 1 }
+
+juniIsisMplsNextHopIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index to uniquely identify the tunnels."
+    ::= { juniIsisMplsTeTunnelEntry 2 }
+
+juniIsisMplsTeSystemId OBJECT-TYPE
+    SYNTAX      SystemID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ID for the instance of the Integrated IS-IS protocol 
+     running in the tunnel's end point."
+    ::= { juniIsisMplsTeTunnelEntry 3 }
+
+juniIsisMplsTeRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The router ID of the tunnel's end point."
+    ::= { juniIsisMplsTeTunnelEntry 4 }
+
+juniIsisMplsTeTunnelMetric OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The metric associated with the tunnel."
+    ::= { juniIsisMplsTeTunnelEntry 5 }
+
+juniIsisMplsTeTunnelRelMetric OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The metric associated with the tunnel relative to the spf path."
+    ::= { juniIsisMplsTeTunnelEntry 6 }
+
+juniIsisMplsTeTunnelName OBJECT-TYPE
+    SYNTAX      OCTET STRING ( SIZE (1..40))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name associated with the tunnel."
+    ::= { juniIsisMplsTeTunnelEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniIsisCompliances  OBJECT IDENTIFIER ::= { juniIsisConformance 1 }
+juniIsisMIBGroups    OBJECT IDENTIFIER ::= { juniIsisConformance 2 }
+
+--
+-- Compliance Statements
+--
+juniIsisCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting ISIS
+        functionality.  This statement became obsolete when the
+        juniIsisCircState object was added."
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup,
+            juniIsisCircuitMgmtGroup }
+    ::= { juniIsisCompliances 1 }                                  -- JUNOSe 2.0
+
+juniIsisCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for systems supporting ISIS
+        functionality.  This statement became obsolete when MPSL support was
+        added."
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup,
+            juniIsisCircuitMgmtGroup2 }
+    ::= { juniIsisCompliances 2 }                                  -- JUNOSe 3.0
+
+juniIsisCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for systems supporting ISIS functionality. This 
+        statement became obsolete when juniIsisCircBFDTable is implemented."
+
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup2,
+            juniIsisCircuitMgmtGroup2 }
+    ::= { juniIsisCompliances 3 }                                  -- JUNOSe 4.0
+
+juniIsisCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for systems supporting ISIS functionality."
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup2,
+            juniIsisCircuitMgmtGroup2,
+            juniIsisCircBFDGroup }
+    ::= { juniIsisCompliances 4 } 
+juniIsisCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for systems supporting ISIS functionality."
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup3,
+            juniIsisCircuitMgmtGroup2,
+            juniIsisCircBFDGroup }
+    ::= { juniIsisCompliances 5 } 
+
+juniIsisCompliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for systems supporting ISIS functionality."
+    MODULE   -- juniIsisMIB
+        MANDATORY-GROUPS {
+            juniIsisSystemMgmtGroup4,
+            juniIsisCircuitMgmtGroup2,
+            juniIsisCircBFDGroup }
+    ::= { juniIsisCompliances 6 } 
+
+--
+-- Units of Conformance
+--
+juniIsisSystemMgmtGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIsisSysVersion,
+        juniIsisSysType,
+        juniIsisSysID,
+        juniIsisSysMaxPathSplits,
+        juniIsisSysMaxLSPGenInt,
+        juniIsisSysOrigLSPBuffSize,
+        juniIsisSysMaxAreaAddresses,
+        juniIsisSysMinL1LSPGenInt,
+        juniIsisSysMinL2LSPGenInt,
+        juniIsisSysPollESHelloRate,
+        juniIsisSysWaitTime,
+        juniIsisSysOperState,
+        juniIsisSysL1State,
+        juniIsisSysCorrLSPs,
+        juniIsisSysLSPL1DbaseOloads,
+        juniIsisSysManAddrDropFromAreas,
+        juniIsisSysAttmptToExMaxSeqNums,
+        juniIsisSysSeqNumSkips,
+        juniIsisSysOwnLSPPurges,
+        juniIsisSysIDFieldLenMismatches,
+        juniIsisSysMaxAreaAddrMismatches,
+        juniIsisSysL2State,
+        juniIsisSysLSPL2DbaseOloads,
+        juniIsisSysAuthFails,
+        juniIsisSysLSPIgnoreErrors,
+        juniIsisSysMaxAreaCheck,
+        juniIsisSysSetOverloadBit,
+        juniIsisSysSetOverloadBitStartupDuration,
+        juniIsisSysMaxLspLifetime ,
+        juniIsisSysL1SpfInterval,
+        juniIsisSysL2SpfInterval,
+        juniIsisSysIshHoldTime,
+        juniIsisSysIshConfigTimer,
+        juniIsisSysDistributeDomainWide,
+        juniIsisSysDistance,
+        juniIsisSysL1MetricStyle,
+        juniIsisSysL2MetricStyle,
+        juniIsisSysIsoRouteTag,
+        juniIsisManAreaAddrRowStatus,
+        juniIsisSysProtSuppRowStatus,
+        juniIsisSummAddrRowStatus,
+        juniIsisSummAddrOperState,
+        juniIsisSummAddrDefaultMetric,
+        juniIsisSummAddrDelayMetric,
+        juniIsisSummAddrExpenseMetric,
+        juniIsisSummAddrErrorMetric,
+        juniIsisSummLevel,
+        juniIsisSysHostNameAreaAddr,
+        juniIsisSysHostNameName,
+        juniIsisSysHostNameType,
+        juniIsisSysHostNameRowStatus,
+        juniIsisSysAreaAuthenticationPwd,
+        juniIsisSysAreaAuthenticationKeyType,
+        juniIsisSysAreaAuthenticationStartAcceptTime,
+        juniIsisSysAreaAuthenticationStartGenerateTime,
+        juniIsisSysAreaAuthenticationStopAcceptTime,
+        juniIsisSysAreaAuthenticationStopGenerateTime,
+        juniIsisSysAreaAuthenticationRowStatus,
+        juniIsisSysDomainAuthenticationPwd,
+        juniIsisSysDomainAuthenticationKeyType,
+        juniIsisSysDomainAuthenticationStartAcceptTime,
+        juniIsisSysDomainAuthenticationStartGenerateTime,
+        juniIsisSysDomainAuthenticationStopAcceptTime,
+        juniIsisSysDomainAuthenticationStopGenerateTime,
+        juniIsisSysDomainAuthenticationRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete system level objects for ISIS management functionality.  This
+        group became obsolete when the MPLS management objects were added."
+    ::= { juniIsisMIBGroups 1 }
+
+juniIsisCircuitMgmtGroup  OBJECT-GROUP
+    OBJECTS {
+        juniIsisCircLocalID,
+        juniIsisCircOperState,
+        juniIsisCircRowStatus,
+        juniIsisCircType,
+        juniIsisCircL1DefaultMetric,
+        juniIsisCircL1DelayMetric,
+        juniIsisCircL1ExpenseMetric,
+        juniIsisCircL1ErrorMetric,
+        juniIsisCircExtDomain,
+        juniIsisCircAdjChanges,
+        juniIsisCircInitFails,
+        juniIsisCircRejAdjs,
+        juniIsisCircOutCtrlPDUs,
+        juniIsisCircInCtrlPDUs,
+        juniIsisCircIDFieldLenMismatches,
+        juniIsisCircL2DefaultMetric,
+        juniIsisCircL2DelayMetric,
+        juniIsisCircL2ExpenseMetric,
+        juniIsisCircL2ErrorMetric,
+        juniIsisCircManL2Only,
+        juniIsisCircL1ISPriority,
+        juniIsisCircL1CircID,
+        juniIsisCircL1DesIS,
+        juniIsisCircLANL1DesISChanges,
+        juniIsisCircL2ISPriority,
+        juniIsisCircL2CircID,
+        juniIsisCircL2DesIS,
+        juniIsisCircLANL2DesISChanges,
+        juniIsisCircMCAddr,
+        juniIsisCircPtToPtCircID,
+        juniIsisCircL1HelloTimer,
+        juniIsisCircL2HelloTimer,
+        juniIsisCircL1HelloMultiplier,
+        juniIsisCircL2HelloMultiplier,
+        juniIsisCircMinLSPTransInt,
+        juniIsisCircMinLSPReTransInt,
+        juniIsisCircL1CSNPInterval,
+        juniIsisCircL2CSNPInterval,
+        juniIsisCircLSPThrottle,
+        juniIsisCircMeshGroupEnabled,
+        juniIsisCircMeshGroup,
+        juniIsisCircLevel,
+        juniIsisSysL1CircAuthenticationPwd,
+        juniIsisSysL1CircAuthenticationKeyType,
+        juniIsisSysL1CircAuthenticationStartAcceptTime,
+        juniIsisSysL1CircAuthenticationStartGenerateTime,
+        juniIsisSysL1CircAuthenticationStopAcceptTime,
+        juniIsisSysL1CircAuthenticationStopGenerateTime,
+        juniIsisSysL1CircAuthenticationRowStatus,
+        juniIsisSysL2CircAuthenticationPwd,
+        juniIsisSysL2CircAuthenticationKeyType,
+        juniIsisSysL2CircAuthenticationStartAcceptTime,
+        juniIsisSysL2CircAuthenticationStartGenerateTime,
+        juniIsisSysL2CircAuthenticationStopAcceptTime,
+        juniIsisSysL2CircAuthenticationStopGenerateTime,
+        juniIsisSysL2CircAuthenticationRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete circuit management objects.  This group became obsolete when
+        the juniIsisCircState object was added."
+    ::= { juniIsisMIBGroups 2 }
+
+juniIsisCircuitMgmtGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIsisCircLocalID,
+        juniIsisCircOperState,
+        juniIsisCircRowStatus,
+        juniIsisCircType,
+        juniIsisCircL1DefaultMetric,
+        juniIsisCircL1DelayMetric,
+        juniIsisCircL1ExpenseMetric,
+        juniIsisCircL1ErrorMetric,
+        juniIsisCircExtDomain,
+        juniIsisCircAdjChanges,
+        juniIsisCircInitFails,
+        juniIsisCircRejAdjs,
+        juniIsisCircOutCtrlPDUs,
+        juniIsisCircInCtrlPDUs,
+        juniIsisCircIDFieldLenMismatches,
+        juniIsisCircL2DefaultMetric,
+        juniIsisCircL2DelayMetric,
+        juniIsisCircL2ExpenseMetric,
+        juniIsisCircL2ErrorMetric,
+        juniIsisCircManL2Only,
+        juniIsisCircL1ISPriority,
+        juniIsisCircL1CircID,
+        juniIsisCircL1DesIS,
+        juniIsisCircLANL1DesISChanges,
+        juniIsisCircL2ISPriority,
+        juniIsisCircL2CircID,
+        juniIsisCircL2DesIS,
+        juniIsisCircLANL2DesISChanges,
+        juniIsisCircMCAddr,
+        juniIsisCircPtToPtCircID,
+        juniIsisCircL1HelloTimer,
+        juniIsisCircL2HelloTimer,
+        juniIsisCircL1HelloMultiplier,
+        juniIsisCircL2HelloMultiplier,
+        juniIsisCircMinLSPTransInt,
+        juniIsisCircMinLSPReTransInt,
+        juniIsisCircL1CSNPInterval,
+        juniIsisCircL2CSNPInterval,
+        juniIsisCircLSPThrottle,
+        juniIsisCircMeshGroupEnabled,
+        juniIsisCircMeshGroup,
+        juniIsisCircLevel,
+        juniIsisCircState,
+        juniIsisSysL1CircAuthenticationPwd,
+        juniIsisSysL1CircAuthenticationKeyType,
+        juniIsisSysL1CircAuthenticationStartAcceptTime,
+        juniIsisSysL1CircAuthenticationStartGenerateTime,
+        juniIsisSysL1CircAuthenticationStopAcceptTime,
+        juniIsisSysL1CircAuthenticationStopGenerateTime,
+        juniIsisSysL1CircAuthenticationRowStatus,
+        juniIsisSysL2CircAuthenticationPwd,
+        juniIsisSysL2CircAuthenticationKeyType,
+        juniIsisSysL2CircAuthenticationStartAcceptTime,
+        juniIsisSysL2CircAuthenticationStartGenerateTime,
+        juniIsisSysL2CircAuthenticationStopAcceptTime,
+        juniIsisSysL2CircAuthenticationStopGenerateTime,
+        juniIsisSysL2CircAuthenticationRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "The circuit management objects."
+    ::= { juniIsisMIBGroups 3 }
+
+juniIsisSystemMgmtGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniIsisSysVersion,
+        juniIsisSysType,
+        juniIsisSysID,
+        juniIsisSysMaxPathSplits,
+        juniIsisSysMaxLSPGenInt,
+        juniIsisSysOrigLSPBuffSize,
+        juniIsisSysMaxAreaAddresses,
+        juniIsisSysMinL1LSPGenInt,
+        juniIsisSysMinL2LSPGenInt,
+        juniIsisSysPollESHelloRate,
+        juniIsisSysWaitTime,
+        juniIsisSysOperState,
+        juniIsisSysL1State,
+        juniIsisSysCorrLSPs,
+        juniIsisSysLSPL1DbaseOloads,
+        juniIsisSysManAddrDropFromAreas,
+        juniIsisSysAttmptToExMaxSeqNums,
+        juniIsisSysSeqNumSkips,
+        juniIsisSysOwnLSPPurges,
+        juniIsisSysIDFieldLenMismatches,
+        juniIsisSysMaxAreaAddrMismatches,
+        juniIsisSysOrigL2LSPBuffSize,
+        juniIsisSysL2State,
+        juniIsisSysLSPL2DbaseOloads,
+        juniIsisSysAuthFails,
+        juniIsisSysLSPIgnoreErrors,
+        juniIsisSysMaxAreaCheck,
+        juniIsisSysSetOverloadBit,
+        juniIsisSysSetOverloadBitStartupDuration,
+        juniIsisSysMaxLspLifetime ,
+        juniIsisSysL1SpfInterval,
+        juniIsisSysL2SpfInterval,
+        juniIsisSysIshHoldTime,
+        juniIsisSysIshConfigTimer,
+        juniIsisSysDistributeDomainWide,
+        juniIsisSysDistance,
+        juniIsisSysL1MetricStyle,
+        juniIsisSysL2MetricStyle,
+        juniIsisSysIsoRouteTag,
+        juniIsisSysMplsTeLevel,
+        juniIsisSysMplsTeRtrIdIfIndex,
+        juniIsisManAreaAddrRowStatus,
+        juniIsisSysProtSuppRowStatus,
+        juniIsisSummAddrRowStatus,
+        juniIsisSummAddrOperState,
+        juniIsisSummAddrDefaultMetric,
+        juniIsisSummAddrDelayMetric,
+        juniIsisSummAddrExpenseMetric,
+        juniIsisSummAddrErrorMetric,
+        juniIsisSummLevel,
+        juniIsisSysHostNameAreaAddr,
+        juniIsisSysHostNameName,
+        juniIsisSysHostNameType,
+        juniIsisSysHostNameRowStatus,
+        juniIsisSysAreaAuthenticationPwd,
+        juniIsisSysAreaAuthenticationKeyType,
+        juniIsisSysAreaAuthenticationStartAcceptTime,
+        juniIsisSysAreaAuthenticationStartGenerateTime,
+        juniIsisSysAreaAuthenticationStopAcceptTime,
+        juniIsisSysAreaAuthenticationStopGenerateTime,
+        juniIsisSysAreaAuthenticationRowStatus,
+        juniIsisSysDomainAuthenticationPwd,
+        juniIsisSysDomainAuthenticationKeyType,
+        juniIsisSysDomainAuthenticationStartAcceptTime,
+        juniIsisSysDomainAuthenticationStartGenerateTime,
+        juniIsisSysDomainAuthenticationStopAcceptTime,
+        juniIsisSysDomainAuthenticationStopGenerateTime,
+        juniIsisSysDomainAuthenticationRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete system level objects for ISIS management functionality.  This
+        group became obsolete when the MPLS tunnel table was added."
+    ::= { juniIsisMIBGroups 4 }
+
+juniIsisCircBFDGroup  OBJECT-GROUP
+    OBJECTS {
+         juniIsisCircBfdEnable,
+         juniIsisCircBfdMinRxInterval,
+    	 juniIsisCircBfdMinTxInterval,
+    	 juniIsisCircBfdMultiplier
+ }
+    STATUS      current
+    DESCRIPTION
+        "The circuit level ISIS BFD configuration parameters."
+    ::= { juniIsisMIBGroups 5 }
+    
+juniIsisSystemMgmtGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniIsisSysVersion,
+        juniIsisSysType,
+        juniIsisSysID,
+        juniIsisSysMaxPathSplits,
+        juniIsisSysMaxLSPGenInt,
+        juniIsisSysOrigLSPBuffSize,
+        juniIsisSysMaxAreaAddresses,
+        juniIsisSysMinL1LSPGenInt,
+        juniIsisSysMinL2LSPGenInt,
+        juniIsisSysPollESHelloRate,
+        juniIsisSysWaitTime,
+        juniIsisSysOperState,
+        juniIsisSysL1State,
+        juniIsisSysCorrLSPs,
+        juniIsisSysLSPL1DbaseOloads,
+        juniIsisSysManAddrDropFromAreas,
+        juniIsisSysAttmptToExMaxSeqNums,
+        juniIsisSysSeqNumSkips,
+        juniIsisSysOwnLSPPurges,
+        juniIsisSysIDFieldLenMismatches,
+        juniIsisSysMaxAreaAddrMismatches,
+        juniIsisSysOrigL2LSPBuffSize,
+        juniIsisSysL2State,
+        juniIsisSysLSPL2DbaseOloads,
+        juniIsisSysAuthFails,
+        juniIsisSysLSPIgnoreErrors,
+        juniIsisSysMaxAreaCheck,
+        juniIsisSysSetOverloadBit,
+        juniIsisSysSetOverloadBitStartupDuration,
+        juniIsisSysMaxLspLifetime ,
+        juniIsisSysL1SpfInterval,
+        juniIsisSysL2SpfInterval,
+        juniIsisSysIshHoldTime,
+        juniIsisSysIshConfigTimer,
+        juniIsisSysDistributeDomainWide,
+        juniIsisSysDistance,
+        juniIsisSysL1MetricStyle,
+        juniIsisSysL2MetricStyle,
+        juniIsisSysIsoRouteTag,
+        juniIsisSysMplsTeLevel,
+        juniIsisSysMplsTeRtrIdIfIndex,
+        juniIsisSysMplsTeSpfUseAnyBestPath,
+        juniIsisManAreaAddrRowStatus,
+        juniIsisSysProtSuppRowStatus,
+        juniIsisSummAddrRowStatus,
+        juniIsisSummAddrOperState,
+        juniIsisSummAddrDefaultMetric,
+        juniIsisSummAddrDelayMetric,
+        juniIsisSummAddrExpenseMetric,
+        juniIsisSummAddrErrorMetric,
+        juniIsisSummLevel,
+        juniIsisSysHostNameAreaAddr,
+        juniIsisSysHostNameName,
+        juniIsisSysHostNameType,
+        juniIsisSysHostNameRowStatus,
+        juniIsisSysAreaAuthenticationPwd,
+        juniIsisSysAreaAuthenticationKeyType,
+        juniIsisSysAreaAuthenticationStartAcceptTime,
+        juniIsisSysAreaAuthenticationStartGenerateTime,
+        juniIsisSysAreaAuthenticationStopAcceptTime,
+        juniIsisSysAreaAuthenticationStopGenerateTime,
+        juniIsisSysAreaAuthenticationRowStatus,
+        juniIsisSysDomainAuthenticationPwd,
+        juniIsisSysDomainAuthenticationKeyType,
+        juniIsisSysDomainAuthenticationStartAcceptTime,
+        juniIsisSysDomainAuthenticationStartGenerateTime,
+        juniIsisSysDomainAuthenticationStopAcceptTime,
+        juniIsisSysDomainAuthenticationStopGenerateTime,
+        juniIsisSysDomainAuthenticationRowStatus,
+        juniIsisMplsTeSystemId,
+        juniIsisMplsTeRouterId,
+        juniIsisMplsTeTunnelMetric,
+        juniIsisMplsTeTunnelRelMetric,
+        juniIsisMplsTeTunnelName }
+        
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete system level objects for ISIS management functionality.  This
+        group became obsolete when the reference bandwidth related variables were added."
+    ::= { juniIsisMIBGroups 6 }
+
+    juniIsisSystemMgmtGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniIsisSysVersion,
+        juniIsisSysType,
+        juniIsisSysID,
+        juniIsisSysMaxPathSplits,
+        juniIsisSysMaxLSPGenInt,
+        juniIsisSysOrigLSPBuffSize,
+        juniIsisSysMaxAreaAddresses,
+        juniIsisSysMinL1LSPGenInt,
+        juniIsisSysMinL2LSPGenInt,
+        juniIsisSysPollESHelloRate,
+        juniIsisSysWaitTime,
+        juniIsisSysOperState,
+        juniIsisSysL1State,
+        juniIsisSysCorrLSPs,
+        juniIsisSysLSPL1DbaseOloads,
+        juniIsisSysManAddrDropFromAreas,
+        juniIsisSysAttmptToExMaxSeqNums,
+        juniIsisSysSeqNumSkips,
+        juniIsisSysOwnLSPPurges,
+        juniIsisSysIDFieldLenMismatches,
+        juniIsisSysMaxAreaAddrMismatches,
+        juniIsisSysOrigL2LSPBuffSize,
+        juniIsisSysL2State,
+        juniIsisSysLSPL2DbaseOloads,
+        juniIsisSysAuthFails,
+        juniIsisSysLSPIgnoreErrors,
+        juniIsisSysMaxAreaCheck,
+        juniIsisSysSetOverloadBit,
+        juniIsisSysSetOverloadBitStartupDuration,
+        juniIsisSysMaxLspLifetime ,
+        juniIsisSysL1SpfInterval,
+        juniIsisSysL2SpfInterval,
+        juniIsisSysIshHoldTime,
+        juniIsisSysIshConfigTimer,
+        juniIsisSysDistributeDomainWide,
+        juniIsisSysDistance,
+        juniIsisSysL1MetricStyle,
+        juniIsisSysL2MetricStyle,
+        juniIsisSysIsoRouteTag,
+        juniIsisSysMplsTeLevel,
+        juniIsisSysMplsTeRtrIdIfIndex,
+        juniIsisSysMplsTeSpfUseAnyBestPath,
+        juniIsisSysReferenceBandwidth,
+        juniIsisSysHighReferenceBandwidth,
+        juniIsisManAreaAddrRowStatus,
+        juniIsisSysProtSuppRowStatus,
+        juniIsisSummAddrRowStatus,
+        juniIsisSummAddrOperState,
+        juniIsisSummAddrDefaultMetric,
+        juniIsisSummAddrDelayMetric,
+        juniIsisSummAddrExpenseMetric,
+        juniIsisSummAddrErrorMetric,
+        juniIsisSummLevel,
+        juniIsisSysHostNameAreaAddr,
+        juniIsisSysHostNameName,
+        juniIsisSysHostNameType,
+        juniIsisSysHostNameRowStatus,
+        juniIsisSysAreaAuthenticationPwd,
+        juniIsisSysAreaAuthenticationKeyType,
+        juniIsisSysAreaAuthenticationStartAcceptTime,
+        juniIsisSysAreaAuthenticationStartGenerateTime,
+        juniIsisSysAreaAuthenticationStopAcceptTime,
+        juniIsisSysAreaAuthenticationStopGenerateTime,
+        juniIsisSysAreaAuthenticationRowStatus,
+        juniIsisSysDomainAuthenticationPwd,
+        juniIsisSysDomainAuthenticationKeyType,
+        juniIsisSysDomainAuthenticationStartAcceptTime,
+        juniIsisSysDomainAuthenticationStartGenerateTime,
+        juniIsisSysDomainAuthenticationStopAcceptTime,
+        juniIsisSysDomainAuthenticationStopGenerateTime,
+        juniIsisSysDomainAuthenticationRowStatus,
+        juniIsisMplsTeSystemId,
+        juniIsisMplsTeRouterId,
+        juniIsisMplsTeTunnelMetric,
+        juniIsisMplsTeTunnelRelMetric,
+        juniIsisMplsTeTunnelName }
+        
+    STATUS      current
+    DESCRIPTION
+        "The system level objects for ISIS management functionality."
+    ::= { juniIsisMIBGroups 7 }
+END
+

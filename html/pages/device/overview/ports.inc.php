@@ -2,7 +2,7 @@
 
 if($interfaces['total']) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>
-        <p class=sectionhead>Ports</p>" . device_traffic_image($device['device_id'], 490, 100, $day, '-300s') . "");
+        " . device_traffic_image($device['device_id'], 490, 100, $day, '-300s') . "");
 
   echo("<div style='height: 5px;'></div>");
 
