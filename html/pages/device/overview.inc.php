@@ -46,8 +46,6 @@ echo("
 <td width=25% class=grey><img src='images/16/cog_disable.png' align=absmiddle> $services[disabled]</td></tr>
 </table>");
 
-
-
   echo("<div style='padding: 8px; font-size: 11px; font-weight: bold;'>");
 
   $sql = "SELECT * FROM services WHERE service_host = '" . $device['device_id'] . "' ORDER BY service_type";
@@ -63,6 +61,8 @@ echo("
 
   echo("</div>");
 
+  echo("</div>");
+
 }
 
 echo("</div>");
@@ -72,7 +72,6 @@ echo("<div style='float:right; width: 50%;'>");
 
 ### Right Pane
 include("overview/processors.inc.php");
-include("overview/hrProcessors.inc.php");
 include("overview/cemp.inc.php");
 include("overview/cmp.inc.php");
 include("overview/hrStorage.inc.php");

@@ -4,6 +4,7 @@ echo("Processors : ");
 
 include("processors-ios.inc.php");
 include("processors-junose.inc.php");
+include("processors-hrdevice.inc.php");
 
 ### Remove processors which weren't redetected here
 
