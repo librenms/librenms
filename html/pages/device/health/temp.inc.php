@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `temperature` WHERE temp_host = '" . $_GET[id] . "' ORDER BY temp_descr";
+$sql = "SELECT * FROM `temperature` WHERE device_id = '" . $_GET[id] . "' ORDER BY temp_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");

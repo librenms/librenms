@@ -40,7 +40,7 @@ echo('<li class="' . $select['graphs'] . '">
 </li>');
 
 $health =  mysql_result(mysql_query("select count(*) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) +
-           mysql_result(mysql_query("select count(temp_id) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0) +
+           mysql_result(mysql_query("select count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0);
 

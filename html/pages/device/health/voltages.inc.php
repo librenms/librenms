@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `voltage` WHERE volt_host = '" . $_GET[id] . "' ORDER BY volt_descr";
+$sql = "SELECT * FROM `voltage` WHERE device_id = '" . $_GET[id] . "' ORDER BY volt_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");

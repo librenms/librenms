@@ -425,7 +425,7 @@ function delHost($id)
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `bgpPeers` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `temperature` WHERE `temp_host` = '$id'");
+  mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");  
   mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
@@ -458,7 +458,7 @@ function retireHost($id)
     echo("Removed interface $int_id ($int_if)<br />");
   }
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `temperature` WHERE `temp_host` = '$id'");
+  mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");

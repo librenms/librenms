@@ -7,6 +7,50 @@ $port = $device['port'];
 
 echo("Temperatures : ");
 
+
+if($device['os'] == "ironware")
+{
+  echo("IronWare ");
+  $oids = shell_exec($config['snmpwalk'] . " -$snmpver -CI -Osqn -m FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-ROOT-MIB -c $community $hostname:$port snAgentTempSensorDescr");
+  $oids = trim($oids);
+  $oids = str_replace(".1.3.6.1.4.1.1991.1.1.2.13.1.1.3.", "", $oids);
+  foreach(explode("\n", $oids) as $data)
+  {
+    $data = trim($data);
+    if ($data != "")
+    {
+      list($oid) = explode(" ", $data);
+      $temp_oid  = ".1.3.6.1.4.1.1991.1.1.2.13.1.1.4.$oid";
+      $descr_oid = ".1.3.6.1.4.1.1991.1.1.2.13.1.1.3.$oid";
+      $descr = trim(shell_exec($config['snmpget'] . " -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
+      $temp = trim(shell_exec($config['snmpget'] . " -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid"));
+      if (!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0")
+      {
+        $descr = str_replace("\"", "", $descr);
+        $descr = str_replace("temperature", "", $descr);
+        $descr = str_replace("temp", "", $descr);
+        $descr = str_replace("sensor", "Sensor", $descr);
+	$descr = str_replace("Line module", "Line Mod", $descr);
+        $descr = str_replace("  ", " ", $descr);
+        $descr = trim($descr);
+        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0')
+        {
+          $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`, `temp_precision`) values ('$id', '$temp_oid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp', '2')";
+          mysql_query($query);
+          echo("+");
+        } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
+          mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid' AND `temp_precision` = '2'");
+          echo("U");
+        } else {
+          echo(".");
+        }
+        $temp_exists[] = "$id $temp_oid";
+      }
+    }
+  }
+}
+
+
 ## JunOS Temperatures
 if ($device['os'] == "junos") 
 {
@@ -31,13 +75,13 @@ if ($device['os'] == "junos")
         $descr = str_replace("temp", "", $descr);
         $descr = str_replace("sensor", "", $descr);
         $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0')
+        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0')
         {
-          $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
+          $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
           mysql_query($query);
           echo("+");
-        } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
-          mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+        } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) {
+          mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'");
           echo("U");
         } else { 
           echo("."); 
@@ -59,15 +103,15 @@ if ($device['os'] == "papouch-tme")
   {
     $temp_oid = "SNMPv2-SMI::enterprises.18248.1.1.1.0";
     $descr = trim(str_replace("\"", "", $descr));
-    if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
+    if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0') 
     {
-      $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',10," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
+      $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',10," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
       mysql_query($query);
       echo("+");
-    } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr)
+    } elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr)
     {
       echo("U");
-      mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+      mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'");
     } else {
       echo(".");
     }
@@ -89,15 +133,15 @@ if ($device['os'] == "linux")
       $descr_query = $config['snmpget'] . " -$snmpver -m SNMPv2-SMI -Osqn -c $community $hostname:$port .1.3.6.1.4.1.2021.7891.$oid.2.1 | sed s/.1.3.6.1.4.1.2021.7891.$oid.2.1\ //";
       $descr = trim(str_replace("\"", "", shell_exec($descr_query)));
       $fulloid = ".1.3.6.1.4.1.2021.7891.$oid.101.1";
-      if (!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0)) 
+      if (!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'"), 0)) 
       {
         echo("+");
-        mysql_query("INSERT INTO `temperature` (`temp_host`,`temp_oid`,`temp_descr`,`temp_limit`) VALUES ('$id', '$fulloid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ")");
+        mysql_query("INSERT INTO `temperature` (`device_id`,`temp_oid`,`temp_descr`,`temp_limit`) VALUES ('$id', '$fulloid', '$descr'," . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ")");
       } 
-      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0) != $descr) 
+      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'"), 0) != $descr) 
       {
         echo("U");
-	  mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'");
+	  mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'");
       }
       else 
       {
@@ -123,15 +167,15 @@ if (strstr($device['hardware'], "dell"))
       $descr_query = $config['snmpget'] . " -m MIB-Dell-10892 -$snmpver  -Onvq -c $community $hostname:$port .1.3.6.1.4.1.674.10892.1.700.20.1.8.$oid";
       $descr = trim(str_replace("\"", "", shell_exec($descr_query)));
       $fulloid = ".1.3.6.1.4.1.674.10892.1.700.20.1.6.$oid";
-      if (!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0)) 
+      if (!mysql_result(mysql_query("SELECT count(temp_id) FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'"), 0)) 
       {
-        mysql_query("INSERT INTO `temperature` (`temp_host`,`temp_oid`,`temp_descr`, `temp_precision`, `temp_limit`) VALUES ('$id', '$fulloid', '$descr', '10', " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ")");
+        mysql_query("INSERT INTO `temperature` (`device_id`,`temp_oid`,`temp_descr`, `temp_precision`, `temp_limit`) VALUES ('$id', '$fulloid', '$descr', '10', " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ")");
 	  echo("+");
       } 
-      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'"), 0) != $descr) 
+      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'"), 0) != $descr) 
       {
-        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'");
-        echo("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$fulloid'");
+        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'");
+        echo("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$fulloid'");
         echo("U");
       }
       else
@@ -162,16 +206,16 @@ if ($device['os'] == "linux")
       $temp  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid")) / 1000;
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
-      if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
+      if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',1000, " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
+        $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_precision`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr',1000, " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
         mysql_query($query);
         echo("+");
       } 
-      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) 
+      elseif (mysql_result(mysql_query("SELECT `temp_descr` FROM temperature WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'"), 0) != $descr) 
       {
         echo("U");
-        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `temp_host` = '$id' AND `temp_oid` = '$temp_oid'");
+        mysql_query("UPDATE temperature SET `temp_descr` = '$descr' WHERE `device_id` = '$id' AND `temp_oid` = '$temp_oid'");
       } 
       else 
       {
@@ -209,9 +253,9 @@ if ($device['os'] == "linux")
         if ($monitor == 'true')
         {
           $descr = trim(str_ireplace("temperature", "", $descr));
-          if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
+          if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0') 
           {
-            $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_current`, `temp_limit`, `temp_precision`) values ('$id', '$temp_oid', '$descr', '$temp', '$limit','$divisor')";
+            $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_current`, `temp_limit`, `temp_precision`) values ('$id', '$temp_oid', '$descr', '$temp', '$limit','$divisor')";
             mysql_query($query);
             echo("+");
           } 
@@ -248,9 +292,9 @@ if ($device['os'] == "ios")
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
         $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND temp_host = '$id'"),0) == '0') 
+        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0') 
         {
-          $query = "INSERT INTO temperature (`temp_host`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr', " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
+          $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr', " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
           mysql_query($query);
           echo("+");
         }
@@ -266,7 +310,7 @@ if ($device['os'] == "ios")
 
 ## Delete removed sensors
 
-$sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.temp_host = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 
 if ($query = mysql_query($sql))
 {
@@ -276,7 +320,7 @@ if ($query = mysql_query($sql))
     $i = 0;
     while ($i < count($temp_exists) && !$exists) 
     {
-      $thistemp = $sensor['temp_host'] . " " . $sensor['temp_oid'];
+      $thistemp = $sensor['device_id'] . " " . $sensor['temp_oid'];
       if ($temp_exists[$i] == $thistemp) { $exists = 1; }
       $i++;
     }

@@ -27,16 +27,16 @@ if ($device['os'] == "linux")
       $volt  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / 1000;
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
-      if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND volt_host = '$id'"),0) == '0') 
+      if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND device_id = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO voltage (`volt_host`, `volt_oid`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_current`) values ('$id', '$volt_oid', '$descr',1000, " . ($config['defaults']['volt_limit'] ? $config['defaults']['volt_limit'] : '60') . ", '$volt')";
+        $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_current`) values ('$id', '$volt_oid', '$descr',1000, " . ($config['defaults']['volt_limit'] ? $config['defaults']['volt_limit'] : '60') . ", '$volt')";
         mysql_query($query);
         echo("+");
       } 
-      elseif (mysql_result(mysql_query("SELECT `volt_descr` FROM voltage WHERE `volt_host` = '$id' AND `volt_oid` = '$volt_oid'"), 0) != $descr) 
+      elseif (mysql_result(mysql_query("SELECT `volt_descr` FROM voltage WHERE `device_id` = '$id' AND `volt_oid` = '$volt_oid'"), 0) != $descr) 
       {
         echo("U");
-        mysql_query("UPDATE voltage SET `volt_descr` = '$descr' WHERE `volt_host` = '$id' AND `volt_oid` = '$volt_oid'");
+        mysql_query("UPDATE voltage SET `volt_descr` = '$descr' WHERE `device_id` = '$id' AND `volt_oid` = '$volt_oid'");
       } 
       else 
       {
@@ -75,9 +75,9 @@ if ($device['os'] == "linux")
         if ($monitor == 'true')
         {
           $descr   = trim(str_ireplace("Voltage", "", $descr));
-          if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND volt_host = '$id'"),0) == '0') 
+          if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND device_id = '$id'"),0) == '0') 
           {
-            $query = "INSERT INTO voltage (`volt_host`, `volt_oid`, `volt_descr`, `volt_current`, `volt_limit`, `volt_limit_low`, `volt_precision`) values ('$id', '$volt_oid', '$descr', '$volt', '$limit','$lowlimit','1000')";
+            $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_current`, `volt_limit`, `volt_limit_low`, `volt_precision`) values ('$id', '$volt_oid', '$descr', '$volt', '$limit','$lowlimit','1000')";
             mysql_query($query);
             echo("+");
           } 
@@ -94,7 +94,7 @@ if ($device['os'] == "linux")
 
 ## Delete removed sensors
 
-$sql = "SELECT * FROM voltage AS V, devices AS D WHERE V.volt_host = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM voltage AS V, devices AS D WHERE V.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 
 if ($query = mysql_query($sql))
 {
@@ -104,7 +104,7 @@ if ($query = mysql_query($sql))
     $i = 0;
     while ($i < count($volt_exists) && !$exists) 
     {
-      $thisvolt = $sensor['volt_host'] . " " . $sensor['volt_oid'];
+      $thisvolt = $sensor['device_id'] . " " . $sensor['volt_oid'];
       if ($volt_exists[$i] == $thisvolt) { $exists = 1; }
       $i++;
     }

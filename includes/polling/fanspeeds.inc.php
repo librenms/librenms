@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM fanspeed WHERE fan_host = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM fanspeed WHERE device_id = '" . $device['device_id'] . "'";
 $fan_data = mysql_query($query);
 while($fanspeed = mysql_fetch_array($fan_data)) {
 

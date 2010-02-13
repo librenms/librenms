@@ -1,13 +1,13 @@
 <?php
 
-$temp = mysql_result(mysql_query("select count(*) from temperature WHERE temp_host = '" . $device['device_id'] . "'"), 0);
+$temp = mysql_result(mysql_query("select count(*) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $storage = mysql_result(mysql_query("select count(*) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0);
 $cemp = mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $cmp = mysql_result(mysql_query("select count(*) from cmpMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $cpm  = mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $hrprocessor  = mysql_result(mysql_query("select count(*) from hrDevice WHERE device_id = '" . $device['device_id'] . "' AND `hrDeviceType` = 'hrDeviceProcessor'"), 0);
-$fans = mysql_result(mysql_query("select count(*) from fanspeed WHERE fan_host = '" . $device['device_id'] . "'"), 0);
-$volts = mysql_result(mysql_query("select count(*) from voltage WHERE volt_host = '" . $device['device_id'] . "'"), 0);
+$fans = mysql_result(mysql_query("select count(*) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$volts = mysql_result(mysql_query("select count(*) from voltage WHERE device_id = '" . $device['device_id'] . "'"), 0);
 
 
 if ($temp) { $datas[] = 'temp'; }

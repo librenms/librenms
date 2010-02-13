@@ -5,7 +5,7 @@ include("common.inc.php");
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM temperature where temp_host = '$device_id'");
+$sql = mysql_query("SELECT * FROM temperature where device_id = '$device_id'");
 $rrd_options .= " COMMENT:'                           Cur   Min   Max\\n'";
 while($temperature = mysql_fetch_array($sql)) 
 {

@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `fanspeed` WHERE fan_host = '" . $_GET[id] . "' ORDER BY fan_descr";
+$sql = "SELECT * FROM `fanspeed` WHERE device_id = '" . $_GET[id] . "' ORDER BY fan_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");

@@ -2,7 +2,9 @@
 
   echo("<div style='font-family: courier, serif; margin: 10px';><strong>" . $device['sysDescr'] . "</strong></div>");
 
-  $uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
+#  $uptime = @mysql_result(mysql_query("SELECT `attrib_value` FROM `devices_attribs` WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = 'uptime'"), 0);
+  $uptime = $device['uptime'];
+
 
   if(is_file("images/devices/" . $device['hardware'] . ".gif")) {
     $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".gif' align=absmiddle></img></div>";

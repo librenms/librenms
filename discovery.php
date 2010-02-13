@@ -84,7 +84,7 @@ foreach ($devices as $device)
   echo("\n");
 
   ## Discover OS Changes
-#  include("includes/discovery/os.inc.php");
+  #include("includes/discovery/os.inc.php");
 
   ## Discover Interfaces 
   include("includes/discovery/interfaces.php");

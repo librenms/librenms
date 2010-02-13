@@ -1,13 +1,13 @@
 <?php
 
 unset($fan_seperator);
-if(mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE fan_host = '" . $device['device_id'] . "'"),0)) {
-  $total = mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE fan_host = '" . $device['device_id'] . "'"),0);
+if(mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"),0)) {
+  $total = mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"),0);
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p class=sectionhead>Fanspeeds</p>");
   $i = '1';
-  $fans = mysql_query("SELECT * FROM fanspeed WHERE fan_host = '" . $device['device_id'] . "'");
+  $fans = mysql_query("SELECT * FROM fanspeed WHERE device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
   echo("<tr><td width=50%>");
   echo("<table width=100% cellspacing=0 cellpadding=2>");
