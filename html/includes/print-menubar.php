@@ -167,9 +167,9 @@ echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" bor
 </li>
 
 
-<li><a class="menu2four" href="/storage/"><img src="images/16/database.png" border="0" align="absmiddle" /> Storage</a></li>
+<li><a class="menu2four" href="storage/"><img src="images/16/database.png" border="0" align="absmiddle" /> Storage</a></li>
 
-<!-- <li><a class="menu2four" href="/inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li> -->
+<!-- <li><a class="menu2four" href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li> -->
 
 <?php
 
