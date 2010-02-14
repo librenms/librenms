@@ -1,5 +1,7 @@
 <?php
 
+if($_GET('opta') == "expunge" && $_SESSION['userlevel'] >= '10') { mysql_query("TRUNCATE TABLE `eventlog`"); }
+
 if($_SESSION['userlevel'] >= '5') {
   $query = "SELECT *,DATE_FORMAT(datetime, '%D %b %Y %T') as humandate  FROM `eventlog` ORDER BY `datetime` DESC LIMIT 0,250";
 } else {

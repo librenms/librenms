@@ -1,5 +1,7 @@
 <meta http-equiv="refresh" content="60">
 
+<?php if($_GET('opta') == "expunge" && $_SESSION['userlevel'] >= '10') { mysql_query("TRUNCATE TABLE `syslog`"); } ?>
+
 <?php  print_optionbar_start('25'); ?>
 
 <form method="post" action="">
