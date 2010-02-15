@@ -14,6 +14,10 @@ Added support for Dell Powerconnect and HP Procurve switches
 Added support for Supermicro SuperoDoctor temperature support
 Added support for LLDP discovery
 Added support for Q-BRIDGE-MIB VLANs (basically for non-cisco HW)
+Added support for LMSensors and Supermicro Temp/Fan/Voltages
+Replaced old image-based percentage bar with new CSS bar
+Added Foundry/Brocade support
+Added Juniper JunOSe support
 
 And more...
 
