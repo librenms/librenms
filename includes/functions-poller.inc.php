@@ -110,6 +110,22 @@ function snmpwalk_cache_double_oid($device, $oid, $array, $mib = NULL, $mibdir =
   return $array;
 }
 
+function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL) {
+  $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
+  foreach(explode("\n", $data) as $entry) {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $first, $second, $third) = explode(".", $oid);
+    if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
+      $index = $first.".".$second.".".$third;
+      $array[$device[device_id]][$index][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
+
+
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
   $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " .

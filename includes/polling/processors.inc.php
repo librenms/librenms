@@ -25,8 +25,7 @@ while($processor = mysql_fetch_array($proc_data)) {
 
   echo($proc . "%\n");
 
-  $updatecmd = $config['rrdtool'] ." update $procrrd N:$proc";
-  shell_exec($updatecmd);
+  rrdtool_update($procrrd,"N:$proc");
 
   mysql_query("UPDATE `processors` SET `processor_usage` = '$proc' WHERE `processor_id` = '".$processor['processor_id']."'");
 
