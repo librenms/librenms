@@ -103,7 +103,7 @@
 echo("</td>");
      echo("<td width=375 valign=top class=interface-desc>");
      if ( strpos($interface['label'], "oopback") === false && !$graph_type) {
-       $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.src_if = '$if_id' AND L.dst_if = I.interface_id AND I.device_id = D.device_id");
+       $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.local_interface_id = '$if_id' AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
 #         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['label'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";

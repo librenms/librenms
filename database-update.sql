@@ -95,3 +95,7 @@ ALTER TABLE  `processors` CHANGE `processor_description` `processor_descr` varch
 ALTER TABLE  `fanspeed` CHANGE `fan_mibtype` `fan_type` varchar(64) NOT NULL ;
 ALTER TABLE  `voltage` ADD  `volt_index` VARCHAR( 8 ) NOT NULL AFTER  `volt_oid`,ADD  `volt_type` VARCHAR( 32 ) NOT NULL AFTER  `volt_index` ;
 ALTER TABLE `processors` ADD `processor_precision` INT( 11 ) NOT NULL DEFAULT '1';
+ALTER TABLE `links` CHANGE `cdp` `vendor` VARCHAR( 11 ) NULL DEFAULT NULL;
+ALTER TABLE `links` ADD `remote_hostname` VARCHAR( 128 ) NOT NULL ,ADD `remote_port` VARCHAR( 128 ) NOT NULL ,ADD `remote_platform` VARCHAR( 128 ) NOT NULL ,ADD `remote_version` VARCHAR( 256 ) NOT NULL ;
+ALTER TABLE `links` CHANGE `src_if` `local_interface_id` INT( 11 ) NULL DEFAULT NULL ,CHANGE `dst_if` `remote_interface_id` INT( 11 ) NULL DEFAULT NULL ;
+ALTER TABLE `links` CHANGE `vendor` `protocol` VARCHAR( 11 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

@@ -113,7 +113,7 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
 #}
 
 
-if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.src_if"),0)) {
+if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0)) {
   echo('<li class="' . $select['map'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/map/">
     <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map

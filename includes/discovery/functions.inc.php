@@ -1,5 +1,32 @@
 <?php
 
+function discover_link($local_interface_id, $protocol, $remote_interface_id, $remote_hostname, $remote_port, $remote_platform, $remote_version) {
+
+      global $config; global $debug; global $link_exists;
+      if (mysql_result(@mysql_query("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
+                                     AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"),0) == "0")
+      {
+        $sql = "INSERT INTO `links` (`local_interface_id`,`protocol`,`remote_interface_id`,`remote_hostname`,`remote_port`,`remote_platform`,`remote_version`)
+                             VALUES ('$local_interface_id','$protocol','$remote_interface_id','$remote_hostname','$remote_port','$remote_platform','$remote_version')";
+        mysql_query($sql);
+        echo("+"); if($debug) {echo("$sql");}
+      } else {
+        $data = mysql_fetch_array(mysql_query("SELECT * FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
+                                               AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"));
+        if($data['remote_interface_id'] == $remote_interface_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
+        {
+          echo(".");
+        } else {
+          $sql = "UPDATE `links` SET `remote_interface_id` = $remote_interface_id, `remote_platform` = '$remote_platform', `remote_version` = '$remote_version' WHERE `id` = '".$data['id']."'";
+          mysql_query($sql); 
+          echo("U"); if($debug) {echo("$sql");}
+        }
+      }
+      $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
+
+}
+
+
 function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL) {
 
       global $config; global $debug;

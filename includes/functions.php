@@ -411,8 +411,8 @@ function delHost($id)
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `src_if` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `dst_if` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
     mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
@@ -449,8 +449,8 @@ function retireHost($id)
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `src_if` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `dst_if` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
+    mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
     mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
