@@ -38,7 +38,6 @@ if ($device['os'] == "linux")
 if ($device['os'] == "linux") 
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.10876.2.1.1.1.1.3", "-OsqnU", "SUPERMICRO-HEALTH-MIB");
-  $oids = str_replace("1.3.6.1.4.1.10876.2.1.1.1.1.3.", "", $oids);
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
@@ -49,6 +48,7 @@ if ($device['os'] == "linux")
     if ($data) 
     {
       list($index,$kind) = explode(" ", $data);
+      $split_oid = explode('.',$oid);
       if ($kind == 0)
       {
         $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
