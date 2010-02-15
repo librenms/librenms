@@ -52,13 +52,13 @@ if ($device['os'] == "linux")
       $index = $split_oid[count($split_oid)-1];
       if ($kind == 0)
       {
-        $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
+        $oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
         $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2$index";
         $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6$index";
         $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$index";
         $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10$index";
         $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current       = snmp_get($device, $oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
