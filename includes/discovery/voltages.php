@@ -7,13 +7,11 @@ $port = $device['port'];
 
 echo("Voltages : ");
 
-## LMSensors Voltages
-/*
+## LMSensors Voltages (returned as 10,000ths of a volt.)
+
 if ($device['os'] == "linux") 
 {
-  $oids = shell_exec($config['snmpwalk'] . " -m LM-SENSORS-MIB -$snmpver -CI -Osqn -c $community $hostname:$port lmTempSensorsDevice");
-  if ($debug) { echo($oids."\n"); }
-  $oids = trim($oids);
+  $oids = snmp_walk($device, "lmTempSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
   if ($oids) echo("LM-SENSORS ");
   foreach(explode("\n", $oids) as $data) 
   {
@@ -23,13 +21,14 @@ if ($device['os'] == "linux")
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
       $volt_id = $split_oid[count($split_oid)-1];
-      $volt_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$volt_id";
-      $volt  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / 1000;
+      $volt_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3." . $volt_id;
+      $volt = snmp_get($device, $volt_oid, "-Oqv", "LM-SENSORS-MIB");
+      $volt = $volt / 10000;
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
       if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND device_id = '$id'"),0) == '0') 
       {
-        $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_current`) values ('$id', '$volt_oid', '$descr',1000, " . ($config['defaults']['volt_limit'] ? $config['defaults']['volt_limit'] : '60') . ", '$volt')";
+        $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_current`) values ('$id', '$volt_oid', '$descr',10000, " . ($config['defaults']['volt_limit'] ? $config['defaults']['volt_limit'] : '60') . ", '$volt')";
         mysql_query($query);
         echo("+");
       } 
@@ -46,7 +45,7 @@ if ($device['os'] == "linux")
     }
   }
 }
-*/
+
 
 ## Supermicro Voltages
 if ($device['os'] == "linux") 
