@@ -55,8 +55,6 @@ if($debug) {echo("$lldp_links");}
 
 $discovered_links = (isset($cdp_links) ? $cdp_links : '') . (isset($lldp_links) ? $lldp_links : '');
 
-echo "\n";
-
 if($discovered_links != "\n") {
   foreach ( explode("\n" ,$discovered_links) as $link ) {
     if ($link == "") { break; }
