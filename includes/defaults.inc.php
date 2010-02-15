@@ -68,6 +68,11 @@ $config['allow_entity_sensor']['watts'] = 1;
 $config['allow_entity_sensor']['truthvalue'] = 1;
 $config['allow_entity_sensor']['specialEnum'] = 1;
 
+# Set default alert limits for various sensors and metrics
+
+$config['limit']['fan']  = "1000";
+$config['limit']['temp'] = "60";
+
 # Filesystems
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc");
@@ -75,7 +80,5 @@ $config['ignore_mount_string'] = array("packages", "devfs", "procfs", "UMA", "MA
 $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
-
-
 
 ?>
