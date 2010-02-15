@@ -2,7 +2,7 @@
 
   if($device['os_group'] == "unix")
   {
-    echo("hrDevice : ");
+    echo("hrDevice ");
     $hrDevice_oids = array('hrDevice','hrProcessorLoad');  
     if($debug) { print_r($processors_array); }
     foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmp_cache_oid($oid, $device, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
@@ -46,10 +46,8 @@
       }
     }
   } 
-  ## End Cisco Processors
-
+  ## End hrDevice Processors
   unset ($processors_array);
 
-echo("\n");
 
 ?>
