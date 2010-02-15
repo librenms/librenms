@@ -64,7 +64,7 @@ if ($device['os'] == "linux")
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         if ($monitor == 'true')
         {
-          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision, NULL, $limit, $current);
+          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision, $limit, NULL, $current);
           $fan_exists[$type][$index] = 1;
         }
       }

@@ -51,8 +51,9 @@ if ($device['os'] == "junos")
   $peer_cmd .= " jnxBgpM2PeerFsmEstablishedTime.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
-  $peer_data = trim(`$peer_cmd . '|grep -v "No Such Instance"'`);
+  $peer_cmd .= ' -M"+' . $config['install_dir'] . '/mibs/junos"|grep -v "No Such Instance"';
   if ($debug) echo "\n$peer_cmd\n";
+  $peer_data = trim(`$peer_cmd`);
   list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
   
   if ($debug) { echo "State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n"; }

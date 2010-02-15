@@ -16,7 +16,7 @@ function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low
         if($oid == $fan_entry['fan_oid'] && $descr == $fan_entry['fan_descr'] && $precision == $fan_entry['fan_precision']) {
           echo(".");
         } else {
-          mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr', `fan_oid` = '$oid', `fan_precision` = '$precision' WHERE `device_id` = '$id' AND fan_type = '$type' AND `fan_index` = '$fan_index' ");
+          mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr', `fan_oid` = '$oid', `fan_precision` = '$precision' WHERE `device_id` = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$fan_index' ");
           echo("U");
         }
       }
