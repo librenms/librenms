@@ -55,6 +55,4 @@
 
   unset ($processors_array);
 
-echo("\n");
-
 ?>

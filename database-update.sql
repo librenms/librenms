@@ -93,3 +93,4 @@ ALTER TABLE  `temperature` CHANGE  `temp_current`  `temp_current` FLOAT( 4 ) NOT
 ALTER TABLE  `processors` ADD `processor_index` varchar(32) NOT NULL AFTER `processor_oid`
 ALTER TABLE  `processors` CHANGE `processor_description` `processor_descr` varchar(64) NOT NULL
 ALTER TABLE  `fanspeed` CHANGE `fan_mibtype` `fan_type` varchar(64) NOT NULL
+ALTER TABLE  `voltage` ADD  `volt_index` VARCHAR( 8 ) NOT NULL AFTER  `volt_oid`,ADD  `volt_type` VARCHAR( 32 ) NOT NULL AFTER  `volt_index`

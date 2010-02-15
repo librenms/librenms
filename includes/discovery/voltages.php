@@ -11,8 +11,11 @@ echo("Voltages : ");
 
 if ($device['os'] == "linux") 
 {
-  $oids = snmp_walk($device, "lmTempSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
+  $oids = snmp_walk($device, "lmVoltSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
+  if ($debug) { echo($oids."\n"); }
   if ($oids) echo("LM-SENSORS ");
+  $precision = 1000;
+  $type = "lmsensors";
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -20,28 +23,12 @@ if ($device['os'] == "linux")
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
-      $volt_id = $split_oid[count($split_oid)-1];
-      $volt_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3." . $volt_id;
-      $volt = snmp_get($device, $volt_oid, "-Oqv", "LM-SENSORS-MIB");
-      $volt = $volt / 10000;
-      $descr = str_ireplace("temp-", "", $descr);
-      $descr = trim($descr);
-      if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND device_id = '$id'"),0) == '0') 
-      {
-        $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_current`) values ('$id', '$volt_oid', '$descr',10000, " . ($config['defaults']['volt_limit'] ? $config['defaults']['volt_limit'] : '60') . ", '$volt')";
-        mysql_query($query);
-        echo("+");
-      } 
-      elseif (mysql_result(mysql_query("SELECT `volt_descr` FROM voltage WHERE `device_id` = '$id' AND `volt_oid` = '$volt_oid'"), 0) != $descr) 
-      {
-        echo("U");
-        mysql_query("UPDATE voltage SET `volt_descr` = '$descr' WHERE `device_id` = '$id' AND `volt_oid` = '$volt_oid'");
-      } 
-      else 
-      {
-        echo("."); 
-      } 
-      $volt_exists[] = "$id $volt_oid";
+      $index = $split_oid[count($split_oid)-1];
+      $oid  = ".1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
+      $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $precision;
+      $descr = trim(str_ireplace("volt-", "", $descr));
+      discover_volt($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+      $volt_exists[$type][$index] = 1;
     }
   }
 }
@@ -50,41 +37,39 @@ if ($device['os'] == "linux")
 ## Supermicro Voltages
 if ($device['os'] == "linux") 
 {
-  $oids = shell_exec($config['snmpwalk'] . " -m SUPERMICRO-HEALTH-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.10876.2.1.1.1.1.3 | sed s/1.3.6.1.4.1.10876.2.1.1.1.1.3.//g");
+  $oids = snmp_walk($device, "1.3.6.1.4.1.10876.2.1.1.1.1.3", "-OsqnU", "SUPERMICRO-HEALTH-MIB");
+  if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
+  $type = "supermicro";
+  $precision = "1000";
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
     if ($data) 
     {
-      list($oid,$type) = explode(" ", $data);
-      if ($type == 1)
+      list($oid,$kind) = explode(" ", $data);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-1];
+      if ($kind == 1)
       {
-        $volt_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
-        $descr_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
-        $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10$oid";
-        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5$oid";
-        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
-        $descr    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-        $volt     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / 1000;
-        $monitor  = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid")) / 1000;
-        $limit    = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid")) / 1000;
-        $lowlimit = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $lowlimit_oid")) / 1000;
+        $volt_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4.".$index;
+        $descr_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.2.".$index;
+        $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10.".$index;
+        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
+        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
+
+        $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current       = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+	$lowlimit      = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $descr   = trim(str_ireplace("Voltage", "", $descr));
+
         if ($monitor == 'true')
         {
-          $descr   = trim(str_ireplace("Voltage", "", $descr));
-          if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE volt_oid = '$volt_oid' AND device_id = '$id'"),0) == '0') 
-          {
-            $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_descr`, `volt_current`, `volt_limit`, `volt_limit_low`, `volt_precision`) values ('$id', '$volt_oid', '$descr', '$volt', '$limit','$lowlimit','1000')";
-            mysql_query($query);
-            echo("+");
-          } 
-          else 
-          { 
-            echo("."); 
-          }
-          $volt_exists[] = "$id $volt_oid";
+          echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+          $volt_exists[$type][$index] = 1;
         }
       }
     }
@@ -93,29 +78,23 @@ if ($device['os'] == "linux")
 
 ## Delete removed sensors
 
-$sql = "SELECT * FROM voltage AS V, devices AS D WHERE V.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+if($debug) { print_r($volt_exists); }
 
+$sql = "SELECT * FROM voltage WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
-  while ($sensor = mysql_fetch_array($query)) 
+  while ($test_volt = mysql_fetch_array($query))
   {
-    unset($exists);
-    $i = 0;
-    while ($i < count($volt_exists) && !$exists) 
-    {
-      $thisvolt = $sensor['device_id'] . " " . $sensor['volt_oid'];
-      if ($volt_exists[$i] == $thisvolt) { $exists = 1; }
-      $i++;
-    }
-  
-    if (!$exists) 
-    { 
+    $index = $test_volt['volt_index'];
+    $type = $test_volt['volt_type'];
+    if($debug) { echo("$type -> $index\n"); }
+    if(!$volt_exists[$type][$index]) {
       echo("-");
-      mysql_query("DELETE FROM voltage WHERE volt_id = '" . $sensor['volt_id'] . "'"); 
+      mysql_query("DELETE FROM `voltage` WHERE volt_id = '" . $test_volt['volt_id'] . "'");
     }
   }
 }
 
-unset($volt_exists); echo("\n");
+unset($fan_exists); echo("\n");
 
 ?>
