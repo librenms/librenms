@@ -8,13 +8,14 @@ $port = $device['port'];
 echo("Fanspeeds : ");
 
 ## LMSensors Fanspeeds
-/*
 if ($device['os'] == "linux") 
 {
-  $oids = shell_exec($config['snmpwalk'] . " -m LM-SENSORS-MIB -$snmpver -CI -Osqn -c $community $hostname:$port lmTempSensorsDevice");
+  $oids = snmp_walk($device, "lmFanSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("LM-SENSORS ");
+  $precision = 1;
+  $type = 'lmsensors';
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -22,70 +23,48 @@ if ($device['os'] == "linux")
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
-      $fan_id = $split_oid[count($split_oid)-1];
-      $fan_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$fan_id";
-      $fan  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $fan_oid")) / 1000;
-      $descr = str_ireplace("temp-", "", $descr);
-      $descr = trim($descr);
-      if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND device_id = '$id'"),0) == '0') 
-      {
-        $query = "INSERT INTO fanspeed (`device_id`, `fan_oid`, `fan_descr`, `fan_precision`, `fan_limit`, `fan_current`) values ('$id', '$fan_oid', '$descr',1000, " . ($config['defaults']['fan_limit'] ? $config['defaults']['fan_limit'] : '60') . ", '$fan')";
-        mysql_query($query);
-        echo("+");
-      } 
-      elseif (mysql_result(mysql_query("SELECT `fan_descr` FROM fanspeed WHERE `device_id` = '$id' AND `fan_oid` = '$fan_oid'"), 0) != $descr) 
-      {
-        echo("U");
-        mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr' WHERE `device_id` = '$id' AND `fan_oid` = '$fan_oid'");
-      } 
-      else 
-      {
-        echo("."); 
-      } 
-      $fan_exists[] = "$id $fan_oid";
+      $index = $split_oid[count($split_oid)-1];
+      $oid  = ".1.3.6.1.4.1.2021.13.16.3.1.3.". $index;
+      $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB");
+      $descr = trim(str_ireplace("fan-", "", $descr));
+      discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL);
+      $fan_exists[$type][$index] = 1;
     }
   }
 }
-*/
+
 
 ## Supermicro Fanspeeds
 if ($device['os'] == "linux") 
 {
-  $oids = shell_exec($config['snmpwalk'] . " -m SUPERMICRO-HEALTH-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.10876.2.1.1.1.1.3 | sed s/1.3.6.1.4.1.10876.2.1.1.1.1.3.//g");
+  $oids = snmp_walk($device, "1.3.6.1.4.1.10876.2.1.1.1.1.3", "-OsqnU", "SUPERMICRO-HEALTH-MIB");
+  $oids = str_replace("1.3.6.1.4.1.10876.2.1.1.1.1.3.", "", $oids);
+  if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
+  $type = "supermicro";
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
     if ($data) 
     {
-      list($oid,$type) = explode(" ", $data);
-      if ($type == 0)
+      list($index,$kind) = explode(" ", $data);
+      if ($kind == 0)
       {
-        $fan_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4$oid";
-        $descr_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.2$oid";
-        $limit_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.6$oid";
-        $divisor_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$oid";
-        $monitor_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.10$oid";
-        $descr   = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-        $fan     = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $fan_oid"));
-        $limit   = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $limit_oid"));
-        $divisor = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $divisor_oid"));
-        $monitor = trim(shell_exec($config['snmpget'] . " -m SUPERMICRO-HEALTH-MIB -O qv -$snmpver -c $community $hostname:$port $monitor_oid"));
+        $oid           = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
+        $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2$index";
+        $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6$index";
+        $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$index";
+        $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10$index";
+        $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         if ($monitor == 'true')
         {
-          $descr = trim(str_replace(" Fan","",str_ireplace("Speed", "", $descr)));
-          if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE fan_oid = '$fan_oid' AND device_id = '$id'"),0) == '0') 
-          {
-            $query = "INSERT INTO fanspeed (`device_id`, `fan_oid`, `fan_descr`, `fan_current`, `fan_limit`) values ('$id', '$fan_oid', '$descr', '$fan', '$limit')";
-            mysql_query($query);
-            echo("+");
-          } 
-          else 
-          { 
-            echo("."); 
-          }
-          $fan_exists[] = "$id $fan_oid";
+          discover_fan($device, $oid, $index, $type, $descr, $precision = 1, NULL, $limit, $current);
+          $fan_exists[$type][$index] = 1;
         }
       }
     }
@@ -94,24 +73,19 @@ if ($device['os'] == "linux")
 
 ## Delete removed sensors
 
-$sql = "SELECT * FROM fanspeed AS V, devices AS D WHERE V.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+if($debug) { echo("\n Checking ... \n"); print_r($fan_exists); }
+
+$sql = "SELECT * FROM fanspeed WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
-  while ($sensor = mysql_fetch_array($query)) 
-  {
-    unset($exists);
-    $i = 0;
-    while ($i < count($fan_exists) && !$exists) 
-    {
-      $thisfan = $sensor['device_id'] . " " . $sensor['fan_oid'];
-      if ($fan_exists[$i] == $thisfan) { $exists = 1; }
-      $i++;
-    }
-    
-    if (!$exists) 
-    { 
+  while ($test_fan = mysql_fetch_array($query)) 
+  {  
+    if($debug) { echo("$fan_type -> $fan_index\n"); }
+    $fan_index = $test_fan['fan_index'];
+    $fan_type = $test_fan['fan_type'];
+    if(!$fan_exists[$fan_type][$fan_index]) {
       echo("-");
-      mysql_query("DELETE FROM fanspeed WHERE fan_id = '" . $sensor['fan_id'] . "'"); 
+      mysql_query("DELETE FROM `fanspeed` WHERE fan_id = '" . $test_fan['fan_id'] . "'");
     }
   }
 }
