@@ -91,3 +91,5 @@ CREATE TABLE IF NOT EXISTS `processors` (  `processor_id` int(11) NOT NULL AUTO_
 ALTER TABLE  `processors` ADD `hrDeviceIndex` int(11) NULL AFTER `entPhysicalIndex`
 ALTER TABLE  `temperature` CHANGE  `temp_current`  `temp_current` FLOAT( 4 ) NOT NULL DEFAULT  '0'
 ALTER TABLE  `processors` ADD `processor_index` varchar(32) NOT NULL AFTER `processor_oid`
+ALTER TABLE  `processors` CHANGE `processor_description` `processor_descr` varchar(64) NOT NULL
+ALTER TABLE  `fanspeed` CHANGE `fan_mibtype` `fan_type` varchar(64) NOT NULL
