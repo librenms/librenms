@@ -58,8 +58,8 @@ while($row = mysql_fetch_array($data)) {
   if($response != $index) {
     mysql_query("DELETE from interfaces where interface_id = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '" . $row['interface_id'] . "'");
-    mysql_query("DELETE from `links` WHERE `src_if` = '" . $row['interface_id'] . "'");
-    mysql_query("DELETE from `links` WHERE `dst_if` = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `links` WHERE `local_interface_id` = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from `links` WHERE `remote_interface_id` = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '" . $row['interface_id'] . "'");
     echo("Removed interface " . $row['ifDescr'] . " from " . $row['hostname'] . "<br />");
   }
@@ -78,11 +78,11 @@ while ($interface = mysql_fetch_array($interface_query)) {
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at end\n");
 
 echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at start\n");
-$link_query = mysql_query("SELECT id,src_if,dst_if FROM `links`");
+$link_query = mysql_query("SELECT id,local_interface_id,remote_interface_id FROM `links`");
 while ($link = mysql_fetch_array($link_query)) {
   $id = $link['id'];
-  $src = $link['src_if'];
-  $dst = $link['dst_if'];
+  $src = $link['local_interface_id'];
+  $dst = $link['remote_interface_id'];
   if(mysql_result(mysql_query("SELECT COUNT(interface_id) FROM `interfaces` WHERE `interface_id` = '$src'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `interface_id` = '$dst'"), 0) == '0') {
     mysql_query("delete from links where `id` = '$id'");
     echo("Deleting link $id \n");

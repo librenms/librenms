@@ -1,9 +1,11 @@
 #!/usr/bin/php
 <?php
 
+
 include("config.php");
 include("includes/functions.php");
 include("includes/functions-poller.inc.php");
+include("includes/discovery/functions.inc.php");
 
 $start = utime();
 

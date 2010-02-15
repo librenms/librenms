@@ -29,7 +29,7 @@ while($loc_data = mysql_fetch_array($loc_result)) {
   while($dev_data = mysql_fetch_array($dev_result)) {
         $device_id = $dev_data['device_id'];
 
-#    if(mysql_result(mysql_query("SELECT count(*) from links WHERE src_if = '$device_id' OR dst_if = '$device_id'"),0)) {
+#    if(mysql_result(mysql_query("SELECT count(*) from links WHERE local_interface_id = '$device_id' OR remote_interface_id = '$device_id'"),0)) {
 	$host = $dev_data['hostname'];
         unset($hostinfo);	
         if(strpos($host, "cust." . $config['mydomain'])) { $hostinfo = "shape=egg style=filled fillcolor=pink"; }
@@ -58,16 +58,16 @@ echo("\n}\n");
 
 }
 
-$links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE  I.device_id = D.device_id AND X.device_id = Y.device_id AND L.src_if = I.interface_id AND X.interface_id = L.dst_if";
+$links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE  I.device_id = D.device_id AND X.device_id = Y.device_id AND L.local_interface_id = I.interface_id AND X.interface_id = L.remote_interface_id";
 
 $links_result = mysql_query($links_sql);
 while($link_data = mysql_fetch_array($links_result)) {
 
-	$src_if = $link_data['src_if'];
-	$dst_if = $link_data['dst_if'];
+	$local_interface_id = $link_data['local_interface_id'];
+	$remote_interface_id = $link_data['remote_interface_id'];
 
-        $sq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$src_if'"));
-        $dq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$dst_if'"));
+        $sq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$local_interface_id'"));
+        $dq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$remote_interface_id'"));
 
         $src = $sq[0];
         $dst = $dq[0];

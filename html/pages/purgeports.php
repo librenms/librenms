@@ -24,8 +24,8 @@
 
      mysql_query("DELETE FROM `pseudowires` WHERE `interface_id` = '$interface_id'");
      mysql_query("DELETE FROM `mac_accounting` WHERE `interface_id` = '$interface_id'");
-     mysql_query("DELETE FROM `links` WHERE `src_if` = '$interface_id'");
-     mysql_query("DELETE FROM `links` WHERE `dst_if` = '$interface_id'");
+     mysql_query("DELETE FROM `links` WHERE `local_interface_id` = '$interface_id'");
+     mysql_query("DELETE FROM `links` WHERE `remote_interface_id` = '$interface_id'");
      mysql_query("DELETE FROM `interfaces_perms` WHERE `interface_id` = '$interface_id'");
      mysql_query("DELETE FROM `interfaces` WHERE `interface_id` = '$interface_id'");
   }

@@ -136,7 +136,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
     list($oid,$value) = explode("=", $entry);
-    $oid = trim($oid); $value = trim($value);
+    $oid = trim($oid); $value = trim($value); $value = str_replace("\"", "", $value);
     list($oid, $first, $second) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
       $array[$device_id][$first][$second][$oid] = $value;
@@ -155,7 +155,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
     list($oid,$value) = explode("=", $entry);
-    $oid = trim($oid); $value = trim($value);
+    $oid = trim($oid); $value = trim($value); $value = str_replace("\"", "", $value);
     list($oid, $first, $second, $third) = explode(".", $oid);
     if($debug) {echo("$entry || $oid || $first || $second || $third\n");}
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second) && isset($third)) {
