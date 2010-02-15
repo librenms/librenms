@@ -47,8 +47,9 @@ if ($device['os'] == "linux")
     $data = trim($data);
     if ($data) 
     {
-      list($index,$kind) = explode(" ", $data);
+      list($oid,$kind) = explode(" ", $data);
       $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-1];
       if ($kind == 0)
       {
         $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
