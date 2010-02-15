@@ -52,19 +52,19 @@ if ($device['os'] == "linux")
       $index = $split_oid[count($split_oid)-1];
       if ($kind == 0)
       {
-        $oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
-        $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2$index";
-        $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6$index";
-        $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$index";
-        $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10$index";
+        $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4.$index";
+        $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2.$index";
+        $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6.$index";
+        $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9.$index";
+        $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10.$index";
         $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $current       = snmp_get($device, $oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         if ($monitor == 'true')
         {
-          discover_fan($device, $oid, $index, $type, $descr, $precision = 1, NULL, $limit, $current);
+          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision = 1, NULL, $limit, $current);
           $fan_exists[$type][$index] = 1;
         }
       }
@@ -81,9 +81,9 @@ if ($query = mysql_query($sql))
 {
   while ($test_fan = mysql_fetch_array($query)) 
   {  
-    if($debug) { echo("$fan_type -> $fan_index\n"); }
     $fan_index = $test_fan['fan_index'];
     $fan_type = $test_fan['fan_type'];
+    if($debug) { echo("$fan_type -> $fan_index\n"); }
     if(!$fan_exists[$fan_type][$fan_index]) {
       echo("-");
       mysql_query("DELETE FROM `fanspeed` WHERE fan_id = '" . $test_fan['fan_id'] . "'");
