@@ -27,7 +27,7 @@ if ($device['os'] == "linux")
       $oid  = ".1.3.6.1.4.1.2021.13.16.3.1.3.". $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB");
       $descr = trim(str_ireplace("fan-", "", $descr));
-      discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL);
+      discover_fan($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
       $fan_exists[$type][$index] = 1;
     }
   }
@@ -64,7 +64,7 @@ if ($device['os'] == "linux")
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         if ($monitor == 'true')
         {
-          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision = 1, NULL, $limit, $current);
+          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision, NULL, $limit, $current);
           $fan_exists[$type][$index] = 1;
         }
       }
