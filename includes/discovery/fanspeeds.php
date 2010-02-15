@@ -51,7 +51,7 @@ if ($device['os'] == "linux")
       list($index,$kind) = explode(" ", $data);
       if ($kind == 0)
       {
-        $oid           = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
+        $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4$index";
         $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2$index";
         $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6$index";
         $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9$index";
