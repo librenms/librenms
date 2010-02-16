@@ -62,6 +62,7 @@ if ($device['os'] == "linux")
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $descr         = str_replace(' Fan Speed','',$descr);
         if ($monitor == 'true')
         {
           echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision, $limit, NULL, $current);

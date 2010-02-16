@@ -37,7 +37,7 @@ while($voltage = mysql_fetch_array($volt_data)) {
     $msg .= "V) at " . date('l dS F Y h:i:s A');
     mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $voltage['volt_descr'] . "\n");
-    eventlog('Voltage ' . $voltage['volt_descr'] . " under threshold: " . $voltage['volt_current'] . " rpm (&gt; " . $voltage['volt_limit'] . " rpm)", $device['device_id']);
+    eventlog('Voltage ' . $voltage['volt_descr'] . " under threshold: " . $voltage['volt_current'] . " V (&gt; " . $voltage['volt_limit'] . " V)", $device['device_id']);
   }
   else if($voltage['volt_current'] < $voltage['volt_limit'] && $volt >= $voltage['volt_limit']) 
   {
@@ -46,7 +46,7 @@ while($voltage = mysql_fetch_array($volt_data)) {
     $msg .= "V) at " . date('l dS F Y h:i:s A');
     mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $voltage['volt_descr'] . "\n");
-    eventlog('Voltage ' . $voltage['volt_descr'] . " above threshold: " . $voltage['volt_current'] . " rpm (&gt; " . $voltage['volt_limit'] . " rpm)", $device['device_id']);
+    eventlog('Voltage ' . $voltage['volt_descr'] . " above threshold: " . $voltage['volt_current'] . " V (&gt; " . $voltage['volt_limit'] . " V)", $device['device_id']);
   }
 
   mysql_query("UPDATE voltage SET volt_current = '$volt' WHERE volt_id = '" . $voltage['volt_id'] . "'");

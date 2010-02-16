@@ -55,8 +55,8 @@ if ($device['os'] == "linux")
         $volt_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4.".$index;
         $descr_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.2.".$index;
         $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10.".$index;
-        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
-        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
+        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
+        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
 
         $descr    = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
