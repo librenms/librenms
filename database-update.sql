@@ -99,3 +99,4 @@ ALTER TABLE `links` CHANGE `cdp` `vendor` VARCHAR( 11 ) NULL DEFAULT NULL;
 ALTER TABLE `links` ADD `remote_hostname` VARCHAR( 128 ) NOT NULL ,ADD `remote_port` VARCHAR( 128 ) NOT NULL ,ADD `remote_platform` VARCHAR( 128 ) NOT NULL ,ADD `remote_version` VARCHAR( 256 ) NOT NULL ;
 ALTER TABLE `links` CHANGE `src_if` `local_interface_id` INT( 11 ) NULL DEFAULT NULL ,CHANGE `dst_if` `remote_interface_id` INT( 11 ) NULL DEFAULT NULL ;
 ALTER TABLE `links` CHANGE `vendor` `protocol` VARCHAR( 11 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
+ALTER TABLE `processors` CHANGE `processor_type` `processor_type` varchar(16) NOT NULL;
