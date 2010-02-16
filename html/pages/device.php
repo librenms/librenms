@@ -172,7 +172,15 @@ echo('<li class="' . $select['syslog'] . '">
 '); 
 }
 
-if($_SESSION['userlevel'] >= "5" && is_file($config['rancid_configs'] . $device['hostname'])) {
+
+
+if($_SESSION['userlevel'] >= "5") {
+  if(!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
+  foreach($config['rancid_configs'] as $configs) {
+    if(is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
+  }
+}
+if($device_config_file) {
   echo('<li class="' . $select['showconfig'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/showconfig/">
     <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
