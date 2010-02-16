@@ -248,18 +248,17 @@ function percent_colour($perc)
 
 function print_error($text)
 {
-  echo("<table class=errorbox cellpadding=3><tr><td><img src='/images/15/exclamation.png' align=absmiddle> $text</td></tr></table>");
+  echo('<table class="errorbox" cellpadding="3"><tr><td><img src="/images/15/exclamation.png" align="absmiddle">'.$text.'</td></tr></table>');
 }
 
 function print_message($text)
 {
-  echo("<table class=messagebox cellpadding=3><tr><td><img src='/images/16/tick.png' align=absmiddle> $text</td></tr></table>");
+  echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle">'.$text.'</td></tr></table>');
 }
 
 function interface_rates ($rrd_file)  // Returns the last in/out value in RRD
 {
   global $config;
-  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd  = $config['rrdtool']." fetch -s -600s -e now $rrd_file AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
   $data = trim(`$cmd`);
   foreach( explode("\n", $data) as $entry) {
@@ -273,7 +272,6 @@ function interface_rates ($rrd_file)  // Returns the last in/out value in RRD
 function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
-  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
   foreach( explode("\n", $data) as $entry) {
@@ -289,7 +287,6 @@ function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/ou
 function interface_packets ($rrd_file) // Returns the last in/out pps value in RRD
 {
   global $config;
-  #$rrdfile = $config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd";
   $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 6,7";
   $data = trim(shell_exec($cmd));
   foreach( explode("\n", $data) as $entry) {
@@ -367,7 +364,7 @@ function device_traffic_image($device, $width, $height, $from, $to)
 function devclass($device) 
 {
    if (isset($device['status']) && $device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
-   if (isset($device['ignore']) &&$device['ignore'] == '1') {
+   if (isset($device['ignore']) && $device['ignore'] == '1') {
      $class = "list-device-ignored";
      if (isset($device['status']) && $device['status'] == '1') { $class = "list-device-ignored-up"; }
    }
@@ -806,8 +803,9 @@ function get_astext($asn)
     {
       $result = dns_get_record("AS$asn.asn.cymru.com",DNS_TXT);
       $txt = explode('|',$result[0]['txt']);
-      $cache['astext'][$asn] = $txt[4];
-      return trim(str_replace('"', '', $txt[4]));
+      $result = trim(str_replace('"', '', $txt[4]));
+      $cache['astext'][$asn] = $result;
+      return $result;
     }
   }
 }
