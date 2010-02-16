@@ -56,15 +56,15 @@ if ($device['os'] == "linux")
         $volt_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.4.".$index;
         $descr_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.2.".$index;
         $monitor_oid  = "1.3.6.1.4.1.10876.2.1.1.1.1.10.".$index;
-        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
-        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
+        $limit_oid    = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
+        $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
 
-        $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $current       = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-	$lowlimit      = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $descr   = trim(str_ireplace("Voltage", "", $descr));
+        $descr    = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $limit    = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+	$lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $monitor  = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $descr    = trim(str_ireplace("Voltage", "", $descr));
 
         if ($monitor == 'true')
         {
