@@ -30,7 +30,9 @@ if($device['os'] == "ironware")
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
         $descr = str_replace("sensor", "Sensor", $descr);
-	$descr = str_replace("Line module", "Line Mod", $descr);
+	$descr = str_replace("Line module", "Slot", $descr);
+	$descr = str_replace("Switch Fabric module", "Fabric", $descr);
+        $descr = str_replace("Active management module", "Mgmt Module", $descr);
         $descr = str_replace("  ", " ", $descr);
         $descr = trim($descr);
         if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0')

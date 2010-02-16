@@ -28,7 +28,7 @@ if(mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE device
     $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['temp_descr'];
     $temp_link .= "</div><div style=\'width: 750px\'><img src=\'$temp_day\'><img src=\'$temp_week\'><img src=\'$temp_month\'><img src=\'$temp_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
-    $temp_link_c = $temp_link . "<span style='color: $temp_colour'>" . $temp['temp_current'] . "&deg;C</span></a>";
+    $temp_link_c = $temp_link . "<span style='color: $temp_colour'>" . round($temp['temp_current'],0) . "&deg;C</span></a>";
     $temp_link_b = $temp_link . $temp_minigraph . "</a>";
     $temp_link_a = $temp_link . $temp['temp_descr'] . "</a>";
 
