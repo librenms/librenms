@@ -33,6 +33,8 @@ Observer to see the interface the name should start with "temp-" (i.e.
 temp-CPU, temp-System). You can change this in /etc/sensors.conf - change
 the label descriptions if necessary, under your specific chipset block.
 
+Simiarly fans and voltages should be prefixed with fan- and volt-
+
 Papouch TME
 ===========
 
