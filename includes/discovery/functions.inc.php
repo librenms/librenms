@@ -58,7 +58,7 @@ function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $lo
       if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE device_id = '".$device['device_id']."' AND volt_type = '$type' AND `volt_index` = '$index'"),0) == '0')
       {
         $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_index`, `volt_type`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_limit_low`, `volt_current`) ";
-        $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$low_limit', '$volt_limit_low', '$current')";
+        $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
         mysql_query($query);
         if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
         echo("+");
