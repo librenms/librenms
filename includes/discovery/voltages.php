@@ -26,7 +26,6 @@ if ($device['os'] == "linux")
       $index = $split_oid[count($split_oid)-1];
       $oid  = ".1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $precision;
-      $descr = trim(str_ireplace("volt-", "", $descr));
       discover_volt($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
       $volt_exists[$type][$index] = 1;
     }
@@ -60,9 +59,9 @@ if ($device['os'] == "linux")
         $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.5.".$index;
 
         $descr    = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $limit    = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-	$lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
+        $limit    = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
+	$lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
         $monitor  = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr    = trim(str_ireplace("Voltage", "", $descr));
 
