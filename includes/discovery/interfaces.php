@@ -35,12 +35,8 @@
           # Add Interface
            echo("+");
         } else {
-          if(isset($interface['deleted']) && $interface['deleted']) {
             mysql_query("UPDATE `interfaces` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
-            echo("*"); 
-          } else {
             echo(".");
-          }
         }
         $int_exists[] = "$ifIndex";
       } else { 
