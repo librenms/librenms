@@ -81,7 +81,12 @@ while ($device = mysql_fetch_array($device_query)) {
 foreach ($devices as $device)
 {
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
+  if($device['os'] != strtolower($device['os'])) {
+    mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
+    $device['os'] = strtolower($device['os']); echo("OS lowercased.");
+  }
   if($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
+
   echo("\n");
 
   ## Discover OS Changes
