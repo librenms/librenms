@@ -22,7 +22,9 @@ else
 
 
   $peer_query = mysql_query("select * from bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id $where ORDER BY D.hostname, B.bgpPeerRemoteAs, B.bgpPeerIdentifier");
-  while($peer = mysql_fetch_array($peer_query)) {
+  while($peer = mysql_fetch_array($peer_query))
+  {
+    unset($bg_image);
 
     if(!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
 
