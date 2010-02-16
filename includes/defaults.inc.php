@@ -1,5 +1,8 @@
 <?php
 
+### Temporary Directory for graph generation
+$config['temp_dir']     = "/tmp";
+
 ### Location of executables
 
 $config['sipcalc']      = "/usr/bin/sipcalc";
