@@ -59,18 +59,27 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if ($pingable) { echo("Pings : yes :)\n"); } else { echo("Pings : no :(\n"); }
 
-  $snmpable = FALSE;
-
   if ($pingable) {
-    $snmpable = isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
-    if ($snmpable) { echo("SNMP : yes :)\n"); } else { echo("SNMP : no :(\n"); }
+    if (isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port'])) { 
+      echo("SNMP : yes :)\n"); 
+      $status = "1";
+    } else { 
+      echo("SNMP : no :(\n"); 
+      $status = "0";
+    }
+  } else { 
+    $status = "0";
   }
 
-  unset($snmpdata);
+  if ( $device['status'] != $status ) {
+    $update .= $seperator . "`status` = '$status'";
+    $seperator = ", ";
+    mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
+    mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
+    eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
+  }
 
-  if ($snmpable) { 
-
-    $status = '1';
+  if ($status) { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
     $snmpdata = shell_exec($snmp_cmd);
@@ -98,7 +107,6 @@ while ($device = mysql_fetch_array($device_query)) {
     }else{
       echo("Generic :(");
     }
-
 
     $sysLocation = str_replace("\"","", $sysLocation); 
   
@@ -180,22 +188,10 @@ while ($device = mysql_fetch_array($device_query)) {
     $seperator = ", ";
   } 
   $update .= $seperator . "`last_polled` = NOW()";
+  $seperator = ", ";
   $polled_devices++;
   echo("\n");
-  } else {
-    $update_query  = "UPDATE `devices` SET ";
-    $update_query .= " `status` = '0'";
-    $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . "\n");
-    $update_result = mysql_query($update_query);
-  }
-
-  if ( $device['status'] != $status ) {
-    $update .= $seperator . "`status` = '$status'";
-    $seperator = ", ";
-    mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
-    eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
-  }
+  } 
 
   if ($update) {
     $update_query  = "UPDATE `devices` SET ";

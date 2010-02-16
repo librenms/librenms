@@ -7,8 +7,8 @@ if(strpos($sysDescr, "olive")) {
   $hardware = "Olive";
   $serial = "";
 } else {
-  $hardware = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.2.0", "OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
-  $serial   = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.3.0", "OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
+  $hardware = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.2.0", "-OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
+  $serial   = snmp_get($device, ".1.3.6.1.4.1.2636.3.1.3.0", "-OQv", "+JUNIPER-MIB", "+".$config['install_dir']."/mibs/junos");
   list(,$hardware,) = explode(" ", $hardware);
   $hardware = "Juniper " . $hardware;
 }
