@@ -1,10 +1,15 @@
 <?php
 
-function print_percentage_bar ($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background) {
-  $output = "<div style='font-size:11px;'><div style=' width:".$width."px; height:".$height."px; background-color:#".$right_background.";'>
-  <div style='width:".$percent."%; height:".$height."px; background-color:#".$left_background."; border-right:0px white solid;'></div>
-  <div style='margin-top:-".($height + 2)."px; color:#".$left_colour."; padding-left:4px;'><b>".$left_text."</b></div>
-  <div style='text-align:right; margin-top:-".($height + 2)."px; color:#".$right_colour."; padding-right:4px;'><b>".$right_text."</b></div></div>";
+function print_percentage_bar ($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background) 
+{
+  $output = '
+<div style="font-size:11px;">
+  <div style=" width:'.$width.'px; height:'.$height.'px; background-color:#'.$right_background.';">
+    <div style="width:'.$percent.'%; height:'.$height.'px; background-color:#'.$left_background.'; border-right:0px white solid;"></div>
+    <div style="vertical-align: center;height: '.$height.'px;margin-top:-'.($height + 2).'px; color:#'.$left_colour .'; padding-left :4px;"><b>'.$left_text.'</b></div>
+    <div style="vertical-align: center;height: '.$height.'px;margin-top:-'.($height + 2).'px; color:#'.$right_colour.'; padding-right:4px;text-align:right;"><b>'.$right_text.'</b></div>
+  </div>
+</div>';
   return $output;
 }
 
