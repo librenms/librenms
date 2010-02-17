@@ -145,7 +145,7 @@ function getHostOS($device)
   }
   closedir($dir_handle);
   
-  if ($os) { return $os; } else { return FALSE; }
+  if ($os) { return $os; } else { return "generic"; }
 }
 
 function billpermitted($bill_id) 
