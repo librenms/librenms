@@ -1,0 +1,20 @@
+<?php
+
+$interface = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$entry[2]."'"));
+
+if(!$interface) {exit;}
+
+    $ifOperStatus = "down";
+    #$ifAdminStatus = "down";
+
+    log_event("SNMP Trap: linkDown " . $interface['ifDescr'], $device, "interface", $interface['interface_id']);
+
+    #if($ifAdminStatus != $interface['ifAdminStatus']) {
+    #  log_event("Interface Disabled : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
+    #}
+    if($ifOperStatus != $interface['ifOperStatus']) {
+      log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
+      mysql_query("UPDATE `interfaces` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
+    }
+
+?>

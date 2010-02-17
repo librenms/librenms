@@ -82,7 +82,6 @@ if(!$config['graph_colours']['mixed']) {
 $config['version'] = "0.10.0";
 
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
-# print_r($config['rrd_opts_array']);
 
 if($config['enable_nagios']) {
   $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
