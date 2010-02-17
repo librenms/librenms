@@ -89,5 +89,4 @@ rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
   list ($load1, $load5, $load10) = explode ("\n", $load_raw);
 
   rrdtool_update($loadrrd, "N:$load1:$load5:$load10");
-  rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:$memShared:$memBuffer:$memCached");
-
+  rrdtool_update($memrrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:".($memShared+0).":".($memBuffer+0).":".($memCached+0));

@@ -2,8 +2,8 @@
 
 $community = $device['community'];
 
-echo("Brocade FDP: ");
-
+if($device['os'] == "ironware") {
+echo(" Brocade FDP: ");
 $fdp_array = snmpwalk_cache_twopart_oid("snFdpCacheEntry", $device, array(), "FOUNDRY-SN-SWITCH-GROUP-MIB");
 $fdp_array = $fdp_array[$device['device_id']];
 if($fdp_array) {
@@ -27,12 +27,13 @@ if($fdp_array) {
     }
   }
 }
+}
+
 
 echo("\n");
 
-
-echo("CISCO-CDP-MIB: ");
-   
+if($device['os_group'] == "ios") {
+echo(" CISCO-CDP-MIB: ");  
 unset($cdp_array);
 $cdp_array = snmpwalk_cache_twopart_oid("cdpCache", $device, array(), "CISCO-CDP-MIB");
 $cdp_array = $cdp_array[$device['device_id']];
@@ -54,9 +55,10 @@ if($cdp_array) {
     }     
   }
 }
-if($debug) {echo("$cdp_links");}
+}
 
-echo("\nLLDP-MIB: ");
+
+echo(" LLDP-MIB: ");
 
 unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid("lldpRemoteSystemsData", $device, array(), "LLDP-MIB");

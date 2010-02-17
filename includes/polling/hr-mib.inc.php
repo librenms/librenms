@@ -34,6 +34,5 @@ if (!is_file($hrSystem_rrd)) {
 rrdtool_update($hrSystem_rrd,  "N:$hrSystemNumUsers:$hrSystemProcesses:$uptime");
 
 include("hr-mib_storage.inc.php");   // Run HOST-RESOURCES-MIB Storage
-#include("hr-mib_processor.inc.php"); // Run HOST-RESOURCES-MIB ProcessorLoad
 
 ?>

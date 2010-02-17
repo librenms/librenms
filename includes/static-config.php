@@ -42,6 +42,7 @@ $os_text['catos']        = "Cisco CatOS";
 $os_text['nxos']         = "Cisco NX-OS";
 $os_text['asa']          = "Cisco ASA";
 $os_text['pix']          = "Cisco PIX";
+$os_text['generic']	 = "Generic Device";
 $os_text['ironware']	 = "Brocade IronWare";
 $os_text['freebsd']      = "FreeBSD";
 $os_text['openbsd']      = "OpenBSD";
