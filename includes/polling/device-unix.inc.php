@@ -12,7 +12,7 @@
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
         list(,,$hardware) = explode ("$features", $sysDescr);
-      } elseif ($device['os'] == "openbsd") {
+      } elseif ($device['os'] == "openbsd" || $device['os'] == "solaris" || $device['os'] == "opensolaris") {
         list(,,$version,$features,$hardware) = explode (" ", $sysDescr);
         $features = str_replace("(", "", $features);
         $features = str_replace(")", "", $features);
@@ -36,6 +36,8 @@
         $hw = trim(str_replace("\"", "", `$cmd`));
         if(strpos($hw, "No") !== FALSE) { unset($hw); } else { $hardware = "Dell " . $hw; }
       }
+
+echo("$version - $hardware - $features ");
 
 include("ucd-mib.inc.php");
 include("hr-mib.inc.php");

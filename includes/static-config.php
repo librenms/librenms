@@ -24,6 +24,7 @@ $os_groups['openbsd']   = "unix";
 $os_groups['netbsd']    = "unix";
 $os_groups['dragonfly'] = "unix";
 $os_groups['solaris']   = "unix";
+$os_groups['opensolaris'] = "unix";
 
 $os_groups['iosxe']     = "ios";
 $os_groups['iosxr']     = "ios";
@@ -46,6 +47,8 @@ $os_text['freebsd']      = "FreeBSD";
 $os_text['openbsd']      = "OpenBSD";
 $os_text['netbsd']       = "NetBSD";
 $os_text['dragonflybsd'] = "DragonFlyBSD";
+$os_text['solaris']	 = "Sun Solaris";
+$os_text['opensolaris']  = "OpenSolaris";
 $os_text['powerconnect'] = "Dell PowerConnect";
 $os_text['windows']      = "Microsoft Windows";
 $os_text['junos']        = "Juniper JUNOS";
