@@ -24,7 +24,11 @@ $os_groups['openbsd']   = "unix";
 $os_groups['netbsd']    = "unix";
 $os_groups['dragonfly'] = "unix";
 $os_groups['solaris']   = "unix";
+
+$os_groups['adva']	= "unix";
+
 $os_groups['opensolaris'] = "unix";
+
 
 $os_groups['iosxe']     = "ios";
 $os_groups['iosxr']     = "ios";
