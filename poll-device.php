@@ -42,7 +42,7 @@ echo("Starting polling run:\n\n");
 $polled_devices = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
-  $status = 0;
+  $status = 0; unset($array);
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
   if ($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
