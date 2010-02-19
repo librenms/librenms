@@ -37,8 +37,8 @@ if($_POST['program']) {
   $where .= " AND program = '".$_POST['program']."'";
 }
 
-$sql =  "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
-$sql .= " ORDER BY datetime DESC LIMIT 1000";
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
+$sql .= " ORDER BY timestamp DESC LIMIT 1000";
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
