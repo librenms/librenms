@@ -65,15 +65,11 @@ function process_syslog ($entry, $update) {
       }
     }
     $x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mysql_real_escape_string($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
-    $entry['processed'] = 1;
+    $x  = "INSERT INTO `syslog` (`device_id`,`program`,`facility`,`priority`, `level`, `tag`, `msg`, `timestamp`) ";
+    $x .= "VALUES ('".$entry['device_id']."','".$entry['program']."','".$entry['facility']."','".$entry['priority']."', '".$entry['level']."', '".$entry['tag']."', '".$entry['msg']."','".$entry['timestamp']."')";   
     if($update) { mysql_query($x); }
+    if(mysql_affected_rows() > "0") { shell_exec("echo written $x >> /tmp/syslog"); } else { echo(mysql_error()); }
     unset ($fix);
-  } else {
-     $x = "DELETE FROM `syslog` where `seq` = '" . $entry['seq'] . "'"; 
-     if($update) { mysql_query($x);}
-
-     $entry['deleted'] = '1';
-
   }
 
   return $entry; 

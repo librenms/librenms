@@ -99,7 +99,7 @@ if($config['enable_syslog']) {
     <h3>Recent Syslog Messages</h3>
   ");
 
-  $sql = "SELECT *, DATE_FORMAT(datetime, '%D %b %T') AS date from syslog ORDER BY datetime DESC LIMIT 20";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
   $query = mysql_query($sql);
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
   while($entry = mysql_fetch_array($query)) { 
