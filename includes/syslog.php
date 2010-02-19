@@ -10,23 +10,17 @@ function process_syslog ($entry, $update) {
     }
   }
 
-  $device_id_host = @mysql_result(mysql_query("SELECT device_id FROM devices WHERE `hostname` = '".$entry['host']."'"),0);
+  $device_id_host = @mysql_result(mysql_query("SELECT device_id FROM devices WHERE `hostname` = '".$entry['host']."' OR `sysName` = '".$entry['host']."'"),0);
 
   if($device_id_host) { 
     $entry['device_id'] = $device_id_host;
   } else {
     $device_id_ip = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE 
     A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id"),0);
-
-    #echo("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE
-    #A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id");
-
     if($device_id_ip) { 
       $entry['device_id'] = $device_id_ip;
     }
   } 
-
-  print_r($entry);
 
   if($entry['device_id'] && !$delete) {
     $os = mysql_result(mysql_query("SELECT `os` FROM `devices` WHERE `device_id` = '".$entry['device_id']."'"),0);
@@ -40,7 +34,6 @@ function process_syslog ($entry, $update) {
         $entry['msg'] = preg_replace("/^.*[0-9]:/", "", $entry['msg']);
         $entry['msg'] = preg_replace("/^[0-9][0-9]\ [A-Z]{3}:/", "", $entry['msg']);
         $entry['msg'] = preg_replace("/^(.+?):\ /", "\\1||", $entry['msg']);
-        #$entry['msg'] = "||" . $entry['msg'];
       }
 
       $entry['msg'] = preg_replace("/^.+\.[0-9]{3}:/", "", $entry['msg']);
@@ -67,8 +60,7 @@ function process_syslog ($entry, $update) {
     $x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mysql_real_escape_string($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
     $x  = "INSERT INTO `syslog` (`device_id`,`program`,`facility`,`priority`, `level`, `tag`, `msg`, `timestamp`) ";
     $x .= "VALUES ('".$entry['device_id']."','".$entry['program']."','".$entry['facility']."','".$entry['priority']."', '".$entry['level']."', '".$entry['tag']."', '".$entry['msg']."','".$entry['timestamp']."')";   
-    if($update) { mysql_query($x); }
-    if(mysql_affected_rows() > "0") { shell_exec("echo written $x >> /tmp/syslog"); } else { echo(mysql_error()); }
+    if($update && $entry['device_id']) { mysql_query($x); }
     unset ($fix);
   }
 

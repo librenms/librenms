@@ -26,7 +26,7 @@
           echo("Moved RRD ");
         }
 
-        if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) 
+        if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" && $descr != "An electronic chip that makes the computer work.") 
         {
           if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = 'hr'"),0) == '0') {
             $query = "INSERT INTO processors (`hrDeviceIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`)

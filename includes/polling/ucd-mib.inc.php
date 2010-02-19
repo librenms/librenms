@@ -37,7 +37,7 @@ if (!is_file($cpurrd)) {
      RRA:MAX:0.5:288:800");
 }
 
-rrdtool_update($cpurrd,  "N:$cpuUser:$cpuSystem:$cpuNice:$cpuIdle");
+rrdtool_update($cpurrd,  "N:".($cpuUser+0).":".($cpuSystem+0).":".($cpuNice+0).":".($cpuIdle+0));
 
 
   if (!is_file($memrrd)) {
