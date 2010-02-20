@@ -1,12 +1,12 @@
 <?php
 
-if($_GET['port']) { $interfaces = $_GET['port']; }
-if($_GET['interfaces']) { $interfaces = $_GET['interfaces']; }
+if($_GET['port']) { $ports = $_GET['port']; }
+if($_GET['ports']) { $ports = $_GET['ports']; }
 
 
 $i = 1;
-foreach(explode(",", $interfaces) as $ifid) {
-  $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+foreach(explode(",", $ports) as $ifid) {
+  $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
   $int = mysql_fetch_row($query);
   if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . safename($int[0] . ".rrd"))) {
     $rrd_filenames[] = $config['rrd_dir'] . "/" . $int[1] . "/" . safename($int[0] . ".rrd");

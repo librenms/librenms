@@ -35,10 +35,10 @@ print_optionbar_end();
        echo("<tr bgcolor='$dev_colour'><td width=150>".generatedevicelink($device, shorthost($device['hostname'])));
 	if($device['vrf_name'] != $vrf['vrf_name']) { echo("<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name']."<br />Configured : ".$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <img align=absmiddle src=images/16/exclamation.png></a>"); }
        echo("</td><td>");
-       $interfaces = mysql_query("SELECT * FROM `interfaces` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
+       $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
        unset($seperator);
 
-       while($port = mysql_fetch_array($interfaces)) {
+       while($port = mysql_fetch_array($ports)) {
          $port = array_merge ($device, $port);
          if($_GET['opta']) {
            $port['width'] = "130";

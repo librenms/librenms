@@ -1,8 +1,8 @@
 <?php
 
-## Generate a list of interfaces and then call the multi_bits grapher to generate from the list
+## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE `ifAlias` LIKE 'Cust: ".mres($_GET['cust'])."%' AND D.device_id = I.device_id");
+$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE `ifAlias` LIKE 'Cust: ".mres($_GET['cust'])."%' AND D.device_id = I.device_id");
 while($int = mysql_fetch_array($query)) {
   if(is_file($config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd"))) {
     $rrd_filenames[] = $config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");

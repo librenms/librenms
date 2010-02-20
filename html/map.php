@@ -25,7 +25,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     {
       if($device)
       {
-        $sql = "SELECT * from interfaces AS I, links AS L WHERE I.device_id = ".$device['device_id']." AND L.local_interface_id = I.interface_id";
+        $sql = "SELECT * from ports AS I, links AS L WHERE I.device_id = ".$device['device_id']." AND L.local_interface_id = I.interface_id";
         $links = mysql_query($sql);
 
         if (mysql_num_rows($links))
@@ -64,11 +64,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             }
 
             $src = $device['hostname'];
-            $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `interfaces` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
-            $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `interfaces` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+            $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+            $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
 
-            $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE `interface_id`=" . $link['local_interface_id'])),$device);
-            $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE `interface_id`=" . $link['remote_interface_id'])));
+            $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
+            $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
 
             $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])

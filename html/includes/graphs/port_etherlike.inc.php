@@ -1,8 +1,8 @@
 <?php
 
-## Generate a list of interfaces and then call the multi_bits grapher to generate from the list
+## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.interface_id = '".mres($_GET['port'])."'
+$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.interface_id = '".mres($_GET['port'])."'
                       AND I.device_id = D.device_id");
 $port = mysql_fetch_array($query);
 

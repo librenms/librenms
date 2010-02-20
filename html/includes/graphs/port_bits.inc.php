@@ -5,7 +5,7 @@ if($_GET['id']) { $interface = $_GET['id'];
 } elseif($_GET['if']) { $interface = $_GET['if'];
 } elseif($_GET['interface']) { $interface = $_GET['interface']; }
 
-$query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.interface_id = '".$interface."'
+$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.interface_id = '".$interface."'
                       AND I.device_id = D.device_id");
 
 $port = mysql_fetch_array($query);

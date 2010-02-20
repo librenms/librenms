@@ -34,7 +34,7 @@
       <select name='ifSpeed' id='ifSpeed'>
       <option value=''>All Speeds</option>
       <?php
-        $query = mysql_query("SELECT `ifSpeed` FROM `interfaces` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
+        $query = mysql_query("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
         while($data = mysql_fetch_array($query)) {
           if ($data['ifSpeed'])
           {
@@ -50,7 +50,7 @@
       <select name='ifType' id='ifType'>
       <option value=''>All Media</option>
       <?php
-        $query = mysql_query("SELECT `ifType` FROM `interfaces` GROUP BY `ifType` ORDER BY `ifType`");
+        $query = mysql_query("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`");
         while($data = mysql_fetch_array($query)) {
           if ($data['ifType'])
           {
@@ -80,9 +80,9 @@
 <?php
 
 #if ($_SESSION['userlevel'] >= '5') {
-#  $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
+#  $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ORDER BY D.hostname, I.ifDescr";
 #} else {
-#  $sql = "SELECT * FROM `interfaces` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
+#  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
 #}
 
 
@@ -116,7 +116,7 @@ if($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
 if($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
 if($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
-$sql = "SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
+$sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
 
 $query = mysql_query($sql);
 

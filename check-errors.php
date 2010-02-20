@@ -10,7 +10,7 @@ if($argv[1]) { $where = "AND `interface_id` = '$argv[1]'"; }
 
 $i = '0';
 
-$interface_query = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id $where");
+$interface_query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where");
 while ($interface = mysql_fetch_array($interface_query)) {
   $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
   if($errors > '1') { 
@@ -21,7 +21,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
 echo("Checked $i Interfaces\n");
 
-if($errored) { ## If there are errored interfaces
+if($errored) { ## If there are errored ports
   $i=0;
   $msg = "Interfaces with errors : \n\n";
   foreach ($errored as $int) {

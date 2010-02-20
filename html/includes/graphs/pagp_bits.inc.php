@@ -1,10 +1,10 @@
 <?php
 
-## Generate a list of interfaces and then call the multi_bits grapher to generate from the list
+## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$parent = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE interface_id = '".mres($_GET['port'])."'"));
+$parent = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE interface_id = '".mres($_GET['port'])."'"));
 
-$query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$parent['device_id']."' AND `pagpGroupIfIndex` = '".$parent['ifIndex']."'");
+$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$parent['device_id']."' AND `pagpGroupIfIndex` = '".$parent['ifIndex']."'");
 
 $i=0;
 while($int = mysql_fetch_array($query)) {

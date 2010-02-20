@@ -71,7 +71,7 @@ if(is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
 </li>');
 }
 
-if(@mysql_result(mysql_query("select count(interface_id) from interfaces WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(@mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['ports'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
     <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
@@ -113,7 +113,7 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
 #}
 
 
-if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0)) {
+if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0)) {
   echo('<li class="' . $select['map'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/map/">
     <img src="images/16/chart_organisation.png" align="absmiddle" border="0" /> Map

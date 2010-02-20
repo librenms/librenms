@@ -1,6 +1,6 @@
 <?php
 
-  $sql  = "SELECT * FROM `interfaces` AS I, `devices` AS D";
+  $sql  = "SELECT * FROM `ports` AS I, `devices` AS D";
   $sql .= " WHERE I.ifAlias like 'Cust: %' AND I.device_id = D.device_id  ORDER BY I.ifAlias,D.hostname";
   $query = mysql_query($sql);
 

@@ -11,7 +11,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   }
   $type_where .= ") ";
 
-  $sql  = "select * from interfaces as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from ports as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($interface = mysql_fetch_array($query)) {
     $if_list .= $seperator . $interface['interface_id'];
@@ -24,7 +24,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   $types = implode(' + ',$types_array);
   
   echo("<tr bgcolor='$bg'>
-             <td><span class=list-large>Total Graph for interfaces of type : ".$types."</span></td></tr>");
+             <td><span class=list-large>Total Graph for ports of type : ".$types."</span></td></tr>");
 
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multi_bits";
@@ -33,7 +33,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
   echo("</td></tr>");
 
 
-  $sql  = "select * from interfaces as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from ports as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   while($interface = mysql_fetch_array($query)) {
     $done = "yes";

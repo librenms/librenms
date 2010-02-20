@@ -12,7 +12,7 @@
     list($oid, $mac) = explode(" ", $data);
     list($if, $first, $second, $third, $fourth) = explode(".", $oid);
     list($m_a, $m_b, $m_c, $m_d, $m_e, $m_f) = explode(":", $mac); 
-    $interface = mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
+    $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
     $ip = $first .".". $second .".". $third .".". $fourth;
     $m_a = zeropad($m_a);
     $m_b = zeropad($m_b);
@@ -44,7 +44,7 @@
     }
     $interface_id = $interface['interface_id'];
   }
-  $sql = "SELECT * from ipv4_mac AS M, interfaces as I WHERE M.interface_id = I.interface_id and I.device_id = '".$device['device_id']."'";
+  $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.interface_id = I.interface_id and I.device_id = '".$device['device_id']."'";
   $query = mysql_query($sql);
   while($entry = mysql_fetch_array($query)) {
     $entry_mac = $entry['mac_address'];

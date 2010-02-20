@@ -117,7 +117,7 @@
  } else {
 
  $query = mysql_query("SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
-                      `interfaces` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id
+                      `ports` AS I, `devices` AS D WHERE M.interface_id = '".$interface['interface_id']."' AND I.interface_id = M.interface_id
                       AND I.device_id = D.device_id ORDER BY bps DESC");
 
  while($acc = mysql_fetch_array($query)) { 
@@ -125,7 +125,7 @@
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."'"));
    $name = gethostbyaddr($addy['ipv4_address']);
 
-   $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE A.ipv4_address = '".$addy['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+   $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$addy['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
    if($arp_host) { $arp_name = generatedevicelink($arp_host); $arp_name .= " ".generateiflink($arp_host); } else { unset($arp_if); }
 
    if($name == $addy['ipv4_address']) { unset ($name); }

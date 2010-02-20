@@ -26,11 +26,11 @@
      mysql_query("DELETE FROM `mac_accounting` WHERE `interface_id` = '$interface_id'");
      mysql_query("DELETE FROM `links` WHERE `local_interface_id` = '$interface_id'");
      mysql_query("DELETE FROM `links` WHERE `remote_interface_id` = '$interface_id'");
-     mysql_query("DELETE FROM `interfaces_perms` WHERE `interface_id` = '$interface_id'");
-     mysql_query("DELETE FROM `interfaces` WHERE `interface_id` = '$interface_id'");
+     mysql_query("DELETE FROM `ports_perms` WHERE `interface_id` = '$interface_id'");
+     mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$interface_id'");
   }
 
-  $ports = mysql_query("SELECT * FROM `interfaces` WHERE `deleted` = '1'");
+  $ports = mysql_query("SELECT * FROM `ports` WHERE `deleted` = '1'");
   while($port = mysql_fetch_array($ports)) {
     echo("<div style='font-weight: bold;'>Deleting port " . $port['interface_id'] . " - " . $port['ifDescr'] );
     delete_port($port['interface_id']);

@@ -103,7 +103,7 @@
 echo("</td>");
      echo("<td width=375 valign=top class=interface-desc>");
      if ( strpos($interface['label'], "oopback") === false && !$graph_type) {
-       $link_query = mysql_query("select * from links AS L, interfaces AS I, devices AS D WHERE L.local_interface_id = '$if_id' AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id");
+       $link_query = mysql_query("select * from links AS L, ports AS I, devices AS D WHERE L.local_interface_id = '$if_id' AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
 #         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['label'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
@@ -119,7 +119,7 @@ echo("</td>");
         $nets_query = mysql_query($sql);
         while($net = mysql_fetch_array($nets_query)) {
           $ipv4_network_id = $net['ipv4_network_id'];
-          $sql = "SELECT I.interface_id FROM ipv4_addresses AS A, interfaces AS I, devices AS D
+          $sql = "SELECT I.interface_id FROM ipv4_addresses AS A, ports AS I, devices AS D
           WHERE A.interface_id = I.interface_id
           AND A.ipv4_network_id = '".$net['ipv4_network_id']."' AND D.device_id = I.device_id
           AND D.device_id != '".$device['device_id']."'";
@@ -139,7 +139,7 @@ echo("</td>");
 	$nets_query = mysql_query($sql);
         while($net = mysql_fetch_array($nets_query)) {
           $ipv6_network_id = $net['ipv6_network_id'];
-          $sql = "SELECT I.interface_id FROM ipv6_addresses AS A, interfaces AS I, devices AS D
+          $sql = "SELECT I.interface_id FROM ipv6_addresses AS A, ports AS I, devices AS D
           WHERE A.interface_id = I.interface_id
           AND A.ipv6_network_id = '".$net['ipv6_network_id']."' AND D.device_id = I.device_id 
           AND D.device_id != '".$device['device_id']."' AND A.ipv6_origin != 'linklayer' AND A.ipv6_origin != 'wellknown'";
@@ -158,7 +158,7 @@ echo("</td>");
 
      foreach($int_links as $int_link) {
 
-       $link_if = mysql_fetch_array(mysql_query("SELECT * from interfaces AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = '".$int_link."'"));
+       $link_if = mysql_fetch_array(mysql_query("SELECT * from ports AS I, devices AS D WHERE I.device_id = D.device_id and I.interface_id = '".$int_link."'"));
 
        echo("$br");
 
@@ -180,7 +180,7 @@ echo("</td>");
   while($pseudowire = mysql_fetch_array($pseudowires)) {
   #`interface_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
     $pw_peer_dev = mysql_fetch_array(mysql_query("SELECT * from `devices` WHERE `device_id` = '" . $pseudowire['peer_device_id'] . "'"));
-    $pw_peer_int = mysql_fetch_array(mysql_query("SELECT * from `interfaces` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
+    $pw_peer_int = mysql_fetch_array(mysql_query("SELECT * from `ports` AS I, pseudowires AS P WHERE I.device_id = '".$pseudowire['peer_device_id']."' AND
                                                                                                           P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
     $pw_peer_int = ifNameDescr($pw_peer_int);
@@ -188,14 +188,14 @@ echo("</td>");
     $br = "<br />";
   }
 
-  $members = mysql_query("SELECT * FROM `interfaces` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
+  $members = mysql_query("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
   while($member = mysql_fetch_array($members)) {
     echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generateiflink($member) . " (PAgP)</strong>");
     $br = "<br />";
   }
 
   if($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interface['ifIndex']) {
-    $parent = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE `ifIndex` = '".$interface['pagpGroupIfIndex']."' and `device_id` = '".$device['device_id']."'"));
+    $parent = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE `ifIndex` = '".$interface['pagpGroupIfIndex']."' and `device_id` = '".$device['device_id']."'"));
     echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generateiflink($parent) . " (PAgP)</strong>");
     $br = "<br />";
   }

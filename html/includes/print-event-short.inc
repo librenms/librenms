@@ -15,7 +15,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
       ".$entry['humandate']."
     </td>");
 
-  $if = mysql_fetch_array(mysql_query("SELECT * from interfaces AS I, devices as D where I.device_id = D.device_id AND I.interface_id = '".$entry['interface']."'"));
+  $if = mysql_fetch_array(mysql_query("SELECT * from ports AS I, devices as D where I.device_id = D.device_id AND I.interface_id = '".$entry['interface']."'"));
 
     echo("<td class=list-bold width=75>
       "  . generateiflink($if) . "

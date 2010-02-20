@@ -1,6 +1,6 @@
 <?php
 
-$interface = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$entry[2]."'"));
+$interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$entry[2]."'"));
 
 if(!$interface) {exit;}
 
@@ -14,7 +14,7 @@ if(!$interface) {exit;}
     #}
     if($ifOperStatus != $interface['ifOperStatus']) {
       log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
-      mysql_query("UPDATE `interfaces` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
+      mysql_query("UPDATE `ports` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
     }
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 
-$interface_query = mysql_query("select * from interfaces WHERE interface_id = '".$_GET['opta']."'");
+$interface_query = mysql_query("select * from ports WHERE interface_id = '".$_GET['opta']."'");
 $interface = mysql_fetch_array($interface_query);
 
  $port_details = 1;
@@ -42,7 +42,7 @@ $interface = mysql_fetch_array($interface_query);
    $broke = yes;
  }
 
- if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'"),0)) {
+ if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'"),0)) {
   $pagp = " | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/pagp/'>PAgP</a>";
  }
 

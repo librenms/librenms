@@ -41,11 +41,11 @@ if($_GET['opta'] == "details" ) {
      echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
      include("includes/device-header.inc");
      echo("</table>");
-     $interfaces = mysql_query("SELECT * FROM `interfaces` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
+     $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
      unset($seperator);
      echo("<table cellspacing=0 cellpadding=7>");
      $i=1;
-     while($interface = mysql_fetch_array($interfaces)) {
+     while($interface = mysql_fetch_array($ports)) {
        if(!is_integer($x/2)) {
          if(is_integer($i/2)) { $int_colour = $list_colour_a_a; } else { $int_colour = $list_colour_a_b; }
        } else {

@@ -23,7 +23,7 @@ function printEntPhysical($ent, $level, $class) {
        if($link) {echo("<a $link>");}
 
        if($ent['ifIndex']) {
-         $interface = mysql_fetch_array(mysql_query("SELECT * FROM `interfaces` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
+         $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
          $ent['entPhysicalName'] = generateiflink($interface);
                 }
 

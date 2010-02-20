@@ -1,6 +1,6 @@
 <?php 
 
-$sql = "SELECT * FROM ipv4_mac AS M, interfaces AS I WHERE I.interface_id = M.interface_id AND I.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM ipv4_mac AS M, ports AS I WHERE I.interface_id = M.interface_id AND I.device_id = '".$device['device_id']."'";
 $query = mysql_query($sql);
 
 echo("<table border=0 cellspacing=0 cellpadding=5 width=100%>");
@@ -8,7 +8,7 @@ $i = "1";
 
 while($arp = mysql_fetch_array($query)) {
   if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-  $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE A.ipv4_address = '".$arp['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+  $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$arp['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
   if($arp_host) { $arp_name = generatedevicelink($arp_host); } else { unset($arp_name); }
   if($arp_host) { $arp_if = generateiflink($arp_host); } else { unset($arp_if); }

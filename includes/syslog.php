@@ -15,7 +15,7 @@ function process_syslog ($entry, $update) {
   if($device_id_host) { 
     $entry['device_id'] = $device_id_host;
   } else {
-    $device_id_ip = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, interfaces AS I WHERE 
+    $device_id_ip = @mysql_result(mysql_query("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE 
     A.ipv4_address = '" . $entry['host']."' AND I.interface_id = A.interface_id"),0);
     if($device_id_ip) { 
       $entry['device_id'] = $device_id_ip;

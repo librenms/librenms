@@ -6,10 +6,10 @@ $overview = 1;
 
 #$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
 
-$interfaces['total'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '" . $device['device_id'] . "'"),0);
-$interfaces['up'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces  WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'up'"),0);
-$interfaces['down'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
-$interfaces['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE device_id = '" . $device['device_id'] . "' AND ifAdminStatus = 'down'"),0);
+$ports['total'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "'"),0);
+$ports['up'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'up'"),0);
+$ports['down'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
+$ports['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifAdminStatus = 'down'"),0);
 
 $services['total'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '" . $device['device_id'] . "'"),0);
 $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_host = '" . $device['device_id'] . "' AND service_status = '1' AND service_ignore ='0'"),0);
@@ -17,7 +17,7 @@ $services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM serv
 $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '" . $device['device_id'] . "' AND service_ignore = '1'"),0);
 
 if($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
-if($interfaces['down']) { $interfaces_colour = $warn_colour_a; } else { $interfaces_colour = $list_colour_a; }
+if($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
 
 echo("<div style='width: 50%; float: left;'>");
 

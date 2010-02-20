@@ -11,7 +11,7 @@
     list($if, $direction, $a_a, $a_b, $a_c, $a_d, $a_e, $a_f) = explode(".", $oid);
     $oid = "$a_a.$a_b.$a_c.$a_d.$a_e.$a_f";
     unset($interface);
-    $interface = mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
+    $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifIndex = '".$if."'"));
     $ah_a = zeropad(dechex($a_a));
     $ah_b = zeropad(dechex($a_b));
     $ah_c = zeropad(dechex($a_c));

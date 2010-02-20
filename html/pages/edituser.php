@@ -12,7 +12,7 @@ function getInterfaceList(sel)
                 var index = ajax.length;
                 ajax[index] = new sack();
 
-                ajax[index].requestFile = '<?php echo($config['base_url']); ?>/ajax/list_interfaces.php?device_id='+deviceId;    // Specifying which file to get
+                ajax[index].requestFile = '<?php echo($config['base_url']); ?>/ajax/list_ports.php?device_id='+deviceId;    // Specifying which file to get
                 ajax[index].onCompletion = function(){ createInterfaces(index) };       // Specify function that will be executed after file has been found
                 ajax[index].runAJAX();          // Execute AJAX function
         }
@@ -45,10 +45,10 @@ if($_GET['user_id']) {
   }
 
   if($_GET['action'] == "delifperm") {
-    mysql_query("DELETE FROM interfaces_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    mysql_query("DELETE FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
   }
   if($_GET['action'] == "addifperm") {
-    mysql_query("INSERT INTO interfaces_perms (`interface_id`, `user_id`) VALUES ('" . $_GET['interface_id'] . "', '" . $_GET['user_id'] . "')");
+    mysql_query("INSERT INTO ports_perms (`interface_id`, `user_id`) VALUES ('" . $_GET['interface_id'] . "', '" . $_GET['user_id'] . "')");
   }
 
   if($_GET['action'] == "delbillperm") {
@@ -98,7 +98,7 @@ echo("<table width=100%><tr><td valign=top width=33%>");
   echo("</td><td valign=top width=33%>");
   echo("<h3>Interface Access</h3>");
 
-  $interface_perm_data = mysql_query("SELECT * from interfaces_perms as P, interfaces as I, devices as D WHERE `user_id` = '" . $_GET['user_id'] .
+  $interface_perm_data = mysql_query("SELECT * from ports_perms as P, ports as I, devices as D WHERE `user_id` = '" . $_GET['user_id'] .
                                      "' AND I.interface_id = P.interface_id AND D.device_id = I.device_id");
   while($interface_perm = mysql_fetch_array($interface_perm_data)) {
 

@@ -5,14 +5,14 @@ include("graphing/fortigate.php");
 include("graphing/windows.php");
 include("graphing/unix.php");
 
-function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
+function graph_multi_bits_trio ($ports, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
   global $config, $installdir;
   $options = " --alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; }
   $i = 1;
-  foreach(explode(",", $interfaces[0]) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $ports[0]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       if(strstr($inverse, "a")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -27,8 +27,8 @@ function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $interfaces[1]) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $ports[1]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       if(strstr($inverse, "b")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -43,8 +43,8 @@ function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $interfaces[2]) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $ports[2]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       if(strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -169,14 +169,14 @@ function graph_multi_bits_trio ($interfaces, $graph, $from, $to, $width, $height
 }
 
 
-function graph_multi_bits_duo ($interfaces, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
+function graph_multi_bits_duo ($ports, $graph, $from, $to, $width, $height, $title, $vertical, $inverse, $legend = '1') {
   global $config, $installdir;
   $options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
   $options .= $config['rrdgraph_def_text'];
   if($height < "99") { $options .= " --only-graph"; }
   $i = 1;
-  foreach(explode(",", $interfaces[0]) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $ports[0]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       $options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";
@@ -190,8 +190,8 @@ function graph_multi_bits_duo ($interfaces, $graph, $from, $to, $width, $height,
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $interfaces[1]) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $ports[1]) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       $options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";

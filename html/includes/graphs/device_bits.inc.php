@@ -1,11 +1,11 @@
 <?php
 
-## Generate a list of interfaces and then call the multi_bits grapher to generate from the list
+## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
 $device = mres($_GET['device']);
 $hostname = gethostbyid($device);
 
-$query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `interfaces` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
+$query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `ports` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
 while($int = mysql_fetch_row($query)) {
   if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd"))) {
     $rrd_filenames[] = $config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd");
