@@ -1,4 +1,5 @@
 <?php
+echo "Discovery protocols:";
 
 $community = $device['community'];
 
@@ -28,9 +29,6 @@ if($fdp_array) {
   }
 }
 }
-
-
-echo("\n");
 
 if($device['os_group'] == "ios") {
 echo(" CISCO-CDP-MIB: ");  
@@ -107,6 +105,5 @@ if ($query = mysql_query($sql))
 }
 
 unset($link_exists); echo("\n");
-
 
 ?>
