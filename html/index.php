@@ -15,7 +15,7 @@ if($debug) {
   include("../config.php"); 
   include("../includes/functions.php");  
   include("includes/functions.inc.php");
-  include("includes/authenticate.inc");
+  include("includes/authenticate.inc.php");
   $start = utime();
 
   $now = time();

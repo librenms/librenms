@@ -2,7 +2,7 @@
 
 include("../config.php");
 include("../includes/functions.php");
-include("includes/authenticate.inc");
+include("includes/authenticate.inc.php");
 
 if (isset($_GET['device'])) { $where = "WHERE device_id = ".$_GET['device']; } else { $where = ""; }
 $deviceresult = mysql_query("SELECT * from devices $where");

@@ -39,7 +39,7 @@ if($_GET['opta'] == "details" ) {
      $hostname = $device['hostname'];
      #if(!is_integer($x/2)) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
      echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
-     include("includes/device-header.inc");
+     include("includes/device-header.inc.php");
      echo("</table>");
      $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
      unset($seperator);

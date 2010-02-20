@@ -2,7 +2,7 @@
 
 include("../config.php");
 include("../includes/functions.php");
-include("includes/authenticate.inc");
+include("includes/authenticate.inc.php");
 
 if (isset($_GET["dir"])) {
   $dir = $_GET["dir"];

@@ -6,7 +6,7 @@ if($_SESSION['userlevel'] < '10') {
 
 if($_POST['addsrv']) {
   if($_SESSION['userlevel'] == '10') {
-    include("includes/add-srv.inc");
+    include("includes/service-add.inc.php");
   }
 }
 
