@@ -89,26 +89,26 @@ while ($device = mysql_fetch_array($device_query))
   #include("includes/discovery/os.inc.php");
 
   ## Discover Interfaces 
-  include("includes/discovery/ports.php");
+  include("includes/discovery/ports.inc.php");
 
   ## Discovery ENTITY-MIB 
-#  include("includes/discovery/entity-physical.inc.php");
+  #include("includes/discovery/entity-physical.inc.php");
 
   include("includes/discovery/processors.inc.php");
 
   ## Discover IPv4 Addresses
-  include("includes/discovery/ipv4-addresses.php");
+  include("includes/discovery/ipv4-addresses.inc.php");
 
   ## Discovery IPv6 Addresses
-  include("includes/discovery/ipv6-addresses.php");
+  include("includes/discovery/ipv6-addresses.inc.php");
 
   ## Discover Temperatures/Voltages/Fanspeeds
-  include("includes/discovery/temperatures.php");
-  include("includes/discovery/voltages.php");
-  include("includes/discovery/fanspeeds.php");
+  include("includes/discovery/temperatures.inc.php");
+  include("includes/discovery/voltages.inc.php");
+  include("includes/discovery/fanspeeds.inc.php");
 
   ## Discover Storage
-  include("includes/discovery/storage.php");
+  include("includes/discovery/storage.inc.php");
 
   ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
@@ -117,44 +117,38 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/discovery-protocols.inc.php");
 
   ## ARP Table
-  include("includes/discovery/arp-table.php");
+  include("includes/discovery/arp-table.inc.php");
 
   if($device['os'] == "screenos") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
   }
 
+  ## BGP Peers (Quagga, Cisco, Juniper, Foundry)
+  include("includes/discovery/bgp-peers.inc.php");
+
   if($device['os'] == "junos") { 
-    include("includes/discovery/bgp-peers.php"); 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
   
   if($device['os'] == "junose") { 
-    include("includes/discovery/bgp-peers.php"); 
     include("includes/discovery/processors-junose.inc.php");
   }
   
-  if ($device['os_group'] == "unix")
-  {
-    # Also discover quagga peers
-    include("includes/discovery/bgp-peers.php");
-  }
-
   if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
-    include("includes/discovery/cisco-vlans.php");
-    include("includes/discovery/bgp-peers.php");
-    include("includes/discovery/cisco-mac-accounting.php");
-    include("includes/discovery/cisco-pw.php");
-    include("includes/discovery/cisco-vrf.php");
+    include("includes/discovery/cisco-vlans.inc.php");
+    include("includes/discovery/cisco-mac-accounting.inc.php");
+    include("includes/discovery/cisco-pw.inc.php");
+    include("includes/discovery/cisco-vrf.inc.php");
     #include("includes/discovery/cisco-processors.php");
-    include("includes/discovery/cemp-mib.php");
-    include("includes/discovery/cmp-mib.php");
+    include("includes/discovery/cemp-mib.inc.php");
+    include("includes/discovery/cmp-mib.inc.php");
 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
   if ($device['os'] == "procurve" || $device['os'] == "powerconnect")
   {
-    include("includes/discovery/q-bridge-mib.php");
+    include("includes/discovery/q-bridge-mib.inc.php");
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
