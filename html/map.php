@@ -64,11 +64,23 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
             }
 
             $src = $device['hostname'];
-            $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
-            $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+            if($remote_interface_id) {
+              $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+              $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
+            } else {
+	      $dst_host = $link['remote_hostname'];
+              $dst = $link['remote_hostname'];
+            }
+
+
 
             $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
-            $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
+            if($remote_interface_id) {
+              $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
+            } else {
+              $dif['label'] = $link['remote_port'];
+	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
+	    }
 
             $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
