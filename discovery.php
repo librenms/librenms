@@ -113,8 +113,8 @@ while ($device = mysql_fetch_array($device_query))
   ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
 
-  ## CDP & LLDP
-  include("includes/discovery/cdp-lldp.inc.php");
+  ## Discovery Protocols (FDP, CDP & LLDP)
+  include("includes/discovery/discovery-protocols.inc.php");
 
   ## ARP Table
   include("includes/discovery/arp-table.php");

@@ -9,7 +9,6 @@ $i="1";
 $s=fopen('php://stdin','r');
 while($line=fgets($s)){
  list($entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg']) = explode("||", trim($line));
- shell_exec('echo "'.$i.'. '.$entry['host'].' -> '.$entry['msg'].'" >> /tmp/syslog');
  process_syslog($entry, 1);
  unset($entry); unset($line);
  $i++;
