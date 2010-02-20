@@ -10,7 +10,7 @@ echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "<
 
 
 echo("<td class=list-bold>");
-$ports_query = mysql_query("SELECT * FROM interfaces WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVrf` = '" . $vrf['vrf_id'] . "' ");
+$ports_query = mysql_query("SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVrf` = '" . $vrf['vrf_id'] . "' ");
 while($port = mysql_fetch_array($ports_query)) {
   if($_GET['opta']) {
    $graph_type = $_GET['opta'];

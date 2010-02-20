@@ -35,7 +35,7 @@ while($device = mysql_fetch_array($sql)){
 
 if($config['warn']['ifdown']) {
 
-$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 while($interface = mysql_fetch_array($sql)){
    if(interfacepermitted($interface['interface_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
@@ -111,39 +111,39 @@ echo("</div>
 if($_SESSION['userlevel'] >= '5') 
 {
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['transit'] .= $seperator . $interface['interface_id'];
+    $ports['transit'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['peering'] .= $seperator . $interface['interface_id'];
+    $ports['peering'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
 
-  $interfaces['broadband'] = "3294,3295,688,3534";
-  $interfaces['wave_broadband'] = "827";
+  $ports['broadband'] = "3294,3295,688,3534";
+  $ports['wave_broadband'] = "827";
 
-  $interfaces['new_broadband'] = "3659,4149,4121,4108,3676,4135";
+  $ports['new_broadband'] = "3659,4149,4121,4108,3676,4135";
 
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($interfaces['peering'] && $interfaces['transit']) {
+  if($ports['peering'] && $ports['transit']) {
     echo("<div style='width: 235px; '>
     <a href='internet/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits_duo&interfaces=".$interfaces['peering']."&interfaces_b=".$interfaces['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multi_bits_duo&interfaces=".$interfaces['peering']."&interfaces_b=".$interfaces['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits_duo&ports=".$ports['peering']."&ports_b=".$ports['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits_duo&ports=".$ports['peering']."&ports_b=".$ports['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Aggregate Internet Traffic</div>".
-    "<img src='graph.php?type=multi_bits_duo&interfaces=".$interfaces['peering']."&interfaces_b=".$interfaces['transit'].
+    "<img src='graph.php?type=multi_bits_duo&ports=".$ports['peering']."&ports_b=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=385&height=100&legend=no'></a></div>");
   }
 
@@ -151,25 +151,25 @@ if($_SESSION['userlevel'] >= '5')
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($interfaces['transit']) {
+  if($ports['transit']) {
     echo("<div style='width: 235px; float: left;'>
     <a href='iftype/transit/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Internet Transit</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=155&height=100&legend=no'></a></div>");
   }
 
-  if($interfaces['peering']) {
+  if($ports['peering']) {
     echo("<div style='width: 235px; float: right;'>
     <a href='iftype/peering/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['peering']."&from=".$week."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['peering']."&from=".$day."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['peering']."&from=".$week."&to=".$now."&width=400&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Internet Peering</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['peering'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['peering'].
     "&from=".$day."&to=".$now."&width=155&height=100&legend=no'></a></div>");
   }
 
@@ -177,14 +177,14 @@ if($_SESSION['userlevel'] >= '5')
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($interfaces['broadband'] && $interfaces['wave_broadband'] && $interfaces['new_broadband']) {
+  if($ports['broadband'] && $ports['wave_broadband'] && $ports['new_broadband']) {
     echo("<div style='width: 466px; '>
     <a href='broadband/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits_trio&interfaces=".$interfaces['broadband']."&interfaces_b=".$interfaces['new_broadband']."&interfaces_c=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=c\'>\
-    <img src=\'graph.php?type=multi_bits_trio&interfaces=".$interfaces['broadband']."&interfaces_b=".$interfaces['new_broadband']."&interfaces_c=".$interfaces['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=c\'>\
+    <img src=\'graph.php?type=multi_bits_trio&ports=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=c\'>\
+    <img src=\'graph.php?type=multi_bits_trio&ports=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=c\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Aggregate Broadband Traffic</div>".
-    "<img src='graph.php?type=multi_bits_trio&interfaces=".$interfaces['broadband']."&interfaces_b=".$interfaces['new_broadband']."&interfaces_c=".$interfaces['wave_broadband'].
+    "<img src='graph.php?type=multi_bits_trio&ports=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband'].
     "&from=".$day."&to=".$now."&width=385&height=100&legend=no&inverse=c'></a></div>");
   }
 
@@ -192,40 +192,40 @@ if($_SESSION['userlevel'] >= '5')
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($interfaces['broadband']) {
+  if($ports['broadband']) {
     echo("<div style='width: 235px; float: left;'>
     <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['broadband']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['broadband']."&from=".$week."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['broadband']."&from=".$day."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['broadband']."&from=".$week."&to=".$now."&width=400&height=150\'>\
     ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Jersey Broadband ATM</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['broadband'].
     "&from=".$day."&to=".$now."&width=155&height=100&legend=no'></a></div>");
   }
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($interfaces['new_broadband']) {
+  if($ports['new_broadband']) {
     echo("<div style='width: 235px; float: left;'>
     <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['new_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=0\'>\
-    <img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['new_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=0\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['new_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=0\'>\
+    <img src=\'graph.php?type=multi_bits&ports=".$ports['new_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=0\'>\
     ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Jersey Broadband NGN</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['new_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=0&legend=no'></a></div>");
+    "<img src='graph.php?type=multi_bits&ports=".$ports['new_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=0&legend=no'></a></div>");
   }
 
   echo("</div>");
 
 
-  if($interfaces['wave_broadband']) {
+  if($ports['wave_broadband']) {
     echo("<div style='width: 235px; float: left;'>
     <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
-    <img src=\'graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=".$ports['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=".$ports['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=1&legend=1\'>\
     ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
     <div style='font-size: 16px; font-weight: bold; color: #555555;'>Wave Broadband</div>".
-    "<img src='graph.php?type=port_bits&port=".$interfaces['wave_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=1&legend=no'></a></div>");
+    "<img src='graph.php?type=port_bits&port=".$ports['wave_broadband']."&from=".$day."&to=".$now."&width=155&height=100&inverse=1&legend=no'></a></div>");
   }
 
   echo("</div>");

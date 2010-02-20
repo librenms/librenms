@@ -10,8 +10,8 @@ function graph_multi_bits ($args) {
   if(!$args['nototal']) {$options .= " COMMENT:'     Total'";}
   $options .= " COMMENT:'\\\\n'";
 
-  foreach(explode(",", $args['interfaces']) as $ifid) {
-    $query = mysql_query("SELECT * FROM `interfaces` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $args['ports']) as $ifid) {
+    $query = mysql_query("SELECT * FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_array($query);
     $this_rrd = $config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");
     $units='bps'; $unit='B'; $colours='greens'; $multiplier = "8"; $coloursb = 'blues';
@@ -59,9 +59,9 @@ function graph_multi_bits ($args) {
   return $graphfile;
 }
 
-if($_GET['if']) { $args['interfaces'] = $_GET['if']; }
-if($_GET['interfaces']) { $args['interfaces'] = $_GET['interfaces']; }
-if($interfaces) {$args['interfaces'] = $interfaces; }
+if($_GET['if']) { $args['ports'] = $_GET['if']; }
+if($_GET['ports']) { $args['ports'] = $_GET['ports']; }
+if($ports) {$args['ports'] = $ports; }
 
 $args['graphfile'] = $graphfile;
 $args['from']      = $from;

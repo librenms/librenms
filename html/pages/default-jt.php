@@ -38,7 +38,7 @@ while($device = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 while($interface = mysql_fetch_array($sql)){
 
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
@@ -145,47 +145,47 @@ echo("<div style='width: 290px; margin: 7px; float: right;'>
 
 if($_SESSION['userlevel'] >= '5') {
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Peering: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['peering'] .= $seperator . $interface['interface_id'];
+    $ports['peering'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['transit'] .= $seperator . $interface['interface_id'];
+    $ports['transit'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  $interfaces['broadband'] = "2490,2509";
-  $interfaces['wave_broadband'] = "2098";
+  $ports['broadband'] = "2490,2509";
+  $ports['wave_broadband'] = "2098";
 
-  if($interfaces['transit']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+  if($ports['transit']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['broadband']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
+  if($ports['broadband']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['broadband'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Broadband</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['broadband'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['broadband'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['wave_broadband']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
+  if($ports['wave_broadband']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['wave_broadband'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Wave Broadhand</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['wave_broadband'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['wave_broadband'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 

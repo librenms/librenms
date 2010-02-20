@@ -4,10 +4,10 @@
 include("config.php");
 include("includes/functions.php");
 
-$interfaces = mysql_result(mysql_query("SELECT count(*) FROM interfaces"),0); 
+$ports = mysql_result(mysql_query("SELECT count(*) FROM ports"),0); 
 $devices    = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
 
-$dataHandle = fopen("http://www.observernms.org/latest.php?i=$interfaces&d=$devices&v=".$config['version'], r);
+$dataHandle = fopen("http://www.observernms.org/latest.php?i=$ports&d=$devices&v=".$config['version'], r);
 
 if($dataHandle)
 {

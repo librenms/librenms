@@ -27,7 +27,7 @@
 
 
 
-  $members = mysql_query("SELECT * FROM `interfaces` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
+  $members = mysql_query("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
   while($member = mysql_fetch_array($members)) {
     echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generateiflink($member) . " (PAgP)</strong>");
     $br = "<br />";

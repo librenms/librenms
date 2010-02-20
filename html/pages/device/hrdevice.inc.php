@@ -15,7 +15,7 @@ if($hrdevice['hrDeviceType'] == "hrDeviceProcessor") {
   echo("<td><a href='#' $proc_popup>".$hrdevice['hrDeviceDescr']."</a></td>");
 } elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork") {
   $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
-  $interface = mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'")); 
+  $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'")); 
   if($interface['ifIndex']) {
   echo("<td>".generateiflink($interface)."</td>");
   } else {

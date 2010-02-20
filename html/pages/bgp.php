@@ -35,7 +35,7 @@ else
      if($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
     }
 
-    $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, interfaces AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
+    $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
     if($peerhost) { $peername = generatedevicelink($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 

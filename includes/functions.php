@@ -173,9 +173,9 @@ function interfacepermitted($interface_id)
   global $_SESSION;
   if ($_SESSION['userlevel'] >= "5") { 
     $allowed = TRUE; 
-  } elseif ( devicepermitted(mysql_result(mysql_query("SELECT `device_id` FROM `interfaces` WHERE `interface_id` = '$interface_id'"),0))) {
+  } elseif ( devicepermitted(mysql_result(mysql_query("SELECT `device_id` FROM `ports` WHERE `interface_id` = '$interface_id'"),0))) {
     $allowed = TRUE;
-  } elseif ( @mysql_result(mysql_query("SELECT `interface_id` FROM `interfaces_perms` WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0)) {
+  } elseif ( @mysql_result(mysql_query("SELECT `interface_id` FROM `ports_perms` WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `interface_id` = $interface_id"), 0)) {
     $allowed = TRUE;
   } else { 
     $allowed = FALSE; 
@@ -403,7 +403,7 @@ function delHost($id)
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
+  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
   while($int_data = mysql_fetch_array($int_query)) {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
@@ -429,7 +429,7 @@ function delHost($id)
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
   mysql_query("DELETE FROM `syslog` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `interfaces` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `ports` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
@@ -441,7 +441,7 @@ function retireHost($id)
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '$id'");
+  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
   while($int_data = mysql_fetch_array($int_query)) {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
@@ -758,9 +758,9 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
   
   if ($ipv6_type == "Link-Local Unicast Addresses") return; # ignore link-locals (coming from IPV6-MIB)
 
-  if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces`
+  if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
         WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-    $i_query = "SELECT interface_id FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
+    $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
     $interface_id = mysql_result(mysql_query($i_query), 0);
     if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1') {
       mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");

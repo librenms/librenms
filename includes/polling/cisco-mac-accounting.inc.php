@@ -9,7 +9,7 @@ $polled = time();
 
 $mac_entries = 0;
 
-$mac_accounting_query = mysql_query("SELECT * FROM `mac_accounting` as A, `interfaces` AS I where A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'");
+$mac_accounting_query = mysql_query("SELECT * FROM `mac_accounting` as A, `ports` AS I where A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'");
 while ($acc = mysql_fetch_array($mac_accounting_query)) {
   
   $device_id = $acc['device_id'];

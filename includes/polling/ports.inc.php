@@ -57,8 +57,8 @@
   ///// TO DO
   /// End New interface detection
 
-  /// Loop interfaces in the DB and update where necessary
-  $port_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$device['device_id']."'");
+  /// Loop ports in the DB and update where necessary
+  $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."'");
   while ($port = mysql_fetch_array($port_query)) {
     
     echo(" --> " . $port['ifDescr'] . " ");   
@@ -155,7 +155,7 @@
 
      // Update MySQL
      if ($update) { 
-        $update_query  = "UPDATE `interfaces` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
+        $update_query  = "UPDATE `ports` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
         @mysql_query($update_query); $mysql++;
         if($debug) {echo("\nMYSQL : [ $update_query ]");}
       }

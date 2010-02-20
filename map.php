@@ -58,7 +58,7 @@ echo("\n}\n");
 
 }
 
-$links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, interfaces AS I, interfaces AS X, devices as D, devices as Y WHERE  I.device_id = D.device_id AND X.device_id = Y.device_id AND L.local_interface_id = I.interface_id AND X.interface_id = L.remote_interface_id";
+$links_sql = "SELECT *, X.ifDescr AS sif, I.ifDescr AS dif FROM links AS L, ports AS I, ports AS X, devices as D, devices as Y WHERE  I.device_id = D.device_id AND X.device_id = Y.device_id AND L.local_interface_id = I.interface_id AND X.interface_id = L.remote_interface_id";
 
 $links_result = mysql_query($links_sql);
 while($link_data = mysql_fetch_array($links_result)) {
@@ -66,8 +66,8 @@ while($link_data = mysql_fetch_array($links_result)) {
 	$local_interface_id = $link_data['local_interface_id'];
 	$remote_interface_id = $link_data['remote_interface_id'];
 
-        $sq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$local_interface_id'"));
-        $dq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM interfaces AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$remote_interface_id'"));
+        $sq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM ports AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$local_interface_id'"));
+        $dq = mysql_fetch_row(mysql_query("SELECT `hostname`,`ifSpeed` FROM ports AS I, devices as D where I.device_id = D.device_id and I.interface_id = '$remote_interface_id'"));
 
         $src = $sq[0];
         $dst = $dq[0];

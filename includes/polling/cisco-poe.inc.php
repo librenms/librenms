@@ -22,7 +22,7 @@ if($device['os_group'] == "ios") {
 
   $polled = time();
 
-  $port_query = mysql_query("SELECT * FROM `interfaces` WHERE `device_id` = '".$device['device_id']."'");
+  $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."'");
   while ($port = mysql_fetch_array($port_query)) {
 
     if($array[$device[device_id]][$port[ifIndex]]) { // Check to make sure Port data is cached.

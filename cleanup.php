@@ -6,7 +6,7 @@
 include("config.php");
 include("includes/functions.php");
 
-$query = "SELECT *,A.id as id FROM ipv4_addresses AS A, interfaces as I, devices as D 
+$query = "SELECT *,A.id as id FROM ipv4_addresses AS A, ports as I, devices as D 
           WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
 
 $data = mysql_query($query);
@@ -34,7 +34,7 @@ while($device = mysql_fetch_array($query)) {
     list($ipv6addr,$ifIndex) = explode(" ", $data);
     $valid_ips[] = $ipv6addr;
   }
-  $sql   = "SELECT * FROM ip6addr AS A, interfaces AS I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'";
+  $sql   = "SELECT * FROM ip6addr AS A, ports AS I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'";
   $data = mysql_query($sql);
   while($row = mysql_fetch_array($data)) {
     echo($row['addr'] . "\n");
@@ -46,7 +46,7 @@ while($device = mysql_fetch_array($query)) {
 }
 
 
-$query = "SELECT * FROM interfaces AS I, devices as D 
+$query = "SELECT * FROM ports AS I, devices as D 
           WHERE I.device_id = D.device_id AND D.status = '1'";
 $data = mysql_query($query);
 while($row = mysql_fetch_array($data)) {
@@ -56,7 +56,7 @@ while($row = mysql_fetch_array($data)) {
   $port = $row['port'];
   $response = trim(`snmpget -v2c -Osq -c $community $hostname:$port ifIndex.$index | cut -d " " -f 2`);
   if($response != $index) {
-    mysql_query("DELETE from interfaces where interface_id = '" . $row['interface_id'] . "'");
+    mysql_query("DELETE from ports where interface_id = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `links` WHERE `local_interface_id` = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `links` WHERE `remote_interface_id` = '" . $row['interface_id'] . "'");
@@ -65,17 +65,17 @@ while($row = mysql_fetch_array($data)) {
   }
 }
 
-echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at start\n");
-$interface_query = mysql_query("SELECT interface_id,device_id FROM `interfaces`");
+echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"), 0) . " ports at start\n");
+$interface_query = mysql_query("SELECT interface_id,device_id FROM `ports`");
 while ($interface = mysql_fetch_array($interface_query)) {
   $device_id = $interface['device_id'];
   $interface_id = $interface['interface_id'];
   if(mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `device_id` = '$device_id'"), 0) == '0') {
-    mysql_query("delete from interfaces where `interface_id` = '$interface_id'");
+    mysql_query("delete from ports where `interface_id` = '$interface_id'");
     echo("Deleting if $interface_id \n");
   } 
 }
-echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces`"), 0) . " interfaces at end\n");
+echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"), 0) . " ports at end\n");
 
 echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at start\n");
 $link_query = mysql_query("SELECT id,local_interface_id,remote_interface_id FROM `links`");
@@ -83,7 +83,7 @@ while ($link = mysql_fetch_array($link_query)) {
   $id = $link['id'];
   $src = $link['local_interface_id'];
   $dst = $link['remote_interface_id'];
-  if(mysql_result(mysql_query("SELECT COUNT(interface_id) FROM `interfaces` WHERE `interface_id` = '$src'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `interface_id` = '$dst'"), 0) == '0') {
+  if(mysql_result(mysql_query("SELECT COUNT(interface_id) FROM `ports` WHERE `interface_id` = '$src'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `interface_id` = '$dst'"), 0) == '0') {
     mysql_query("delete from links where `id` = '$id'");
     echo("Deleting link $id \n");
   }
@@ -91,12 +91,12 @@ while ($link = mysql_fetch_array($link_query)) {
 echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at end\n");
 
 echo(mysql_result(mysql_query("SELECT COUNT(adj_id) FROM `adjacencies`"), 0) . " adjacencies at start\n");
-$link_query = mysql_query("SELECT * FROM `adjacencies` AS A, `interfaces` AS I, `devices` AS D, networks AS N WHERE I.interface_id = A.interface_id AND D.device_id = I.device_id AND N.id = A.network_id");
+$link_query = mysql_query("SELECT * FROM `adjacencies` AS A, `ports` AS I, `devices` AS D, networks AS N WHERE I.interface_id = A.interface_id AND D.device_id = I.device_id AND N.id = A.network_id");
 while ($link = mysql_fetch_array($link_query)) {
   $id = $link['adj_id'];
   $netid = $link['network_id'];
   $ifid = $link['interface_id'];
-  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `interface_id` = '$ifid'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(id) FROM `networks` WHERE `id` = '$netid'"), 0) == '0') {
+  if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `interface_id` = '$ifid'"), 0) == '0' || mysql_result(mysql_query("SELECT COUNT(id) FROM `networks` WHERE `id` = '$netid'"), 0) == '0') {
     $remove = 1;
     echo("Removed Interface!\n");
   }

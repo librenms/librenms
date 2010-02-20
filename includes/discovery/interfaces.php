@@ -1,19 +1,19 @@
 <?php
 
-# Discover interfaces
+# Discover ports
 
   echo("Interfaces : ");
 
-  $interfaces = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
+  $ports = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
 
-  $interfaces = str_replace("\"", "", $interfaces);
-  $interfaces = str_replace("ifDescr.", "", $interfaces);
-  $interfaces = str_replace(" ", "||", $interfaces);
+  $ports = str_replace("\"", "", $ports);
+  $ports = str_replace("ifDescr.", "", $ports);
+  $ports = str_replace(" ", "||", $ports);
 
   $interface_ignored = 0;
   $interface_added   = 0;
 
-  foreach(explode("\n", $interfaces) as $entry){
+  foreach(explode("\n", $ports) as $entry){
 
     $entry = trim($entry);
     list($ifIndex, $ifDescr) = explode("||", $entry);
@@ -30,19 +30,19 @@
       }
       if ($debug) echo("\n $if ");
       if ($nullintf == 0) {
-        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
-          mysql_query("INSERT INTO `interfaces` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
+        if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
+          mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
           # Add Interface
            echo("+");
         } else {
-            mysql_query("UPDATE `interfaces` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
+            mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
             echo(".");
         }
         $int_exists[] = "$ifIndex";
       } else { 
         # Ignored Interface
-	if(mysql_result(mysql_query("SELECT COUNT(*) FROM `interfaces` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
-          mysql_query("UPDATE `interfaces` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+	if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
+          mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
           # Delete Interface
           echo("-"); ## Deleted Interface
         } else {
@@ -53,7 +53,7 @@
   }
 
 
-  $sql = "SELECT * FROM `interfaces` WHERE `device_id`  = '".$device['device_id']."' AND `deleted` = '0'";
+  $sql = "SELECT * FROM `ports` WHERE `device_id`  = '".$device['device_id']."' AND `deleted` = '0'";
   $query = mysql_query($sql);
 
   while ($test_if = mysql_fetch_array($query)) {
@@ -66,7 +66,7 @@
         }
         if(!$exists) {
           echo("-");
-          mysql_query("UPDATE `interfaces` SET `deleted` = '1' WHERE interface_id = '" . $test_if['interface_id'] . "'");
+          mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE interface_id = '" . $test_if['interface_id'] . "'");
         }
   }
 

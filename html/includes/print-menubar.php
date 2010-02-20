@@ -1,7 +1,7 @@
 <?php 
 
   $service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
-  $if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
+  $if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
   $device_alerts = "0"; 
   $device_alert_sql = "WHERE 0";
 
@@ -12,7 +12,7 @@
     $this_alert = 0;
     if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0') {
       if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_host = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
-      if (mysql_result(mysql_query("SELECT count(*) FROM interfaces WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "'"),0)) { $this_alert = "1"; }
+      if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "'"),0)) { $this_alert = "1"; }
     }
     if ($this_alert) { 
      $device_alerts++;
@@ -106,16 +106,16 @@ if ($config['show_locations']) { echo('<li><a class="menu2four" href="locations/
 ?>
 
 
-<li><a class="menu2four" href="interfaces/"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
+<li><a class="menu2four" href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
 
 <table><tr><td>
         <ul>
-<li><a href="interfaces/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
+<li><a href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> All Ports</a></li>
 
 <?php
 
-if ($interfaces['errored']) {
-  echo('<li><a href="interfaces/errors/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$interfaces['errored'].')</a></li>');
+if ($ports['errored']) {
+  echo('<li><a href="ports/errors/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
 if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money_pound.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1;}
@@ -143,13 +143,13 @@ if ($_SESSION['userlevel'] >= '5') {##FIXME html
 if ($ifbreak) { echo('<li><hr width="140" /></li>'); }
 
 if (isset($interface_alerts)) {
-echo('<li><a href="interfaces/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
+echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
 ?>
 
-<li><a href="interfaces/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
-<li><a href="interfaces/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
+<li><a href="ports/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
+<li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
 </ul></td></tr></table>
 </li>
 

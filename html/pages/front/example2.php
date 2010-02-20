@@ -36,7 +36,7 @@ while($device = mysql_fetch_array($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `interfaces` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
+$sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 while($interface = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
@@ -110,54 +110,54 @@ echo("</div>
 
 if($_SESSION['userlevel'] >= '5') {
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['l2tp'] .= $seperator . $interface['interface_id'];
+    $ports['l2tp'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Transit: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['transit'] .= $seperator . $interface['interface_id'];
+    $ports['transit'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  $sql  = "select * from interfaces as I, devices as D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
+  $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'Server: thlon-pbx%' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
-    $interfaces['voip'] .= $seperator . $interface['interface_id'];
+    $ports['voip'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  if($interfaces['transit']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+  if($ports['transit']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['transit'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['l2tp']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['l2tp'].
+  if($ports['l2tp']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['l2tp'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['l2tp'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['l2tp'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($interfaces['voip']) {
-    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&interfaces=".$interfaces['voip'].
+  if($ports['voip']) {
+    echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['voip'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>".
-    "<img src='graph.php?type=multi_bits&interfaces=".$interfaces['voip'].
+    "<img src='graph.php?type=multi_bits&ports=".$ports['voip'].
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 

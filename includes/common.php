@@ -13,7 +13,7 @@ function mres($string) { // short function wrapper because the real one is stupi
 }
 
 function getifhost($id) {
-     $sql = mysql_query("SELECT `device_id` from `interfaces` WHERE `interface_id` = '$id'");
+     $sql = mysql_query("SELECT `device_id` from `ports` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
@@ -45,19 +45,19 @@ function getpeerhost($id) {
 }
 
 function getifindexbyid($id) {
-     $sql = mysql_query("SELECT `ifIndex` FROM `interfaces` WHERE `interface_id` = '$id'");
+     $sql = mysql_query("SELECT `ifIndex` FROM `ports` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }
 
 function getifbyid($id) {
-     $sql = mysql_query("SELECT * FROM `interfaces` WHERE `interface_id` = '$id'");
+     $sql = mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '$id'");
      $result = @mysql_fetch_array($sql);
      return $result;
 }
 
 function getifdescrbyid($id) {
-     $sql = mysql_query("SELECT `ifDescr` FROM `interfaces` WHERE `interface_id` = '$id'");
+     $sql = mysql_query("SELECT `ifDescr` FROM `ports` WHERE `interface_id` = '$id'");
      $result = @mysql_result($sql, 0);
      return $result;
 }

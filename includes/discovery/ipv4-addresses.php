@@ -14,8 +14,8 @@
     list($net,$cidr) = explode("/", $network);
     $cidr = trim($cidr);
     if($mask == "255.255.255.255") { $cidr = "32"; $network = "$oid/$cidr"; }
-    if (mysql_result(mysql_query("SELECT count(*) FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0") {
-      $i_query = "SELECT interface_id FROM `interfaces` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
+    if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0") {
+      $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
       $interface_id = mysql_result(mysql_query($i_query), 0);
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_networks` WHERE `ipv4_network` = '$network'"), 0) < '1') {
         mysql_query("INSERT INTO `ipv4_networks` (`ipv4_network`) VALUES ('$network')");
@@ -35,7 +35,7 @@
 
   }
 
-  $sql   = "SELECT * FROM ipv4_addresses AS A, interfaces AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
+  $sql   = "SELECT * FROM ipv4_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
     $data = mysql_query($sql);
     while($row = mysql_fetch_array($data)) {
       $full_address = $row['ipv4_address'] . "/" . $row['ipv4_prefixlen'] . "|" . $row['ifIndex'];

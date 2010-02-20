@@ -4,7 +4,7 @@
 $type = $_GET['id'];
 $sql  = "select *, DATE_FORMAT(I.lastchange, '%l:%i%p %D %M %Y') AS changed, I.id as iid, I.snmpid 
 as snmpid, D.id as did, D.hostname as hostname, I.if as ifname, I.name as ifalias ";
-$sql .= "from interfaces as I, devices as D WHERE `up_admin` = 'up' AND `up` = 'down' AND I.host = D.id AND I.name NOT LIKE 'Test%'";
+$sql .= "from ports as I, devices as D WHERE `up_admin` = 'up' AND `up` = 'down' AND I.host = D.id AND I.name NOT LIKE 'Test%'";
 $sql .= "AND I.name NOT LIKE '%[eng]%' ORDER BY D.hostname, I.if ";
 $query = mysql_query($sql);
 

@@ -31,7 +31,7 @@ if($_GET['optc'] == thumbs) {
   $timeperiods = array('-1day','-1week','-1month','-1year');
   $from = '-1day';
   echo("<div style='display: block; clear: both; margin: auto;'>");
-  $sql  = "select * from interfaces WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
+  $sql  = "select * from ports WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
   $query = mysql_query($sql);
   unset ($seperator);
   while($interface = mysql_fetch_array($query)) {
@@ -55,7 +55,7 @@ if($_GET['optc'] == thumbs) {
     if($_GET['opta'] == "details" ) { $port_details = 1; }
     echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
-    $interface_query = mysql_query("select * from interfaces WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
+    $interface_query = mysql_query("select * from ports WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
     while($interface = mysql_fetch_array($interface_query)) {
       include("includes/print-interface.inc.php");
       $i++; 

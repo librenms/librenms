@@ -32,12 +32,12 @@ print_optionbar_end();
 
      if($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
-     $query = "SELECT * FROM ipv4_addresses AS A, interfaces AS I, devices AS D WHERE ";
+     $query = "SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE ";
      $query .= "(A.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
      $query .= " AND D.device_id = I.device_id";
      $ipv4_host = mysql_fetch_array(mysql_query($query));
 
-     $query = "SELECT * FROM ipv6_addresses AS A, interfaces AS I, devices AS D WHERE ";
+     $query = "SELECT * FROM ipv6_addresses AS A, ports AS I, devices AS D WHERE ";
      $query .= "(A.ipv6_address = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id)";
      $query .= " AND D.device_id = I.device_id";
      $ipv6_host = mysql_fetch_array(mysql_query($query));
@@ -105,7 +105,7 @@ print_optionbar_end();
   }
   if ($_GET['opta'] == "macaccounting") {
     if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0)) {
-      $acc = mysql_fetch_array(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, interfaces AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
+      $acc = mysql_fetch_array(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, ports AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
       $graph_type = "mac_acc_bits";    
       $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
       if ( is_file($database) ) {

@@ -13,7 +13,7 @@ if($device['os_group'] == "ios") {
   if($debug) { print_r($portifIndex); }
 }
 
-$interface_query = mysql_query("SELECT * FROM `interfaces` $where");
+$interface_query = mysql_query("SELECT * FROM `ports` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
  if(!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
@@ -115,7 +115,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    }
 
    if ($update) {
-     $update_query  = "UPDATE `interfaces` SET ";
+     $update_query  = "UPDATE `ports` SET ";
      $update_query .= $update;
      $update_query .= " WHERE `interface_id` = '" . $interface['interface_id'] . "'";
      #echo("Updating : " . $device['hostname'] . " $ifDescr\nSQL :$update_query\n\n");
@@ -152,7 +152,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
  }
 
   $rates = interface_rates ($rrdfile);
-  mysql_query("UPDATE `interfaces` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
+  mysql_query("UPDATE `ports` SET in_rate = '" . $rates['in'] . "', out_rate = '" . $rates['out'] . "' WHERE interface_id= '" . $interface['interface_id'] . "'");
 
 }
 

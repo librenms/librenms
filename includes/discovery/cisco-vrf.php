@@ -34,15 +34,15 @@
     $vrf_id = @mysql_result(mysql_query("SELECT vrf_id FROM vrfs WHERE `device_id` = '".$device['device_id']."' AND `vrf_oid`='".$vrf['oid']."'"),0);
     $valid_vrf[$vrf_id] = 1;
     echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['name']." ".$vrf['mplsVpnVrfDescription']." ");
-    $interfaces_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
-    $interfaces = shell_exec($config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $interfaces_oid");
-    $interfaces = trim(str_replace($interfaces_oid . ".", "", $interfaces));
-#    list($interfaces) = explode(" ", $interfaces);
+    $ports_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
+    $ports = shell_exec($config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $ports_oid");
+    $ports = trim(str_replace($ports_oid . ".", "", $ports));
+#    list($ports) = explode(" ", $ports);
     echo(" ( ");
-    foreach (explode("\n", $interfaces) as $if_id) {
-      $interface = mysql_fetch_array(mysql_query("SELECT * FROM interfaces WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
+    foreach (explode("\n", $ports) as $if_id) {
+      $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
       echo(makeshortif($interface['ifDescr']) . " ");
-      mysql_query("UPDATE interfaces SET ifVrf = '".$vrf_id."' WHERE interface_id = '".$interface['interface_id']."'");
+      mysql_query("UPDATE ports SET ifVrf = '".$vrf_id."' WHERE interface_id = '".$interface['interface_id']."'");
       $if = $interface['interface_id'];
       $valid_vrf_if[$vrf_id][$if] = 1;
     }
@@ -52,14 +52,14 @@
 
   echo("\n");
 
-  $sql   = "SELECT * FROM interfaces WHERE device_id = '" . $device['device_id'] . "'";
+  $sql   = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
     $data = mysql_query($sql);
     while($row = mysql_fetch_array($data)) {
       $if = $row['interface_id'];
       $vrf_id = $row['ifVrf'];
       if($row['ifVrf']){ if(!$valid_vrf_if[$vrf_id][$if]) {
         echo("-");
-        $query = @mysql_query("UPDATE interfaces SET `ifVrf` = NULL WHERE interface_id = '$if'");
+        $query = @mysql_query("UPDATE ports SET `ifVrf` = NULL WHERE interface_id = '$if'");
       } else {echo(".");} }
     }
 
