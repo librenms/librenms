@@ -6,7 +6,7 @@ if($_SESSION['userlevel'] < '5') {
 
 if($_POST['editing']) {
   if($_SESSION['userlevel'] > "5") {
-    include("includes/edit-host.inc");
+    include("includes/device-edit.inc.php");
   }
 }
 

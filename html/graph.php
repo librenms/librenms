@@ -13,7 +13,7 @@ if($_GET['debug']) {
   include("../includes/common.php");
   include("../includes/graphing.php");
   include("../includes/rewrites.php");
-  include("includes/authenticate.inc");
+  include("includes/authenticate.inc.php");
 
 #  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   

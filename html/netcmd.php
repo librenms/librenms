@@ -12,7 +12,7 @@ if($_GET[debug]) {
 
 include("../config.php");
 include("../includes/functions.php");
-include("includes/authenticate.inc");
+include("includes/authenticate.inc.php");
 if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
 

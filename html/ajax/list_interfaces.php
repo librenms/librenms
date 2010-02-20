@@ -2,7 +2,7 @@
 
   include("../../config.php");
   include("../../includes/functions.php");
-  include("../includes/authenticate.inc");
+  include("../includes/authenticate.inc.php");
   if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
 if(isset($_GET['device_id'])){

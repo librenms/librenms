@@ -6,7 +6,7 @@ if($_SESSION['userlevel'] < '5') {
 
 if($_POST['delsrv']) {
   if($_SESSION['userlevel'] > "5") {
-    include("includes/del-srv.inc");
+    include("includes/service-delete.inc.php");
   }
 }
 
