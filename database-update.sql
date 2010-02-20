@@ -104,5 +104,5 @@ ALTER TABLE `bgpPeers_cbgp` CHANGE `afi` `afi` VARCHAR( 16 ) NOT NULL , CHANGE `
 ALTER TABLE  `eventlog` ADD  `reference` VARCHAR( 64 ) NOT NULL AFTER  `type`;
 ALTER TABLE `syslog` CHANGE `datetime` `datetime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `syslog`  DROP `host`,  DROP `processed`;
-RENAME TABLE  `interfaces` TO  `observer_demo`.`ports` ;
-RENAME TABLE  `interfaces_perms` TO  `observer_demo`.`ports_perms` ;
+RENAME TABLE  `interfaces` TO  `ports` ;
+RENAME TABLE  `interfaces_perms` TO `ports_perms` ;
