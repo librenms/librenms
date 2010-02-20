@@ -2,7 +2,7 @@
 
 # Discover ports
 
-  echo("Interfaces : ");
+  echo("Ports : ");
 
   $ports = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
 
