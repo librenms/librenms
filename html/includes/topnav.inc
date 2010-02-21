@@ -73,6 +73,7 @@ if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['b
     <td> ) </td>
     <td width=5></td>
   </tr>
+<?php if ($config['show_services']) { ?>
   <tr style="background-color: <?php echo $services['bgcolour'] ?>">
     <td width="5"></td>
     <td>Services : </td>
@@ -85,4 +86,5 @@ if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['b
     <td> ) </td>
     <td width="5"></td>
   </tr>
+<?php } ?>
 </table>
