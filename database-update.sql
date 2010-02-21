@@ -107,3 +107,4 @@ ALTER TABLE `syslog`  DROP `host`,  DROP `processed`;
 RENAME TABLE  `interfaces` TO  `ports` ;
 RENAME TABLE  `interfaces_perms` TO `ports_perms` ;
 ALTER TABLE  `temperature` ADD `temp_index` VARCHAR( 32 ) NOT NULL AFTER  `device_id` , ADD  `temp_type` VARCHAR( 16 ) NOT NULL AFTER  `temp_index`;
+ALTER TABLE  `processors` CHANGE  `processor_oid`  `processor_oid` VARCHAR( 128 ) NOT NULL
