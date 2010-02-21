@@ -23,6 +23,11 @@ if(!$samehost) {
 
   $mini_url = $config['base_url'] . "/graph.php?id=".$service['service_id']."&type=service&from=".$day."&to=".$now."&width=80&height=20&bg=efefef";
 
+    $popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$service['service_type'];
+    $popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $service['service_id'] . "&type=service&from=$day&to=$now&width=400&height=125\'>";
+    $popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
+
+
 
   echo("
          <tr style=\"background-color: $bg; padding: 5px;\">");
@@ -41,7 +46,7 @@ echo("
            <td valign=top class=list-bold>
              $status
            </td>
-           <td><img src='$mini_url'></td>
+           <td valign=top><a $popup><img src='$mini_url'></a></td>
            <td valign=top width=175>
              $since
            </td>

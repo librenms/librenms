@@ -11,17 +11,21 @@ include("common.inc.php");
   $query = mysql_query($sql);
   $service = mysql_fetch_array($query);
 
+  $service_text = substr(str_pad($service['service_type'], 28),0,28);
+
   $rrd  = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename("service-" . $service['service_type'] . "-" . $service['service_id'] . ".rrd");
 
   $rrd_options .= " COMMENT:'                                Cur    Max\\n'";
   $rrd_options .= " DEF:status=$rrd:status:AVERAGE";
+  $rrd_options .= " CDEF:percent=status,100,*";
   $rrd_options .= " CDEF:down=status,1,LT,status,UNKN,IF";
-  $rrd_options .= " AREA:status#CCFFCC";
-  $rrd_options .= " AREA:down#FFCCCC";
-  $rrd_options .= " LINE1.5:status#009900:'" . $service['service_type'] . "'"; # Ugly hack :(
-  $rrd_options .= " LINE1.5:down#cc0000";
+  $rrd_options .= " CDEF:percentdown=down,100,*";
+  $rrd_options .= " AREA:percent#CCFFCC";
+  $rrd_options .= " AREA:percentdown#FFCCCC";
+  $rrd_options .= " LINE1.5:percent#009900:'" . $service_text . "'"; # Ugly hack :(
+  $rrd_options .= " LINE1.5:percentdown#cc0000";
   $rrd_options .= " GPRINT:status:LAST:%3.0lf";
-  $rrd_options .= " GPRINT:status:MAX:%3.0lf\\\\l";
+  $rrd_options .= " GPRINT:percent:AVERAGE:%3.0lf%%\\\\l";
 
 
 
