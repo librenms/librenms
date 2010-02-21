@@ -12,7 +12,7 @@ if($device['os'] == "junos")
   if(is_array($processors_array[$device['device_id']])) {
     foreach($processors_array[$device['device_id']] as $index => $entry) {
       if($entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan")) {
-        echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingCPU'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n");
+        if ($debug) { echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingCPU'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n"); }
         $usage_oid = ".1.3.6.1.4.1.2636.3.1.13.1.8." . $index;
         $descr = $entry['jnxOperatingDescr'];
         $usage = $entry['jnxOperatingCPU'];
