@@ -33,7 +33,7 @@
 
         if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) 
         {
-          discover_processor($valid_processor, $device, $oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
+          discover_processor($valid_processor, $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
         }
       }
     }

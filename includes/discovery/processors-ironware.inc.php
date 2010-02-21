@@ -33,20 +33,7 @@
 
         if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) 
         {
-          if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = 'ironware'"),0) == '0') {
-            $query = "INSERT INTO processors (`entPhysicalIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`, `processor_precision`)
-                      values ('$entPhysicalIndex', '".$device['device_id']."', '$descr', '$index', '$usage_oid', '".$usage."', 'ironware', '$precision')";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-            echo("+");
-          } else {
-            echo(".");
-            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$usage_oid."', `processor_usage` = '".$usage."'
-                      WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = 'ironware'";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-          }
-          $valid_processor['ironware'][$index] = 1;
+          discover_processor($valid_processor, $device, $usage_oid, $index, "ironware", $descr, $precision, $usage, $entPhysicalIndex, NULL);
         }
       }
     }
