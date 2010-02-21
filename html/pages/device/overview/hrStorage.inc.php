@@ -45,7 +45,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
    
     echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$fs_url."' $fs_popup>" . $drive['hrStorageDescr'] . "</a></td>
             <td width=90><a href='".$fs_url."' $fs_popup><img src='$mini_graph' /></a></td>
-            <td width=200><a href='".$fs_url."' $fs_popup>".print_percentage_bar (200, 16, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a></td>
+            <td width=200><a href='".$fs_url."' $fs_popup>".print_percentage_bar (200, 20, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a></td>
           </tr>");
     $drive_rows++;
   }
