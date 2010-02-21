@@ -21,6 +21,8 @@ if(!$samehost) {
     $checked = formatUptime($checked);
   } else { $checked = "Never"; }
 
+  $mini_url = $config['base_url'] . "/graph.php?id=".$service['service_id']."&type=service&from=".$day."&to=".$now."&width=80&height=20&bg=efefef";
+
 
   echo("
          <tr style=\"background-color: $bg; padding: 5px;\">");
@@ -35,10 +37,11 @@ if($device_id) {
   }
 }
 
-echo("     
+echo("
            <td valign=top class=list-bold>
              $status
            </td>
+           <td><img src='$mini_url'></td>
            <td valign=top width=175>
              $since
            </td>

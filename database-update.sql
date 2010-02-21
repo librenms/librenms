@@ -109,3 +109,4 @@ RENAME TABLE  `interfaces_perms` TO `ports_perms` ;
 ALTER TABLE  `temperature` CHANGE `temp_index` `temp_index` VARCHAR( 32 ) NOT NULL AFTER  `device_id` , ADD  `temp_type` VARCHAR( 16 ) NOT NULL AFTER  `temp_index`;
 ALTER TABLE  `processors` CHANGE  `processor_oid`  `processor_oid` VARCHAR( 128 ) NOT NULL
 ALTER TABLE eventlog CHANGE `type` `type` VARCHAR( 64 ) NOT NULL;
+ALTER TABLE  `services` CHANGE  `service_host`  `device_id` INT( 11 ) NOT NULL

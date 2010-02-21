@@ -11,10 +11,10 @@ $ports['up'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE devic
 $ports['down'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
 $ports['disabled'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifAdminStatus = 'down'"),0);
 
-$services['total'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '" . $device['device_id'] . "'"),0);
-$services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_host = '" . $device['device_id'] . "' AND service_status = '1' AND service_ignore ='0'"),0);
-$services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '" . $device['device_id'] . "' AND service_status = '0' AND service_ignore = '0'"),0);
-$services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_host = '" . $device['device_id'] . "' AND service_ignore = '1'"),0);
+$services['total'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "'"),0);
+$services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE device_id = '" . $device['device_id'] . "' AND service_status = '1' AND service_ignore ='0'"),0);
+$services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_status = '0' AND service_ignore = '0'"),0);
+$services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_ignore = '1'"),0);
 
 if($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
 if($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
@@ -48,7 +48,7 @@ echo("
 
   echo("<div style='padding: 8px; font-size: 11px; font-weight: bold;'>");
 
-  $sql = "SELECT * FROM services WHERE service_host = '" . $device['device_id'] . "' ORDER BY service_type";
+  $sql = "SELECT * FROM services WHERE device_id = '" . $device['device_id'] . "' ORDER BY service_type";
   $query = mysql_query($sql);
   while($data = mysql_fetch_array($query)) {
     if ($data[service_status] == "0" && $data[service_ignore] == "1") { $status = "grey"; }

@@ -18,8 +18,8 @@ include("common.inc.php");
   $rrd_options .= " DEF:temp=$rrd_filename:temp:AVERAGE";
   $rrd_options .= " CDEF:tempwarm=temp,".$temperature['temp_limit'].",GT,temp,UNKN,IF";
   $rrd_options .= " CDEF:tempcold=temp,20,LT,temp,UNKN,IF";
-  $rrd_options .= " AREA:temp#FFFF99";
-  $rrd_options .= " AREA:tempwarm#FF9999";
+  $rrd_options .= " AREA:temp#bbd392";
+  $rrd_options .= " AREA:tempwarm#FFCCCC";
   $rrd_options .= " AREA:tempcold#CCCCFF";
   $rrd_options .= " LINE1.5:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['temp_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " LINE1.5:tempwarm#660000";

@@ -430,7 +430,7 @@ function delHost($id)
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
   mysql_query("DELETE FROM `syslog` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `ports` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
+  mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   echo("Removed device $host<br />");
@@ -458,7 +458,7 @@ function retireHost($id)
   mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `services` WHERE `service_host` = '$id'");
+  mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   echo("Removed device $host<br />");
 }
