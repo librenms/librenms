@@ -26,6 +26,27 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 
 }
 
+function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysical = NULL, $hrDevice = NULL) {
+
+      global $config; global $debug; global $valid_processor;
+      if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysical, $hrDevice\n"); }
+      if($descr) {
+          if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = '$type'"),0) == '0') {
+            $query = "INSERT INTO processors (`entPhysicalIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`)
+                      values ('$entPhysicalIndex', '".$device['device_id']."', '$descr', '$index', '$usage_oid', '$usage', '$type')";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; }
+            echo("+");
+          } else {
+            echo(".");
+            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$usage_oid."', `processor_usage` = '".$usage."'
+                      WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = '".$type."'";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; }
+          }
+          $valid_processor[$type][$index] = 1;
+      }
+}
 
 function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL) {
 

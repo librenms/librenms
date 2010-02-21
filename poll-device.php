@@ -43,7 +43,7 @@ $polled_devices = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = '0' $where  ORDER BY `device_id` ASC");
 while ($device = mysql_fetch_array($device_query)) {
   $status = 0; unset($array);
-
+  $device_start = utime();  // Start counting device poll time
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
   if ($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
   echo("\n");
@@ -202,6 +202,9 @@ while ($device = mysql_fetch_array($device_query)) {
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
+
+  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+  echo("Polled in $device_time seconds\n");
 
 }   
 

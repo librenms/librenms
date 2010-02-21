@@ -14,11 +14,9 @@ echo("<div style='padding: 5px;'>
 
 echo("<tr class=tablehead>
         <th width=280>Device</th>
-        <th width=175>Storage</th>
-        <th width=360>Usage</th>
-        <th width=60></th>
-        <th width=100>Size</th>
-        <th width=100>Used</th>
+        <th>Storage</th>
+        <th width=420>Usage</th>
+        <th width=100>Free</th>
       </tr>");
 
 $row = 1;
@@ -40,6 +38,7 @@ while($drive = mysql_fetch_array($query)) {
 
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
     $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
+    $free  = $total - $used;
     $perc  = round($drive['storage_perc'], 0);
     $total = formatStorage($total);
     $used = formatStorage($used);
@@ -47,11 +46,16 @@ while($drive = mysql_fetch_array($query)) {
     $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=hrstorage&from=$month&to=$now&width=400&height=125";
     $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
 
-    $drv_colour = percent_colour($perc);
+    if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
+    } elseif($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
+    } elseif($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
+    } elseif($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
+    } else { $left_background='9abf5b'; $right_background='bbd392'; }
+
 
     echo("<tr bgcolor='$row_colour'><td>" . generatedevicelink($drive) . "</td><td class=tablehead>" . $drive['hrStorageDescr'] . "</td><td>
-          <a href='#' $store_popup><img src='percentage.php?per=" . $perc . "&width=350'></a>
-          </td><td style='font-weight: bold; color: $drv_colour'>" . $perc . "%</td><td>" . $total . "</td><td>" . $used . "</td></tr>");
+          <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a>
+          </td><td>" . formatStorage($free) . "</td></tr>");
 
 
     $row++;
