@@ -8,6 +8,18 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE host_id
 
   $drives = mysql_query("SELECT * FROM `storage` WHERE host_id = '" . $device['device_id'] . "'");
   while($drive = mysql_fetch_array($drives)) {
+
+    $skipdrive = 0;
+
+    if ($device["os"] == "junos") {
+        foreach ($config['ignore_junos_os_drives'] as $jdrive) {
+            if (preg_match($jdrive, $drive["hrStorageDescr"])) {
+                $skipdrive = 1;
+            }
+        }
+    }
+
+    if ($skipdrive) { continue; }
     if(is_integer($drive_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
     $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
