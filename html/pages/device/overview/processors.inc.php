@@ -33,7 +33,7 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
     echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
            <td width=90><a href='".$proc_url."'  $proc_popup><img src='$mini_url'></a></td>
            <td width=200><a href='".$proc_url."' $proc_popup>
-           ".print_percentage_bar (200, 16, $perc, NULL, "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."
+           ".print_percentage_bar (200, 20, $perc, NULL, "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."
            </a></td>
          </tr>");
     $processor_rows++;    
