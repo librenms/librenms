@@ -1,6 +1,6 @@
 <?php
 
-  if($device['os_group'] == "unix")
+  if($device['os_group'] == "unix" || $device['os'] == "windows")
   {
     echo("hrDevice ");
     $hrDevice_oids = array('hrDevice','hrProcessorLoad');  
