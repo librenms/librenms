@@ -11,7 +11,7 @@
    unset($image);
 
    $image = getImage($device['device_id']);
-
+   if ($device['os'] == "ios") { formatCiscoHardware($device, true); }
    $device['os_text'] = $os_text[$device['os']]; 
 
    echo('  <tr background="'.$bg_image.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';" 
