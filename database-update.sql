@@ -102,7 +102,7 @@ ALTER TABLE `links` CHANGE `vendor` `protocol` VARCHAR( 11 ) CHARACTER SET latin
 ALTER TABLE `processors` CHANGE `processor_type` `processor_type` varchar(16) NOT NULL;
 ALTER TABLE `bgpPeers_cbgp` CHANGE `afi` `afi` VARCHAR( 16 ) NOT NULL , CHANGE `safi` `safi` VARCHAR( 16 ) NOT NULL; 
 ALTER TABLE  `eventlog` ADD  `reference` VARCHAR( 64 ) NOT NULL AFTER  `type`;
-ALTER TABLE `syslog` CHANGE `datetime` `datetime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `syslog` CHANGE `datetime` `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `syslog`  DROP `host`,  DROP `processed`;
 RENAME TABLE  `interfaces` TO  `ports` ;
 RENAME TABLE  `interfaces_perms` TO `ports_perms` ;
