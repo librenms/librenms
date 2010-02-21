@@ -25,7 +25,18 @@ $row = 1;
 
 while($drive = mysql_fetch_array($query)) {
 
-  if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+    $skipdrive = 0;
+
+    if ($drive["os"] == "junos") {
+        foreach ($config['ignore_junos_os_drives'] as $jdrive) {
+            if (preg_match($jdrive, $drive["hrStorageDescr"])) {
+                $skipdrive = 1;
+            }
+        }
+    }
+
+    if ($skipdrive) { continue; }
+    if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     $total = $drive['hrStorageSize'] * $drive['hrStorageAllocationUnits'];
     $used  = $drive['hrStorageUsed'] * $drive['hrStorageAllocationUnits'];
