@@ -33,21 +33,14 @@
 
         if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) 
         {
-          if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = 'cpm'"),0) == '0') {
-            $query = "INSERT INTO processors (`entPhysicalIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`)
-                      values ('$entPhysicalIndex', '".$device['device_id']."', '$descr', '$index', '$usage_oid', '".$entry['juniSystemModuleCpuUtilPct']."', 'cpm')";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-            echo("+");
-          } else {
-            echo(".");
-            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$usage_oid."', `processor_usage` = '".$usage."'
-                      WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = 'cpm'";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-          }
-          $valid_processor['cpm'][$index] = 1;
+          discover_processor($valid_processor, $device, $oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
         }
+      }
+    }
+    if(!is_array($valid_processor['cpm'])) {
+      $avgBusy5 = snmp_get($device, ".1.3.6.1.4.1.9.2.1.58.0", "-Oqv");
+      if(is_numeric($avgBusy5)) {
+        discover_processor($valid_processor, $device, ".1.3.6.1.4.1.9.2.1.58.0", "0", "ios", "Processor", $precision = "1", $current = $avgBusy5, $entPhysical = NULL, $hrDevice = NULL);
       }
     }
   } 
