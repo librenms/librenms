@@ -28,10 +28,10 @@
       $vlan_descr = trim(str_replace("\"", "", $vlan_descr));
 
       if(mysql_result(mysql_query("SELECT COUNT(vlan_id) FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "' AND `vlan_domain` = '' AND `vlan_vlan` = '" . $vlan . "'"), 0) == '0') {
-        mysql_query("INSERT INTO `vlans` (`device_id`,`vlan_domain`,`vlan_vlan`, `vlan_descr`) VALUES (" . $device['device_id'] . ",'','$vlan', '" . mysql_real_escape_string($vlan_descr) . "')");
+        mysql_query("INSERT INTO `vlans` (`device_id`,`vlan_domain`,`vlan_vlan`, `vlan_descr`) VALUES (" . $device['device_id'] . ",'','$vlan', '" . mres($vlan_descr) . "')");
         echo("+");
       } else { 
-        mysql_query("UPDATE `vlans` SET `vlan_descr`='" . mysql_real_escape_string($vlan_descr) . "' WHERE `device_id`='" . $device['device_id'] . "' AND `vlan_vlan`='" . $vlan . "'");
+        mysql_query("UPDATE `vlans` SET `vlan_descr`='" . mres($vlan_descr) . "' WHERE `device_id`='" . $device['device_id'] . "' AND `vlan_vlan`='" . $vlan . "'");
         echo("."); 
       }
 
@@ -48,7 +48,7 @@
       if(!$vlan_exists) { 
         mysql_query("DELETE FROM `vlans` WHERE `vlan_id` = '" . $dev_vlan['vlan_id'] . "'"); 
         echo("-");
-        #echo("Deleted VLAN ". $dev_vlan['vlan_vlan'] ."\n"); 
+        if ($debug) { echo("Deleted VLAN ". $dev_vlan['vlan_vlan'] ."\n"); }
       }
     }
   }
