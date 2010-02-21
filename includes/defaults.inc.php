@@ -60,6 +60,9 @@ $config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "
 
 $config['bad_if_regexp'] = array("/serial[0-9]:/");
 
+$config['processor_filter'][] = "An electronic chip that makes the computer work.";
+
+
 # Sensors
 
 $config['allow_entity_sensor']['amperes'] = 1;
