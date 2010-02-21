@@ -16,7 +16,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
     sleep(1); # Give the TME some time to reset
   }
 
-  if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision'];p }
+  if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
 
   $temprrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
