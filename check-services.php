@@ -3,7 +3,7 @@
 include("config.php");
 include("includes/functions.php");
   
-$sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.service_host = D.device_id ORDER by D.device_id DESC";
+$sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.device_id = D.device_id ORDER by D.device_id DESC";
 $query = mysql_query($sql);
 while ($service = mysql_fetch_array($query)) {
 
@@ -34,6 +34,19 @@ while ($service = mysql_fetch_array($query)) {
   } else { unset($updated); }
   $update_sql = "UPDATE `services` SET `service_status` = '$status', `service_message` = '" . addslashes($check) . "', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '" . $service['service_id']. "'";
   mysql_query($update_sql);
-#  echo("$update_sql " . mysql_affected_rows() . " rows updated\n");
+
+  $rrd  = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename("service-" . $service['service_type'] . "-" . $service['service_id'] . ".rrd");
+
+  if (!is_file($rrd)) {
+    $create = $config['rrdtool'] . " create $rrd \
+     --step 300 \
+     DS:status:GAUGE:600:0:1 \
+     RRA:AVERAGE:0.5:1:1200 \
+     RRA:AVERAGE:0.5:12:2400";
+    shell_exec($create);
+  }
+
+  rrdtool_update($rrd,"N:".$status);
+
 }
 ?>

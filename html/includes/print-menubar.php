@@ -11,7 +11,7 @@
   while($device = mysql_fetch_array($query_a)) {
     $this_alert = 0;
     if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0') {
-      if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_host = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
+      if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
       if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1";}
     }
     if ($this_alert) { 

@@ -148,7 +148,7 @@ if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entP
 #}
 
 
-if(mysql_result(mysql_query("select count(service_id) from services WHERE service_host = '" . $device['device_id'] . "'"), 0) > '0') {
+if(mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['srv'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/srv/">
     <img src="images/16/server_cog.png" align="absmiddle" border="0" /> Services
