@@ -822,7 +822,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
   global $debug;
 
   $event_query = "INSERT INTO eventlog (host, reference, type, datetime, message) VALUES (" . ($device['device_id'] ? $device['device_id'] : "NULL");
-  $event_query .= ", " . ($reference ? $reference : "NULL") . ", " . ($type ? $type : "NULL") . ", NOW(), '" . mres($text) . "')";
+  $event_query .= ", '" . ($reference ? $reference : "NULL") . "', '" . ($type ? $type : "NULL") . "', NOW(), '" . mres($text) . "')";
   if ($debug) { echo($event_query . "\n"); }
   mysql_query($event_query);
 } 
