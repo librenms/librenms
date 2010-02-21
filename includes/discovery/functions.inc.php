@@ -32,8 +32,8 @@ function discover_processor(&$valid_processor, $device, $oid, $index, $type, $de
       if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysical, $hrDevice\n"); }
       if($descr) {
           if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = '$type'"),0) == '0') {
-            $query = "INSERT INTO processors (`entPhysicalIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`)
-                      values ('$entPhysicalIndex', '".$device['device_id']."', '$descr', '$index', '$usage_oid', '$usage', '$type')";
+            $query = "INSERT INTO processors (`entPhysicalIndex`, `hrDeviceIndex`, ``device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`, `processor_precision`)
+                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$oid', '$usage', '$type','$precision')";
             mysql_query($query);
             if($debug) { print $query . "\n"; }
             echo("+");
