@@ -40,7 +40,7 @@
     if(!is_array($valid_processor['cpm'])) {
       $avgBusy5 = snmp_get($device, ".1.3.6.1.4.1.9.2.1.58.0", "-Oqv");
       if(is_numeric($avgBusy5)) {
-        discover_processor($valid_processor, $device, ".1.3.6.1.4.1.9.2.1.58.0", "0", "ios", "Processor", $precision = "1", $current = $avgBusy5, $entPhysical = NULL, $hrDevice = NULL);
+        discover_processor($valid_processor, $device, ".1.3.6.1.4.1.9.2.1.58.0", "0", "ios", "Processor", "1", $avgBusy5, NULL, NULL);
       }
     }
   } 

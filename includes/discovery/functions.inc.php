@@ -28,7 +28,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 
 function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysical = NULL, $hrDevice = NULL) {
 
-      global $config; global $debug; global $valid_processor;
+      global $config; global $debug;
       if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysical, $hrDevice\n"); }
       if($descr) {
           if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = '$type'"),0) == '0') {
