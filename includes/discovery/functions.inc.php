@@ -26,20 +26,20 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 
 }
 
-function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysical = NULL, $hrDevice = NULL) {
+function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL) {
 
       global $config; global $debug;
-      if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysical, $hrDevice\n"); }
+      if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n"); }
       if($descr) {
           if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = '$type'"),0) == '0') {
-            $query = "INSERT INTO processors (`entPhysicalIndex`, `hrDeviceIndex`, ``device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`, `processor_precision`)
-                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$oid', '$usage', '$type','$precision')";
+            $query = "INSERT INTO processors (`entPhysicalIndex`, `hrDeviceIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`, `processor_precision`)
+                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$oid', '$current', '$type','$precision')";
             mysql_query($query);
             if($debug) { print $query . "\n"; }
             echo("+");
           } else {
             echo(".");
-            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$usage_oid."', `processor_usage` = '".$usage."'
+            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$oid."', `processor_usage` = '".$current."'
                       WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = '".$type."'";
             mysql_query($query);
             if($debug) { print $query . "\n"; }
