@@ -21,6 +21,7 @@
 
         $descr_oid = "entPhysicalName." . $entPhysicalIndex;
         $descr = snmp_get($device, $descr_oid, "-Oqv", "ENTITY-MIB");
+        if(!$descr) { $descr = "Processor $index" }
 
         $old_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("cpmCPU-" . $index . ".rrd");
         $new_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-cpm-" . $index . ".rrd");
