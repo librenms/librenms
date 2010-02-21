@@ -19,8 +19,8 @@
       $rra = $rrd['rra'];
       $filename = $rrd['filename'];
       $descr = $rrd['descr'];
-
-      $descr = substr(str_pad(short_hrDeviceDescr($rrd['descr']), 10),0,10);
+      $descr = substr(str_pad($descr, 10),0,10);
+      $descr = str_replace(":", "\:", $descr);
 
       $id = $rra."_".$i;
       

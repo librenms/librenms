@@ -10,7 +10,6 @@ while($proc = mysql_fetch_array($query)) {
   if(is_file($rrd_filename)) {
 
     $descr = short_hrDeviceDescr($proc['processor_descr']);
-    $descr = str_replace(":", "\:", $descr);
 
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
