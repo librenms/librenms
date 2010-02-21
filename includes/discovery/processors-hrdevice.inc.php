@@ -25,23 +25,9 @@
           rename($old_rrd,$new_rrd);
           echo("Moved RRD ");
         }
-
         if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" && $descr != "An electronic chip that makes the computer work.") 
         {
-          if(mysql_result(mysql_query("SELECT count(processor_id) FROM `processors` WHERE `processor_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `processor_type` = 'hr'"),0) == '0') {
-            $query = "INSERT INTO processors (`hrDeviceIndex`, `device_id`, `processor_descr`, `processor_index`, `processor_oid`, `processor_usage`, `processor_type`)
-                      values ('$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$usage_oid', '".$usage."', 'hr')";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-            echo("+");
-          } else {
-            echo(".");
-            $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$usage_oid."', `processor_usage` = '".$usage."'
-                      WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = 'hr'";
-            mysql_query($query);
-            if($debug) { print $query . "\n"; }
-          }
-          $valid_processor['hr'][$index] = 1;
+          discover_processor($valid_processor, $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
         }
       }
     }
