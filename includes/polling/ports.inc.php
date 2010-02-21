@@ -86,7 +86,7 @@
           eventlog($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
         } elseif ( $port[$oid] != $this_port[$oid] ) {
-          $update .= ", `$oid` = '".mysql_real_escape_string($this_port[$oid])."'";
+          $update .= ", `$oid` = '".mres($this_port[$oid])."'";
   	  eventlog($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
         }

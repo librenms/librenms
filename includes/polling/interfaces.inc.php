@@ -98,7 +98,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    }
  
    if ( $interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
-     $update .= $seperator . "`ifAlias` = '".mysql_real_escape_string($ifAlias)."'";
+     $update .= $seperator . "`ifAlias` = '".mres($ifAlias)."'";
      $seperator = ", ";
      eventlog("ifAlias -> $ifAlias", $interface['device_id'], $interface['interface_id']);
    }

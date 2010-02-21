@@ -1,6 +1,6 @@
 <?php
 
-## JUNOSe Processors
+## JUNOS Processors
 if($device['os'] == "junos")
 {
   echo("JUNOS : ");
