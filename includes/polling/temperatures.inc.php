@@ -6,21 +6,17 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   echo("Checking temp " . $temperature['temp_descr'] . "... ");
 
-  for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading;
+  for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
   {
     if ($debug) echo "Attempt $i ";
     $temp_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['temp_oid'] . "|grep -v \"No Such Instance\"";
     $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
 
     if ($temp != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
+    sleep(1); # Give the TME some time to reset
   }
 
-  if($temperature['temp_tenths']) { $temp = $temp / 10; }
-  else
-  {
-    if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision']; }
-  }
-  #FIXME also divide the limit here
+  if ($temperature['temp_precision']) { $temp = $temp / $temperature['temp_precision'];p }
 
   $temprrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
