@@ -50,6 +50,8 @@ $config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F',
 $config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
 $config['graph_colours']['default'] = $config['graph_colours']['blues'];
 
+### The device overview page options
+
 $config['overview_show_sysDescr'] = true;
 
 ### Ignores & Allows

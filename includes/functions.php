@@ -835,5 +835,25 @@ function notify($device,$title,$message)
   if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
   mail($email, $title, $message, $config['email_headers']);
 }
-                                                                                                                                
+
+
+function formatCiscoHardware(&$device, $short = false)
+{
+
+    if ($device['os'] == "ios") {
+        if ($device['hardware']) {
+            if (preg_match("/^WS-C([A-Za-z0-9]+).*/", $device['hardware'], $matches)) {
+                if (!$short) {
+                    $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
+                } else {
+                    $device['hardware'] = "Cisco " . $matches[1];
+                }
+            }
+        } else {
+            if (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
+                $device['hardware'] = "Cisco " . $matches[1];
+            }
+        }
+    }
+}
 ?>
