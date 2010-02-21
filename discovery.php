@@ -133,6 +133,10 @@ while ($device = mysql_fetch_array($device_query))
   if($device['os'] == "junose") { 
     include("includes/discovery/processors-junose.inc.php");
   }
+
+  if($device['os'] == "linux") {
+    if (($device['type'] == "unknown") && preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
+  }
   
   if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
     include("includes/discovery/cisco-vlans.inc.php");
