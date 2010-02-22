@@ -96,6 +96,8 @@ while ($device = mysql_fetch_array($device_query))
 
   include("includes/discovery/processors.inc.php");
 
+  include("includes/discovery/mempools.inc.php");
+
   ## Discover IPv4 Addresses
   include("includes/discovery/ipv4-addresses.inc.php");
 

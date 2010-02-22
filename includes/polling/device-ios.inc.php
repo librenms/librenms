@@ -20,9 +20,13 @@
    $snmp_cmdb .= " entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 ";
    $snmp_cmdb .= " entPhysicalModelName.1001 entPhysicalContainedIn.1001";
    $snmp_cmdb .= " cardDescr.1 cardSlotNumber.1";
-   list($model_1,$contained_1,$name_1,$ver_1,$model_1001,$contained_1001,$descr_1,$slot_1) = explode("\n", shell_exec($snmp_cmdb));
-   if(($contained_1 == "0" || $name_1 == "Chassis") && strpos($model_1, "No") === FALSE) { $ciscomodel = $model_1; list($version_1) = explode(",",$ver_1); }
+   $model_data = shell_exec($snmp_cmdb);
+   if($debug) {echo($model_data);}
+   list($model_1,$contained_1,$name_1,$ver_1,$model_1001,$contained_1001,$descr_1,$slot_1) = explode("\n", $model_data);
+
+
    if($slot_1 == "-1" && strpos($descr_1, "No") === FALSE) { $ciscomodel = $descr_1; }
+   if(($contained_1 == "0" || $name_1 == "Chassis") && strpos($model_1, "No") === FALSE) { $ciscomodel = $model_1; list($version_1) = explode(",",$ver_1); }
    if($contained_1001 == "0" && strpos($model_1001, "No") === FALSE) { $ciscomodel = $model_1001; }
    $ciscomodel = str_replace("\"","",$ciscomodel);
    if($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }

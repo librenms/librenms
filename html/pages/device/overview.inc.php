@@ -72,8 +72,9 @@ echo("<div style='float:right; width: 50%;'>");
 
 ### Right Pane
 include("overview/processors.inc.php");
-include("overview/cemp.inc.php");
-include("overview/cmp.inc.php");
+include("overview/mempools.inc.php");
+#include("overview/cemp.inc.php");
+#include("overview/cmp.inc.php");
 include("overview/hrStorage.inc.php");
 include("overview/temperatures.inc.php");
 include("overview/fanspeeds.inc.php");
