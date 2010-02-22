@@ -48,6 +48,29 @@ function discover_processor(&$valid_processor, $device, $oid, $index, $type, $de
       }
 }
 
+
+function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL) {
+
+      global $config; global $debug;
+      if($debug) { echo("$device, $oid, $index, $type, $descr, $precision, $current, $entPhysicalIndex, $hrDeviceIndex\n"); }
+      if($descr) {
+          if(mysql_result(mysql_query("SELECT count(mempool_id) FROM `mempools` WHERE `mempool_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `mempool_type` = '$type'"),0) == '0') {
+            $query = "INSERT INTO mempools (`entPhysicalIndex`, `hrDeviceIndex`, `device_id`, `mempool_descr`, `mempool_index`, `mempool_type`, `mempool_precision`)
+                      values ('$entPhysicalIndex', '$hrDeviceIndex', '".$device['device_id']."', '$descr', '$index', '$type','$precision')";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; }
+            echo("+");
+          } else {
+            echo(".");
+            $query = "UPDATE `mempools` SET `mempool_descr` = '".$descr."' WHERE `device_id` = '".$device['device_id']."' AND `mempool_index` = '".$index."' AND `mempool_type` = '".$type."'";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; }
+          }
+          $valid_mempool[$type][$index] = 1;
+      }
+}
+
+
 function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL) {
 
       global $config; global $debug;

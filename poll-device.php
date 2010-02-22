@@ -114,6 +114,7 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/fanspeeds.inc.php");
     include("includes/polling/voltages.inc.php");
     include("includes/polling/processors.inc.php");
+    include("includes/polling/mempools.inc.php");
     include("includes/polling/device-netstats.inc.php");
     include("includes/polling/ipSystemStats.inc.php");
     include("includes/polling/ports.inc.php");
