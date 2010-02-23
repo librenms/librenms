@@ -23,10 +23,9 @@ $os_groups['freebsd']   = "unix";
 $os_groups['openbsd']   = "unix";
 $os_groups['netbsd']    = "unix";
 $os_groups['dragonfly'] = "unix";
+$os_groups['monowall']  = "unix";
 $os_groups['solaris']   = "unix";
-
 $os_groups['adva']	= "unix";
-
 $os_groups['opensolaris'] = "unix";
 
 
@@ -48,6 +47,7 @@ $os_text['asa']          = "Cisco ASA";
 $os_text['pix']          = "Cisco PIX";
 $os_text['generic']	 = "Generic Device";
 $os_text['ironware']	 = "Brocade IronWare";
+$os_text['monowall']	 = "m0n0wall";
 $os_text['freebsd']      = "FreeBSD";
 $os_text['openbsd']      = "OpenBSD";
 $os_text['netbsd']       = "NetBSD";
