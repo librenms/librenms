@@ -24,14 +24,14 @@ echo("<div class=mainpane>");
 
 echo('<ul id="maintab" class="shadetabs">');
 
-
-#echo("
-#<ul id='maintab' class='shadetabs'>
-#<li class=" . $select['overview'] . ">
-#  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/overview/'>
-#    <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
-#  </a>
-#</li>");
+if($config['show_overview_tab']) {
+echo("
+<li class=" . $select['overview'] . ">
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/overview/'>
+    <img src='images/16/server_lightning.png' align=absmiddle border=0> Overview
+  </a>
+</li>");
+}
 
 echo('<li class="' . $select['graphs'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/graphs/">
