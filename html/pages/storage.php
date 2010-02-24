@@ -32,6 +32,7 @@ while($drive = mysql_fetch_array($query)) {
                 $skipdrive = 1;
             }
         }
+        $drive["storage_descr"] = preg_replace("/.*mounted on: (.*)/", "\\1", $drive["storage_descr"]);
     }
 
     if ($skipdrive) { continue; }
