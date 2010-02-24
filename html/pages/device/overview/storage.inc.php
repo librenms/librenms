@@ -17,6 +17,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_
                 $skipdrive = 1;
             }
         }
+        $drive["storage_descr"] = preg_replace("/.*mounted on: (.*)/", "\\1", $drive["storage_descr"]);
     }
 
     if ($skipdrive) { continue; }
