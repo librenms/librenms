@@ -75,8 +75,8 @@ if($_GET['debug']) {
   }
 
   if($graph) {
-    header('Content-type: image/png');
-    $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+#    header('Content-type: image/png');
+#    $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
   } else {  
     header('Content-type: image/png');
     $string = "Graph Generation Error";
