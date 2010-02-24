@@ -8,16 +8,30 @@
 
     $proc_url   = "?page=device/".$device['device_id']."/health/processors/";
 
-    $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$proc['processor_descr'];
-    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
+    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+
+
+
+    $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
+    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['proc_id'] . "&type=proc&from=$month&to=$now&width=400&height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
-    if($proc['processor_usage'] > '60') { $proc_colour='#cc0000'; } else { $proc_colour='#0000cc';  }
-    echo("<tr><td class=tablehead width=450><a href='' $proc_popup>" . $proc['processor_descr'] . "</a></td>
-           <td><a href='#' $proc_popup>
-             <img src='percentage.php?per=" . $proc['processorLoad'] . "&width=500'></a></td>
-           <td style='font-weight: bold; color: $proc_colour'>" . $proc['processor_usage'] . "%</td>
+    $perc = round($proc['processor_usage']);
+
+    if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
+    } elseif($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
+    } elseif($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
+    } elseif($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
+    } else { $left_background='9abf5b'; $right_background='bbd392'; }
+
+    echo("<tr bgcolor=$row_colour><td class=tablehead><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
+           <td width=90><a href='".$proc_url."'  $proc_popup><img src='$mini_url'></a></td>
+           <td width=200><a href='".$proc_url."' $proc_popup>
+           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background)."
+            </a></td>
          </tr>");
+
+
  
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
 

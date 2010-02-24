@@ -39,7 +39,7 @@ echo('<li class="' . $select['graphs'] . '">
   </a>
 </li>');
 
-$health =  mysql_result(mysql_query("select count(*) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) +
+$health =  mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0) +
@@ -137,7 +137,7 @@ if($config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entP
 
 
 
-#if(mysql_result(mysql_query("select count(storage_id) from storage WHERE host_id = '" . $device['device_id'] . "'"), 0) > '0') {
+#if(mysql_result(mysql_query("select count(storage_id) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
 #  echo("
 #<li class=" . $select['storage'] . ">
 #  <a href='".$config['base_url']."/device/" . $device['device_id'] . '/storage/">
