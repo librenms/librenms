@@ -12,13 +12,13 @@ $query = mysql_query($sql);
 echo("<div style='padding: 5px;'>
         <table width=100% cellspacing=0 cellpadding=2>");
 
-#echo("<tr class=tablehead>
-#        <th width=280>Device</th>
-#        <th>Storage</th>
-#        <th width=100></th>
-#        <th width=280>Usage</th>
-#        <th width=100>Used</th>
-#      </tr>");
+echo("<tr class=tablehead>
+        <th width=280>Device</th>
+        <th>Storage</th>
+        <th width=100></th>
+        <th width=280>Usage</th>
+        <th width=50>Used</th>
+      </tr>");
 
 $row = 1;
 
@@ -37,13 +37,10 @@ while($drive = mysql_fetch_array($query)) {
     if ($skipdrive) { continue; }
     if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    $total = $drive['storage_size'];
-    $used  = $drive['storage_used'];
-    $free  = $drive['storage_free'];
     $perc  = round($drive['storage_perc'], 0);
-    $free  = formatStorage($free);
-    $total = formatStorage($total);
-    $used = formatStorage($used);
+    $total = formatStorage($drive['storage_size']);
+    $free = formatStorage($drive['storage_free']);
+    $used = formatStorage($drive['storage_used']);
 
     $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=400&height=125";
     $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";

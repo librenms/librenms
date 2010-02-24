@@ -21,11 +21,10 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_
 
     if ($skipdrive) { continue; }
     if(is_integer($drive_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
-    $total = $drive['storage_size'] * $drive['storage_units'];
-    $used  = $drive['storage_used'] * $drive['storage_units'];
     $perc  = round($drive['storage_perc'], 0);
-    $total = formatStorage($total);
-    $used = formatStorage($used);
+    $total = formatStorage($drive['storage_size']);
+    $free = formatStorage($drive['storage_free']);
+    $used = formatStorage($drive['storage_used']);
 
     $fs_url   = "/device/".$device['device_id']."/health/storage/";
 
