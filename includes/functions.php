@@ -8,7 +8,7 @@ include_once("Net/IPv6.php");
 ## Observer Includes
 
 include_once($config['install_dir'] . "/includes/common.php");
-
+include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
 include_once($config['install_dir'] . "/includes/generic.php");
 include_once($config['install_dir'] . "/includes/procurve.php");
 include_once($config['install_dir'] . "/includes/graphing.php");
@@ -103,22 +103,6 @@ function shorthost($hostname, $len=16)
     $i++;
   }
   return ($shorthost);
-}
-
-function rrdtool_update($rrdfile, $rrdupdate)
-{
-  global $config, $debug;
-  
-  if ($debug) { echo($config['rrdtool'] . " update $rrdfile $rrdupdate \n"); }
-  return shell_exec($config['rrdtool'] . " update $rrdfile $rrdupdate");
-}
-
-function rrdtool($command, $file, $options)
-{
-  global $config;
-  
-  if ($config['debug']) { echo($config['rrdtool'] . " $command $file $options \n"); }
-  return shell_exec($config['rrdtool'] . " $command $file $options");
 }
 
 function device_array($device_id)
@@ -256,19 +240,6 @@ function print_message($text)
   echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle">'.$text.'</td></tr></table>');
 }
 
-function interface_rates ($rrd_file)  // Returns the last in/out value in RRD
-{
-  global $config;
-  $cmd  = $config['rrdtool']." fetch -s -600s -e now $rrd_file AVERAGE | grep : | cut -d\" \" -f 2,3 | grep e";
-  $data = trim(`$cmd`);
-  foreach( explode("\n", $data) as $entry) {
-    list($in, $out) = split(" ", $entry);
-    $rate['in'] = $in * 8;
-    $rate['out'] = $out * 8;
-  }
-  return $rate;
-}
-
 function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
@@ -282,19 +253,6 @@ function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/ou
   $errors['in'] = round($in_errors);
   $errors['out'] = round($out_errors);
   return $errors;
-}
-
-function interface_packets ($rrd_file) // Returns the last in/out pps value in RRD
-{
-  global $config;
-  $cmd = $config['rrdtool']." fetch -s -1d -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 6,7";
-  $data = trim(shell_exec($cmd));
-  foreach( explode("\n", $data) as $entry) {
-        list($in, $out) = explode(" ", $entry);
-  }
-  $packets['in'] = round($in);
-  $packets['out'] = round($out);
-  return $packets;
 }
 
 function geteventicon ($message) 
@@ -389,7 +347,6 @@ function getImage($host)
   return $image;
 }
 
-
 function renamehost($id, $new) {
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
@@ -425,7 +382,7 @@ function delHost($id)
   mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");  
   mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
+  mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `eventlog` WHERE `host` = '$id'");
   mysql_query("DELETE FROM `syslog` WHERE `device_id` = '$id'");
@@ -456,7 +413,7 @@ function retireHost($id)
   }
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `storage` WHERE `host_id` = '$id'");
+  mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");

@@ -1,70 +1,28 @@
 <?php
 
-  unset( $storage_exists );
+echo("Storage : ");
 
-  echo("HOST-RESOURCES-MIB Storage : ");  
+include("storage-hrstorage.inc.php");
 
-  $oids = shell_exec($config['snmpwalk'] . " -CI -m HOST-RESOURCES-MIB -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageIndex");
-  $oids = trim(str_replace("hrStorageIndex.","",$oids));
+### Remove storage which weren't redetected here
 
-  foreach(explode("\n", $oids) as $data) {
-   if($data) {
-    $data = trim($data);
-    list($oid,$hrStorageIndex) = explode(" ", $data);
-    $temp = shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES -O sqv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " hrStorageDescr.$oid hrStorageAllocationUnits.$oid hrStorageSize.$oid hrStorageType.$oid");
-    $temp = trim($temp);
-    list($descr, $units, $size, $fstype) = explode("\n", $temp);
-    list($units) = explode(" ", $units);
-    $allow = 1;
-    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $allow = 0; if ($debug) echo("$bi == $descr \n"); } }
-    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $allow = 0; if ($debug) echo("$descr, $bi \n"); } }
-    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $allow = 0; if ($debug) echo("$bi, $descr \n"); } }
-    if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == "hrStorageRemovableDisk") { $allow = 0; if ($debug) echo("removable, skipping\n"); }
-    if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == "hrStorageNetworkDisk") { $allow = 0; if ($debug) echo("network, skipping\n"); }
-    $descr = str_replace("mounted on: ", "", $descr);
-    $descr = preg_replace("/: [A-Za-z0-9_]+ file system, /", ", ", $descr);
-    if ($debug) { echo("$fstype"); }
-
-    if($size > '0' && $allow) {
-      if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"),0) == '0') {
-        $query  = "INSERT INTO storage (`host_id`, `hrStorageIndex`, `hrStorageType`, `hrStorageDescr`,`hrStorageSize`,`hrStorageAllocationUnits`) ";
-        $query .= "values ('".$device['device_id']."', '$hrStorageIndex', '$fstype', '$descr', '$size', '$units')";
-	mysql_query($query); if($debug) { echo("$query"); }
-	echo("+");
-      } else {
-        $data = mysql_fetch_array(mysql_query("SELECT * FROM `storage` WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'"));
-	if($data['hrStorageDescr'] != $descr || $data['hrStorageSize'] != $size || $data['hrStorageAllocationUnits'] != $units || $data['hrStorageType'] != $fstype) {
-          $query  = "UPDATE storage SET `hrStorageDescr` = '$descr', `hrStorageType` = '$fstype', `hrStorageSize` = '$size', `hrStorageAllocationUnits` = '$units' ";
-          $query .= ", `hrStorageType` = '$fstype' ";
-          $query .= "WHERE hrStorageIndex = '$hrStorageIndex' AND host_id = '".$device['device_id']."'";
-	  echo("U");
-          if($debug) { echo("$query \n"); }
-	  mysql_query($query);
-        } else { echo("."); }
-      }
-      $storage_exists[] = $device['device_id']." $hrStorageIndex";
-    } else { echo("X"); };
-   }
-  }
-
-$sql = "SELECT * FROM storage AS S, devices AS D where S.host_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM `storage` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);
 
-while ($store = mysql_fetch_array($query)) {
-        unset($exists);
-        $i = 0;
-        while ($i < count($storage_exists) && !isset($exists)) {
-            $thisstore = $store['host_id'] . " " . $store['hrStorageIndex'];
-            if ($storage_exists[$i] == $thisstore) { $exists = 1; }
-            $i++;
-        }
-        if(!$exists) {
-          echo("-");
-          mysql_query("DELETE FROM storage WHERE storage_id = '" . $store['storage_id'] . "'");
-        }
+if($debug) { print_r ($valid_storage); }
+
+while ($test_storage = mysql_fetch_array($query)) {
+  $storage_index = $test_storage['storage_index'];
+  $storage_mib = $test_storage['storage_mib'];
+  if($debug) { echo($storage_index . " -> " . $storage_mib . "\n"); }
+  if(!$valid_storage[$storage_mib][$storage_index]) {
+    echo("-");
+    mysql_query("DELETE FROM `storage` WHERE storage_id = '" . $test_storage['storage_id'] . "'");
+  }
+  unset($storage_index); unset($storage_mib);
 }
 
+unset($valid_storage);
 echo("\n");
-
 
 ?>

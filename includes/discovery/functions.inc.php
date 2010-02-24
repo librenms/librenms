@@ -26,6 +26,29 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
 
 }
 
+function discover_storage(&$valid_storage, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL) {
+
+      global $config; global $debug;
+      if($debug) { echo("$device, $index, $type, $mib, $descr, $units, $used, $size\n"); }
+      if($descr && $size > "0") {
+          if(mysql_result(mysql_query("SELECT count(storage_id) FROM `storage` WHERE `storage_index` = '$index' AND `device_id` = '".$device['device_id']."' AND `storage_mib` = '$mib'"),0) == '0') {
+            $query = "INSERT INTO storage (`device_id`, `storage_descr`, `storage_index`, `storage_mib`, `storage_type`, `storage_units`,`storage_size`,`storage_used`)
+                      values ('".$device['device_id']."', '$descr', '$index', '$mib','$type', '$units', '$size', '$used')";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; mysql_error(); }
+            echo("+");
+          } else {
+            echo(".");
+            $query = "UPDATE `storage` SET `storage_descr` = '".$descr."', `storage_type` = '".$type."', `storage_units` = '".$units."', `storage_size` = '".$size."'
+                      WHERE `device_id` = '".$device['device_id']."' AND `storage_index` = '".$index."' AND `storage_mib` = '".$mib."'";
+            mysql_query($query);
+            if($debug) { print $query . "\n"; }
+          }
+          $valid_storage[$mib][$index] = 1;
+      }
+}
+
+
 function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL) {
 
       global $config; global $debug;

@@ -676,8 +676,6 @@ function rewrite_junose_hardware ($hardware)
   return ($hardware);
 }
 
-
-
 function fixiftype ($type)
 {
   global $rewrite_iftype;
