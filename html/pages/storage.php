@@ -41,6 +41,7 @@ while($drive = mysql_fetch_array($query)) {
     $used  = $drive['storage_used'];
     $free  = $drive['storage_free'];
     $perc  = round($drive['storage_perc'], 0);
+    $free  = formatStorage($free);
     $total = formatStorage($total);
     $used = formatStorage($used);
 
