@@ -11,20 +11,15 @@ include("common.inc.php");
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
-    $descr = $entPhysicalName . " " . $mempool['mempool_descr'];
-    $descr = str_replace("Routing Processor", "RP", $descr);
-    $descr = str_replace("Switching Processor", "SP", $descr);
-    $descr = str_replace("Processor", "Proc", $descr);
-    $descr = str_pad($descr, 28);
-    $descr = substr($descr,0,28);
+    $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), 28),0,28);
+    $descr = str_replace(":", "\:", $descr);
     $rrd  = $config['rrd_dir'] . "/".$mempool['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
-    $id = $mempool['mempool_type'] . "-" . $mempool['mempool_index'];
-    $rrd_options .= " DEF:mempool" . $id . "free=$rrd:free:AVERAGE ";
-    $rrd_options .= " DEF:mempool" . $id . "used=$rrd:used:AVERAGE ";
-    $rrd_options .= " CDEF:mempool" . $id . "total=mempool" . $id . "used,mempool" . $id . "used,mempool" . $id . "free,+,/,100,* ";
-    $rrd_options .= " LINE1:mempool" . $id . "total#" . $colour . ":'" . $descr . "' ";
-    $rrd_options .= " GPRINT:mempool" . $id . "total:LAST:%3.0lf";
-    $rrd_options .= " GPRINT:mempool" . $id . "total:MAX:%3.0lf\\\l ";
+    $rrd_options .= " DEF:mempoolfree=$rrd:free:AVERAGE ";
+    $rrd_options .= " DEF:mempoolused=$rrd:used:AVERAGE ";
+    $rrd_options .= " CDEF:mempooltotal=mempoolused,mempoolused,mempoolfree,+,/,100,* ";
+    $rrd_options .= " LINE1:mempooltotal#" . $colour . ":'" . $descr . "' ";
+    $rrd_options .= " GPRINT:mempooltotal:LAST:%3.0lf";
+    $rrd_options .= " GPRINT:mempooltotal:MAX:%3.0lf\\\l ";
     $iter++;
   }
 
