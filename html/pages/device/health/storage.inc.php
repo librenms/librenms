@@ -18,9 +18,9 @@ while($drive = mysql_fetch_array($query)) {
 
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    $total = $drive['storage_size'] * $drive['storage_units'];
-    $used  = $drive['storage_used'] * $drive['storage_units'];
-    $free  = $total - $drive['storage_used'] * $drive['storage_units'];
+    $total = $drive['storage_size'];
+    $used  = $drive['storage_used'];
+    $free  = $drive['storage_free'];
     $perc  = round($drive['storage_perc'], 0);
     $used = formatStorage($used);
     $total = formatStorage($total);

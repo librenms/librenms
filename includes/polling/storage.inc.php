@@ -12,8 +12,8 @@ while($storage = mysql_fetch_array($storage_data)) {
 
   if (!is_file($storage_rrd)) {
    rrdtool_create($storage_rrd, "--step 300 \
-     DS:used:GAUGE:600:-273:100000000000 \
-     DS:free:GAUGE:600:-273:100000000000 \
+     DS:used:GAUGE:600:0:U \
+     DS:free:GAUGE:600:0:U \
      RRA:AVERAGE:0.5:1:600 \
      RRA:AVERAGE:0.5:6:700 \
      RRA:AVERAGE:0.5:24:775 \
