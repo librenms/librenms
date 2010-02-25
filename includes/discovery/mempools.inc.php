@@ -3,6 +3,7 @@
 echo("Memory : ");
 
 include("mempools-cmp.inc.php");
+include("mempools-ironware-dyn.inc.php");
 
 ### Remove memory pools which weren't redetected here
 

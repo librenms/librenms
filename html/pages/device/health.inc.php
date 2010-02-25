@@ -7,10 +7,10 @@ $processor  = mysql_result(mysql_query("select count(*) from processors WHERE de
 $fans = mysql_result(mysql_query("select count(*) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $volts = mysql_result(mysql_query("select count(*) from voltage WHERE device_id = '" . $device['device_id'] . "'"), 0);
 
-if ($temperatures) { $datas[] = 'temp'; }
-if ($storage) { $datas[] = 'storage'; }
-if ($memory) { $datas[] = 'memory'; }
 if ($processor) { $datas[] = 'processors'; }
+if ($memory) { $datas[] = 'memory'; }
+if ($storage) { $datas[] = 'storage'; }
+if ($temperatures) { $datas[] = 'temperatures'; }
 if ($fans) { $datas[] = 'fanspeeds'; }
 if ($volts) { $datas[] = 'voltages'; }
 
@@ -23,11 +23,14 @@ $type_text['fanspeeds'] = "Fan Speeds";
 
 print_optionbar_start();
 
+if(!$_GET['opta']) { echo("<b>"); }
+echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/'>Main</a>\n");
+if(!$_GET['opta']) { echo("</b>"); }
 
 
 foreach ($datas as $type) {
-  if ($_GET['opta'] == $type) { echo(" | <strong>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/" . $type . "/'>" . $type_text[$type] ."</a>\n");
+  if ($_GET['opta'] == $type) { echo("<strong>"); }
+  echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/" . $type . "/'>" . $type_text[$type] ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
 }
 
