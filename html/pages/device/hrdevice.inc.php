@@ -8,11 +8,12 @@ while($hrdevice = mysql_fetch_array($hrdevices)) {
   echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
 
 if($hrdevice['hrDeviceType'] == "hrDeviceProcessor") {
-  $proc_url   = "?page=device/".$device['device_id']."/health/hrprocessors/";
+  $proc_id = mysql_result(mysql_query("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'"),0);
+  $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
   $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
-  $proc_popup .= "</div><img src=\'graph.php?id=" . $hrdevice['hrDevice_id'] . "&type=hrProcessor&from=$month&to=$now&width=400&height=125\'>";
+  $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
   $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
-  echo("<td><a href='#' $proc_popup>".$hrdevice['hrDeviceDescr']."</a></td>");
+  echo("<td><a href='$proc_url' $proc_popup>".$hrdevice['hrDeviceDescr']."</a></td>");
 } elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork") {
   $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
   $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'")); 
