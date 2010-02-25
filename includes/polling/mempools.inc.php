@@ -1,5 +1,7 @@
 <?php
 
+echo("Memory: ");
+
 $query = "SELECT * FROM mempools WHERE device_id = '" . $device['device_id'] . "'";
 $mempool_data = mysql_query($query);
 while($mempool = mysql_fetch_array($mempool_data)) {
@@ -9,8 +11,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   $mempoolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("mempool-" . $mempool['mempool_type'] . "-" . $mempool['mempool_index'] . ".rrd");
 
   if (!is_file($mempoolrrd)) {
-   shell_exec("rrdtool create $mempoolrrd \
-     --step 300 \
+   rrdtool_create($mempoolrrd, "--step 300 \
      DS:used:GAUGE:600:-273:100000000000 \
      DS:free:GAUGE:600:-273:100000000000 \
      RRA:AVERAGE:0.5:1:600 \

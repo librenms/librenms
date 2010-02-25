@@ -207,7 +207,15 @@ echo("</td>");
      echo("</td></tr>");
 
      // If we're showing graphs, generate the graph and print the img tags
-     if($graph_type && is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex'] . ".rrd"))) {
+
+    if($graph_type == "etherlike")
+    { 
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-". safename($interface['ifIndex']) . ".rrd"; 
+    } else {
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex']) . ".rrd";  
+    }
+
+     if($graph_type && is_file($graph_file)) {
  
           $type = $graph_type;
 

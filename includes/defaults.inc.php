@@ -96,4 +96,8 @@ $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_junos_os_drives'] = array("/on: \/packages/", "/on: \/dev/", "/on: \/proc/"); # Ignore JunOS partitions who are always 100%
 
+# Ports
+
+$config['enable_ports_etherlike']       = 0; # Enable EtherLike-MIB
+
 ?>
