@@ -33,7 +33,7 @@ function rrdtool_lastupdate($rrdfile, $rrdupdate)
 function rrdtool($command, $file, $options)
 {
   global $config; global $debug;
-  if ($config['debug']) { echo($config['rrdtool'] . " $command $file $options \n"); }
+  if ($debug) { echo($config['rrdtool'] . " $command $file $options \n"); }
   return shell_exec($config['rrdtool'] . " $command $file $options");
 }
 
