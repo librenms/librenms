@@ -35,7 +35,7 @@
     $mac_table[$interface_id][$clean_mac] = 1;
     if(mysql_result(mysql_query("SELECT COUNT(*) from ipv4_mac WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'"),0)) {
       $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'";
-      $old_mac = mysql_fetch_row(mysql_query("SELECT mac_address from ipv4_mac WHERE ipv4_address='$ip'"));
+      $old_mac = mysql_fetch_row(mysql_query("SELECT mac_address from ipv4_mac WHERE ipv4_address='$ip' AND interface_id = '".$interface['interface_id']."'"));
       if($clean_mac != $old_mac[0]) 
       {
         if ($debug) { echo "Changed mac address for $ip from $old_mac[0] to $clean_mac\n"; }
