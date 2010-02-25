@@ -30,7 +30,7 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
   if($fanspeed['fan_current'] > $fanspeed['fan_limit'] && $fan <= $fanspeed['fan_limit']) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['fan_limit'];
-    $msg .= "rpm) at " . date('l dS F Y h:i:s A');
+    $msg .= "rpm) at " . date($config['timestamp_format']);
     mail($email, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $fanspeed['fan_descr'] . "\n");
     eventlog('Fan speed ' . $fanspeed['fan_descr'] . " under threshold: " . $fanspeed['fan_current'] . " rpm (&gt; " . $fanspeed['fan_limit'] . " rpm)", $device['device_id']);

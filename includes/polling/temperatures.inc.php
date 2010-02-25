@@ -37,7 +37,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
   if($temperature['temp_current'] < $temperature['temp_limit'] && $temp >= $temperature['temp_limit']) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'] . " is " . $temp . " (Limit " . $temperature['temp_limit'];
-    $msg .= ") at " . date('l dS F Y h:i:s A');
+    $msg .= ") at " . date($config['timestamp_format']);
     mail($email, "Temp Alarm: " . $device['hostname'] . " " . $temperature['temp_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $temperature['temp_descr'] . "\n");
     eventlog('Temperature ' . $temperature['temp_descr'] . " over threshold: " . $temperature['temp_current'] . " &deg;C (&gt; " . $temperature['temp_limit'] . " &deg;C)", $device['device_id']);

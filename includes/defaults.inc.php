@@ -17,15 +17,16 @@ $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
 
 ### Local Specifics
 
-$config['title_image']  = "images/observer-logo.gif";
-$config['stylesheet']   = "css/styles.css";
-$config['mono_font']    = "DejaVuSansMono";
-$config['favicon']      = "favicon.ico";
-$config['header_color'] = "#1F334E";
-$config['page_refresh'] = "30";  ## Refresh the page every xx seconds
-$config['frong_page']   = "default.php";
-$config['page_title']   = "ObserverNMS";
-$config['syslog_age']    = "1 month";
+$config['title_image']      = "images/observer-logo.gif";
+$config['stylesheet']       = "css/styles.css";
+$config['mono_font']        = "DejaVuSansMono";
+$config['favicon']          = "favicon.ico";
+$config['header_color']     = "#1F334E";
+$config['page_refresh']     = "30";  ## Refresh the page every xx seconds
+$config['frong_page']       = "default.php";
+$config['page_title']       = "ObserverNMS";
+$config['syslog_age']       = "1 month";
+$config['timestamp_format'] = 'd-m-Y H:i:s';
 
 ### Cosmetics
 

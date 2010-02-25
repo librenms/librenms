@@ -162,6 +162,20 @@
       // End Update MySQL
 
       unset($update_query); unset($update);
+
+      // Send alerts for interface flaps.
+      if ($config['warn']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus'])) {
+          if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+          if ($this_port['ifAlias']) { $falias = preg_replace('/^"/', '', $this_port['ifAlias']); $falias = preg_replace('/"$/', '', $falias); $full = $this_port['ifDescr'] . " (" . $falias . ")"; } else { $full = $this_port['ifDescr']; }
+          switch ($this_port['ifOperStatus']) {
+              case "up":
+                  mail($email, "Interface UP - " . $device['hostname'] . " - " . $full, "Device:    " . $device['hostname'] . "\nInterface: " . $full . "\nTimestamp: " . date($config['timestamp_format']), $config['email_headers']);
+              break;
+              case "down":
+                  mail($email, "Interface DOWN - " . $device['hostname'] . " - " . $full, "Device:    " . $device['hostname'] . "\nInterface: " . $full . "\nTimestamp: " . date($config['timestamp_format']), $config['email_headers']);
+              break;
+          }
+      }
     } else {
       echo("Port Deleted?"); // Port missing from SNMP cache?
     } 
