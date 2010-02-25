@@ -118,6 +118,10 @@ if ($ports['errored']) {
   echo('<li><a href="ports/errors/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
+if ($ports['ignored']) {
+  echo('<li><a href="ports/ignored/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
+}
+
 if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money_pound.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1;}
 
 if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Pseudowires</a></li>'); $ifbreak = 1;}

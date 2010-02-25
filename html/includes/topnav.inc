@@ -63,7 +63,7 @@ if($services['down']) { $services['bgcolour'] = "#ffcccc"; } else { $services['b
     <td width=5></td>
   </tr>
   <tr style="background-color: <?php echo $ports['bgcolour'] ?>">
-      <td width="5"></td><td>Interfaces : </td>
+      <td width="5"></td><td>Ports : </td>
     <td><?php echo $ports['count'] ?></td>
     <td> ( </td>
     <td style='text-align: right'><span class=green> <?php echo $ports['up'] ?> up </span></td>
