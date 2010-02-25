@@ -45,11 +45,11 @@ while ($device = mysql_fetch_array($device_query)) {
      if ($status == '1') { 
        $stat = "Up"; 
        mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is up\n')");
-       mail($email, "DeviceUp: " . $device['hostname'], "Device Up: " . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
+       mail($email, "DeviceUp: " . $device['hostname'], "Device Up: " . $device['hostname'] . " at " . date($config['timestamp_format']), $config['email_headers']);
      } else {
        $stat = "Down"; 
        mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
-       mail($email, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname'] . " at " . date('l dS F Y h:i:s A'), $config['email_headers']);
+       mail($email, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname'] . " at " . date($config['timestamp_format']), $config['email_headers']);
      }
      eventlog("Device status changed to $stat", $device['device_id']);
      echo("Status Changed!\n");

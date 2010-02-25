@@ -38,7 +38,7 @@ while ($dr = mysql_fetch_array($dq)) {
   if (!is_numeric($dr['storage_perc_warn'])) { $dr['storage_perc_warn'] = 60; }
   if($dr['storage_perc'] < $dr['storage_perc_warn'] && $perc >= $dr['storage_perc_warn']) 
   {
-    $msg = "Disk Alarm: " . $device['hostname'] . " " . $dr['storage_descr'] . " is " . $perc . "% at " . date('l dS F Y h:i:s A');
+    $msg = "Disk Alarm: " . $device['hostname'] . " " . $dr['storage_descr'] . " is " . $perc . "% at " . date($config['timestamp_format']);
     notify($device, "Disk Alarm: " . $device['hostname'] . " " . $dr['storage_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $dr['storage_descr'] . "\n");
   }

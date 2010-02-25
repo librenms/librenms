@@ -23,11 +23,11 @@ while ($service = mysql_fetch_array($query)) {
     if($service['sysContact']) { $email = $service['sysContact']; } else { $email = $config['email_default']; }
     if($status == "1") {
         $msg  = "Service Up: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date('l dS F Y h:i:s A');
+        $msg .= " at " . date($config['timestamp_format']);
 	mail($email, "Service Up: " . $service['service_type'] . " on " . $service['hostname'], $msg, $config['email_headers']);
     } elseif ($status == "0") {
 	$msg  = "Service Down: " . $service['service_type'] . " on " . $service['hostname'];
-        $msg .= " at " . date('l dS F Y h:i:s A');
+        $msg .= " at " . date($config['timestamp_format']);
         mail($email, "Service Down: " . $service['service_type'] . " on " . $service['hostname'], $msg, $config['email_headers']);
     }
 
