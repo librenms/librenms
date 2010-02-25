@@ -62,7 +62,7 @@ function process_syslog ($entry, $update) {
     $x .= "VALUES ('".$entry['device_id']."','".$entry['program']."','".$entry['facility']."','".$entry['priority']."', '".$entry['level']."', '".$entry['tag']."', '".$entry['msg']."','".$entry['timestamp']."')";   
     if($update && $entry['device_id']) { mysql_query($x); }
     unset ($fix);
-  }
+  } else { print_r($entry); echo("D-$delete");}
 
   return $entry; 
 

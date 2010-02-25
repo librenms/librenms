@@ -3,6 +3,7 @@
 
 include("config.php");
 include("includes/syslog.php");
+include("includes/common.php");
 
 $i="1";
 
