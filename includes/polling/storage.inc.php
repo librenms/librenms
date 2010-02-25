@@ -8,7 +8,7 @@ while($storage = mysql_fetch_array($storage_data)) {
 
   echo($storage['storage_descr'] . ": ");
 
-  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $storage['storage_mib'] . "-" . $storage['storage_index'] . ".rrd");
+  $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $storage['storage_mib'] . "-" . safename($storage['storage_descr']) . ".rrd");
 
   if (!is_file($storage_rrd)) {
    rrdtool_create($storage_rrd, "--step 300 \

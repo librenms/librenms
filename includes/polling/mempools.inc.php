@@ -28,16 +28,13 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   }
 
   $file = $config['install_dir']."/includes/polling/mempools-".$mempool['mempool_type'].".inc.php";
-  echo($file);
   if(is_file($file)) {
     include($file);
   } else {
     ### FIXME GENERIC
   }
 
-  $percent = $mempool['used'] * $mempool['total'] * 100;
-
-  print_r($mempool);
+  $percent = round($mempool['used'] * $mempool['total'] * 100);
 
   echo($percent."% ");
 
