@@ -90,7 +90,7 @@ $config['limit']['temp'] = "60";
 
 # Filesystems
 
-$config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc");
+$config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc", "/dev");
 $config['ignore_mount_string'] = array("packages", "devfs", "procfs", "UMA", "MALLOC");
 $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
