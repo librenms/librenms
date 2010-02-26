@@ -811,6 +811,8 @@ function formatCiscoHardware(&$device, $short = false)
         } else {
             if (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
                 $device['hardware'] = "Cisco " . $matches[1];
+            } elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches)) {
+                $device['hardware'] = "Cisco " . $matches[1];
             }
         }
     }
