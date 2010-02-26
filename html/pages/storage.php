@@ -3,7 +3,7 @@
 if($_SESSION['userlevel'] >= '5') {
   $sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr";
 } else {
-  $sql  = "SELECT * FROM `storage` AS S, `devices` AS D, devices_perms as P WHERE D.device_id = D.device_id AND ";
+  $sql  = "SELECT * FROM `storage` AS S, `devices` AS D, devices_perms as P WHERE S.device_id = D.device_id AND ";
   $sql .= "D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, S.storage_descr";
 }
 
