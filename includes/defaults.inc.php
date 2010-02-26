@@ -96,7 +96,7 @@ $config['ignore_mount_regexp'] = array();
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_junos_os_drives'] = array("/on: \/packages/", "/on: \/dev/", "/on: \/proc/", "^/\/junos$/", "^/\/junos\/dev/$", "/^\/jail\/dev$/"); # Ignore JunOS partitions who are always 100%
-$config['ignore_bsd_os_drives']   = array("/^\/dev$/", "/^\/var\/dhcpd\/dev$/", "/^UMA:/");  # Ignore BSD partitions who are always 100%
+$config['ignore_bsd_os_drives']   = array("/^\/dev,/", "/^\/var\/dhcpd\/dev,/", "/UMA/");  # Ignore BSD partitions who are always 100%
 
 # Ports
 
