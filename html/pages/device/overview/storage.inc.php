@@ -20,6 +20,14 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_
         $drive["storage_descr"] = preg_replace("/.*mounted on: (.*)/", "\\1", $drive["storage_descr"]);
     }
 
+    if ($device['os'] == "freebsd") {
+        foreach ($config['ignore_bsd_os_drives'] as $jdrive) {
+            if (preg_match($jdrive, $drive["storage_descr"])) {
+                $skipdrive = 1;
+            }
+        }
+    }
+
     if ($skipdrive) { continue; }
     if(is_integer($drive_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $perc  = round($drive['storage_perc'], 0);
