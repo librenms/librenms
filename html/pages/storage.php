@@ -35,7 +35,7 @@ while($drive = mysql_fetch_array($query)) {
         $drive["storage_descr"] = preg_replace("/.*mounted on: (.*)/", "\\1", $drive["storage_descr"]);
     }
 
-    if ($device['os'] == "freebsd") {
+    if ($drive['os'] == "freebsd") {
         foreach ($config['ignore_bsd_os_drives'] as $jdrive) {
             if (preg_match($jdrive, $drive["storage_descr"])) {
                 $skipdrive = 1;
