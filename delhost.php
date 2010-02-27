@@ -1,6 +1,7 @@
 #!/usr/bin/php 
 <?php
 
+include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 

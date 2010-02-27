@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
 
+include("includes/defaults.inc.php");
 include("config.php");
 
 echo("Observer Poller v".$config['version']."\n\n");

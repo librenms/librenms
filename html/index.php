@@ -12,6 +12,7 @@ if($debug) {
   ini_set('error_reporting', E_ALL);
 }
 
+  include("../includes/defaults.inc.php");
   include("../config.php"); 
   include("../includes/functions.php");  
   include("includes/functions.inc.php");

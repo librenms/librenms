@@ -1,6 +1,5 @@
 <?php
 
-
 if($_GET['debug']) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 0);
@@ -9,6 +8,7 @@ if($_GET['debug']) {
   ini_set('error_reporting', E_ALL);
 }
 
+  include("../includes/defaults.inc.php");
   include("../config.php");
   include("../includes/common.php");
   include("../includes/graphing.php");
