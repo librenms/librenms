@@ -3,6 +3,7 @@
 ### Clean up the database removing old IPs and links
 
 <?php
+include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
