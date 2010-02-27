@@ -4,7 +4,7 @@
 
 if(!is_array($storage_cache['hrstorage'])) {
   $storage_cache['hrstorage'] = snmp_cache_oid("hrStorageEntry", $device, array(), "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES");
-  print_r($storage_cache);
+  if ($debug) { print_r($storage_cache); }
 }
 
 $entry = $storage_cache['hrstorage'][$device[device_id]][$storage[storage_index]];
