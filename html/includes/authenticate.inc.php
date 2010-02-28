@@ -3,7 +3,6 @@
 @ini_set("session.gc_maxlifetime","0"); 
 
 session_start();
-
 if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
@@ -24,21 +23,35 @@ if(isset($_COOKIE['username']) && isset($_COOKIE['password'])){
   $_SESSION['password'] = mres($_COOKIE['password']);
 }
 
+if(isset($_SERVER['REMOTE_USER'])) {
+  $_SESSION['username'] = mres($_SERVER['REMOTE_USER']);
+  // we don't set a password here because we're using HTTP AUTH
+}
+
 $auth_success = 0;
 
-if ($_SESSION['username'])
+if (isset($_SESSION['username']))
 {
-  if ($config['auth_mechanism'] == "mysql" || !$config['auth_mechanism'])
+  if ($config['auth_mechanism'] == "mysql" || $config['auth_mechanism'] == "http-auth" || !$config['auth_mechanism'])
   {
-    $encrypted = md5($_SESSION['password']);
-    $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username']."' AND `password`='".$encrypted."'";
-    $query = mysql_query($sql);
+       $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username'];
+       if ($config['auth_mechanism'] != "http-auth") 
+       {
+           $encrypted = md5($_SESSION['password']);
+           $sql .=       "' AND `password`='".$encrypted."';";
+       } else { 
+           $sql .= "';"; 
+       }
+       $query = mysql_query($sql);
     $row = @mysql_fetch_array($query);
     if($row['username'] && $row['username'] == $_SESSION['username']) {
       $auth_success = 1;
-    }
+       } else {
+         $_SESSION['username'] = $config['http_auth_guest'];
+         $auth_success = 1;
+       }
   }
- else if ($config['auth_mechanism'] == "ldap")
+  else if ($config['auth_mechanism'] == "ldap")
   {
     $ds=@ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
     if ($ds)
@@ -82,10 +95,9 @@ if ($auth_success) {
     setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
   }
 } 
-elseif ($_SESSION['username']) { 
+elseif (isset($_SESSION['username'])) { 
   $auth_message = "Authentication Failed"; 
   unset ($_SESSION['authenticated']);
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
 } 
-
 ?>
