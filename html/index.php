@@ -98,7 +98,7 @@ function popUp(URL) {
           </td>
           <td align="right" style="margin-right: 10px;">
             <div id="topnav" style="float: right;">
- 	  <?php if($_SESSION['authenticated']) {
+ 	  <?php if(isset($_SESSION['authenticated']) && $_SESSION['authenticated']) {
 	    include("includes/topnav.inc");		
 	  } ?>
             </div>
