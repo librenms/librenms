@@ -4,7 +4,6 @@
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
-include("includes/functions-poller.inc.php");
 include("includes/discovery/functions.inc.php");
 
 $start = utime();
@@ -56,7 +55,7 @@ if (file_exists('.svn'))
 
   if ($dbu_rev+0 > $db_rev)
   {
-    echo("Applying database updates to from r$db_rev to r" . trim($dbu_rev) . "...\n");
+    echo("SVN revision changed.\nRunning development SQL update script from r$db_rev to r" . trim($dbu_rev) . "...\n");
     shell_exec("scripts/update-sql.php database-update.sql");
     if ($db_rev == 0)
     {
@@ -86,48 +85,31 @@ while ($device = mysql_fetch_array($device_query))
 
   echo("\n");
 
-  ## Discover OS Changes
   #include("includes/discovery/os.inc.php");
 
-  ## Discover Interfaces 
   include("includes/discovery/ports.inc.php");
-
-  ## Discovery ENTITY-MIB 
-  #include("includes/discovery/entity-physical.inc.php");
-
+  include("includes/discovery/entity-physical.inc.php");
   include("includes/discovery/processors.inc.php");
-
   include("includes/discovery/mempools.inc.php");
-
-  ## Discover IPv4 Addresses
   include("includes/discovery/ipv4-addresses.inc.php");
-
-  ## Discovery IPv6 Addresses
   include("includes/discovery/ipv6-addresses.inc.php");
-
-  ## Discover Temperatures/Voltages/Fanspeeds
   include("includes/discovery/temperatures.inc.php");
   include("includes/discovery/voltages.inc.php");
   include("includes/discovery/fanspeeds.inc.php");
-
-  ## Discover Storage
   include("includes/discovery/storage.inc.php");
-
-  ## hr-device.inc.php
   include("includes/discovery/hr-device.inc.php");
-
-  ## Discovery Protocols (FDP, CDP & LLDP)
   include("includes/discovery/discovery-protocols.inc.php");
-
-  ## ARP Table
   include("includes/discovery/arp-table.inc.php");
-
-  ## BGP Peers (Quagga, Cisco, Juniper, Foundry)
+  include("includes/discovery/junose-atm-vc.inc.php");
   include("includes/discovery/bgp-peers.inc.php");
+  include("includes/discovery/q-bridge-mib.inc.php");
 
-  if($device['os'] == "ironware") { 
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
-  }
+  include("includes/discovery/cisco-vlans.inc.php");
+  include("includes/discovery/cisco-mac-accounting.inc.php");
+  include("includes/discovery/cisco-pw.inc.php");
+  include("includes/discovery/cisco-vrf.inc.php");
+
+
 
   if($device['os'] == "screenos") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
@@ -137,29 +119,16 @@ while ($device = mysql_fetch_array($device_query))
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
   }
   
-  if($device['os'] == "junose") { 
-    include("includes/discovery/processors-junose.inc.php");
-  }
-
   if($device['os'] == "linux") {
     if (($device['type'] == "unknown") && preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
   }
   
   if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
-    include("includes/discovery/cisco-vlans.inc.php");
-    include("includes/discovery/cisco-mac-accounting.inc.php");
-    include("includes/discovery/cisco-pw.inc.php");
-    include("includes/discovery/cisco-vrf.inc.php");
-    #include("includes/discovery/cisco-processors.php");
-    include("includes/discovery/cemp-mib.inc.php");
-    include("includes/discovery/cmp-mib.inc.php");
-
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
   if ($device['os'] == "procurve" || $device['os'] == "powerconnect")
   {
-    include("includes/discovery/q-bridge-mib.inc.php");
     if ($device['type'] == "unknown") { $device['type'] = 'network'; };
   }
 
@@ -171,6 +140,11 @@ while ($device = mysql_fetch_array($device_query))
   if ($device['os'] == "dell-laser")
   {
     if ($device['type'] == "unknown") { $device['type'] = 'printer'; }
+  }
+
+  if($device['os'] == "ironware") 
+  { 
+    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
   }
 
   $update_query  = "UPDATE `devices` SET ";

@@ -7,7 +7,6 @@ include("config.php");
 echo("Observer Poller v".$config['version']."\n\n");
 
 include("includes/functions.php");
-include("includes/functions-poller.inc.php");
 
 $poller_start = utime();
 

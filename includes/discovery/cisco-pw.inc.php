@@ -1,11 +1,11 @@
 <?php
 
-if($config['enable_pseudowires']) {
+if($config['enable_pseudowires'] && $device['os_group'] == "ios") {
 
   unset( $cpw_count );
   unset($cpw_exists);  
 
-  echo("PW : ");
+  echo("Cisco Pseudowires : ");
 
   $oids = shell_exec($config['snmpwalk'] . " -m CISCO-IETF-PW-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " cpwVcID");
 

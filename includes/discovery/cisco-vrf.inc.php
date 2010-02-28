@@ -1,8 +1,11 @@
 <?php
 
+#if($device['os_group'] == "ios") 
+#{
+
   unset( $vrf_count );
 
-  echo("VRF : ");
+  echo("VRFs : ");
 
   $oid_cmd = $config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher";
   $oids = shell_exec($oid_cmd);
@@ -77,5 +80,7 @@
   unset($valid_vrf);
 
   echo("\n");
+
+#}
 
 ?>
