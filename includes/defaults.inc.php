@@ -71,6 +71,9 @@ $config['bad_if_regexp'] = array("/serial[0-9]:/");
 
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 
+$config['ignore_mount_removable'] = 1; # Ignore removable disk storage
+$config['ignore_mount_network']   = 1; # Ignore network mounted storage
+$config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 
 # Sensors
 
