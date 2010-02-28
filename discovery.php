@@ -122,12 +122,16 @@ while ($device = mysql_fetch_array($device_query))
   ## ARP Table
   include("includes/discovery/arp-table.inc.php");
 
+  ## BGP Peers (Quagga, Cisco, Juniper, Foundry)
+  include("includes/discovery/bgp-peers.inc.php");
+
+  if($device['os'] == "ironware") { 
+    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
+  }
+
   if($device['os'] == "screenos") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
   }
-
-  ## BGP Peers (Quagga, Cisco, Juniper, Foundry)
-  include("includes/discovery/bgp-peers.inc.php");
 
   if($device['os'] == "junos") { 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
