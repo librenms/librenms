@@ -24,7 +24,7 @@
                   <td colspan="2" align="right"><input class="submit" name="submit" type="submit" value="Login" /></td>
                 </tr>
 <?php
-if($auth_message) {
+if(isset($auth_message)) {
   echo('<tr><td colspan="2" style="font-weight: bold; color: #cc0000;">' . $auth_message . '</td></tr>');
 }
 ?>
@@ -38,7 +38,7 @@ if($auth_message) {
 
 print_optionbar_end();
 
-if($config['login_message']) {
+if(isset($config['login_message'])) {
   echo('<div style="margin: auto; margin-top: 10px;text-align: center; font-weight: bold; color: #cc0000; width: 470px;">'.$config['login_message'].'</div>');
 }
 ?>
