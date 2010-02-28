@@ -23,7 +23,7 @@ if(is_file($file)) {
   }
 } else {echo("file missing: $file");  }
 
-print_r($rrd_list);
+if ($_GET['debug']) { print_r($rrd_list); } 
 
 $colours   = "mixed";
 $nototal   = 1;
