@@ -98,7 +98,11 @@ if($config['enable_nagios']) {
     die;
 }
 $nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
+}
 
+# If we're on SSL, let's properly detect it
+if(isset($_SERVER['HTTPS'])) {
+  $config['base_url'] = preg_replace('/^http:/','https:', $config['base_url']);
 }
 
 ### Connect to database
