@@ -1,9 +1,24 @@
 <?php
 
+function discover_juniAtmVp(&$exists, $interface_id, $vp_id, $vp_descr) {
+
+      global $config; global $debug;
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `juniAtmVp` WHERE `interface_id` = '".$interface_id."' AND `vp_id` = '".$vp_id."'"),0) == "0") 
+      {
+        echo(".");         
+      } else {
+         $sql = "INSERT INTO `juniAtmVP` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
+         mysql_query($sql); echo("+"); if($debug) { echo($sql . " - " . mysql_affected_rows() . "inserted "); }
+      }
+
+      $exists[$interface_id][$vp_id] = 1;
+
+}
+
 function discover_link($local_interface_id, $protocol, $remote_interface_id, $remote_hostname, $remote_port, $remote_platform, $remote_version) {
 
       global $config; global $debug; global $link_exists;
-      if (mysql_result(@mysql_query("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
                                      AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"),0) == "0")
       {
         $sql = "INSERT INTO `links` (`local_interface_id`,`protocol`,`remote_interface_id`,`remote_hostname`,`remote_port`,`remote_platform`,`remote_version`)

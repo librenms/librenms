@@ -101,8 +101,10 @@ $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_junos_os_drives'] = array("/on: \/packages/", "/on: \/dev/", "/on: \/proc/", "/on: \/junos^/", "/on: \/junos\/dev/", "/on: \/jail\/dev/", "/^(dev|proc)fs/", "/^\/dev\/md0/"); # Ignore JunOS partitions who are always 100%
 $config['ignore_bsd_os_drives']   = array("/^\/dev,/", "/^\/var\/dhcpd\/dev,/", "/UMA/");  # Ignore BSD partitions who are always 100%
 
-# Ports
+# Poller/Discovery
 
 $config['enable_ports_etherlike']       = 0; # Enable EtherLike-MIB
+$config['enable_ports_junoseatmvc']     = 0; # Enable JunOSe ATM VC Discovery/Poller
+
 
 ?>

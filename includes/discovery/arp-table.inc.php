@@ -63,7 +63,6 @@
   }
 
   echo("\n");
-
   unset($mac);
 
 ?>
