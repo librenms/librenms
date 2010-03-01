@@ -5,10 +5,10 @@ function discover_juniAtmVp(&$exists, $interface_id, $vp_id, $vp_descr) {
       global $config; global $debug;
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `juniAtmVp` WHERE `interface_id` = '".$interface_id."' AND `vp_id` = '".$vp_id."'"),0) == "0") 
       {
-        echo(".");         
-      } else {
-         $sql = "INSERT INTO `juniAtmVP` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
+         $sql = "INSERT INTO `juniAtmVp` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
          mysql_query($sql); echo("+"); if($debug) { echo($sql . " - " . mysql_affected_rows() . "inserted "); }
+      } else {
+        echo(".");
       }
 
       $exists[$interface_id][$vp_id] = 1;
