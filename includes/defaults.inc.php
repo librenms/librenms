@@ -106,5 +106,8 @@ $config['ignore_bsd_os_drives']   = array("/^\/dev,/", "/^\/var\/dhcpd\/dev,/", 
 $config['enable_ports_etherlike']       = 0; # Enable EtherLike-MIB
 $config['enable_ports_junoseatmvc']     = 0; # Enable JunOSe ATM VC Discovery/Poller
 
+# LDAP Authentication
+
+$config['auth_ldap_version'] = 3; # v2 or v3
 
 ?>
