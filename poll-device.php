@@ -48,7 +48,7 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
   echo("\n");
 
-  unset($update); unset($update_query); unset($seperator); unset($version); unset($uptime); unset($features); 
+  unset($poll_update); unset($poll_update_query); unset($poll_separator); unset($version); unset($uptime); unset($features); 
   unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName);
 
   $pingable = isPingable($device['hostname']);
@@ -71,37 +71,6 @@ while ($device = mysql_fetch_array($device_query)) {
     $status = "0";
   }
 
-  if ($uptime) 
-  {
-    if ( $uptime < $device['uptime'] ) {
-      notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
-      eventlog('Device rebooted', $device['device_id']);
-    }
-
-    $uptimerrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
-
-    if (!is_file($uptimerrd)) {
-      $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
-        DS:uptime:GAUGE:600:0:U \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797");
-    }
-    rrdtool_update($uptimerrd, "N:$uptime");
-
-    $update .= $seperator . "`uptime` = '$uptime'";
-    $seperator = ", ";
-  } 
-
-  if ( $device['status'] != $status ) {
-    $update .= $seperator . "`status` = '$status'";
-    $seperator = ", ";
-    mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
-    mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
-    eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
-  }
-
   if ($status) { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
@@ -120,6 +89,39 @@ while ($device = mysql_fetch_array($device_query)) {
     $mins = $mins + ($hours * 60);
     $secs = $secs + ($mins * 60);
     $uptime = $secs;
+
+    if ($uptime) 
+    {
+      if ( $uptime < $device['uptime'] ) {
+        notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
+        eventlog('Device rebooted', $device['device_id']);
+      }
+  
+      $uptimerrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
+  
+      if (!is_file($uptimerrd)) 
+      {
+        $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
+        DS:uptime:GAUGE:600:0:U \
+        RRA:AVERAGE:0.5:1:600 \
+        RRA:AVERAGE:0.5:6:700 \
+        RRA:AVERAGE:0.5:24:775 \
+        RRA:AVERAGE:0.5:288:797");
+      }
+      rrdtool_update($uptimerrd, "N:$uptime");
+
+      $poll_update .= $poll_separator . "`uptime` = '$uptime'";
+      $poll_separator = ", ";
+    } 
+
+    if ( $device['status'] != $status ) 
+    {
+      $poll_update .= $poll_separator . "`status` = '$status'";
+      $poll_separator = ", ";
+      mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
+      mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
+      eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
+    }
 
     if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
       /// OS Specific
@@ -149,59 +151,59 @@ while ($device = mysql_fetch_array($device_query)) {
   unset( $seperator) ;
 
   if ( $sysContact && $sysContact != $device['sysContact'] ) {
-    $update .= $seperator . "`sysContact` = '".mres($sysContact)."'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
+    $poll_separator = ", ";
     eventlog("Contact -> $sysContact", $device['device_id']);
   }
 
   if ( $sysName && $sysName != $device['sysName'] ) {
-    $update .= $seperator . "`sysName` = '$sysName'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`sysName` = '$sysName'";
+    $poll_separator = ", ";
     eventlog("sysName -> $sysName", $device['device_id']);
   }
 
   if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
-    $update .= $seperator . "`sysDescr` = '$sysDescr'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
+    $poll_separator = ", ";
     eventlog("sysDescr -> $sysDescr", $device['device_id']);
   }
 
   if ( $sysLocation && $device['location'] != $sysLocation ) {
-    $update .= $seperator . "`location` = '$sysLocation'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`location` = '$sysLocation'";
+    $poll_separator = ", ";
     eventlog("Location -> $sysLocation", $device['device_id']);
   }
 
   if ( $version && $device['version'] != $version ) {
-    $update .= $seperator . "`version` = '$version'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`version` = '$version'";
+    $poll_separator = ", ";
     eventlog("OS Version -> $version", $device['device_id']);
   }
 
   if ( $features && $features != $device['features'] ) {
-    $update .= $seperator . "`features` = '$features'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`features` = '$features'";
+    $poll_separator = ", ";
     eventlog("OS Features -> $features", $device['device_id']);
   }
 
   if ( $hardware && $hardware != $device['hardware'] ) {
-    $update .= $seperator . "`hardware` = '$hardware'";
-    $seperator = ", ";
+    $poll_update .= $poll_separator . "`hardware` = '$hardware'";
+    $poll_separator = ", ";
     eventlog("Hardware -> $hardware", $device['device_id']);
   }
 
-  $update .= $seperator . "`last_polled` = NOW()";
-  $seperator = ", ";
+  $poll_update .= $poll_separator . "`last_polled` = NOW()";
+  $poll_separator = ", ";
   $polled_devices++;
   echo("\n");
   } 
 
-  if ($update) {
-    $update_query  = "UPDATE `devices` SET ";
-    $update_query .= $update;
-    $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . " - $update_query \n");
-    $update_result = mysql_query($update_query);
+  if ($poll_update) {
+    $poll_update_query  = "UPDATE `devices` SET ";
+    $poll_update_query .= $poll_update;
+    $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+    echo("Updating " . $device['hostname'] . " - $poll_update_query \n");
+    $poll_update_result = mysql_query($poll_update_query);
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
