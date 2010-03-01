@@ -117,4 +117,5 @@ ALTER TABLE `storage` ADD `storage_free` INT NOT NULL AFTER `storage_used`;
 ALTER TABLE `storage` CHANGE `storage_size` `storage_size` BIGINT NOT NULL ,CHANGE `storage_used` `storage_used` BIGINT NOT NULL ,CHANGE `storage_free` `storage_free` BIGINT NOT NULL;
 ALTER TABLE `mempools` CHANGE `mempool_used` `mempool_used` BIGINT( 20 ) NOT NULL ,
 CHANGE `mempool_free` `mempool_free` BIGINT( 20 ) NOT NULL ,CHANGE `mempool_total` `mempool_total` BIGINT( 20 ) NOT NULL ,CHANGE `mempool_largestfree` `mempool_largestfree` BIGINT( 20 ) NULL DEFAULT NULL ,CHANGE `mempool_lowestfree` `mempool_lowestfree` BIGINT( 20 ) NULL DEFAULT NULL;
-CREATE TABLE IF NOT EXISTS `juniAtmVp` (  `juniAtmVp_id` int(11) NOT NULL,  `interface_id` int(11) NOT NULL,  `vp_id` int(11) NOT NULL,  `vp_descr` varchar(32) NOT NULL) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+CREATE TABLE IF NOT EXISTS `juniAtmVp` (  `juniAtmVp_id` int(11) NOT NULL AUTO_INCREMENT,  `interface_id` int(11) NOT NULL,  `vp_id` int(11) NOT NULL,  `vp_descr` varchar(32) NOT NULL,  PRIMARY KEY (`juniAtmVp_id`)) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
