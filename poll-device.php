@@ -73,22 +73,39 @@ while ($device = mysql_fetch_array($device_query)) {
 
   if ($status) { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
+    $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 HOST-RESOURCES-MIB::hrSystemUptime.0";
     $snmpdata = shell_exec($snmp_cmd);
     #$snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
     $snmpdata = trim($snmpdata);
     $snmpdata = str_replace("\"", "", $snmpdata);
-    list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
+    list($sysUptime, $sysLocation, $sysContact, $sysName, $hrSystemUptime) = explode("\n", $snmpdata);
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
-    $sysUptime = str_replace("(", "", $sysUptime);
-    $sysUptime = str_replace(")", "", $sysUptime); 
     $sysName = strtolower($sysName);
-    list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
-    list($secs, $microsecs) = explode(".", $secs);
-    $hours = $hours + ($days * 24);
-    $mins = $mins + ($hours * 60);
-    $secs = $secs + ($mins * 60);
-    $uptime = $secs;
+
+    if ($hrSystemUptime)
+    {
+      #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
+      $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
+      $hrSystemUptime = str_replace(")", "", $hrSystemUptime); 
+      list($days,$hours, $mins, $secs) = explode(":", $hrSystemUptime);
+      list($secs, $microsecs) = explode(".", $secs);
+      $hours = $hours + ($days * 24);
+      $mins = $mins + ($hours * 60);
+      $secs = $secs + ($mins * 60);
+      $uptime = $secs;
+    }
+    else 
+    { 
+      #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
+      $sysUptime = str_replace("(", "", $sysUptime);
+      $sysUptime = str_replace(")", "", $sysUptime); 
+      list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
+      list($secs, $microsecs) = explode(".", $secs);
+      $hours = $hours + ($days * 24);
+      $mins = $mins + ($hours * 60);
+      $secs = $secs + ($mins * 60);
+      $uptime = $secs;
+    }
 
     if ($uptime) 
     {
