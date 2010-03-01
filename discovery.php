@@ -100,7 +100,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/hr-device.inc.php");
   include("includes/discovery/discovery-protocols.inc.php");
   include("includes/discovery/arp-table.inc.php");
-  include("includes/discovery/junose-atm-vc.inc.php");
+  include("includes/discovery/junose-atm-vp.inc.php");
   include("includes/discovery/bgp-peers.inc.php");
   include("includes/discovery/q-bridge-mib.inc.php");
 
