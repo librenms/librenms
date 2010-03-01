@@ -7,6 +7,10 @@ function authenticate($username,$password)
   $ds=@ldap_connect($config['auth_ldap_server'],$config['auth_ldap_port']);
   if ($ds)
   {
+    if ($config['auth_ldap_version'])
+    {
+      ldap_set_option($ds, LDAP_OPT_PROTOCOL_VERSION, $config['auth_ldap_version']);
+    }
     if (ldap_bind($ds, $config['auth_ldap_prefix'] . $username . $config['auth_ldap_suffix'], $password))
     {
       if (!$config['auth_ldap_group'])
