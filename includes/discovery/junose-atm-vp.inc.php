@@ -15,7 +15,9 @@ if($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
   if(is_array($vp_array[$device['device_id']])) {
     foreach($vp_array[$device['device_id']] as $index => $entry) {
 
-        list($interface_id,$vp_id)= explode('.', $index);      
+        list($ifIndex,$vp_id)= explode('.', $index);      
+
+        $interface_id = mysql_result(mysql_query("SELECT `interface_id` FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"),0);
 
         if(is_numeric($interface_id) && is_numeric($vp_id)) {
           discover_juniAtmvp($valid_vp, $interface_id, $vp_id, NULL);
