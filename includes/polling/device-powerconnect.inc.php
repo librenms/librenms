@@ -7,6 +7,11 @@ $snmp_cmd .= " productIdentificationDisplayName.0 productIdentificationVersion.0
 
 list($hardware, $version, $features) = explode("\n", shell_exec($snmp_cmd));
 
+if (strstr($hardware,"No Such Object available"))
+{
+  $hardware = $sysDescr;
+}
+
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/powerconnect-cpu.rrd";
 
 $cpu_cmd  = $config['snmpget'] . " -m RADLAN-rndMng -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
