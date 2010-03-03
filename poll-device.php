@@ -93,6 +93,7 @@ while ($device = mysql_fetch_array($device_query)) {
       $mins = $mins + ($hours * 60);
       $secs = $secs + ($mins * 60);
       $uptime = $secs;
+      if ($device['os'] == "windows") { $uptime /= 10; }
     }
     else 
     { 

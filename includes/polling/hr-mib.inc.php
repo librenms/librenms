@@ -5,15 +5,9 @@
 
 $hrSystem_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
 $hrSystem_cmd  = $config['snmpget'] ." -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-$hrSystem_cmd .= " hrSystemProcesses.0 hrSystemNumUsers.0 hrSystemUptime.0 hrMemorySize.0";
+$hrSystem_cmd .= " hrSystemProcesses.0 hrSystemNumUsers.0 hrMemorySize.0";
 $hrSystem  = `$hrSystem_cmd`;
-list ($hrSystemProcesses, $hrSystemNumUsers, $hrSystemUptime, $hrMemorySize) = explode("\n", $hrSystem);
-
-list($days, $hours, $mins, $secs) = explode(":", $hrSystemUptime);
-list($secs, $microsecs) = explode(".", $secs);
-$uptime = $secs + ($mins * 60) + ($hours * 60 * 60) + ($days * 24 * 60 * 60);
-
-if ($device['os'] == "windows") { $uptime /= 10; }
+list ($hrSystemProcesses, $hrSystemNumUsers, $hrMemorySize) = explode("\n", $hrSystem);
 
 if (!is_file($hrSystem_rrd)) {
   shell_exec($config['rrdtool'] . " create $hrSystem_rrd \
