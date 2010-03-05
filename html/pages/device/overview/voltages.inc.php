@@ -22,7 +22,7 @@ if(mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE device_id 
     $volt_year  = "graph.php?id=" . $volt['volt_id'] . "&type=voltage&from=$year&to=$now&width=300&height=100";
     $volt_minigraph = "<img src='graph.php?id=" . $volt['volt_id'] . "&type=voltage&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $volt_link  = "<a href='/device/".$device['device_id']."/health/volt/' onmouseover=\"return ";
+    $volt_link  = "<a href='/device/".$device['device_id']."/health/voltages/' onmouseover=\"return ";
     $volt_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$volt['volt_descr'];
     $volt_link .= "</div><div style=\'width: 750px\'><img src=\'$volt_day\'><img src=\'$volt_week\'><img src=\'$volt_month\'><img src=\'$volt_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
