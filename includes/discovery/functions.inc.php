@@ -109,6 +109,30 @@ function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $prec
       }
 }
 
+function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current)
+{
+     global $config; global $debug;
+     if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
+     if (mysql_result(mysql_query("SELECT COUNT(temp_id) FROM `temperature` WHERE temp_type = '$type' AND temp_index = '$index' AND device_id = '".$device['device_id']."'"),0) == '0')
+     {
+        $query  = "INSERT INTO temperature (`device_id`, `temp_type`,`temp_index`,`temp_oid`, `temp_descr`, `temp_limit`, `temp_current`, `temp_precision`)";
+        $query .= " values ('".$device['device_id']."', '$type','$index','$oid', '$descr','" . ($high_limit ? $high_limit : $config['defaults']['temp_limit']) . "', '$current', '$precision')";
+        mysql_query($query);
+        echo("+");
+     } else {
+        $entry = mysql_fetch_array(mysql_query("SELECT * FROM `temperature` WHERE device_id = '".$device['device_id']."' AND `temp_type` = '$type' AND `temp_index` = '$index'"));
+         echo(mysql_error());
+        if($oid == $entry['temp_oid'] && $descr == $entry['temp_descr'] && $precision == $ntry['temp_precision']) {
+          echo(".");
+        } else {
+          mysql_query("UPDATE temperature SET `temp_descr` = '$descr', `temp_oid` = '$oid', `temp_precision` = '$precision' WHERE `temp_id` = '".$entry['temp_id']."'");
+          echo("U");
+        }
+      }
+      echo(mysql_error());
+      $valid_temp[$type][$index] = 1;
+      return $return;
+}
 
 function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL) {
 

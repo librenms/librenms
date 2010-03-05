@@ -7,6 +7,8 @@ $port = $device['port'];
 
 echo("Temperatures : ");
 
+include("temperatures-junose.inc.php");
+
 
 if($device['os'] == "ironware")
 {
