@@ -45,7 +45,7 @@ if (isset($_SESSION['username']))
 {
   if (authenticate($_SESSION['username'],$_SESSION['password']))
   {
-    $_SESSION['userlevel'] = get_userlevel($_SESSION['username'])
+    $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
     $_SESSION['user_id'] = $row['user_id'];
     if(!$_SESSION['authenticated']) 
     {
