@@ -264,7 +264,7 @@ function geteventicon ($message)
   if ($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
   if ($message == "Interface disabled") { $icon = "if-disable.png"; }
   if ($message == "Interface enabled") { $icon = "if-enable.png"; }
-  if ($icon) { return $icon; } else { return false; }
+  if (isset($icon)) { return $icon; } else { return false; }
 }
 
 function generateiflink($interface, $text=0, $type = NULL) 
@@ -307,7 +307,7 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
 
   $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
   $contents = "<div class=list-large>".$device['hostname']." - CPU &amp; Memory Usage</div>";
-  if ($device['location']) { $contents .= "" . htmlentities($device['location']."<br />"); }
+  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location']."<br />"); }
   $contents .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_b\'";
   $text = htmlentities($text);
   $link = overlib_link($url, $text, $contents, $class);
