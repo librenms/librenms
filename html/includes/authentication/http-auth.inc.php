@@ -34,5 +34,21 @@ function changepassword($username,$newpassword)
   # Not supported
 }
   
+function auth_usermanagement()
+{
+  return 1;
+}
   
+function adduser($username, $password, $level, $email = "", $realname = "")
+{
+  mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`) VALUES ('".mres($username)."',MD5('".mres($password)."'),'".mres($level)."','".mres($email)."','".mres($realname)."')");
+   
+  return mysql_affected_rows();
+}
+  
+function user_exists($username)
+{
+  return mysql_result(mysql_query("SELECT * FROM users WHERE username = '".mres($username)."'"),0);
+}
+
 ?>

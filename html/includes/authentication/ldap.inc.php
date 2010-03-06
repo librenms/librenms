@@ -43,5 +43,22 @@ function changepassword($username,$newpassword)
 {
   # Not supported (for now)
 }
-    
+
+function auth_usermanagement()
+{
+  return 0;
+}
+
+function adduser($username, $password, $level, $email = "", $realname = "")
+{
+  # Not supported
+  return 0;
+}
+  
+function user_exists($username)
+{
+  return 0; # FIXME to be implemented
+}
+  
+  
 ?>

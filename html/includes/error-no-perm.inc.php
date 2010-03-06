@@ -23,7 +23,7 @@ echo("<div style='margin:auto; text-align: center; margin-top: 20px; max-width:4
   </div>
   <b class='rounded'>
   <b class='rounded5'></b>
-  <b class='unded4'></b>
+  <b class='rounded4'></b>
   <b class='rounded3'></b>
   <b class='rounded2'></b>
   <b class='rounded1'></b></b>
