@@ -4,10 +4,10 @@ $datas = array('Temperatures', 'Voltages', 'Fanspeeds');
 
 print_optionbar_start();
 
-unset ($sep);
+$sep = "";
 foreach ($datas as $texttype) {
   $type = strtolower($texttype);
-  if (!$_GET['opta']) { $_GET['opta'] = $type; }
+  if (!isset($_GET['opta'])) { $_GET['opta'] = $type; }
   echo($sep);
   if ($_GET['opta'] == $type) { echo("<strong>"); }
   echo("<a href='".$config['base_url']."/sensors/" . $type . "/'> " . $texttype ."</a>\n");
