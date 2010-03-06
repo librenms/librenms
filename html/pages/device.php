@@ -177,6 +177,7 @@ echo('<li class="' . $select['syslog'] . '">
 if($_SESSION['userlevel'] >= "5") {
   if(!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
   foreach($config['rancid_configs'] as $configs) {
+    if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
     if(is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
   }
 }
