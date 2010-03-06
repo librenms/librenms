@@ -11,7 +11,7 @@ if($_SESSION['userlevel'] == '10') {
 $device_query = mysql_query($sql);
 while($device = mysql_fetch_array($device_query)) {
 
-   if($bg == "#ffffff") { $bg = "#eeeeee"; } else { $bg="#ffffff"; }
+   if(!isset($bg) || $bg == "#ffffff") { $bg = "#eeeeee"; } else { $bg="#ffffff"; }
 
    if($_SESSION['userlevel'] == '10') {
      $num = mysql_result(mysql_query("SELECT COUNT(device_id) FROM devices WHERE location = '" . $device['location'] . "'"),0);
