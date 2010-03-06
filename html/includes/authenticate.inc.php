@@ -45,11 +45,7 @@ if (isset($_SESSION['username']))
 {
   if (authenticate($_SESSION['username'],$_SESSION['password']))
   {
-    #FIXME below should also come from auth module, get_userlevel, etc
-    $sql = "SELECT * FROM `users` WHERE `username`='".$_SESSION['username']."'";
-    $query = mysql_query($sql);
-    $row = @mysql_fetch_array($query);
-    $_SESSION['userlevel'] = $row['level'];
+    $_SESSION['userlevel'] = get_userlevel($_SESSION['username'])
     $_SESSION['user_id'] = $row['user_id'];
     if(!$_SESSION['authenticated']) 
     {

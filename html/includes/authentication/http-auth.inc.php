@@ -51,4 +51,11 @@ function user_exists($username)
   return mysql_result(mysql_query("SELECT * FROM users WHERE username = '".mres($username)."'"),0);
 }
 
+function get_userlevel($username)
+{
+  $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
+  $row = mysql_fetch_array(mysql_query($sql);
+  return $row['level'];
+}
+
 ?>

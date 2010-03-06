@@ -60,5 +60,12 @@ function user_exists($username)
   return 0; # FIXME to be implemented
 }
   
-  
+function get_userlevel($username)
+{
+  # FIXME should come from LDAP
+  $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
+  $row = mysql_fetch_array(mysql_query($sql);
+  return $row['level'];
+}
+ 
 ?>
