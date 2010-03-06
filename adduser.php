@@ -5,17 +5,33 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
-if($argv[1] && $argv[2] && $argv[3]) {
-  if($argv[4]) {
-   mysql_query("INSERT INTO `users` (`username`,`password`,`level`) VALUES ('".mres($argv[1])."',MD5('".$argv[2]."'),'".mres($argv[3])."'),'".mres($argv[4])."')");
-  } else {
-   mysql_query("INSERT INTO `users` (`username`,`password`,`level`) VALUES ('".mres($argv[1])."',MD5('".$argv[2]."'),'".mres($argv[3])."')");
-  }
-  if(mysql_affected_rows()) {
-    echo("User ".$argv[1]." added successfully\n");
-  }
-} else {
-  echo("Add User Tool\nUsage: ./adduser.php <username> <password> <level 1-10> [email]\n");
-} 
+if (file_exists('html/includes/authentication/' . $config['auth_mechanism'] . '.inc.php'))
+{
+  include('html/includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
+}
+else
+{
+  echo "ERROR: no valid auth_mechanism defined.\n";
+  exit();
+}        
+        
+if (auth_usermanagement())
+{
+  if($argv[1] && $argv[2] && $argv[3]) 
+  {
+    if(adduser($argv[1],$argv[2],$argv[3],$argv[4]))
+    {
+      echo("User ".$argv[1]." added successfully\n");
+    }
+  } 
+  else 
+  {
+    echo("Add User Tool\nUsage: ./adduser.php <username> <password> <level 1-10> [email]\n");
+  } 
+}
+else
+{
+  echo "Auth module does not allow adding users!\n";
+}
 
 ?>

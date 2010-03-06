@@ -214,11 +214,16 @@ echo('        <li><hr /></li>
       echo('
         <li><hr width="140" /></li>
         <li><a href="/statistics/"><img src="images/16/report.png" border="0" align="absmiddle" /> Statistics</a></li>
-        <li><hr width="140" /></li>
-	<li><a href="?page=adduser"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
-        <li><a href="?page=deluser"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
+        <li><hr width="140" /></li>');
+      if (auth_usermanagement())
+      {
+      echo('
+	<li><a href="adduser/"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
+        <li><a href="deluser/"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
         <li><a href="?page=edituser"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
-        <li><hr width="140" /></li>
+        <li><hr width="140" /></li>');
+      }
+      echo ('
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
     </ul>
