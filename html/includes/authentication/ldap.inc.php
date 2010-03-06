@@ -34,4 +34,14 @@ function authenticate($username,$password)
   return 0;
 }
 
+function passwordscanchange()
+{
+  return 0;
+}
+
+function changepassword($username,$newpassword)
+{
+  # Not supported (for now)
+}
+    
 ?>

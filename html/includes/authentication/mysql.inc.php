@@ -13,4 +13,16 @@ function authenticate($username,$password)
   return 0;
 }
 
+function passwordscanchange()
+{
+  return 1;
+}
+
+function changepassword($username,$newpassword)
+{
+  $encrypted = md5($password);
+  $sql = "UPDATE `users` SET  password`='$encrypted' WHERE `username`='".$_SESSION['username']."'";
+  $query = mysql_query($sql);
+}
+
 ?>
