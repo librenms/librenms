@@ -35,7 +35,7 @@ include("overview/ports.inc.php");
 if($services['total']) {
 
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Services</p><div style='height: 5px;'></div>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/cog.png'> Services</p><div style='height: 5px;'></div>");
 
 echo("
 <table class=tablehead cellpadding=2 cellspacing=0 width=100%>
@@ -82,7 +82,7 @@ include("overview/fanspeeds.inc.php");
 include("overview/voltages.inc.php");
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-echo("<p class=sectionhead>Recent Events</p>");
+echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</p>");
 
 $query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,10";
 $data = mysql_query($query);

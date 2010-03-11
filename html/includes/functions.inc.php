@@ -1,5 +1,24 @@
 <?php
 
+function print_graph_tag ($args) 
+{
+  echo generate_graph_tag ($args);
+}
+
+function generate_graph_tag ($args) 
+{
+  global $config;
+  $sep = "?";
+  $url = $config['base_url'] . "/graph.php";
+  foreach ($args as $key => $arg) 
+  {
+    $url .= $sep.$key."=".$arg;
+    $sep="&";
+  }
+  return "<img src=\"".$url."\" border=0>";
+}
+
+
 function print_percentage_bar ($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background) 
 {
   $output = '
@@ -32,14 +51,16 @@ function generate_if_link($args)
   return $link;
 }
 
-function generate_port_thumbnail($args) {
+function generate_port_thumbnail($args) 
+{
     if(!$args['bg']) { $args['bg'] = "FFFFF"; }
     $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&if=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
     $output = generate_if_link($args);
     echo $output;
 }
 
-function print_optionbar_start ($height = 20, $width = 0) {
+function print_optionbar_start ($height = 20, $width = 0) 
+{
   echo("
     <div style='margin:auto; text-align: center; margin-top: 0px; margin-bottom: 10px; " . ($width ? 'max-width: ' . $width . 'px; ' : '') . "'>
     <b class='rounded'>
@@ -53,7 +74,8 @@ function print_optionbar_start ($height = 20, $width = 0) {
 }
 
 
-function print_optionbar_end () {
+function print_optionbar_end () 
+{
   echo("  </div>
     </div>
     <b class='rounded'>

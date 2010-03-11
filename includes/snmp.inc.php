@@ -82,7 +82,7 @@ function snmp_cache_ifIndex($device) {
 }
 
 function snmpwalk_cache_oid($poll_oid, $device, $array, $mib = NULL, $mibdir = NULL) {
-  global $config;
+  global $config; global $debug;
   $data = snmp_walk($device, $poll_oid, "-OQUs", $mib, $mibdir);
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
