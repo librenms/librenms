@@ -1,5 +1,7 @@
 <?php
 
+if( !isset($_GET['optb']) ) { $_GET['optb'] = "graphs"; }
+
 $interface_query = mysql_query("select * from ports WHERE interface_id = '".$_GET['opta']."'");
 $interface = mysql_fetch_array($interface_query);
 
@@ -55,8 +57,7 @@ echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/inte
 
 
 
- if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
-
+ if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0) > "0"){
    echo(" | Mac Accounting : 
    <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/'>Bits</a> 
    (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/thumbs/'>Mini</a>|<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/'>Top10</a>) | 
@@ -64,40 +65,19 @@ echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/inte
    (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/thumbs/'>Mini</a>)");
   }
 
+
+ if(mysql_result(mysql_query("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'"),0) > "0"){
+   echo(" | ATM VPs :");
+   echo(" <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/octets/'>Bits</a>");
+   echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
+   echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
+   echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
+
+  }
+
+
 print_optionbar_end();
 
-if($_GET['optb']) {
-
 include("pages/device/port/".mres($_GET['optb']).".inc.php");
-
-} else {
-  if(file_exists($config['rrd_dir'] . "/" . $hostname . "/". $ifIndex . ".rrd")) {
-
-    $iid = $id;
-    echo("<div class=graphhead>Interface Traffic</div>");
-    $graph_type = "port_bits";
-    include("includes/print-interface-graphs.inc.php");
-
-    echo("<div class=graphhead>Interface Packets</div>");
-    $graph_type = "port_upkts";
-    include("includes/print-interface-graphs.inc.php");
-
-    echo("<div class=graphhead>Interface Non Unicast</div>");
-    $graph_type = "port_nupkts";
-    include("includes/print-interface-graphs.inc.php");
-
-    echo("<div class=graphhead>Interface Errors</div>");
-    $graph_type = "port_errors";
-    include("includes/print-interface-graphs.inc.php");
-
-    if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-" . $interface['ifIndex'] . ".rrd")) {
-      echo("<div class=graphhead>Ethernet Errors</div>");
-      $graph_type = "port_etherlike";
-      include("includes/print-interface-graphs.inc.php");
-    }
-  }
- 
-}
-
 
 ?>
