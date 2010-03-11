@@ -2,18 +2,18 @@
 
 if(mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>Memory Pools</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/mempool.png'> Memory Pools</p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $mempool_rows = '1';
   $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
   while($mempool = mysql_fetch_array($mempools)) {
     if(is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $perc = round($mempool['mempool_used'] / ($mempool['mempool_total']) * 100,2);
+
     $text_descr = $mempool['mempool_descr'];
     $text_descr = str_replace("Routing Processor", "RP", $text_descr);
     $text_descr = str_replace("Switching Processor", "SP", $text_descr);
-    $text_descr = str_replace("Processor", "Proc", $text_descr);
-    $text_descr = str_replace("Sub-Module", "Mod", $text_descr);
+    $text_descr = str_replace("Sub-Module", "Module ", $text_descr);
     $text_descr = str_replace("DFC Card", "DFC", $text_descr);
 
     $mempool_url   = "/device/".$device['device_id']."/health/memory/";

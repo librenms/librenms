@@ -3,7 +3,7 @@
 if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>Processors</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/cpuload.png'> Processors</p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $i = '1';
   $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "'");
@@ -19,7 +19,13 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
     $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $text_descr = $proc['processor_descr'];
-    $text_descr = short_hrDeviceDescr($proc['processor_descr']);
+    $text_descr = str_replace("Routing Processor", "RP", $text_descr);
+    $text_descr = str_replace("Switching Processor", "SP", $text_descr);
+    $text_descr = str_replace("Sub-Module", "Module ", $text_descr);
+    $text_descr = str_replace("DFC Card", "DFC", $text_descr);
+
+    # disable short hrDeviceDescr. need to make this prettier.
+    #$text_descr = short_hrDeviceDescr($proc['processor_descr']);
 
     $perc = $proc['processor_usage'];
 
