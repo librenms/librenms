@@ -5,7 +5,7 @@ if(mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE device_id 
   $total = mysql_result(mysql_query("SELECT count(fan_id) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"),0);
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Fanspeeds</p>");
+  echo("<p class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/fans.png'> Fanspeeds</p>");
   $i = '1';
   $fans = mysql_query("SELECT * FROM fanspeed WHERE device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
