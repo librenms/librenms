@@ -5,7 +5,7 @@ if(mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE device_id 
   $total = mysql_result(mysql_query("SELECT count(volt_id) from voltage WHERE device_id = '" . $device['device_id'] . "'"),0);
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p class=sectionhead>Voltages</p>");
+  echo("<p class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/voltages.png'> Voltages</p>");
   $i = '1';
   $volts = mysql_query("SELECT * FROM voltage WHERE device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
