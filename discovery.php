@@ -77,7 +77,7 @@ if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; } else { $debug = 0; }
 
 $devices_discovered = 0;
 
-$device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id DESC");
+$device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query))
 {
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
