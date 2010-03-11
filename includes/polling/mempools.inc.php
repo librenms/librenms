@@ -32,7 +32,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   if(is_file($file)) {
     include($file);
   } else {
-    ### FIXME GENERIC
+    ### Do we need a generic mempool poller?
   }
 
   $percent = round($mempool['used'] * $mempool['total'] * 100);

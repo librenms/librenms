@@ -2,6 +2,7 @@
 
 echo("Memory : ");
 
+include("mempools-cemp.inc.php");
 include("mempools-cmp.inc.php");
 include("mempools-junos.inc.php");
 include("mempools-ironware-dyn.inc.php");
