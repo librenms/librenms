@@ -12,6 +12,10 @@ if($device['os'] == "ios" || $device['os_type'] == "ios") {
        list($entPhysicalIndex) = explode(".", $index);
        $entPhysicalDescr = snmp_get($device, "entPhysicalDescr.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");       
        $descr = $entPhysicalDescr." - ".$entry['cempMemPoolName'];
+
+       $descr = str_replace("Cisco ", "", $descr);
+       $descr = str_replace("Network Processing Engine", "", $descr);
+
        discover_mempool($valid_mempool, $device, $index, "cemp", $descr, "1", $entPhysicalIndex, NULL);
       }
     }
