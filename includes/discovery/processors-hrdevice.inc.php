@@ -17,6 +17,15 @@
 
         $descr = $entry['hrDeviceDescr'];
 
+	$descr_array = explode(":",$entry['hrDeviceDescr']);
+
+	if($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
+
+	$descr = str_replace("CPU ", "", $descr);
+        $descr = str_replace("(TM)", "", $descr);
+        $descr = str_replace("(R)", "", $descr);
+
+
         $old_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("hrProcessor-" . $index . ".rrd");
         $new_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-hr-" . $index . ".rrd");
 
