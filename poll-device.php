@@ -80,7 +80,8 @@ while ($device = mysql_fetch_array($device_query)) {
       eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
     }
 
-  if ($status == "1") { 
+  if ($status == "1") 
+  { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 HOST-RESOURCES-MIB::hrSystemUptime.0";
     $snmpdata = shell_exec($snmp_cmd);
@@ -91,7 +92,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
-    if ($hrSystemUptime)
+    if ($hrSystemUptime != "No Such Object available on this agent at this OID")
     {
       #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
       $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
