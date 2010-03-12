@@ -18,6 +18,7 @@ if(is_array($storage_array)) {
     if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == "hrStorageRemovableDisk") { $deny = 1; if ($debug) echo("skip(removable)\n"); }
     if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == "hrStorageNetworkDisk") { $deny = 1; if ($debug) echo("skip(network)\n"); }
     if (isset($config['ignore_mount_optical']) && $config['ignore_mount_optical'] && $fstype == "hrStorageCompactDisc") { $deny = 1; if ($debug) echo("skip(cd)\n"); }
+    if ($fstype == "hrStorageVirtualMemory" || $fstype == "hrStorageRam" || $fstype == "hrStorageOther") { $deny = 1; }
 
     if(!$deny && is_numeric($index)) {
       discover_storage($valid_storage, $device, $index, $fstype, "hrstorage", $descr, $size , $units, $used);
