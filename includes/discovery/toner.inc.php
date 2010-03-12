@@ -32,6 +32,7 @@ if ($device['os'] == "dell-laser")
         $descr         = str_replace('"','',snmp_get($device, $descr_oid, "-Oqv"));
         $current       = snmp_get($device, $toner_oid, "-Oqv");
         $capacity      = snmp_get($device, $capacity_oid, "-Oqv");
+        $current       = $current / $capacity * 100;
         $type          = "dell-laser";
         echo discover_toner($device, $toner_oid, $index, $type, $descr, $capacity, $current);
         $toner_exists[$type][$index] = 1;
