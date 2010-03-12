@@ -6,7 +6,7 @@ $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
 $sql = mysql_query("SELECT * FROM toner where device_id = '$device_id'");
-$rrd_options .= " COMMENT:'RPM                    Cur     Min      Max\\n'";
+$rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
 while($toner = mysql_fetch_array($sql)) 
 {
   switch ($iter)
@@ -35,7 +35,11 @@ while($toner = mysql_fetch_array($sql))
       unset($iter);
       break;
   }
-
+  if (stripos($toner['toner_descr'],"cyan"   ) !== false) { $colour = "55D6D3"; }
+  if (stripos($toner['toner_descr'],"magenta") !== false) { $colour = "F24AC8"; }
+  if (stripos($toner['toner_descr'],"yellow" ) !== false) { $colour = "FFF200"; }
+  if (stripos($toner['toner_descr'],"black"  ) !== false) { $colour = "000000"; }
+        
   $hostname = gethostbyid($toner['device_id']);
   
   $descr = substr(str_pad($toner['toner_descr'], 17),0,17);
