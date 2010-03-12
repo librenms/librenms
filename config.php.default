@@ -80,7 +80,6 @@ $config['int_l2tp'] 		= 0;  # Enable L2TP Port Types
 
 $config['show_locations'] 	= 1;  # Enable Locations on menu
 $config['show_services']        = 1;  # Enable Services on menu
-$config['show_printers']        = 0;  # Enable Printers Device Type on menu
 
 $config['ports_page_default']	= "details/";  
 # Default devices ports page display type. "details/", "graphs/bits/", etc
@@ -95,6 +94,7 @@ $config['enable_etherlike']	= 1; # Enable Etherlike
 $config['enable_pseudowires']   = 1; # Enable Pseudowires
 $config['enable_ports_junoseatmvp']   = 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_etherlike']     = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
+$config['enable_printers']        = 0;  # Enable Printer support
 
 #$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
 $config['rancid_ignorecomments'] = 0; # Ignore lines starting with #

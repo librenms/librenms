@@ -164,7 +164,7 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/ports.inc.php");
     include("includes/polling/cisco-mac-accounting.inc.php");
     include("includes/polling/bgpPeer.inc.php");
-    include("includes/polling/toner.inc.php")
+    include("includes/polling/toner.inc.php");
 
   unset( $update ) ;
   unset( $seperator) ;

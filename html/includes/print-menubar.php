@@ -51,7 +51,7 @@
         <li><a href="devices/network/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Network</a></li>
         <li><a href="devices/firewall/"><img src="images/16/shield.png" border="0" align="absmiddle" /> Firewalls</a></li>
 <?php
-if (isset($config['show_printers']) && $config['show_printers'])
+if (isset($config['enable_printers']) && $config['enable_printers'])
 {
 ?>
         <li><a href="devices/printer/"><img src="images/16/printer.png" border="0" align="absmiddle" /> Printers</a></li>

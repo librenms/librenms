@@ -1,6 +1,6 @@
 <?php
 
-if ($config['show_printers'])
+if ($config['enable_printers'])
 {
 
 $id = $device['device_id'];
@@ -62,5 +62,5 @@ if ($query = mysql_query($sql))
                                       
 unset($toner_exists); echo("\n");
 
-} # if ($config['show_printers'])
+} # if ($config['enable_printers'])
 ?>
