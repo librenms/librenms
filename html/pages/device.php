@@ -160,7 +160,7 @@ if(mysql_result(mysql_query("select count(service_id) from services WHERE device
 if(@mysql_result(mysql_query("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['toner'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/toner/">
-    <img src="images/16/color_wheel.png" align="absmiddle" border="0" /> Toner
+    <img src="images/16/palette.png" align="absmiddle" border="0" /> Toner
   </a>
 </li>');
 }

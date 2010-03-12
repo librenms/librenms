@@ -1,6 +1,6 @@
 <?php
 
-if ($config['show_printers'])
+if ($config['enable_printers'])
 {
   $query = "SELECT * FROM toner WHERE device_id = '" . $device['device_id'] . "'";
   $toner_data = mysql_query($query);
