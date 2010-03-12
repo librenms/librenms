@@ -71,7 +71,16 @@ while ($device = mysql_fetch_array($device_query)) {
     $status = "0";
   }
 
-  if ($status) { 
+    if ( $device['status'] != $status )
+    {
+      $poll_update .= $poll_separator . "`status` = '$status'";
+      $poll_separator = ", ";
+      mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
+      mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " .($status == '1' ? 'up' : 'down') . "')");
+      eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
+    }
+
+  if ($status == "1") { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 HOST-RESOURCES-MIB::hrSystemUptime.0";
     $snmpdata = shell_exec($snmp_cmd);
@@ -131,15 +140,6 @@ while ($device = mysql_fetch_array($device_query)) {
       $poll_update .= $poll_separator . "`uptime` = '$uptime'";
       $poll_separator = ", ";
     } 
-
-    if ( $device['status'] != $status ) 
-    {
-      $poll_update .= $poll_separator . "`status` = '$status'";
-      $poll_separator = ", ";
-      mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
-      mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " . ($status == '1' ? 'up' : 'down') . "')");
-      eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
-    }
 
     if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
       /// OS Specific
