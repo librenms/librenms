@@ -27,7 +27,7 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
 
   rrdtool_update($fanrrd,"N:$fan");
 
-  if($fanspeed['fan_current'] < $fanspeed['fan_limit'] && $fan >= $fanspeed['fan_limit']) {
+  if($fanspeed['fan_current'] > $fanspeed['fan_limit'] && $fan <= $fanspeed['fan_limit']) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['fan_limit'];
     $msg .= "rpm) at " . date($config['timestamp_format']);
