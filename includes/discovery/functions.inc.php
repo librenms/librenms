@@ -138,9 +138,9 @@ function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $prec
 
 function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current)
 {
-  global $config, $debug;
-  
+  global $config, $debug; 
   if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
+
   if (mysql_result(mysql_query("SELECT COUNT(temp_id) FROM `temperature` WHERE temp_type = '$type' AND temp_index = '$index' AND device_id = '".$device['device_id']."'"),0) == '0')
   {
     $query  = "INSERT INTO temperature (`device_id`, `temp_type`,`temp_index`,`temp_oid`, `temp_descr`, `temp_limit`, `temp_current`, `temp_precision`)";
@@ -162,8 +162,6 @@ function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr
       echo("U");
     }
   }
-
-  echo(mysql_error());
   $valid_temp[$type][$index] = 1;
   return $return;
 }
