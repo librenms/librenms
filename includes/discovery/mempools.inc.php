@@ -2,6 +2,7 @@
 
 echo("Memory : ");
 
+include("mempools-hrstorage.inc.php");
 include("mempools-cemp.inc.php");
 include("mempools-cmp.inc.php");
 include("mempools-junos.inc.php");
