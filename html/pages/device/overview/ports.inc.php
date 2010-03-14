@@ -26,7 +26,7 @@ if($ports['total']) {
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  echo(overlib_link("#", $graph, $content, NULL));
+  echo(overlib_link($_SERVER['REQUEST_URI'], $graph, $content, NULL));
 
 
   echo('  <div style="height: 5px;"></div>');
