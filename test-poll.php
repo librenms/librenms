@@ -5,6 +5,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
+$debug =1;
 
 $poller_start = utime();
 
@@ -59,6 +60,6 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 
 $string = $argv[0] . " " . date("F j, Y, G:i") . " - $i devices polled in $poller_time secs";
 echo("$string\n");
-shell_exec("echo '".$string."' >> /opt/observer/observer.log");
+shell_exec("echo '".$string."' >> /tmp/observer.log");
 
 ?>
