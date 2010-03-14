@@ -228,6 +228,8 @@ while ($device = mysql_fetch_array($device_query)) {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
 
+  unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
+
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
   echo("Polled in $device_time seconds\n");
 

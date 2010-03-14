@@ -52,6 +52,6 @@ while($storage = mysql_fetch_array($storage_data)) {
 
 }
 
-unset($storage_cache, $storage);
+unset($storage);
 
 ?>
