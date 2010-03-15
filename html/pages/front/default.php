@@ -30,7 +30,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.dev
 while($device = mysql_fetch_array($sql)){
 
       generate_front_box("alert", "<center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center>");
 
