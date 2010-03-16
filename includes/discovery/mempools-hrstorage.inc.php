@@ -13,7 +13,9 @@ if(is_array($storage_array)) {
     $units  = $storage['hrStorageAllocationUnits'];
     $deny   = 1;
 
-    if ($fstype == "hrStorageVirtualMemory" || $fstype == "hrStorageRam" || $fstype == "hrStorageOther") { $deny = 0; }
+    if ($fstype == "hrStorageVirtualMemory" || $fstype == "hrStorageRam") { $deny = 0; }
+
+    if(strstr($descr, "MALLOC") || strstr($descr, "UMA")) { $deny = 1;  } ## Ignore FreeBSD INSANITY
 
     if(!$deny && is_numeric($index)) {
       discover_mempool($valid_mempool, $device, $index, "hrstorage", $descr, $units, NULL, NULL);
