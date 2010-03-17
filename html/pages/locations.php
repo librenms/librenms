@@ -1,7 +1,7 @@
 <?php
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">');
 
-if($_SESSION['userlevel'] == '10') {
+if($_SESSION['userlevel'] >= '5') {
   $sql = "SELECT `location` FROM `devices` GROUP BY `location` ORDER BY `location`";
 } else {
   $sql = "SELECT `location` FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' GROUP BY `location` ORDER BY `location`";
