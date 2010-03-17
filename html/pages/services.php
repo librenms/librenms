@@ -5,7 +5,7 @@ if($_GET['status'] == '0') { $where = " AND service_status = '0'"; } else { unse
 echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
 //echo("<tr class=interface-desc bgcolor='#e5e5e5'><td>Device</td><td>Service</td><td>Status</td><td>Changed</td><td>Checked</td><td>Message</td></tr>");
 
-if ($_SESSION['userlevel'] == '10') {
+if ($_SESSION['userlevel'] >= '5') {
   $host_sql = "SELECT * FROM devices AS D, services AS S WHERE D.device_id = S.device_id GROUP BY D.hostname ORDER BY D.hostname";
 } else {
   $host_sql = "SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' $where GROUP BY D.hostname ORDER BY D.hostname";
