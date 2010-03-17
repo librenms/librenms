@@ -2,7 +2,7 @@
 
 include("includes/geshi/geshi.php");
 
-if($_SESSION['userlevel'] >= "5") {
+if($_SESSION['userlevel'] >= "7") {
 
   if(!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
   
