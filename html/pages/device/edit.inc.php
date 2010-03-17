@@ -1,11 +1,11 @@
 <?php
 
-if($_SESSION['userlevel'] < '5') { 
+if($_SESSION['userlevel'] < '7') { 
   print_error("Insufficient Privileges");
 } else {
 
 if($_POST['editing']) {
-  if($_SESSION['userlevel'] > "5") {
+  if($_SESSION['userlevel'] > "7") {
     include("includes/device-edit.inc.php");
   }
 }

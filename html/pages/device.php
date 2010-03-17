@@ -183,7 +183,7 @@ echo('<li class="' . $select['syslog'] . '">
 
 
 
-if($_SESSION['userlevel'] >= "5") {
+if($_SESSION['userlevel'] >= "7") {
   if(!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
   foreach($config['rancid_configs'] as $configs) {
     if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
@@ -199,7 +199,7 @@ if($device_config_file) {
 ');
 }
 
-if($_SESSION['userlevel'] >= "5") {
+if($_SESSION['userlevel'] >= "7") {
   echo('<li class="' . $select['edit'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/edit/">
     <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings
