@@ -19,7 +19,12 @@ GetVersionFromFile()
                 elif [ "${OS}" = "Linux" ] ; then
                                 KERNEL=`uname -r`
                                 if [ -f /etc/redhat-release ] ; then
-                                        DIST='RedHat'
+                                        DIST=$(cat /etc/redhat-release | awk '{print $1}')
+                                        if [ "${DIST}" = "CentOS" ]; then
+                                            DIST="CentOS"
+                                        else
+                                            DIST="RedHat"
+                                        fi
                                         PSUEDONAME=`cat /etc/redhat-release | sed s/.*\(// | sed s/\)//`
                                         REV=`cat /etc/redhat-release | sed s/.*release\ // | sed s/\ .*//`
                                 elif [ -f /etc/SuSE-release ] ; then
