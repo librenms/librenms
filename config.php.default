@@ -58,7 +58,7 @@ $config['page_refresh'] = "0";  ## Refresh the page every xx seconds
 $config['front_page'] 	= "pages/front/default.php";
 
 $config['email_default']  = "adama@as8681.net";
-$config['email_from']     = "Observer <observer@" . $config['mydomain'] . >";
+$config['email_from']     = "Observer <observer@" . $config['mydomain'] . ">";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 $config['login_message']  = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
