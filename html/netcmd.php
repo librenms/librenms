@@ -22,17 +22,24 @@ if($_GET['query'] && $_GET['cmd']) {
   if(Net_IPv6::checkIPv6($host)||Net_IPv4::validateip($host)||preg_match("/^[a-zA-Z0-9.-]*$/", $host)) {
     switch ($_GET['cmd']) {
       case 'whois':
-        $output = `/usr/bin/whois $host | grep -v \%`;
+	$cmd = $config['whois'] . " $host | grep -v \%";
         break;
       case 'ping':
-        $output = `/bin/ping $host`;
+        $cmd = $config['ping'] . " -c 5 $host";
         break;
       case 'tracert':
-        $output = `/usr/sbin/traceroute $host`;
+        $cmd = $config['mtr'] . " -r -c 5 $host";
         break;
       case 'nmap':
-        $output = `/usr/bin/nmap $host`;
+        if ($_SESSION['userlevel'] != '10') {
+            echo("insufficient privileges");
+        } else {
+            $cmd = $config['nmap'] . " $host";
+        }
         break; 
+    }
+    if (!empty($cmd)) {
+        $output = `$cmd`;
     }
   }
 }
