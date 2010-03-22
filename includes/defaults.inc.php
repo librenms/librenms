@@ -12,6 +12,10 @@ $config['ipcalc']       = "/usr/bin/ipcalc";
 $config['snmpwalk']     = "/usr/bin/snmpwalk";
 $config['snmpget']      = "/usr/bin/snmpget";
 $config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
+$config['whois']        = "/usr/bin/whois";
+$config['ping']         = "/bin/ping";
+$config['mtr']          = "/usr/bin/mtr";
+$config['nmap']         = "/usr/bin/nmap";
 
 $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
 
