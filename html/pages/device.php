@@ -53,15 +53,15 @@ if($health) {
 </li>');
 }
 
-$cisco_sensors = mysql_result(mysql_query("SELECT count(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%'"),0);
+#$cisco_sensors = mysql_result(mysql_query("SELECT count(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%'"),0);
 
-if($cisco_sensors) {
-  echo('<li class="' . $select['ciscosensors'] . '">
-  <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ciscosensors/">
-    <img src="images/16/contrast.png" align="absmiddle" border="0" /> Sensors
-  </a>
-</li>');
-}
+#if($cisco_sensors) {
+#  echo('<li class="' . $select['ciscosensors'] . '">
+#  <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ciscosensors/">
+#    <img src="images/16/contrast.png" align="absmiddle" border="0" /> Sensors
+#  </a>
+#</li>');
+#}
 
 if(is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
   echo('<li class="' . $select['collectd'] . '">
