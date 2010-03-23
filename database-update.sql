@@ -4,3 +4,4 @@ ALTER TABLE  `processors` CHANGE  `processor_descr`  `processor_descr` VARCHAR( 
 DROP TABLE `cempMemPool`;
 DROP TABLE `cpmCPU`;
 DROP TABLE `cmpMemPool`;
+ALTER TABLE `mempools` CHANGE `mempool_used` `mempool_used` INT( 16 ) NOT NULL ,CHANGE `mempool_free` `mempool_free` INT( 16 ) NOT NULL ,CHANGE `mempool_total` `mempool_total` INT( 16 ) NOT NULL ,CHANGE `mempool_largestfree` `mempool_largestfree` INT( 16 ) NULL DEFAULT NULL ,CHANGE `mempool_lowestfree` `mempool_lowestfree` INT( 16 ) NULL DEFAULT NULL ;
