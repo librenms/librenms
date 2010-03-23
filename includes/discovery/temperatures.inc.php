@@ -285,34 +285,24 @@ if ($device['os'] == "ios")
     $data = trim($data);
     if ($data) 
     {
-      list($oid) = explode(" ", $data);
-      $temp_oid  = ".1.3.6.1.4.1.9.9.13.1.3.1.3.$oid";
-      $descr_oid = ".1.3.6.1.4.1.9.9.13.1.3.1.2.$oid";
-      $descr = trim(shell_exec($config['snmpget'] . " -m CISCO-ENVMON-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-      $temp  = trim(shell_exec($config['snmpget'] . " -m CISCO-ENVMON-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid"));
+      list($index) = explode(" ", $data);
+      $oid  = ".1.3.6.1.4.1.9.9.13.1.3.1.3.$index";
+      $descr_oid = ".1.3.6.1.4.1.9.9.13.1.3.1.2.$index";
+      $descr = snmp_get($device, $descr_oid, "-Oqv", "CISCO-ENVMON-MIB");
+      $temp = snmp_get($device, $oid, "-Oqv", "CISCO-ENVMON-MIB");
       if (!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" ) 
       {
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("temp", "", $descr);
         $descr = trim($descr);
-        if (mysql_result(mysql_query("SELECT count(temp_id) FROM `temperature` WHERE temp_oid = '$temp_oid' AND device_id = '$id'"),0) == '0') 
-        {
-          $query = "INSERT INTO temperature (`device_id`, `temp_oid`, `temp_descr`, `temp_limit`, `temp_current`) values ('$id', '$temp_oid', '$descr', " . ($config['defaults']['temp_limit'] ? $config['defaults']['temp_limit'] : '60') . ", '$temp')";
-          mysql_query($query);
-          echo("+");
-        }
-        else 
-        { 
-          echo(".");
-        }
-        $temp_exists[] = "$id $temp_oid";
+
+        discover_temperature($valid_temp, $device, $oid, $index, "cisco", $descr, "1", NULL, NULL, $temp);
+        $temp_exists[] = $device['device_id'] . " $oid";
       }
     }
   } 
 }
-
-## Delete removed sensors
 
 $sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 
