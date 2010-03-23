@@ -233,13 +233,13 @@ echo("</td>");
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 
-  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
+  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
         onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
-  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
+  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
-  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
-  echo("<a href='?page=interface&id=" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
 
   echo("</td></tr>");
