@@ -127,7 +127,9 @@ function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $prec
     {
       echo(".");
 #      entry = mysql_fetch_assoc(mysql_query());
-      $query = "UPDATE `mempools` SET `mempool_descr` = '".$descr."', `entPhysicalIndex` = '$entPhysicalIndex', `hrDeviceIndex` = '$hrDeviceIndex' WHERE `device_id` = '".$device['device_id']."' AND `mempool_index` = '".$index."' AND `mempool_type` = '".$type."'";
+      $query  = "UPDATE `mempools` SET `mempool_descr` = '".$descr."', `entPhysicalIndex` = '".$entPhysicalIndex."'"'
+      $query .= ", `hrDeviceIndex` = '$hrDeviceIndex' ";
+      $query .= "WHERE `device_id` = '".$device['device_id']."' AND `mempool_index` = '".$index."' AND `mempool_type` = '".$type."'";
       mysql_query($query);
       if($debug) { print $query . "\n"; }
     }

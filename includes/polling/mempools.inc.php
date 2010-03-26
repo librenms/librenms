@@ -42,7 +42,8 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   rrdtool_update($mempoolrrd,"N:".$mempool['used'].":".$mempool['free']);
 
   $update_query  = "UPDATE `mempools` SET `mempool_used` = '".$mempool['used']."'";
-  $update_query .= ", `mempool_free` = '".$mempool['free']."', `mempool_total` = '".$mempool['total']."'";
+  $update_query .= ", `mempool_free` = '".$mempool['free']."'";
+  $update_query .= ", `mempool_total` = '".$mempool['total']."'";
   $update_query .= ", `mempool_largestfree` = '".$mempool['largestfree']."'";
   $update_query .= ", `mempool_lowestfree` = '".$mempool['lowestfree']."'";
   $update_query .= " WHERE `mempool_id` = '".$mempool['mempool_id']."'";
