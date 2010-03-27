@@ -25,6 +25,22 @@ if($debug) {
   $week = time() - (7 * 24 * 60 * 60);
   $month = time() - (31 * 24 * 60 * 60);
   $year = time() - (365 * 24 * 60 * 60);
+
+
+  # Load the settings for Multi-Tenancy.
+  if (is_array($config['branding'])) {
+      if ($config['branding'][$_SERVER['SERVER_NAME']]) {
+          foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
+              eval("\$config['" . $confitem . "'] = \$confval;");
+          }
+      } else {
+          foreach ($config['branding']['default'] as $confitem => $confval) {
+              eval("\$config['" . $confitem . "'] = \$confval;");
+          }
+      }
+  } else {
+      echo "Please check config.php.default and adjust your settings to reflect the new Multi-Tenancy configuration.";
+  }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -142,17 +158,24 @@ function popUp(URL) {
 <?php
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
-    echo('<br /> <div id="footer">Generated in ' . $gentime . ' seconds 
-          <br /> <a href="http://www.observernms.org">Observer ' . $config['version']);
+
+    echo '<br />  <div id="footer">' . $config['footer'];
+    echo '<br />Powered by <a href="http://www.observernms.org" target="_blank">Observer ' . $config['version'];
+
     if (file_exists('.svn/entries'))
     {
       $svn = File('.svn/entries');
       echo '-SVN r' . trim($svn[3]);
       unset($svn);
     }
-    echo ('</a> &copy; 2006-2010 Adam Armstrong
-          <br />This work is licensed under the <a href="http://www.gnu.org/licenses/gpl-3.0-standalone.html">GPL, version 3</a>.</div>');
-	            
+
+    echo '</a>. Copyright &copy; 2006-'. date("Y"). '. All rights reserved.';
+
+    if ($config['page_gen']) {
+        echo '<br />Generated in ' . $gentime . ' seconds.';
+    }
+
+    echo '</div>';
 ?>
 </body>
 </html>
