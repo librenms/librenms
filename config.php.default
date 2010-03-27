@@ -18,8 +18,6 @@ $config['observer_log'] = $config['install_dir'] . "/observer.log";
 ### Default community
 $config['community'] = "public";
 
-$config['base_url'] = "http://observer2.as8681.net";
-
 ### Authentication model
 $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['http_auth_guest'] = "guest"; # remember to configure this user if you use http-auth
@@ -42,24 +40,48 @@ $config['snmpget']      = "/usr/bin/snmpget";
 $config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
 $config['snmpset']      = "/usr/bin/snmpset";
 
+### Application information. Multi-Tenant aware.
+$config['branding'] = array(
+
+    # The default branding.
+    'default' => array(
+        'base_url'       => "http://observer.example.com",
+        'mydomain'       => "example.com",
+        'page_title'     => "ObserverNMS",
+        'title_image'    => "images/observer-logo.gif",
+        'stylesheet'     => "css/styles.css",
+        'mono_font'      => "DejaVuSansMono",
+        'header_color'   => "#133A7B",
+        'favicon'        => "images/observer-icon.png",
+        'page_gen'       => 1,
+        'footer'         => "",
+    ),
+
+    # Example branding for a specifc URL.
+    'observer.branding.com' => array(
+        'base_url'       => "http://observer.branding.com",
+        'mydomain'       => "branding.com",
+        'page_title'     => "ObserverNMS",
+        'title_image'    => "images/observer-logo.gif",
+        'stylesheet'     => "css/styles.css",
+        'mono_font'      => "DejaVuSansMono",
+        'header_color'   => "#133A7B",
+        'favicon'        => "images/observer-icon.png",
+        'page_gen'       => 0,
+        'footer'         => "<a href='http://www.branding.com' target='_blank'>My Branding Company</a> - Slogan!",
+    ),
+);
+
+### E-Mail information.
+$config['email_default']  = "observer@example.com";
+$config['email_from']     = "Observer <observer@example.com>";
+$config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
+
 ### List of networks to allow scanning-based discovery
 $config['nets'] =  array ("89.21.224.0/19", "212.9.12.0/24", "212.9.13.0/24");
 
-### Your company domain name and specifics
-$config['mydomain'] 	= "jerseytelecom.com";
-$config['page_title']  	= "JT Observer";
-$config['title_image']  = "images/observer-logo.gif";
-$config['stylesheet']  	= "css/styles.css";
-$config['mono_font']    = "DejaVuSansMono";
-$config['header_color'] = "#133A7B";
-$config['favicon'] 	= "images/observer-icon.png";
-
 $config['page_refresh'] = "0";  ## Refresh the page every xx seconds
 $config['front_page'] 	= "pages/front/default.php";
-
-$config['email_default']  = "adama@as8681.net";
-$config['email_from']     = "Observer <observer@" . $config['mydomain'] . ">";
-$config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 $config['login_message']  = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
 

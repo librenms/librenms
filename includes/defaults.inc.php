@@ -31,6 +31,7 @@ $config['frong_page']       = "default.php";
 $config['page_title']       = "ObserverNMS";
 $config['syslog_age']       = "1 month";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
+$config['page_gen']         = 1;
 
 ### Cosmetics
 
