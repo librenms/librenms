@@ -160,7 +160,7 @@ function popUp(URL) {
     $gentime = substr($run, 0, 5);
 
     echo '<br />  <div id="footer">' . $config['footer'];
-    echo '<br />Powered by <a href="http://www.observernms.org" target="_blank">Observer ' . $config['version'];
+    echo '<br />Powered by <a href="http://www.observernms.org" target="_blank">ObserverNMS ' . $config['version'];
 
     if (file_exists('.svn/entries'))
     {
@@ -169,7 +169,7 @@ function popUp(URL) {
       unset($svn);
     }
 
-    echo '</a>. Copyright &copy; 2006-'. date("Y"). '. All rights reserved.';
+    echo '</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights reserved.';
 
     if ($config['page_gen']) {
         echo '<br />Generated in ' . $gentime . ' seconds.';
