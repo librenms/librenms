@@ -1,6 +1,6 @@
 <?php
 
-if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"),0)) {
+if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '" . $device['device_id'] . "' ORDER BY processor_descr ASC"),0)) {
   $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/overview/processors.png'> Processors</p>");
