@@ -91,7 +91,7 @@ $config['version'] = "0.10.0";
 
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 
-if($config['enable_nagios']) {
+if(isset($config['enable_nagios']) && $config['enable_nagios']) {
   $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
   if (!$nagios_link) {
     echo "<h2>Nagios MySQL Error</h2>";
