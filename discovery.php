@@ -153,11 +153,6 @@ while ($device = mysql_fetch_array($device_query))
   { 
     if ($device['type'] == "unknown") { $device['type'] = 'network'; }
   }
-  
-  if($device['os'] == "allied") 
-  { 
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
-  }
 
   $update_query  = "UPDATE `devices` SET ";
   $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
