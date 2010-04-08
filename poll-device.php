@@ -222,8 +222,9 @@ while ($device = mysql_fetch_array($device_query)) {
     $poll_update_query  = "UPDATE `devices` SET ";
     $poll_update_query .= $poll_update;
     $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    echo("Updating " . $device['hostname'] . " - $poll_update_query \n");
+    if($debug) {echo("Updating " . $device['hostname'] . " - $poll_update_query \n");}
     $poll_update_result = mysql_query($poll_update_query);
+    if(mysql_affected_rows() == "1") { echo("UPDATED!"); } else { echo("NOT UPDATED!"); }
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
