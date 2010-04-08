@@ -5,7 +5,7 @@ print_optionbar_start();
 echo("
 <a href='".$config['base_url']. "/vrfs/'>Basic</a> | Graphs :
 <a href='".$config['base_url']. "/vrfs/bits/'>Bits</a> |
-<a href='".$config['base_url']. "/vrfs/pkts/'>Packets</a> |
+<a href='".$config['base_url']. "/vrfs/upkts/'>Packets</a> |
 <a href='".$config['base_url']. "/vrfs/nupkts/'>NU Packets</a> |
 <a href='".$config['base_url']. "/vrfs/errors/'>Errors</a>
 ");
@@ -46,7 +46,7 @@ print_optionbar_end();
            $port['from'] = $day;
            $port['to'] = $now;
            $port['bg'] = "#".$bg;
-           $port['graph_type'] = $_GET['opta'];
+           $port['graph_type'] = "port_".$_GET['opta'];
            echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 135px; max-width:135px; min-height:75px; max-height:75px;
              text-align: center; float: left; background-color: ".$list_colour_b_b.";'>
              <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>");
