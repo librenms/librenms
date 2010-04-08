@@ -224,11 +224,11 @@ while ($device = mysql_fetch_array($device_query)) {
     $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
     if($debug) {echo("Updating " . $device['hostname'] . " - $poll_update_query \n");}
     $poll_update_result = mysql_query($poll_update_query);
-    if(mysql_affected_rows() == "1") { echo("UPDATED!"); } else { echo("NOT UPDATED!"); }
+    if(mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
   } else {
     echo("No Changes to " . $device['hostname'] . "\n");
   }
-
+  
   unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);

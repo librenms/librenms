@@ -26,7 +26,6 @@ if($debug) {
   $month = time() - (31 * 24 * 60 * 60);
   $year = time() - (365 * 24 * 60 * 60);
 
-
   # Load the settings for Multi-Tenancy.
   if (is_array($config['branding'])) {
       if ($config['branding'][$_SERVER['SERVER_NAME']]) {
