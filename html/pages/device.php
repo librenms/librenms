@@ -48,13 +48,14 @@ $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_i
 if($health) {
   echo('<li class="' . $select['health'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/health/">
-    <img src="images/16/chart_curve.png" align="absmiddle" border="0" /> Health
+    <img src="images/icons/sensors.png" align="absmiddle" border="0" /> Health
   </a>
 </li>');
 }
 
-#$cisco_sensors = mysql_result(mysql_query("SELECT count(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%'"),0);
+### This needs to die, rolled into generic sensors! (still need to implement booleans, tx/rx powers and currents)
 
+#$cisco_sensors = mysql_result(mysql_query("SELECT count(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%'"),0);
 #if($cisco_sensors) {
 #  echo('<li class="' . $select['ciscosensors'] . '">
 #  <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ciscosensors/">
@@ -103,6 +104,9 @@ if($config['enable_bgp'] && $device['bgpLocalAs']) {
   </a>
 </li>');
 }
+
+### This probably needs to die? DEATH TO NAGIOS!
+
 
 #if(@mysql_result(mysql_query("SELECT count(*) FROM nagios_hosts WHERE address = '".$device['hostname']."'", $nagios_link), 0) > '0') {
 #  echo('<li class="' . $select['nagios'] . '">

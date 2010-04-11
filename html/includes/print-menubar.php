@@ -158,13 +158,17 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
 </li>
 
 
-<li><a class="menu2four" href="sensors/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Sensors
+<li><a class="menu2four" href="health/"><img src="images/icons/sensors.png" border="0" align="absmiddle" /> Health
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-        <li><a href="sensors/temperatures/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperatures</a></li>
-        <li><a href="sensors/fanspeeds/"><img src="images/icons/fans.png" border="0" align="absmiddle" /> Fans</a></li>
-        <li><a href="sensors/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>
+	<li><a href="health/processors/"><img src="images/icons/cpuload.png" border="0" align="absmiddle" /> Processorss</a></li>
+        <li><a href="health/memory/"><img src="images/icons/mempool.png" border="0" align="absmiddle" /> Memory</a></li>
+        <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
+
+        <li><a href="health/temperatures/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperatures</a></li>
+        <li><a href="health/fanspeeds/"><img src="images/icons/fans.png" border="0" align="absmiddle" /> Fans</a></li>
+        <li><a href="health/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>
         </ul>
         </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->

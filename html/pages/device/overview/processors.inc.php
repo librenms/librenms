@@ -18,6 +18,8 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
 
     $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
+    ## REPLACE THIS SHITTY CODE. IT IS ALSO ELSEWHERE.
+
     $text_descr = $proc['processor_descr'];
     $text_descr = str_replace("Routing Processor", "RP", $text_descr);
     $text_descr = str_replace("Switching Processor", "SP", $text_descr);
