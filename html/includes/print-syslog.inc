@@ -2,6 +2,9 @@
 <?php
 
 
+if(devicepermitted($entry['device_id'])) {
+
+
 $syslog_iter++;
 if(!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
@@ -22,5 +25,7 @@ if(!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colo
     </td>
     <td></td>
   </tr>");
+
+}
 
 ?>
