@@ -1,6 +1,8 @@
 <?php
 
-$datas = array('Temperatures', 'Voltages', 'Fanspeeds');
+$datas = array('Processors','Memory','Storage','Temperatures', 'Voltages', 'Fanspeeds');
+
+if(!$_GET['opta']) { $_GET['opta'] = "processors"; }
 
 print_optionbar_start();
 
@@ -10,7 +12,7 @@ foreach ($datas as $texttype) {
   if (!isset($_GET['opta'])) { $_GET['opta'] = $type; }
   echo($sep);
   if ($_GET['opta'] == $type) { echo("<strong>"); }
-  echo("<a href='".$config['base_url']."/sensors/" . $type . "/'> " . $texttype ."</a>\n");
+  echo("<a href='".$config['base_url']."/health/" . $type . "/'> " . $texttype ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
 }
@@ -22,13 +24,16 @@ print_optionbar_end();
 
 switch ($_GET['opta'])
 {
+  case 'processors':
+  case 'memory':
+  case 'storage':
   case 'temperatures':
   case 'voltages':
   case 'fanspeeds':
-    include('pages/sensors/'.$_GET['opta'].'.php');
+    include('pages/health/'.$_GET['opta'].'.inc.php');
     break;
   default:
-    include('pages/sensors/temperatures.php');
+    include('pages/health/temperatures.inc.php');
     break;
 }
 

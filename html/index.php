@@ -4,7 +4,7 @@
   ini_set('allow_url_fopen', 0);
   ini_set('display_errors', 0);
 
-#$debug=1;
+$debug=1;
 if($debug) {
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);

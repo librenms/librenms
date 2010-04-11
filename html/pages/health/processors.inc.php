@@ -3,18 +3,23 @@
   echo("<div style='margin-top: 5px; padding: 0px;'>");
   echo("<table width=100% cellpadding=6 cellspacing=0>");
   $i = '1';
-  $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "'");
+  $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id");
   while($proc = mysql_fetch_array($procs)) {
 
-    $proc_url   = "?page=device/".$device['device_id']."/health/processors/";
+   if(devicepermitted($proc['device_id'])) { 
 
-    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $device = $proc;
 
     $text_descr = $proc['processor_descr'];
     $text_descr = str_replace("Routing Processor", "RP", $text_descr);
     $text_descr = str_replace("Switching Processor", "SP", $text_descr);
     $text_descr = str_replace("Sub-Module", "Module ", $text_descr);
     $text_descr = str_replace("DFC Card", "DFC", $text_descr);
+
+
+    $proc_url   = "?page=device/".$device['device_id']."/health/processors/";
+
+    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['proc_id'] . "&type=proc&from=$month&to=$now&width=400&height=125\'>";
@@ -29,14 +34,14 @@
     } else { $left_background='9abf5b'; $right_background='bbd392'; }
 
     echo("<tr bgcolor=$row_colour>
+           <td>".generatedevicelink($proc)."</td>
+
            <td class=tablehead><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
            <td width=90><a href='".$proc_url."'  $proc_popup><img src='$mini_url'></a></td>
            <td width=200><a href='".$proc_url."' $proc_popup>
            ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background)."
             </a></td>
          </tr>");
-
-
  
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
@@ -63,6 +68,8 @@
   echo("</td></tr>");
 
     $i++;
+   }
+
   }
   echo("</table>");
   echo("</div>");
