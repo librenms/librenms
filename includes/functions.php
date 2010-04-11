@@ -284,7 +284,11 @@ function generateiflink($interface, $text=0, $type = NULL)
   if ($interface['ifAlias']) { $contents .= htmlentities($interface['ifAlias'] ."<br />" ); }
   $contents .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>";
   $link = overlib_link($url, $text, $contents, $class);
-  return $link;
+  if(interfacepermitted($interface['interface_id'])) {
+    return $link;
+  } else {
+    return fixifName($interface['label']);
+  }
 }
 
 function overlib_link($url, $text, $contents, $class) {
@@ -312,6 +316,13 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   $contents .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_b\'";
   $text = htmlentities($text);
   $link = overlib_link($url, $text, $contents, $class);
+  if(devicepermitted($device['device_id'])) {
+    return $link;
+  } else {
+    return $device['hostname'];
+  }
+
+
   return $link;
 }
 
