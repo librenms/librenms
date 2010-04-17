@@ -9,13 +9,15 @@ if($ports['total']) {
   $graph_array['to']     = $now;
   $graph_array['device'] = $device['device_id'];
   $graph_array['type']   = "device_bits";
-  $graph_array['from']     = $day;
+  $graph_array['from']   = $day;
+  $graph_array['legend'] = "no";
   $graph = generate_graph_tag($graph_array);
 
 
   $content = "<div class=list-large>".$device['hostname']." - Device Traffic</div>";
   $content .= "<div style=\'width: 850px\'>";
-  $graph_array['width']  = "340";
+  $graph_array['legend']   = "yes";
+  $graph_array['width']    = "340";
   $graph_array['from']     = $day;
   $content .= generate_graph_tag($graph_array);
   $graph_array['from']     = $week;
