@@ -195,7 +195,7 @@ function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low
     }
     else
     {
-      mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr', `fan_oid` = '$oid', `fan_precision` = '$precision' WHERE `device_id` = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$fan_index' ");
+      mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr', `fan_oid` = '$oid', `fan_precision` = '$precision' WHERE `device_id` = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$index' ");
       echo("U");
     }
   }
@@ -230,7 +230,7 @@ function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $lo
     }
     else
     {
-      mysql_query("UPDATE voltage SET `volt_descr` = '$descr', `volt_oid` = '$oid', `volt_precision` = '$precision' WHERE `device_id` = '$id' AND volt_type = '$type' AND `volt_index` = '$volt_index' ");
+      mysql_query("UPDATE voltage SET `volt_descr` = '$descr', `volt_oid` = '$oid', `volt_precision` = '$precision' WHERE `device_id` = '$id' AND volt_type = '$type' AND `volt_index` = '$index' ");
       echo("U");
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }
@@ -261,7 +261,7 @@ function discover_toner($device, $oid, $index, $type, $descr, $capacity = NULL, 
     }
     else 
     {
-      mysql_query("UPDATE toner SET `toner_descr` = '$descr', `toner_oid` = '$oid', `toner_capacity` = '$capacity' WHERE `device_id` = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$toner_index' ");
+      mysql_query("UPDATE toner SET `toner_descr` = '$descr', `toner_oid` = '$oid', `toner_capacity` = '$capacity' WHERE `device_id` = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index' ");
       echo("U");
     }
   }
