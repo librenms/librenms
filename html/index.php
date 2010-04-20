@@ -137,7 +137,7 @@ function popUp(URL) {
     if(isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
     } else { 
-      if($config['front_page']) {
+      if(isset($config['front_page'])) {
         include($config['front_page']);
       } else {
         include("pages/front/default.php");

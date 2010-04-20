@@ -13,7 +13,7 @@ if(!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colo
 
   echo("<td class=syslog width=125>" . $entry['date'] . "</td>");
 
-#  $entry['hostname'] = shorthost(gethostbyid($entry['host']), 20);
+  $entry['hostname'] = shorthost($entry['hostname'], 20);
 
   if($_GET['page'] != "device") { 
     echo("<td width=160><strong>".generatedevicelink($entry)."</strong></td>"); 

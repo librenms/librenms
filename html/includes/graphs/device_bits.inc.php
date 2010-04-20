@@ -2,14 +2,34 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$device = mres($_GET['device']);
-$hostname = gethostbyid($device);
+if($_GET['device']) {
+  $device = device_by_id_cache(mres($_GET['device']));
+} elseif($_GET['id']) {
+  $device = device_by_id_cache(mres($_GET['id']));
+}
 
-$query = mysql_query("SELECT `ifIndex`,`interface_id` FROM `ports` WHERE `device_id` = '$device' AND `ifType` NOT LIKE '%oopback%' AND `ifType` NOT LIKE '%SVI%' AND `ifType` != 'l2vlan'");
-while($int = mysql_fetch_row($query)) {
-  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd"))) {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $hostname . "/" . safename($int[0] . ".rrd");
+$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."'");
+while($int = mysql_fetch_assoc($query)) {
+  $ignore = 0;
+  if(is_array($config['device_traffic_iftype'])) {
+    foreach($config['device_traffic_iftype'] as $iftype) { 
+      if (preg_match($iftype ."i", $int['ifType'])) { 
+        $ignore = 1;
+      } 
+    }
   }
+  if(is_array($config['device_traffic_descr'])) {
+    foreach($config['device_traffic_descr'] as $ifdescr) {
+      if (preg_match($ifdescr."i", $int['ifDescr']) || preg_match($ifdescr."i", $int['ifName']) || preg_match($ifdescr."i", $int['portName'])) {
+        $ignore = 1;
+      }
+    }
+  }
+
+  if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($int['ifIndex'] . ".rrd")) && $ignore != 1) {
+    $rrd_filenames[] = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");
+  }
+  unset($ignore);
 }
 
 $rra_in  = "INOCTETS";

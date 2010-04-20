@@ -25,19 +25,6 @@ require('collectd/config.php');
 require('collectd/functions.php');
 require('collectd/definitions.php');
 
-function device_by_id_cache($device_id)
-{
-  global $device_cache;
-  if (is_array($device_cache[$device_id]))
-  {
-    $device = $device_cache[$device_id];
-  } else {
-    $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
-    $device_cache[$device_id] = $device;
-  }
-  return $device;
-}
-
 function mac_clean_to_readable($mac)
 {
   $r = substr($mac, 0, 2);
