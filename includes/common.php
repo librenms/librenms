@@ -2,6 +2,19 @@
 
 ## Common Functions
 
+function device_by_id_cache($device_id)
+{
+  global $device_cache;
+  if (is_array($device_cache[$device_id]))
+  {
+    $device = $device_cache[$device_id];
+  } else {
+    $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
+    $device_cache[$device_id] = $device;
+  }
+  return $device;
+}
+
 function truncate($substring, $max = 50, $rep = '...'){
   if(strlen($substring) < 1){ $string = $rep; } else { $string = $substring; }
   $leave = $max - strlen ($rep);

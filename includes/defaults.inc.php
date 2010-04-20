@@ -27,7 +27,7 @@ $config['mono_font']        = "DejaVuSansMono";
 $config['favicon']          = "favicon.ico";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "30";  ## Refresh the page every xx seconds
-$config['frong_page']       = "default.php";
+$config['frong_page']       = "pages/front/default.php";
 $config['page_title']       = "ObserverNMS";
 $config['syslog_age']       = "1 month";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
@@ -79,6 +79,9 @@ $config['processor_filter'][] = "An electronic chip that makes the computer work
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
+
+$config['device_traffic_iftype']  = array('/loopback/','/other/','/tunnel/','/virtual/','/mpls/');
+$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:/');
 
 # Sensors
 
