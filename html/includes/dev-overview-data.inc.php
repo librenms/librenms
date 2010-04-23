@@ -7,22 +7,22 @@
 
   $uptime = $device['uptime'];
 
-  if(is_file("images/devices/" . $device['hardware'] . ".gif")) 
-  {
-    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".gif' align=absmiddle></img></div>";
-  } 
-  elseif (is_file("images/devices/" . $device['hardware'] . ".jpg")) 
-  {
-    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".jpg' align=absmiddle></img></div>";
-  }
-  elseif (is_file("images/devices/" . $device['hardware'] . ".png")) 
-  {
-    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".png' align=absmiddle></img></div>";
-  }
-  else
-  {
-    $dev_img = '';
-  }
+#  if(is_file("images/devices/" . $device['hardware'] . ".gif")) 
+#  {
+#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".gif' align=absmiddle></img></div>";
+#  } 
+#  elseif (is_file("images/devices/" . $device['hardware'] . ".jpg")) 
+#  {
+#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".jpg' align=absmiddle></img></div>";
+#  }
+#  elseif (is_file("images/devices/" . $device['hardware'] . ".png")) 
+#  {
+#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".png' align=absmiddle></img></div>";
+#  }
+#  else
+#  {
+#    $dev_img = '';
+#  }
 
   if ($device['os'] == "ios") { formatCiscoHardware($device); }
   if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
