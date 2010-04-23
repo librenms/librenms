@@ -68,7 +68,7 @@ echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/inte
 
  if(mysql_result(mysql_query("SELECT COUNT(*) FROM juniAtmVp WHERE interface_id = '".$interface['interface_id']."'"),0) > "0"){
    echo(" | ATM VPs :");
-   echo(" <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/octets/'>Bits</a>");
+   echo(" <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/bits/'>Bits</a>");
    echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/packets/'>Packets</a>");
    echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/cells/'>Cells</a>");
    echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/junose-atm-vp/errors/'>Errors</a>");
