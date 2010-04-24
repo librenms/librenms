@@ -15,7 +15,7 @@ include("common.inc.php");
 
   $rrd  = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename("service-" . $service['service_type'] . "-" . $service['service_id'] . ".rrd");
 
-  $rrd_options .= " COMMENT:'                                Cur    Max\\n'";
+  $rrd_options .= " COMMENT:'                                Cur    Avail\\n'";
   $rrd_options .= " DEF:status=$rrd:status:AVERAGE";
   $rrd_options .= " CDEF:percent=status,100,*";
   $rrd_options .= " CDEF:down=status,1,LT,status,UNKN,IF";
@@ -25,7 +25,7 @@ include("common.inc.php");
   $rrd_options .= " LINE1.5:percent#009900:'" . $service_text . "'"; # Ugly hack :(
   $rrd_options .= " LINE1.5:percentdown#cc0000";
   $rrd_options .= " GPRINT:status:LAST:%3.0lf";
-  $rrd_options .= " GPRINT:percent:AVERAGE:%3.0lf%%\\\\l";
+  $rrd_options .= " GPRINT:percent:AVERAGE:%3.5lf%%\\\\l";
 
 
 
