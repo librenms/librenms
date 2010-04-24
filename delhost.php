@@ -11,7 +11,7 @@ if($argv[1]) {
   $host = strtolower($argv[1]);
   $id = getidbyname($host);
   if($id) {
-    delHost($id);
+    delete_device($id);
     echo("Removed $host\n");
   } else {
     echo("Host doesn't exist!\n");

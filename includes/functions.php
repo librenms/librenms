@@ -325,15 +325,9 @@ function renamehost($id, $new) {
   eventlog("Hostname changed -> $new (console)", $id);
 }
 
-function delHost($id) 
+function delete_port($int_id) 
 {
-  global $config;
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
-  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while($int_data = mysql_fetch_array($int_query)) {
-    $int_if = $int_data['ifDescr'];
-    $int_id = $int_data['interface_id'];
+    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = '".$int_id."' AND D.device_id = P.device_id"));
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
     mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
@@ -343,6 +337,20 @@ function delHost($id)
     mysql_query("DELETE from `mac_accounting` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
     mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
+    mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
+    shell_exec("rm -rf ".$config['rrd_dir']."/".$interface['hostname']."/".$interface['ifIndex'].".rrd");
+}
+
+function delete_device($id) 
+{
+  global $config;
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
+  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
+  while($int_data = mysql_fetch_array($int_query)) {
+    $int_if = $int_data['ifDescr'];
+    $int_id = $int_data['interface_id'];
+    delete_port($int_id);
     echo("Removed interface $int_id ($int_if)<br />");
   }
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
