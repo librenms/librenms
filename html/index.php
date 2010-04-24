@@ -18,6 +18,7 @@ if($debug) {
   include("includes/functions.inc.php");
   include("includes/authenticate.inc.php");
   if($_SESSION['authenticated']) {
+    # Load permissions used my devicepermitted() and interfacepermitted()
     $permissions = permissions_cache($_SESSION['user_id']);
   }
 
