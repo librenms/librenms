@@ -150,10 +150,24 @@ if (isset($interface_alerts)) {
 echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
+  $sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
+  $query = mysql_query($sql);
+  $deleted_ports = 0;
+  while($interface = mysql_fetch_assoc($query)) {
+    if(interfacepermitted($interface['interface_id'], $interface['device_id'])){
+      $deleted_ports++;
+    }
+  }
+
 ?>
 
 <li><a href="ports/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
 <li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
+<?
+
+  if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted</a></li>'); }
+
+?>
 </ul></td></tr></table>
 </li>
 

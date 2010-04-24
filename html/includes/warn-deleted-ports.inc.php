@@ -1,5 +1,0 @@
-<?php
-
-## REWRITE THIS
-
-?>
