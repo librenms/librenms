@@ -8,6 +8,7 @@ $sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.dev
 $query = mysql_query($sql);
 while ($service = mysql_fetch_array($query)) {
 
+ if($service['status'] = "1") {
   unset($check, $service_status, $time, $status);
   $service_status = $service['service_status'];
   $service_type = strtolower($service['service_type']);
@@ -35,7 +36,11 @@ while ($service = mysql_fetch_array($query)) {
   } else { unset($updated); }
   $update_sql = "UPDATE `services` SET `service_status` = '$status', `service_message` = '" . addslashes($check) . "', `service_checked` = '" . time() . "' $updated WHERE `service_id` = '" . $service['service_id']. "'";
   mysql_query($update_sql);
-
+ } else {
+   $status = "0";
+ }
+  
+  
   $rrd  = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename("service-" . $service['service_type'] . "-" . $service['service_id'] . ".rrd");
 
   if (!is_file($rrd)) {
