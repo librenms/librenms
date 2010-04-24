@@ -23,6 +23,11 @@ function ifLabel ($interface, $device = NULL) {
     $interface['label'] = $interface['ifDescr'];
     if(isset($config['appendifindex'][$os])) { $interface['label'] = $interface['label'] . " " . $interface['ifIndex']; }
   }
+
+  if($device['os'] == "speedtouch") {
+    list($interface['label']) = explode("thomson", $interface['label']);
+  }
+
   return $interface;
 
 }

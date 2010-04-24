@@ -13,6 +13,37 @@ function permissions_cache($user_id) {
   return $permissions;
 }
 
+function interfacepermitted($interface_id, $device_id = NULL)
+{
+  global $_SESSION; global $permissions;
+  if(!$device_id) { $device_id = mysql_result(mysql_query("SELECT `device_id` from ports WHERE interface_id = '".$interface_id."'"),0); }
+  if ($_SESSION['userlevel'] >= "5") {
+    $allowed = TRUE;
+  } elseif ( devicepermitted($device_id)) {
+    $allowed = TRUE;
+  } elseif ( $permissions['port'][$interface_id]) {
+    $allowed = TRUE;
+  } else {
+    $allowed = FALSE;
+  }
+  return $allowed;
+}
+
+function devicepermitted($device_id)
+{
+  global $_SESSION; global $permissions;
+  if ($_SESSION['userlevel'] >= "5") {
+    $allowed = true;
+  } elseif ( $permissions['device'][$device_id] ) {
+    $allowed = true;
+  } else {
+    $allowed = false;
+  }
+  return $allowed;
+
+}
+
+
 function print_graph_tag ($args) 
 {
   echo generate_graph_tag ($args);
