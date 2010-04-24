@@ -1,5 +1,18 @@
 <?php
 
+function permissions_cache($user_id) {
+  $permissions = array();
+  $query = mysql_query("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'");
+  while($device = mysql_fetch_assoc($query)) {
+    $permissions['device'][$device[device_id]] = 1;    
+  }
+  $query = mysql_query("SELECT * FROM ports_perms WHERE user_id = '".$user_id."'");
+  while($port = mysql_fetch_assoc($query)) {
+    $permissions['port'][$port[interface_id]] = 1;
+  }
+  return $permissions;
+}
+
 function print_graph_tag ($args) 
 {
   echo generate_graph_tag ($args);

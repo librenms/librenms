@@ -17,8 +17,11 @@ if($debug) {
   include("../includes/functions.php");  
   include("includes/functions.inc.php");
   include("includes/authenticate.inc.php");
-  $start = utime();
+  if($_SESSION['authenticated']) {
+    $permissions = permissions_cache($_SESSION['user_id']);
+  }
 
+  $start = utime();
   $now = time();
   $day = time() - (24 * 60 * 60);
   $twoday = time() - (2 * 24 * 60 * 60);
