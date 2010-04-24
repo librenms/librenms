@@ -6,15 +6,15 @@ if($_GET['optb'] == "purge" && $_GET['optc'] == "all") {
   $query = mysql_query($sql);
   while($interface = mysql_fetch_assoc($query)) {
     if(interfacepermitted($interface['interface_id'], $interface['device_id'])){
-      mysql_query("DELETE FROM `ports` WHERE `interface_id` = '".$interface['interface_id']."'");
-      if(mysql_affected_rows()) { echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>"); }
+      delete_port($interface['interface_id']);
+      echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>");
     }
   }
 } elseif($_GET['optb'] == "purge" && $_GET['optc'])  { 
   $interface = mysql_fetch_assoc(mysql_query("SELECT * from `ports` AS P, `devices` AS D WHERE `interface_id` = '".mres($_GET['optc'])."' AND D.device_id = P.device_id"));
   if(interfacepermitted($interface['interface_id'], $interface['device_id']))
-  mysql_query("DELETE FROM `ports` WHERE `interface_id` = '".mres($_GET['optc'])."' AND `deleted` = '1'");
-  if(mysql_affected_rows()) { echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>"); }
+  delete_port($interface['interface_id']);
+  echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>");
 }
 
 
