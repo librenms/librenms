@@ -3,6 +3,8 @@
 $ports_a = $_GET['ports'];
 $ports_b = $_GET['ports_b'];
 
+if($_GET['legend']) { $legend = $_GET['legend']; }
+
   $rrd_options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
   $rrd_options .= $config['rrdgraph_def_text'];
   if($height < "99") { $rrd_options .= " --only-graph"; }
@@ -56,14 +58,14 @@ $ports_b = $_GET['ports_b'];
   if($legend == "no") {
    $rrd_options .= " AREA:inbits_tot#cdeb8b:";
    $rrd_options .= " AREA:inbits#ffcc99:";
-   $rrd_options .= " AREA:doutbits_tot#cdeb8b:";
+   $rrd_options .= " AREA:doutbits_tot#C3D9FF:";
    $rrd_options .= " AREA:doutbits#ffcc99:";
    $rrd_options .= " LINE1:inbits#aa9966:";
    $rrd_options .= " LINE1:doutbits#aa9966:";
-   $rrd_options .= " LINE1:inbitsb#006600:";
-   $rrd_options .= " LINE1:doutbitsb#006600:";
+#   $rrd_options .= " LINE1:inbitsb#006600:";
+#   $rrd_options .= " LINE1:doutbitsb#000066:";
    $rrd_options .= " LINE1.25:inbits_tot#006600:";
-   $rrd_options .= " LINE1.25:doutbits_tot#006600:";
+   $rrd_options .= " LINE1.25:doutbits_tot#000099:";
    $rrd_options .= " LINE0.5:nothing#555555:";
   } else {
    $rrd_options .= " COMMENT:BPS\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
@@ -72,7 +74,7 @@ $ports_b = $_GET['ports_b'];
    $rrd_options .= " GPRINT:inbitsb:AVERAGE:%6.2lf%s";
    $rrd_options .= " GPRINT:inbitsb:MIN:%6.2lf%s";
    $rrd_options .= " GPRINT:inbitsb:MAX:%6.2lf%s\\\\l";
-   $rrd_options .= " AREA:doutbits_tot#cdeb8b:";
+   $rrd_options .= " AREA:doutbits_tot#C3D9FF:";
    $rrd_options .= " COMMENT:\ \ \ \ \ \ \ \ \ \ Out";
    $rrd_options .= " GPRINT:outbitsb:LAST:%6.2lf%s";
    $rrd_options .= " GPRINT:outbitsb:AVERAGE:%6.2lf%s";
@@ -104,10 +106,10 @@ $ports_b = $_GET['ports_b'];
 
    $rrd_options .= " LINE1:inbits#aa9966:";
    $rrd_options .= " LINE1:doutbits#aa9966:";
-   $rrd_options .= " LINE1.25:inbitsb#006600:";
-   $rrd_options .= " LINE1.25:doutbitsb#006600:";
+#   $rrd_options .= " LINE1.25:inbitsb#006600:";
+#   $rrd_options .= " LINE1.25:doutbitsb#006600:";
    $rrd_options .= " LINE1.25:inbits_tot#006600:";
-   $rrd_options .= " LINE1.25:doutbits_tot#006600:";
+   $rrd_options .= " LINE1.25:doutbits_tot#000099:";
    $rrd_options .= " LINE0.5:nothing#555555:";
 
   }
