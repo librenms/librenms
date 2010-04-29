@@ -38,7 +38,7 @@ if($device['os'] == "ironware")
         $descr = str_replace("Active management module", "Mgmt Module", $descr);
         $descr = str_replace("  ", " ", $descr);
         $descr = trim($descr);
-        discover_temperature($valid_temp, $device, $temp_oid, $oid, "ironware", $descr, "1", NULL, NULL, $temp);
+        discover_temperature($valid_temp, $device, $temp_oid, $oid, "ironware", $descr, "2", NULL, NULL, $temp);
       }
     }
   }
