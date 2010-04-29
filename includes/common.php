@@ -89,7 +89,8 @@ function gethostosbyid($id) {
 
 function safename($name) 
 {
-  return preg_replace('/[^a-zA-Z0-9,._\+\(\)\-]/', '_', $name);
+  return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
+
 }
 
 

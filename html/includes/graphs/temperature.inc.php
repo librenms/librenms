@@ -16,6 +16,7 @@ include("common.inc.php");
 
   $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("temp-" . $temperature['temp_descr'] . ".rrd");
 
+
   $rrd_options .= " DEF:temp=$rrd_filename:temp:AVERAGE";
   $rrd_options .= " DEF:temp_max=$rrd_filename:temp:MAX";
   $rrd_options .= " DEF:temp_min=$rrd_filename:temp:MIN";
