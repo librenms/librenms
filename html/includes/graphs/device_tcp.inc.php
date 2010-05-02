@@ -1,8 +1,9 @@
 <?php
 
   include("common.inc.php");
+  $device = device_by_id_cache($id);
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-tcp.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-tcp.rrd";
 
   $rrd_options .= " DEF:tcpActiveOpens=$rrd_filename:tcpActiveOpens:AVERAGE";
   $rrd_options .= " DEF:tcpPassiveOpens=$rrd_filename:tcpPassiveOpens:AVERAGE";

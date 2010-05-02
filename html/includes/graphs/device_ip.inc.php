@@ -1,8 +1,9 @@
 <?php
 
   include("common.inc.php");
+  $device = device_by_id_cache($id);
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-ip.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-ip.rrd";
 
   $rrd_options .= " DEF:ipForwDatagrams=$rrd_filename:ipForwDatagrams:AVERAGE";
   $rrd_options .= " DEF:ipInDelivers=$rrd_filename:ipInDelivers:AVERAGE";

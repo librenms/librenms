@@ -2,10 +2,12 @@
 
 include("common.inc.php");
 
+$device = device_by_id_cache($id);
+
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM fanspeed where device_id = '$device_id'");
+$sql = mysql_query("SELECT * FROM fanspeed where device_id = '$id'");
 $rrd_options .= " COMMENT:'RPM                    Cur     Min      Max\\n'";
 while($fanspeed = mysql_fetch_array($sql)) 
 {
@@ -36,10 +38,8 @@ while($fanspeed = mysql_fetch_array($sql))
       break;
   }
 
-  $hostname = gethostbyid($fanspeed['device_id']);
-  
   $descr = substr(str_pad($fanspeed['fan_descr'], 17),0,17);
-  $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("fan-" . $fanspeed['fan_descr'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("fan-" . $fanspeed['fan_descr'] . ".rrd");
   $fan_id = $fanspeed['fan_id'];
 
   $rrd_options .= " DEF:fan$fan_id=$rrd_filename:fan:AVERAGE";

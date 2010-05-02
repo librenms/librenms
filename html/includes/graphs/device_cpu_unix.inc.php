@@ -1,11 +1,12 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".mres($device_id)."' AND hrDeviceType = 'hrDeviceProcessor'");
+$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".$id."' AND hrDeviceType = 'hrDeviceProcessor'");
+$device = device_by_id_cache($id);
 
 $i=0;
 while($proc = mysql_fetch_array($query)) {
 
-  $rrd_filename  = $config['rrd_dir'] . "/$hostname/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/."$device['hostname']."/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
 
   if(is_file($rrd_filename)) {
 

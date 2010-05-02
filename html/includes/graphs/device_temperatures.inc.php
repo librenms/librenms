@@ -1,11 +1,12 @@
 <?php
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM temperature where device_id = '$device_id'");
+$sql = mysql_query("SELECT * FROM temperature where device_id = '$id'");
 $rrd_options .= " COMMENT:'                           Cur   Min   Max\\n'";
 while($temperature = mysql_fetch_array($sql)) 
 {
@@ -37,7 +38,7 @@ while($temperature = mysql_fetch_array($sql))
   }
   
   $temperature['temp_descr_fixed'] = substr(str_pad($temperature['temp_descr'], 22),0,22);
-  $temprrd  = $config['rrd_dir'] . "/$hostname/".safename("temp-" . $temperature['temp_descr'] . ".rrd");
+  $temprrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("temp-" . $temperature['temp_descr'] . ".rrd");
   $rrd_options .= " DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE ";
   $rrd_options .= " LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['temp_descr_fixed']))) . "' ";
   $rrd_options .= " GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lfC ";

@@ -1,11 +1,12 @@
 <?php
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM voltage where device_id = '$device_id'");
+$sql = mysql_query("SELECT * FROM voltage where device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
 while($voltage = mysql_fetch_array($sql)) 
 {
@@ -39,7 +40,7 @@ while($voltage = mysql_fetch_array($sql))
   $hostname = gethostbyid($voltage['device_id']);
   
   $descr = substr(str_pad($voltage['volt_descr'], 17),0,17);
-  $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
   $volt_id = $voltage['volt_id'];
 
   $rrd_options .= " DEF:volt$volt_id=$rrd_filename:volt:AVERAGE";

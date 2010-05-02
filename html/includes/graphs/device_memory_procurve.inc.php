@@ -3,8 +3,9 @@
 $scale_min = "0";
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
-$rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/procurve-mem.rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-mem.rrd";
 
 $rrd_options .= " -b 1024";
 $rrd_options .= " DEF:TOTAL=$rrd_filename:TOTAL:AVERAGE";

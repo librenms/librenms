@@ -1,8 +1,9 @@
 <?php
 
   include("common.inc.php");
+  $device = device_by_id_cache($id);
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-udp.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-udp.rrd";
 
   $rrd_options .= " DEF:udpInDatagrams=$rrd_filename:udpInDatagrams:AVERAGE";
   $rrd_options .= " DEF:udpOutDatagrams=$rrd_filename:udpOutDatagrams:AVERAGE";

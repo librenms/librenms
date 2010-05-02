@@ -1,11 +1,13 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `processors` where `device_id` = '".mres($device_id)."'");
+$device = device_by_id_cache($id);
+
+$query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
 
 $i=0;
 while($proc = mysql_fetch_array($query)) {
 
-  $rrd_filename  = $config['rrd_dir'] . "/$hostname/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
 
   if(is_file($rrd_filename)) {
 
