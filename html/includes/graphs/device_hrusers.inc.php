@@ -1,10 +1,12 @@
 <?php
 
+$device = device_by_id_cache($id);
+
 $scale_min = "0";
 
 include("common.inc.php");
 
-$database = $config['rrd_dir'] . "/" . $hostname . "/hrSystem.rrd";
+$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
 
 $rrd_options .= " DEF:users=$database:users:AVERAGE";
 $rrd_options .= " DEF:users_max=$database:users:MAX";

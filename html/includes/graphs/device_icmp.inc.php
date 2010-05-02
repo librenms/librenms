@@ -2,7 +2,9 @@
 
   include("common.inc.php");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/netstats-icmp.rrd";
+  $device = device_by_id_cache($id);
+
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/netstats-icmp.rrd";
 
   $rrd_options .= " DEF:icmpInMsgs=$rrd_filename:icmpInMsgs:AVERAGE";
   $rrd_options .= " DEF:icmpOutMsgs=$rrd_filename:icmpOutMsgs:AVERAGE";

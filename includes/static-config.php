@@ -106,7 +106,7 @@ if(isset($_SERVER['HTTPS'])) {
 }
 
 ### Connect to database
-$observer_link = mysql_connect($config['db_host'], $config['db_user'], $config['db_pass']);
+$observer_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observer_link) {
         echo "<h2>Observer MySQL Error</h2>";
         die;

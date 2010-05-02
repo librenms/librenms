@@ -15,21 +15,17 @@ if($_GET['debug']) {
   include("../includes/rewrites.php");
   include("includes/authenticate.inc.php");
 
-#  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   
   if($_GET['device']) {
-    $device_id = $_GET['device'];
+    $_GET['id'] = $_GET['device'];
   } elseif($_GET['if']) {
-    $device_id = getifhost($_GET['if']);
-    $ifIndex = getifindexbyid($_GET['if']);
+    $_GET['id'] = $_GET['if'];
   } elseif($_GET['port']) {
-    $device_id = getifhost($_GET['port']);
-    $ifIndex = getifindexbyid($_GET['port']);
+    $_GET['id'] = $_GET['port'];
   } elseif($_GET['peer']) {
-    $device_id = getpeerhost($_GET['peer']);
+    $_GET['id'] = $_GET['peer'];
   }
-
-  if($device_id) { $hostname = gethostbyid($device_id); }
 
   $from     = mres($_GET['from']);
   $to       = mres($_GET['to']);
@@ -38,6 +34,8 @@ if($_GET['debug']) {
   $title    = mres($_GET['title']);
   $vertical = mres($_GET['vertical']);
   $type     = mres($_GET['type']);
+  $legend   = mres($_GET['legend']);
+  $id       = mres($_GET['id']);
 
   $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
@@ -62,6 +60,7 @@ if($_GET['debug']) {
     if(is_file($graphfile)) {
       header('Content-type: image/png');
       $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+      unlink($graphfile);
     } else {
       header('Content-type: image/png');
       $string = "Graph Generation Error";
@@ -74,23 +73,6 @@ if($_GET['debug']) {
     }
   }
 
-  if($graph) {
-#    header('Content-type: image/png');
-#    $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
-  } else {  
-    header('Content-type: image/png');
-    $string = "Graph Generation Error";
-    $im     = imagecreate($width, $height);
-    $orange = imagecolorallocate($im, 255, 255, 255);
-    $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
-    imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
-    imagepng($im);
-    imagedestroy($im);
-  }
-
-  unlink($graphfile);
-
-#  } // End IF
 
 
 ?>

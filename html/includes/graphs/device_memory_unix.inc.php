@@ -1,8 +1,9 @@
 <?php
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
-$rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/ucd_mem.rrd";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_mem.rrd";
 
 $rrd_options .= " -b 1024";
 

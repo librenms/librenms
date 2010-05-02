@@ -2,13 +2,9 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-if($_GET['device']) {
-  $device = device_by_id_cache(mres($_GET['device']));
-} elseif($_GET['id']) {
-  $device = device_by_id_cache(mres($_GET['id']));
-}
+$device = device_by_id_cache($id);
 
-$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."'");
+$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$id."'");
 while($int = mysql_fetch_assoc($query)) {
   $ignore = 0;
   if(is_array($config['device_traffic_iftype'])) {

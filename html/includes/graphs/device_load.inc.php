@@ -1,8 +1,9 @@
 <?php
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
-$database = $config['rrd_dir'] . "/" . $hostname . "/load.rrd";
+$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/load.rrd";
 
   $rrd_options .= " DEF:1min=$database:1min:AVERAGE";
   $rrd_options .= " DEF:5min=$database:5min:AVERAGE";

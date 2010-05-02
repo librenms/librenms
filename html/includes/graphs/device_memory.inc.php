@@ -1,6 +1,7 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `mempools` where `device_id` = '".mres($device_id)."'");
+$device = device_by_id_cache($id);
+$query = mysql_query("SELECT * FROM `mempools` where `device_id` = '".$id."'");
 
 include("common.inc.php");
 
@@ -14,7 +15,7 @@ include("common.inc.php");
     } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
     $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), 28),0,28);
     $descr = str_replace(":", "\:", $descr);
-    $rrd  = $config['rrd_dir'] . "/".$hostname."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
+    $rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
     $rrd_options .= " DEF:mempoolfree$i=$rrd:free:AVERAGE ";
     $rrd_options .= " DEF:mempoolused$i=$rrd:used:AVERAGE ";
     $rrd_options .= " CDEF:mempooltotal$i=mempoolused$i,mempoolused$i,mempoolfree$i,+,/,100,* ";

@@ -1,11 +1,12 @@
 <?php
 
 include("common.inc.php");
+$device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM toner where device_id = '$device_id'");
+$sql = mysql_query("SELECT * FROM toner where device_id = '$id'");
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
 while($toner = mysql_fetch_array($sql)) 
 {
@@ -43,7 +44,7 @@ while($toner = mysql_fetch_array($sql))
   $hostname = gethostbyid($toner['device_id']);
   
   $descr = substr(str_pad($toner['toner_descr'], 17),0,17);
-  $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
   $toner_id = $toner['toner_id'];
 
   $rrd_options .= " DEF:toner$toner_id=$rrd_filename:toner:AVERAGE";
