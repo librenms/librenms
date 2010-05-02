@@ -116,14 +116,24 @@ echo("</div>
   echo("<div style=' margin-bottom: 5px;'>");
 
   if($ports['fileserver']) {
-    echo("<div style='width: 470px;'>
-    <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multi_bits&ports=".$ports['fileserver']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multi_bits&ports=".$ports['fileserver']."&from=".$week."&to=".$now."&width=400&height=150\'>\
-    ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Main Fileserver</div>".
-    "<img src='graph.php?type=multi_bits&ports=".$ports['broadband'].
-    "&from=".$day."&to=".$now."&width=385&height=100&legend=no'></a></div>");
+
+    echo("<div style='width: 470px;'>");
+    echo("<div style='font-size: 16px; font-weight: bold; color: #555555;'>Central Fileserver</div>");
+
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "385";
+    $graph_array['to']     = $now;
+    $graph_array['port']   = $ports['fileserver'];
+    $graph_array['type']   = "port_bits";
+    $graph_array['from']   = $day;
+    $graph_array['legend'] = "no";
+
+    $graph_array['popup_title'] = "Central Fileserver";
+
+    print_graph_popup($graph_array);
+
+    echo("</div>");
+
   }
 
   echo("</div>");

@@ -1,5 +1,53 @@
 <?php
 
+function generateiflink($interface, $text=0, $type = NULL)
+{
+
+   ## Exists only to support older version of this function (i suck)
+
+   if($type) { $interface['type'] = $type; }
+   return generate_if_link($interface, $text);
+}
+
+function overlib_link($url, $text, $contents, $class) {
+  global $config;
+  $contents = str_replace("\"", "\'", $contents);
+  $output = "<a class='".$class."' href='".$url."'";
+  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">";
+  $output .= $text."</a>";
+  return $output;
+}
+
+function generate_graph_popup($graph_array) 
+{
+  global $config;
+  ## Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
+
+  $graph = generate_graph_tag($graph_array);
+  $content = "<div class=list-large>".$graph_array['popup_title']."</div>";
+  $content .= "<div style=\'width: 850px\'>";
+  $graph_array['legend']   = "yes";
+  $graph_array['height']   = "100";
+  $graph_array['width']    = "340";
+  $graph_array['from']     = $config['day'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['week'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['month'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['year'];
+  $content .= generate_graph_tag($graph_array);
+  $content .= "</div>";
+  return overlib_link($graph_array['link'], $graph, $content, NULL);
+
+}
+
+function print_graph_popup($graph_array)
+{
+  echo (generate_graph_popup($graph_array));
+}
+
+
 function permissions_cache($user_id) {
   $permissions = array();
   $query = mysql_query("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'");
@@ -76,23 +124,41 @@ function print_percentage_bar ($width, $height, $percent, $left_text, $left_colo
   return $output;
 }
 
-function generate_if_link($args)
+function generate_if_link($args, $text = NULL)
 {
   global $twoday; global $now; global $config; global $day; global $month;
   $args = ifNameDescr($args);
-  if(!$args['content']) { $args['content'] = fixIfName($args['label']); }
-  if(!$args['graph_type']) { $args['graph_type'] = 'bits'; }
+  if(!$text) { $text = fixIfName($args['label']); }
+  if(!$args['graph_type']) { $args['graph_type'] = 'port_bits'; }
   $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
-  $graph_url = $config['base_url'] . "/graph.php?if=" . $args['interface_id'] . "&from=$day&to=$now&width=400&height=100&type=" . $args['graph_type'];
-  $graph_url_month = $config['base_url'] . "/graph.php?if=" . $args['interface_id'] . "&from=$month&to=$now&width=400&height=100&type=" . $args['graph_type'];
-  $device_id = getifhost($args['interface_id']);
-  $link = "<a class=$class href='".$config['base_url']."/device/$device_id/interface/" . $args['interface_id'] . "/' ";
-  $link .= "onmouseover=\" return overlib('";
-  $link .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>', CAPTION, '<span class=list-large>" . $args['hostname'] . " - " . fixifName($args['label']) . "</span>";
-  if($args['ifAlias']) { $link .= "<br />" . $args['ifAlias']; }
-  $link .= "' ";
-  $link .= $config['overlib_defaults'].");\" onmouseout=\"return nd();\" >".$args['content']."</a>";
-  return $link;
+  if(!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
+
+  $content = "<div class=list-large>".$args['hostname']." - " . fixifName($args['label']) . "</div>";
+  if($args['ifAlias']) { $content .= $args['ifAlias']."<br />"; }
+  $content .= "<div style=\'width: 850px\'>";
+  $graph_array['type']     = $args['graph_type'];
+  $graph_array['legend']   = "yes";
+  $graph_array['height']   = "100";
+  $graph_array['width']    = "340";
+  $graph_array['from']     = $config['day'];
+  $graph_array['port']     = $args['interface_id'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['week'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['month'];
+  $content .= generate_graph_tag($graph_array);
+  $graph_array['from']     = $config['year'];
+  $content .= generate_graph_tag($graph_array);
+  $content .= "</div>";
+  
+  $url = $config['base_url']."/device/".$args['device_id']."/interface/" . $args['interface_id'] . "/";
+
+  if(interfacepermitted($args['interface_id'])) {
+    return overlib_link($url, $text, $content, $class);
+  } else {
+    return fixifName($text);
+  }
+
 }
 
 function generate_port_thumbnail($args) 

@@ -224,39 +224,6 @@ function geteventicon ($message)
   if (isset($icon)) { return $icon; } else { return false; }
 }
 
-function generateiflink($interface, $text=0, $type = NULL) 
-{
-  global $twoday; global $now; global $config; global $day; global $month;
-  $interface = ifNameDescr($interface);
-  if (!$text) { $text = fixIfName($interface['label']); }
-  if (isset($type)) { $interface['graph_type'] = $type; } else { $interface['graph_type'] = 'port_bits'; }
-  if(!isset($interface['hostname'])) { $interface = array_merge($interface, device_by_id_cache($interface['device_id'])); }
-  $class = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-  $graph_url = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$day&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
-  $graph_url_month = $config['base_url'] . "/graph.php?port=" . $interface['interface_id'] . "&amp;from=$month&amp;to=$now&amp;width=400&amp;height=100&amp;type=" . $interface['graph_type'];
-  $device_id = getifhost($interface['interface_id']);
-  $url = $config['base_url']."/device/$device_id/interface/" . $interface['interface_id'] . "/";
-
-  $contents = "<div class=list-large>" . $interface['hostname'] . " - " . fixifName($interface['label']) . "</div>";
-  if ($interface['ifAlias']) { $contents .= htmlentities($interface['ifAlias'] ."<br />" ); }
-  $contents .= "<img src=\'$graph_url\'><br /><img src=\'$graph_url_month\'>";
-  $link = overlib_link($url, $text, $contents, $class);
-  if(interfacepermitted($interface['interface_id'])) {
-    return $link;
-  } else {
-    return fixifName($interface['label']);
-  }
-}
-
-function overlib_link($url, $text, $contents, $class) {
-  global $config;
-  $contents = str_replace("\"", "\'", $contents);
-  $output = "<a class='".$class."' href='".$url."'";
-  $output .= " onmouseover=\"return overlib('".$contents."'".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">";
-  $output .= $text."</a>";
-  return $output;
-}
-
 function generatedevicelink($device, $text=0, $start=0, $end=0) 
 {
   global $twoday; global $day; global $now; global $config;

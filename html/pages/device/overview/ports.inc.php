@@ -49,8 +49,8 @@ if($ports['total']) {
   $ifsep = "";
   while($data = mysql_fetch_array($query)) {
     $data = ifNameDescr($data);
-    $data['hostname'] = $device['hostname'];
-    echo("$ifsep" . generateiflink($data, makeshortif(strtolower($data['label']))));
+    $data = array_merge($data, $device);
+    echo("$ifsep" . generate_if_link($data, makeshortif(strtolower($data['label']))));
     $ifsep = ", ";
   }
   unset($ifsep);

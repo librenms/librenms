@@ -122,4 +122,12 @@ $week = time() - (7 * 24 * 60 * 60);
 $month = time() - (31 * 24 * 60 * 60);
 $year = time() - (365 * 24 * 60 * 60);
 
+$config['now'] = $now;
+$config['day'] = $day;
+$config['twoday'] = $twoday;
+$config['week'] = $week;
+$config['month'] = $month;
+$config['year'] = $year;
+
+
 ?>
