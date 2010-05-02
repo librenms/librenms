@@ -2,22 +2,28 @@
 
 $cip_oids = array('cipMacHCSwitchedBytes', 'cipMacHCSwitchedPkts');
 echo("Caching OID: ");
-foreach ($cip_oids as $oid)      { echo("$oid "); $array = snmp_cache_cip($oid, $device, $array, "CISCO-IP-STAT-MIB"); }
-echo("\n");
+$cip_array = array();
+
+foreach ($cip_oids as $oid) 
+{ 
+  echo("$oid "); 
+  $cip_array = snmp_cache_cip($oid, $device, $cip_array, "CISCO-IP-STAT-MIB"); 
+}
 
 $polled = time();
 
 $mac_entries = 0;
 
-$mac_accounting_query = mysql_query("SELECT * FROM `mac_accounting` as A, `ports` AS I where A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'");
-while ($acc = mysql_fetch_array($mac_accounting_query)) {
+$mac_accounting_query = mysql_query("SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'");
+while ($acc = mysql_fetch_assoc($mac_accounting_query)) {
   
   $device_id = $acc['device_id'];
   $ifIndex = $acc['ifIndex'];
   $mac = $acc['mac'];
-  if($array[$device_id][$ifIndex][$mac]) {
 
-    $polled_period = $polled - $acc['poll_time'];
+  $polled_period = $polled - $acc['poll_time'];
+
+  if($cip_array[$device_id][$ifIndex][$mac]) {
 
     $update .= "`poll_time` = '".$polled."'";
     $update .= ", `poll_prev` = '".$acc['poll_time']."'";
@@ -25,12 +31,12 @@ while ($acc = mysql_fetch_array($mac_accounting_query)) {
 
     $mac_entries++;
 
-    $b_in = $array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
-    $b_out = $array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
-    $p_in = $array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
-    $p_out = $array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
+    $b_in = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
+    $b_out = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
+    $p_in = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
+    $p_out = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
 
-    $this_ma = &$array[$device_id][$ifIndex][$mac]; 
+    $this_ma = &$cip_array[$device_id][$ifIndex][$mac]; 
 
     /// Update metrics
     foreach ($cip_oids as $oid) {
@@ -80,6 +86,8 @@ while ($acc = mysql_fetch_array($mac_accounting_query)) {
   }
 }
 
-if($mac_entries) { echo("$mac_entries mac accounting entries updated\n"); }
+unset($cip_array);
+
+if($mac_entries) { echo(" $mac_entries MAC accounting entries\n"); }
 
 ?>
