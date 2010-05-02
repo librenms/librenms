@@ -140,6 +140,7 @@ if ($device['os'] == "junos")
      $cbgp_cmd .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+    
      if($debug) { echo("$cbgp_cmd\n"); }
      $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
      if($debug) { echo("$cbgp_data\n"); }
