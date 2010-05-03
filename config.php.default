@@ -106,6 +106,9 @@ $config['show_services']        = 1;  # Enable Services on menu
 $config['ports_page_default']	= "details/";  
 # Default devices ports page display type. "details/", "graphs/bits/", etc
 
+#$config['port_descr_parser']            = "includes/port-descr-parser.inc.php";
+## Use parser to parse out ifAlias into type/descr/speed/circuit/notes
+
 ### Which additional features should we enable?
 
 $config['enable_bgp'] 		= 1; # Enable BGP session 	collection and display

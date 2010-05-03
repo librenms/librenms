@@ -5,3 +5,5 @@ DROP TABLE `cempMemPool`;
 DROP TABLE `cpmCPU`;
 DROP TABLE `cmpMemPool`;
 ALTER TABLE `mempools` CHANGE `mempool_used` `mempool_used` BIGINT( 16 ) NOT NULL ,CHANGE `mempool_free` `mempool_free` BIGINT( 16 ) NOT NULL ,CHANGE `mempool_total` `mempool_total` BIGINT( 16 ) NOT NULL ,CHANGE `mempool_largestfree` `mempool_largestfree` BIGINT( 16 ) NULL DEFAULT NULL ,CHANGE `mempool_lowestfree` `mempool_lowestfree` BIGINT( 16 ) NULL DEFAULT NULL ;
+ALTER TABLE  `ports` ADD  `port_descr_type` VARCHAR( 32 ) NULL DEFAULT NULL AFTER  `device_id` ,ADD  `port_descr_descr` VARCHAR( 64 ) NULL DEFAULT NULL AFTER  `port_descr_type` ,ADD  `port_descr_circuit` VARCHAR( 64 ) NULL DEFAULT NULL AFTER  `port_descr_descr` ,ADD  `port_descr_speed` VARCHAR( 32 ) NULL DEFAULT NULL AFTER  `port_descr_circuit` ,ADD  `port_descr_notes` VARCHAR( 128 ) NULL DEFAULT NULL AFTER  `port_descr_speed`;
+

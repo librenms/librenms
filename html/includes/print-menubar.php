@@ -176,7 +176,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-	<li><a href="health/processors/"><img src="images/icons/overview/processors.png" border="0" align="absmiddle" /> Processorss</a></li>
+	<li><a href="health/processors/"><img src="images/icons/overview/processors.png" border="0" align="absmiddle" /> Processors</a></li>
         <li><a href="health/memory/"><img src="images/icons/overview/mempools.png" border="0" align="absmiddle" /> Memory</a></li>
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
         <li><hr width=140 /></li>
