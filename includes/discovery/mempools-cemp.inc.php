@@ -1,10 +1,10 @@
 <?php
 
-if($device['os'] == "ios" || $device['os_type'] == "ios") {
+if($device['os'] == "ios" || $device['os_group'] == "ios") {
 
   echo("CISCO-ENHANCED-MEMORY-POOL: ");
 
-  $array = snmpwalk_cache_multi_oid($device, "cempMemPoolEntry", array(), "CISCO-ENHANCED-MEMPOOL-MIB");
+  $array = snmpwalk_cache_multi_oid($device, "cempMemPoolEntry", NULL, "CISCO-ENHANCED-MEMPOOL-MIB");
 
   if(is_array($array)) {
     foreach($array[$device[device_id]] as $index => $entry) {
