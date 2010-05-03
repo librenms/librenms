@@ -92,6 +92,28 @@
         }
       }
 
+      /// Parse description (usually ifAlias) if config option set
+
+      if(isset($config['port_descr_parser']))
+      {
+        $port_attribs = array('type','descr','circuit','speed','notes');
+        include($config['port_descr_parser']);
+
+        foreach ($port_attribs as $attrib) {
+          $attrib_key = "port_descr_".$attrib;
+          if($port_ifAlias[$attrib]) 
+          {
+            if($port_ifAlias[$attrib] != $port[$attrib_key]) 
+            {
+              $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
+              eventlog($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], $port['interface_id']);
+            }
+          }
+        }        
+      }
+
+      /// Ende parse ifAlias
+
       /// Update IF-MIB metrics
       foreach ($stat_oids_db as $oid) {
 	$update .= ", `$oid` = '".$this_port[$oid]."'";

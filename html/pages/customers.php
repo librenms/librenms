@@ -31,7 +31,7 @@
 
     $ifclass = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
 
-    list(,$customer) = preg_split("/[\:\[\]\{\}\(\)]/", $interface['ifAlias']);  
+    list($type,$customer) = preg_split("/[\:\[\]\{\}\(\)]/", $interface['ifAlias']);  
     list(,$circuit) = preg_split("/[\{\}]/", $interface['ifAlias']);
     list(,$notes) = preg_split("/[\(\)]/", $interface['ifAlias']);
     list(,$speed) = preg_split("/[\[\]]/", $interface['ifAlias']);
