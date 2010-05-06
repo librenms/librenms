@@ -4,9 +4,16 @@ $query = "SELECT * FROM processors WHERE device_id = '" . $device['device_id'] .
 $proc_data = mysql_query($query);
 while($processor = mysql_fetch_array($proc_data)) {
 
-  $proc = snmp_get ($device, $processor['processor_oid'], "-O Uqnv");
-
   echo("Checking CPU " . $processor['processor_descr'] . "... ");
+
+  $file = $config['install_dir']."/includes/polling/processors-".$processor['processor_type'].".inc.php";
+  if(is_file($file)) {
+    include($file);
+  } else {
+    $proc = snmp_get ($device, $processor['processor_oid'], "-O Uqnv");
+  }
+
+
 
   $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("processor-" . $processor['processor_type'] . "-" . $processor['processor_index'] . ".rrd");
 

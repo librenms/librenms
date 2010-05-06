@@ -9,7 +9,7 @@ $rrd_options .= " -b 1024";
 
   $iter = "1";
   $sql = mysql_query("SELECT * FROM storage where storage_id = '".mres($_GET['id'])."'");
-  $rrd_options .= " COMMENT:'                    Size       Used    %age\\n'";
+  $rrd_options .= " COMMENT:'                    Size      Free   % Used\\n'";
   while($storage = mysql_fetch_array($sql)) {
     $hostname = gethostbyid($storage['device_id']);
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
@@ -23,8 +23,8 @@ $rrd_options .= " -b 1024";
     $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";
     $rrd_options .= " CDEF:$storage[storage_id]perc=$storage[storage_id]used,$storage[storage_id]size,/,100,*";
     $rrd_options .= " LINE1.25:$storage[storage_id]perc#" . $colour . ":'$descr'";
+    $rrd_options .= " GPRINT:$storage[storage_id]size:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$storage[storage_id]free:LAST:%6.2lf%sB";
-    $rrd_options .= " GPRINT:$storage[storage_id]used:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$storage[storage_id]perc:LAST:%5.2lf%%\\\\n";
     $iter++;
   }
