@@ -8,6 +8,10 @@ include("processors-junos.inc.php");
 include("processors-hrdevice.inc.php");
 include("processors-ironware.inc.php");
 
+## Last-resort discovery here
+
+include("processors-ucd-old.inc.php");
+
 ### Remove processors which weren't redetected here
 
 $sql = "SELECT * FROM `processors` WHERE `device_id`  = '".$device['device_id']."'";
