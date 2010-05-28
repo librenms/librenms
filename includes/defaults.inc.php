@@ -83,6 +83,8 @@ $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 $config['device_traffic_iftype']  = array('/loopback/','/other/','/tunnel/','/virtual/','/mpls/');
 $config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:/');
 
+$config['allow_unauth_graphs']	  = 0; ## Allow graphs to be viewed by anyone
+
 # Sensors
 
 $config['allow_entity_sensor']['amperes'] = 1;

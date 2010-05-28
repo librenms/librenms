@@ -78,6 +78,9 @@ while ($device = mysql_fetch_array($device_query)) {
       mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
       mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " .($status == '1' ? 'up' : 'down') . "')");
       eventlog('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id']);
+      mail($email, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " at " . date($config['timestamp_format']), $config['email_headers']);
+
+
     }
 
   if ($status == "1") 
