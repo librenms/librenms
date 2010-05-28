@@ -15,7 +15,9 @@ if($_GET['debug']) {
   include("../includes/rewrites.php");
   include("includes/authenticate.inc.php");
 
-  if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+  if(!$config['allow_unauth_graphs']) {
+    if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+  }
   
   if($_GET['device']) {
     $_GET['id'] = $_GET['device'];
