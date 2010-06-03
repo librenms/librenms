@@ -240,6 +240,42 @@ function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $lo
   return $return;
 }
 
+function discover_freq($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+{
+  global $config, $debug;
+  
+  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
+  if(!$low_limit)
+  {
+    $low_limit = $config['limit']['freq'];
+  }
+  
+  if (mysql_result(mysql_query("SELECT count(freq_id) FROM `frequency` WHERE device_id = '".$device['device_id']."' AND freq_type = '$type' AND `freq_index` = '$index'"),0) == '0')
+  {
+    $query = "INSERT INTO frequency (`device_id`, `freq_oid`, `freq_index`, `freq_type`, `freq_descr`, `freq_precision`, `freq_limit`, `freq_limit_low`, `freq_current`) ";
+    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
+    mysql_query($query);
+    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
+    echo("+");
+  }
+  else
+  {
+    $freq_entry = mysql_fetch_array(mysql_query("SELECT * FROM `frequency` WHERE device_id = '".$device['device_id']."' AND freq_type = '$type' AND `freq_index` = '$index'"));
+    if($oid == $freq_entry['freq_oid'] && $descr == $freq_entry['freq_descr'] && $precision == $freq_entry['freq_precision'])
+    {
+      echo(".");
+    }
+    else
+    {
+      mysql_query("UPDATE frequency SET `freq_descr` = '$descr', `freq_oid` = '$oid', `freq_precision` = '$precision' WHERE `device_id` = '" . $device['device_id'] . "' AND freq_type = '$type' AND `freq_index` = '$index' ");
+      echo("U");
+      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
+    }
+  }
+
+  return $return;
+}
+
 function discover_toner($device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
 {
   global $config, $debug;

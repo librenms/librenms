@@ -45,7 +45,7 @@ while ($device = mysql_fetch_array($device_query)) {
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if ($os_groups[$device[os]]) {$device['os_group'] = $os_groups[$device[os]]; echo "(".$device['os_group'].")";}
+  if ($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
   echo("\n");
 
   unset($poll_update); unset($poll_update_query); unset($poll_separator); unset($version); unset($uptime); unset($features); 
@@ -160,6 +160,7 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/temperatures.inc.php");
     include("includes/polling/fanspeeds.inc.php");
     include("includes/polling/voltages.inc.php");
+    include("includes/polling/frequencies.inc.php");
     include("includes/polling/processors.inc.php");
     include("includes/polling/mempools.inc.php");
     include("includes/polling/storage.inc.php");
