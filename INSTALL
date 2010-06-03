@@ -37,7 +37,7 @@ Papouch TME
 ===========
 
 Set your thermometer name (Option 1->0 in the telnet CLI) to the sensor name
-you want displayed in Observer.
+you want displayed in Observer. (Also, the TME only speaks SNMP v1)
 
 Supermicro monitoring
 =====================
