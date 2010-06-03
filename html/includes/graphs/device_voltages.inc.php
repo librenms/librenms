@@ -39,7 +39,7 @@ while($voltage = mysql_fetch_array($sql))
 
   $hostname = gethostbyid($voltage['device_id']);
   
-  $descr = substr(str_pad($voltage['volt_descr'], 17),0,17);
+  $descr = substr(str_pad($voltage['volt_descr'], 15),0,15);
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
   $volt_id = $voltage['volt_id'];
 
