@@ -43,7 +43,7 @@ if ($device['os'] == "dell-laser")
 
 ## Delete removed toners  
 
-if($debug) { echo("\n Checking ... \n"); print_r($fan_exists); }
+if($debug) { echo("\n Checking ... \n"); print_r($toner_exists); }
 
 $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))

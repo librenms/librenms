@@ -6,8 +6,8 @@ if($device['os'] == "ios" || $device['os_group'] == "ios") {
 
   $array = snmpwalk_cache_multi_oid($device, "cempMemPoolEntry", NULL, "CISCO-ENHANCED-MEMPOOL-MIB");
 
-  if(is_array($array)) {
-    foreach($array[$device[device_id]] as $index => $entry) {
+  if(is_array($array[$device['device_id']])) {
+    foreach($array[$device['device_id']] as $index => $entry) {
       if(is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == "true") {
        list($entPhysicalIndex) = explode(".", $index);
        $entPhysicalDescr = snmp_get($device, "entPhysicalDescr.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");       
