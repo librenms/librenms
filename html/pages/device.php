@@ -43,7 +43,9 @@ $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_i
            mysql_result(mysql_query("select count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-	   mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0);
+	   mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0) +
+	   mysql_result(mysql_query("select count(volt_id) from voltage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
+	   mysql_result(mysql_query("select count(fan_id) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"), 0);
 
 if($health) {
   echo('<li class="' . $select['health'] . '">
