@@ -231,7 +231,7 @@ function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $lo
     }
     else
     {
-      mysql_query("UPDATE voltage SET `volt_descr` = '$descr', `volt_oid` = '$oid', `volt_precision` = '$precision' WHERE `device_id` = '$id' AND volt_type = '$type' AND `volt_index` = '$index' ");
+      mysql_query("UPDATE voltage SET `volt_descr` = '$descr', `volt_oid` = '$oid', `volt_precision` = '$precision' WHERE `device_id` = '" . $device['device_id'] . "' AND volt_type = '$type' AND `volt_index` = '$index' ");
       echo("U");
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }

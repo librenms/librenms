@@ -112,6 +112,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/cisco-pw.inc.php");
   include("includes/discovery/cisco-vrf.inc.php");
   include("includes/discovery/toner.inc.php");
+  include("includes/discovery/ups.inc.php");
 
   if($device['os'] == "screenos") { 
     if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }

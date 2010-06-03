@@ -75,6 +75,65 @@ if ($device['os'] == "linux")
   }
 }
 
+## MGE UPS Voltages
+
+if ($device['os'] == "mgeups") 
+{
+  echo("MGE ");
+  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.7.1", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $volt_oid   = ".1.3.6.1.4.1.705.1.7.2.$i.2.1.0";
+    $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $volt_oid, "-Oqv") / 10;
+    $type       = "mge-ups";
+    $precision  = 10;
+    $index      = $i;
+    if ($current > 200 && $current < 250) 
+    {
+      #FIXME Are these sensible values?
+      $lowlimit = 210;
+      $limit = 250;
+    }
+    else
+    {
+      $lowlimit = 0;
+      $limit = 0;
+    }
+    echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    $volt_exists[$type][$index] = 1;
+  }
+  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $volt_oid   = ".1.3.6.1.4.1.705.1.6.2.$i.2.1.0";
+    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $volt_oid, "-Oqv") / 10;
+    $type       = "mge-ups";
+    $precision  = 10;
+    $index      = 100+$i;
+    if ($current > 200 && $current < 250) 
+    {
+      #FIXME Are these sensible values?
+      $lowlimit = 210;
+      $limit = 250;
+    }
+    else
+    {
+      $lowlimit = 0;
+      $limit = 0;
+    }
+    echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    $volt_exists[$type][$index] = 1;
+  }
+}
+
+
+
 ## Delete removed sensors
 
 if($debug) { print_r($volt_exists); }

@@ -111,7 +111,7 @@ $config['ports_page_default']	= "details/";
 
 ### Which additional features should we enable?
 
-$config['enable_bgp'] 		= 1; # Enable BGP session 	collection and display
+$config['enable_bgp'] 		= 1; # Enable BGP session collection and display
 $config['enable_syslog'] 	= 0; # Enable Syslog
 $config['enable_billing']	= 0; # Enable Billing
 $config['enable_inventory']	= 1; # Enable Inventory
