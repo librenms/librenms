@@ -80,6 +80,7 @@ include("overview/storage.inc.php");
 include("overview/temperatures.inc.php");
 include("overview/fanspeeds.inc.php");
 include("overview/voltages.inc.php");
+include("overview/frequencies.inc.php");
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</p>");
