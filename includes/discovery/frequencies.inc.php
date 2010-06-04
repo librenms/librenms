@@ -22,8 +22,8 @@ if ($device['os'] == "mgeups")
     $current    = snmp_get($device, $volt_oid, "-Oqv");
     if (!$current)
     {
-      $volt_oid .= ".0";
-      $current    = snmp_get($device, $volt_oid, "-Oqv");
+      $freq_oid .= ".0";
+      $current    = snmp_get($device, $freq_oid, "-Oqv");
     }
     $current   /= 10;
     $type       = "mge-ups";
@@ -59,8 +59,8 @@ if ($device['os'] == "mgeups")
     $current    = snmp_get($device, $volt_oid, "-Oqv");
     if (!$current)
     {
-      $volt_oid .= ".0";
-      $current    = snmp_get($device, $volt_oid, "-Oqv");
+      $freq_oid .= ".0";
+      $current    = snmp_get($device, $freq_oid, "-Oqv");
     }
     $current   /= 10;
     $type       = "mge-ups";
