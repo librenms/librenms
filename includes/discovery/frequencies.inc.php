@@ -17,9 +17,15 @@ if ($device['os'] == "mgeups")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $freq_oid   = ".1.3.6.1.4.1.705.1.7.2.1.3.$i.0";
+    $freq_oid   = ".1.3.6.1.4.1.705.1.7.2.1.3.$i";
     $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
+    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    if (!$current)
+    {
+      $volt_oid .= ".0";
+      $current    = snmp_get($device, $volt_oid, "-Oqv");
+    }
+    $current   /= 10;
     $type       = "mge-ups";
     $precision  = 10;
     $index      = $i;
@@ -48,9 +54,15 @@ if ($device['os'] == "mgeups")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $freq_oid   = ".1.3.6.1.4.1.705.1.6.2.1.3.$i.0";
+    $freq_oid   = ".1.3.6.1.4.1.705.1.6.2.1.3.$i";
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
+    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    if (!$current)
+    {
+      $volt_oid .= ".0";
+      $current    = snmp_get($device, $volt_oid, "-Oqv");
+    }
+    $current   /= 10;
     $type       = "mge-ups";
     $precision  = 10;
     $index      = 100+$i;
