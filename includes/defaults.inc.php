@@ -81,7 +81,7 @@ $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 
 $config['device_traffic_iftype']  = array('/loopback/','/other/','/tunnel/','/virtual/','/mpls/');
-$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:/');
+$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/');
 
 $config['allow_unauth_graphs']	  = 0; ## Allow graphs to be viewed by anyone
 
