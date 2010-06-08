@@ -6,6 +6,7 @@ $config['ifname']['catos'] = true;
 $config['ifname']['windows'] = true;
 $config['ifname']['speedtouch'] = true;
 $config['ifname']['dell-laser'] = true;
+$config['ifname']['powerconnect'] = true;
 $config['ifalias']['adva'] = true;
 #$config['appendifindex']['adva'] = true;
 
