@@ -1,6 +1,6 @@
 <?php
 
-$datas = array('Processors','Memory','Storage','Temperatures', 'Voltages', 'Fanspeeds', 'Frequencies');
+$datas = array('Processors','Memory','Storage','Temperatures', 'Voltages', 'Fanspeeds', 'Frequencies', 'Current');
 
 if(!$_GET['opta']) { $_GET['opta'] = "processors"; }
 
@@ -31,6 +31,7 @@ switch ($_GET['opta'])
   case 'voltages':
   case 'fanspeeds':
   case 'frequencies':
+  case 'current':
     include('pages/health/'.$_GET['opta'].'.inc.php');
     break;
   default:

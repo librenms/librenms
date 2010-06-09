@@ -165,6 +165,6 @@ if ($query = mysql_query($sql))
   }
 }
 
-unset($fan_exists); echo("\n");
+unset($volt_exists); echo("\n");
 
 ?>
