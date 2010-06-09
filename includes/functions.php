@@ -334,6 +334,11 @@ function delete_device($id)
   mysql_query("DELETE FROM `ports` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `voltage` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `fanspeed` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `toner` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   echo("Removed device $host<br />");
 }
