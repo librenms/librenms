@@ -161,6 +161,7 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/fanspeeds.inc.php");
     include("includes/polling/voltages.inc.php");
     include("includes/polling/frequencies.inc.php");
+    include("includes/polling/current.inc.php");
     include("includes/polling/processors.inc.php");
     include("includes/polling/mempools.inc.php");
     include("includes/polling/storage.inc.php");
