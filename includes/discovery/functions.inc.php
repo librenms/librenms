@@ -155,7 +155,7 @@ function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr
   {
     $entry = mysql_fetch_array(mysql_query("SELECT * FROM `temperature` WHERE device_id = '".$device['device_id']."' AND `temp_type` = '$type' AND `temp_index` = '$index'"));
     echo(mysql_error());
-    if($oid == $entry['temp_oid'] && $descr == $entry['temp_descr'] && $precision == $ntry['temp_precision'])
+    if($oid == $entry['temp_oid'] && $descr == $entry['temp_descr'] && $precision == $entry['temp_precision'])
     {
       echo(".");
     }
