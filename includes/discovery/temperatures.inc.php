@@ -44,7 +44,6 @@ if($device['os'] == "ironware")
   }
 }
 
-
 ## JunOS Temperatures
 if ($device['os'] == "junos" || $device['os_group'] == "junos") 
 {
@@ -77,6 +76,31 @@ if ($device['os'] == "junos" || $device['os_group'] == "junos")
   }
 }
 
+## Areca Harddisk Temperatures
+if ($device['os'] == "areca") 
+{
+  $oids = shell_exec($config['snmpwalk'] . " -$snmpver -CI -Osqn -c $community $hostname:$port SNMPv2-SMI::enterprises.18928.1.1.2.14.1.2");
+  if ($debug) { echo($oids."\n"); }
+  $oids = trim($oids);
+  if ($oids) echo("Areca ");
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$descr) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $temp_id = $split_oid[count($split_oid)-1];
+      $temp_oid  = "1.3.6.1.4.1.18928.1.1.2.14.1.2.$temp_id";
+      $temp  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $temp_oid"));
+      $descr = "Hard disk $temp_id";
+      if ($temp != -128)
+      {
+        discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "areca", $descr, 1, NULL, NULL, NULL);
+      }
+    }
+  }
+}
 
 ## Papouch TME Temperatures
 if ($device['os'] == "papouch-tme") 
@@ -90,8 +114,6 @@ if ($device['os'] == "papouch-tme")
     $descr = trim(str_replace("\"", "", $descr));
 
     discover_temperature($valid_temp, $device, $temp_oid, "1", "ironware", $descr, "10", NULL, NULL, $temp);
-
-    $temp_exists[] = "$id $temp_oid";
   }
 }
 
@@ -216,7 +238,6 @@ if ($device['os'] == "ios")
         $descr = trim($descr);
 
         discover_temperature($valid_temp, $device, $oid, $index, "cisco", $descr, "1", NULL, NULL, $temp);
-        $temp_exists[] = $device['device_id'] . " $oid";
       }
     }
   } 
