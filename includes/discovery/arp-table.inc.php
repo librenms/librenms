@@ -39,7 +39,7 @@
       if($clean_mac != $old_mac[0]) 
       {
         if ($debug) { echo "Changed mac address for $ip from $old_mac[0] to $clean_mac\n"; }
-        log_event("MAC change: $ip : " . $old_mac[0] . " -> $clean_mac", $device, "interface", $interface['interface_id']);
+        log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac[0]) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['interface_id']);
       }
       mysql_query($sql);
       echo(".");
