@@ -1,9 +1,9 @@
 <?php
 
   echo("<div style='margin-top: 5px; padding: 0px;'>");
-  echo("<table width=100% cellpadding=6 cellspacing=0>");
+  echo("  <table width=100% cellpadding=6 cellspacing=0>");
   $i = '1';
-  $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id");
+  $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname");
   while($proc = mysql_fetch_array($procs)) {
 
    if(devicepermitted($proc['device_id'])) { 
@@ -33,17 +33,15 @@
     } elseif($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
     } else { $left_background='9abf5b'; $right_background='bbd392'; }
 
-    echo("<tr bgcolor=$row_colour>
-           <td>".generatedevicelink($proc)."</td>
-
-           <td class=tablehead><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
-           <td width=90><a href='".$proc_url."'  $proc_popup><img src='$mini_url'></a></td>
-           <td width=200><a href='".$proc_url."' $proc_popup>
-           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background)."
-            </a></td>
-         </tr>");
+    echo("    <tr bgcolor=\"$row_colour\">
+               <td>".generatedevicelink($proc)."</td>
+               <td class=\"tablehead\"><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
+               <td width=\"90\"><a href=\"".$proc_url."\"  $proc_popup><img src=\"$mini_url\" /></a></td>
+               <td width=\"200\"><a href=\"".$proc_url."\" $proc_popup>
+           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background).'</a></td>
+             </tr>');
  
-  echo("<tr bgcolor='$row_colour'><td colspan=5>");
+  echo('    <tr bgcolor="'.$row_colour.'"><td colspan="5">');
 
   $daily_graph   = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$day&to=$now&width=211&height=100";
   $daily_url     = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$day&to=$now&width=400&height=150";
@@ -57,15 +55,16 @@
   $yearly_graph  = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$year&to=$now&width=211&height=100";
   $yearly_url    = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$year&to=$now&width=400&height=150";
 
-  echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$daily_graph' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$weekly_graph' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$monthly_graph' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$yearly_graph' border=0></a>");
-  echo("</td></tr>");
+  echo("      <a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src="$daily_graph" border=\"0\"></a> ");
+  echo("      <a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src="$weekly_graph" border=\"0\"></a> ");
+  echo("      <a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src="$monthly_graph" border=\"0\"></a> ");
+  echo("      <a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src=\"$yearly_graph\" border=\"0\"></a>");
+  echo("  </td>
+  </tr>");
 
     $i++;
    }
