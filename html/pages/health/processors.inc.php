@@ -56,11 +56,11 @@
   $yearly_url    = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$year&to=$now&width=400&height=150";
 
   echo("      <a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src="$daily_graph" border=\"0\"></a> ");
+        <img src=\"$daily_graph\" border=\"0\"></a> ");
   echo("      <a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src="$weekly_graph" border=\"0\"></a> ");
+        <img src=\"$weekly_graph\" border=\"0\"></a> ");
   echo("      <a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src="$monthly_graph" border=\"0\"></a> ");
+        <img src=\"$monthly_graph\" border=\"0\"></a> ");
   echo("      <a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src=\"$yearly_graph\" border=\"0\"></a>");
   echo("  </td>

@@ -136,7 +136,8 @@ function popUp(URL) {
         <div style="margin: 7px;"></div>
 <?php
   if($_SESSION['authenticated']) {
-    include("includes/warn-deleted-ports.inc.php");
+# FIXME: file below is MISSING!
+#    include("includes/warn-deleted-ports.inc.php");
     ## Authenticated. Print a page.
     if(isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
       include("pages/" . $_GET['page'] . ".php");
@@ -162,7 +163,7 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
 
-    echo '<br />  <div id="footer">' . $config['footer'];
+    echo '<br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : '');
     echo '<br />Powered by <a href="http://www.observernms.org" target="_blank">ObserverNMS ' . $config['version'];
 
     if (file_exists('.svn/entries'))
