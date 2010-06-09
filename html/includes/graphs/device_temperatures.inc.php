@@ -6,7 +6,7 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM temperature where device_id = '$id'");
+$sql = mysql_query("SELECT * FROM temperature where device_id = '$id' ORDER BY temp_index");
 $rrd_options .= " COMMENT:'                           Cur   Min   Max\\n'";
 while($temperature = mysql_fetch_array($sql)) 
 {
