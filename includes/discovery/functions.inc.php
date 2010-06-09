@@ -276,6 +276,42 @@ function discover_freq($device, $oid, $index, $type, $descr, $precision = 1, $lo
   return $return;
 }
 
+function discover_current($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+{
+  global $config, $debug;
+  
+  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
+  if(!$low_limit)
+  {
+    $low_limit = $config['limit']['current'];
+  }
+  
+  if (mysql_result(mysql_query("SELECT count(current_id) FROM `current` WHERE device_id = '".$device['device_id']."' AND current_type = '$type' AND `current_index` = '$index'"),0) == '0')
+  {
+    $query = "INSERT INTO current (`device_id`, `current_oid`, `current_index`, `current_type`, `current_descr`, `current_precision`, `current_limit`, `current_limit_warn`, `current_limit_low`, `current_current`) ";
+    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$current')";
+    mysql_query($query);
+    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
+    echo("+");
+  }
+  else
+  {
+    $current_entry = mysql_fetch_array(mysql_query("SELECT * FROM `current` WHERE device_id = '".$device['device_id']."' AND current_type = '$type' AND `current_index` = '$index'"));
+    if($oid == $current_entry['current_oid'] && $descr == $current_entry['current_descr'] && $precision == $current_entry['current_precision'])
+    {
+      echo(".");
+    }
+    else
+    {
+      mysql_query("UPDATE current SET `current_descr` = '$descr', `current_oid` = '$oid', `current_precision` = '$precision' WHERE `device_id` = '" . $device['device_id'] . "' AND current_type = '$type' AND `current_index` = '$index' ");
+      echo("U");
+      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
+    }
+  }
+
+  return $return;
+}
+
 function discover_toner($device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
 {
   global $config, $debug;

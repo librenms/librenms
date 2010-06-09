@@ -184,6 +184,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
         <li><a href="health/fanspeeds/"><img src="images/icons/fans.png" border="0" align="absmiddle" /> Fans</a></li>
         <li><a href="health/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>
         <li><a href="health/frequencies/"><img src="images/icons/frequencies.png" border="0" align="absmiddle" /> Frequencies</a></li>
+        <li><a href="health/current/"><img src="images/icons/current.png" border="0" align="absmiddle" /> Current</a></li>
         </ul>
         </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->

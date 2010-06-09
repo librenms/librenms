@@ -1,9 +1,11 @@
 <?php
 
-#list($hardware, $features, $version) = explode(",", str_replace(", ", ",", $sysDescr));
-#list($version) = explode("(", $version);
 
-preg_match("/MN:(AP\d+) /",$sysDescr,$matches);
-$hardware = str_replace('MN:','',$matches[0]);
+$serial = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.6.0", "-OQv", "", ""),'"');
+
+$hardware = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.5.0", "-OQv", "", ""),'"');
+$hardware .= ' ' . trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.2.0", "-OQv", "", ""),'"');
+
+$version = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.3.0", "-OQv", "", ""),'"');
 
 ?>

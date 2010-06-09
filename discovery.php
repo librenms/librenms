@@ -100,6 +100,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/temperatures.inc.php");
   include("includes/discovery/voltages.inc.php");
   include("includes/discovery/frequencies.inc.php");
+  include("includes/discovery/current.inc.php");
   include("includes/discovery/fanspeeds.inc.php");
   include("includes/discovery/storage.inc.php");
   include("includes/discovery/hr-device.inc.php");
