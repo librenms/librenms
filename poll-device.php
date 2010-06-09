@@ -95,7 +95,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
-    if ($hrSystemUptime != "No Such Object available on this agent at this OID")
+    if ($hrSystemUptime != "No Such Object available on this agent at this OID" && $hrSystemUptime != "")
     {
       #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
       $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
@@ -109,7 +109,7 @@ while ($device = mysql_fetch_array($device_query)) {
       if ($device['os'] == "windows") { $uptime /= 10; }
     }
     else 
-    { 
+    {
       #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
       $sysUptime = str_replace("(", "", $sysUptime);
       $sysUptime = str_replace(")", "", $sysUptime); 
