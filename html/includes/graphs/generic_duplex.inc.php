@@ -39,7 +39,7 @@ if($percentile) {
   $rrd_options .= "      ".$percentile."th %";
 }
 $rrd_options .= "\\n'";
-$rrd_options .= " LINE1.25:in#".$colour_line_in.":In\ ";
+$rrd_options .= " LINE1.25:in#".$colour_line_in.":'In '";
 $rrd_options .= " GPRINT:in:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:in:AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:in_max:MAX:%6.2lf%s";
@@ -57,7 +57,7 @@ if($percentile) {
 }
 $rrd_options .= " COMMENT:\\\\n";
 if($print_total) {
-  $rrd_options .= " GPRINT:tot:'Total\ %6.2lf%s'";
+  $rrd_options .= " GPRINT:tot:'Total %6.2lf%s'";
   $rrd_options .= " GPRINT:totin:'(In %6.2lf%s'";
   $rrd_options .= " GPRINT:totout:'Out %6.2lf%s)\\\\l'";
 }
