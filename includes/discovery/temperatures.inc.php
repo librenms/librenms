@@ -207,7 +207,7 @@ if ($device['os'] == "linux")
         if ($monitor == 'true')
         {
           $descr = trim(str_ireplace("temperature", "", $descr));
-          discover_temperature($valid_temp, $device, $temp_oid, $oid, "supermicro", $descr, $divisor, $limit, NULL, $temp);
+          discover_temperature($valid_temp, $device, $temp_oid, trim($oid,'.'), "supermicro", $descr, $divisor, $limit, NULL, $temp);
         }
       }
     }
