@@ -19,12 +19,7 @@ if($updated && $update_message) {
   print_error($update_message);
 }
 
-if($device['type'] == 'server') { $server_select = "selected"; }
-if($device['type'] == 'network') { $network_select = "selected"; }
-if($device['type'] == 'firewall') { $firewall_select = "selected"; }
-if($device['type'] == 'workstation') { $workstation_select = "selected"; }
-if($device['type'] == 'printer') { $printer_select = "selected"; }
-if($device['type'] == 'other' || $device['type'] == 'unknown') { $other_select = "selected"; }
+$device_types = array('server','network','firewall','workstation','printer','power');
 
 echo("<table cellpadding=0 cellspacing=0><tr><td>
 
@@ -58,13 +53,24 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
         Type
       </td> 
       <td>
-        <select name='type'>
-          <option value='server' $server_select>Server</option>
-          <option value='network' $network_select>Network</option>
-          <option value='firewall' $firewall_select>Firewall</option>
-          <option value='workstation' $workstation_select>Workstation</option>
-          <option value='printer' $printer_select>Printer</option>
-          <option value='other' $other_select>Other</option>
+        <select name='type'>");
+
+$unknown = 1;
+foreach ($device_types as $type)
+{
+  echo '          <option value="'.$type.'"';
+  if ($device['type'] == $type)
+  {
+    echo 'selected="1"';
+    $unknown = 0;
+  }
+  echo ' >' . ucfirst($type) . '</option>';
+}
+  if ($unknown)
+  {
+    echo '          <option value="other">Other</option>';
+  }
+echo("
         </select>
       </td>
     </tr>
@@ -79,15 +85,15 @@ echo("/></td>
 echo("/></td>
     </tr>");
 
-echo("
+echo('
   </table>
-  <input type='submit' name='Submit' value='Save' />
+  <input type="submit" name="Submit" value="Save" />
   <label><br />
   </label>
 </form>
 
 </td>
-<td width=50></td><td></td></tr></table>");
+<td width="50"></td><td></td></tr></table>');
 
 }
 
