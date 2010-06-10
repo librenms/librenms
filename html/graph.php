@@ -58,9 +58,10 @@ if($_GET['debug']) {
 
   if($rrd_options) {
     if($_GET['debug']) { echo("<pre>".$config['rrdtool'] . " graph $graphfile $rrd_options\n\n"); }
-    $thing = popen($config['rrdtool'] . " -",'w');
-    fputs($thing, "graph $graphfile $rrd_options");
-    pclose($thing);
+    $thing = shell_exec($config['rrdtool'] . " graph $graphfile $rrd_options");    
+#    $thing = popen($config['rrdtool'] . " -",'w');
+#    fputs($thing, "graph $graphfile $rrd_options");
+#    pclose($thing);
     if(is_file($graphfile)) {
       header('Content-type: image/png');
       $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
