@@ -49,7 +49,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo("\n");
 
   unset($poll_update); unset($poll_update_query); unset($poll_separator); unset($version); unset($uptime); unset($features); 
-  unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName);
+  unset($sysLocation); unset($hardware); unset($sysDescr); unset($sysContact); unset($sysName); unset($serial);
 
   $pingable = isPingable($device['hostname']);
 
