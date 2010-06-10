@@ -139,7 +139,7 @@ while ($device = mysql_fetch_array($device_query))
         $device['type'] = 'printer'; 
         break;
       case "linux":
-        if (preg_match("/-server$/", $device['version']) { $device['type'] = 'server'; }
+        if (preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
         break;
       case "apc":
       case "mgeups":
