@@ -163,7 +163,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
 
 <li><a href="ports/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
 <li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
-<?
+<?php
 
   if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted</a></li>'); }
 
