@@ -116,46 +116,36 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/toner.inc.php");
   include("includes/discovery/ups.inc.php");
 
-  if($device['os'] == "screenos") { 
-    if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
-  }
-
-  if($device['os'] == "junos") { 
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; } # FIXME: could also be a Netscreen...
-  }
-  
-  if($device['os'] == "linux") {
-    if (($device['type'] == "unknown") && preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
-  }
-  
-  if($device['os'] == "ios" || $device['os'] == "iosxe" || $device['os'] == "catos" || $device['os'] == "asa" || $device['os'] == "pix") {
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; };
-  }
-
-  if ($device['os'] == "procurve" || $device['os'] == "powerconnect")
+  if ($device['type'] == "unknown")
   {
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; };
-  }
-
-  if ($device['os'] == "asa" || $device['os'] == "pix")
-  {
-    if ($device['type'] == "unknown") { $device['type'] = 'firewall'; }
-  }
-
-  if ($device['os'] == "dell-laser")
-  {
-    if ($device['type'] == "unknown") { $device['type'] = 'printer'; }
-  }
-
-  if($device['os'] == "ironware") 
-  { 
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
-  }
-  
-  if($device['os'] == "allied") 
-  { 
-    if ($device['type'] == "unknown") { $device['type'] = 'network'; }
-  }
+    switch ($device['os'])
+    {
+      case "procurve":
+      case "powerconnect":
+      case "ironware":
+      case "allied":
+      case "junos": # Could also be a Netscreen?
+      case "ios":
+      case "iosxe":
+      case "catos":
+        $device['type'] = 'network'; 
+        break;
+      case "asa":
+      case "pix":
+      case "screenos":
+        $device['type'] = 'firewall'; 
+        break;
+      case "dell-laser":
+        $device['type'] = 'printer'; 
+        break;
+      case "linux":
+        if (preg_match("/-server$/", $device['version']) { $device['type'] = 'server'; }
+        break;
+      case "apc":
+      case "mgeups":
+        $device['type'] = 'power'; 
+        break;
+    }
 
   $update_query  = "UPDATE `devices` SET ";
   $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
