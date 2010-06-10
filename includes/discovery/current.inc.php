@@ -8,7 +8,7 @@ $port = $device['port'];
 echo("Current : ");
 
 ## APC PDU
-if ($device['os'] == "apc") 
+if ($device['os'] == "apc")
 {
   $oids = snmp_walk($device, ".1.3.6.1.4.1.318.1.1.12.2.3.1.1.2", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
@@ -16,10 +16,10 @@ if ($device['os'] == "apc")
   if ($oids) echo("APC ");
   $type = "apc";
   $precision = "10";
-  foreach(explode("\n", $oids) as $data) 
+  foreach(explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$kind) = explode(" ", $data);
       $split_oid = explode('.',$oid);
@@ -43,6 +43,59 @@ if ($device['os'] == "apc")
     }
   }
 }
+
+## MGE UPS
+if ($device['os'] == "mgeups") 
+{
+  echo("MGE ");
+  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.7.1", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $current_oid   = ".1.3.6.1.4.1.705.1.7.2.1.5.$i";
+    $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $current_oid, "-Oqv");
+    if (!$current)
+    {
+      $current_oid .= ".0";
+      $current    = snmp_get($device, $current_oid, "-Oqv");
+    }
+    $current   /= 10;
+    $type       = "mge-ups";
+    $precision  = 10;
+    $index      = $i;
+    $warnlimit  = NULL;
+    $lowlimit   = 0;
+    $limit      = NULL;
+    echo discover_current($device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+    $current_exists[$type][$index] = 1;
+  }
+  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $current_oid   = ".1.3.6.1.4.1.705.1.7.2.1.6.$i";
+    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $current_oid, "-Oqv");
+    if (!$current)
+    {
+      $current_oid .= ".0";
+      $current    = snmp_get($device, $current_oid, "-Oqv");
+    }
+    $current   /= 10;
+    $type       = "mge-ups";
+    $precision  = 10;
+    $index      = 100+$i;
+    $warnlimit  = NULL;
+    $lowlimit   = 0;
+    $limit      = NULL;
+    echo discover_current($device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+    $current_exists[$type][$index] = 1;
+  }
+}
+
 
 ## Delete removed sensors
 
