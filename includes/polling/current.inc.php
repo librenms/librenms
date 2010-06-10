@@ -38,7 +38,7 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
     $msg .= "A) at " . date($config['timestamp_format']);
     mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['current_descr'] . "\n");
-    eventlog('Current ' . $dbcurrent['current_descr'] . " under threshold: " . $dbcurrent['current_current'] . " A (< " . $dbcurrent['current_limit_low'] . " A)", $device['device_id']);
+    eventlog('Current ' . $dbcurrent['current_descr'] . " under threshold: " . $current . " A (< " . $dbcurrent['current_limit_low'] . " A)", $device['device_id']);
   }
   else if($dbcurrent['current_current'] < $dbcurrent['current_limit'] && $current >= $dbcurrent['current_limit']) 
   {
@@ -47,7 +47,7 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
     $msg .= "A) at " . date($config['timestamp_format']);
     mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['current_descr'] . "\n");
-    eventlog('Current ' . $dbcurrent['current_descr'] . " above threshold: " . $dbcurrent['current_current'] . " A (> " . $dbcurrent['current_limit'] . " A)", $device['device_id']);
+    eventlog('Current ' . $dbcurrent['current_descr'] . " above threshold: " . $current . " A (> " . $dbcurrent['current_limit'] . " A)", $device['device_id']);
   }
 
   mysql_query("UPDATE current SET current_current = '$current' WHERE current_id = '" . $dbcurrent['current_id'] . "'");
