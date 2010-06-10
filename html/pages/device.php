@@ -33,11 +33,15 @@ echo("
 </li>");
 }
 
-echo('<li class="' . $select['graphs'] . '">
+if ((is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$device['os'].".inc.php")) ||
+   ($os_group && is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$os_group.".inc.php")))
+{
+  echo('<li class="' . $select['graphs'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/graphs/">
     <img src="images/16/server_chart.png" align="absmiddle" border="0"> Graphs
   </a>
 </li>');
+}
 
 $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0) +
