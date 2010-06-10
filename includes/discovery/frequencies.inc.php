@@ -19,7 +19,7 @@ if ($device['os'] == "mgeups")
   {
     $freq_oid   = ".1.3.6.1.4.1.705.1.7.2.1.3.$i";
     $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    $current    = snmp_get($device, $freq_oid, "-Oqv");
     if (!$current)
     {
       $freq_oid .= ".0";
@@ -56,7 +56,7 @@ if ($device['os'] == "mgeups")
   {
     $freq_oid   = ".1.3.6.1.4.1.705.1.6.2.1.3.$i";
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    $current    = snmp_get($device, $freq_oid, "-Oqv");
     if (!$current)
     {
       $freq_oid .= ".0";
