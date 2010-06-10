@@ -175,6 +175,12 @@ while ($device = mysql_fetch_array($device_query)) {
   unset( $update ) ;
   unset( $seperator) ;
 
+  if ( $serial && $serial != $device['serial'] ) {
+    $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
+    $poll_separator = ", ";
+    eventlog("Serial -> $serial", $device['device_id']);
+  }
+
   if ( $sysContact && $sysContact != $device['sysContact'] ) {
     $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
     $poll_separator = ", ";
