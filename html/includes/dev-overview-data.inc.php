@@ -39,6 +39,14 @@
         </tr>'); 
   }
 
+  if($device['serial']) 
+  {
+    echo('<tr>
+          <td class="list-bold">Serial</td>
+          <td>' . $device['serial']. '</td>
+        </tr>'); 
+  }
+
   echo('<tr>
           <td class="list-bold">Operating System</td>
           <td>' . $device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'] . ' </td>
