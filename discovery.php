@@ -146,6 +146,7 @@ while ($device = mysql_fetch_array($device_query))
         $device['type'] = 'power'; 
         break;
     }
+  }
 
   $update_query  = "UPDATE `devices` SET ";
   $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
