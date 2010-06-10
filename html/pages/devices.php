@@ -99,14 +99,14 @@
 print_optionbar_end();
 
 
-if ($_POST['hostname']) { $where = " AND hostname LIKE '%".$_POST['hostname']."%'"; }
-if ($_POST['os'])       { $where = " AND os = '".$_POST['os']."'"; }
-if ($_POST['version'])  { $where .= " AND version = '".$_POST['version']."'"; }
-if ($_POST['hardware']) { $where .= " AND hardware = '".$_POST['hardware']."'"; }
-if ($_POST['features']) { $where .= " AND features = '".$_POST['features']."'"; }
-if ($_POST['location']) { $where .= " AND location = '".$_POST['location']."'"; }
-if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location = '".$_GET['location']."'"; }
-if ($_GET['type'])      { $where = "AND type = '$_GET[type]'"; }
+if ($_POST['hostname']) { $where = " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
+if ($_POST['os'])       { $where = " AND os = '".mres($_POST['os'])."'"; }
+if ($_POST['version'])  { $where .= " AND version = '".mres($_POST['version'])."'"; }
+if ($_POST['hardware']) { $where .= " AND hardware = '".mres($_POST['hardware'])."'"; }
+if ($_POST['features']) { $where .= " AND features = '".mres($_POST['features'])."'"; }
+if ($_POST['location']) { $where .= " AND location = '".mres($_POST['location'])."'"; }
+if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location = '".mres($_GET['location'])."'"; }
+if ($_GET['type'])      { $where = "AND type = '" .mres($_GET[type]). "'"; }
 if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
 
 $sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostname`";
