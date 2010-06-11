@@ -7,8 +7,7 @@ $port = $device['port'];
 
 echo("Voltages : ");
 
-## LMSensors Voltages (returned as 10,000ths of a volt.)
-
+## LMSensors Voltages
 if ($device['os'] == "linux") 
 {
   $oids = snmp_walk($device, "lmVoltSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
@@ -24,7 +23,7 @@ if ($device['os'] == "linux")
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
       $index = $split_oid[count($split_oid)-1];
-      $oid  = ".1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
+      $oid  = "1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $precision;
       discover_volt($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
       $volt_exists[$type][$index] = 1;
@@ -32,6 +31,32 @@ if ($device['os'] == "linux")
   }
 }
 
+## Areca Voltages
+if ($device['os'] == "areca") 
+{
+  $oids = snmp_walk($device, "1.3.6.1.4.1.18928.1.2.2.1.8.1.2", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids) echo("Areca ");
+  $precision = 1000;
+  $type = "areca";
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$descr) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-1];
+      $oid  = "1.3.6.1.4.1.18928.1.2.2.1.8.1.3." . $index;
+      $current = snmp_get($device, $oid, "-Oqv", "") / $precision;
+      if ($descr != '"Battery Status"' || $current != 0.255) # FIXME not sure if this is supposed to be a voltage, but without BBU it's 225, then ignore.
+      {
+        discover_volt($device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
+        $volt_exists[$type][$index] = 1;
+      }
+    }
+  }
+}
 
 ## Supermicro Voltages
 if ($device['os'] == "linux") 
@@ -76,7 +101,6 @@ if ($device['os'] == "linux")
 }
 
 ## MGE UPS Voltages
-
 if ($device['os'] == "mgeups") 
 {
   echo("MGE ");
@@ -143,7 +167,6 @@ if ($device['os'] == "mgeups")
     $volt_exists[$type][$index] = 1;
   }
 }
-
 
 
 ## Delete removed sensors
