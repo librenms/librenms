@@ -8,6 +8,8 @@
 
    if(devicepermitted($proc['device_id'])) { 
 
+    if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+
     $device = $proc;
 
     $text_descr = $proc['processor_descr'];

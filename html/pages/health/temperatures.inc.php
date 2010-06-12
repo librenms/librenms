@@ -8,7 +8,7 @@ if($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 
-echo('<table cellspacing="0" cellpadding="2" width="100%">');
+echo('<table cellspacing="0" cellpadding="6" width="100%">');
 
 echo('<tr class=tablehead>
         <th width="280">Device</th>
@@ -29,6 +29,8 @@ while($temp = mysql_fetch_array($query))
   $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&amp;type=temperature&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
   $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_temp\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $temp['temp_descr'] . "</a>";
+
+  $temp['temp_current'] = round($temp['temp_current'],1);
 
   $temp_perc = $temp['temp_current'] / $temp['temp_limit'] * 100;
   $temp_colour = percent_colour($temp_perc);

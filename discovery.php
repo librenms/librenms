@@ -41,7 +41,7 @@ if(!$where) {
 
 if (file_exists('.svn'))
 {
-  list(,$dbu_rev) = split(': ',@shell_exec('svn info database-update.sql|grep ^Revision'));
+  list(,$dbu_rev) = preg_split('/: /',@shell_exec('svn info database-update.sql|grep ^Revision'));
 
   $device_query = mysql_query("SELECT revision FROM `dbSchema`");
   if ($rev = @mysql_fetch_array($device_query)) 
