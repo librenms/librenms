@@ -194,7 +194,9 @@ if ($device['os'] == "linux")
       $temp  = trim(shell_exec($config['snmpget'] . " -m LM-SENSORS-MIB -O qv -$snmpver -c $community $hostname:$port $temp_oid")) / 1000;
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
-      discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "lmsensors", $descr, "1000", NULL, NULL, NULL);
+      if($temp != "0" && $temp <= "1000") {
+        discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "lmsensors", $descr, "1000", NULL, NULL, $temp);
+      }
     }
   }
 }

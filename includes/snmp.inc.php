@@ -42,7 +42,7 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0)
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
   foreach(explode("\n", $data) as $entry) {
-    list ($this_oid, $this_value) = split("=", $entry);
+    list ($this_oid, $this_value) = preg_split("/=/", $entry);
     $this_oid = trim($this_oid);
     $this_value = trim($this_value);
     $this_oid = substr($this_oid, 30);
@@ -69,7 +69,7 @@ function snmp_cache_ifIndex($device) {
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
-    list ($this_oid, $this_value) = split("=", $entry);
+    list ($this_oid, $this_value) = preg_split("/=/", $entry);
     list ($this_oid, $this_index) = explode(".", $this_oid);
     $this_index = trim($this_index);
     $this_oid = trim($this_oid);
@@ -217,7 +217,7 @@ function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
   foreach(explode("\n", $data) as $entry) {
-    list ($this_oid, $this_value) = split("=", $entry);
+    list ($this_oid, $this_value) = preg_split("/=/", $entry);
     list ($this_oid, $this_index) = explode(".", $this_oid);
     $this_index = trim($this_index);
     $this_oid = trim($this_oid);
