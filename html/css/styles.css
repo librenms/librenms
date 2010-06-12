@@ -828,3 +828,7 @@ color: #cc0000;
   float: left;
 }
 
+.optionicon { 
+  vertical-align:middle;
+  margin-top: -4px
+}
