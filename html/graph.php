@@ -21,6 +21,7 @@ if($_GET['debug']) {
   
   if($_GET['device']) {
     $_GET['id'] = $_GET['device'];
+    $device_id = $_GET['device'];
   } elseif($_GET['if']) {
     $_GET['id'] = $_GET['if'];
   } elseif($_GET['port']) {

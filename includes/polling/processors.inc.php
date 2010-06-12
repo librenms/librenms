@@ -28,7 +28,7 @@ while($processor = mysql_fetch_array($proc_data)) {
   }
 
   $proc = trim(str_replace("\"", "", $proc));
-  list($proc) = split(" ", $proc); 
+  list($proc) = preg_split("@\ @", $proc); 
 
   echo($proc . "%\n");
 

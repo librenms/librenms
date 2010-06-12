@@ -211,7 +211,7 @@ while ($device = mysql_fetch_array($device_query)) {
     eventlog("OS Version -> $version", $device['device_id']);
   }
 
-  if ( $features && $features != $device['features'] ) {
+  if ( $features != $device['features'] ) {
     $poll_update .= $poll_separator . "`features` = '$features'";
     $poll_separator = ", ";
     eventlog("OS Features -> $features", $device['device_id']);
