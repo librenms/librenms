@@ -16,6 +16,9 @@ $select[$section] = "selected";
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $_GET['id'] . "'");
 while($device = mysql_fetch_array($device_query)) {
+
+  if($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
+
   echo('<table cellpadding="15" cellspacing="0" class="devicetable" width="100%">');
   include("includes/device-header.inc.php");
   echo("</table>");
@@ -33,8 +36,9 @@ echo("
 </li>");
 }
 
+
 if ((is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$device['os'].".inc.php")) ||
-   ($os_group && is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$os_group.".inc.php")))
+   ($device['os_group'] && is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$device['os_group'].".inc.php")))
 {
   echo('<li class="' . $select['graphs'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/graphs/">
