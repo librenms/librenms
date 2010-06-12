@@ -1,12 +1,13 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".$id."' AND hrDeviceType = 'hrDeviceProcessor'");
-$device = device_by_id_cache($id);
+$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".mres($_GET['id'])."' AND hrDeviceType = 'hrDeviceProcessor'");
+$device = device_by_id_cache(mres($device_id));
+
 
 $i=0;
 while($proc = mysql_fetch_array($query)) {
 
-  $rrd_filename  = $config['rrd_dir'] . "/."$device['hostname']."/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
 
   if(is_file($rrd_filename)) {
 
@@ -37,7 +38,7 @@ include ("generic_multi_line.inc.php");
 
 } else {
   include("common.inc.php");
-  $rrd_filename = $config['rrd_dir'] . "/" . $hostname . "/" . "ucd_cpu.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . "ucd_cpu.rrd";
   $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";
   $rrd_options .= " DEF:nice=$rrd_filename:nice:AVERAGE";
   $rrd_options .= " DEF:system=$rrd_filename:system:AVERAGE";
