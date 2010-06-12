@@ -1,26 +1,41 @@
 <?php
 
-$datas = array('Processors','Memory','Storage','Temperatures', 'Voltages', 'Fanspeeds', 'Frequencies', 'Current');
+$datas = array('Processors','Memory','Storage','Temperatures', 'Fanspeeds', 'Voltages', 'Frequencies', 'Current');
 
 if(!$_GET['opta']) { $_GET['opta'] = "processors"; }
+if(!$_GET['optb']) { $_GET['optb'] = "nographs"; }
 
-print_optionbar_start();
+
+print_optionbar_start('', '');
 
 $sep = "";
 foreach ($datas as $texttype) {
   $type = strtolower($texttype);
-  if (!isset($_GET['opta'])) { $_GET['opta'] = $type; }
   echo($sep);
   if ($_GET['opta'] == $type) { echo("<strong>"); }
-  echo("<a href='".$config['base_url']."/health/" . $type . "/'> " . $texttype ."</a>\n");
+  echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+  echo("<a href='".$config['base_url']."/health/" . $type . "/" . $_GET['optb']. "/'> " . $texttype ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
 }
 unset ($sep);
 
+echo('<div style="float: right;">');
+
+if($_GET['optb'] == "graphs") { echo('<strong>'); }
+echo('<img src="images/16/chart_curve.png" class="optionicon" />');
+echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
+if($_GET['optb'] == "graphs") { echo('</strong>'); }
+echo(' | ');
+if($_GET['optb'] == "nographs") { echo('<strong>'); }
+echo('<img src="images/16/table.png" class="optionicon" />');
+echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+if($_GET['optb'] == "nographs") { echo('</strong>'); }
+
+
+echo('</div>');
+
 print_optionbar_end();
-
-
 
 switch ($_GET['opta'])
 {
