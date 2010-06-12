@@ -4,7 +4,7 @@ unset($temp_seperator);
 if($total = mysql_result(mysql_query("SELECT count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/temperature.png'> Temperatures</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/temperatures.png'> Temperatures</p>");
   $i = '1';
   $temps = mysql_query("SELECT * FROM temperature WHERE device_id = '" . $device['device_id'] . "' ORDER BY temp_index");
   echo('<table width="100%" valign="top">');
