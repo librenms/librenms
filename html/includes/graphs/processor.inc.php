@@ -17,6 +17,12 @@ include("common.inc.php");
     $descr = str_replace(":", "\:", $descr);
     $rrd  = $config['rrd_dir'] . "/".$proc['hostname']."/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
     $rrd_options .= " DEF:proc" . $proc['hrDeviceIndex'] . "=$rrd:usage:AVERAGE ";
+    $rrd_options .= " DEF:proc_max=$rrd:usage:MAX";
+    $rrd_options .= " DEF:proc_min=$rrd:usage:MIN";
+
+    $rrd_options .= " AREA:proc_max#c5c5c5";
+    $rrd_options .= " AREA:proc_min#ffffffff";
+
     $rrd_options .= " LINE1:proc" . $proc['hrDeviceIndex'] . "#" . $colour . ":'" . $descr . "' ";
     $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":LAST:%3.0lf";
     $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":MAX:%3.0lf\\\l ";
