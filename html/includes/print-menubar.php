@@ -23,10 +23,9 @@
 
 <div class="menu2">
 <ul>
-<li><a class="menu2four" href="overview/"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Status</a>
+<li><a class="menu2four" href="overview/"><img src="images/16/lightbulb.png" border="0" align="absmiddle" /> Overview</a>
         <table><tr><td>
         <ul>
-        <li><a href="overview/"><img src="images/16/zoom.png" border="0" align="absmiddle" /> Overview</a></li>
         <?php if (isset($config['enable_map']) && $config['enable_map']) {
           echo('<li><a href="map/"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
         } ?>
