@@ -8,7 +8,7 @@ if($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 
-echo('<table cellspacing="0" cellpadding="2" width="100%">');
+echo('<table cellspacing="0" cellpadding="6" width="100%">');
 
 echo('<tr class=tablehead>
         <th width="280">Device</th>

@@ -22,7 +22,7 @@ include("common.inc.php");
   $rrd_options .= " DEF:temp_min=$rrd_filename:temp:MIN";
   $rrd_options .= " CDEF:tempwarm=temp_max,".$temperature['temp_limit'].",GT,temp,UNKN,IF";
   $rrd_options .= " CDEF:tempcold=temp_min,20,LT,temp,UNKN,IF";
-  $rrd_options .= " AREA:temp_max#a5a5a5";
+  $rrd_options .= " AREA:temp_max#c5c5c5";
   $rrd_options .= " AREA:temp_min#ffffffff";
 
 
