@@ -122,9 +122,10 @@
         if($port[$oid]) {
           $oid_diff = $this_port[$oid] - $port[$oid];
           $oid_rate  = $oid_diff / $polled_period;
+          if($oid_rate < 0) { $oid_rate = "0"; }
           $update .= ", `".$oid."_rate` = '".$oid_rate."'";
           $update .= ", `".$oid."_delta` = '".$oid_diff."'";
-          #echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");
+          if($debug) {echo("\n $oid ($oid_diff B) $oid_rate Bps $polled_period secs\n");}
         }
       }
 
