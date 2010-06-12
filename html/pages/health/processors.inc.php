@@ -41,6 +41,8 @@
            ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background).'</a></td>
              </tr>');
  
+  if($_GET['optb'] == "graphs") { ## If graphs are requested, do them, else not!
+
   echo('    <tr bgcolor="'.$row_colour.'"><td colspan="5">');
 
   $daily_graph   = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$day&to=$now&width=211&height=100";
@@ -65,6 +67,8 @@
         <img src=\"$yearly_graph\" border=\"0\"></a>");
   echo("  </td>
   </tr>");
+
+  } #end graphs if
 
     $i++;
    }

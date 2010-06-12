@@ -40,7 +40,7 @@
             </a></td>
             <td width=50>".$perc."%</td>
          </tr>");
-
+  if($_GET['optb'] == "graphs") { ## If graphs
  
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
  
@@ -65,6 +65,8 @@
   echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$yearly_graph' border=0></a>");
   echo("</td></tr>");
+
+    } # endif graphs
  
     $i++;
    }

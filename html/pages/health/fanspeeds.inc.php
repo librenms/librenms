@@ -51,6 +51,36 @@ while($fan = mysql_fetch_array($query))
           <td>" . (isset($fan['fan_notes']) ? $fan['fan_notes'] : '') . "</td>
         </tr>\n");
 
+      if($_GET['optb'] == "graphs") { ## If graphs
+
+  echo("<tr bgcolor='$row_colour'><td colspan=6>");
+
+  $daily_graph   = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$day&to=$now&width=400&height=150";
+
+  $weekly_graph  = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$week&to=$now&width=400&height=150";
+
+  $monthly_graph = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$month&to=$now&width=400&height=150";
+
+  $yearly_graph  = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $fan['fan_id'] . "&type=fanspeed&from=$year&to=$now&width=400&height=150";
+
+  echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src='$daily_graph' border=0></a> ");
+  echo("<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src='$weekly_graph' border=0></a> ");
+  echo("<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src='$monthly_graph' border=0></a> ");
+  echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
+        <img src='$yearly_graph' border=0></a>");
+  echo("</td></tr>");
+
+    } # endif graphs
+
+
+
   $row++;
 
 }
