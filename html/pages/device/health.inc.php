@@ -9,6 +9,7 @@ $volts = mysql_result(mysql_query("select count(*) from voltage WHERE device_id 
 $freqs = mysql_result(mysql_query("select count(*) from frequency WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $current = mysql_result(mysql_query("select count(*) from current WHERE device_id = '" . $device['device_id'] . "'"), 0);
 
+$datas[] = 'overview';
 if ($processor) { $datas[] = 'processors'; }
 if ($memory) { $datas[] = 'memory'; }
 if ($storage) { $datas[] = 'storage'; }
@@ -18,6 +19,8 @@ if ($volts) { $datas[] = 'voltages'; }
 if ($freqs) { $datas[] = 'frequencies'; }
 if ($current) { $datas[] = 'current'; }
 
+
+$type_text['overview'] = "Overview";
 $type_text['temperatures'] = "Temperatures";
 $type_text['memory'] = "Memory Pools";
 $type_text['storage'] = "Disk Usage";
@@ -29,15 +32,22 @@ $type_text['current'] = "Current";
 
 print_optionbar_start();
 
-if(!$_GET['opta']) { echo("<b>"); }
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/'>Main</a>\n");
-if(!$_GET['opta']) { echo("</b>"); }
+if(!$_GET['opta']) { $_GET['opta'] = "overview"; }
 
-
+unset($sep);
 foreach ($datas as $type) {
-  if ($_GET['opta'] == $type) { echo("<strong>"); }
-  echo(" | <a href='".$config['base_url']."/device/" . $device['device_id'] . "/health/" . $type . "/'>" . $type_text[$type] ."</a>\n");
+
+  echo($sep);
+
+  if ($_GET['opta'] == $type) {
+    echo("<strong>");
+    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+  } else {
+    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
+  }
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . "/" . $_GET['optb']. "/'> " . $type_text[$type] ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
+  $sep = " | ";
 }
 
 print_optionbar_end();
@@ -47,9 +57,11 @@ if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php"))
    include("pages/device/health/".mres($_GET['opta']).".inc.php"); 
 } else { 
   foreach ($datas as $type) {
-    $graph_title = $type_text[$type];
-    $graph_type = "device_".$type;
-    include ("includes/print-device-graph.php"); 
+    if($type != "overview") {
+      $graph_title = $type_text[$type];
+      $graph_type = "device_".$type;
+      include ("includes/print-device-graph.php"); 
+    }
   }
 }
 

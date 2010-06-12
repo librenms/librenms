@@ -22,6 +22,7 @@ $rrd_options .= " -b 1024";
     $rrd_options .= " DEF:$storage[storage_id]free=$rrd:free:AVERAGE";
     $rrd_options .= " CDEF:$storage[storage_id]size=$storage[storage_id]used,$storage[storage_id]free,+";
     $rrd_options .= " CDEF:$storage[storage_id]perc=$storage[storage_id]used,$storage[storage_id]size,/,100,*";
+
     $rrd_options .= " LINE1.25:$storage[storage_id]perc#" . $colour . ":'$descr'";
     $rrd_options .= " GPRINT:$storage[storage_id]size:LAST:%6.2lf%sB";
     $rrd_options .= " GPRINT:$storage[storage_id]free:LAST:%6.2lf%sB";
