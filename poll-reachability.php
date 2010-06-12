@@ -46,7 +46,7 @@ while ($device = mysql_fetch_array($device_query)) {
      if ($status == '1') { 
        $stat = "Up"; 
        mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is up\n')");
-       mail($email, "DeviceUp: " . $device['hostname'], "Device Up: " . $device['hostname'] . " at " . date($config['timestamp_format']), $config['email_headers']);
+       mail($email, "Device Up: " . $device['hostname'], "Device Up: " . $device['hostname'] . " at " . date($config['timestamp_format']), $config['email_headers']);
      } else {
        $stat = "Down"; 
        mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('9', '" . $device['device_id'] . "', 'Device is down\n')");
