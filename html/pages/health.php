@@ -12,8 +12,12 @@ $sep = "";
 foreach ($datas as $texttype) {
   $type = strtolower($texttype);
   echo($sep);
-  if ($_GET['opta'] == $type) { echo("<strong>"); }
-  echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+  if ($_GET['opta'] == $type) { 
+    echo("<strong>");
+    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+  } else {
+    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
+  }
   echo("<a href='".$config['base_url']."/health/" . $type . "/" . $_GET['optb']. "/'> " . $texttype ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
@@ -22,13 +26,19 @@ unset ($sep);
 
 echo('<div style="float: right;">');
 
-if($_GET['optb'] == "graphs") { echo('<strong>'); }
-echo('<img src="images/16/chart_curve.png" class="optionicon" />');
+if($_GET['optb'] == "graphs") { echo('<strong>');
+  echo('<img src="images/icons/graphs.png" class="optionicon" />');
+} else {
+  echo('<img src="images/icons/greyscale/graphs.png" class="optionicon" />');
+}
 echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
 if($_GET['optb'] == "graphs") { echo('</strong>'); }
 echo(' | ');
-if($_GET['optb'] == "nographs") { echo('<strong>'); }
-echo('<img src="images/16/table.png" class="optionicon" />');
+if($_GET['optb'] == "nographs") { echo('<strong>');
+  echo('<img src="images/icons/nographs.png" class="optionicon" />');
+} else {
+  echo('<img src="images/icons/greyscale/nographs.png" class="optionicon" />');
+}
 echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
 if($_GET['optb'] == "nographs") { echo('</strong>'); }
 
