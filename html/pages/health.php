@@ -31,7 +31,7 @@ if($_GET['optb'] == "graphs") { echo('<strong>');
 } else {
   echo('<img src="images/icons/greyscale/graphs.png" class="optionicon" />');
 }
-echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
+echo('<a href="health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
 if($_GET['optb'] == "graphs") { echo('</strong>'); }
 echo(' | ');
 if($_GET['optb'] == "nographs") { echo('<strong>');
@@ -39,7 +39,7 @@ if($_GET['optb'] == "nographs") { echo('<strong>');
 } else {
   echo('<img src="images/icons/greyscale/nographs.png" class="optionicon" />');
 }
-echo('<a href="http://demo.observernms.org/health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+echo('<a href="health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
 if($_GET['optb'] == "nographs") { echo('</strong>'); }
 
 
