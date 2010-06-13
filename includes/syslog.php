@@ -52,11 +52,14 @@ function process_syslog ($entry, $update) {
     } else {
       $program = preg_quote($entry['program'],'/');
       $entry['msg'] = preg_replace("/^$program:\ /", "", $entry['msg']);
-      if(preg_match("/^[a-zA-Z\/]+\[[0-9]+\]:/", $entry['msg'])) {
+#      if(preg_match("/^[a-zA-Z\/]+\[[0-9]+\]:/", $entry['msg'])) {
         $entry['msg'] = preg_replace("/^(.+?)\[[0-9]+\]:\ /", "\\1||", $entry['msg']);
+        if(!strstr($entry['msg'], "||")) { $entry['msg'] = preg_replace("/^(.+?):\ /", "\\1||", $entry['msg']);}
         list($entry['program'], $entry['msg']) = explode("||", $entry['msg']);
-      }
+        $entry['program'] = preg_replace("@\-[0-9]+@", "", $entry['program']);
+#      }
     }
+    $entry['program'] = strtoupper($entry['program']);
     $x  = "UPDATE `syslog` set `device_id` = '".$entry['device_id']."', `program` = '".$entry['program']."', `msg` = '" . mres($entry['msg']) . "', processed = '1' WHERE `seq` = '" . $entry['seq'] . "'";
     $x  = "INSERT INTO `syslog` (`device_id`,`program`,`facility`,`priority`, `level`, `tag`, `msg`, `timestamp`) ";
     $x .= "VALUES ('".$entry['device_id']."','".$entry['program']."','".$entry['facility']."','".$entry['priority']."', '".$entry['level']."', '".$entry['tag']."', '".$entry['msg']."','".$entry['timestamp']."')";   
