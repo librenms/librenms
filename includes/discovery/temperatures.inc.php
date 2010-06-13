@@ -96,7 +96,7 @@ if ($device['os'] == "areca")
       $descr = "Hard disk $temp_id";
       if ($temp != -128)
       {
-        discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "areca", $descr, 1, NULL, NULL, $temp);
+        discover_temperature($valid_temp, $device, $temp_oid, zeropad($temp_id), "areca", $descr, 1, NULL, NULL, $temp);
       }
     }
   }
