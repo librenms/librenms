@@ -150,11 +150,11 @@ echo("</div>
 
     echo("<div style='width: 235px; float: right;'>
     <a onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=port_bits&port=74&from=".$day."&to=".$now."&width=400&height=150&inverse=0&legend=1\'>\
-    <img src=\'graph.php?type=port_bits&port=74&from=".$week."&to=".$now."&width=400&height=150&inverse=0&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=28&from=".$day."&to=".$now."&width=400&height=150&inverse=0&legend=1\'>\
+    <img src=\'graph.php?type=port_bits&port=28&from=".$week."&to=".$now."&width=400&height=150&inverse=0&legend=1\'>\
     ', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".    "
     <div style='font-size: 16px; font-weight: bold; color: #555555;'>NE61 Server</div>".
-    "<img src='graph.php?type=port_bits&port=74&from=".$day."&to=".$now."&width=155&height=100&inverse=0&legend=no'></a></div>");
+    "<img src='graph.php?type=port_bits&port=28&from=".$day."&to=".$now."&width=155&height=100&inverse=0&legend=no'></a></div>");
 
   echo("</div>");
 

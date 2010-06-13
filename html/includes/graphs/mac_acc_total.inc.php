@@ -42,15 +42,16 @@ if(is_numeric($_GET['topn'])) { $topn = $_GET['topn']; } else { $topn = '10'; }
   while($acc = mysql_fetch_array($query)) {
    $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
    if(is_file($this_rrd)) {
-   $name = $acc['mac'];
+   $mac = formatmac($acc['mac']);
+   $name = $mac;
    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."' AND interface_id = '".$acc['interface_id']."'"));
    if($addy) {
-     $name = $addy['ipv4_address'];
+     $name = $addy['ipv4_address'] . " (".$mac.")";
      $peer = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D 
              WHERE A.ipv4_address = '".$addy['ipv4_address']."'
              AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
      if($peer) {
-       $name = $peer['hostname'] . " " . $peer['ifDescr'];
+       $name = $peer['hostname'] . " " . makeshortif($peer['ifDescr']) . " (".$mac.")";
      }
 
      if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".
@@ -70,6 +71,9 @@ if(is_numeric($_GET['topn'])) { $topn = $_GET['topn']; } else { $topn = '10'; }
     $colour=$config['graph_colours'][$colours][$iter];
     $descr = str_pad($name, 36);
     $descr = substr($descr,0,36);
+    $descr = str_replace("(", "(", $descr);
+    $descr = str_replace(")", ")", $descr);
+    $descr = str_replace(":", "\\:", $descr);
     $rrd_options .= " DEF:in".$this_id."=$this_rrd:".$prefix."IN:AVERAGE ";
     $rrd_options .= " DEF:out".$this_id."temp=$this_rrd:".$prefix."OUT:AVERAGE ";
     $rrd_options .= " CDEF:inB".$this_id."=in".$this_id.",$multiplier,* ";

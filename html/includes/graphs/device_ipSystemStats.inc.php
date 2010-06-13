@@ -38,42 +38,42 @@
 
   $rrd_options .= " COMMENT:'Packets/sec       Current  Average  Maximum\\n'";
 
-  $rrd_options .= " AREA:InReceives_4#003300:'InReceives   v4'";
+  $rrd_options .= " AREA:InReceives_4#CDEB8B:'InReceives   v4'";
   $rrd_options .= " GPRINT:InReceives_4:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:InReceives_4:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:InReceives_4:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " AREA:InReceives_6#91B13C:'             v6':STACK";
+  $rrd_options .= " AREA:InReceives_6#8C9E5E:'             v6':STACK";
   $rrd_options .= " GPRINT:InReceives_6:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:InReceives_6:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:InReceives_6:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " AREA:OutRequests_4_n#000033:'OutRequests  v4'";
+  $rrd_options .= " AREA:OutRequests_4_n#C3D9FF:'OutRequests  v4'";
   $rrd_options .= " GPRINT:OutRequests_4:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:OutRequests_4:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:OutRequests_4:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " AREA:OutRequests_6_n#8080BD:'             v6':STACK";
+  $rrd_options .= " AREA:OutRequests_6_n#8D9CB7:'             v6':STACK";
   $rrd_options .= " GPRINT:OutRequests_6:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:OutRequests_6:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:OutRequests_6:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " LINE1.25:InForwDatagrams_4#AF63AF:'InForward    v4'";
+  $rrd_options .= " AREA:InForwDatagrams_4#AF63AF:'InForward    v4'";
   $rrd_options .= " GPRINT:InForwDatagrams_4:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:InForwDatagrams_4:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:InForwDatagrams_4:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " LINE1.25:InForwDatagrams_6#3F003F:'             v6'";
+  $rrd_options .= " AREA:InForwDatagrams_6#3F003F:'             v6':STACK";
   $rrd_options .= " GPRINT:InForwDatagrams_6:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:InForwDatagrams_6:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:InForwDatagrams_6:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " LINE1.25:OutForwDatagrams_4#AF63AF:'OutForward   v4'";
+  $rrd_options .= " AREA:OutForwDatagrams_4#AF63AF:'OutForward   v4'";
   $rrd_options .= " GPRINT:OutForwDatagrams_4:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:OutForwDatagrams_4:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:OutForwDatagrams_4:MAX:%6.2lf%s\\\\n";
 
-  $rrd_options .= " LINE1.25:OutForwDatagrams_6#3F003F:'             v6'";
+  $rrd_options .= " AREA:OutForwDatagrams_6#3F003F:'             v6':STACK";
   $rrd_options .= " GPRINT:OutForwDatagrams_6:LAST:%6.2lf%s";
   $rrd_options .= " GPRINT:OutForwDatagrams_6:AVERAGE:%6.2lf%s";
   $rrd_options .= " GPRINT:OutForwDatagrams_6:MAX:%6.2lf%s\\\\n";
