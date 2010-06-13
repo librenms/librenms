@@ -33,6 +33,12 @@ $config['syslog_age']       = "1 month";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
 
+### Alerting Settings
+
+#$config['alert']['email']]'default']      = NULL;    ## Default alert recipient
+#$config['alert']['email']['default_only'] = FALSE;   ## Only use default recipient
+#$config['alert']['email']['enable']	  = TRUE;    ## Enable email alerts
+
 ### Cosmetics
 
 $config['rrdgraph_def_text']  = " -c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c FONT#000000 -c CANVAS#FFFFFF -c GRID#a5a5a5";
