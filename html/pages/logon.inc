@@ -1,3 +1,5 @@
+<div style="width:400px; margin: auto; margin-top: 100px;">
+
 <?php print_optionbar_start(190,435); ?>
     <div style="margin: auto; width:350px; padding:5px;">
       <table border="0" cellpadding="0" cellspacing="0">
@@ -47,3 +49,5 @@ if(isset($config['login_message'])) {
 document.logonform.username.focus();
 // -->
 </script>
+
+</div>
