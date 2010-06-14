@@ -6,6 +6,9 @@
   
   $version = "Engine " . trim($version,')');
 
-  $hardware = substr($hardware,0,strpos($hardware,';'));
+  if (strstr($hardware  ,';'))
+  {
+    $hardware = substr($hardware,0,strpos($hardware,';'));
+  }
 
 ?>
