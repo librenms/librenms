@@ -22,5 +22,4 @@ if($alert_text) {
 #  `echo '$alert_text' | gnokii --sendsms <NUMBER>`;
 }
 
-
 ?>
