@@ -33,6 +33,8 @@ $config['syslog_age']       = "1 month";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
 
+$config['web_header']	    = "header.inc.php";  # in html/includes
+
 ### Alerting Settings
 
 #$config['alert']['email']]'default']      = NULL;    ## Default alert recipient
