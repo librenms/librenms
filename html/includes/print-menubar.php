@@ -226,9 +226,11 @@ echo('        <li><hr /></li>
 
 <li style="float: right;"><a><img src="images/16/wrench.png" border="0" align="absmiddle" /> System
 <!--[if IE 7]><!--></a><!--<![endif]-->
-    <table><tr><td>
+  <table><tr><td>
     <ul>
-    <li><a href="/preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
+     <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About</a></li>
+     <li><hr width="140" /></li>
+      <li><a href="/preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
     <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
         <li><hr width="140" /></li>
@@ -246,7 +248,7 @@ echo('        <li><hr /></li>
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
     </ul>
-    </td></tr></table>
+  </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->
 </li>
 </ul>
