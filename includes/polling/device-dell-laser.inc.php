@@ -5,4 +5,7 @@
   list(,$version) = split('Engine ',$sysDescr);
   
   $version = "Engine " . trim($version,')');
+
+  $hardware = substr($hardware,0,strpos($hardware,';'));
+
 ?>
