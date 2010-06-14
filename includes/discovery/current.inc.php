@@ -76,7 +76,7 @@ if ($device['os'] == "mgeups")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $current_oid   = ".1.3.6.1.4.1.705.1.7.2.1.6.$i";
+    $current_oid   = ".1.3.6.1.4.1.705.1.6.2.1.6.$i";
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $current_oid, "-Oqv");
     if (!$current)
