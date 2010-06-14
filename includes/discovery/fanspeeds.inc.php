@@ -41,7 +41,7 @@ if ($device['os'] == "areca")
   $oids = snmp_walk($device, "1.3.6.1.4.1.18928.1.2.2.1.9.1.2", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("Areca ");
-  $precision = 1000;
+  $precision = 1;
   $type = "areca";
   foreach(explode("\n", $oids) as $data) 
   {
