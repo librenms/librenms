@@ -11,3 +11,4 @@ ALTER TABLE  `temperature` CHANGE  `temp_index`  `temp_index` int(11) NOT NULL;
 CREATE TABLE `current` ( `current_id` int(11) NOT NULL auto_increment, `device_id` int(11) NOT NULL default '0', `current_oid` varchar(64) NOT NULL, `current_index` varchar(8) NOT NULL, `current_type` varchar(32) NOT NULL, `current_descr` varchar(32) NOT NULL default '', `current_precision` int(11) NOT NULL default '1', `current_current` float default NULL, `current_limit` float default NULL, `current_limit_warn` float default NULL, `current_limit_low` float default NULL, PRIMARY KEY  (`current_id`), KEY `current_host` (`device_id`)) ENGINE=MyISAM AUTO_INCREMENT=189 DEFAULT CHARSET=latin1;
 ALTER TABLE `devices` ADD `serial` text default NULL;
 ALTER TABLE  `temperature` CHANGE  `temp_index`  `temp_index` VARCHAR(32) NOT NULL;
+ALTER TABLE  `ports` CHANGE  `ifDescr`  `ifDescr` VARCHAR(255) NOT NULL;
