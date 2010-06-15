@@ -1,10 +1,10 @@
-<div style="width:400px; margin: auto; margin-top: 100px;">
+<div style="width: 470px; margin: auto; margin-top: 30px;">
 
-<?php print_optionbar_start(190,435); ?>
-    <div style="margin: auto; width:350px; padding:5px;">
+<?php print_optionbar_start(190,475); ?>
+    <div style="margin: auto; width:400px; padding:5px;">
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td width="128"><img src="images/password.png" alt="Login required" /></td>
+          <td style="width: 128px"><img src="images/password.png" alt="Login required" /></td>
           <td>
             <form action="<?php echo $_SERVER['REQUEST_URI'] ?>" method="post" name="logonform">
               <h3>Please log in:</h3>
@@ -35,13 +35,12 @@ if(isset($auth_message)) {
           </td>
         </tr>
       </table>
-    </div>
 <?php
 
 print_optionbar_end();
 
 if(isset($config['login_message'])) {
-  echo('<div style="margin: auto; margin-top: 10px;text-align: center; font-weight: bold; color: #cc0000; width: 470px;">'.$config['login_message'].'</div>');
+  echo('<div style="margin-top: 10px;text-align: center; font-weight: bold; color: #cc0000; width: 470px;">'.$config['login_message'].'</div>');
 }
 ?>
 <script type="text/javascript">
@@ -50,4 +49,5 @@ document.logonform.username.focus();
 // -->
 </script>
 
+    </div>
 </div>
