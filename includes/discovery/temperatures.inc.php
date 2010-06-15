@@ -200,10 +200,10 @@ switch ($device['os'])
     break;
     
   case "netmanplus":
-    $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.7", "-Oqv", "UPS-MIB");
+    $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.7", "-Osqn", "UPS-MIB");
     if ($debug) { echo($oids."\n"); }
     $oids = trim($oids);
-    if ($oids) echo("Areca Harddisk ");
+    if ($oids) echo("NetMan Plus Battery Temperature ");
     foreach(explode("\n", $oids) as $data) 
     {
       $data = trim($data);
