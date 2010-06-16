@@ -168,6 +168,57 @@ if ($device['os'] == "mgeups")
   }
 }
 
+## Riello UPS Voltages
+if ($device['os'] == "netmanplus") 
+{
+  echo("NetMan Plus ");
+  
+  $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.5", "-Osqn", "UPS-MIB");
+  if ($debug) { echo($oids."\n"); }
+  $oids = trim($oids);
+  if ($oids) echo("NetMan Plus Battery Voltage ");
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$descr) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $volt_id = $split_oid[count($split_oid)-1];
+      $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
+      $precision = 10;
+      $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
+      $descr = "Battery " . (count(explode("\n",$oids)) == 1 ? '' : ($volt_id+1));
+      $type = "netmanplus";
+      discover_volt($device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
+      $volt_exists[$type][$volt_id] = 1;
+    }
+  }
+
+  $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.3.3.1.3", "-Osqn", "UPS-MIB");
+  if ($debug) { echo($oids."\n"); }
+  $oids = trim($oids);
+  if ($oids) echo("NetMan Plus Input Voltage ");
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$descr) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $volt_id = $split_oid[count($split_oid)-1];
+      $volt_oid  = "1.3.6.1.2.1.33.1.3.3.1.3.$volt_id";
+      $precision = 1;
+      $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
+      $descr = "Input phase " . ($volt_id);
+      $type = "netmanplus";
+      discover_volt($device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
+      $volt_exists[$type][$volt_id] = 1;
+    }
+  }
+
+}
+
 
 ## Delete removed sensors
 

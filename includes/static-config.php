@@ -34,7 +34,8 @@ $os_groups['iosxr']     = "ios";
 $os_groups['ios']	= "ios";
 $os_groups['asa']       = "ios";
 
-$os_groups['mgeups']       = "ups";
+$os_groups['mgeups']      = "ups";
+$os_groups['netmanplus']  = "ups";
 
 $os_groups['dell-laser']  = "printer";
 
@@ -68,6 +69,9 @@ $os_text['allied']	 = "AlliedWare";
 $os_text['mgeups']	 = "MGE UPS";
 $os_text['apc']		 = "APC";
 $os_text['areca']	 = "Areca RAID Subsystem";
+$os_text['netmanplus']	 = "NetMan Plus";
+$os_text['akcp']	 = "AKCP SensorProbe";
+$os_text['minkelsrms']	 = "Minkels RMS";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
@@ -115,6 +119,7 @@ if(isset($_SERVER['HTTPS'])) {
 $observer_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observer_link) {
         echo "<h2>Observer MySQL Error</h2>";
+        echo mysql_error();
         die;
 }
 $observer_db = mysql_select_db($config['db_name'], $observer_link);

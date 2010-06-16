@@ -214,7 +214,7 @@ switch ($device['os'])
         $temp_id = $split_oid[count($split_oid)-1];
         $temp_oid  = "1.3.6.1.2.1.33.1.2.7.$temp_id";
         $temp  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $temp_oid"));
-        $descr = "Battery " . ($temp_id+1);
+        $descr = "Battery " . (count(explode("\n",$oids)) == 1 ? '' : ($temp_id+1));
         discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "netmanplus", $descr, 1, NULL, NULL, $temp);
       }
     }
