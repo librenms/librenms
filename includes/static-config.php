@@ -72,6 +72,7 @@ $os_text['areca']	 = "Areca RAID Subsystem";
 $os_text['netmanplus']	 = "NetMan Plus";
 $os_text['akcp']	 = "AKCP SensorProbe";
 $os_text['minkelsrms']	 = "Minkels RMS";
+$os_text['papouch']	 = "Papouch TME";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
