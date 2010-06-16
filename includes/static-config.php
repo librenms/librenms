@@ -17,8 +17,10 @@ $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
-## Set OS Groups
+## Don't bulkwalk for these OS types
+$config['nobulkwalk'] = array("netmanplus");
 
+## Set OS Groups
 $os_groups['linux']     = "unix";
 $os_groups['freebsd']   = "unix";
 $os_groups['openbsd']   = "unix";
