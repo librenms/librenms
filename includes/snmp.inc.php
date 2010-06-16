@@ -19,7 +19,15 @@ function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
 {
   global $debug; global $config; global $runtime_stats;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   if($options) { $cmd .= " $options "; }
   if($mib) { $cmd .= " -m $mib"; }
   if($mibdir) { $cmd .= " -M " . $mibdir; }
@@ -35,7 +43,15 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_cache_cip($oid, $device, $array, $mib = 0) 
 {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
@@ -64,7 +80,15 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0)
 
 function snmp_cache_ifIndex($device) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $cmd .= "-m IF-MIB ifIndex";
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
@@ -149,8 +173,15 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
-                                    $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
@@ -168,8 +199,15 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   global $config, $debug;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " .
-                                    $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
@@ -188,8 +226,15 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . 
-                                    $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));
@@ -210,7 +255,15 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  $cmd  = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  { 
+    $snmpcommand = $config['snmpwalk'];
+  }
+  else
+  {
+    $snmpcommand = $config['snmpbulkwalk'];
+  }
+  $cmd  = $snmpcommand . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   if($mib) { $cmd .= "-m $mib "; }
   $cmd .= $oid;
   $data = trim(shell_exec($cmd));

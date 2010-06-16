@@ -143,6 +143,7 @@ while ($device = mysql_fetch_array($device_query))
         break;
       case "apc":
       case "mgeups":
+      case "netmanplus":
         $device['type'] = 'power'; 
         break;
     }
