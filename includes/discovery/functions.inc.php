@@ -204,7 +204,7 @@ function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low
   return $return;
 }
 
-function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_volt(&$valid_volt, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -250,10 +250,11 @@ function discover_volt($device, $oid, $index, $type, $descr, $precision = 1, $lo
     }
   }
 
+  $valid_volt[$type][$index] = 1;
   return $return;
 }
 
-function discover_freq($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_freq(&$valid_freq, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -265,6 +266,10 @@ function discover_freq($device, $oid, $index, $type, $descr, $precision = 1, $lo
   
   if (mysql_result(mysql_query("SELECT count(freq_id) FROM `frequency` WHERE device_id = '".$device['device_id']."' AND freq_type = '$type' AND `freq_index` = '$index'"),0) == '0')
   {
+
+    if(!$high_limit && isset($current)) { $high_limit = round($current * 1.05, 0); }
+    if(!$low_limit && isset($current))  { $low_limit = round($current * 0.95, 0); }
+
     $query = "INSERT INTO frequency (`device_id`, `freq_oid`, `freq_index`, `freq_type`, `freq_descr`, `freq_precision`, `freq_limit`, `freq_limit_low`, `freq_current`) ";
     $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
     mysql_query($query);
@@ -286,6 +291,7 @@ function discover_freq($device, $oid, $index, $type, $descr, $precision = 1, $lo
     }
   }
 
+  $valid_freq[$type][$index] = 1;
   return $return;
 }
 

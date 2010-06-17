@@ -5,6 +5,8 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
+$valid_volt = array();
+
 echo("Voltages : ");
 
 ## LMSensors Voltages
@@ -25,8 +27,7 @@ if ($device['os'] == "linux")
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $precision;
-      discover_volt($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
-      $volt_exists[$type][$index] = 1;
+      discover_volt($valid_volt,$device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
     }
   }
 }
@@ -51,8 +52,7 @@ if ($device['os'] == "areca")
       $current = snmp_get($device, $oid, "-Oqv", "") / $precision;
       if ($descr != '"Battery Status"' || $current != 0.255) # FIXME not sure if this is supposed to be a voltage, but without BBU it's 225, then ignore.
       {
-        discover_volt($device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
-        $volt_exists[$type][$index] = 1;
+        discover_volt($valid_volt,$device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
       }
     }
   }
@@ -92,8 +92,7 @@ if ($device['os'] == "linux")
 
         if ($monitor == 'true')
         {
-          echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
-          $volt_exists[$type][$index] = 1;
+          echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
         }
       }
     }
@@ -121,19 +120,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = $i;
-    if ($current > 200 && $current < 250) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 210;
-      $limit = 250;
-    }
-    else
-    {
-      $lowlimit = 0;
-      $limit = 0;
-    }
-    echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
-    $volt_exists[$type][$index] = 1;
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -152,19 +139,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = 100+$i;
-    if ($current > 200 && $current < 250) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 210;
-      $limit = 250;
-    }
-    else
-    {
-      $lowlimit = 0;
-      $limit = 0;
-    }
-    echo discover_volt($device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
-    $volt_exists[$type][$index] = 1;
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
 }
 
@@ -176,7 +151,6 @@ if ($device['os'] == "netmanplus")
   $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.5", "-Osqn", "UPS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  if ($oids) echo("NetMan Plus Battery Voltage ");
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -188,41 +162,59 @@ if ($device['os'] == "netmanplus")
       $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
       $precision = 10;
       $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
-      $descr = "Battery " . (count(explode("\n",$oids)) == 1 ? '' : ($volt_id+1));
+      $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "netmanplus";
-      discover_volt($device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
-      $volt_exists[$type][$volt_id] = 1;
+      discover_volt($valid_volt,$device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
     }
   }
 
-  $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.3.3.1.3", "-Osqn", "UPS-MIB");
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.4.3.0", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
-  $oids = trim($oids);
-  if ($oids) echo("NetMan Plus Input Voltage ");
-  foreach(explode("\n", $oids) as $data) 
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
   {
-    $data = trim($data);
-    if ($data) 
-    {
-      list($oid,$descr) = explode(" ", $data,2);
-      $split_oid = explode('.',$oid);
-      $volt_id = $split_oid[count($split_oid)-1];
-      $volt_oid  = "1.3.6.1.2.1.33.1.3.3.1.3.$volt_id";
-      $precision = 1;
-      $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
-      $descr = "Input phase " . ($volt_id);
-      $type = "netmanplus";
-      discover_volt($device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
-      $volt_exists[$type][$volt_id] = 1;
-    }
+    $volt_oid   = ".1.3.6.1.2.1.33.1.4.4.1.2.$i";
+    $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = $i;
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
 
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $volt_oid   = "1.3.6.1.2.1.33.1.3.3.1.3.$i";
+    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = 100+$i;
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+  }
+
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $volt_oid   = "1.3.6.1.2.1.33.1.5.3.1.2.$i";
+    $descr      = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $volt_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = 200+$i;
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+  }
 }
 
 
 ## Delete removed sensors
 
-if($debug) { print_r($volt_exists); }
+if($debug) { print_r($valid_volt); }
 
 $sql = "SELECT * FROM voltage WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
@@ -232,13 +224,13 @@ if ($query = mysql_query($sql))
     $index = $test_volt['volt_index'];
     $type = $test_volt['volt_type'];
     if($debug) { echo("$type -> $index\n"); }
-    if(!$volt_exists[$type][$index]) {
+    if(!$valid_volt[$type][$index]) {
       echo("-");
       mysql_query("DELETE FROM `voltage` WHERE volt_id = '" . $test_volt['volt_id'] . "'");
     }
   }
 }
 
-unset($volt_exists); echo("\n");
+unset($valid_volt); echo("\n");
 
 ?>

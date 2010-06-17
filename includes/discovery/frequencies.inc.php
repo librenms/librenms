@@ -5,10 +5,11 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
+$valid_freq = array();
+
 echo("Frequencies : ");
 
 ## MGE UPS Frequencies
-
 if ($device['os'] == "mgeups") 
 {
   echo("MGE ");
@@ -29,25 +30,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = $i;
-    if ($current > 55 && $current < 65) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 58;
-      $limit = 62;
-    }
-    else if ($current > 45 && $current < 55) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 48;
-      $limit = 52;
-    }
-    else
-    {
-      $lowlimit = 0;
-      $limit = 0;
-    }
-    echo discover_freq($device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
-    $freq_exists[$type][$index] = 1;
+    echo discover_freq($valid_freq,$device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -66,32 +49,14 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = 100+$i;
-    if ($current > 55 && $current < 65) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 58;
-      $limit = 62;
-    }
-    else if ($current > 45 && $current < 55) 
-    {
-      #FIXME Are these sensible values?
-      $lowlimit = 48;
-      $limit = 52;
-    }
-    else
-    {
-      $lowlimit = 0;
-      $limit = 0;
-    }
-    echo discover_freq($device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
-    $freq_exists[$type][$index] = 1;
+    echo discover_freq($valid_freq,$device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
 }
 
 
 ## Delete removed sensors
 
-if($debug) { print_r($freq_exists); }
+if($debug) { print_r($valid_freq); }
 
 $sql = "SELECT * FROM frequency WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
@@ -101,7 +66,7 @@ if ($query = mysql_query($sql))
     $index = $test_freq['freq_index'];
     $type = $test_freq['freq_type'];
     if($debug) { echo("$type -> $index\n"); }
-    if(!$freq_exists[$type][$index]) {
+    if(!$valid_freq[$type][$index]) {
       echo("-");
       mysql_query("DELETE FROM `frequency` WHERE freq_id = '" . $test_freq['freq_id'] . "'");
     }
