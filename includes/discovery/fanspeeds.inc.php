@@ -5,7 +5,7 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
-$valid_van = array();
+$valid_fan = array();
 
 echo("Fanspeeds : ");
 
