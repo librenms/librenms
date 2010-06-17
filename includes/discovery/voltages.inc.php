@@ -164,7 +164,8 @@ if ($device['os'] == "netmanplus")
       $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "netmanplus";
-      discover_volt($valid_volt,$device, $volt_oid, $volt_id, $type, $descr, $precision, NULL, NULL, $volt);
+      $index = 500+$volt_id;
+      discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $volt);
     }
   }
 
@@ -179,7 +180,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = $i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -193,7 +194,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 100+$i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -207,7 +208,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 200+$i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
   }
 }
 
