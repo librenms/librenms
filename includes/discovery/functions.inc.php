@@ -295,7 +295,7 @@ function discover_freq(&$valid, $device, $oid, $index, $type, $descr, $precision
   return $return;
 }
 
-function discover_current($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -328,6 +328,7 @@ function discover_current($device, $oid, $index, $type, $descr, $precision = 1, 
     }
   }
 
+  $valid[$type][$index] = 1;
   return $return;
 }
 

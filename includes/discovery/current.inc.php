@@ -5,6 +5,8 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
+$valid_current = array();
+
 echo("Current : ");
 
 ## APC PDU
@@ -38,8 +40,7 @@ if ($device['os'] == "apc")
       $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
       $descr     = "Phase $phase";
 
-      echo discover_current($device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
-      $current_exists[$type][$index] = 1;
+      echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
     }
   }
 }
@@ -68,8 +69,7 @@ if ($device['os'] == "mgeups")
     $warnlimit  = NULL;
     $lowlimit   = 0;
     $limit      = NULL;
-    echo discover_current($device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
-    $current_exists[$type][$index] = 1;
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -91,15 +91,83 @@ if ($device['os'] == "mgeups")
     $warnlimit  = NULL;
     $lowlimit   = 0;
     $limit      = NULL;
-    echo discover_current($device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
-    $current_exists[$type][$index] = 1;
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+  }
+}
+
+## Riello UPS
+if ($device['os'] == "netmanplus") 
+{
+  echo("NetMan Plus ");
+  
+  $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.6", "-Osqn", "UPS-MIB");
+  if ($debug) { echo($oids."\n"); }
+  $oids = trim($oids);
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$descr) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $current_id = $split_oid[count($split_oid)-1];
+      $current_oid  = "1.3.6.1.2.1.33.1.2.6.$current_id";
+      $precision = 10;
+      $current  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $current_oid")) / $precision;
+      $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
+      $type = "netmanplus";
+      $index = 500+$current_id;
+      discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    }
+  }
+
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.4.3.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $current_oid   = ".1.3.6.1.2.1.33.1.4.4.1.3.$i";
+    $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $current_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = $i;
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  }
+
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $current_oid   = "1.3.6.1.2.1.33.1.3.3.1.4.$i";
+    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $current_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = 100+$i;
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  }
+
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $current_oid   = "1.3.6.1.2.1.33.1.5.3.1.3.$i";
+    $descr      = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $current_oid, "-Oqv");
+    $type       = "netmanplus";
+    $precision  = 1;
+    $index      = 200+$i;
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
   }
 }
 
 
 ## Delete removed sensors
 
-if($debug) { print_r($current_exists); }
+if($debug) { print_r($valid_current); }
 
 $sql = "SELECT * FROM current WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
@@ -109,13 +177,13 @@ if ($query = mysql_query($sql))
     $index = $test_current['current_index'];
     $type = $test_current['current_type'];
     if($debug) { echo("$type -> $index\n"); }
-    if(!$current_exists[$type][$index]) {
+    if(!$valid_current[$type][$index]) {
       echo("-");
       mysql_query("DELETE FROM `current` WHERE current_id = '" . $test_current['current_id'] . "'");
     }
   }
 }
 
-unset($current_exists); echo("\n");
+unset($valid_current); echo("\n");
 
 ?>
