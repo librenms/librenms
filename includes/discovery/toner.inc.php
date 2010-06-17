@@ -9,6 +9,8 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
+$valid_toner = array();
+
 echo("Toner : ");
 
 if ($device['os'] == "dell-laser") 
@@ -34,8 +36,7 @@ if ($device['os'] == "dell-laser")
         $capacity      = snmp_get($device, $capacity_oid, "-Oqv");
         $current       = $current / $capacity * 100;
         $type          = "dell-laser";
-        echo discover_toner($device, $toner_oid, $index, $type, $descr, $capacity, $current);
-        $toner_exists[$type][$index] = 1;
+        echo discover_toner($valid_toner,$device, $toner_oid, $index, $type, $descr, $capacity, $current);
       }
     }
   }
@@ -43,7 +44,7 @@ if ($device['os'] == "dell-laser")
 
 ## Delete removed toners  
 
-if($debug) { echo("\n Checking ... \n"); print_r($toner_exists); }
+if($debug) { echo("\n Checking ... \n"); print_r($valid_toner); }
 
 $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
@@ -52,7 +53,7 @@ if ($query = mysql_query($sql))
   {
     $toner_index = $test_toner['toner_index'];
     $toner_type = $test_toner['toner_type'];
-    if(!$toner_exists[$toner_type][$toner_index]) {
+    if(!$valid_toner[$toner_type][$toner_index]) {
       echo("-");
       mysql_query("DELETE FROM `toner` WHERE toner_id = '" . $test_toner['toner_id'] . "'");
     }
@@ -61,7 +62,7 @@ if ($query = mysql_query($sql))
 
                                       
                                       
-unset($toner_exists); echo("\n");
+unset($valid_toner); echo("\n");
 
 } # if ($config['enable_printers'])
 ?>

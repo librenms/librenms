@@ -332,7 +332,7 @@ function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precis
   return $return;
 }
 
-function discover_toner($device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
+function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -359,6 +359,7 @@ function discover_toner($device, $oid, $index, $type, $descr, $capacity = NULL, 
     }
   }
   
+  $valid[$type][$index] = 1;
   return $return;
 }
 
