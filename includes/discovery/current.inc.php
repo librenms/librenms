@@ -117,7 +117,7 @@ if ($device['os'] == "netmanplus")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
       $type = "netmanplus";
       $index = 500+$current_id;
-      discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+      discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
     }
   }
 
@@ -132,7 +132,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = $i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -146,7 +146,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 100+$i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -160,7 +160,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 200+$i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
   }
 }
 
