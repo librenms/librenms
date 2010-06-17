@@ -1,7 +1,7 @@
 <?php
 
 
-function discover_juniAtmVp(&$exists, $interface_id, $vp_id, $vp_descr)
+function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
 {
   global $config, $debug;
 
@@ -15,7 +15,7 @@ function discover_juniAtmVp(&$exists, $interface_id, $vp_id, $vp_descr)
   {
     echo(".");
   }
-  $exists[$interface_id][$vp_id] = 1;
+  $valid[$interface_id][$vp_id] = 1;
 }
 
 function discover_link($local_interface_id, $protocol, $remote_interface_id, $remote_hostname, $remote_port, $remote_platform, $remote_version)
@@ -49,7 +49,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
   $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
 }
 
-function discover_storage(&$valid_storage, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL)
+function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, $units, $used = NULL)
 {
   global $config, $debug;
   
@@ -73,12 +73,12 @@ function discover_storage(&$valid_storage, $device, $index, $type, $mib, $descr,
       if($debug) { print $query . "\n"; }
     }
     
-    $valid_storage[$mib][$index] = 1;
+    $valid[$mib][$index] = 1;
   }
 }
 
 
-function discover_processor(&$valid_processor, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
+function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $precision = "1", $current = NULL, $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
   
@@ -103,12 +103,12 @@ function discover_processor(&$valid_processor, $device, $oid, $index, $type, $de
       if($debug) { print $query . "\n"; }
     }
 
-    $valid_processor[$type][$index] = 1;
+    $valid[$type][$index] = 1;
   }
 }
 
 
-function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
+function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = "1", $entPhysicalIndex = NULL, $hrDeviceIndex = NULL)
 {
   global $config, $debug;
   
@@ -134,11 +134,11 @@ function discover_mempool(&$valid_mempool, $device, $index, $type, $descr, $prec
       if($debug) { print $query . "\n"; }
     }
 
-    $valid_mempool[$type][$index] = 1;
+    $valid[$type][$index] = 1;
   }
 }
 
-function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current)
+function discover_temperature(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current)
 {
   global $config, $debug; 
   if($debug) { echo("$oid, $index, $type, $descr, $precision, $current\n"); }
@@ -165,11 +165,11 @@ function discover_temperature(&$valid_temp, $device, $oid, $index, $type, $descr
       echo("U");
     }
   }
-  $valid_temp[$type][$index] = 1;
+  $valid[$type][$index] = 1;
   return $return;
 }
 
-function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_fan(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -200,11 +200,11 @@ function discover_fan($device, $oid, $index, $type, $descr, $precision = 1, $low
       echo("U");
     }
   }
-
+  $valid[$type][$index] = 1;
   return $return;
 }
 
-function discover_volt(&$valid_volt, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_volt(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -250,11 +250,11 @@ function discover_volt(&$valid_volt, $device, $oid, $index, $type, $descr, $prec
     }
   }
 
-  $valid_volt[$type][$index] = 1;
+  $valid[$type][$index] = 1;
   return $return;
 }
 
-function discover_freq(&$valid_freq, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_freq(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   
@@ -291,7 +291,7 @@ function discover_freq(&$valid_freq, $device, $oid, $index, $type, $descr, $prec
     }
   }
 
-  $valid_freq[$type][$index] = 1;
+  $valid[$type][$index] = 1;
   return $return;
 }
 

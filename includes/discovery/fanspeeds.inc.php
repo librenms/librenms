@@ -5,6 +5,8 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
+$valid_van = array();
+
 echo("Fanspeeds : ");
 
 ## LMSensors Fanspeeds
@@ -28,8 +30,7 @@ if ($device['os'] == "linux")
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB");
       $descr = trim(str_ireplace("fan-", "", $descr));
       if($current > '0' && $current < '500') {
-        discover_fan($device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
-        $fan_exists[$type][$index] = 1;
+        discover_fan($valid_fan,$device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
       }
     }
   }
@@ -53,8 +54,7 @@ if ($device['os'] == "areca")
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.18928.1.2.2.1.9.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "") / $precision;
-      discover_fan($device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
-      $fan_exists[$type][$index] = 1;
+      discover_fan($valid_fan,$device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
     }
   }
 }
@@ -86,6 +86,7 @@ if ($device['os'] == "linux")
         $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
 #        $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+# This returns an incorrect precision. At least using the raw value... I think. -TL
         $precision     = 1;
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr         = str_replace(' Fan Speed','',$descr);
@@ -93,8 +94,7 @@ if ($device['os'] == "linux")
                 
         if ($monitor == 'true')
         {
-          echo discover_fan($device, $fan_oid, $index, $type, $descr, $precision, $limit, NULL, $current);
-          $fan_exists[$type][$index] = 1;
+          echo discover_fan($valid_fan,$device, $fan_oid, $index, $type, $descr, $precision, $limit, NULL, $current);
         }
       }
     }
@@ -103,7 +103,7 @@ if ($device['os'] == "linux")
 
 ## Delete removed sensors
 
-if($debug) { echo("\n Checking ... \n"); print_r($fan_exists); }
+if($debug) { echo("\n Checking ... \n"); print_r($valid_fan); }
 
 $sql = "SELECT * FROM fanspeed WHERE device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
@@ -113,13 +113,13 @@ if ($query = mysql_query($sql))
     $fan_index = $test_fan['fan_index'];
     $fan_type = $test_fan['fan_type'];
     if($debug) { echo("$fan_type -> $fan_index\n"); }
-    if(!$fan_exists[$fan_type][$fan_index]) {
+    if(!$valid_fan[$fan_type][$fan_index]) {
       echo("-");
       mysql_query("DELETE FROM `fanspeed` WHERE fan_id = '" . $test_fan['fan_id'] . "'");
     }
   }
 }
 
-unset($fan_exists); echo("\n");
+unset($valid_fan); echo("\n");
 
 ?>
