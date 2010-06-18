@@ -8,5 +8,11 @@ if (!$version) { $version = trim(snmp_get($device, "1.3.6.1.4.1.18928.1.2.1.4.0"
 
 $serial = trim(snmp_get($device, "1.3.6.1.4.1.18928.1.1.1.3.0", "-OQv", "", ""),'"');
 if (!$serial) { $serial = trim(snmp_get($device, "1.3.6.1.4.1.18928.1.2.1.3.0", "-OQv", "", ""),'"'); }
+
+if (strstr($serial,' '))
+{
+  # Sometimes firmware outputs serial as hex-string
+  $serial = hex2str(str_replace(' ','',str_replace(' 00','',$serial)));
+}
   
 ?>
