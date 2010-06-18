@@ -30,7 +30,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = $i;
-    echo discover_freq($valid_freq,$device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -49,9 +49,46 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $precision  = 10;
     $index      = 100+$i;
-    echo discover_freq($valid_freq,$device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
   }
 }
+
+## Riello UPS
+if ($device['os'] == "netmanplus") 
+{
+  echo("NetMan Plus ");
+  
+  $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
+  if ($debug) { echo($oids."\n"); }
+  list($unused,$numPhase) = explode(' ',$oids);
+  for($i = 1; $i <= $numPhase;$i++)
+  {
+    $freq_oid   = "1.3.6.1.2.1.33.1.3.3.1.2.$i";
+    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
+    $type       = "netmanplus";
+    $precision  = 10;
+    $index      = '3.2.0.'.$i;
+    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  }
+
+  $freq_oid   = "1.3.6.1.2.1.33.1.4.2.0";
+  $descr      = "Output";
+  $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
+  $type       = "netmanplus";
+  $precision  = 10;
+  $index      = '4.2.0';
+  echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+
+  $freq_oid   = "1.3.6.1.2.1.33.1.5.1.0";
+  $descr      = "Bypass";
+  $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
+  $type       = "netmanplus";
+  $precision  = 10;
+  $index      = '5.1.0';
+  echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+}
+
 
 
 ## Delete removed sensors
