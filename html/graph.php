@@ -11,7 +11,6 @@ if($_GET['debug']) {
   include("../includes/defaults.inc.php");
   include("../config.php");
   include("../includes/common.php");
-  include("../includes/graphing.php");
   include("../includes/rewrites.php");
   include("includes/authenticate.inc.php");
 
