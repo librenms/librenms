@@ -39,13 +39,14 @@ foreach ($datas as $type) {
 
   echo($sep);
 
-  if ($_GET['opta'] == $type) {
+  if ($_GET['opta'] == $type) 
+  {
     echo("<strong>");
     echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
   } else {
     echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . "/" . $_GET['optb']. "/'> " . $type_text[$type] ."</a>\n");
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = " | ";
 }

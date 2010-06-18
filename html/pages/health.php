@@ -9,16 +9,20 @@ if(!$_GET['optb']) { $_GET['optb'] = "nographs"; }
 print_optionbar_start('', '');
 
 $sep = "";
-foreach ($datas as $texttype) {
+foreach ($datas as $texttype) 
+{
   $type = strtolower($texttype);
   echo($sep);
-  if ($_GET['opta'] == $type) { 
+  if ($_GET['opta'] == $type) 
+  { 
     echo("<strong>");
     echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
-  } else {
+  } 
+  else 
+  {
     echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
-  echo("<a href='".$config['base_url']."/health/" . $type . "/" . $_GET['optb']. "/'> " . $texttype ."</a>\n");
+  echo('<a href="'.$config['base_url'].'/health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/"> ' . $texttype ."</a>\n");
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
 }
