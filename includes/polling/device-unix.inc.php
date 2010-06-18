@@ -27,9 +27,18 @@
         else if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
         else if(strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
         else if(strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
-        $cmd = $config['snmpget'] . " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port']. " .1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111";
+        
+        # Distro "extend" support
+        $cmd = $config['snmpget'] . " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port']. " .1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111|grep -v 'No Such Instance'";
         $features = trim(`$cmd`);
         $features = str_replace("\"", "", $features);
+
+        if (!$features) # No "extend" support, try "exec" support
+        {
+          $cmd = $config['snmpget'] . " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port']. " .1.3.6.1.4.1.2021.7890.1.101.1|grep -v 'No Such Instance'";
+          $features = trim(`$cmd`);
+          $features = str_replace("\"", "", $features);
+        }
         if(preg_match("@No\ Such@", $features)||preg_match("@No\ such@", $features)) { unset($features); }
         // Detect Dell hardware via OpenManage SNMP
         $cmd = $config['snmpget'] . " -m MIB-Dell-10892 -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " .1.3.6.1.4.1.674.10892.1.300.10.1.9.1";
