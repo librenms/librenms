@@ -766,4 +766,15 @@ function formatCiscoHardware(&$device, $short = false)
         }
     }
 }
+
+# from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
+function hex2str($hex)
+{
+    $string='';
+    for ($i=0; $i < strlen($hex)-1; $i+=2)
+    {
+        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+    }
+    return $string;
+}
 ?>
