@@ -42,8 +42,12 @@ GetVersionFromFile()
                             DIST="${DIST}[`cat /etc/UnitedLinux-release | tr "\n" ' ' | sed s/VERSION.*//`]"
                         fi
                         if [ -f /etc/lsb-release ] ; then
-                            DIST="`cat /etc/lsb-release | grep DISTRIB_ID | cut -d "=" -f2`"
-                            REV="`cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2`"
+                            LSB_DIST="`cat /etc/lsb-release | grep DISTRIB_ID | cut -d "=" -f2`"
+                            LSB_REV="`cat /etc/lsb-release | grep DISTRIB_RELEASE | cut -d "=" -f2`"
+                            if [ "$LSB_DIST" != "" ] ; then
+                              DIST=$LSB_DIST
+                              REV=$LSB_REV
+                            fi
                         fi
 #                        OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
                         OSSTR="${DIST} ${REV}"
