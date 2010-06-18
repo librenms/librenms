@@ -21,7 +21,14 @@ if ($options['h'] == "odd") {
 } elseif ($options['h'] == "all") {
   $where = " ";  $doing = "all";
 } elseif($options['h']) {
-  $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+  if (is_numeric($options['h']))
+  {
+    $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+  }
+  else
+  {
+    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";  $doing = "Host ".$options['h'];
+  }
 } elseif ($options['i'] && isset($options['n'])) {
   $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
 }
