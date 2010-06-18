@@ -128,6 +128,7 @@ while ($device = mysql_fetch_array($device_query))
       case "ios":
       case "iosxe":
       case "catos":
+      case "3com":
         $device['type'] = 'network'; 
         break;
       case "asa":
