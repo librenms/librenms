@@ -116,6 +116,15 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
   if ($_GET['debug'] == 1) { echo("<pre>$map</pre>");exit(); }
 
+  switch ($_GET['format'])
+  {
+    case 'svg':
+    case 'png':
+      break;
+    case default:
+      $_GET['format'] = 'png';
+  }
+
   $img = shell_exec("echo \"".addslashes($map)."\" | dot -T".$_GET['format']."");
   if($_GET['format'] == "png") {
     header("Content-type: image/".$_GET['format']);
