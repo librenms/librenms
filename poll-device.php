@@ -86,12 +86,13 @@ while ($device = mysql_fetch_array($device_query)) {
   if ($status == "1") 
   { 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0 HOST-RESOURCES-MIB::hrSystemUptime.0";
-    $snmpdata = shell_exec($snmp_cmd);
-    #$snmpdata = preg_replace("/^.*IOS/","", $snmpdata);
-    $snmpdata = trim($snmpdata);
-    $snmpdata = str_replace("\"", "", $snmpdata);
-    list($sysUptime, $sysLocation, $sysContact, $sysName, $hrSystemUptime) = explode("\n", $snmpdata);
+    $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
+    $snmpdata = str_replace('"','',trim(shell_exec($snmp_cmd)));
+    list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
+    $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
+    $snmp_cmd .= " HOST-RESOURCES-MIB::hrSystemUptime.0";
+    $snmpdata = str_replace('"','',trim(shell_exec($snmp_cmd)));
+    list($hrSystemUptime) = explode("\n", $snmpdata);
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
@@ -108,7 +109,7 @@ while ($device = mysql_fetch_array($device_query)) {
       $uptime = $secs;
       if ($device['os'] == "windows") { $uptime /= 10; }
     }
-    else 
+    else
     {
       #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
       $sysUptime = str_replace("(", "", $sysUptime);
