@@ -2,6 +2,7 @@
 
 $temperatures = mysql_result(mysql_query("select count(*) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $storage = mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$diskio = mysql_result(mysql_query("select count(*) from ucd_diskio WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $memory = mysql_result(mysql_query("select count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $processor  = mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $fans = mysql_result(mysql_query("select count(*) from fanspeed WHERE device_id = '" . $device['device_id'] . "'"), 0);
@@ -13,6 +14,7 @@ $datas[] = 'overview';
 if ($processor) { $datas[] = 'processors'; }
 if ($memory) { $datas[] = 'memory'; }
 if ($storage) { $datas[] = 'storage'; }
+if ($diskio) { $datas[] = 'diskio'; }
 if ($temperatures) { $datas[] = 'temperatures'; }
 if ($fans) { $datas[] = 'fanspeeds'; }
 if ($volts) { $datas[] = 'voltages'; }
@@ -24,6 +26,7 @@ $type_text['overview'] = "Overview";
 $type_text['temperatures'] = "Temperatures";
 $type_text['memory'] = "Memory Pools";
 $type_text['storage'] = "Disk Usage";
+$type_text['diskio'] = "Disk IO";
 $type_text['processors'] = "Processor Usage";
 $type_text['voltages'] = "Voltages";
 $type_text['fanspeeds'] = "Fan Speeds";

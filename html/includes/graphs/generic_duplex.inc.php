@@ -5,7 +5,6 @@
 
 include("common.inc.php");
 
-
 $unit_text = str_pad(truncate($unit_text,10),10);
 
 $rrd_options .= " DEF:".$out."=".$rrd_filename.":".$rra_out.":AVERAGE";

@@ -7,6 +7,7 @@ include("includes/functions.php");
 include("includes/discovery/functions.inc.php");
 
 $start = utime();
+$runtime_stats = array();
 
 ### Observer Device Discovery
 
@@ -122,6 +123,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/cisco-vrf.inc.php");
   include("includes/discovery/toner.inc.php");
   include("includes/discovery/ups.inc.php");
+  include("includes/discovery/ucd-diskio.inc.php");
 
   if ($device['type'] == "unknown")
   {
