@@ -121,7 +121,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     case 'svg':
     case 'png':
       break;
-    case default:
+    default:
       $_GET['format'] = 'png';
   }
 
