@@ -24,11 +24,15 @@ if(isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$li
     </td>");
   }
 
-  echo('<td class="syslog" width="100">');
-  if($entry['interface']) {
-    echo(generateiflink(getifbyid($entry['interface'])));
-  }  
-  echo("</td><td>" . htmlspecialchars($entry['message']) . "</td>
+  if($entry['type'] == "interface") {
+    $entry['link'] = "<b>".generateiflink(getifbyid($entry['reference']))."</b>";
+  } else {
+    $entry['link'] = "System";
+  }
+  
+  echo("<td>".$entry['link']."</td>");
+
+  echo("<td>".htmlspecialchars($entry['message']) . "</td>
   </tr>");
 
 

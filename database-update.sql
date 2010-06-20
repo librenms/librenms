@@ -13,3 +13,4 @@ ALTER TABLE `devices` ADD `serial` text default NULL;
 ALTER TABLE  `temperature` CHANGE  `temp_index`  `temp_index` VARCHAR(32) NOT NULL;
 ALTER TABLE  `ports` CHANGE  `ifDescr`  `ifDescr` VARCHAR(255) NOT NULL;
 CREATE TABLE IF NOT EXISTS `ucd_diskio` (  `diskio_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `diskio_index` int(11) NOT NULL,  `diskio_descr` varchar(32) NOT NULL,  PRIMARY KEY (`diskio_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
+ALTER TABLE `eventlog` CHANGE  `type`  `type` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;

@@ -33,7 +33,7 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
     $msg .= "rpm) at " . date($config['timestamp_format']);
     mail($email, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $fanspeed['fan_descr'] . "\n");
-    eventlog('Fan speed ' . $fanspeed['fan_descr'] . " under threshold: " . $fanspeed['fan_current'] . " rpm (&gt; " . $fanspeed['fan_limit'] . " rpm)", $device['device_id']);
+    log_event('Fan speed ' . $fanspeed['fan_descr'] . " under threshold: " . $fanspeed['fan_current'] . " rpm (&gt; " . $fanspeed['fan_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['fan_id']);
   }
 
   mysql_query("UPDATE fanspeed SET fan_current = '$fan' WHERE fan_id = '" . $fanspeed['fan_id'] . "'");

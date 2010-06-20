@@ -1,15 +1,17 @@
 <?php
 
-  $descr = $_POST['descr'];
-  $ignore = $_POST['ignore'];
-  $type = $_POST['type'];
-  $disabled = $_POST['disabled'];
-  $community = $_POST['community'];
-  $snmpver = $_POST['snmpver'];
+  $descr = mres($_POST['descr']);
+  $ignore = mres($_POST['ignore']);
+  $type = mres($_POST['type']);
+  $disabled = mres($_POST['disabled']);
+  $community = mres($_POST['community']);
+  $snmpver = mres($_POST['snmpver']);
+  $port = mres($_POST['port']);
 
-#FIXME needs more sanity checking!
-  $sql = "UPDATE `devices` SET `purpose` = '" . mysql_escape_string($descr) . "', `community` = '" . mysql_escape_string($community) . "', `type` = '$type'";
-  $sql .= ", `snmpver` = '" . mysql_escape_string($snmpver) . "', `ignore` = '$ignore',  `disabled` = '$disabled' WHERE `device_id` = '$_GET[id]'";
+  #FIXME needs more sanity checking! and better feedback
+
+  $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `community` = '" . $community . "', `type` = '$type'";
+  $sql .= ", `snmpver` = '" . $snmpver . "', `ignore` = '$ignore',  `disabled` = '$disabled', `port` = '$port' WHERE `device_id` = '".$device['device_id']."'";
   $query = mysql_query($sql);
 
   $rows_updated = mysql_affected_rows();

@@ -83,11 +83,11 @@
       foreach ($data_oids as $oid)      { 
         if ( $port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
           $update .= ", `$oid` = NULL";
-          eventlog($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], $port['interface_id']);
+          log_event($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], 'interface', $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
         } elseif ( $port[$oid] != $this_port[$oid] ) {
           $update .= ", `$oid` = '".mres($this_port[$oid])."'";
-  	  eventlog($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], $port['interface_id']);
+  	  log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], 'interface', $port['interface_id']);
           if($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
         }
       }
@@ -106,7 +106,7 @@
             if($port_ifAlias[$attrib] != $port[$attrib_key]) 
             {
               $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
-              eventlog($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], $port['interface_id']);
+              log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], 'interface', $port['interface_id']);
             }
           }
         }        
@@ -167,7 +167,7 @@
           if ( $this_port[$oid] != $port[$oid] ) { // If data has changed, build a query
             $update .= ", `$oid` = '".mres($this_port[$oid])."'";
             echo("PAgP ");
-	    eventlog("$oid -> ".$this_port[$oid], $device['device_id'], $port['interface_id']);
+	    log_event("$oid -> ".$this_port[$oid], $device['device_id'], 'interface', $port['interface_id']);
           }
         }
       } 

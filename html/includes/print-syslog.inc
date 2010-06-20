@@ -11,7 +11,7 @@ if(!is_integer($syslog_iter/2)) { $bg_colour = $list_colour_a; } else { $bg_colo
   echo("<tr style=\"background-color: $bg_colour\">
     <td width=0></td>");
 
-  echo("<td class=syslog width=125>" . $entry['date'] . "</td>");
+  echo("<td class=syslog width=140>" . $entry['date'] . "</td>");
 
   $entry['hostname'] = shorthost($entry['hostname'], 20);
 
