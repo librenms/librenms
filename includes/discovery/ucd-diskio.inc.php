@@ -9,7 +9,7 @@
     foreach($diskio_array[$device['device_id']] as $index => $entry) {
 
       if($entry['diskIONRead'] > "0" || $entry['diskIONWritten'] > "0") {
-        echo("$index ".$entry['diskIODevice']."\n");
+        if ($debug) { echo("$index ".$entry['diskIODevice']."\n"); }
 
         if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ucd_diskio` WHERE `device_id` = '".$device['device_id']."' AND `diskio_index` = '".$index."'"),0) == "0")
         {
@@ -20,7 +20,7 @@
         else
         {
           echo(".");
-          ## Need update code here!
+          ## FIXME Need update code here!
         }
 
         $valid_diskio[$index] = 1;
