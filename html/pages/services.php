@@ -7,8 +7,6 @@ echo("<a href='".$config['base_url']."/services/details/'>Details</a>");
 
 print_optionbar_end();
 
-print_r($_GET);
-
 if($_GET['status'] == '0') { $where = " AND service_status = '0'"; } else { unset ($where); }
 
 echo("<div style='margin: 5px;'><table cellpadding=7 border=0 cellspacing=0 width=100%>");
@@ -39,7 +37,7 @@ if ($_SESSION['userlevel'] >= '5') {
 
          $periods = array('day', 'week', 'month', 'year');
 
-         echo('<tr style="background-color: $bg; padding: 5px;"><td colspan=6>');
+         echo('<tr style="background-color: '.$bg.'; padding: 5px;"><td colspan=6>');
 
          foreach($periods as $period) {
            $graph_array['from']     = $$period;
