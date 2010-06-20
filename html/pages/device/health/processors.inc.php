@@ -17,7 +17,7 @@
     $text_descr = str_replace("DFC Card", "DFC", $text_descr);
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['proc_id'] . "&type=proc&from=$month&to=$now&width=400&height=125\'>";
+    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     $perc = round($proc['processor_usage']);

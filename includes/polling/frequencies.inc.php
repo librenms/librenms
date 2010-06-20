@@ -37,7 +37,7 @@ while($frequency = mysql_fetch_array($freq_data)) {
     $msg .= "Hz) at " . date($config['timestamp_format']);
     mail($email, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $frequency['freq_descr'] . "\n");
-    eventlog('Frequency ' . $frequency['freq_descr'] . " under threshold: " . $freq . " Hz (< " . $frequency['freq_limit_low'] . " Hz)", $device['device_id']);
+    log_event('Frequency ' . $frequency['freq_descr'] . " under threshold: " . $freq . " Hz (< " . $frequency['freq_limit_low'] . " Hz)", $device['device_id'] , 'frequency', $frequency['freq_id']);
   }
   else if($frequency['freq_current'] < $frequency['freq_limit'] && $freq >= $frequency['freq_limit']) 
   {
@@ -46,7 +46,7 @@ while($frequency = mysql_fetch_array($freq_data)) {
     $msg .= "Hz) at " . date($config['timestamp_format']);
     mail($email, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg, $config['email_headers']);
     echo("Alerting for " . $device['hostname'] . " " . $frequency['freq_descr'] . "\n");
-    eventlog('Frequency ' . $frequency['freq_descr'] . " above threshold: " . $freq . " Hz (> " . $frequency['freq_limit'] . " Hz)", $device['device_id']);
+    log_event('Frequency ' . $frequency['freq_descr'] . " above threshold: " . $freq . " Hz (> " . $frequency['freq_limit'] . " Hz)", $device['device_id'], 'frequency', $frequency['freq_id']);
   }
 
   mysql_query("UPDATE frequency SET freq_current = '$freq' WHERE freq_id = '" . $frequency['freq_id'] . "'");

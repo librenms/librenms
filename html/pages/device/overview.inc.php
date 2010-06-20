@@ -65,6 +65,19 @@ echo("
 
 }
 
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
+$sql .= " ORDER BY timestamp DESC LIMIT 20";
+$query = mysql_query($sql);
+
+if(mysql_affected_rows() > "0"){
+  echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/printer.png'> Recent Syslog</p>");
+  echo("<table cellspacing=0 cellpadding=2 width=100%>");
+  while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
+  echo("</table>");
+  echo("</div>");
+}
+
 echo("</div>");
 
 echo("<div style='float:right; width: 50%;'>");

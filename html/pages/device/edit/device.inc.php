@@ -36,12 +36,22 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
     <tr>
       <td width='300'><div align='right'>SNMP Community</div></td>
       <td colspan='3'><input name='community' size='20' value='" . $device['community'] . "'></input>
-        <select name='snmpver'>
+      </td>
+    </tr>
+    <tr>
+    <td><div align=right>SNMP Version</div></td>
+    <td><select name='snmpver'>
           <option value='v1'>v1</option>
           <option value='v2c'" . ($device['snmpver'] == 'v2c' ? 'selected=selected' : '') . ">v2c</option>
         </select>
       </td>
     </tr>
+    <tr>
+      <td width='300'><div align='right'>SNMP Port</div></td>
+      <td colspan='3'><input name='port' size='20' value='" . $device['port'] . "'></input>
+      </td>
+    </tr>
+
    <tr>
       <td align='right'>
         Type
