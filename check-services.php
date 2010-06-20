@@ -4,7 +4,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
   
-$sql = "SELECT * FROM devices AS D, services AS S WHERE D.status = '1' AND S.device_id = D.device_id ORDER by D.device_id DESC";
+$sql = "SELECT * FROM devices AS D, services AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC";
 $query = mysql_query($sql);
 while ($service = mysql_fetch_array($query)) {
 
@@ -52,7 +52,8 @@ while ($service = mysql_fetch_array($query)) {
     shell_exec($create);
   }
 
-  rrdtool_update($rrd,"N:".$status);
-
+  if($status = "1" || $status = "0") {
+    rrdtool_update($rrd,"N:".$status);
+  }
 }
 ?>
