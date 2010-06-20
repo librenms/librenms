@@ -4,96 +4,37 @@ if($_SESSION['userlevel'] < '7') {
   print_error("Insufficient Privileges");
 } else {
 
-if($_POST['editing']) {
-  if($_SESSION['userlevel'] > "7") {
-    include("includes/device-edit.inc.php");
+
+$panes =  array('device'   => 'Device Settings',
+                'apps'     => 'Applications',
+		'services' => 'Services');
+
+print_optionbar_start();
+
+unset($sep);
+foreach($panes as $type => $text) {
+
+  if(!isset($_GET['opta'])) { $_GET['opta'] = $type; }
+  echo($sep);
+  if ($_GET['opta'] == $type)
+  {
+    echo("<strong>");
+    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+  } else {
+    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/edit/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $text ."</a>\n");
+  if ($_GET['opta'] == $type) { echo("</strong>"); }
+  $sep = " | ";
 }
 
-$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
-$descr  = $device['purpose'];
+print_optionbar_end();
 
-if($updated && $update_message) { 
-  print_message($update_message); 
-} elseif ($update_message) {
-  print_error($update_message);
-}
-
-$device_types = array('server','network','firewall','workstation','printer','power');
-
-echo("<table cellpadding=0 cellspacing=0><tr><td>
-
-<h4>Edit Device</h4>
-
-<h5>
-  <a href='?page=delhost&id=".$device['device_id']."'>
-    <img src='images/16/server_delete.png' align='absmiddle'>
-    Delete
-  </a>
-</h5>
-
-<form id='edit' name='edit' method='post' action=''>
-  <input type=hidden name='editing' value='yes'>
-  <table width='400' border='0'>
-    <tr>
-      <td><div align='right'>Description</div></td>
-      <td colspan='3'><input name='descr' size='32' value='" . $device['purpose'] . "'></input></td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Community</div></td>
-      <td colspan='3'><input name='community' size='20' value='" . $device['community'] . "'></input>
-        <select name='snmpver'>
-          <option value='v1'>v1</option>
-          <option value='v2c'" . ($device['snmpver'] == 'v2c' ? 'selected=selected' : '') . ">v2c</option>
-        </select>
-      </td>
-    </tr>
-   <tr>
-      <td align='right'>
-        Type
-      </td> 
-      <td>
-        <select name='type'>");
-
-$unknown = 1;
-foreach ($device_types as $type)
+if (is_file("pages/device/edit/".mres($_GET['opta']).".inc.php"))
 {
-  echo '          <option value="'.$type.'"';
-  if ($device['type'] == $type)
-  {
-    echo 'selected="1"';
-    $unknown = 0;
-  }
-  echo ' >' . ucfirst($type) . '</option>';
+   include("pages/device/edit/".mres($_GET['opta']).".inc.php");
+} else {
 }
-  if ($unknown)
-  {
-    echo '          <option value="other">Other</option>';
-  }
-echo("
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td><div align='right'>Disable</div></td>
-      <td><input name='disabled' type='checkbox' id='disabled' value='1'");
-if($device['disabled']) { echo("checked=checked"); }
-echo("/></td>
-      <td><div align='right'>Ignore</div></td>
-      <td><input name='ignore' type='checkbox' id='disable' value='1'");
-      if($device['ignore']) { echo("checked=checked"); }
-echo("/></td>
-    </tr>");
-
-echo('
-  </table>
-  <input type="submit" name="Submit" value="Save" />
-  <label><br />
-  </label>
-</form>
-
-</td>
-<td width="50"></td><td></td></tr></table>');
 
 }
 
