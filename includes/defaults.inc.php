@@ -124,6 +124,13 @@ $config['ignore_bsd_os_drives']   = array("/^\/dev,/", "/^\/var\/dhcpd\/dev,/", 
 $config['enable_ports_etherlike']       = 0; # Enable EtherLike-MIB
 $config['enable_ports_junoseatmvp']     = 0; # Enable JunOSe ATM VC Discovery/Poller
 
+## Logging
+
+$config['syslog_filter'] = array("last message repeated", "Connection from UDP: [",
+                                 "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
+                                 "diskio.c: don't know how to handle");  ## Ignore some crappy stuff from SNMP daemon
+
+
 # LDAP Authentication
 
 $config['auth_ldap_version'] = 3; # v2 or v3
