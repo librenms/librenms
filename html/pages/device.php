@@ -65,6 +65,15 @@ if($health) {
 </li>');
 }
 
+if(@mysql_result(mysql_query("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') 
+{
+  echo('<li class="' . $select['apps'] . '">
+  <a href="' . $config['base_url'] . '/device/' . $device['device_id'] . '/apps/">
+    <img src="images/icons/apps.png" align="absmiddle" border="0" /> Apps
+  </a>
+</li>');
+}
+
 ### This needs to die, rolled into generic sensors! (still need to implement booleans, tx/rx powers and currents)
 
 #$cisco_sensors = mysql_result(mysql_query("SELECT count(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entSensorType != '' AND entSensorType NOT LIKE 'No%'"),0);
