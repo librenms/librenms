@@ -61,7 +61,7 @@ if (file_exists('.svn'))
     $db_rev = 0;
   }
 
-  if ($dbu_rev+0 < "1223") {
+  if ($db_rev+0 < "1223") {
     include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
   }
 
