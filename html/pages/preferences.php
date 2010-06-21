@@ -2,6 +2,28 @@
 echo("<div style='margin: 10px'>");
 echo("<h3>User Preferences</h3>");
 
+
+if($_POST['action'] == "changepass") {
+
+  if(authenticate($_SESSION['username'],$_POST['old_pass'])) {
+    if($_POST['new_pass'] == "" || $_POST['new_pass2'] == "")
+    {
+      $changepass_message = "Password must not be blank.";
+    }
+    elseif($_POST['new_pass'] == $_POST['new_pass2']) 
+    {
+      changepassword($_SESSION['username'],$_POST['new_pass']);
+      $changepass_message = "Password Changed.";      
+    } 
+    else 
+    {
+      $changepass_message = "Passwords don't match.";
+    }
+  } else {
+    $changepass_message = "Incorrect password";
+  }
+}
+
 include("includes/update-preferences-password.inc.php");
 
 echo("<div style='width: 800px; background-color: #fff; padding:5px; margin-bottom:10px; float:left;'>");
