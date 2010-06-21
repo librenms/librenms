@@ -15,3 +15,4 @@ ALTER TABLE  `ports` CHANGE  `ifDescr`  `ifDescr` VARCHAR(255) NOT NULL;
 CREATE TABLE IF NOT EXISTS `ucd_diskio` (  `diskio_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `diskio_index` int(11) NOT NULL,  `diskio_descr` varchar(32) NOT NULL,  PRIMARY KEY (`diskio_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=11 ;
 ALTER TABLE `eventlog` CHANGE  `type`  `type` VARCHAR( 64 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE  `bills` ADD  `bill_custid` VARCHAR( 64 ) NOT NULL ,ADD  `bill_ref` VARCHAR( 64 ) NOT NULL ,ADD  `bill_notes` VARCHAR( 256 ) NOT NULL;
+CREATE TABLE IF NOT EXISTS `applications` (  `app_id` int(11) NOT NULL AUTO_INCREMENT,  `device_id` int(11) NOT NULL,  `app_type` varchar(64) NOT NULL,  PRIMARY KEY (`app_id`)) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
