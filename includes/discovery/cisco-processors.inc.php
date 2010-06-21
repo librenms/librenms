@@ -53,12 +53,4 @@ while ($test_cpm = mysql_fetch_array($query)) {
 unset($valid_cpm);
 echo("\n");
 
-
-##### ************FIX ME***************** 
-##### WRITE CODE TO REMOVE OLD PROCESSORS
-##### SOMETIMES CPUS FALL OUT, DONT THEY?
-##### ***********************************
-
-echo("\n");
-
 ?>
