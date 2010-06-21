@@ -15,7 +15,6 @@ include("common.inc.php");
   $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("current-" . $current['current_descr'] . ".rrd");
 
   $rrd_options .= " DEF:current=$rrd_filename:current:AVERAGE";
-  $rrd_options .= " AREA:current#FFFF99";
   $rrd_options .= " LINE1.5:current#cc0000:'" . $current['current_descr_fixed']."'";
   $rrd_options .= " GPRINT:current:LAST:%3.0lfA";
   $rrd_options .= " GPRINT:current:MAX:%3.0lfA\\\\l";

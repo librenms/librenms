@@ -15,7 +15,6 @@ include("common.inc.php");
   $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("fan-" . $fanspeed['fan_descr'] . ".rrd");
 
   $rrd_options .= " DEF:fan=$rrd_filename:fan:AVERAGE";
-  $rrd_options .= " AREA:fan#FFFF99";
   $rrd_options .= " LINE1.5:fan#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($fanspeed['fan_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " GPRINT:fan:LAST:%3.0lfrpm";
   $rrd_options .= " GPRINT:fan:MAX:%3.0lfrpm\\\\l";
