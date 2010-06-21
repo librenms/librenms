@@ -1,9 +1,12 @@
 <?php
 
-#ini_set('display_errors', 1);
-#ini_set('display_startup_errors', 1);
-#ini_set('log_errors', 1);
-#ini_set('error_reporting', E_ALL);
+if($_GET['debug']) {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('allow_url_fopen', 0);
+  ini_set('error_reporting', E_ALL);
+} else { ini_set('display_errors', 0); }
 
 include("../includes/defaults.inc.php");
 include("../config.php");
@@ -146,6 +149,9 @@ while($row = mysql_fetch_array($data))
 
 }
 
+#print_r($ticks);
+#print_r($tot_data);
+
 $graph_name = date('M j g:ia', $start) . " - " . date('M j g:ia', $last);
 
 $n = count($ticks);
@@ -157,14 +163,14 @@ $graph_name = date('M j g:ia', $xmin) . " - " . date('M j g:ia', $xmax);
 
 $graph = new Graph($xsize, $ysize, $graph_name);
 $graph->img->SetImgFormat("png");
-$graph->img->SetAntiAliasing(true);
+#$graph->img->SetAntiAliasing(true);
 $graph->SetScale( "intlin");
 #$graph->SetScale('intlin',0,0,$xmin,$xmax);
 $graph->title->Set("$graph_name"); 
-$graph->title->SetFont(FF_VERDANA,FS_BOLD);
-$graph->xaxis->SetFont(FF_VERDANA,FS_NORMAL);
+$graph->title->SetFont(FF_FONT2,FS_BOLD,10);
+$graph->xaxis->SetFont(FF_FONT1,FS_BOLD);
 
-#$graph->xaxis->SetTickLabels($ticks);
+$graph->xaxis->SetTickLabels($ticks);
 
 if(count($tickPositions) > 24) {
   $graph->xaxis->SetTextLabelInterval(3);
@@ -173,22 +179,22 @@ if(count($tickPositions) > 24) {
 }
 
 $graph->xaxis->SetPos('min');
-$graph->xaxis->SetLabelAngle(15);
+#$graph->xaxis->SetLabelAngle(15);
 $graph->yaxis->HideZeroLabel(1);
-$graph->yaxis->SetFont(FF_VERDANA);
+$graph->yaxis->SetFont(FF_FONT1);
 $graph->yaxis->SetLabelAngle(0);
-$graph->xaxis->title->SetFont(FF_VERDANA,FS_NORMAL,10);
-$graph->yaxis->title->SetFont(FF_VERDANA,FS_NORMAL,10);
+$graph->xaxis->title->SetFont(FF_FONT1,FS_NORMAL,10);
+$graph->yaxis->title->SetFont(FF_FONT1,FS_NORMAL,10);
 $graph->yaxis->SetTitleMargin(50);
 $graph->xaxis->SetTitleMargin(30); 
 #$graph->xaxis->HideLastTickLabel();
-$graph->xaxis->HideFirstTickLabel(); 
+#$graph->xaxis->HideFirstTickLabel(); 
 #$graph->yaxis->scale->SetAutoMin(1);
 #$graph->xaxis->title->Set("$type");
 $graph->yaxis->title->Set("$yaxis");
 
 $graph->xaxis->SetTickPositions($tickPositions,$tickMinPositions,$tickLabels);
-#$graph->xaxis->SetMajTickPositions($tickPositions,$tickLabels);
+$graph->xaxis->SetMajTickPositions($tickPositions,$tickLabels);
 
 $graph->ygrid->SetFill(true,'#EFEFEF@0.5','#FFFFFF@0.5');
 $graph->xgrid->Show(true,true);
@@ -196,7 +202,7 @@ $graph->xgrid->SetColor('#e0e0e0','#efefef');
 $graph->SetMarginColor('white');
 $graph->SetFrame(false);
 $graph->SetMargin(75,30,30,45);
-$graph->legend->SetFont(FF_VERDANA,FS_NORMAL);
+$graph->legend->SetFont(FF_FONT1,FS_NORMAL);
 
 $lineplot = new LinePlot($tot_data);
 #$lineplot->SetLegend("Traffic total");

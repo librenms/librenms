@@ -1,12 +1,75 @@
 
 <?php
 
+if($_POST['addbill'] == "yes") {
+
+  $updated = '1';
+
+  $sql = "INSERT INTO `bills` (`bill_name`,`bill_type`,`bill_cdr`,`bill_day`,`bill_gb`, `bill_custid`, `bill_ref`, `bill_notes`)
+          VALUES ('" . mres($_POST['bill_name']) . "','" . mres($_POST['bill_type']) . "',
+                                  '" . mres($_POST['bill_cdr']) . "','" . mres($_POST['bill_day']) . "',
+                                  '" . mres($_POST['bill_quota']) . "','" . mres($_POST['bill_custid']) . "',
+                                  '" . mres($_POST['bill_ref']) . "','" . mres($_POST['bill_notes']) . "' )";
+
+  $query = mysql_query($sql);
+  $affected = mysql_affected_rows() . "records affected";
+
+  $message .= $message_break . "Bill ".mres($_POST['bill_name'])." added!";
+  $message_break .= "<br />";
+
+}
+
+
+echo("<meta http-equiv='refresh' content='10000'>");
+
 if($_GET['opta'] == "add") {
 
 ?>
 <div style='padding:10px;font-size:20px; font-weight: bold;'>Add Bill</div>
 
-<form method='post' action=''>
+<form name="form1" method="post" action="bills/">
+
+ <input type=hidden name=addbill value=yes>
+
+ <div style="padding: 10px; background: #f0f0f0;">
+  <table cellpadding=2px width=400px>
+  <tr>
+    <td><strong>Description</strong></td>
+    <td><input type="text" name="bill_name" size="32"></td>
+  </tr>
+  <tr>
+    <td><strong>Billing Type</strong></td>
+    <td>
+      <input type="radio" name="bill_type" value="cdr" checked /> CDR 95th: <input type="text" name="bill_cdr" size="10">KBps
+      <br />
+      <input type="radio" name="bill_type" value="quota" /> Quota: <input type="text" name="bill_quota" size="10">GB
+
+  </tr>
+  <tr>
+    <td><strong>Billing Day</strong></td>
+    <td><input type="text" name="bill_day" size="5" value="1"></td>
+  </tr>
+  <tr><td colspan=4><h3>Optional Information</h3></td></tr>
+  <tr>
+    <td><strong>Customer Reference</strong></td>
+    <td><input type="text" name="bill_custid" size="32"></td>
+  </tr>
+  <tr>
+    <td><strong>Billing Reference</strong></td>
+    <td><input type="text" name="bill_ref" size="32"></td>
+  </tr>
+  <tr>
+    <td><strong>Notes</strong></td>
+    <td><input type="textarea" name="bill_notes" size="32"></td>
+  </tr>
+
+
+  <tr>
+    <td></td><td><input type="submit" class="submit" name="Submit" value=" Add Bill "></td>
+  </tr>
+  </table>
+ </div>
+</form>
 
 
 <?php
@@ -96,7 +159,7 @@ print_optionbar_end();
              <td>$used</td>
              <td><img src='percentage.php?width=350&per=$percent'> $percent%</td>
 						 <td></td>
-						 <td width=60><a><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+						 <td width=60><a href='".$config['base_url']."/bills/1/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
     $i++;
