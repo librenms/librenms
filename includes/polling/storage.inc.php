@@ -32,7 +32,7 @@ while($storage = mysql_fetch_array($storage_data)) {
   if(is_file($file)) {
     include($file);
   } else {
-    ### FIXME GENERIC
+    ### Generic poller goes here if we ever have a discovery module which uses it.
   }
 
   if($debug) {print_r($storage);}

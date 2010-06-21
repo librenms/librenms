@@ -56,12 +56,6 @@ function only_alphanumeric( $string )
   return preg_replace('/[^a-zA-Z0-9]/', '', $string);
 }
 
-
-function validate_hostip($host)
-{
-  // FIXME
-}
-
 function write_dev_attrib($device_id, $attrib_type, $attrib_value)
 {
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . $device_id . "' AND `attrib_type` = '$attrib_type'";
