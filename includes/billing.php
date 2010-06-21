@@ -66,10 +66,14 @@ function getDates($dayofmonth) {
 }
 
 
-function getValue($host, $community, $port, $id, $inout) {
+function getValue($host, $community, $snmpver, $port, $id, $inout) {
         global $config;
 	$oid  = "IF-MIB::ifHC" . $inout . "Octets." . $id;
-        $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -v2c -O qv $host:$port $oid");
+        $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -$snmpver -O qv $host:$port $oid");
+        if(!is_numeric($value)) {
+          $oid  = "IF-MIB::if" . $inout . "Octets." . $id;
+          $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -$snmpver -O qv $host:$port $oid");
+        }
         return $value;
 }
 
