@@ -1,9 +1,20 @@
 <?php
 
-  include("../../includes/defaults.inc.php");
-  include("../../config.php");
-  include("../../includes/functions.php");
-  include("../includes/authenticate.inc.php");
+if($_GET['debug']) {
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('allow_url_fopen', 0);
+  ini_set('error_reporting', E_ALL);
+}
+
+  include("../includes/defaults.inc.php");
+  include("../config.php");
+  include("../includes/common.php");
+  include("../includes/rewrites.php");
+  include("includes/authenticate.inc.php");
+
+
   if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
 if(isset($_GET['device_id'])){
