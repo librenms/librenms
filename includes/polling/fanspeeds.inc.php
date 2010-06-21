@@ -9,7 +9,6 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
   $fan_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['fan_oid'] . "|grep -v \"No Such Instance\"";
   $fan = trim(str_replace("\"", "", shell_exec($fan_cmd)));
   if ($fanspeed['fan_precision']) { $fan = $fan / $fanspeed['fan_precision']; }
-  #FIXME also divide the limit here
 
   $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['fan_descr'] . ".rrd");
 
