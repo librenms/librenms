@@ -1,15 +1,17 @@
 For more granular updates check http://twitter.com/observernms or 
 http://www.observernms.org/websvn/listing.php?repname=observer
 
-Release 0.10.0 ( Pre release )
+Release 0.10.6
 
 Changed netstats (icmp, udp, tcp, snmp, ip) stats collection
+Implemented new application monitoring system
 Implemented new includes-based graphing system
-Replaced interfaces polling code
+Improvements to eventlogging code
+Replaced interfaces polling code (2x speed improvement on average!)
 
 Removed, cleaned up or replaced a lot of old and unused code.
 
-Added support for ipv6 BGP sessions on JunOS
+Added support for IPv6 BGP sessions on JunOS
 Added support for Dell Powerconnect and HP Procurve switches
 Added support for Supermicro SuperoDoctor temperature support
 Added support for LLDP discovery
