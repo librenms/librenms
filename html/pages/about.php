@@ -1,11 +1,11 @@
 <div style="margin: 10px;">
-  <h3>ObserverNMS</h3>
+  <h3>ObserverNMS <?php echo($config['version']);?></h3>
 
     <div style="float: right; padding: 5px;">
     <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
     <pre>ObserverNMS Network Management and Monitoring System
-Copyright (C) 2010 Adam Armstrong
+Copyright (C) 2006-2010 Adam Armstrong
  
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -22,19 +22,53 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
      <?php print_optionbar_end(); ?>
      </div>
 
-  <?php echo('<h4>v'. $config['version']);
+    <?php
 
-    #if (file_exists('.svn/entries'))
-    #{
-    #  $svn = File('.svn/entries');
-    #  echo '-SVN r' . trim($svn[3]);
-    #  unset($svn);
-    #}
+    $observer_version = $config['version'];
+    if (file_exists('.svn/entries'))
+    {
+      $svn = File('.svn/entries');
+      $observer_version .='-SVN r' . trim($svn[3]);
+      unset($svn);
+    }
 
-    echo('</h4>');
+
+$apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
+
+$php_version = phpversion();
+
+$t=mysql_query("select version() as ve");
+echo mysql_error();
+$r=mysql_fetch_object($t);
+$mysql_version = $r->ve;
+
+$netsnmp_version = shell_exec($config['snmpget'] . " --version");
+
+
+echo("
+
+<table width=250 cellpadding=5 cellspacing=0 bgcolor=#e5e5e5 border=2 bordercolor=#ffffff>
+<tr><td>ObserverNMS</td><td>$observer_version</td></tr>
+<tr><td>Apache</td><td>$apache_version</td></tr>
+<tr><td>PHP</td><td>$php_version</td></tr>
+<tr><td>MySQL</td><td>$mysql_version</td></tr>
+</table>
+
+");
+
+
+
     ?>
 
-  <i>ObserverNMS is an autodiscovering PHP/MySQL based network monitoring system.</i>
+  <h5>ObserverNMS is an autodiscovering PHP/MySQL based network monitoring system.</h5>
+
+  <p><a href="http://www.observernms.org">Website</a> | 
+     <a href="http://www.observernms.org/wiki/">Support Wiki</a> | 
+     <a href="http://www.observernms.org/forum/">Forum</a> | 
+     <a href="http://www.observernms.org/bugs/">Bugtracker</a> | 
+     <a href="http://www.observernms.org/pmwiki.php/Main/MailingLists">Mailing List</a> | 
+     <a href="http://http://twitter.com/observernms">Twitter</a></p>
+
 
   <h4>The Team</h4>
 
