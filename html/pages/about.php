@@ -136,7 +136,6 @@ $apache_version = str_replace("Apache/", "", $_SERVER['SERVER_SOFTWARE']);
 $php_version = phpversion();
 
 $t=mysql_query("select version() as ve");
-echo mysql_error();
 $r=mysql_fetch_object($t);
 $mysql_version = $r->ve;
 
