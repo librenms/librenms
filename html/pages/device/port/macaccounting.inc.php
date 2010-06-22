@@ -33,7 +33,8 @@
    } else { $sort = "in"; }
 
 
-   echo("<div style=' margin:0px; float: left;';>
+   echo("<div style='margin: 5px 0px 0px 3px'>
+          <div style=' margin:0px; float: left;';>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Day</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
@@ -109,9 +110,8 @@
                      "&stat=$stat&type=mac_acc_total&sort=both&from=$from&to=now&width=150&height=50' />
             </a>
             </div>
-
         </div>
- 
+      </div> 
 ");
    unset($query);
  } else {
