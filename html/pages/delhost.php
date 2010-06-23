@@ -6,9 +6,9 @@ if($_SESSION['userlevel'] < 10) {
 }
 
 if($_POST['id']) {
-  delete_device(mres($_POST['id']));
-} elseif (mres($_GET['id'])) {
-  delete_device(mres($_GET['id']));
+  echo delete_device(mres($_POST['id']));
+} elseif ($_GET['id']) {
+  echo delete_device(mres($_GET['id']));
 }
 
 ?>

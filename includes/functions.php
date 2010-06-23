@@ -311,7 +311,7 @@ function delete_device($id)
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     delete_port($int_id);
-    echo("Removed interface $int_id ($int_if)<br />");
+    $ret = "Removed interface $int_id ($int_if)\n";
   }
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
@@ -333,7 +333,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
-  echo("Removed device $host<br />");
+  return $ret . "Removed device $host\n";
 }
 
 function retireHost($id)
