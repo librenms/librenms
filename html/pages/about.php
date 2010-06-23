@@ -1,7 +1,7 @@
 <div style="margin: 10px;">
   <h3>ObserverNMS <?php echo($config['version']);?></h3>
 
-    <div style="float: right; padding: 5px;">
+    <div style="float: right; padding: 0px; max-width: 50%">
     <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
     <pre>ObserverNMS Network Management and Monitoring System
@@ -44,6 +44,7 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     $stat_volt = mysql_result(mysql_query("SELECT COUNT(*) FROM `voltage`"),0);
     $stat_amp = mysql_result(mysql_query("SELECT COUNT(*) FROM `current`"),0);
     $stat_hz = mysql_result(mysql_query("SELECT COUNT(*) FROM `frequency`"),0);
+    $stat_humid = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE sensor_class='humidity'"),0);
     $stat_toner = mysql_result(mysql_query("SELECT COUNT(*) FROM `toner`"),0);
     $stat_hrdev = mysql_result(mysql_query("SELECT COUNT(*) FROM `hrDevice`"),0);
     $stat_entphys = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical`"),0);
@@ -62,49 +63,54 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 
 <table width=100% cellpadding=5 cellspacing=0>
 <tr>
-    <td width=150><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td>$stat_devices</td>
-    <td width=150><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td>$stat_ports</td>
+    <td width=45%><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
+    <td width=45%><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
 </tr>
 <tr>
-    <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td>$stat_ipv4_addy</td>
-    <td><img src='images/icons/ipv4.png' class='optionicon'> <b>IPv4 Networks</b></td><td>$stat_ipv4_nets</td>
+    <td><img src='images/icons/ipv4.png'  class='optionicon'> <b>IPv4 Addresses<b></td><td align=right>$stat_ipv4_addy</td>
+    <td><img src='images/icons/ipv4.png' class='optionicon'> <b>IPv4 Networks</b></td><td align=right>$stat_ipv4_nets</td>
 </tr>
 <tr>
-    <td><img src='images/icons/ipv6.png'  class='optionicon'> <b>IPv6 Addresses<b></td><td>$stat_ipv6_addy</td>
-    <td><img src='images/icons/ipv6.png' class='optionicon'> <b>IPv6 Networks</b></td><td>$stat_ipv6_nets</td>
+    <td><img src='images/icons/ipv6.png'  class='optionicon'> <b>IPv6 Addresses<b></td><td align=right>$stat_ipv6_addy</td>
+    <td><img src='images/icons/ipv6.png' class='optionicon'> <b>IPv6 Networks</b></td><td align=right>$stat_ipv6_nets</td>
 </tr>
 <tr>
-    <td><img src='images/icons/services.png'  class='optionicon'> <b>Services<b></td><td>$stat_services</td>
-    <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td>$stat_apps</td>
+    <td><img src='images/icons/services.png'  class='optionicon'> <b>Services<b></td><td align=right>$stat_services</td>
+    <td><img src='images/icons/apps.png' class='optionicon'> <b>Applications</b></td><td align=right>$stat_apps</td>
 </tr>
 <tr>
-    <td ><img src='images/icons/processors.png' class='optionicon'> <b>Processors</b></td><td>$stat_processors</td>
-    <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td>$stat_memory</td>
+    <td ><img src='images/icons/processors.png' class='optionicon'> <b>Processors</b></td><td align=right>$stat_processors</td>
+    <td><img src='images/icons/memory.png' class='optionicon'> <b>Memory</b></td><td align=right>$stat_memory</td>
 </tr>
 <tr>
-    <td><img src='images/icons/storage.png' class='optionicon'> <b>Storage</b></td><td>$stat_storage</td>
-    <td><img src='images/icons/diskio.png' class='optionicon'> <b>Disk I/O</b></td><td>$stat_diskio</td>
+    <td><img src='images/icons/storage.png' class='optionicon'> <b>Storage</b></td><td align=right>$stat_storage</td>
+    <td><img src='images/icons/diskio.png' class='optionicon'> <b>Disk I/O</b></td><td align=right>$stat_diskio</td>
 </tr>
 <tr>
-    <td><img src='images/icons/inventory.png' class='optionicon'> <b>HR-MIB</b></td><td>$stat_hrdev</td>
-    <td><img src='images/icons/inventory.png' class='optionicon'> <b>Entity-MIB</b></td><td>$stat_entphys</td>
+    <td><img src='images/icons/inventory.png' class='optionicon'> <b>HR-MIB</b></td><td align=right>$stat_hrdev</td>
+    <td><img src='images/icons/inventory.png' class='optionicon'> <b>Entity-MIB</b></td><td align=right>$stat_entphys</td>
 </tr>
 <tr>
-    <td ><img src='images/icons/syslog.png' class='optionicon'> <b>Syslog Entries</b></td><td>$stat_syslog</td>
-    <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td>$stat_events</td>
+    <td ><img src='images/icons/syslog.png' class='optionicon'> <b>Syslog Entries</b></td><td align=right>$stat_syslog</td>
+    <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td align=right>$stat_events</td>
 </tr>
 <tr>
-    <td ><img src='images/icons/temperatures.png' class='optionicon'> <b>Temperatures</b></td><td>$stat_temp</td>
-    <td><img src='images/icons/fanspeeds.png' class='optionicon'> <b>Fanspeeds</b></td><td>$stat_fanspeeds</td>
+    <td ><img src='images/icons/temperatures.png' class='optionicon'> <b>Temperatures</b></td><td align=right>$stat_temp</td>
+    <td><img src='images/icons/fanspeeds.png' class='optionicon'> <b>Fanspeeds</b></td><td align=right>$stat_fanspeeds</td>
 </tr>
 <tr>
-    <td ><img src='images/icons/voltages.png' class='optionicon'> <b>Voltage</b></td><td>$stat_volt</td>
-    <td><img src='images/icons/current.png' class='optionicon'> <b>Current</b></td><td>$stat_amp</td>
+    <td ><img src='images/icons/voltages.png' class='optionicon'> <b>Voltage</b></td><td align=right>$stat_volt</td>
+    <td><img src='images/icons/current.png' class='optionicon'> <b>Current</b></td><td align=right>$stat_amp</td>
 </tr>
 
 <tr>
-    <td ><img src='images/icons/frequencies.png' class='optionicon'> <b>Frequency</b></td><td>$stat_hz</td>
-    <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td>$stat_toner</td>
+    <td ><img src='images/icons/frequencies.png' class='optionicon'> <b>Frequency</b></td><td align=right>$stat_hz</td>
+    <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner</td>
+</tr>
+
+<tr>
+    <td ><img src='images/icons/humidity.png' class='optionicon'> <b>Humidity</b></td><td align=right>$stat_humid</td>
+    <td><!--<img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner--></td>
 </tr>
 
 
@@ -118,7 +124,7 @@ print_optionbar_end(); ?>
     
      </div>
 
-<div style="float: left; padding: 5px;">
+<div style="float: left; padding: 0px; max-width: 50%">
 
     <?php
 
@@ -145,10 +151,10 @@ print_optionbar_start(NULL);
 
 echo("
 <h3>Versions</h3>
-<table width=100% cellpadding=5 cellspacing=0 border=0>
-<tr><td><b>ObserverNMS</b></td><td>$observer_version</td>
+<table width=100% cellpadding=3 cellspacing=0 border=0>
+<tr valign=top><td width=20%><b>ObserverNMS</b></td><td width=25%>$observer_version</td>
     <td><b>Apache</b></td><td>$apache_version</td></tr>
-<tr><td><b>PHP</b></td><td>$php_version</td>
+<tr valign=top><td><b>PHP</b></td><td>$php_version</td>
     <td><b>MySQL</b></td><td>$mysql_version</td></tr>
 </table>
 
