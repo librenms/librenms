@@ -17,7 +17,7 @@
               {
                 echo("<option value='".$data['os']."'");
                 if ($data['os'] == $_POST['os']) { echo(" selected"); }
-                echo(">".$data['os']."</option>");
+                echo(">".$os_text[$data['os']]."</option>");
               }
             }
           ?>
