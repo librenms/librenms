@@ -60,11 +60,11 @@ if($_POST['device']) {
 }
 
 if($_SESSION['userlevel'] >= '5') {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices AS D 
-          WHERE S.device_id = D.device_id $where ORDER BY timestamp DESC LIMIT 1000";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog 
+          WHERE 1 $where ORDER BY timestamp DESC LIMIT 1000";
 } else {
-  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices AS D, devices_perms AS P
-          WHERE S.device_id = P.device_id AND P.user_id = " . $_SESSION['user_id'] . " AND S.device_id = D.device_id $where ORDER BY timestamp DESC LIMIT 1000";
+  $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog AS S, devices_perms AS P
+          WHERE S.device_id = P.device_id AND P.user_id = " . $_SESSION['user_id'] . " $where ORDER BY timestamp DESC LIMIT 1000";
 }
 
 $query = mysql_query($sql);
