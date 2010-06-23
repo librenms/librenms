@@ -181,6 +181,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
         <li><hr width=140 /></li>
         <li><a href="health/temperatures/"><img src="images/icons/temperatures.png" border="0" align="absmiddle" /> Temperatures</a></li>
+        <li><a href="health/humidity/"><img src="images/icons/humidity.png" border="0" align="absmiddle" /> Humidity</a></li>
         <li><a href="health/fanspeeds/"><img src="images/icons/fanspeeds.png" border="0" align="absmiddle" /> Fans</a></li>
         <li><hr width=140 /></li>
         <li><a href="health/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>

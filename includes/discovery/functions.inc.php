@@ -295,6 +295,43 @@ function discover_freq(&$valid, $device, $oid, $index, $type, $descr, $precision
   return $return;
 }
 
+function discover_humidity(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+{
+  global $config, $debug;
+  
+  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
+  if(!$low_limit)
+  {
+    $low_limit = $config['limit']['current'];
+  }
+  
+  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='humidity' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
+  {
+    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
+    $query .= " VALUES ('humidity', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
+    mysql_query($query);
+    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
+    echo("+");
+  }
+  else
+  {
+    $sensor_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='humidity' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+    if($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $precision == $sensor_entry['sensor_precision'])
+    {
+      echo(".");
+    }
+    else
+    {
+      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'humidity' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
+      echo("U");
+      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
+    }
+  }
+
+  $valid[$type][$index] = 1;
+  return $return;
+}
+
 function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;

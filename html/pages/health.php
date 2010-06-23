@@ -1,6 +1,6 @@
 <?php
 
-$datas = array('Processors','Memory','Storage','Temperatures', 'Fanspeeds', 'Voltages', 'Frequencies', 'Current');
+$datas = array('Processors','Memory','Storage','Temperatures', 'Humidity', 'Fanspeeds', 'Voltages', 'Frequencies', 'Current');
 
 if(!$_GET['opta']) { $_GET['opta'] = "processors"; }
 if(!$_GET['optb']) { $_GET['optb'] = "nographs"; }
@@ -57,6 +57,7 @@ switch ($_GET['opta'])
   case 'memory':
   case 'storage':
   case 'temperatures':
+  case 'humidity':
   case 'voltages':
   case 'fanspeeds':
   case 'frequencies':
