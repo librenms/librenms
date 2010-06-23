@@ -110,6 +110,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/ipv4-addresses.inc.php");
   include("includes/discovery/ipv6-addresses.inc.php");
   include("includes/discovery/temperatures.inc.php");
+  include("includes/discovery/humidity.inc.php");
   include("includes/discovery/voltages.inc.php");
   include("includes/discovery/frequencies.inc.php");
   include("includes/discovery/current.inc.php");
