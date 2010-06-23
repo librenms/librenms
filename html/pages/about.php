@@ -171,7 +171,8 @@ print_optionbar_end();
      <a href="http://www.observernms.org/forum/">Forum</a> | 
      <a href="http://www.observernms.org/bugs/">Bugtracker</a> | 
      <a href="http://www.observernms.org/pmwiki.php/Main/MailingLists">Mailing List</a> | 
-     <a href="http://http://twitter.com/observernms">Twitter</a></p>
+     <a href="http://twitter.com/observernms">Twitter</a> |
+     <a href="http://www.facebook.com/pages/Observer/128354461353">Facebook</a></p>
 
 
   <h4>The Team</h4>
