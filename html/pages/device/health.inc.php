@@ -1,6 +1,7 @@
 <?php
 
 $temperatures = mysql_result(mysql_query("select count(*) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$humidity = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "'"), 0);
 $storage = mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $diskio = mysql_result(mysql_query("select count(*) from ucd_diskio WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $memory = mysql_result(mysql_query("select count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"), 0);
@@ -16,6 +17,7 @@ if ($memory) { $datas[] = 'memory'; }
 if ($storage) { $datas[] = 'storage'; }
 if ($diskio) { $datas[] = 'diskio'; }
 if ($temperatures) { $datas[] = 'temperatures'; }
+if ($humidity) { $datas[] = 'humidity'; }
 if ($fans) { $datas[] = 'fanspeeds'; }
 if ($volts) { $datas[] = 'voltages'; }
 if ($freqs) { $datas[] = 'frequencies'; }
@@ -24,6 +26,7 @@ if ($current) { $datas[] = 'current'; }
 
 $type_text['overview'] = "Overview";
 $type_text['temperatures'] = "Temperatures";
+$type_text['humidity'] = "Humidity";
 $type_text['memory'] = "Memory Pools";
 $type_text['storage'] = "Disk Usage";
 $type_text['diskio'] = "Disk IO";

@@ -166,6 +166,7 @@ while ($device = mysql_fetch_array($device_query)) {
     $sysLocation = str_replace("\"","", $sysLocation); 
   
     include("includes/polling/temperatures.inc.php");
+    include("includes/polling/humidity.inc.php");
     include("includes/polling/fanspeeds.inc.php");
     include("includes/polling/voltages.inc.php");
     include("includes/polling/frequencies.inc.php");

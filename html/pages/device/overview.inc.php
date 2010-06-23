@@ -91,6 +91,7 @@ include("overview/mempools.inc.php");
 #include("overview/hrStorage.inc.php");
 include("overview/storage.inc.php");
 include("overview/temperatures.inc.php");
+include("overview/humidity.inc.php");
 include("overview/fanspeeds.inc.php");
 include("overview/voltages.inc.php");
 include("overview/frequencies.inc.php");

@@ -1,4 +1,4 @@
-f<?php
+<?php
 $id = $device['device_id'];
 $hostname = $device['hostname'];
 $community = $device['community'];
@@ -31,7 +31,7 @@ switch ($device['os'])
           $humidity_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.3.$humidity_id";
           $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.7.$humidity_id";
           $limit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.8.$humidity_id";
-          # .9 = low warn limit
+          $warnlowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.9.$humidity_id";
           $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.10.$humidity_id";
           
           $descr = trim(snmp_get($device, $descr_oid, "-Oqv", ""),'"');
@@ -39,9 +39,9 @@ switch ($device['os'])
           $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
           $limit = snmp_get($device, $limit_oid, "-Oqv", "");
           $lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "");
+          $warnlowlimit = snmp_get($device, $warnlowlimit_oid, "-Oqv", "");
         
-          # FIXME no warnlimit in table/discover function yet...
-#          discover_humidity($valid_humidity, $device, $humidity_oid, $humidity_id, "akcp", $descr, 1, $lowlimit, $limit, $humidity);
+          discover_humidity($valid_humidity, $device, $humidity_oid, $humidity_id, "akcp", $descr, 1, $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
         }
       }
     }
@@ -50,18 +50,18 @@ switch ($device['os'])
 
 if($debug) { print_r($valid_humidity); }
 
-$sql = "SELECT * FROM humidity AS T, devices AS D WHERE T.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='humidity' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
   while ($test_humidity = mysql_fetch_array($query)) 
   {
-    $humidity_index = $test_humidity['humidity_index'];
-    $humidity_type = $test_humidity['humidity_type'];
+    $humidity_index = $test_humidity['sensor_index'];
+    $humidity_type = $test_humidity['sensor_type'];
     if($debug) { echo($humidity_index . " -> " . $humidity_type . "\n"); }
     if(!$valid_humidity[$humidity_type][$humidity_index]) 
     {
       echo("-");
-      mysql_query("DELETE FROM `humidity` WHERE humidity_id = '" . $test_humidity['humidity_id'] . "'");
+      mysql_query("DELETE FROM `sensors` WHERE sensor_class='humidity' AND sensor_id = '" . $test_humidity['sensor_id'] . "'");
     }
     unset($humidity_oid); unset($humidity_type);
   }
