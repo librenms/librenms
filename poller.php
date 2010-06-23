@@ -60,7 +60,7 @@ while ($device = mysql_fetch_array($device_query)) {
       include("includes/polling/".$options['t'].".inc.php");
     } else {
       include("includes/polling/ports.inc.php");
-      include("includes/polling/ports-etherlike.inc.php");
+      include("includes/polling/port-etherlike.inc.php");
       include("includes/polling/cisco-mac-accounting.inc.php");
     }
   } else { echo(" Unreachable"); } // End Reachability Check
