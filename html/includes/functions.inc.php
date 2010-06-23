@@ -172,7 +172,7 @@ function generate_port_thumbnail($args)
 function print_optionbar_start ($height = 20, $width = 0) 
 {
   echo("
-    <div style='text-align: center; margin-top: 0px; margin-bottom: 0px; " . ($width ? 'max-width: ' . $width . 'px; ' : '') . "'>
+    <div style='text-align: center; margin-top: 0px; margin-bottom: 0px; " . ($width ? 'max-width: ' . $width . (strstr($width,'%') ? '' : 'px') . '; ' : '') . "'>
     <b class='rounded'>
     <b class='rounded1'><b></b></b>
     <b class='rounded2'><b></b></b>
@@ -180,7 +180,7 @@ function print_optionbar_start ($height = 20, $width = 0)
     <b class='rounded4'></b>
     <b class='rounded5'></b></b>
     <div class='roundedfg' style='padding: 0px 5px;'>
-    <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; height:" . $height . "px;'>");
+    <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; " . ($height ? 'height:' . $height . 'px;' : '') . "'>");
 }
 
 
