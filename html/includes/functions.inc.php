@@ -9,6 +9,44 @@ function generateiflink($interface, $text=0, $type = NULL)
    return generate_if_link($interface, $text);
 }
 
+function generatedevicelink($device, $text=0, $start=0, $end=0) 
+{
+  global $twoday; global $day; global $now; global $config; global $popgraph; global $popdescr;
+  if (!$start) { $start = $day; }
+  if (!$end) { $end = $now; }
+  $class = devclass($device);
+  if (!$text) { $text = $device['hostname']; }
+  
+  if (isset($popgraph[$device['os']]))
+  {
+    $graphs = $popgraph[$device['os']];
+    $descr = $popdescr[$device['os']];
+  }
+  else
+  {
+    $graphs = $popgraph['default'];
+    $descr = $popdescr['default'];
+  }
+
+  $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
+  $contents = "<div class=list-large>".$device['hostname'] . " - $descr</div>";
+  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
+  foreach ($graphs as $graph)
+  {
+    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=$graph" . '"><br />';
+  }
+  $text = htmlentities($text);
+  $link = overlib_link($url, $text, $contents, $class);
+  if(devicepermitted($device['device_id'])) {
+    return $link;
+  } else {
+    return $device['hostname'];
+  }
+
+
+  return $link;
+}
+
 function overlib_link($url, $text, $contents, $class) {
   global $config;
   $contents = str_replace("\"", "\'", $contents);

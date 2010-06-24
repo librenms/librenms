@@ -97,11 +97,42 @@ if(!$config['graph_colours']['mixed']) {
 
 $device_types = array('server','network','firewall','workstation','printer','power', 'environment');
 
+## Popup graphs
+
+# Default
+$popgraph['default'][] = 'device_cpu';
+$popgraph['default'][] = 'device_memory';
+$popdescr['default'] = "CPU &amp; Memory Usage";
+
+$popgraph['apc'][] = 'device_current';
+$popdescr['apc'] = "Current";
+
+$popgraph['mgeups'][] = 'device_current';
+$popdescr['mgeups'] = "Current";
+
+$popgraph['dell-laser'][] = 'device_toner';
+$popdescr['dell-laser'] = "Toner";
+
+#$popgraph['areca'][] = 'device_';
+#$popdescr['areca'] = "";
+
+$popgraph['netmanplus'][] = 'device_current';
+$popdescr['netmanplus'] = "Current";
+
+$popgraph['akcp'][] = 'device_temperatures';
+$popdescr['akcp'] = "Temperature";
+
+$popgraph['minkelsrms'] = $popgraph['akcp'];
+$popdescr['minkelsrms'] = $popdescr['akcp'];
+
+$popgraph['papouch-tme'][] = 'device_temperatures';
+$popdescr['papouch-tme'] = "Temperature";
+
 ##############################
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.10.6";
+$config['version'] = "0.10";
 
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 
