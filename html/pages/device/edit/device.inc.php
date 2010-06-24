@@ -15,8 +15,6 @@ if($updated && $update_message) {
   print_error($update_message);
 }
 
-$device_types = array('server','network','firewall','workstation','printer','power');
-
 echo("<table cellpadding=0 cellspacing=0><tr><td>
 
 <h5>

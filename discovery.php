@@ -161,6 +161,11 @@ while ($device = mysql_fetch_array($device_query))
       case "netmanplus":
         $device['type'] = 'power'; 
         break;
+      case "akcp":
+      case "minkelsrms":
+      case "papouch-tme":
+        $device['type'] = 'environment';
+        break;
     }
   }
 

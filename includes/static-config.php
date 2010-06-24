@@ -95,6 +95,7 @@ if(!$config['graph_colours']['mixed']) {
   $config['graph_colours']['mixed']  = array("CC0000", "008C00", "4096EE", "73880A", "D01F3C", "36393D", "FF0084");
 }
 
+$device_types = array('server','network','firewall','workstation','printer','power', 'environment');
 
 ##############################
 # No changes below this line #
