@@ -58,6 +58,7 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 }
 ?>
         <li><a href="devices/power/"><img src="images/icons/power.png" border="0" align="absmiddle" /> Power</a></li>
+        <li><a href="devices/environment/"><img src="images/icons/environment.png" border="0" align="absmiddle" /> Environment</a></li>
         <li><hr width="140" /></li>
         <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo $device_alerts ?>)</a></li>
 <?php

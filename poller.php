@@ -259,7 +259,7 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
-shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log");
+shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log"); # FIXME EWW
 
 
 ?>
