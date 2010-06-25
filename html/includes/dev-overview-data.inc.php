@@ -26,7 +26,7 @@
 
   if ($device['os'] == "ios") { formatCiscoHardware($device); }
   if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
-  $device['os_text'] = $os_text[$device['os']];
+  $device['os_text'] = $config['os'][$device['os']]['text'];
 
   echo($dev_img . '
       <table width="100%">');

@@ -20,61 +20,69 @@ $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 ## Don't bulkwalk for these OS types
 $config['nobulkwalk'] = array("netmanplus");
 
-## Set OS Groups
-$os_groups['linux']     = "unix";
-$os_groups['freebsd']   = "unix";
-$os_groups['openbsd']   = "unix";
-$os_groups['netbsd']    = "unix";
-$os_groups['dragonfly'] = "unix";
-$os_groups['monowall']  = "unix";
-$os_groups['solaris']   = "unix";
-$os_groups['adva']	= "unix";
-$os_groups['opensolaris'] = "unix";
+$config['os']['linux']['group'] = "unix";
+$config['os']['linux']['text']  = "Linux";
+$config['os']['freebsd']['group'] = "unix";
+$config['os']['freebsd']['text']  = "FreeBSD";
+$config['os']['openbsd']['group'] = "unix";
+$config['os']['openbsd']['text']  = "OpenBSD";
+$config['os']['netbsd']['group'] = "unix";
+$config['os']['netbsd']['text']  = "NetBSD";
+$config['os']['dragonfly']['group'] = "unix";
+$config['os']['dragonfly']['text']  = "DragonflyBSD";
+$config['os']['monowall']['group'] = "unix";
+$config['os']['monowall']['text']  = "m0n0wall";
+$config['os']['solaris']['group'] = "unix";
+$config['os']['solaris']['text']  = "Sun Solaris";
+$config['os']['opensolaris']['group'] = "unix";
+$config['os']['opensolaris']['text']  = "Adva";
+$config['os']['opensolaris']['group'] = "unix";
+$config['os']['opensolaris']['text']  = "Sun OpenSolaris";
 
-$os_groups['iosxe']     = "ios";
-$os_groups['iosxr']     = "ios";
-$os_groups['ios']	= "ios";
-$os_groups['asa']       = "ios";
+$config['os']['ios']['group'] = "ios";
+$config['os']['ios']['text']  = "Cisco IOS";
+$config['os']['iosxe']['group'] = "ios";
+$config['os']['iosxe']['text']  = "Cisco IOS-XE";
+$config['os']['iosxr']['group'] = "ios";
+$config['os']['iosxr']['text']  = "Cisco IOS-XR";
+$config['os']['asa']['group'] = "ios";
+$config['os']['asa']['text']  = "Cisco ASA";
+$config['os']['pix']['group'] = "ios";
+$config['os']['pix']['text']  = "Cisco PIXOS";
+$config['os']['nxos']['group'] = "ios";
+$config['os']['nxos']['text']  = "Cisco NX-OS";
+$config['os']['catos']['group'] = "ios";
+$config['os']['catos']['text']  = "Cisco CatOS";
 
-$os_groups['mgeups']      = "ups";
-$os_groups['netmanplus']  = "ups";
+$config['os']['junos']['text'] = "Juniper JunOS";
+$config['os']['junose']['text']  = "Juniper JunOSe";
 
-$os_groups['dell-laser']  = "printer";
+$config['os']['mgeups']['group'] = "ios";
+$config['os']['mgeups']['text']  = "Cisco IOS";
+$config['os']['netmanplus']['group'] = "ios";
+$config['os']['netmanplus']['text']  = "";
+$config['os']['generic']['text']        = "Generic Device";
+$config['os']['ironware']['text']       = "Brocade IronWare";
+$config['os']['powerconnect']['text']   = "Dell PowerConnect";
+$config['os']['windows']['text']        = "Microsoft Windows";
+$config['os']['procurve']['text']       = "HP ProCurve";
+$config['os']['speedtouch']['text']     = "Thomson Speedtouch";
+$config['os']['allied']['text']         = "AlliedWare";
 
-##
-$os_text['linux']	 = "Linux";
-$os_text['ios']       	 = "Cisco IOS";
-$os_text['iosxr']        = "Cisco IOS XE";
-$os_text['iosxe']        = "Cisco IOS XR";
-$os_text['catos']        = "Cisco CatOS";
-$os_text['nxos']         = "Cisco NX-OS";
-$os_text['asa']          = "Cisco ASA";
-$os_text['pix']          = "Cisco PIX";
-$os_text['generic']	 = "Generic Device";
-$os_text['ironware']	 = "Brocade IronWare";
-$os_text['monowall']	 = "m0n0wall";
-$os_text['freebsd']      = "FreeBSD";
-$os_text['openbsd']      = "OpenBSD";
-$os_text['netbsd']       = "NetBSD";
-$os_text['dragonflybsd'] = "DragonFlyBSD";
-$os_text['solaris']	 = "Sun Solaris";
-$os_text['opensolaris']  = "OpenSolaris";
-$os_text['powerconnect'] = "Dell PowerConnect";
-$os_text['windows']      = "Microsoft Windows";
-$os_text['junos']        = "Juniper JunOS";
-$os_text['junose']	 = "Juniper JunOSe";
-$os_text['procurve']     = "HP ProCurve";
-$os_text['speedtouch']   = "Thomson Speedtouch";
-$os_text['dell-laser']   = "Dell Laser Printer";
-$os_text['adva']	 = "Adva";
-$os_text['allied']	 = "AlliedWare";
-$os_text['mgeups']	 = "MGE UPS";
-$os_text['apc']		 = "APC Management Module";
-$os_text['areca']	 = "Areca RAID Subsystem";
-$os_text['netmanplus']	 = "NetMan Plus";
-$os_text['akcp']	 = "AKCP SensorProbe";
-$os_text['minkelsrms']	 = "Minkels RMS";
-$os_text['papouch-tme']	 = "Papouch TME";
+$config['os']['mgeups']['text']         = "MGE UPS";
+$config['os']['mgeups']['group']        = "ups";
+
+$config['os']['apc']['text']            = "APC Management Module";
+$config['os']['areca']['text']          = "Areca RAID Subsystem";
+$config['os']['netmanplus']['text']     = "NetMan Plus";
+$config['os']['netmanplus']['group']	= "ups";
+$config['os']['akcp']['text']           = "AKCP SensorProbe";
+$config['os']['minkelsrms']['text']     = "Minkels RMS";
+$config['os']['papouch-tme']['text']    = "Papouch TME";
+
+$config['os']['dell-laser']['group'] = "printer";
+$config['os']['dell-laser']['text']  = "Dell Laser";
+
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
