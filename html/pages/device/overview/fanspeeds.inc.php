@@ -6,7 +6,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/fanspeeds.png'> Fanspeeds</p>");
   $i = '1';
-  $fans = mysql_query("SELECT * FROM fanspeed WHERE device_id = '" . $device['device_id'] . "'");
+  $fans = mysql_query("SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
   echo("<tr><td width=50%>");
   echo("<table width=100% cellspacing=0 cellpadding=2>");
