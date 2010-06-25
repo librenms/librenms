@@ -59,7 +59,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      }
    }
 
-   if($config[ifname][$device[os]]) { $ifDescr = $ifName; }
+   if($config['os'][$device[os]]['ifname']) { $ifDescr = $ifName; }
 
    $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd"); 
 

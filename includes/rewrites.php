@@ -15,16 +15,16 @@ function ifLabel ($interface, $device = NULL) {
   if(!$device) { $device = device_array($interface['device_id']); }
   $os = strtolower($device['os']);
 
-  if(isset($config['ifname'][$os])) {
+  if (isset($config['os'][$os]['ifname'])) {
     $interface['label'] = $interface['ifName'];
-  } elseif(isset($config['ifAlias'][$os])) {
+  } elseif (isset($config['os'][$os]['ifalias'])) {
     $interface['label'] = $interface['ifAlias'];
   } else {
     $interface['label'] = $interface['ifDescr'];
-    if(isset($config['appendifindex'][$os])) { $interface['label'] = $interface['label'] . " " . $interface['ifIndex']; }
+    if (isset($config['os'][$os]['ifindex'])) { $interface['label'] = $interface['label'] . " " . $interface['ifIndex']; }
   }
 
-  if($device['os'] == "speedtouch") {
+  if ($device['os'] == "speedtouch") {
     list($interface['label']) = explode("thomson", $interface['label']);
   }
 
