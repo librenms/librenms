@@ -11,21 +11,26 @@ function generateiflink($interface, $text=0, $type = NULL)
 
 function generatedevicelink($device, $text=0, $start=0, $end=0) 
 {
-  global $twoday; global $day; global $now; global $config; global $popgraph; global $popdescr;
+  global $twoday; global $day; global $now; global $config;
   if (!$start) { $start = $day; }
   if (!$end) { $end = $now; }
   $class = devclass($device);
   if (!$text) { $text = $device['hostname']; }
   
-  if (isset($popgraph[$device['os']]))
+  if (isset($config['os'][$device['os']]['overgraph']))
   {
-    $graphs = $popgraph[$device['os']];
-    $descr = $popdescr[$device['os']];
+    $graphs = $config['os'][$device['os']]['overgraph'];
+    $descr = $config['os'][$device['os']]['overtext'];
   }
+  elseif (isset($config['os'][$device['os_group']]['overgraph']))
+  {
+    $graphs = $config['os'][$device['os_group']]['overgraph'];
+    $descr = $config['os'][$device['os_group']]['overtext'];
+  } 
   else
   {
-    $graphs = $popgraph['default'];
-    $descr = $popdescr['default'];
+    $graphs = $config['os']['default']['overgraph']; 
+    $descr = $config['os']['default']['overtext'];
   }
 
   $url  = $config['base_url']."/device/" . $device['device_id'] . "/";

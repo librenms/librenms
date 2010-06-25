@@ -1,15 +1,5 @@
 <?php
 
-## ifDescr whitelist (used instead of ifName)
-$config['ifname']['asa'] = true;
-$config['ifname']['catos'] = true;
-$config['ifname']['windows'] = true;
-$config['ifname']['speedtouch'] = true;
-$config['ifname']['dell-laser'] = true;
-$config['ifname']['powerconnect'] = true;
-$config['ifalias']['adva'] = true;
-#$config['appendifindex']['adva'] = true;
-
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
 $config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
@@ -17,72 +7,124 @@ $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
-## Don't bulkwalk for these OS types
-$config['nobulkwalk'] = array("netmanplus");
+$config['os']['default']['overgraph'][]	= "device_cpu";
+$config['os']['default']['overgraph'][] = "device_memory";
+$config['os']['default']['overtext']	= "CPU &amp; Memory Usage";
 
-$config['os']['linux']['group'] = "unix";
-$config['os']['linux']['text']  = "Linux";
-$config['os']['freebsd']['group'] = "unix";
-$config['os']['freebsd']['text']  = "FreeBSD";
-$config['os']['openbsd']['group'] = "unix";
-$config['os']['openbsd']['text']  = "OpenBSD";
-$config['os']['netbsd']['group'] = "unix";
-$config['os']['netbsd']['text']  = "NetBSD";
-$config['os']['dragonfly']['group'] = "unix";
-$config['os']['dragonfly']['text']  = "DragonflyBSD";
-$config['os']['monowall']['group'] = "unix";
-$config['os']['monowall']['text']  = "m0n0wall";
-$config['os']['solaris']['group'] = "unix";
-$config['os']['solaris']['text']  = "Sun Solaris";
-$config['os']['opensolaris']['group'] = "unix";
-$config['os']['opensolaris']['text']  = "Adva";
-$config['os']['opensolaris']['group'] = "unix";
-$config['os']['opensolaris']['text']  = "Sun OpenSolaris";
+$config['os']['linux']['group'] 	= "unix";
+$config['os']['linux']['text']  	= "Linux";
 
-$config['os']['ios']['group'] = "ios";
-$config['os']['ios']['text']  = "Cisco IOS";
-$config['os']['iosxe']['group'] = "ios";
-$config['os']['iosxe']['text']  = "Cisco IOS-XE";
-$config['os']['iosxr']['group'] = "ios";
-$config['os']['iosxr']['text']  = "Cisco IOS-XR";
-$config['os']['asa']['group'] = "ios";
-$config['os']['asa']['text']  = "Cisco ASA";
-$config['os']['pix']['group'] = "ios";
-$config['os']['pix']['text']  = "Cisco PIXOS";
-$config['os']['nxos']['group'] = "ios";
-$config['os']['nxos']['text']  = "Cisco NX-OS";
-$config['os']['catos']['group'] = "ios";
-$config['os']['catos']['text']  = "Cisco CatOS";
+$config['os']['freebsd']['group'] 	= "unix";
+$config['os']['freebsd']['text']  	= "FreeBSD";
 
-$config['os']['junos']['text'] = "Juniper JunOS";
-$config['os']['junose']['text']  = "Juniper JunOSe";
+$config['os']['openbsd']['group'] 	= "unix";
+$config['os']['openbsd']['text']  	= "OpenBSD";
 
-$config['os']['mgeups']['group'] = "ios";
-$config['os']['mgeups']['text']  = "Cisco IOS";
-$config['os']['netmanplus']['group'] = "ios";
-$config['os']['netmanplus']['text']  = "";
+$config['os']['netbsd']['group'] 	= "unix";
+$config['os']['netbsd']['text']  	= "NetBSD";
+
+$config['os']['dragonfly']['group'] 	= "unix";
+$config['os']['dragonfly']['text']  	= "DragonflyBSD";
+
+$config['os']['monowall']['group'] 	= "unix";
+$config['os']['monowall']['text']  	= "m0n0wall";
+
+$config['os']['solaris']['group'] 	= "unix";
+$config['os']['solaris']['text']  	= "Sun Solaris";
+
+$config['os']['adva']['group'] 		= "unix";
+$config['os']['adva']['text']  		= "Adva";
+$config['os']['adva']['ifalias']	= 1;
+
+$config['os']['opensolaris']['group']	= "unix";
+$config['os']['opensolaris']['text']	= "Sun OpenSolaris";
+
+$config['os']['ios']['group']		= "ios";
+$config['os']['ios']['text']		= "Cisco IOS";
+
+$config['os']['iosxe']['group']		= "ios";
+$config['os']['iosxe']['text']		= "Cisco IOS-XE";
+
+$config['os']['iosxr']['group']		= "ios";
+$config['os']['iosxr']['text']		= "Cisco IOS-XR";
+
+$config['os']['asa']['group']		= "ios";
+$config['os']['asa']['text']		= "Cisco ASA";
+$config['os']['asa']['ifname']		= 1;
+
+$config['os']['pix']['group'] 		= "ios";
+$config['os']['pix']['text']		= "Cisco PIX-OS";
+$config['os']['pix']['ifname']		= 1;
+
+$config['os']['nxos']['group'] 		= "ios";
+$config['os']['nxos']['text']  		= "Cisco NX-OS";
+
+$config['os']['catos']['group']		= "ios";
+$config['os']['catos']['text']		= "Cisco CatOS";
+$config['os']['catos']['ifname']	= 1;
+
+$config['os']['junos']['text']		= "Juniper JunOS";
+$config['os']['junose']['text']		= "Juniper JunOSe";
+
+$config['os']['mgeups']['group']	= "ups";
+$config['os']['mgeups']['text']		= "MGE UPSS";
+
+$config['os']['netmanplus']['group']	= "ups";
+$config['os']['netmanplus']['text'] 	= "NetMan Plus";
+
 $config['os']['generic']['text']        = "Generic Device";
+
 $config['os']['ironware']['text']       = "Brocade IronWare";
+
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
+$config['os']['powerconnect']['ifname'] = 1;
+
 $config['os']['windows']['text']        = "Microsoft Windows";
+$config['os']['windows']['ifname']	= 1;
+
 $config['os']['procurve']['text']       = "HP ProCurve";
+
 $config['os']['speedtouch']['text']     = "Thomson Speedtouch";
+$config['os']['speedtouch']['ifname']	= 1;
+
 $config['os']['allied']['text']         = "AlliedWare";
 
 $config['os']['mgeups']['text']         = "MGE UPS";
 $config['os']['mgeups']['group']        = "ups";
+$config['os']['mgeups']['overgraph'][]	= "device_current";
+$config['os']['mgeups']['overtext']	= "Current"
 
 $config['os']['apc']['text']            = "APC Management Module";
+$config['os']['apc']['overgraph'][]	= "device_current";
+$config['os']['apc']['overtext']	= "Current"
+
 $config['os']['areca']['text']          = "Areca RAID Subsystem";
+$config['os']['areca']['overgraph'][]	= ""
+$config['os']['areca']['overtext']	= ""
+
 $config['os']['netmanplus']['text']     = "NetMan Plus";
 $config['os']['netmanplus']['group']	= "ups";
+$config['os']['netmanplus']['nobulk']	= 1;
+$config['os']['netmanplus']['overgraph'][] = "device_current";
+$config['os']['netmanplus']['overtext'] = "Current";
+
 $config['os']['akcp']['text']           = "AKCP SensorProbe";
+$config['os']['akcp']['overgraph'][]	= "device_temperature";
+$config['os']['akcp']['overtext']	= "Temperature"
+
 $config['os']['minkelsrms']['text']     = "Minkels RMS";
+$config['os']['minkelsrms']['overgraph'][] = "device_temperature";
+$config['os']['minkelsrms']['overtext']	= "Temperature";
+
 $config['os']['papouch-tme']['text']    = "Papouch TME";
+$config['os']['papouch-tme']['overgraph'] = "device_temperature";
+$config['os']['papouch-tme']['overtext'] = "Temperature";
 
-$config['os']['dell-laser']['group'] = "printer";
-$config['os']['dell-laser']['text']  = "Dell Laser";
-
+$config['os']['dell-laser']['group'] 	= "printer";
+$config['os']['dell-laser']['text']  	= "Dell Laser";
+$config['os']['dell-laser']['overgraph'][] = "device_toner";
+$config['os']['dell-laser']['overtext'] = "Toner"
+$config['os']['dell-laser']['ifname']	= 1;
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
@@ -104,37 +146,6 @@ if(!$config['graph_colours']['mixed']) {
 }
 
 $device_types = array('server','network','firewall','workstation','printer','power', 'environment');
-
-## Popup graphs
-
-# Default
-$popgraph['default'][] = 'device_cpu';
-$popgraph['default'][] = 'device_memory';
-$popdescr['default'] = "CPU &amp; Memory Usage";
-
-$popgraph['apc'][] = 'device_current';
-$popdescr['apc'] = "Current";
-
-$popgraph['mgeups'][] = 'device_current';
-$popdescr['mgeups'] = "Current";
-
-$popgraph['dell-laser'][] = 'device_toner';
-$popdescr['dell-laser'] = "Toner";
-
-#$popgraph['areca'][] = 'device_';
-#$popdescr['areca'] = "";
-
-$popgraph['netmanplus'][] = 'device_current';
-$popdescr['netmanplus'] = "Current";
-
-$popgraph['akcp'][] = 'device_temperatures';
-$popdescr['akcp'] = "Temperature";
-
-$popgraph['minkelsrms'] = $popgraph['akcp'];
-$popdescr['minkelsrms'] = $popdescr['akcp'];
-
-$popgraph['papouch-tme'][] = 'device_temperatures';
-$popdescr['papouch-tme'] = "Temperature";
 
 ##############################
 # No changes below this line #

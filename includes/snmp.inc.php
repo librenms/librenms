@@ -19,7 +19,7 @@ function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
 {
   global $debug; global $config; global $runtime_stats;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -43,7 +43,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_cache_cip($oid, $device, $array, $mib = 0) 
 {
   global $config;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -80,7 +80,7 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0)
 
 function snmp_cache_ifIndex($device) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -173,7 +173,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -199,7 +199,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   global $config, $debug;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -226,7 +226,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -255,7 +255,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || in_array($device['os'],$config['nobulkwalk']))
+  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
