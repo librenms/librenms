@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `temperature` WHERE device_id = '" . $_GET[id] . "' ORDER BY temp_descr";
+$sql = "SELECT * FROM `sensors` WHERE sensor_class='temperature' AND device_id = '" . $_GET['id'] . "' ORDER BY sensor_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");
@@ -12,10 +12,10 @@ while($temp = mysql_fetch_array($query)) {
   if(!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
-          <td width=350>" . $temp['temp_descr'] . "</td>
-          <td>" . print_temperature($temp['temp_current'], $temp['temp_limit']) . " &deg;C</td>
-          <td>" . $temp['temp_limit'] . " &deg;C</td>
-          <td>" . $temp['temp_notes'] . "</td>
+          <td width=350>" . $temp['sensor_descr'] . "</td>
+          <td>" . print_temperature($temp['sensor_current'], $temp['sensor_limit']) . " &deg;C</td>
+          <td>" . $temp['sensor_limit'] . " &deg;C</td>
+          <td>" . $temp['sensor_notes'] . "</td>
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
@@ -23,17 +23,17 @@ while($temp = mysql_fetch_array($query)) {
 
 // start temperature graphs
 
-  $daily_temp   = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$day&to=$now&width=400&height=150";
+  $daily_temp   = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$day&to=$now&width=400&height=150";
 
-  $weekly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$week&to=$now&width=400&height=150";
+  $weekly_temp  = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$week&to=$now&width=400&height=150";
 
-  $monthly_temp = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$month&to=$now&width=400&height=150";
+  $monthly_temp = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$month&to=$now&width=400&height=150";
 
-  $yearly_temp  = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $temp['temp_id'] . "&type=$graph_type&from=$year&to=$now&width=400&height=150";
+  $yearly_temp  = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $temp['sensor_id'] . "&type=$graph_type&from=$year&to=$now&width=400&height=150";
 
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_temp' border=0></a> ");
@@ -56,4 +56,3 @@ echo("</table>");
 
 
 ?>
-

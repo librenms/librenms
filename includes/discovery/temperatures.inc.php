@@ -310,18 +310,18 @@ if (strstr($device['hardware'], "dell"))
 
 if($debug) { print_r($valid_temp); }
 
-$sql = "SELECT * FROM temperature AS T, devices AS D WHERE T.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+$sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='temperature' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
   while ($test_temperature = mysql_fetch_array($query)) 
   {
-    $temperature_index = $test_temperature['temp_index'];
-    $temperature_type = $test_temperature['temp_type'];
+    $temperature_index = $test_temperature['sensor_index'];
+    $temperature_type = $test_temperature['sensor_type'];
     if($debug) { echo($temperature_index . " -> " . $temperature_type . "\n"); }
     if(!$valid_temp[$temperature_type][$temperature_index]) 
     {
       echo("-");
-      mysql_query("DELETE FROM `temperature` WHERE temp_id = '" . $test_temperature['temp_id'] . "'");
+      mysql_query("DELETE FROM `sensors` WHERE sensor_class='temperature' AND sensor_id = '" . $test_temperature['sensor_id'] . "'");
     }
     unset($temperature_oid); unset($temperature_type);
   }
