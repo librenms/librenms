@@ -35,6 +35,10 @@ $config['page_gen']         = 1;
 
 $config['web_header']	    = "header.inc.php";  # in html/includes
 
+### SNMP settings
+$config['snmp']['timeout'] = 300; # timeout in ms
+$config['snmp']['retries'] = 6; # how many times to retry the query
+
 ### Alerting Settings
 
 #$config['alert']['email']]'default']      = NULL;    ## Default alert recipient

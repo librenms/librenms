@@ -1,5 +1,11 @@
 <?php
 
+#-r RETRIES            set the number of retries
+#-t TIMEOUT            set the request timeout (in seconds)
+
+#$config['snmp']['timeout'] = 300; # timeout in ms
+#$config['snmp']['retries'] = 6; # how many times to retry the query
+    
 function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
 {
   global $debug; global $config; global $runtime_stats;
@@ -7,6 +13,7 @@ function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   if($options) { $cmd .= " " . $options; }
   if($mib) { $cmd .= " -m " . $mib; }
   if($mibdir) { $cmd .= " -M " . $mibdir; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
@@ -19,7 +26,7 @@ function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
 {
   global $debug; global $config; global $runtime_stats;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -31,6 +38,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   if($options) { $cmd .= " $options "; }
   if($mib) { $cmd .= " -m $mib"; }
   if($mibdir) { $cmd .= " -M " . $mibdir; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
@@ -43,7 +51,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 function snmp_cache_cip($oid, $device, $array, $mib = 0) 
 {
   global $config;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -51,9 +59,10 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0)
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $snmpcommand . " -O snQ -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
@@ -80,7 +89,7 @@ function snmp_cache_cip($oid, $device, $array, $mib = 0)
 
 function snmp_cache_ifIndex($device) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -88,8 +97,9 @@ function snmp_cache_ifIndex($device) {
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  $cmd .= "-m IF-MIB ifIndex";
+  $cmd  = $snmpcommand . " -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $cmd .= " -m IF-MIB ifIndex";
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -173,7 +183,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
 
 function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -181,9 +191,10 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -199,7 +210,7 @@ function snmpwalk_cache_twopart_oid($oid, $device, $array, $mib = 0) {
 
 function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   global $config, $debug;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -207,9 +218,10 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -226,7 +238,7 @@ function snmpwalk_cache_threepart_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -234,9 +246,10 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $snmpcommand . " -O QUs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -255,7 +268,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
 
 function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   global $config;
-  if ($device['snmpver'] == 'v1'  || $config['os'][$device['os']]['nobulk'])
+  if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
   }
@@ -263,9 +276,10 @@ function snmp_cache_oid($oid, $device, $array, $mib = 0) {
   {
     $snmpcommand = $config['snmpbulkwalk'];
   }
-  $cmd  = $snmpcommand . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $oid;
+  $cmd  = $snmpcommand . " -O UQs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oid;
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
@@ -288,9 +302,10 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   foreach($oids as $oid){
     $string .= " $oid.$port";
   }
-  $cmd = $config['snmpget'] . " -O vq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-  if($mib) { $cmd .= "-m $mib "; }
-  $cmd .= $string;
+  $cmd = $config['snmpget'] . " -O vq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($mib) { $cmd .= " -m $mib"; }
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$string;
   $data = trim(shell_exec($cmd));
   $x=0;
   $values = explode("\n", $data);
@@ -306,7 +321,9 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
 
 function snmp_cache_portIfIndex ($device, $array) {
   global $config;
-  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex";
+  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " portIfIndex";
   $output = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $output) as $entry){
@@ -322,7 +339,9 @@ function snmp_cache_portIfIndex ($device, $array) {
 
 function snmp_cache_portName ($device, $array) {
   global $config;
-  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName";
+  $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " portName";
   $output = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: portName\n");
