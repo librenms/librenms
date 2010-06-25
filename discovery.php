@@ -132,40 +132,14 @@ while ($device = mysql_fetch_array($device_query))
 
   if ($device['type'] == "unknown")
   {
-    switch ($device['os'])
+    if ($config['os'][$device['os']]['type'])
     {
-      case "procurve":
-      case "powerconnect":
-      case "ironware":
-      case "allied":
-      case "junos": # Could also be a Netscreen?
-      case "ios":
-      case "iosxe":
-      case "catos":
-      case "3com":
-        $device['type'] = 'network'; 
-        break;
-      case "asa":
-      case "pix":
-      case "screenos":
-        $device['type'] = 'firewall'; 
-        break;
-      case "dell-laser":
-        $device['type'] = 'printer'; 
-        break;
-      case "linux":
-        if (preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
-        break;
-      case "apc":
-      case "mgeups":
-      case "netmanplus":
-        $device['type'] = 'power'; 
-        break;
-      case "akcp":
-      case "minkelsrms":
-      case "papouch-tme":
-        $device['type'] = 'environment';
-        break;
+      $device['type'] = $config['os'][$device['os']]['type'];
+    }
+    
+    if ($device['os'] == "linux")
+    {
+      if (preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
     }
   }
 

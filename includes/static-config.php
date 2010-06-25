@@ -28,6 +28,7 @@ $config['os']['dragonfly']['text']  	= "DragonflyBSD";
 
 $config['os']['monowall']['group'] 	= "unix";
 $config['os']['monowall']['text']  	= "m0n0wall";
+$config['os']['monowall']['type']  	= "firewall";
 
 $config['os']['solaris']['group'] 	= "unix";
 $config['os']['solaris']['text']  	= "Sun Solaris";
@@ -41,90 +42,114 @@ $config['os']['opensolaris']['text']	= "Sun OpenSolaris";
 
 $config['os']['ios']['group']		= "ios";
 $config['os']['ios']['text']		= "Cisco IOS";
+$config['os']['ios']['type']		= "network";
 
 $config['os']['iosxe']['group']		= "ios";
 $config['os']['iosxe']['text']		= "Cisco IOS-XE";
+$config['os']['iosxe']['type']		= "network";
 
 $config['os']['iosxr']['group']		= "ios";
 $config['os']['iosxr']['text']		= "Cisco IOS-XR";
+$config['os']['iosxr']['type']		= "network";
 
 $config['os']['asa']['group']		= "ios";
 $config['os']['asa']['text']		= "Cisco ASA";
 $config['os']['asa']['ifname']		= 1;
+$config['os']['asa']['type']		= "firewall";
 
 $config['os']['pix']['group'] 		= "ios";
 $config['os']['pix']['text']		= "Cisco PIX-OS";
 $config['os']['pix']['ifname']		= 1;
+$config['os']['pix']['type']		= "firewall";
 
 $config['os']['nxos']['group'] 		= "ios";
 $config['os']['nxos']['text']  		= "Cisco NX-OS";
+$config['os']['nxos']['type']  		= "network";
 
 $config['os']['catos']['group']		= "ios";
 $config['os']['catos']['text']		= "Cisco CatOS";
 $config['os']['catos']['ifname']	= 1;
+$config['os']['catos']['type']		= "network";
 
 $config['os']['junos']['text']		= "Juniper JunOS";
+$config['os']['junos']['type']		= "network";
+
+$config['os']['screenos']['text']	= "Juniper ScreenOS";
+$config['os']['screenos']['type']	= "firewall";
+
 $config['os']['junose']['text']		= "Juniper JunOSe";
-
-$config['os']['mgeups']['group']	= "ups";
-$config['os']['mgeups']['text']		= "MGE UPSS";
-
-$config['os']['netmanplus']['group']	= "ups";
-$config['os']['netmanplus']['text'] 	= "NetMan Plus";
+$config['os']['junose']['type']		= "network";
 
 $config['os']['generic']['text']        = "Generic Device";
 
 $config['os']['ironware']['text']       = "Brocade IronWare";
+$config['os']['ironware']['type']       = "network";
 
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
+$config['os']['powerconnect']['type']   = "network";
 
 $config['os']['windows']['text']        = "Microsoft Windows";
 $config['os']['windows']['ifname']	= 1;
 
 $config['os']['procurve']['text']       = "HP ProCurve";
+$config['os']['procurve']['type']       = "network";
 
 $config['os']['speedtouch']['text']     = "Thomson Speedtouch";
 $config['os']['speedtouch']['ifname']	= 1;
+$config['os']['speedtouch']['type']     = "network";
 
 $config['os']['allied']['text']         = "AlliedWare";
+$config['os']['allied']['type']         = "network";
 
 $config['os']['mgeups']['text']         = "MGE UPS";
 $config['os']['mgeups']['group']        = "ups";
 $config['os']['mgeups']['overgraph'][]	= "device_current";
 $config['os']['mgeups']['overtext']	= "Current";
+$config['os']['mgeups']['type']		= "power";
 
 $config['os']['apc']['text']            = "APC Management Module";
 $config['os']['apc']['overgraph'][]	= "device_current";
 $config['os']['apc']['overtext']	= "Current";
+$config['os']['apc']['type']		= "power";
 
 $config['os']['areca']['text']          = "Areca RAID Subsystem";
 $config['os']['areca']['overgraph'][]	= "";
 $config['os']['areca']['overtext']	= "";
 
-$config['os']['netmanplus']['text']     = "NetMan Plus";
-$config['os']['netmanplus']['group']	= "ups";
-$config['os']['netmanplus']['nobulk']	= 1;
+$config['os']['netmanplus']['text']        = "NetMan Plus";
+$config['os']['netmanplus']['group']	   = "ups";
+$config['os']['netmanplus']['nobulk']	   = 1;
 $config['os']['netmanplus']['overgraph'][] = "device_current";
-$config['os']['netmanplus']['overtext'] = "Current";
+$config['os']['netmanplus']['overtext']    = "Current";
+$config['os']['netmanplus']['type']	   = "power";
 
-$config['os']['akcp']['text']           = "AKCP SensorProbe";
-$config['os']['akcp']['overgraph'][]	= "device_temperature";
-$config['os']['akcp']['overtext']	= "Temperature";
+$config['os']['akcp']['text']              = "AKCP SensorProbe";
+$config['os']['akcp']['overgraph'][]	   = "device_temperature";
+$config['os']['akcp']['overtext']          = "Temperature";
+$config['os']['akcp']['type']              = "environment";
 
-$config['os']['minkelsrms']['text']     = "Minkels RMS";
+$config['os']['minkelsrms']['text']        = "Minkels RMS";
 $config['os']['minkelsrms']['overgraph'][] = "device_temperature";
-$config['os']['minkelsrms']['overtext']	= "Temperature";
+$config['os']['minkelsrms']['overtext']    = "Temperature";
+$config['os']['minkelsrms']['type']        = "environment";
 
-$config['os']['papouch-tme']['text']    = "Papouch TME";
-$config['os']['papouch-tme']['overgraph'] = "device_temperature";
-$config['os']['papouch-tme']['overtext'] = "Temperature";
+$config['os']['papouch-tme']['text']       = "Papouch TME";
+$config['os']['papouch-tme']['overgraph'][] = "device_temperature";
+$config['os']['papouch-tme']['overtext']   = "Temperature";
+$config['os']['papouch-tme']['type']       = "environment";
 
-$config['os']['dell-laser']['group'] 	= "printer";
-$config['os']['dell-laser']['text']  	= "Dell Laser";
+$config['os']['dell-laser']['group'] 	   = "printer";
+$config['os']['dell-laser']['text']  	   = "Dell Laser";
 $config['os']['dell-laser']['overgraph'][] = "device_toner";
-$config['os']['dell-laser']['overtext'] = "Toner";
-$config['os']['dell-laser']['ifname']	= 1;
+$config['os']['dell-laser']['overtext']    = "Toner";
+$config['os']['dell-laser']['ifname']	   = 1;
+$config['os']['dell-laser']['type']        = "printer";
+
+$config['os']['3com']['text']             = "3Com";
+$config['os']['3com']['overgraph'][]      = "";
+$config['os']['3com']['overtext']         = "";
+$config['os']['3com']['type']             = "network";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
