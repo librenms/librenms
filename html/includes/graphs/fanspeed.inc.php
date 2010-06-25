@@ -6,7 +6,7 @@ include("common.inc.php");
 
   $rrd_options .= " COMMENT:'                         Last     Max\\n'";
 
-  $fanspeed = mysql_fetch_array(mysql_query("SELECT * FROM sensors WHERE sensor_class='fanspeed' AND fan_id = '".mres($_GET['id'])."'"));
+  $fanspeed = mysql_fetch_array(mysql_query("SELECT * FROM sensors WHERE sensor_class='fanspeed' AND sensor_id = '".mres($_GET['id'])."'"));
 
   $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $fanspeed['device_id'] . "'"),0);
 
