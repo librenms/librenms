@@ -1,6 +1,6 @@
 <?php
 
-$temperatures = mysql_result(mysql_query("select count(*) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$temperatures = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "'"), 0);
 $humidity = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "'"), 0);
 $storage = mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $diskio = mysql_result(mysql_query("select count(*) from ucd_diskio WHERE device_id = '" . $device['device_id'] . "'"), 0);

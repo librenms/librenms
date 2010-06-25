@@ -6,7 +6,7 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM temperature where device_id = '$id' ORDER BY temp_index");
+$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '$id' ORDER BY sensor_index");
 $rrd_options .= " COMMENT:'                           Cur   Min   Max\\n'";
 while($temperature = mysql_fetch_array($sql)) 
 {
@@ -37,13 +37,13 @@ while($temperature = mysql_fetch_array($sql))
       break;
   }
   
-  $temperature['temp_descr_fixed'] = substr(str_pad($temperature['temp_descr'], 22),0,22);
-  $temprrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("temp-" . $temperature['temp_descr'] . ".rrd");
-  $rrd_options .= " DEF:temp" . $temperature[temp_id] . "=$temprrd:temp:AVERAGE ";
-  $rrd_options .= " LINE1:temp" . $temperature[temp_id] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['temp_descr_fixed']))) . "' ";
-  $rrd_options .= " GPRINT:temp" . $temperature[temp_id] . ":LAST:%3.0lfC ";
-  $rrd_options .= " GPRINT:temp" . $temperature[temp_id] . ":MIN:%3.0lfC ";
-  $rrd_options .= " GPRINT:temp" . $temperature[temp_id] . ":MAX:%3.0lfC\\\l ";
+  $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], 22),0,22);
+  $temprrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("temp-" . $temperature['sensor_descr'] . ".rrd");
+  $rrd_options .= " DEF:temp" . $temperature['sensor_id'] . "=$temprrd:temp:AVERAGE ";
+  $rrd_options .= " LINE1:temp" . $temperature['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['sensor_descr_fixed']))) . "' ";
+  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":LAST:%3.0lfC ";
+  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":MIN:%3.0lfC ";
+  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":MAX:%3.0lfC\\\l ";
   $iter++;
 }
 

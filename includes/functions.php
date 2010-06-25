@@ -290,7 +290,6 @@ function delete_device($id)
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `bgpPeers` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");  
   mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
@@ -305,6 +304,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `toner` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
+  mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   return $ret . "Removed device $host\n";
 }
