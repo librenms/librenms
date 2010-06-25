@@ -1,16 +1,16 @@
 <?php
 
-$query = "SELECT * FROM fanspeed WHERE device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'";
 $fan_data = mysql_query($query);
 while($fanspeed = mysql_fetch_array($fan_data)) {
 
-  echo("Checking fan " . $fanspeed['fan_descr'] . "... ");
+  echo("Checking fan " . $fanspeed['sensor_descr'] . "... ");
 
-  $fan_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['fan_oid'] . "|grep -v \"No Such Instance\"";
+  $fan_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['sensor_oid'] . "|grep -v \"No Such Instance\"";
   $fan = trim(str_replace("\"", "", shell_exec($fan_cmd)));
-  if ($fanspeed['fan_precision']) { $fan = $fan / $fanspeed['fan_precision']; }
+  if ($fanspeed['sensor_precision']) { $fan = $fan / $fanspeed['sensor_precision']; }
 
-  $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['fan_descr'] . ".rrd");
+  $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");
 
   if (!is_file($fanrrd)) {
      `rrdtool create $fanrrd \
@@ -26,16 +26,16 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
 
   rrdtool_update($fanrrd,"N:$fan");
 
-  if($fanspeed['fan_current'] > $fanspeed['fan_limit'] && $fan <= $fanspeed['fan_limit']) {
+  if($fanspeed['sensor_current'] > $fanspeed['sensor_limit'] && $fan <= $fanspeed['sensor_limit']) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['fan_limit'];
+    $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['sensor_limit'];
     $msg .= "rpm) at " . date($config['timestamp_format']);
-    mail($email, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['fan_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $fanspeed['fan_descr'] . "\n");
-    log_event('Fan speed ' . $fanspeed['fan_descr'] . " under threshold: " . $fanspeed['fan_current'] . " rpm (&gt; " . $fanspeed['fan_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['fan_id']);
+    mail($email, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'], $msg, $config['email_headers']);
+    echo("Alerting for " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . "\n");
+    log_event('Fan speed ' . $fanspeed['sensor_descr'] . " under threshold: " . $fanspeed['sensor_current'] . " rpm (&gt; " . $fanspeed['sensor_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['sensor_id']);
   }
 
-  mysql_query("UPDATE fanspeed SET fan_current = '$fan' WHERE fan_id = '" . $fanspeed['fan_id'] . "'");
+  mysql_query("UPDATE sensors SET sensor_current = '$fan' WHERE sensor_class='fanspeed' AND sensor_id = '" . $fanspeed['sensor_id'] . "'");
 }
 
 ?>

@@ -160,7 +160,7 @@ function discover_temperature(&$valid, $device, $oid, $index, $type, $descr, $pr
     }
     else
     {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE  sensor_class` = 'temperature' AND`sensor_id` = '".$entry['sensor_id']."'");
+      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'temperature' AND`sensor_id` = '".$entry['sensor_id']."'");
       echo("U");
     }
   }
@@ -179,23 +179,23 @@ function discover_fan(&$valid, $device, $oid, $index, $type, $descr, $precision 
     $low_limit = $config['limit']['fan'];
   }
 
-  if (mysql_result(mysql_query("SELECT count(fan_id) FROM `fanspeed` WHERE device_id = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$index'"),0) == '0')
+  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='fanspeed' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
-    $query = "INSERT INTO fanspeed (`device_id`, `fan_oid`, `fan_index`, `fan_type`, `fan_descr`, `fan_precision`, `fan_limit`, `fan_current`) ";
-    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$low_limit', '$current')";
+    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_current`) ";
+    $query .= " VALUES ('fanspeed','".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$low_limit', '$current')";
     mysql_query($query);
     echo("+");
   }
   else
   {
-    $fan_entry = mysql_fetch_array(mysql_query("SELECT * FROM `fanspeed` WHERE device_id = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$index'"));
-    if($oid == $fan_entry['fan_oid'] && $descr == $fan_entry['fan_descr'] && $precision == $fan_entry['fan_precision'])
+    $fan_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='fanspeed' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+    if($oid == $fan_entry['sensor_oid'] && $descr == $fan_entry['sensor_descr'] && $precision == $fan_entry['sensor_precision'])
     {
       echo(".");
     }
     else
     {
-      mysql_query("UPDATE fanspeed SET `fan_descr` = '$descr', `fan_oid` = '$oid', `fan_precision` = '$precision' WHERE `device_id` = '".$device['device_id']."' AND fan_type = '$type' AND `fan_index` = '$index' ");
+      mysql_query("UPDATE fanspeed SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'fanspeed' AND `device_id` = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
     }
   }
