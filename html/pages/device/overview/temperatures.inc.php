@@ -32,7 +32,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $temp_link_a = $temp_link . $temp['sensor_descr'] . "</a>";
 
     $temp['sensor_descr'] = truncate($temp['sensor_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$temp_link_a</strong></td><td width=80 align=right class=tablehead>$temp_link_b<td width=35 align=right class=tablehead>$temp_link_c</td></tr>");
+    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$temp_link_a</strong></td><td width=80 align=right class=tablehead>$temp_link_b<td width=80 align=right class=tablehead>$temp_link_c</td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
