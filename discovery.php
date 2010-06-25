@@ -97,7 +97,7 @@ while ($device = mysql_fetch_array($device_query))
     mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
     $device['os'] = strtolower($device['os']); echo("OS lowercased.");
   }
-  if($os_groups[$device['os']]) {$device['os_group'] = $os_groups[$device['os']]; echo "(".$device['os_group'].")";}
+  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo "(".$device['os_group'].")";}
 
   echo("\n");
 

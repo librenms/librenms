@@ -8,7 +8,7 @@ while ($device = mysql_fetch_array($device_query))
 
   echo('<div style="clear: both;">');
 
-  if ($os_groups[$device['os']]) { $os_group = $os_groups[$device['os']]; }
+  if ($config['os'][$device['os']]['group']) { $os_group = $config['os'][$device['os']]['group']; }
 
   if (is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$device['os'].".inc.php")) {
     /// OS Specific
