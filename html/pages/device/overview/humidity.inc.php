@@ -32,7 +32,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $humidity_link_a = $humidity_link . $humidity['sensor_descr'] . "</a>";
 
     $humidity['sensor_descr'] = truncate($humidity['sensor_descr'], 25, '');
-    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$humidity_link_a</strong></td><td width=80 align=right class=tablehead>$humidity_link_b<td width=35 align=right class=tablehead>$humidity_link_c</td></tr>");
+    echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$humidity_link_a</strong></td><td width=80 align=right class=tablehead>$humidity_link_b<td width=80 align=right class=tablehead>$humidity_link_c</td></tr>");
     if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
