@@ -92,15 +92,15 @@ $config['os']['allied']['text']         = "AlliedWare";
 $config['os']['mgeups']['text']         = "MGE UPS";
 $config['os']['mgeups']['group']        = "ups";
 $config['os']['mgeups']['overgraph'][]	= "device_current";
-$config['os']['mgeups']['overtext']	= "Current"
+$config['os']['mgeups']['overtext']	= "Current";
 
 $config['os']['apc']['text']            = "APC Management Module";
 $config['os']['apc']['overgraph'][]	= "device_current";
-$config['os']['apc']['overtext']	= "Current"
+$config['os']['apc']['overtext']	= "Current";
 
 $config['os']['areca']['text']          = "Areca RAID Subsystem";
-$config['os']['areca']['overgraph'][]	= ""
-$config['os']['areca']['overtext']	= ""
+$config['os']['areca']['overgraph'][]	= "";
+$config['os']['areca']['overtext']	= "";
 
 $config['os']['netmanplus']['text']     = "NetMan Plus";
 $config['os']['netmanplus']['group']	= "ups";
@@ -110,7 +110,7 @@ $config['os']['netmanplus']['overtext'] = "Current";
 
 $config['os']['akcp']['text']           = "AKCP SensorProbe";
 $config['os']['akcp']['overgraph'][]	= "device_temperature";
-$config['os']['akcp']['overtext']	= "Temperature"
+$config['os']['akcp']['overtext']	= "Temperature";
 
 $config['os']['minkelsrms']['text']     = "Minkels RMS";
 $config['os']['minkelsrms']['overgraph'][] = "device_temperature";
@@ -123,7 +123,7 @@ $config['os']['papouch-tme']['overtext'] = "Temperature";
 $config['os']['dell-laser']['group'] 	= "printer";
 $config['os']['dell-laser']['text']  	= "Dell Laser";
 $config['os']['dell-laser']['overgraph'][] = "device_toner";
-$config['os']['dell-laser']['overtext'] = "Toner"
+$config['os']['dell-laser']['overtext'] = "Toner";
 $config['os']['dell-laser']['ifname']	= 1;
 
 if(!$config['graph_colours']['greens']) {
