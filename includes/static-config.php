@@ -77,6 +77,9 @@ $config['os']['junos']['type']		= "network";
 $config['os']['screenos']['text']	= "Juniper ScreenOS";
 $config['os']['screenos']['type']	= "firewall";
 
+$config['os']['routeros']['text']	= "Mikrotik RouterOS";
+$config['os']['routeros']['type']	= "network";
+
 $config['os']['junose']['text']		= "Juniper JunOSe";
 $config['os']['junose']['type']		= "network";
 
