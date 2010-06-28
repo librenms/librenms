@@ -1,4 +1,7 @@
 <?php
+
+if($config['discover_services']){
+
   $id = $device['device_id'];
   $hostname = $device['hostname'];
   $community = $device['community'];
@@ -27,5 +30,7 @@
   } ## End Services
 
 echo("\n");
+
+}
 
 ?>
