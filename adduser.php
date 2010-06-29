@@ -5,8 +5,6 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
-print_r($config);
-
 if (file_exists('html/includes/authentication/' . $config['auth_mechanism'] . '.inc.php'))
 {
   include('html/includes/authentication/' . $config['auth_mechanism'] . '.inc.php');
