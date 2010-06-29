@@ -1,7 +1,7 @@
 <div style="margin: 10px;">
   <h3>ObserverNMS <?php echo($config['version']);?></h3>
 
-    <div style="float: right; padding: 0px; max-width: 50%">
+    <div style="float: right; padding: 0px; width: 49%">
     <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
     <pre>ObserverNMS Network Management and Monitoring System
@@ -61,7 +61,7 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 
     echo("
 
-<table width=100% cellpadding=5 cellspacing=0>
+<table width=95% cellpadding=5 cellspacing=0>
 <tr>
     <td width=45%><img src='images/icons/device.png' class='optionicon'> <b>Devices</b></td><td align=right>$stat_devices</td>
     <td width=45%><img src='images/icons/port.png' class='optionicon'> <b>Ports</b></td><td align=right>$stat_ports</td>
@@ -124,7 +124,7 @@ print_optionbar_end(); ?>
     
      </div>
 
-<div style="float: left; padding: 0px; max-width: 50%">
+<div style="float: left; padding: 0px; width: 49%">
 
     <?php
 
@@ -152,12 +152,11 @@ print_optionbar_start(NULL);
 echo("
 <h3>Versions</h3>
 <table width=100% cellpadding=3 cellspacing=0 border=0>
-<tr valign=top><td width=20%><b>ObserverNMS</b></td><td width=25%>$observer_version</td>
-    <td><b>Apache</b></td><td>$apache_version</td></tr>
-<tr valign=top><td><b>PHP</b></td><td>$php_version</td>
-    <td><b>MySQL</b></td><td>$mysql_version</td></tr>
+<tr valign=top><td width=150><b>ObserverNMS</b></td><td>$observer_version</td></tr>
+<tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
+<tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
+<tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
 </table>
-
 ");
 
 print_optionbar_end();
@@ -193,4 +192,3 @@ print_optionbar_end();
 
 
 </div>
-
