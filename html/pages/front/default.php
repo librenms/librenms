@@ -42,7 +42,11 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id
 } else {
 $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND  I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
 }
+
+### These things need to become more generic, and more manageable across different frontpages... rewrite inc :>
+
 while($interface = mysql_fetch_array($sql)){
+ if(!$interface['deleted']){
   $interface = ifNameDescr($interface);
   generate_front_box("warn", "<center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
@@ -51,6 +55,7 @@ while($interface = mysql_fetch_array($sql)){
       " . ($interface['ifAlias'] ? '<span class="body-date-1">'.truncate($interface['ifAlias'], 20, '').'</span>' : '') . "
       </center>");
 
+  }
 }
 
 /* FIXME service permissions? seem nonexisting now.. */
