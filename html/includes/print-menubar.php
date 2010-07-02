@@ -103,7 +103,34 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ## Display Locations entry if $config['show_locations']
-if ($config['show_locations']) { echo('<li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a></li>'); }
+if ($config['show_locations']) 
+{ 
+  $locations = mysql_query("SELECT DISTINCT location FROM devices ORDER BY location");
+?>
+<li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
+<?php
+  if ($config['show_locations_dropdown'])
+  {
+?>
+        <table><tr><td>
+        <ul>
+<?php
+    while ($row = mysql_fetch_array($locations))
+    {
+      if ($row['location'] != '')
+      {
+        echo '        <li><a href="?page=devices&location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>';
+      }
+    }
+?>
+        </ul>
+        </td></tr></table>
+<?php
+  }
+?>
+</li>
+<?php
+}
 ?>
 
 
