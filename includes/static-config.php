@@ -150,6 +150,13 @@ $config['os']['dell-laser']['overtext']    = "Toner";
 $config['os']['dell-laser']['ifname']	   = 1;
 $config['os']['dell-laser']['type']        = "printer";
 
+$config['os']['jetdirect']['group'] 	   = "printer";
+$config['os']['jetdirect']['text']  	   = "HP Printer";
+$config['os']['jetdirect']['overgraph'][]  = "device_toner";
+$config['os']['jetdirect']['overtext']     = "Toner";
+$config['os']['jetdirect']['ifname']	   = 1;
+$config['os']['jetdirect']['type']         = "printer";
+
 $config['os']['3com']['text']             = "3Com";
 $config['os']['3com']['overgraph'][]      = "";
 $config['os']['3com']['overtext']         = "";

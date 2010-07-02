@@ -131,7 +131,7 @@ while ($device = mysql_fetch_array($device_query))
   include("includes/discovery/ucd-diskio.inc.php");
   include("includes/discovery/services.inc.php");
 
-  if ($device['type'] == "unknown")
+  if ($device['type'] == "unknown" || $device['type'] == "")
   {
     if ($config['os'][$device['os']]['type'])
     {

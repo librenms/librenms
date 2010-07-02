@@ -13,11 +13,11 @@ $valid_toner = array();
 
 echo("Toner : ");
 
-if ($device['os'] == "dell-laser") 
+if ($device['os'] == "dell-laser" || $device['os'] == "jetdirect") 
 {
   $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
-  if ($oids) echo("Dell ");
+  if ($oids) echo("Jetdirect ");
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -35,7 +35,7 @@ if ($device['os'] == "dell-laser")
         $current       = snmp_get($device, $toner_oid, "-Oqv");
         $capacity      = snmp_get($device, $capacity_oid, "-Oqv");
         $current       = $current / $capacity * 100;
-        $type          = "dell-laser";
+        $type          = "jetdirect";
         echo discover_toner($valid_toner,$device, $toner_oid, $index, $type, $descr, $capacity, $current);
       }
     }
