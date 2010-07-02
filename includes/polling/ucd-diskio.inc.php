@@ -57,6 +57,8 @@ if(mysql_affected_rows()) {
 
   }
 
+  echo("\n");
+
 }
 
 unset($diskio_data);

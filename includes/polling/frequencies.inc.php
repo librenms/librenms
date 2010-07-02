@@ -6,8 +6,11 @@ while($frequency = mysql_fetch_array($freq_data)) {
 
   echo("Checking frequency " . $frequency['freq_descr'] . "... ");
 
-  $freq_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $frequency['freq_oid'] . "|grep -v \"No Such Instance\"";
-  $freq = trim(str_replace("\"", "", shell_exec($freq_cmd)));
+  #$freq_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $frequency['freq_oid'] . "|grep -v \"No Such Instance\"";
+  #$freq = trim(str_replace("\"", "", shell_exec($freq_cmd)));
+
+  $freq = snmp_get($device, $frequency['freq_oid'], "SNMPv2-MIB");
+
 
   if ($frequency['freq_precision']) 
   {

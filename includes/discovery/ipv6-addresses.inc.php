@@ -2,7 +2,7 @@
 
 echo("IPv6 Addresses : ");
 
-  $cmd = $config['snmpwalk']." -m IP-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];
+  $cmd = $config['snmpwalk']. " -M " . $config['mibdir'] ." -m IP-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];
   $cmd .= " ipAddressIfIndex.ipv6 -Osq | grep -v No";
   $oids = trim(trim(shell_exec($cmd)));
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
@@ -22,8 +22,8 @@ echo("IPv6 Addresses : ");
       $do++;
       if($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
     }
-    $ipv6_prefixlen = trim(shell_exec($config['snmpget']." -m IP-MIB -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.5.2.16.$oid | sed 's/.*\.//'"));
-    $ipv6_origin    = trim(shell_exec($config['snmpget']." -m IP-MIB -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.6.2.16.$oid"));
+    $ipv6_prefixlen = trim(shell_exec($config['snmpget']. " -M " . $config['mibdir'] ." -m IP-MIB -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.5.2.16.$oid | sed 's/.*\.//'"));
+    $ipv6_origin    = trim(shell_exec($config['snmpget']. " -M " . $config['mibdir'] ." -m IP-MIB -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.4.34.1.6.2.16.$oid"));
 
     discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
    } # if $data
@@ -31,7 +31,7 @@ echo("IPv6 Addresses : ");
 
 if (!$oids)
 {
-  $cmd = $config['snmpwalk']." -m IPV6-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];
+  $cmd = $config['snmpwalk']. " -M " . $config['mibdir'] ." -m IPV6-MIB -".$device['snmpver']." -Ln -c ".$device['community']." ".$device['hostname'].":".$device['port'];
   $cmd .= " ipv6AddrPfxLength -Osq -OnU| grep -v No";
   $oids = trim(trim(shell_exec($cmd)));
   $oids = str_replace(".1.3.6.1.2.1.55.1.8.1.2.", "", $oids);  $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
@@ -42,7 +42,7 @@ if (!$oids)
     list($ifIndex,$ipv6addr) = split("\\.",$if_ipv6addr,2);
     $ipv6_address = snmp2ipv6($ipv6addr);
 
-    $ipv6_origin    = trim(shell_exec($config['snmpget']." -m IPV6-MIB -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." IPV6-MIB::ipv6AddrType.$if_ipv6addr"));
+    $ipv6_origin    = trim(shell_exec($config['snmpget']. " -M " . $config['mibdir'] ." -m IPV6-MIB -Ovq -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." IPV6-MIB::ipv6AddrType.$if_ipv6addr"));
     
     discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_origin);
    } # if $data

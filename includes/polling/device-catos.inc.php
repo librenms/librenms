@@ -25,7 +25,7 @@
 
 
 
-   list ($cpu5m, $cpu5s) = explode("\n", shell_exec($config['snmpget'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0"));
+   list ($cpu5m, $cpu5s) = explode("\n", shell_exec($config['snmpget'] . " -M ".$config['mibdir'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port 1.3.6.1.4.1.9.2.1.58.0 1.3.6.1.4.1.9.2.1.56.0"));
    $cpu5m = $cpu5m + 0;
    $cpu5s = $cpu5s + 0;
 

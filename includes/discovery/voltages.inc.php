@@ -161,7 +161,8 @@ if ($device['os'] == "netmanplus")
       $volt_id = $split_oid[count($split_oid)-1];
       $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
       $precision = 10;
-      $volt  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
+      $volt = snmp_get($device, $volt_oid, "-O vq") / $precision;
+      #$volt = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "netmanplus";
       $index = 500+$volt_id;

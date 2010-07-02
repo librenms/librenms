@@ -2,13 +2,13 @@
   
   echo("IP Addresses : ");
 
-  $oids = shell_exec($config['snmpwalk'] . " -m IP-MIB -".$device['snmpver']." -Osq -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAdEntIfIndex");
+  $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m IP-MIB -".$device['snmpver']." -Osq -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAdEntIfIndex");
   $oids = trim($oids);
   $oids = str_replace("ipAdEntIfIndex.", "", $oids);
   foreach(explode("\n", $oids) as $data) {
     $data = trim($data);
     list($oid,$ifIndex) = explode(" ", $data);
-    $mask = shell_exec($config['snmpget']." -m IP-MIB -O qv -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAdEntNetMask.$oid");
+    $mask = shell_exec($config['snmpget']. " -M " . $config['mibdir'] ." -m IP-MIB -O qv -".$device['snmpver']." -c ".$device['community']." ".$device['hostname'].":".$device['port']." ipAdEntNetMask.$oid");
     $mask = trim($mask);
     $network = trim(shell_exec ($config['ipcalc'] . " $oid/$mask | grep Network | cut -d\" \" -f 4"));
     list($net,$cidr) = explode("/", $network);

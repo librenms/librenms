@@ -4,7 +4,7 @@
 
   echo("BGP Sessions : ");
 
-  $as_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+  $as_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m BGP4-MIB -CI -Oqvn -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $as_cmd .= ".1.3.6.1.2.1.15.2";
   $bgpLocalAs = trim(shell_exec($as_cmd));
   
@@ -17,7 +17,7 @@
       mysql_query("UPDATE devices SET bgpLocalAs = '$bgpLocalAs' WHERE device_id = '".$device['device_id']."'"); echo("Updated AS ");
     }
 
-    $peers_cmd  = $config['snmpwalk'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+    $peers_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m BGP4-MIB -CI -Oq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $peers_cmd .= "BGP4-MIB::bgpPeerRemoteAs"; 
     $peers_data = shell_exec($peers_cmd);
     if($debug) { echo("Peers : $peers_cmd --> \n$peers_data \n"); }
@@ -37,7 +37,7 @@
     if ($device['os'] == "junos")
     {
       ## Juniper BGP4-V2 MIB, ipv6 only for now, because v4 should be covered in BGP4-MIB above
-      $peers_cmd  = $config['snmpwalk'] . " -M +".$config['install_dir']."/mibs/junos -m BGP4-V2-MIB-JUNIPER -CI -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+      $peers_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -M +".$config['install_dir']."/mibs/junos -m BGP4-V2-MIB-JUNIPER -CI -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
       $peers_cmd .= "jnxBgpM2PeerRemoteAs.0.ipv6";  # FIXME: is .0 the only possible value here?
       $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", `$peers_cmd`));  
       foreach (explode("\n", $peers) as $peer)  
@@ -82,7 +82,7 @@ if (isset($peerlist))
     if ($device['os'] == "ios") 
     {
       unset($af_list);
-      $af_cmd  = $config['snmpwalk'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+      $af_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
       $af_cmd .= "cbgpPeerAddrFamilyName." . $peer['ip'];
       $af_data = shell_exec($af_cmd);
       if($debug) { echo("afi data :: $af_cmd --> \n $af_data \n"); }

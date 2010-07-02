@@ -7,7 +7,7 @@
 
   echo("VRFs : ");
 
-  $oid_cmd = $config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher";
+  $oid_cmd = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher";
   $oids = shell_exec($oid_cmd);
 
   if($debug) { echo("$oid_cmd -> $oids \n"); }
@@ -20,9 +20,9 @@
   foreach ( explode("\n", $oids) as $oid ) {
    if($oid) {
     list($vrf['oid'], $vrf['mplsVpnVrfRouteDistinguisher']) = explode("||", $oid);
-    $vrf['name'] = trim(shell_exec($config['snmpget'] . " -m MPLS-VPN-MIB -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']));
+    $vrf['name'] = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -Ln -Osq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfRouteDistinguisher.".$vrf['oid']));
     list(,$vrf['name'],, $vrf['mplsVpnVrfRouteDistinguisher']) = explode("\"", $vrf['name']);
-    $vrf['mplsVpnVrfDescription'] = trim(shell_exec($config['snmpget'] . " -m MPLS-VPN-MIB -Ln -Osqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfDescription.".$vrf['oid']));
+    $vrf['mplsVpnVrfDescription'] = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -Ln -Osqvn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " mplsVpnVrfDescription.".$vrf['oid']));
 
     if(@mysql_result(mysql_query("SELECT count(*) FROM vrfs WHERE `device_id` = '".$device['device_id']."'
                                  AND `vrf_oid`='".$vrf['oid']."'"),0)) {
@@ -38,7 +38,7 @@
     $valid_vrf[$vrf_id] = 1;
     echo("\nRD:".$vrf['mplsVpnVrfRouteDistinguisher']." ".$vrf['name']." ".$vrf['mplsVpnVrfDescription']." ");
     $ports_oid = ".1.3.6.1.3.118.1.2.1.1.2." . $vrf['oid'];
-    $ports = shell_exec($config['snmpwalk'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $ports_oid");
+    $ports = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m MPLS-VPN-MIB -CI -Ln -Osqn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $ports_oid");
     $ports = trim(str_replace($ports_oid . ".", "", $ports));
 #    list($ports) = explode(" ", $ports);
     echo(" ( ");

@@ -6,8 +6,10 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   echo("Checking voltage " . $voltage['volt_descr'] . "... ");
 
-  $volt_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $voltage['volt_oid'] . "|grep -v \"No Such Instance\"";
-  $volt = trim(str_replace("\"", "", shell_exec($volt_cmd)));
+  #$volt_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $voltage['volt_oid'] . "|grep -v \"No Such Instance\"";
+  #$volt = trim(str_replace("\"", "", shell_exec($volt_cmd)));
+
+  $volt = snmp_get($device, $voltage['volt_oid'], "SNMPv2-MIB");
 
   if ($voltage['volt_precision']) 
   {

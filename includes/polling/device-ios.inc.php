@@ -15,7 +15,7 @@
    list(,$features) = explode("(", $features);
    list(,$features) = explode("-", $features);
 
-   $snmp_cmdb =  $config['snmpget'] . " -m ENTITY-MIB:OLD-CISCO-CHASSIS-MIB -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+   $snmp_cmdb =  $config['snmpget'] . " -M ".$config['mibdir'] . " -m ENTITY-MIB:OLD-CISCO-CHASSIS-MIB -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                  $device['hostname'].":".$device['port'];
    $snmp_cmdb .= " entPhysicalModelName.1 entPhysicalContainedIn.1 entPhysicalName.1 entPhysicalSoftwareRev.1 ";
    $snmp_cmdb .= " entPhysicalModelName.1001 entPhysicalContainedIn.1001";
@@ -32,7 +32,7 @@
    if($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
 
 
-   $cpu5m = shell_exec($config['snmpget'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port avgBusy5.0");
+   $cpu5m = shell_exec($config['snmpget'] . " -M ".$config['mibdir'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port avgBusy5.0");
    $cpu5m = $cpu5m + 0;
 
    echo("$hostname\n");
@@ -58,7 +58,7 @@
 
    $mem_get  = ".1.3.6.1.4.1.9.9.48.1.1.1.6.2 .1.3.6.1.4.1.9.9.48.1.1.1.6.1 .1.3.6.1.4.1.9.9.48.1.1.1.6.3";
    $mem_get .= ".1.3.6.1.4.1.9.9.48.1.1.1.5.2 .1.3.6.1.4.1.9.9.48.1.1.1.5.1 .1.3.6.1.4.1.9.9.48.1.1.1.5.3";
-   $mem_raw  = shell_exec($config['snmpget'] . " -O qv -".$device['snmpver']." -c $community $hostname:$port $mem_get");
+   $mem_raw  = shell_exec($config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -".$device['snmpver']." -c $community $hostname:$port $mem_get");
    $mem_raw  = str_replace("No Such Instance currently exists at this OID", "0", $mem_raw); 
    list ($memfreeio, $memfreeproc, $memfreeprocb, $memusedio, $memusedproc, $memusedprocb) = explode("\n", $mem_raw); 
    $memfreeproc = $memfreeproc + $memfreeprocb;
