@@ -2,7 +2,7 @@
 
 if($device['os_group'] == "ios") { 
   $portifIndex = array();
-  $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
+  $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -M ".$config['mibdir']. " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
   #echo("$cmd");
   $portifIndex_output = trim(shell_exec($cmd));
   foreach(explode("\n", $portifIndex_output) as $entry){
@@ -31,7 +31,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    echo("Looking at " . $interface['ifDescr'] . " on " . $device['hostname'] . "\n");
 
-   $snmp_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+   $snmp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
    $snmp_cmd .= " ifAdminStatus." . $interface['ifIndex'] . " ifOperStatus." . $interface['ifIndex'] . " ifAlias." . $interface['ifIndex'] . " ifName." . $interface['ifIndex'];
    $snmp_cmd .= " ifDescr." . $interface['ifIndex'];
 
@@ -54,7 +54,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifIndex = $interface['ifIndex'];
    if($portifIndex[$ifIndex]) { 
      if($device['os'] == "CatOS") {
-       $cmd = $config['snmpget'] . " -m CISCO-STACK-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName." . $portifIndex[$ifIndex];
+       $cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-STACK-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName." . $portifIndex[$ifIndex];
        $ifAlias = trim(shell_exec($cmd));
      }
    }
@@ -126,7 +126,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if($ifOperStatus == "up") {
 
-    $snmp_data_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $snmp_data_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifOutErrors." . $interface['ifIndex'] . " ifInUcastPkts." . $interface['ifIndex'] . " ifOutUcastPkts." . $interface['ifIndex'];
     $snmp_data_cmd .= " ifInNUcastPkts." . $interface['ifIndex'] . " ifOutNUcastPkts." . $interface['ifIndex'];
@@ -138,7 +138,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
     list($ifHCInOctets, $ifHCOutOctets, $ifInErrors, $ifOutErrors, $ifInUcastPkts, $ifOutUcastPkts, $ifInNUcastPkts, $ifOutNUcastPkts) = explode("\n", $snmp_data);
     if($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
 
-      $octets_cmd  = $config['snmpget'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+      $octets_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
       $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex'];
       $octets = shell_exec($octets_cmd);
       list ($ifHCInOctets, $ifHCOutOctets) = explode("\n", $octets);

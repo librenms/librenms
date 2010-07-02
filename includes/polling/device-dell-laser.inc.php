@@ -1,7 +1,7 @@
 <?php
 
-  $hardware = trim(exec($config['snmpget'] . " -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
-    $device['hostname'].":".$device['port'] . " hrDeviceDescr.1"));
+  $hardware = snmp_get($device, "hrDeviceDescr", "HOST-RESOURCES-MIB");
+
   list(,$version) = split('Engine ',$sysDescr);
   
   $version = "Engine " . trim($version,')');

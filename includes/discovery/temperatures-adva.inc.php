@@ -13,10 +13,10 @@
     $descr_hss1 = "hss1";
     $oid_hss2 = "1.3.6.1.4.1.2544.1.9.2.4.1.5.1.1.14";
     $descr_hss2 = "hss2";
-    $temp_chassis = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $oid_chassis"));
-    $temp_stm16 = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $oid_stm16"));
-    $temp_hss1 = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss1"));
-    $temp_hss2 = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss2"));
+    $temp_chassis = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_chassis"));
+    $temp_stm16 = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_stm16"));
+    $temp_hss1 = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss1"));
+    $temp_hss2 = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss2"));
     echo("Adva Chassis ");
     if($temp_chassis != "0")
     {

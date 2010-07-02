@@ -1,8 +1,8 @@
 <?php
 
 echo("Doing Juniper JunOS ");
-
-$jun_ver  =  trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -m HOST-RESOURCES-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.25.6.3.1.2.2")));
+## FIX ME below
+$jun_ver  =  trim(str_replace("\"", "", shell_exec($config['snmpget'] . " -M ".$config['mibdir'] . " -m HOST-RESOURCES-MIB -".$device['snmpver']." -Oqv -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.2.1.25.6.3.1.2.2")));
 if(strpos($sysDescr, "olive")) {
   $hardware = "Olive";
   $serial = "";

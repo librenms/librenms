@@ -1,7 +1,7 @@
 <?php
 
 
-$snmp_cmd =  $config['snmpget'] . " -m Dell-Vendor-MIB -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
+$snmp_cmd =  $config['snmpget'] . " -M ".$config['mibdir'] . " -m Dell-Vendor-MIB -O Qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .
                  $device['hostname'].":".$device['port'];
 $snmp_cmd .= " productIdentificationDisplayName.0 productIdentificationVersion.0 productIdentificationDescription.0";
 
@@ -14,7 +14,7 @@ if (strstr($hardware,"No Such Object available"))
 
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/powerconnect-cpu.rrd";
 
-$cpu_cmd  = $config['snmpget'] . " -m RADLAN-rndMng -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$cpu_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m RADLAN-rndMng -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $cpu_cmd .= " RADLAN-rndMng::rlCpuUtilDuringLastSecond.0";
 $cpu_usage = trim(shell_exec($cpu_cmd));
 

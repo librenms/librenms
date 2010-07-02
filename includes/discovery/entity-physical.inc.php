@@ -31,8 +31,8 @@
     $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
 
 
-    $ent_data  = $config['snmpget'] . " -m ENTITY-MIB:IF-MIB -Ovqs -";
-    $ent_data  .= $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
+    $ent_data  = $config['snmpget'] . " -M ".$config['mibdir']." -m ENTITY-MIB:IF-MIB -Ovqs -";
+    $ent_data  .= $device['snmpver'] . " -M ".$config['mibdir']." -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
     $ent_data .= " entAliasMappingIdentifier." . $entPhysicalIndex. ".0";
 
     $ifIndex = shell_exec($ent_data);

@@ -6,10 +6,10 @@ list($version) = explode("(", $version);
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-cpu.rrd";
 $memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-mem.rrd";
 
-$cpu_cmd = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0";
+$cpu_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.0";
 $cpu     = shell_exec($cpu_cmd);
 
-$mem_cmd  = $config['snmpget'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$mem_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $mem_cmd .= " 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.5.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.6.1 1.3.6.1.4.1.11.2.14.11.5.1.1.2.2.1.1.7.1";
 $mem      = shell_exec($mem_cmd);
 

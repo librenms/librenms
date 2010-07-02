@@ -4,6 +4,8 @@
 
    // Get SNOM specific version string from silly SNOM location. Silly SNOM!
 
+   ## Lol fixme?
+
    $cmd      = "snmpget -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " 1.3.6.1.2.1.7526.2.4";
    $sysDescr = `$cmd`;
    $sysDescr = str_replace("-", " ", $sysDescr);

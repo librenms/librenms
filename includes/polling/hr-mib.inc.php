@@ -4,7 +4,7 @@
 //  Generic System Statistics
 
 $hrSystem_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
-$hrSystem_cmd  = $config['snmpget'] ." -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+$hrSystem_cmd  = $config['snmpget'] . " -M ".$config['mibdir']." -m HOST-RESOURCES-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $hrSystem_cmd .= " hrSystemProcesses.0 hrSystemNumUsers.0 hrMemorySize.0";
 $hrSystem  = `$hrSystem_cmd`;
 list ($hrSystemProcesses, $hrSystemNumUsers, $hrMemorySize) = explode("\n", $hrSystem);

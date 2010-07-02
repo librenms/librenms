@@ -6,8 +6,11 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
 
   echo("Checking fan " . $fanspeed['sensor_descr'] . "... ");
 
-  $fan_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['sensor_oid'] . "|grep -v \"No Such Instance\"";
-  $fan = trim(str_replace("\"", "", shell_exec($fan_cmd)));
+  #$fan_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['sensor_oid'] . "|grep -v \"No Such Instance\"";
+  #$fan = trim(str_replace("\"", "", shell_exec($fan_cmd)));
+
+  $fan = snmp_get($device, $fanspeed['sensor_oid'], "SNMPv2-MIB");
+
   if ($fanspeed['sensor_precision']) { $fan = $fan / $fanspeed['sensor_precision']; }
 
   $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");

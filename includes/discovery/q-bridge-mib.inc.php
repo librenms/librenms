@@ -2,7 +2,7 @@
 
   echo("Q-BRIDGE-MIB VLANs : ");
 
-  $vlanversion_cmd  = $config['snmpget'] . " -m Q-BRIDGE-MIB -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " ";
+  $vlanversion_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " ";
   $vlanversion_cmd .= $device['hostname'].":".$device['port'] . " Q-BRIDGE-MIB::dot1qVlanVersionNumber.0";
   $vlanversion = trim(`$vlanversion_cmd 2>/dev/null`);  
 
@@ -10,7 +10,7 @@
 
     echo("VLAN $vlanversion ");
 
-    $vlans_cmd  = $config['snmpwalk'] . " -m Q-BRIDGE-MIB -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+    $vlans_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
     $vlans_cmd .= "dot1qVlanFdbId";
 
     $vlans  = trim(`$vlans_cmd | grep -v o`);
@@ -21,7 +21,7 @@
       $oid_ex = explode('.',$oid);
       $oid = $oid_ex[count($oid_ex)-1];
 
-      $vlan_descr_cmd  = $config['snmpget'] . " -m Q-BRIDGE-MIB -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " "; 
+      $vlan_descr_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " "; 
       $vlan_descr_cmd .= "dot1qVlanStaticName.$oid|grep -v \"No Such Instance currently exists at this OID\"";
       $vlan_descr = shell_exec($vlan_descr_cmd);
 

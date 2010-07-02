@@ -51,7 +51,7 @@ if($device[os] != "Snom") {
       $snmpstring .= " $oid.0"; 
     }
     if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
-    $snmpdata_cmd = "snmpget -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
+    $snmpdata_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
     $snmpdata     = trim(shell_exec($snmpdata_cmd));
     $rrdupdate = "N";
     foreach(explode("\n", $snmpdata) as $data) {

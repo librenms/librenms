@@ -6,7 +6,7 @@ while($humidity = mysql_fetch_array($hum_data)) {
 
   echo("Checking humidity " . $humidity['sensor_descr'] . "... ");
 
-  $hum_cmd = $config['snmpget'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $humidity['sensor_oid'] . "|grep -v \"No Such Instance\"";
+  $hum_cmd = $config['snmpget'] . " -M ".$config['mibdir']. " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $humidity['sensor_oid'] . "|grep -v \"No Such Instance\"";
   $hum = trim(str_replace("\"", "", shell_exec($hum_cmd)));
 
   if ($humidity['sensor_precision']) 

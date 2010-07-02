@@ -1,6 +1,6 @@
 <?php
 
-/// HOST-RESOURCES-MIB - Storage Objects
+### HOST-RESOURCES-MIB - Storage Objects
 
 if(!is_array($storage_cache['hrstorage'])) {
   $storage_cache['hrstorage'] = snmp_cache_oid("hrStorageEntry", $device, array(), "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES");

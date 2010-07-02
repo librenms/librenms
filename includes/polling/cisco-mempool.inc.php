@@ -10,7 +10,7 @@ while($mempool = mysql_fetch_array($pool_data)) {
 
   $oid = $mempool['Index']; 
 
-  $pool_cmd  = $config['snmpget'] . " -m CISCO-MEMORY-POOL-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  $pool_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-MEMORY-POOL-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $pool_cmd .= " ciscoMemoryPoolUsed.$oid ciscoMemoryPoolFree.$oid ciscoMemoryPoolLargestFree.$oid";
   $pool_cmd .= " | cut -f 1 -d ' '";
 
