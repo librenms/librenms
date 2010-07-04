@@ -5,6 +5,21 @@ include("../config.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc.php");
 
+  if (is_array($config['branding'])) {
+      if ($config['branding'][$_SERVER['SERVER_NAME']]) {
+          foreach ($config['branding'][$_SERVER['SERVER_NAME']] as $confitem => $confval) {
+              eval("\$config['" . $confitem . "'] = \$confval;");
+          }
+      } else {
+          foreach ($config['branding']['default'] as $confitem => $confval) {
+              eval("\$config['" . $confitem . "'] = \$confval;");
+          }
+      }
+  } else {
+#      echo "Please check config.php.default and adjust your settings to reflect the new Multi-Tenancy configuration.";
+  }
+
+
 if (isset($_GET['device'])) { $where = "WHERE device_id = ".$_GET['device']; } else { $where = ""; }
 $deviceresult = mysql_query("SELECT * from devices $where");
 
@@ -31,7 +46,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
         if (mysql_num_rows($links))
         {
-          $map .= "\"".$device['hostname']."\" [fontsize=20 fillcolor=\"lightblue\" URL=\"/device/".$device['device_id']."/map/\" shape=box3d]\n";
+          $map .= "\"".$device['hostname']."\" [fontsize=20 fillcolor=\"lightblue\" URL=\"{$config['base_url']}/device/".$device['device_id']."/map/\" shape=box3d]\n";
         }
 
         while($link = mysql_fetch_array($links)) 
@@ -83,19 +98,19 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
 	    }
 
-            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"/device/".$device['device_id']."/interface/$local_interface_id/\"]\n";
+            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"{$config['base_url']}/device/".$device['device_id']."/interface/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
             {
               $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
               $ifdone[$src][$sif['interface_id']] = 1;
             }
 
-            $map .= "\"$dst\" [URL=\"/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
+            $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
             if($dst_host == $device['device_id']) {
-              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"/device/$dst_host/interface/$remote_interface_id/\"]\n";
+              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
             } else {
-              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"/device/$dst_host/interface/$remote_interface_id/\"]\n";
+              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
             }
 
             if (!$ifdone[$dst][$dif['interface_id']])
