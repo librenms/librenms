@@ -6,5 +6,8 @@ $community = $device['community'];
 $snmpver = $device['snmpver'];
 $port = $device['port'];
 
-echo("UPS : ");
+#echo("UPS : ");
+
+
+
 ?>
