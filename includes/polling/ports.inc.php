@@ -151,13 +151,36 @@
         RRA:MAX:0.5:288:797");
       }
 
+      $ifx_rrd = $host_rrd . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+      $ifx_rrd_cmd = $config['rrdtool'] . " create $ifx_rrd -s 300 \
+        DS:InBroadcastPkts:DERIVE:600:0:12500000000 \
+        DS:OutBroadcastPkts:DERIVE:600:0:12500000000 \
+        DS:InMulticastPkts:DERIVE:600:0:12500000000 \
+        DS:OutMulticastPkts:DERIVE:600:0:12500000000 \
+        RRA:AVERAGE:0.5:1:600 \
+        RRA:AVERAGE:0.5:6:700 \
+        RRA:AVERAGE:0.5:24:775 \
+        RRA:AVERAGE:0.5:288:797 \
+        RRA:MAX:0.5:1:600 \
+        RRA:MAX:0.5:6:700 \
+        RRA:MAX:0.5:24:775 \
+        RRA:MAX:0.5:288:797";
+
+
       foreach ($stat_oids as $oid) {  /// Copy values from array to global variables and force numeric.
         $$oid = $this_port[$oid];      
         if(!is_numeric($$oid)) { $$oid = "0"; }
       }
 
-      $woo = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
-      $ret = rrdtool_update("$rrdfile", $woo);
+      $if_rrd_update = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
+      $ret = rrdtool_update("$rrdfile", $if_rrd_update);
+
+
+      if($config['enable_port_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
+        if(!is_file($ifx_rrd)) { shell_exec($ifx_rrd_cmd); }
+        $ifx_rrd_update = "$polled:$ifHCInBroadcastPkts:$ifHCOutBroadcastPkts:$ifHCInMulticastPkts:$ifHCOutMulticastPkts";
+        $ret = rrdtool_update($ifx_rrd, $ifx_rrd_update);
+      }
 
       /// End Update IF-MIB
 
