@@ -1,7 +1,7 @@
 <?php
 
-#if($device['os_group'] == "ios") 
-#{
+if($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['os'] == "ironware") 
+{
 
   unset( $vrf_count );
 
@@ -53,8 +53,6 @@
    }
   }
 
-  echo("\n");
-
   $sql   = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
     $data = mysql_query($sql);
     while($row = mysql_fetch_array($data)) {
@@ -81,6 +79,6 @@
 
   echo("\n");
 
-#}
+}
 
 ?>
