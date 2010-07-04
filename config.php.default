@@ -15,6 +15,10 @@ $config['rrd_dir'] 	= "/opt/observer/rrd";
 $config['temp_dir']	= "/tmp";
 $config['observer_log'] = $config['install_dir'] . "/observer.log";
 
+### Enable the below to use rrdcached. be sure rrd_dir is within the rrdcached dir
+### and that your web server has permission to talk to rrdcached.
+#$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
+
 ### Default community
 $config['community'] = "public";
 

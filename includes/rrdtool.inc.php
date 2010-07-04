@@ -33,8 +33,15 @@ function rrdtool_lastupdate($rrdfile, $rrdupdate)
 function rrdtool($command, $file, $options)
 {
   global $config; global $debug;
-  if ($debug) { echo($config['rrdtool'] . " $command $file $options \n"); }
-  return shell_exec($config['rrdtool'] . " $command $file $options");
+
+  $command = $config['rrdtool'] . " $command $file $options";
+  if($config['rrdcached']) 
+  {
+    $command .= " --daemon " . $config['rrdcached'];
+  }
+
+  if ($debug) { echo($command."\n"); }
+  return shell_exec($command);
 }
 
 ?>
