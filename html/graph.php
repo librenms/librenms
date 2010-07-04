@@ -56,8 +56,11 @@ if($_GET['debug']) {
   }
 
   if($rrd_options) {
-    if($_GET['debug']) { echo("<pre>".$config['rrdtool'] . " graph $graphfile $rrd_options\n\n"); }
-    $thing = shell_exec($config['rrdtool'] . " graph $graphfile $rrd_options");    
+    
+    if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
+    $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
+    $woo = shell_exec($rrd_cmd);
+    if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
 #    $thing = popen($config['rrdtool'] . " -",'w');
 #    fputs($thing, "graph $graphfile $rrd_options");
 #    pclose($thing);
