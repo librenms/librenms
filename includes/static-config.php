@@ -13,6 +13,7 @@ $config['os']['default']['overtext']	= "CPU &amp; Memory Usage";
 
 $config['os']['linux']['group'] 	= "unix";
 $config['os']['linux']['text']  	= "Linux";
+$config['os']['linux']['ifXmcbc']	= 1;
 
 $config['os']['freebsd']['group'] 	= "unix";
 $config['os']['freebsd']['text']  	= "FreeBSD";
@@ -43,14 +44,17 @@ $config['os']['opensolaris']['text']	= "Sun OpenSolaris";
 $config['os']['ios']['group']		= "ios";
 $config['os']['ios']['text']		= "Cisco IOS";
 $config['os']['ios']['type']		= "network";
+$config['os']['ios']['ifXmcbc']         = 1;
 
 $config['os']['iosxe']['group']		= "ios";
 $config['os']['iosxe']['text']		= "Cisco IOS-XE";
 $config['os']['iosxe']['type']		= "network";
+$config['os']['iosxe']['ifXmcbc']       = 1;
 
 $config['os']['iosxr']['group']		= "ios";
 $config['os']['iosxr']['text']		= "Cisco IOS-XR";
 $config['os']['iosxr']['type']		= "network";
+$config['os']['iosxr']['ifXmcbc']       = 1;
 
 $config['os']['asa']['group']		= "ios";
 $config['os']['asa']['text']		= "Cisco ASA";

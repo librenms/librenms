@@ -76,6 +76,10 @@ $config['show_overview_tab'] = true;
 
 $config['overview_show_sysDescr'] = true;
 
+## Poller Modules
+
+$config['enable_port_Xbcmc']     = 1; # Enable ifXEntry broadcast/multicast
+
 ### Ignores & Allows
 
 $config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",

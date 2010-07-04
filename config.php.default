@@ -117,6 +117,7 @@ $config['enable_syslog'] 	= 0; # Enable Syslog
 $config['enable_billing']	= 0; # Enable Billing
 $config['enable_inventory']	= 1; # Enable Inventory
 $config['enable_etherlike']	= 1; # Enable Etherlike
+$config['enable_port_Xbcmc']	= 1; # Enable ifXEntry broadcast/multicast
 $config['enable_pseudowires']   = 1; # Enable Pseudowires
 $config['enable_ports_junoseatmvp']   = 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_etherlike']     = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
