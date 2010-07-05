@@ -8,13 +8,13 @@ session_start();
 if(!is_dir($config['rrd_dir']))
   echo "<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>";
 
-if(!is_writable($config['rrd_dir']))
+if(!$config['rrdcached'] && !is_writable($config['rrd_dir']))
   echo "<div class='errorbox'>RRD Log Directory is not writable ({$config['rrd_dir']}).  Graphing may fail.</div>";
 
-if(!is_dir($config['tmp_dir']))
+if(!is_dir($config['temp_dir']))
   echo "<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>";
 
-if(!is_writable($config['tmp_dir']))
+if(!is_writable($config['temp_dir']))
   echo "<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>";
 
 
