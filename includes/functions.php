@@ -747,4 +747,15 @@ function hex2str($hex)
     }
     return $string;
 }
+
+function snmp_hexstring($hex)
+{
+  return hex2str(str_replace(' ','',str_replace(' 00','',$hex)));
+}
+
+function isHexString($str)
+{
+  return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is",$str);
+}
+
 ?>
