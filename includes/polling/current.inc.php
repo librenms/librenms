@@ -9,7 +9,7 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
   #$current_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $dbcurrent['current_oid'] . "|grep -v \"No Such Instance\"";
   #$current = trim(shell_exec($current_cmd));
 
-  $current = snmp_get($device, $dbcurrent['current_oid'], "", "SNMPv2-MIB");
+  $current = snmp_get($device, $dbcurrent['current_oid'], "-OUqnv", "SNMPv2-MIB");
 
   if ($dbcurrent['current_precision']) 
   {
