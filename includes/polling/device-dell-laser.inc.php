@@ -1,6 +1,6 @@
 <?php
 
-  $hardware = snmp_get($device, "hrDeviceDescr", "HOST-RESOURCES-MIB");
+  $hardware = snmp_get($device, "hrDeviceDescr", "-OQv", "HOST-RESOURCES-MIB");
 
   list(,$version) = split('Engine ',$sysDescr);
   
