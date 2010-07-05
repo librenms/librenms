@@ -3,6 +3,22 @@
 @ini_set("session.gc_maxlifetime","0"); 
 
 session_start();
+
+// Preflight checks
+if(!is_dir($config['rrd_dir']))
+  echo "<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>";
+
+if(!is_writable($config['rrd_dir']))
+  echo "<div class='errorbox'>RRD Log Directory is not writable ({$config['rrd_dir']}).  Graphing may fail.</div>";
+
+if(!is_dir($config['tmp_dir']))
+  echo "<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>";
+
+if(!is_writable($config['tmp_dir']))
+  echo "<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>";
+
+
+
 if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
@@ -34,8 +50,7 @@ if (file_exists('includes/authentication/' . $config['auth_mechanism'] . '.inc.p
 }
 else
 {
-  # FIXME use standard error message box?
-  echo "ERROR: no valid auth_mechanism defined.";
+  echo "<div class='errorbox'>ERROR: no valid auth_mechanism defined</div>";
   exit();
 }
 
