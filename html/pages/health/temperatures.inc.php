@@ -1,9 +1,9 @@
 <?php
 
 if($_SESSION['userlevel'] >= '5') {
-  $sql = "SELECT * FROM `sensors` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.sensor_index, S.sensor_descr";
+  $sql = "SELECT * FROM `sensors` AS S, `devices` AS D WHERE S.sensor_class='temperature' AND S.device_id = D.device_id ORDER BY D.hostname, S.sensor_index, S.sensor_descr";
 } else {
-  $sql = "SELECT * FROM `sensors` AS S, `devices` AS D, devices_perms as P WHERE S.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, S.sensor_index, S.sensor_descr";
+  $sql = "SELECT * FROM `sensors` AS S, `devices` AS D, devices_perms as P WHERE S.sensor_class='temperature' AND S.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, S.sensor_index, S.sensor_descr";
 }
 
 $query = mysql_query($sql);
