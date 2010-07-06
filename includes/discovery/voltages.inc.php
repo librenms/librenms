@@ -58,6 +58,48 @@ if ($device['os'] == "areca")
   }
 }
 
+## APC Voltages
+if ($device['os'] == "apc") 
+{
+  $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.3.1.3", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids) echo("APC In ");
+  $precision = 1;
+  $type = "apc";
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$current) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-3];
+      $oid  = "1.3.6.1.4.1.318.1.1.8.5.3.3.1.3." . $index . ".1.1";
+      $descr = "Input Feed " . chr(64+$index);
+      discover_volt($valid_volt,$device, $oid, "3.3.1.3.$index", $type, $descr, $precision, NULL, NULL, $current);
+    }
+  }
+
+  $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.4.3.1.3", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids) echo(" APC Out ");
+  $precision = 1;
+  $type = "apc";
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$current) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-3];
+      $oid  = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.3." . $index . ".1.1";
+      $descr = "Output Feed"; if (count(explode("\n", $oids)) > 1) { $descr .= " $index"; }
+      discover_volt($valid_volt,$device, $oid, "4.3.1.3.$index", $type, $descr, $precision, NULL, NULL, $current);
+    }
+  }
+}
+
 ## Supermicro Voltages
 if ($device['os'] == "linux") 
 {

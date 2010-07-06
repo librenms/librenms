@@ -9,9 +9,10 @@ $valid_current = array();
 
 echo("Current : ");
 
-## APC PDU
+## APC
 if ($device['os'] == "apc")
 {
+  # PDU
   $oids = snmp_walk($device, ".1.3.6.1.4.1.318.1.1.12.2.3.1.1.2", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
@@ -42,6 +43,25 @@ if ($device['os'] == "apc")
 
       echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
     }
+  }
+
+  # ATS  
+  $atsCurrent = snmp_get($device, "1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1", "-OsqnU", "");
+  if ($atsCurrent)
+  {
+      $current_oid   = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.4.1.1.1";
+      $limit_oid     = "1.3.6.1.4.1.318.1.1.8.4.16.1.5.1";
+      $lowlimit_oid  = "1.3.6.1.4.1.318.1.1.8.4.16.1.3.1";
+      $warnlimit_oid = "1.3.6.1.4.1.318.1.1.8.4.16.1.4.1";
+      $index         = 1;
+
+      $current   = snmp_get($device, $current_oid, "-Oqv", "") / $precision;
+      $limit     = snmp_get($device, $limit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
+      $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
+      $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
+      $descr     = "Output Feed";
+
+      echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
   }
 }
 
