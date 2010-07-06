@@ -89,6 +89,48 @@ if ($device['os'] == "netmanplus")
   echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
 }
 
+## APC
+if ($device['os'] == "apc") 
+{
+  $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids) echo("APC In ");
+  $precision = 1;
+  $type = "apc";
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$current) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-1];
+      $oid  = "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4." . $index;
+      $descr = "Input Feed " . chr(64+$index);
+      discover_freq($valid_freq,$device, $oid, "3.2.1.4.$index", $type, $descr, $precision, NULL, NULL, $current);
+    }
+  }
+
+  $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.4.2.1.4", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids) echo(" APC Out ");
+  $precision = 1;
+  $type = "apc";
+  foreach(explode("\n", $oids) as $data) 
+  {
+    $data = trim($data);
+    if ($data) 
+    {
+      list($oid,$current) = explode(" ", $data,2);
+      $split_oid = explode('.',$oid);
+      $index = $split_oid[count($split_oid)-3];
+      $oid  = "1.3.6.1.4.1.318.1.1.8.5.4.2.1.4." . $index;
+      $descr = "Output Feed"; if (count(explode("\n", $oids)) > 1) { $descr .= " $index"; }
+      discover_freq($valid_freq,$device, $oid, "4.2.1.4.$index", $type, $descr, $precision, NULL, NULL, $current);
+    }
+  }
+}
+
 
 
 ## Delete removed sensors

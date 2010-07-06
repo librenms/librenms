@@ -19,3 +19,6 @@ CREATE TABLE IF NOT EXISTS `applications` (  `app_id` int(11) NOT NULL AUTO_INCR
 ## 0.10.6
 CREATE TABLE IF NOT EXISTS `sensors` ( `sensor_id` int(11) NOT NULL auto_increment, `sensor_class` varchar(64) NOT NULL, `device_id` int(11) NOT NULL default '0', `sensor_oid` varchar(64) NOT NULL, `sensor_index` varchar(8) NOT NULL, `sensor_type` varchar(32) NOT NULL, `sensor_descr` varchar(32) NOT NULL default '', `sensor_precision` int(11) NOT NULL default '1', `sensor_current` float default NULL, `sensor_limit` float default NULL, `sensor_limit_warn` float default NULL, `sensor_limit_low` float default NULL, `sensor_limit_low_warn` float default NULL, PRIMARY KEY  (`sensor_id`), KEY `sensor_host` (`device_id`)) ENGINE=MyISAM AUTO_INCREMENT=189 DEFAULT CHARSET=latin1;
 ALTER TABLE  `devices` CHANGE  `type`  `type` VARCHAR(20) NOT NULL;
+ALTER TABLE  `voltage` CHANGE  `volt_index`  `volt_index` VARCHAR(10) NOT NULL;
+ALTER TABLE  `frequency` CHANGE  `freq_index`  `freq_index` VARCHAR(10) NOT NULL;
+ALTER TABLE  `sensors` CHANGE  `sensor_index`  `sensor_index` VARCHAR(10) NOT NULL;
