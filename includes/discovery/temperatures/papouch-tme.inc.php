@@ -1,6 +1,6 @@
 <?php
 
-  if($device['os'] == "papouche-tme") {
+  if($device['os'] == "papouch-tme") {
 
     echo("Papouch TME ");
     #$descr = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port SNMPv2-SMI::enterprises.18248.1.1.3.0"));

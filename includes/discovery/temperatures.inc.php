@@ -20,7 +20,7 @@ include("temperatures/junos.inc.php");
 include("temperatures/lm-sensors.inc.php");
 include("temperatures/netmanplus.inc.php");
 include("temperatures/observer-custom.inc.php");
-include("temperatures/papouche-tme.inc.php");
+include("temperatures/papouch-tme.inc.php");
 include("temperatures/supermicro.inc.php");
 
 if($debug) { print_r($valid_temp); }
