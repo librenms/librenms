@@ -48,7 +48,7 @@ if ((is_file($config['install_dir'] . "/html/pages/device/graphs/os-".$device['o
 }
 
 $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
-           mysql_result(mysql_query("select count(temp_id) from temperature WHERE device_id = '" . $device['device_id'] . "'"), 0) +
+           mysql_result(mysql_query("select count(sensor_id) from sensors WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cempMemPool WHERE device_id = '" . $device['device_id'] . "'"), 0) +
            mysql_result(mysql_query("select count(*) from cpmCPU WHERE device_id = '" . $device['device_id'] . "'"), 0) +
 	   mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0) +
