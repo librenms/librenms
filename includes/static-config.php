@@ -133,17 +133,17 @@ $config['os']['netmanplus']['overtext']    = "Current";
 $config['os']['netmanplus']['type']	   = "power";
 
 $config['os']['akcp']['text']              = "AKCP SensorProbe";
-$config['os']['akcp']['overgraph'][]	   = "device_temperature";
+$config['os']['akcp']['overgraph'][]	   = "device_temperatures";
 $config['os']['akcp']['overtext']          = "Temperature";
 $config['os']['akcp']['type']              = "environment";
 
 $config['os']['minkelsrms']['text']        = "Minkels RMS";
-$config['os']['minkelsrms']['overgraph'][] = "device_temperature";
+$config['os']['minkelsrms']['overgraph'][] = "device_temperatures";
 $config['os']['minkelsrms']['overtext']    = "Temperature";
 $config['os']['minkelsrms']['type']        = "environment";
 
 $config['os']['papouch-tme']['text']       = "Papouch TME";
-$config['os']['papouch-tme']['overgraph'][] = "device_temperature";
+$config['os']['papouch-tme']['overgraph'][] = "device_temperatures";
 $config['os']['papouch-tme']['overtext']   = "Temperature";
 $config['os']['papouch-tme']['type']       = "environment";
 
