@@ -1,22 +1,19 @@
 <?php
 
-$query = "SELECT * FROM voltage WHERE device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'";
 $volt_data = mysql_query($query);
 while($voltage = mysql_fetch_array($volt_data)) {
 
-  echo("Checking voltage " . $voltage['volt_descr'] . "... ");
+  echo("Checking voltage " . $voltage['sensor_descr'] . "... ");
 
-  #$volt_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $voltage['volt_oid'] . "|grep -v \"No Such Instance\"";
-  #$volt = trim(str_replace("\"", "", shell_exec($volt_cmd)));
+  $volt = snmp_get($device, $voltage['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  $volt = snmp_get($device, $voltage['volt_oid'], "-OUqnv", "SNMPv2-MIB");
-
-  if ($voltage['volt_precision']) 
+  if ($voltage['sensor_precision']) 
   {
-    $volt = $volt / $voltage['volt_precision'];
+    $volt = $volt / $voltage['sensor_precision'];
   }
 
-  $voltrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
+  $voltrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
 
   if (!is_file($voltrrd)) {
     `rrdtool create $voltrrd \
@@ -32,26 +29,26 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   rrdtool_update($voltrrd,"N:$volt");
 
-  if($voltage['volt_current'] > $voltage['volt_limit_low'] && $volt <= $voltage['volt_limit_low']) 
+  if($voltage['sensor_current'] > $voltage['sensor_limit_low'] && $volt <= $voltage['sensor_limit_low']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'] . " is " . $volt . "V (Limit " . $voltage['volt_limit'];
+    $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['sensor_descr'] . " is " . $volt . "V (Limit " . $voltage['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
-    mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $voltage['volt_descr'] . "\n");
-    log_event('Voltage ' . $voltage['volt_descr'] . " under threshold: " . $volt . " V (< " . $voltage['volt_limit_low'] . " V)", $device['device_id'], 'voltage', $voltage['volt_id']);
+    mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['sensor_descr'], $msg, $config['email_headers']);
+    echo("Alerting for " . $device['hostname'] . " " . $voltage['sensor_descr'] . "\n");
+    log_event('Voltage ' . $voltage['sensor_descr'] . " under threshold: " . $volt . " V (< " . $voltage['sensor_limit_low'] . " V)", $device['device_id'], 'voltage', $voltage['sensor_id']);
   }
-  else if($voltage['volt_current'] < $voltage['volt_limit'] && $volt >= $voltage['volt_limit']) 
+  else if($voltage['sensor_current'] < $voltage['sensor_limit'] && $volt >= $voltage['sensor_limit']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'] . " is " . $volt . "V (Limit " . $voltage['volt_limit'];
+    $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $voltage['sensor_descr'] . " is " . $volt . "V (Limit " . $voltage['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
-    mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['volt_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $voltage['volt_descr'] . "\n");
-    log_event('Voltage ' . $voltage['volt_descr'] . " above threshold: " . $volt . " V (> " . $voltage['volt_limit'] . " V)", $device['device_id'], 'voltage', $voltage['volt_id']);
+    mail($email, "Voltage Alarm: " . $device['hostname'] . " " . $voltage['sensor_descr'], $msg, $config['email_headers']);
+    echo("Alerting for " . $device['hostname'] . " " . $voltage['sensor_descr'] . "\n");
+    log_event('Voltage ' . $voltage['sensor_descr'] . " above threshold: " . $volt . " V (> " . $voltage['sensor_limit'] . " V)", $device['device_id'], 'voltage', $voltage['sensor_id']);
   }
 
-  mysql_query("UPDATE voltage SET volt_current = '$volt' WHERE volt_id = '" . $voltage['volt_id'] . "'");
+  mysql_query("UPDATE sensor SET volt_current = '$volt' WHERE sensor_class='voltage' AND volt_id = '" . $voltage['sensor_id'] . "'");
 }
 
 ?>

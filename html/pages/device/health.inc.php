@@ -7,7 +7,7 @@ $diskio = mysql_result(mysql_query("select count(*) from ucd_diskio WHERE device
 $memory = mysql_result(mysql_query("select count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $processor  = mysql_result(mysql_query("select count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $fans = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'"), 0);
-$volts = mysql_result(mysql_query("select count(*) from voltage WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$volts = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"), 0);
 $freqs = mysql_result(mysql_query("select count(*) from frequency WHERE device_id = '" . $device['device_id'] . "'"), 0);
 $current = mysql_result(mysql_query("select count(*) from current WHERE device_id = '" . $device['device_id'] . "'"), 0);
 

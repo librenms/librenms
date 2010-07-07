@@ -161,36 +161,12 @@ function format_bi($size, $round = '2')
   return round($size, $round).$ext;
 }
 
-function arguments($argv) 
-{
-    $_ARG = array();
-    foreach ($argv as $arg) {
-      if (ereg('--([^=]+)=(.*)',$arg,$reg)) {
-        $_ARG[$reg[1]] = $reg[2];
-      } elseif (ereg('-([a-zA-Z0-9])',$arg,$reg)) {
-            $_ARG[$reg[1]] = 'true';
-        }
-   
-    }
-  return $_ARG;
-}
-
 function percent_colour($perc)
 {
  $r = min(255, 5 * ($perc - 25));
  $b = max(0, 255 - (5 * ($perc + 25)));
  return sprintf('#%02x%02x%02x', $r, $b, $b);
 } 
-
-function print_error($text)
-{
-  echo('<table class="errorbox" cellpadding="3"><tr><td><img src="/images/15/exclamation.png" align="absmiddle">'.$text.'</td></tr></table>');
-}
-
-function print_message($text)
-{
-  echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle">'.$text.'</td></tr></table>');
-}
 
 function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
@@ -207,17 +183,7 @@ function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/ou
   return $errors;
 }
 
-function geteventicon ($message) 
-{
-  if ($message == "Device status changed to Down") { $icon = "server_connect.png"; }
-  if ($message == "Device status changed to Up") { $icon = "server_go.png"; }
-  if ($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
-  if ($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
-  if ($message == "Interface disabled") { $icon = "if-disable.png"; }
-  if ($message == "Interface enabled") { $icon = "if-enable.png"; }
-  if (isset($icon)) { return $icon; } else { return false; }
-}
-
+# FIXME: below function is unused, only commented out in html/pages/device/overview/ports.inc.php - do we still need it?
 function device_traffic_image($device, $width, $height, $from, $to) 
 {
   return "<img src='graph.php?device=" . $device . "&amp;type=device_bits&amp;from=" . $from . "&amp;to=" . $to . "&amp;width=" . $width . "&amp;height=" . $height . "&amp;legend=no' />";
@@ -232,7 +198,6 @@ function devclass($device)
    }
   return $class;
 }
-
 
 function getImage($host) 
 {
@@ -300,41 +265,12 @@ function delete_device($id)
   mysql_query("DELETE FROM `ports` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `voltage` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `fanspeed` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `toner` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".$config['rrd_dir']."/$host");
   return $ret . "Removed device $host\n";
-}
-
-function retireHost($id)
-{
-  global $config;
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
-  mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
-  $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while($int_data = mysql_fetch_array($int_query)) {
-    $int_if = $int_data['ifDescr'];
-    $int_id = $int_data['interface_id'];
-    mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
-    mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
-    echo("Removed interface $int_id ($int_if)<br />");
-  }
-  mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `temperature` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `services` WHERE `device_id` = '$id'");
-  shell_exec("rm -rf ".$config['rrd_dir']."/$host");
-  echo("Removed device $host<br />");
 }
 
 function addHost($host, $community, $snmpver, $port = 161) 
@@ -353,10 +289,6 @@ function addHost($host, $community, $snmpver, $port = 161)
   } else { echo("Could not resolve $host\n"); }
 }
 
-function overlibprint($text) {
-	return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
-}
-
 function scanUDP ($host, $port, $timeout) 
 { 
   $handle = fsockopen($host, $port, &$errno, &$errstr, 2); 
@@ -372,19 +304,6 @@ function scanUDP ($host, $port, $timeout)
   if ($timeDiff >= $timeout) { 
     fclose($handle); return 1; 
   } else { fclose($handle); return 0; } 
-}
-
-function humanmedia($media) 
-{
-  array_preg_replace($rewrite_iftype, $media);	
-  return $media;
-}
-
-function humanspeed($speed) 
-{
-  $speed = formatRates($speed);
-  if ($speed == "") { $speed = "-"; }
-  return $speed;
 }
 
 function netmask2cidr($netmask) 
@@ -684,6 +603,7 @@ function get_astext($asn)
   }
 }
 
+# DEPRECATED
 function eventlog($eventtext,$device_id = "", $interface_id = "")
 {
   $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
@@ -691,6 +611,7 @@ function eventlog($eventtext,$device_id = "", $interface_id = "")
   mysql_query($event_query);
 }
 
+# Use this function to write to the eventlog table
 function log_event($text, $device = NULL, $type = NULL, $reference = NULL) 
 {
   global $debug;
@@ -748,14 +669,16 @@ function hex2str($hex)
     return $string;
 }
 
+# Convert an SNMP hex string to regular string
 function snmp_hexstring($hex)
 {
   return hex2str(str_replace(' ','',str_replace(' 00','',$hex)));
 }
 
+# Check if the supplied string is an SNMP hex string
 function isHexString($str)
 {
-  return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is",$str);
+  return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is",trim($str));
 }
 
 ?>

@@ -195,7 +195,7 @@ function discover_fan(&$valid, $device, $oid, $index, $type, $descr, $precision 
     }
     else
     {
-      mysql_query("UPDATE fanspeed SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'fanspeed' AND `device_id` = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
+      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'fanspeed' AND `device_id` = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
     }
   }
@@ -213,14 +213,14 @@ function discover_volt(&$valid, $device, $oid, $index, $type, $descr, $precision
     $low_limit = $config['limit']['volt'];
   }
   
-  if (mysql_result(mysql_query("SELECT count(volt_id) FROM `voltage` WHERE device_id = '".$device['device_id']."' AND volt_type = '$type' AND `volt_index` = '$index'"),0) == '0')
+  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='voltage' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
 
     if(!$high_limit && isset($current)) { $high_limit = round($current * 1.05, 2); }
     if(!$low_limit && isset($current))  { $low_limit = round($current * 0.95, 2); }
 
-    $query = "INSERT INTO voltage (`device_id`, `volt_oid`, `volt_index`, `volt_type`, `volt_descr`, `volt_precision`, `volt_limit`, `volt_limit_low`, `volt_current`) ";
-    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
+    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_low`, `sensor_current`) ";
+    $query .= " VALUES ('voltage','".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
     mysql_query($query);
     if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
     echo("+");
@@ -228,21 +228,21 @@ function discover_volt(&$valid, $device, $oid, $index, $type, $descr, $precision
   else
   {
 
-    $volt_entry = mysql_fetch_array(mysql_query("SELECT * FROM `voltage` WHERE device_id = '".$device['device_id']."' AND volt_type = '$type' AND `volt_index` = '$index'"));
+    $volt_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='voltage' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
 
     if(!isset($current) && isset($volt_entry['current'])) { $current = $volt_entry['current']; }
 
 
-    if(!$high_limit && !$volt_entry['volt_limit'] && $current)  { $high_limit = round($current * 1.05, 2); } elseif (!$high_limit && $volt_entry['volt_limit']) { $high_limit = $volt_entry['volt_limit']; }
-    if(!$low_limit && !$volt_entry['volt_limit_low'] && $current)   { $low_limit = round($current * 0.95, 2); } elseif (!$low_limit && $volt_entry['volt_limit_low']) { $low_limit = $volt_entry['volt_limit_low']; }
+    if(!$high_limit && !$volt_entry['sensor_limit'] && $current)  { $high_limit = round($current * 1.05, 2); } elseif (!$high_limit && $volt_entry['sensor_limit']) { $high_limit = $volt_entry['sensor_limit']; }
+    if(!$low_limit && !$volt_entry['sensor_limit_low'] && $current)   { $low_limit = round($current * 0.95, 2); } elseif (!$low_limit && $volt_entry['sensor_limit_low']) { $low_limit = $volt_entry['sensor_limit_low']; }
 
-    if($oid == $volt_entry['volt_oid'] && $descr == $volt_entry['volt_descr'] && $precision == $volt_entry['volt_precision'] && $volt_entry['volt_limit'] == $high_limit && $volt_entry['volt_limit_low'] == $low_limit)
+    if($oid == $volt_entry['sensor_oid'] && $descr == $volt_entry['sensor_descr'] && $precision == $volt_entry['sensor_precision'] && $volt_entry['sensor_limit'] == $high_limit && $volt_entry['sensor_limit_low'] == $low_limit)
     {
       echo(".");
     }
     else
     {
-      $sql = "UPDATE voltage SET `volt_descr` = '$descr', `volt_oid` = '$oid', `volt_precision` = '$precision', `volt_limit_low` = '$low_limit', `volt_limit` = '$high_limit' WHERE `device_id` = '" . $device['device_id'] . "' AND volt_type = '$type' AND `volt_index` = '$index'";
+      $sql = "UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision', `sensor_limit_low` = '$low_limit', `sensor_limit` = '$high_limit' WHERE `sensor_class` = 'voltage' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index'";
       $query = mysql_query($sql);
       echo("U");
       if($debug) { echo("$sql ". mysql_affected_rows() . " updated"); }

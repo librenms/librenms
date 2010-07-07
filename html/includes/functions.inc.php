@@ -240,4 +240,43 @@ function print_optionbar_end ()
   </div>");
 }
 
+function geteventicon ($message) 
+{
+  if ($message == "Device status changed to Down") { $icon = "server_connect.png"; }
+  if ($message == "Device status changed to Up") { $icon = "server_go.png"; }
+  if ($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
+  if ($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
+  if ($message == "Interface disabled") { $icon = "if-disable.png"; }
+  if ($message == "Interface enabled") { $icon = "if-enable.png"; }
+  if (isset($icon)) { return $icon; } else { return false; }
+}
+
+function overlibprint($text) {
+	return "onmouseover=\"return overlib('" . $text . "');\" onmouseout=\"return nd();\"";
+}
+
+function humanmedia($media) 
+{
+  array_preg_replace($rewrite_iftype, $media);	
+  return $media;
+}
+
+function humanspeed($speed) 
+{
+  $speed = formatRates($speed);
+  if ($speed == "") { $speed = "-"; }
+  return $speed;
+}
+
+function print_error($text)
+{
+  echo('<table class="errorbox" cellpadding="3"><tr><td><img src="/images/15/exclamation.png" align="absmiddle">'.$text.'</td></tr></table>');
+}
+
+function print_message($text)
+{
+  echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle">'.$text.'</td></tr></table>');
+}
+
+
 ?>
