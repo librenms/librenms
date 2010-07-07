@@ -6,7 +6,7 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM voltage where device_id = '$id'");
+$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
 while($voltage = mysql_fetch_array($sql)) 
 {
@@ -39,9 +39,9 @@ while($voltage = mysql_fetch_array($sql))
 
   $hostname = gethostbyid($voltage['device_id']);
   
-  $descr = substr(str_pad($voltage['volt_descr'], 15),0,15);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("volt-" . $voltage['volt_descr'] . ".rrd");
-  $volt_id = $voltage['volt_id'];
+  $descr = substr(str_pad($voltage['sensor_descr'], 15),0,15);
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
+  $volt_id = $voltage['sensor_id'];
 
   $rrd_options .= " DEF:volt$volt_id=$rrd_filename:volt:AVERAGE";
   $rrd_options .= " LINE1:volt$volt_id#".$colour.":'" . $descr . "'";

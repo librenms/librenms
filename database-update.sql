@@ -22,3 +22,6 @@ ALTER TABLE  `devices` CHANGE  `type`  `type` VARCHAR(20) NOT NULL;
 ALTER TABLE  `voltage` CHANGE  `volt_index`  `volt_index` VARCHAR(10) NOT NULL;
 ALTER TABLE  `frequency` CHANGE  `freq_index`  `freq_index` VARCHAR(10) NOT NULL;
 ALTER TABLE  `sensors` CHANGE  `sensor_index`  `sensor_index` VARCHAR(10) NOT NULL;
+DROP TABLE `fanspeed`;
+DROP TABLE `temperature`;
+DROP TABLE `voltage`;
