@@ -25,3 +25,4 @@ ALTER TABLE  `sensors` CHANGE  `sensor_index`  `sensor_index` VARCHAR(10) NOT NU
 DROP TABLE `fanspeed`;
 DROP TABLE `temperature`;
 DROP TABLE `voltage`;
+DROP TABLE `current`;

@@ -277,7 +277,7 @@ function addHost($host, $community, $snmpver, $port = 161)
 {
   global $config;
   list($hostshort)      = explode(".", $host);
-  if ( isDomainResolves($host)){
+  if ( isDomainResolves($host)) {
     if ( isPingable($host)) {
       if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
@@ -332,17 +332,17 @@ function formatUptime($diff, $format="long")
   $uptime = "";
   
   if ($format == "short") {
-    if ($yearsDiff > '0'){ $uptime .= $yearsDiff . "y "; }
-    if ($daysDiff > '0'){ $uptime .= $daysDiff . "d "; }
-    if ($hrsDiff > '0'){ $uptime .= $hrsDiff . "h "; }
-    if ($minsDiff > '0'){ $uptime .= $minsDiff . "m "; }
-    if ($secsDiff > '0'){ $uptime .= $secsDiff . "s "; }
+    if ($yearsDiff > '0') { $uptime .= $yearsDiff . "y "; }
+    if ($daysDiff > '0') { $uptime .= $daysDiff . "d "; }
+    if ($hrsDiff > '0') { $uptime .= $hrsDiff . "h "; }
+    if ($minsDiff > '0') { $uptime .= $minsDiff . "m "; }
+    if ($secsDiff > '0') { $uptime .= $secsDiff . "s "; }
   } else {
-    if ($yearsDiff > '0'){ $uptime .= $yearsDiff . " years, "; }
-    if ($daysDiff > '0'){ $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
-    if ($hrsDiff > '0'){ $uptime .= $hrsDiff     . "h "; }
-    if ($minsDiff > '0'){ $uptime .= $minsDiff   . "m "; }
-    if ($secsDiff > '0'){ $uptime .= $secsDiff   . "s "; }
+    if ($yearsDiff > '0') { $uptime .= $yearsDiff . " years, "; }
+    if ($daysDiff > '0') { $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
+    if ($hrsDiff > '0') { $uptime .= $hrsDiff     . "h "; }
+    if ($minsDiff > '0') { $uptime .= $minsDiff   . "m "; }
+    if ($secsDiff > '0') { $uptime .= $secsDiff   . "s "; }
   }
   return trim($uptime);
 }
@@ -367,7 +367,6 @@ function isPingable($hostname) {
      return FALSE;
    }
 }
-
 
 function is_odd($number) {  
   return $number & 1; // 0 = even, 1 = odd 
@@ -624,7 +623,6 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
   mysql_query($event_query);
 } 
 
-
 function notify($device,$title,$message)
 {
   global $config;
@@ -632,7 +630,6 @@ function notify($device,$title,$message)
   if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
   mail($email, $title, $message, $config['email_headers']);
 }
-
 
 function formatCiscoHardware(&$device, $short = false)
 {

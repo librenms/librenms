@@ -6,7 +6,7 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM current where device_id = '$id'");
+$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
 while($current = mysql_fetch_array($sql)) 
 {
@@ -39,9 +39,9 @@ while($current = mysql_fetch_array($sql))
 
   $hostname = gethostbyid($current['device_id']);
   
-  $descr = substr(str_pad($current['current_descr'], 15),0,15);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("current-" . $current['current_descr'] . ".rrd");
-  $current_id = $current['current_id'];
+  $descr = substr(str_pad($current['sensor_descr'], 15),0,15);
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("current-" . $current['sensor_descr'] . ".rrd");
+  $current_id = $current['sensor_id'];
 
   $rrd_options .= " DEF:current$current_id=$rrd_filename:current:AVERAGE";
   $rrd_options .= " LINE1:current$current_id#".$colour.":'" . $descr . "'";

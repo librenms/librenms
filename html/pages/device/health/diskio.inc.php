@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `ucd_diskio` WHERE device_id = '" . $_GET[id] . "' ORDER BY diskio_descr";
+$sql = "SELECT * FROM `ucd_diskio` WHERE device_id = '" . mres($_GET['id']) . "' ORDER BY diskio_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");
