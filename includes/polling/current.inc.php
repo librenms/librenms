@@ -1,22 +1,19 @@
 <?php
 
-$query = "SELECT * FROM current WHERE device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'";
 $current_data = mysql_query($query);
 while($dbcurrent = mysql_fetch_array($current_data)) {
 
-  echo("Checking current " . $dbcurrent['current_descr'] . "... ");
+  echo("Checking current " . $dbcurrent['sensor_descr'] . "... ");
 
-  #$current_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $dbcurrent['current_oid'] . "|grep -v \"No Such Instance\"";
-  #$current = trim(shell_exec($current_cmd));
+  $current = snmp_get($device, $dbcurrent['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  $current = snmp_get($device, $dbcurrent['current_oid'], "-OUqnv", "SNMPv2-MIB");
-
-  if ($dbcurrent['current_precision']) 
+  if ($dbcurrent['sensor_precision']) 
   {
-    $current = $current / $dbcurrent['current_precision'];
+    $current = $current / $dbcurrent['sensor_precision'];
   }
 
-  $currentrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("current-" . $dbcurrent['current_descr'] . ".rrd");
+  $currentrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("current-" . $dbcurrent['sensor_descr'] . ".rrd");
 
   if (!is_file($currentrrd)) {
     `rrdtool create $currentrrd \
@@ -33,26 +30,26 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
   rrdtool_update($currentrrd,"N:$current");
   
 # FIXME also warn when crossing WARN level!!
-  if($dbcurrent['current_current'] > $dbcurrent['current_limit_low'] && $current <= $dbcurrent['current_limit_low']) 
+  if($dbcurrent['sensor_current'] > $dbcurrent['sensor_limit_low'] && $current <= $dbcurrent['sensor_limit_low']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'] . " is " . $current . "A (Limit " . $dbcurrent['current_limit'];
+    $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is " . $current . "A (Limit " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
-    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['current_descr'] . "\n");
-    log_event('Current ' . $dbcurrent['current_descr'] . " under threshold: " . $current . " A (< " . $dbcurrent['current_limit_low'] . " A)", $device['device_id'], 'current', $current['current_id']);
+    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg, $config['email_headers']);
+    echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . "\n");
+    log_event('Current ' . $dbcurrent['sensor_descr'] . " under threshold: " . $current . " A (< " . $dbcurrent['sensor_limit_low'] . " A)", $device['device_id'], 'current', $current['sensor_id']);
   }
-  else if($dbcurrent['current_current'] < $dbcurrent['current_limit'] && $current >= $dbcurrent['current_limit']) 
+  else if($dbcurrent['sensor_current'] < $dbcurrent['sensor_limit'] && $current >= $dbcurrent['sensor_limit']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'] . " is " . $current . "A (Limit " . $dbcurrent['current_limit'];
+    $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is " . $current . "A (Limit " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
-    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['current_descr'], $msg, $config['email_headers']);
-    echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['current_descr'] . "\n");
-    log_event('Current ' . $dbcurrent['current_descr'] . " above threshold: " . $current . " A (> " . $dbcurrent['current_limit'] . " A)", $device['device_id'], 'current', $current['current_id']);
+    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg, $config['email_headers']);
+    echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . "\n");
+    log_event('Current ' . $dbcurrent['sensor_descr'] . " above threshold: " . $current . " A (> " . $dbcurrent['sensor_limit'] . " A)", $device['device_id'], 'current', $current['sensor_id']);
   }
 
-  mysql_query("UPDATE current SET current_current = '$current' WHERE current_id = '" . $dbcurrent['current_id'] . "'");
+  mysql_query("UPDATE sensors SET sensor_current = '$current' WHERE sensor_class='current' AND sensor_id = '" . $dbcurrent['sensor_id'] . "'");
 }
 
 ?>

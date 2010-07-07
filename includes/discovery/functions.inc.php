@@ -341,24 +341,24 @@ function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precis
     $low_limit = $config['limit']['current'];
   }
   
-  if (mysql_result(mysql_query("SELECT count(current_id) FROM `current` WHERE device_id = '".$device['device_id']."' AND current_type = '$type' AND `current_index` = '$index'"),0) == '0')
+  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='current' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
-    $query = "INSERT INTO current (`device_id`, `current_oid`, `current_index`, `current_type`, `current_descr`, `current_precision`, `current_limit`, `current_limit_warn`, `current_limit_low`, `current_current`) ";
-    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$current')";
+    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_current`) ";
+    $query .= " VALUES ('current', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$current')";
     mysql_query($query);
     if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
     echo("+");
   }
   else
   {
-    $current_entry = mysql_fetch_array(mysql_query("SELECT * FROM `current` WHERE device_id = '".$device['device_id']."' AND current_type = '$type' AND `current_index` = '$index'"));
-    if($oid == $current_entry['current_oid'] && $descr == $current_entry['current_descr'] && $precision == $current_entry['current_precision'])
+    $current_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='current' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+    if($oid == $current_entry['sensor_oid'] && $descr == $current_entry['sensor_descr'] && $precision == $current_entry['sensor_precision'])
     {
       echo(".");
     }
     else
     {
-      mysql_query("UPDATE current SET `current_descr` = '$descr', `current_oid` = '$oid', `current_precision` = '$precision' WHERE `device_id` = '" . $device['device_id'] . "' AND current_type = '$type' AND `current_index` = '$index' ");
+      mysql_query("UPDATE current SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class`='current' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }

@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `frequency` WHERE device_id = '" . $_GET[id] . "' ORDER BY freq_descr";
+$sql = "SELECT * FROM `frequency` WHERE device_id = '" . mres($_GET['id']- . "' ORDER BY freq_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");

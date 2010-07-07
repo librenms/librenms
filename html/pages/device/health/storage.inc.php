@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `storage` WHERE device_id = '" . $_GET[id] . "' ORDER BY storage_descr";
+$sql = "SELECT * FROM `storage` WHERE device_id = '" . ($_GET['id']) . "' ORDER BY storage_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");
