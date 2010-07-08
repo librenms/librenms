@@ -1,5 +1,19 @@
 <?php
 
+function rewrite_processor_descr ($descr) {
+
+  $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
+  $descr = preg_replace("/7600 Series SPA Interface Processor-/", "SIP-", $descr);
+  $descr = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $descr);
+
+  $descr = str_replace("Routing Processor", "RP", $descr);
+  $descr = str_replace("Switching Processor", "SP", $descr);
+  $descr = str_replace("Sub-Module", "Module ", $descr);
+  $descr = str_replace("DFC Card", "DFC", $descr);
+
+  return $descr;
+}
+
 function generateiflink($interface, $text=0, $type = NULL)
 {
 
