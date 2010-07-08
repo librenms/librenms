@@ -1,6 +1,6 @@
 <?php
 
-function rewrite_processor_descr ($descr) {
+function rewrite_entity_descr ($descr) {
 
   $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
   $descr = preg_replace("/7600 Series SPA Interface Processor-/", "SIP-", $descr);

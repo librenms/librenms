@@ -12,7 +12,7 @@
 
     $text_descr = $proc['processor_descr'];
 
-    $text_descr = rewrite_processor_descr($text_descr);
+    $text_descr = rewrite_entity_descr($text_descr);
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
