@@ -10,11 +10,7 @@ if(mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" 
     if(is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $perc = round($mempool['mempool_used'] / ($mempool['mempool_total']) * 100,2);
 
-    $text_descr = $mempool['mempool_descr'];
-    $text_descr = str_replace("Routing Processor", "RP", $text_descr);
-    $text_descr = str_replace("Switching Processor", "SP", $text_descr);
-    $text_descr = str_replace("Sub-Module", "Module ", $text_descr);
-    $text_descr = str_replace("DFC Card", "DFC", $text_descr);
+    $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url   = "/device/".$device['device_id']."/health/memory/";
     $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=mempool&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";

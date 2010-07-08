@@ -9,7 +9,7 @@
  
     $proc_url   = "?page=device/".$device['device_id']."/health/memory/";
  
-    $text_descr = $mempool['mempool_descr'];
+    $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url   = "/device/".$device['device_id']."/health/memory/";
     $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=mempool&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";

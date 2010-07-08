@@ -20,7 +20,7 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
 
     ## REPLACE THIS SHITTY CODE. IT IS ALSO ELSEWHERE.
 
-    $text_descr = rewrite_processor_descr($proc['processor_descr']);
+    $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
     # disable short hrDeviceDescr. need to make this prettier.
     #$text_descr = short_hrDeviceDescr($proc['processor_descr']);
