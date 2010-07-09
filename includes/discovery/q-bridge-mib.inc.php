@@ -17,12 +17,12 @@
 
     foreach(explode("\n", $vlans) as $vlan_oid) {
 
-      list($oid,$vlan) = split(' ',$vlan_oid);
+      list($oid,$vlan_index) = split(' ',$vlan_oid);
       $oid_ex = explode('.',$oid);
-      $oid = $oid_ex[count($oid_ex)-1];
+      $vlan = $oid_ex[count($oid_ex)-1];
 
       $vlan_descr_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -O nvq -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " "; 
-      $vlan_descr_cmd .= "dot1qVlanStaticName.$oid|grep -v \"No Such Instance currently exists at this OID\"";
+      $vlan_descr_cmd .= "dot1qVlanStaticName.$vlan|grep -v \"No Such Instance currently exists at this OID\"";
       $vlan_descr = shell_exec($vlan_descr_cmd);
 
       $vlan_descr = trim(str_replace("\"", "", $vlan_descr));

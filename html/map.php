@@ -15,8 +15,6 @@ include("includes/authenticate.inc.php");
               eval("\$config['" . $confitem . "'] = \$confval;");
           }
       }
-  } else {
-#      echo "Please check config.php.default and adjust your settings to reflect the new Multi-Tenancy configuration.";
   }
 
 
