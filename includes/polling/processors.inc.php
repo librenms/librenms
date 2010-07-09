@@ -28,6 +28,7 @@ while($processor = mysql_fetch_array($proc_data)) {
   $proc = trim(str_replace("\"", "", $proc));
   list($proc) = preg_split("@\ @", $proc); 
 
+  if(!$processor['processor_precision']) {$processor['processor_precision'] = "1";};
   $proc = round($proc / $processor['processor_precision'],2);
 
   echo($proc . "%\n");
