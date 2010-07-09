@@ -18,7 +18,7 @@
         } elseif($entry['snAgentCpuUtilValue']) {
           $usage_oid = ".1.3.6.1.4.1.1991.1.1.2.11.1.1.4." . $index;
           $usage = $entry['snAgentCpuUtilValue'];
-          $precision = 1;
+          $precision = 100;
         }
 
         list($slot, $instance, $interval) = explode(".", $index);
