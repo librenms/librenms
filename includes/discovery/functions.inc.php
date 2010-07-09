@@ -133,7 +133,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
     else
     {
       echo(".");
-      $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$oid."', `processor_usage` = '".$current."'
+      $query = "UPDATE `processors` SET `processor_descr` = '".$descr."', `processor_oid` = '".$oid."', `processor_usage` = '".$current."', `processor_precision` = '".$precision."'
                       WHERE `device_id` = '".$device['device_id']."' AND `processor_index` = '".$index."' AND `processor_type` = '".$type."'";
       mysql_query($query);
       if($debug) { print $query . "\n"; }
