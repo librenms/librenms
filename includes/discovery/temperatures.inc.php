@@ -9,19 +9,7 @@ echo("Temperatures : ");
 
 $valid_temp = array();
 
-#include("temperatures/adva.inc.php"); ## Disabled needing rewrite
-include("temperatures/akcp.inc.php");
-include("temperatures/areca.inc.php");
-include("temperatures/cisco-envmon.inc.php");
-include("temperatures/dell.inc.php");
-include("temperatures/ironware.inc.php");
-include("temperatures/junose.inc.php");
-include("temperatures/junos.inc.php");
-include("temperatures/lm-sensors.inc.php");
-include("temperatures/netmanplus.inc.php");
-include("temperatures/observer-custom.inc.php");
-include("temperatures/papouch-tme.inc.php");
-include("temperatures/supermicro.inc.php");
+include_dir("includes/discovery/temperatures");
 
 if($debug) { print_r($valid_temp); }
 

@@ -1,9 +1,11 @@
 <?php
 
+global $valid_temp;
+  
 if ($device['os'] == "junos" || $device['os_group'] == "junos")
 {
   echo("JunOS ");
-  $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -M +".$config['install_dir']."/mibs/junos -m JUNIPER-MIB -$snmpver -CI -Osqn -c $community $hostname:$port 1.3.6.1.4.1.2636.3.1.13.1.7");
+  $oids = snmp_walk($device,"1.3.6.1.4.1.2636.3.1.13.1.7","-Osqn","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
   $oids = trim($oids);
   foreach(explode("\n", $oids) as $data)
   {
@@ -14,8 +16,8 @@ if ($device['os'] == "junos" || $device['os_group'] == "junos")
       list($oid) = explode(" ", $data);
       $temp_oid  = "1.3.6.1.4.1.2636.3.1.13.1.7.$oid";
       $descr_oid = "1.3.6.1.4.1.2636.3.1.13.1.5.$oid";
-      $descr = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -M +".$config['install_dir']."/mibs/junos -m JUNIPER-MIB -O qv -$snmpver -c $community $hostname:$port $descr_oid"));
-      $temp = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -M +".$config['install_dir']."/mibs/junos -m JUNIPER-MIB -O qv -$snmpver -c$community $hostname:$port $temp_oid"));
+      $descr = snmp_get($device,$descr_oid,"-Oqv","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
+      $temp = snmp_get($device,$temp_oid,"-Oqv","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
       if (!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0")
       {
         $descr = str_replace("\"", "", $descr);
@@ -25,11 +27,9 @@ if ($device['os'] == "junos" || $device['os_group'] == "junos")
         $descr = trim($descr);
 
         discover_temperature($valid_temp, $device, $temp_oid, $oid, "junos", $descr, "1", NULL, NULL, $temp);
-
       }
     }
   }
 }
-
 
 ?>

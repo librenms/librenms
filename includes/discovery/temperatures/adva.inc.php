@@ -1,4 +1,7 @@
 <?php
+/*
+Disabled needing rewrite
+
   $id = $device['device_id'];
   $hostname = $device['hostname'];
   $community = $device['community'];
@@ -81,4 +84,5 @@
       }
       $temp_exists[] = "$id $oid_hss2";
     }
+*/
 ?>
