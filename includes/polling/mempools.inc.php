@@ -35,7 +35,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
     ### Do we need a generic mempool poller?
   }
 
-  $percent = round($mempool['used'] * $mempool['total'] * 100);
+  $percent = round($mempool['used'] * $mempool['total'] * 100, 2);
 
   echo($percent."% ");
 
@@ -51,5 +51,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   mysql_query($update_query);
 
 }
+
+echo("\n");
 
 ?>

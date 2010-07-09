@@ -13,8 +13,6 @@ while($processor = mysql_fetch_array($proc_data)) {
     $proc = snmp_get ($device, $processor['processor_oid'], "-O Uqnv");
   }
 
-
-
   $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("processor-" . $processor['processor_type'] . "-" . $processor['processor_index'] . ".rrd");
 
   if (!is_file($procrrd)) {
@@ -29,6 +27,8 @@ while($processor = mysql_fetch_array($proc_data)) {
 
   $proc = trim(str_replace("\"", "", $proc));
   list($proc) = preg_split("@\ @", $proc); 
+
+  $proc = round($proc / $processor['processor_precision'],2);
 
   echo($proc . "%\n");
 
