@@ -38,7 +38,7 @@
       }
     }
   } 
-  ## End Cisco Processors
+  ## End Ironware Processors
 
   unset ($processors_array);
 
