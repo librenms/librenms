@@ -1,9 +1,10 @@
 <?php
 
-if($device['os'] == "linux")
+global $valid_temp;
+
+if ($device['os'] == "linux")
 {
-    ## FIX ME SNMP_WALK
-    $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m LM-SENSORS-MIB -$snmpver -CI -Osqn -c $community $hostname:$port lmTempSensorsDevice");
+    $oids = snmp_walk($device, "lmTempSensorsDevice", "-Osqn", "LM-SENSORS-MIB");
     if ($debug) { echo($oids."\n"); }
     $oids = trim($oids);
     if ($oids) echo("LM-SENSORS ");
@@ -25,8 +26,6 @@ if($device['os'] == "linux")
         }
       }
     }
-
-
 }
 
 ?>

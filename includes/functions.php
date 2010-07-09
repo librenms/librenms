@@ -678,4 +678,23 @@ function isHexString($str)
   return preg_match("/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is",trim($str));
 }
 
+# Include all .inc.php files in $dir
+function include_dir($dir)
+{
+  global $device, $config;
+
+  if ($handle = opendir($dir)) 
+  {
+    while (false !== ($file = readdir($handle))) 
+    {
+      if (filetype($dir . '/' . $file) == 'file' && substr($file,strlen($file)-8) == '.inc.php')
+      {
+        include($dir . '/' . $file);
+      }
+    }
+
+    closedir($handle);
+  }
+}
+
 ?>

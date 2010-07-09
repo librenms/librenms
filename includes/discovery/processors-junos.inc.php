@@ -4,9 +4,9 @@
 if($device['os'] == "junos")
 {
   echo("JUNOS : ");
-  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingCPU", $processors_array, "JUNIPER-MIB" , "+".$config['install_dir']."/mibs/junos");
-  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDRAMSize", $processors_array, "JUNIPER-MIB" , "+".$config['install_dir']."/mibs/junos");
-  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDescr", $processors_array, "JUNIPER-MIB" , "+".$config['install_dir']."/mibs/junos");
+  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingCPU", $processors_array, "JUNIPER-MIB" , '+'.$config['install_dir']."/mibs/junos");
+  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDRAMSize", $processors_array, "JUNIPER-MIB" , '+'.$config['install_dir']."/mibs/junos");
+  $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDescr", $processors_array, "JUNIPER-MIB" , '+'.$config['install_dir']."/mibs/junos");
   if($debug) { print_r($processors_array); }
 
   if(is_array($processors_array[$device['device_id']])) {
