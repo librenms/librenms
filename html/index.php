@@ -87,10 +87,10 @@ function popUp(URL) {
 <?php
   if($_SESSION['authenticated']) {
     ## Authenticated. Print a page.
-    if(isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".php")) {
-      include("pages/" . $_GET['page'] . ".php");
+    if(isset($_GET['page']) && !strstr("..", $_GET['page']) &&  is_file("pages/" . $_GET['page'] . ".inc.php")) {
+      include("pages/" . $_GET['page'] . ".inc.php");
     } else { 
-      if(isset($config['front_page'])) {
+      if(isset($config['front_page']) && is_file($config['front_page'])) {
         include($config['front_page']);
       } else {
         include("pages/front/default.php");
@@ -99,7 +99,7 @@ function popUp(URL) {
 
   } else {
     ## Not Authenticated. Print login.
-    include("pages/logon.inc");
+    include("pages/logon.inc.php");
     exit;
   } 
 ?>
