@@ -29,7 +29,7 @@ LM-Sensors setup
 
 For lm-sensors/net-snmp to put your temperatures in the "Temp" group (as
 opposed to the "Misc" group, their name needs to start with "temp"; for
-Observer to see the interface the name should start with "temp-" (i.e.
+ObserverNMS to see the interface the name should start with "temp-" (i.e.
 temp-CPU, temp-System). You can change this in /etc/sensors.conf - change
 the label descriptions if necessary, under your specific chipset block.
 

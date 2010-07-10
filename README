@@ -18,7 +18,7 @@ Please see COPYING for usage requirements and restrictions.
 Introduction
 ------------
 
-Observer is an auto-discovering network monitoring system. 
+ObserverNMS is an auto-discovering network monitoring system. 
 
 It's designed to be an easily-navigable interface to the health of your network.
 
@@ -30,12 +30,12 @@ Planned Features
 * Pseudowire (MPLS/L2TP) tracking                   * In Progress
 * MPLS IP-VPN tracking                              * In Progress
 * 95th and metered usage tracking                   * In Progress
-* Nagios Integration                                * Too scary for contempation
+* Nagios Integration                                * Too scary for contemplation
 
 Installation
 ------------
 
-Installation of Observer is currently not for the faint of heart! There is no automated
+Installation of ObserverNMS is currently not for the faint of heart! There is no automated
 install script, so it'll probably take quite a bit of fiddling!
 
 Please see http://www.observernms.org.

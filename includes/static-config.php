@@ -216,13 +216,13 @@ if(isset($_SERVER['HTTPS'])) {
 }
 
 ### Connect to database
-$observer_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$observer_link) {
-        echo "<h2>MySQL Error</h2>";
+$observernms_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$observernms_link) {
+        echo "<h2>ObserverNMS MySQL Error</h2>";
         echo mysql_error();
         die;
 }
-$observer_db = mysql_select_db($config['db_name'], $observer_link);
+$observernms_db = mysql_select_db($config['db_name'], $observernms_link);
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 

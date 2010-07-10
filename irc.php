@@ -9,7 +9,7 @@ include("includes/discovery/functions.inc.php");
 include_once('Net/SmartIRC.php');
 
 
-class observerbot
+class observernmsbot
 {
 
   function device_info (&$irc, &$data)
@@ -52,7 +52,7 @@ $port = 6667;
 $nick = "ObserverBOT";
 $chan = "#observernms";
 
-$bot = &new observerbot( );
+$bot = &new observernmsbot( );
 $irc = &new Net_SmartIRC( );
 $irc->setUseSockets( TRUE );
 
