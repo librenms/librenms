@@ -193,6 +193,7 @@ $device_types = array('server','network','firewall','workstation','printer','pow
 
 $config['version'] = "0.10";
 
+$config['rrdgraph_def_text'] = str_replace("  ", " ", $config['rrdgraph_def_text']);
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 
 if(!$config['mibdir']) 
@@ -217,7 +218,7 @@ if(isset($_SERVER['HTTPS'])) {
 ### Connect to database
 $observer_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observer_link) {
-        echo "<h2>Observer MySQL Error</h2>";
+        echo "<h2>MySQL Error</h2>";
         echo mysql_error();
         die;
 }
