@@ -9,9 +9,9 @@ include("includes/discovery/functions.inc.php");
 
 $start = utime();
 
-### Observer Device Discovery
+### ObserverNMS Device Discovery
 
-echo("Observer v".$config['version']." Discovery\n\n");
+echo("ObserverNMS v".$config['version']." Discovery\n\n");
 
 if($argv[1] == "--device" && $argv[2]) {
   $where = "AND `device_id` = '".$argv[2]."'";

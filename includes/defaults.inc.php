@@ -79,6 +79,8 @@ $config['overview_show_sysDescr'] = true;
 ## Poller Modules
 
 $config['enable_port_Xbcmc']     = 1; # Enable ifXEntry broadcast/multicast
+$config['port_descr_parser']	 = "includes/port-descr-parser.inc.php"; # Parse port descriptions into fields
+
 
 ### Ignores & Allows
 

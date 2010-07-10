@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ ! -e /var/log/observer-mysql.pipe ]
+if [ ! -e /var/log/observernms-mysql.pipe ]
 then
-mkfifo /var/log/observer-mysql.pipe
+mkfifo /var/log/observernms-mysql.pipe
 fi
-while [ -e /var/log/observer-mysql.pipe ]
+while [ -e /var/log/observernms-mysql.pipe ]
 do
-mysql -u observer --password=password observer < /var/log/observer-mysql.pipe >/dev/null
+mysql -u observernms --password=password observernms < /var/log/observernms-mysql.pipe >/dev/null
 done 

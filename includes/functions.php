@@ -5,7 +5,7 @@
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
-## Observer Includes
+## ObserverNMS Includes
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
