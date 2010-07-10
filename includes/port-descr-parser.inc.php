@@ -1,7 +1,7 @@
 
 <?php
 
-  ## Very basic parser to parse classic Observer-type schemes.
+  ## Very basic parser to parse classic ObserverNMS-type schemes.
   ## Parser should populate $port_ifAlias array with type, descr, circuit, speed and notes
 
   unset ($port_ifAlias);

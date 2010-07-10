@@ -128,11 +128,11 @@ print_optionbar_end(); ?>
 
     <?php
 
-    $observer_version = $config['version'];
+    $observernms_version = $config['version'];
     if (file_exists('.svn/entries'))
     {
       $svn = File('.svn/entries');
-      $observer_version .='-SVN r' . trim($svn[3]);
+      $observernms_version .='-SVN r' . trim($svn[3]);
       unset($svn);
     }
 
@@ -152,7 +152,7 @@ print_optionbar_start(NULL);
 echo("
 <h3>Versions</h3>
 <table width=100% cellpadding=3 cellspacing=0 border=0>
-<tr valign=top><td width=150><b>ObserverNMS</b></td><td>$observer_version</td></tr>
+<tr valign=top><td width=150><b>ObserverNMS</b></td><td>$observernms_version</td></tr>
 <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
 <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
 <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
