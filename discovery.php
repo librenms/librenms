@@ -9,9 +9,9 @@ include("includes/discovery/functions.inc.php");
 $start = utime();
 $runtime_stats = array();
 
-### Observer Device Discovery
+### ObserverNMS Device Discovery
 
-echo("Observer v".$config['version']." Discovery\n\n");
+echo("ObserverNMS v".$config['version']." Discovery\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 

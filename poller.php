@@ -1,12 +1,14 @@
 #!/usr/bin/php
 <?php
 
+### ObserverNMS Device Poller
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
 $poller_start = utime();
-echo("Observer Poller v".$config['version']."\n\n");
+echo("ObserverNMS Poller v".$config['version']."\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 
@@ -259,7 +261,7 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
-shell_exec("echo '".$string."' >> ".$config['install_dir']."/observer.log"); # FIXME EWW
+shell_exec("echo '".$string."' >> ".$config['install_dir']."/observernms.log"); # FIXME EWW
 
 
 ?>
