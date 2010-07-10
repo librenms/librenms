@@ -29,7 +29,7 @@ $config['rrd_interval']  = 10;
 // Average rows/rra (currently ignored)
 $config['rrd_rows']      = 2400;
 // Additional options to pass to rrdgraph
-$config['rrd_opts']      = (isset($config['rrdgraph_defaults']) ? $config['rrdgraph_defaults'] : '');
+#$config['rrd_opts']      = (isset($config['rrdgraph_defaults']) ? $config['rrdgraph_defaults'] : '');
 #$config['rrd_opts']      = array('-E', "-c", "SHADEA#a5a5a5", "-c", "SHADEB#a5a5a5", "-c", "FONT#000000", "-c", "CANVAS#FFFFFF", "-c", "GRID#aaaaaa",
 #                                       "-c", "MGRID#FFAAAA", "-c", "FRAME#3e3e3e", "-c", "ARROW#5e5e5e", "-R", "normal");
 // Predefined set of colors for use by collectd_draw_rrd()
