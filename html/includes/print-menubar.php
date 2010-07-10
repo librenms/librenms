@@ -262,6 +262,7 @@ echo('        <li><hr /></li>
       echo('
         <li><hr width="140" /></li>
         <li><a href="settings/"><img src="images/16/wrench.png" border="0" align="absmiddle" /> Global Settings</a></li>');
+        }
      ?>
      <li><hr width="140" /></li>
       <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
