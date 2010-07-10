@@ -258,11 +258,17 @@ echo('        <li><hr /></li>
   <table><tr><td>
     <ul>
      <li><a href="about/"><img src="images/16/information.png" border="0" align="absmiddle" /> About</a></li>
+     <?php if ($_SESSION['userlevel'] >= '10') {
+      echo('
+        <li><hr width="140" /></li>
+        <li><a href="settings/"><img src="images/16/wrench.png" border="0" align="absmiddle" /> Global Settings</a></li>');
+     ?>
      <li><hr width="140" /></li>
-      <li><a href="/preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
+      <li><a href="preferences/"><img src="images/16/wrench_orange.png" border="0" align="absmiddle" /> My Settings</a></li>
     <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
         <li><hr width="140" /></li>');
+        
       if (auth_usermanagement())
       {
       echo('
