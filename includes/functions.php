@@ -99,8 +99,10 @@ function getHostOS($device)
 {
   global $config;
   
-  $sysDescr_cmd = $config['snmpget']." -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " sysDescr.0";
-  $sysDescr = str_replace("\"", "", trim(shell_exec($sysDescr_cmd)));
+  $sysDescr    = snmp_get ($device, "sysDescr.0", "-Ovq");
+  $sysObjectId = snmp_get ($device, "sysObjectID.0", "-Ovqn");
+
+
   $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
