@@ -129,9 +129,33 @@ if ($device['os'] == "apc")
       discover_freq($valid_freq,$device, $oid, "4.2.1.4.$index", $type, $descr, $precision, NULL, NULL, $current);
     }
   }
+
+  $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.3.2.4.0", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids)
+  {
+    echo(" APC In ");
+    list($oid,$current) = explode(" ",$oids);
+    $precision = 1;
+    $type = "apc";
+    $index = "3.2.4.0";
+    $descr = "Input";
+    discover_freq($valid_freq, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  }
+
+  $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.4.2.2.0", "-OsqnU", "");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids)
+  {
+    echo(" APC Out ");
+    list($oid,$current) = explode(" ",$oids);
+    $precision = 1;
+    $type = "apc";
+    $index = "4.2.2.0";
+    $descr = "Output";
+    discover_freq($valid_freq, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  }
 }
-
-
 
 ## Delete removed sensors
 
