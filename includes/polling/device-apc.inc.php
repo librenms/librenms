@@ -9,6 +9,18 @@ if ($serial == "")
   $serial = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.8.1.6.0", "-OQv", "", ""),'"');
 }
 
+if ($serial == "")
+{
+  # UPS
+  $serial = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.1.1.2.3.0", "-OQv", "", ""),'"');
+}
+
+if ($serial == "")
+{
+  # Masterswitch/AP9606
+  $serial = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.4.1.5.0", "-OQv", "", ""),'"');
+}
+
 ######################
 
 # PDU
@@ -22,6 +34,20 @@ if ($hardware == " ")
   $hardware .= ' ' . trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.8.1.1.0", "-OQv", "", ""),'"');
 }
 
+if ($hardware == " ")
+{
+  # UPS
+  $hardware = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.1.1.1.1.0", "-OQv", "", ""),'"');
+  $hardware .= ' ' . trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.1.1.2.1.0", "-OQv", "", ""),'"');
+}
+
+if ($hardware == " ")
+{
+  # Masterswitch/AP9606
+  $hardware = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.4.1.4.0", "-OQv", "", ""),'"');
+  $hardware .= ' ' . trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.4.1.1.0", "-OQv", "", ""),'"');
+}
+
 ######################
 
 # PDU
@@ -31,6 +57,12 @@ if ($version == "")
 {
   # ATS
   $version = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.8.1.2.0", "-OQv", "", ""),'"');
+}
+
+if ($version == "")
+{
+  # Masterswitch/AP9606
+  $version = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.4.1.2.0", "-OQv", "", ""),'"');
 }
 
 ?>
