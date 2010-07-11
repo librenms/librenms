@@ -41,9 +41,9 @@ $config['snmp']['retries'] = 6; # how many times to retry the query
 
 ### Alerting Settings
 
-#$config['alert']['email']]'default']      = NULL;    ## Default alert recipient
-#$config['alert']['email']['default_only'] = FALSE;   ## Only use default recipient
-#$config['alert']['email']['enable']	  = TRUE;    ## Enable email alerts
+$config['alerts']['email']['default']      = NULL;    ## Default alert recipient
+$config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
+$config['alerts']['email']['enable']	   = TRUE;    ## Enable email alerts
 
 ### Cosmetics
 
@@ -61,7 +61,7 @@ $list_highlight  = "#ffcccc";
 $warn_colour_a = "#ffeeee";
 $warn_colour_b = "#ffcccc";
 
-$config['graph_colours']['mixed']  = array("CC0000", "008C00", "4096EE", "73880A", "D01F3C", "36393D", "FF0084");
+$config['graph_colours']['mixed']   = array('CC0000','008C00','4096EE','73880A','D01F3C','36393D','FF0084');
 $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
 $config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38','5C1F1E','401F10');
 $config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');

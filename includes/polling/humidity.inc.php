@@ -9,6 +9,8 @@ while($humidity = mysql_fetch_array($hum_data)) {
   $hum_cmd = $config['snmpget'] . " -M ".$config['mibdir']. " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $humidity['sensor_oid'] . "|grep -v \"No Such Instance\"";
   $hum = trim(str_replace("\"", "", shell_exec($hum_cmd)));
 
+  ## fixme snmp_get()
+
   if ($humidity['sensor_precision']) 
   {
     $hum = $hum / $humidity['sensor_precision'];
@@ -35,7 +37,7 @@ while($humidity = mysql_fetch_array($hum_data)) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
-    mail($email, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg, $config['email_headers']);
+    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
     log_event('Frequency ' . $humidity['sensor_descr'] . " under threshold: " . $hum . " % (< " . $humidity['sensor_limit_low'] . " %)", $device['device_id'] , 'humidity', $humidity['sensor_id']);
   }
@@ -44,7 +46,7 @@ while($humidity = mysql_fetch_array($hum_data)) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
-    mail($email, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg, $config['email_headers']);
+    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
     log_event('Humidity ' . $humidity['sensor_descr'] . " above threshold: " . $hum . " % (> " . $humidity['sensor_limit'] . " %)", $device['device_id'], 'humidity', $humidity['sensor_id']);
   }

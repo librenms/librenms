@@ -30,8 +30,7 @@ if($errored) { ## If there are errored ports
     $i++;
   } 
   ## Send the alert email
-  mail($config['email_default'], "ObserverNMS detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg, $config['email_headers']);
-  echo($msg);
+  notify($device, "ObserverNMS detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
 }
 
 ?>

@@ -107,6 +107,11 @@ $config['os']['speedtouch']['text']     = "Thomson Speedtouch";
 $config['os']['speedtouch']['ifname']	= 1;
 $config['os']['speedtouch']['type']     = "network";
 
+$config['os']['zywall']['text']     	= "ZyXEL ZyWALL";
+$config['os']['zywall']['type']     	= "firewall";
+$config['os']['zywall']['overgraph'][]  = "device_bits";
+$config['os']['zywall']['overtext']     = "Traffic";
+
 $config['os']['allied']['text']         = "AlliedWare";
 $config['os']['allied']['type']         = "network";
 
