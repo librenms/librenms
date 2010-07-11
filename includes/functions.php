@@ -627,8 +627,24 @@ function notify($device,$title,$message)
 {
   global $config;
 
-  if ($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-  mail($email, $title, $message, $config['email_headers']);
+  if($config['alerts']['email']['enable']) 
+  {
+    if($config['alerts']['email']['default_only']) 
+    {
+      $email = $config['alerts']['email']['default'];
+    } else {
+      if ($device['sysContact']) 
+      { 
+        $email = $device['sysContact']; 
+      } else { 
+        $email = $config['alerts']['email']['default']; 
+      }
+    }
+    if($email) 
+    {
+      mail($email, $title, $message, $config['email_headers']);
+    }
+  }
 }
 
 function formatCiscoHardware(&$device, $short = false)

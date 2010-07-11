@@ -32,19 +32,17 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
 # FIXME also warn when crossing WARN level!!
   if($dbcurrent['sensor_current'] > $dbcurrent['sensor_limit_low'] && $current <= $dbcurrent['sensor_limit_low']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is " . $current . "A (Limit " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
-    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg, $config['email_headers']);
+    notify($device, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . "\n");
     log_event('Current ' . $dbcurrent['sensor_descr'] . " under threshold: " . $current . " A (< " . $dbcurrent['sensor_limit_low'] . " A)", $device['device_id'], 'current', $current['sensor_id']);
   }
   else if($dbcurrent['sensor_current'] < $dbcurrent['sensor_limit'] && $current >= $dbcurrent['sensor_limit']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is " . $current . "A (Limit " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
-    mail($email, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg, $config['email_headers']);
+    notify($device, "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . "\n");
     log_event('Current ' . $dbcurrent['sensor_descr'] . " above threshold: " . $current . " A (> " . $dbcurrent['sensor_limit'] . " A)", $device['device_id'], 'current', $current['sensor_id']);
   }

@@ -6,9 +6,6 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
 
   echo("Checking fan " . $fanspeed['sensor_descr'] . "... ");
 
-  #$fan_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $fanspeed['sensor_oid'] . "|grep -v \"No Such Instance\"";
-  #$fan = trim(str_replace("\"", "", shell_exec($fan_cmd)));
-
   $fan = snmp_get($device, $fanspeed['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
   if ($fanspeed['sensor_precision']) { $fan = $fan / $fanspeed['sensor_precision']; }
@@ -33,7 +30,7 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['sensor_limit'];
     $msg .= "rpm) at " . date($config['timestamp_format']);
-    mail($email, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'], $msg, $config['email_headers']);
+    notify($device, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . "\n");
     log_event('Fan speed ' . $fanspeed['sensor_descr'] . " under threshold: " . $fanspeed['sensor_current'] . " rpm (&gt; " . $fanspeed['sensor_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['sensor_id']);
   }

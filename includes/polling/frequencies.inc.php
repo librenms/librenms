@@ -6,11 +6,7 @@ while($frequency = mysql_fetch_array($freq_data)) {
 
   echo("Checking frequency " . $frequency['freq_descr'] . "... ");
 
-  #$freq_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $frequency['freq_oid'] . "|grep -v \"No Such Instance\"";
-  #$freq = trim(str_replace("\"", "", shell_exec($freq_cmd)));
-
   $freq = snmp_get($device, $frequency['freq_oid'], "-OUqnv", "SNMPv2-MIB");
-
 
   if ($frequency['freq_precision']) 
   {
@@ -38,7 +34,7 @@ while($frequency = mysql_fetch_array($freq_data)) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'] . " is " . $freq . "Hz (Limit " . $frequency['freq_limit'];
     $msg .= "Hz) at " . date($config['timestamp_format']);
-    mail($email, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg, $config['email_headers']);
+    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $frequency['freq_descr'] . "\n");
     log_event('Frequency ' . $frequency['freq_descr'] . " under threshold: " . $freq . " Hz (< " . $frequency['freq_limit_low'] . " Hz)", $device['device_id'] , 'frequency', $frequency['freq_id']);
   }
@@ -47,7 +43,7 @@ while($frequency = mysql_fetch_array($freq_data)) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'] . " is " . $freq . "Hz (Limit " . $frequency['freq_limit'];
     $msg .= "Hz) at " . date($config['timestamp_format']);
-    mail($email, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg, $config['email_headers']);
+    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['freq_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $frequency['freq_descr'] . "\n");
     log_event('Frequency ' . $frequency['freq_descr'] . " above threshold: " . $freq . " Hz (> " . $frequency['freq_limit'] . " Hz)", $device['device_id'], 'frequency', $frequency['freq_id']);
   }
