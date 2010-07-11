@@ -2,7 +2,7 @@
 
 if ($config['enable_printers'])
 {
-$valid_toner = array();
+  $valid_toner = array();
   
   echo("Toner : ");
   
