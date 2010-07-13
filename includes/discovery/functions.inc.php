@@ -362,7 +362,7 @@ function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precis
     }
     else
     {
-      mysql_query("UPDATE current SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class`='current' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
+      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class`='current' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }
