@@ -5,7 +5,7 @@ $scale_max = "40";
 
 include("common.inc.php");
 
-  $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
+  $rrd_options .= " COMMENT:'                                 Last   Min   Max\\n'";
 
   $temperature = mysql_fetch_array(mysql_query("SELECT * FROM sensors where sensor_id = '".mres($_GET['id'])."'"));
 
@@ -32,6 +32,7 @@ include("common.inc.php");
   $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['sensor_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " LINE1:tempwarm#660000";
   $rrd_options .= " GPRINT:temp:LAST:%3.0lfC";
+  $rrd_options .= " GPRINT:temp:MIN:%3.0lfC";
   $rrd_options .= " GPRINT:temp:MAX:%3.0lfC\\\\l";
 
 ?>
