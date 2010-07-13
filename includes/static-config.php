@@ -97,6 +97,9 @@ $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
 $config['os']['powerconnect']['type']   = "network";
 
+$config['os']['airport']['type'] 	= "network";
+$config['os']['airport']['text']  	= "Apple AirPort";
+
 $config['os']['windows']['text']        = "Microsoft Windows";
 $config['os']['windows']['ifname']	= 1;
 
