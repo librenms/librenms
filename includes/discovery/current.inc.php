@@ -39,7 +39,14 @@ if ($device['os'] == "apc")
       $limit     = snmp_get($device, $limit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
       $lowlimit  = snmp_get($device, $lowlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
       $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
-      $descr     = "Phase $phase";
+      if (count(explode("\n",$oids)) != 1)
+      {
+        $descr     = "Phase $phase";
+      }
+      else
+      {
+        $descr     = "Output";
+      }
 
       echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
     }
