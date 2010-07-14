@@ -93,6 +93,10 @@ $config['os']['generic']['text']        = "Generic Device";
 $config['os']['ironware']['text']       = "Brocade IronWare";
 $config['os']['ironware']['type']       = "network";
 
+$config['os']['extremeware']['text']    = "Extremeware";
+$config['os']['extremeware']['type']    = "network";
+$config['os']['extremeware']['ifname']  = 1;
+
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
 $config['os']['powerconnect']['type']   = "network";

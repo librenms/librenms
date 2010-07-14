@@ -142,7 +142,7 @@ $config['syslog_age']    = "1 month"; ## Time to keep syslog for in
 $config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "container",
              "async", "plip", "-physical", "-signalling", "control", "container", "unrouted",
-             "bri", "-bearer", "ng", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
+             "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
              "span rp", "span sp", "sslvpn");
 
 $config['bad_if_regexp'] = array("/serial[0-9]:/");
