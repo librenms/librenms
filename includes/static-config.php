@@ -103,6 +103,8 @@ $config['os']['powerconnect']['type']   = "network";
 
 $config['os']['powervault']['text']   = "Dell PowerVault";
 
+$config['os']['gamatronicups']['text']   = "Gamatronic UPS Stack";
+
 $config['os']['airport']['type'] 	= "network";
 $config['os']['airport']['text']  	= "Apple AirPort";
 
