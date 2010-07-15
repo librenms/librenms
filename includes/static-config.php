@@ -105,6 +105,9 @@ $config['os']['powervault']['text']     = "Dell PowerVault";
 
 $config['os']['drac']['text']           = "Dell DRAC";
 
+$config['os']['netopia']['text']        = "Motorola Netopia";
+$config['os']['netopia']['type']        = "network";
+
 $config['os']['axiscam']['text']        = "AXIS Network Camera";
 
 $config['os']['gamatronicups']['text']  = "Gamatronic UPS Stack";
