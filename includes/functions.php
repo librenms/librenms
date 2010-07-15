@@ -102,7 +102,6 @@ function getHostOS($device)
   $sysDescr    = snmp_get ($device, "sysDescr.0", "-Ovq");
   $sysObjectId = snmp_get ($device, "sysObjectID.0", "-Ovqn");
 
-
   $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
