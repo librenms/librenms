@@ -47,7 +47,7 @@ while($voltage = mysql_fetch_array($volt_data)) {
     echo("Alerting for " . $device['hostname'] . " " . $voltage['sensor_descr'] . "\n");
     log_event('Voltage ' . $voltage['sensor_descr'] . " above threshold: " . $volt . " V (> " . $voltage['sensor_limit'] . " V)", $device['device_id'], 'voltage', $voltage['sensor_id']);
   }
-  mysql_query("UPDATE sensor SET volt_current = '$volt' WHERE sensor_class='voltage' AND volt_id = '" . $voltage['sensor_id'] . "'");
+  mysql_query("UPDATE sensor SET sensor_current = '$volt' WHERE sensor_class='voltage' AND sensor_id = '" . $voltage['sensor_id'] . "'");
 }
 
 ?>
