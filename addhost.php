@@ -23,10 +23,10 @@ if($argv[1]) {
       if ( isPingable($argv[1])) {
        if ( isSNMPable($argv[1], $community, $snmpver, $port)) {
         $snmphost = trim(str_replace("\"", "", shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0")));
-        if ($snmphost != "" || $snmphost && ($snmphost == $host || $hostshort = $host)) {
+        if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
           $return = createHost ($host, $community, $snmpver, $port);
 	  if($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
-        } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
+        } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
        } else { echo("Could not reach $host with SNMP\n"); }
       } else { echo("Could not ping $host\n"); }
     } else { echo("Could not resolve $host\n"); }
