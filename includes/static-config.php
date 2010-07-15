@@ -101,9 +101,14 @@ $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
 $config['os']['powerconnect']['type']   = "network";
 
-$config['os']['powervault']['text']   = "Dell PowerVault";
+$config['os']['powervault']['text']     = "Dell PowerVault";
 
-$config['os']['gamatronicups']['text']   = "Gamatronic UPS Stack";
+$config['os']['drac']['text']           = "Dell DRAC";
+
+$config['os']['axiscam']['text']        = "AXIS Network Camera";
+
+$config['os']['gamatronicups']['text']  = "Gamatronic UPS Stack";
+$config['os']['gamatronicups']['type']  = "power";
 
 $config['os']['airport']['type'] 	= "network";
 $config['os']['airport']['text']  	= "Apple AirPort";
@@ -131,6 +136,9 @@ $config['os']['mgeups']['group']        = "ups";
 $config['os']['mgeups']['overgraph'][]	= "device_current";
 $config['os']['mgeups']['overtext']	= "Current";
 $config['os']['mgeups']['type']		= "power";
+
+$config['os']['mgepdu']['text']         = "MGE PDU";
+$config['os']['mgepdu']['type']		= "power";
 
 $config['os']['apc']['text']            = "APC Management Module";
 $config['os']['apc']['overgraph'][]	= "device_current";
