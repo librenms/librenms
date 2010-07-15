@@ -26,3 +26,5 @@ DROP TABLE `fanspeed`;
 DROP TABLE `temperature`;
 DROP TABLE `voltage`;
 DROP TABLE `current`;
+ALTER TABLE  `sensors` ADD  `entPhysicalIndex` VARCHAR( 16 ) NULL;
+ALTER TABLE `sensors`  ADD `entPhysicalIndex_measured` VARCHAR(16) NULL;
