@@ -123,7 +123,7 @@ if (!isset($called_by_script_server)) {
    }
 
    # Split the result up and extract only the desired parts of it.
-   #$options['items'] = "";
+   $options['items'] = "";
    $wanted = explode(',', $options['items']);
    $output = array();
    foreach ( explode(' ', $result) as $item ) {
