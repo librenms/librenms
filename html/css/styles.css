@@ -330,6 +330,10 @@ a.list-device-ignored-up {
 	color: #009900;
 }
 
+a.list-device-disabled {
+	color: #888888;
+}
+
 .footer-text {
   font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 12px;

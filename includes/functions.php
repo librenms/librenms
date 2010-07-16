@@ -197,6 +197,7 @@ function devclass($device)
      $class = "list-device-ignored";
      if (isset($device['status']) && $device['status'] == '1') { $class = "list-device-ignored-up"; }
    }
+   if (isset($device['disabled']) && $device['disabled'] == '1') { $class = "list-device-disabled"; }
   return $class;
 }
 
