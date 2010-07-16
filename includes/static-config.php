@@ -110,6 +110,8 @@ $config['os']['netopia']['type']        = "network";
 
 $config['os']['axiscam']['text']        = "AXIS Network Camera";
 
+$config['os']['axisdocserver']['text']  = "AXIS Network Document Server";
+
 $config['os']['gamatronicups']['text']  = "Gamatronic UPS Stack";
 $config['os']['gamatronicups']['type']  = "power";
 
