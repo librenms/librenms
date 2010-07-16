@@ -697,17 +697,17 @@ function isHexString($str)
 }
 
 # Include all .inc.php files in $dir
-function include_dir($dir)
+function include_dir($dir, $regex = "/\.inc\.php$/")
 {
   global $device, $config;
 
-  if ($handle = opendir($dir)) 
+  if ($handle = opendir($config['install_dir'] . '/' . $dir)) 
   {
     while (false !== ($file = readdir($handle))) 
     {
-      if (filetype($dir . '/' . $file) == 'file' && substr($file,strlen($file)-8) == '.inc.php')
+      if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file))
       {
-        include($dir . '/' . $file);
+        include($config['install_dir'] . '/' . $dir . '/' . $file);
       }
     }
 
