@@ -1,5 +1,6 @@
 <?php
 
+include("cpu.inc.php");
 include("memory.inc.php");
 include("netstats.inc.php");
 include("laload.inc.php");
