@@ -224,6 +224,12 @@ $config['os']['ricoh']['overgraph'][]      = "device_toner";
 $config['os']['ricoh']['overtext']         = "Toner";
 $config['os']['ricoh']['type']             = "printer";
 
+$config['os']['brother']['group'] 	   = "printer";
+$config['os']['brother']['text']  	   = "Brother Printer";
+$config['os']['brother']['overgraph'][]    = "device_toner";
+$config['os']['brother']['overtext']       = "Toner";
+$config['os']['brother']['type']           = "printer";
+
 $config['os']['konica']['group'] 	   = "printer";
 $config['os']['konica']['text']  	   = "Konica-Minolta Printer";
 $config['os']['konica']['overgraph'][]     = "device_toner";
