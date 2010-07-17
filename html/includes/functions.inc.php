@@ -221,8 +221,8 @@ function generate_if_link($args, $text = NULL)
 function generate_port_thumbnail($args) 
 {
     if(!$args['bg']) { $args['bg'] = "FFFFF"; }
-    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&if=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
-    $output = generate_if_link($args);
+    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
+    $output = generate_if_link($args, $args['content']);
     echo $output;
 }
 
