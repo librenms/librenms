@@ -18,6 +18,10 @@
 
 error_reporting(E_ALL | E_NOTICE | E_WARNING);
 
+require('includes/collectd/config.php');
+require('includes/collectd/functions.php');
+require('includes/collectd/definitions.php');
+
 #require('config.php');
 #require('functions.php');
 #require('definitions.php');
