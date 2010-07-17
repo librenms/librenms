@@ -2,7 +2,7 @@
 
 echo("<table width=100%>");
 
-$hrdevices = mysql_query("SELECT * FROM `hrDevice` WHERE `device_id` = '".$device['device_id']."'");
+$hrdevices = mysql_query("SELECT * FROM `hrDevice` WHERE `device_id` = '".$device['device_id']."' ORDER BY `hrDeviceIndex`");
 while($hrdevice = mysql_fetch_array($hrdevices)) {
 
   echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
