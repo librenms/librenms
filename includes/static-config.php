@@ -49,6 +49,11 @@ $config['os']['ios']['text']		= "Cisco IOS";
 $config['os']['ios']['type']		= "network";
 $config['os']['ios']['ifXmcbc']         = 1;
 
+$config['os']['cat1900']['group']	= "cat1900";
+$config['os']['cat1900']['text']	= "Cisco Catalyst 1900";
+$config['os']['cat1900']['type']        = "network";
+$config['os']['cat1900']['icon']        = "catos";
+
 $config['os']['iosxe']['group']		= "ios";
 $config['os']['iosxe']['text']		= "Cisco IOS-XE";
 $config['os']['iosxe']['type']		= "network";
@@ -65,6 +70,7 @@ $config['os']['asa']['group']		= "ios";
 $config['os']['asa']['text']		= "Cisco ASA";
 $config['os']['asa']['ifname']		= 1;
 $config['os']['asa']['type']		= "firewall";
+$config['os']['asa']['icon']		= "ios";
 
 $config['os']['pix']['group'] 		= "ios";
 $config['os']['pix']['text']		= "Cisco PIX-OS";
@@ -146,6 +152,7 @@ $config['os']['windows']['ifname']	= 1;
 
 $config['os']['procurve']['text']       = "HP ProCurve";
 $config['os']['procurve']['type']       = "network";
+$config['os']['procurve']['icon']       = "hp";
 
 $config['os']['speedtouch']['text']     = "Thomson Speedtouch";
 $config['os']['speedtouch']['ifname']	= 1;
@@ -240,6 +247,7 @@ $config['os']['jetdirect']['overgraph'][]  = "device_toner";
 $config['os']['jetdirect']['overtext']     = "Toner";
 $config['os']['jetdirect']['ifname']	   = 1;
 $config['os']['jetdirect']['type']         = "printer";
+$config['os']['jetdirect']['icon']         = "hp";
 
 $config['os']['ricoh']['group'] 	   = "printer";
 $config['os']['ricoh']['text']  	   = "Ricoh Printer";
