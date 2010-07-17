@@ -1,7 +1,24 @@
 For more granular updates check http://twitter.com/observium or 
 http://www.observium.org/websvn/listing.php?repname=observer
 
-Release 0.10.6
+Release 0.10.7 ( SVN )
+
+* Project name has changed to Observium
+* rrdcached support
+* Discovery of new device/os types : 
+  Apple Airport, Axis Camera, Motorola Netopia, APC Switch PDU,
+  Extreme Extremware, Redback, ZyXEL ZyWALL, DELL DRAC,
+  Dell PowerVault, Allied Telesis, Cisco NX-OS, MGE Evolution UPS
+  HP JetDirect printers, APC STS/ATS, Mikrotic RouterOS,
+  AKCP SensorProbe3
+* Temperature detection from CISCO-ENTITY-SENSOR-MIB
+* Graphing of statistics from DISKIO-MIB
+* Ongoing unification of all sensors into one 'sensors' framework
+* Detection and polling of frequency, voltage and ampage stats
+  for many UPSes and power switching hardware
+
+
+Release 0.10.6 ( 21st June 2010 )
 
 Changed netstats (icmp, udp, tcp, snmp, ip) stats collection
 Implemented new application monitoring system
