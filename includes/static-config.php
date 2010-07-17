@@ -142,6 +142,11 @@ $config['os']['speedtouch']['text']     = "Thomson Speedtouch";
 $config['os']['speedtouch']['ifname']	= 1;
 $config['os']['speedtouch']['type']     = "network";
 
+$config['os']['sonicwal']['text']     	= "SonicWALL";
+$config['os']['sonicwal']['type']     	= "firewall";
+$config['os']['sonicwal']['overgraph'][]  = "device_bits";
+$config['os']['sonicwal']['overtext']     = "Traffic";
+
 $config['os']['zywall']['text']     	= "ZyXEL ZyWALL";
 $config['os']['zywall']['type']     	= "firewall";
 $config['os']['zywall']['overgraph'][]  = "device_bits";
