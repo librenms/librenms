@@ -6,9 +6,9 @@
 
  if($config['enable_inventory']) {
 
-  $empty = array();
-  $entity_array = snmpwalk_cache_oid("entPhysicalEntry", $device, $empty, "ENTITY-MIB");
-  $entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+  $entity_array = array();
+  $entity_array = snmpwalk_cache_oid("entPhysicalEntry", $device, $entity_array, "ENTITY-MIB");
+  #$entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
 
   if(!$entity_array[$device['device_id']]) { $entity_array[$device['device_id']] = array(); }
 
@@ -67,25 +67,26 @@
         echo("+");
       }
 
-      if($entPhysicalClass == "sensor")
-      {
-        $entSensorType            = $entry['entSensorType'];
-        $entSensorScale           = $entry['entSensorScale'];
-        $entSensorPrecision       = $entry['entSensorPrecision'];
-        $entSensorValueUpdateRate = $entry['entSensorValueUpdateRate'];
-        $entSensorMeasuredEntity  = $entry['entSensorMeasuredEntity'];
+#      if($entPhysicalClass == "sensor")
+#      {
+#        $entSensorType            = $entry['entSensorType'];
+#        $entSensorScale           = $entry['entSensorScale'];
+#        $entSensorPrecision       = $entry['entSensorPrecision'];
+#        $entSensorValueUpdateRate = $entry['entSensorValueUpdateRate'];
+#        $entSensorMeasuredEntity  = $entry['entSensorMeasuredEntity'];
 	
-       if($config['allow_entity_sensor'][$entSensorType]) {
-          $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
-          $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
-          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
-        } else {
-          echo("!");
-          $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
-          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
-        }
-        mysql_query($sql);
-      }
+#       if($config['allow_entity_sensor'][$entSensorType]) {
+#          $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
+#          $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
+#          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+#        } else {
+#          echo("!");
+#          $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
+#          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
+#        }
+#        mysql_query($sql);
+#      }
+
       $valid[$entPhysicalIndex] = 1;
     }
   }
