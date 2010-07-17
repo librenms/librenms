@@ -9,7 +9,7 @@ include("includes/discovery/functions.inc.php");
 include_once('Net/SmartIRC.php');
 
 
-class observernmsbot
+class observiumbot
 {
 
   function device_info (&$irc, &$data)
@@ -50,9 +50,9 @@ class observernmsbot
 $host = "chat.eu.freenode.net";
 $port = 6667;
 $nick = "ObserverBOT";
-$chan = "#observernms";
+$chan = "#observium";
 
-$bot = &new observernmsbot( );
+$bot = &new observiumbot( );
 $irc = &new Net_SmartIRC( );
 $irc->setUseSockets( TRUE );
 
@@ -60,7 +60,7 @@ $irc->registerActionhandler( SMARTIRC_TYPE_CHANNEL, '!device', $bot, 'device_inf
 $irc->registerActionhandler( SMARTIRC_TYPE_CHANNEL, '!port', $bot, 'port_info' );
 
 $irc->connect( $host, $port );
-$irc->login( $nick, 'ObserverNMS Bot', 0, $nick );
+$irc->login( $nick, 'Observium Bot', 0, $nick );
 $irc->join( array( $chan ) );
 $irc->listen( );
 $irc->disconnect( );

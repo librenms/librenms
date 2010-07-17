@@ -9,9 +9,9 @@ $debug =1;
 
 $poller_start = utime();
 
-### ObserverNMS Device Polling Test
+### Observium Device Polling Test
 
-echo("ObserverNMS v".$config['version']." Discovery\n\n");
+echo("Observium v".$config['version']." Discovery\n\n");
 
 if($argv[1] == "--device" && $argv[2]) {
   $where = "AND `device_id` = '".$argv[2]."'";

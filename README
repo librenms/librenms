@@ -18,7 +18,7 @@ Please see COPYING for usage requirements and restrictions.
 Introduction
 ------------
 
-ObserverNMS is an auto-discovering network monitoring system. 
+Observium is an auto-discovering network monitoring system. 
 
 It's designed to be an easily-navigable interface to the health of your network.
 
@@ -35,10 +35,10 @@ Planned Features
 Installation
 ------------
 
-Installation of ObserverNMS is currently not for the faint of heart! There is no automated
+Installation of Observium is currently not for the faint of heart! There is no automated
 install script, so it'll probably take quite a bit of fiddling!
 
-Please see http://www.observernms.org.
+Please see http://www.observium.org.
 
 Please email adama@memetic.org with any feature requests, bug reports or just to tell me
 that you're using observer!

@@ -1,6 +1,6 @@
 Unfortunately this documentation hasn't been written yet.
 	
-Please see http://www.observernms.org for installation instructions.
+Please see http://www.observium.org for installation instructions.
 
 Please also contact me via adama@memetic.org if you run in to any issues.
 
@@ -29,7 +29,7 @@ LM-Sensors setup
 
 For lm-sensors/net-snmp to put your temperatures in the "Temp" group (as
 opposed to the "Misc" group, their name needs to start with "temp"; for
-ObserverNMS to see the interface the name should start with "temp-" (i.e.
+Observium to see the interface the name should start with "temp-" (i.e.
 temp-CPU, temp-System). You can change this in /etc/sensors.conf - change
 the label descriptions if necessary, under your specific chipset block.
 

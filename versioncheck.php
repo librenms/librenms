@@ -8,7 +8,7 @@ include("includes/functions.php");
 $ports = mysql_result(mysql_query("SELECT count(*) FROM ports"),0); 
 $devices    = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
 
-$dataHandle = fopen("http://www.observernms.org/latest.php?i=$ports&d=$devices&v=".$config['version'], r);
+$dataHandle = fopen("http://www.observium.org/latest.php?i=$ports&d=$devices&v=".$config['version'], r);
 
 if($dataHandle)
 {

@@ -6,7 +6,9 @@
 
   unset ($port_ifAlias);
 
-#  echo("parser!");
+  echo("parser!");
+
+  echo($this_port['ifAlias']);
 
   list($type,$descr) = preg_split("/[\:\[\]\{\}\(\)]/", $this_port['ifAlias']);
   list(,$circuit) = preg_split("/[\{\}]/", $this_port['ifAlias']);
@@ -21,7 +23,9 @@
     $port_ifAlias['speed'] = $speed;
     $port_ifAlias['notes'] = $notes;
 
-    print_r($port_ifAlias);
+#    if($debug) {
+      print_r($port_ifAlias);
+#    }
 
   }
 

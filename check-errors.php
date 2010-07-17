@@ -30,7 +30,7 @@ if($errored) { ## If there are errored ports
     $i++;
   } 
   ## Send the alert email
-  notify($device, "ObserverNMS detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
+  notify($device, "Observium detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
 }
 
 ?>
