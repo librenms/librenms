@@ -5,7 +5,7 @@ print_optionbar_start();
 echo("
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/'>Basic</a> | Graphs :
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/bits/'>Bits</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/pkts/'>Packets</a> |
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/upkts/'>Packets</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/nupkts/'>NU Packets</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/errors/'>Errors</a>
  ");
