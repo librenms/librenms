@@ -112,7 +112,7 @@ function popUp(URL) {
     $gentime = substr($run, 0, 5);
 
     echo '<br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : '');
-    echo '<br />Powered by <a href="http://www.observernms.org" target="_blank">ObserverNMS ' . $config['version'];
+    echo '<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version'];
 
     if (file_exists('.svn/entries'))
     {

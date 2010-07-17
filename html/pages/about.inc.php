@@ -1,10 +1,10 @@
 <div style="margin: 10px;">
-  <h3>ObserverNMS <?php echo($config['version']);?></h3>
+  <h3>Observium <?php echo($config['version']);?></h3>
 
     <div style="float: right; padding: 0px; width: 49%">
     <?php print_optionbar_start(NULL); ?>
     <h3>License</h3>
-    <pre>ObserverNMS Network Management and Monitoring System
+    <pre>Observium Network Management and Monitoring System
 Copyright (C) 2006-2010 Adam Armstrong
  
 This program is free software: you can redistribute it and/or modify
@@ -128,11 +128,11 @@ print_optionbar_end(); ?>
 
     <?php
 
-    $observernms_version = $config['version'];
+    $Observium_version = $config['version'];
     if (file_exists('.svn/entries'))
     {
       $svn = File('.svn/entries');
-      $observernms_version .='-SVN r' . trim($svn[3]);
+      $Observium_version .='-SVN r' . trim($svn[3]);
       unset($svn);
     }
 
@@ -152,7 +152,7 @@ print_optionbar_start(NULL);
 echo("
 <h3>Versions</h3>
 <table width=100% cellpadding=3 cellspacing=0 border=0>
-<tr valign=top><td width=150><b>ObserverNMS</b></td><td>$observernms_version</td></tr>
+<tr valign=top><td width=150><b>Observium</b></td><td>$Observium_version</td></tr>
 <tr valign=top><td><b>Apache</b></td><td>$apache_version</td></tr>
 <tr valign=top><td><b>PHP</b></td><td>$php_version</td></tr>
 <tr valign=top><td><b>MySQL</b></td><td>$mysql_version</td></tr>
@@ -163,14 +163,14 @@ print_optionbar_end();
 
     ?>
 
-  <h5>ObserverNMS is an autodiscovering PHP/MySQL based network monitoring system.</h5>
+  <h5>Observium is an autodiscovering PHP/MySQL based network monitoring system.</h5>
 
-  <p><a href="http://www.observernms.org">Website</a> | 
-     <a href="http://www.observernms.org/wiki/">Support Wiki</a> | 
-     <a href="http://www.observernms.org/forum/">Forum</a> | 
-     <a href="http://www.observernms.org/bugs/">Bugtracker</a> | 
-     <a href="http://www.observernms.org/pmwiki.php/Main/MailingLists">Mailing List</a> | 
-     <a href="http://twitter.com/observernms">Twitter</a> |
+  <p><a href="http://www.observium.org">Website</a> | 
+     <a href="http://www.observium.org/wiki/">Support Wiki</a> | 
+     <a href="http://www.observium.org/forum/">Forum</a> | 
+     <a href="http://www.observium.org/bugs/">Bugtracker</a> | 
+     <a href="http://www.observium.org/pmwiki.php/Main/MailingLists">Mailing List</a> | 
+     <a href="http://twitter.com/Observium">Twitter</a> |
      <a href="http://www.facebook.com/pages/Observer/128354461353">Facebook</a></p>
 
 

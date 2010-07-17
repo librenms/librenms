@@ -6,14 +6,14 @@
 $config['db_host'] = "localhost";
 $config['db_user'] = "USERNAME";
 $config['db_pass'] = "PASSWORD";
-$config['db_name'] = "observernms";
+$config['db_name'] = "observium";
 
 ### Locations
-$config['install_dir'] 	= "/opt/observernms";
+$config['install_dir'] 	= "/opt/observium";
 $config['html_dir']	= $config['install_dir'] . "/html";
-$config['rrd_dir'] 	= "/opt/observernms/rrd";
+$config['rrd_dir'] 	= "/opt/observium/rrd";
 $config['temp_dir']	= "/tmp";
-$config['observer_log'] = $config['install_dir'] . "/observernms.log";
+$config['observer_log'] = $config['install_dir'] . "/observium.log";
 
 ### Enable the below to use rrdcached. be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.
@@ -31,7 +31,7 @@ $config['auth_ldap_server'] = "ldap.yourserver.com";
 $config['auth_ldap_port']   = 389;
 $config['auth_ldap_prefix'] = "uid=";
 $config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=observernms,ou=groups,dc=example,dc=com";
+$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
 
 ### Location of executables
 
@@ -49,10 +49,10 @@ $config['branding'] = array(
 
     # The default branding.
     'default' => array(
-        'base_url'       => "http://observernms.example.com",
+        'base_url'       => "http://observium.example.com",
         'mydomain'       => "example.com",
-        'page_title'     => "ObserverNMS",
-        'title_image'    => "images/observer-logo.gif",
+        'page_title'     => "Observium",
+#        'title_image'    => "images/observer-logo.gif",
         'stylesheet'     => "css/styles.css",
         'mono_font'      => "DejaVuSansMono",
         'header_color'   => "#133A7B",
@@ -62,10 +62,10 @@ $config['branding'] = array(
     ),
 
     # Example branding for a specifc URL.
-    'observernms.branding.com' => array(
-        'base_url'       => "http://observernms.branding.com",
+    'observium.branding.com' => array(
+        'base_url'       => "http://observium.branding.com",
         'mydomain'       => "branding.com",
-        'page_title'     => "ObserverNMS",
+        'page_title'     => "Observium",
         'title_image'    => "images/observer-logo.gif",
         'stylesheet'     => "css/styles.css",
         'mono_font'      => "DejaVuSansMono",
@@ -77,8 +77,8 @@ $config['branding'] = array(
 );
 
 ### E-Mail information.
-$config['email_default']  = "observernms@example.com";
-$config['email_from']     = "ObserverNMS <observernms@example.com>";
+$config['email_default']  = "observium@example.com";
+$config['email_from']     = "Observium <observium@example.com>";
 $config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
 
 ### List of networks to allow scanning-based discovery
