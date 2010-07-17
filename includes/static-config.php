@@ -265,25 +265,6 @@ $config['os']['3com']['overgraph'][]       = "";
 $config['os']['3com']['overtext']          = "";
 $config['os']['3com']['type']              = "network";
 
-if(!$config['graph_colours']['greens']) {
-  $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
-}
-if(!$config['graph_colours']['pinks']) {
-  $config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38','5C1F1E','401F10');
-}
-if(!$config['graph_colours']['blues']) {
-  $config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');
-}
-if(!$config['graph_colours']['purples']) {
-  $config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
-}
-if(!$config['graph_colours']['default']) {
-  $config['graph_colours']['default'] = $config['graph_colours']['blues'];
-}
-if(!$config['graph_colours']['mixed']) {
-  $config['graph_colours']['mixed']  = array("CC0000", "008C00", "4096EE", "73880A", "D01F3C", "36393D", "FF0084");
-}
-
 $device_types = array('server','network','firewall','workstation','printer','power', 'environment');
 
 ##############################
@@ -315,13 +296,13 @@ if(isset($_SERVER['HTTPS'])) {
 }
 
 ### Connect to database
-$observernms_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
-if (!$observernms_link) {
-        echo "<h2>ObserverNMS MySQL Error</h2>";
+$observium_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
+if (!$observium_link) {
+        echo "<h2>Observer MySQL Error</h2>";
         echo mysql_error();
         die;
 }
-$observernms_db = mysql_select_db($config['db_name'], $observernms_link);
+$observium_db = mysql_select_db($config['db_name'], $observium_link);
 
 # Set some times needed by loads of scripts (it's dynamic, so we do it here!)
 

@@ -5,7 +5,7 @@
 include_once("Net/IPv4.php");
 include_once("Net/IPv6.php");
 
-## ObserverNMS Includes
+## Observium Includes
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
@@ -18,12 +18,6 @@ include_once($config['install_dir'] . "/includes/syslog.php");
 include_once($config['install_dir'] . "/includes/rewrites.php");
 include_once($config['install_dir'] . "/includes/snmp.inc.php");
 include_once($config['install_dir'] . "/includes/services.inc.php");
-
-## CollectD
-
-require('collectd/config.php');
-require('collectd/functions.php');
-require('collectd/definitions.php');
 
 function mac_clean_to_readable($mac)
 {

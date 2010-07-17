@@ -27,7 +27,11 @@ if($_GET['debug']) {
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");
+require('includes/collectd/config.php');
+require('includes/collectd/functions.php');
+require('includes/collectd/definitions.php');
 include("includes/authenticate.inc.php");
+
 if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
 
 function makeTextBlock($text, $fontfile, $fontsize, $width) {

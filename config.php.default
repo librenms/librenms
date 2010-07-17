@@ -11,8 +11,7 @@ $config['db_name'] = "observium";
 ### Locations
 $config['install_dir'] 	= "/opt/observium";
 $config['html_dir']	= $config['install_dir'] . "/html";
-$config['rrd_dir'] 	= "/opt/observium/rrd";
-$config['temp_dir']	= "/tmp";
+$config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
 $config['observer_log'] = $config['install_dir'] . "/observium.log";
 
 ### Enable the below to use rrdcached. be sure rrd_dir is within the rrdcached dir
@@ -20,188 +19,22 @@ $config['observer_log'] = $config['install_dir'] . "/observium.log";
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 
 ### Default community
-$config['community'] = "public";
+$config['snmp']['community'][] = "public";
 
-### Authentication model
+### Authentication Model
 $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['http_auth_guest'] = "guest"; # remember to configure this user if you use http-auth
 
 # LDAP module configuration
-$config['auth_ldap_server'] = "ldap.yourserver.com";
-$config['auth_ldap_port']   = 389;
-$config['auth_ldap_prefix'] = "uid=";
-$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
-
-### Location of executables
-
-$config['rrdtool']      = "/usr/bin/rrdtool";
-$config['fping']        = "/usr/bin/fping";
-$config['ipcalc']       = "/usr/bin/ipcalc";
-$config['sipcalc']      = "/usr/bin/sipcalc";
-$config['snmpwalk']     = "/usr/bin/snmpwalk";
-$config['snmpget']      = "/usr/bin/snmpget";
-$config['snmpbulkwalk'] = "/usr/bin/snmpbulkwalk";
-$config['snmpset']      = "/usr/bin/snmpset";
-
-### Application information. Multi-Tenant aware.
-$config['branding'] = array(
-
-    # The default branding.
-    'default' => array(
-        'base_url'       => "http://observium.example.com",
-        'mydomain'       => "example.com",
-        'page_title'     => "Observium",
-#        'title_image'    => "images/observer-logo.gif",
-        'stylesheet'     => "css/styles.css",
-        'mono_font'      => "DejaVuSansMono",
-        'header_color'   => "#133A7B",
-        'favicon'        => "images/observer-icon.png",
-        'page_gen'       => 1,
-        'footer'         => "",
-    ),
-
-    # Example branding for a specifc URL.
-    'observium.branding.com' => array(
-        'base_url'       => "http://observium.branding.com",
-        'mydomain'       => "branding.com",
-        'page_title'     => "Observium",
-        'title_image'    => "images/observer-logo.gif",
-        'stylesheet'     => "css/styles.css",
-        'mono_font'      => "DejaVuSansMono",
-        'header_color'   => "#133A7B",
-        'favicon'        => "images/observer-icon.png",
-        'page_gen'       => 0,
-        'footer'         => "<a href='http://www.branding.com' target='_blank'>My Branding Company</a> - Slogan!",
-    ),
-);
-
-### E-Mail information.
-$config['email_default']  = "observium@example.com";
-$config['email_from']     = "Observium <observium@example.com>";
-$config['email_headers']  = "From: " . $config['email_from'] . "\r\n";
+#$config['auth_ldap_server'] = "ldap.yourserver.com";
+#$config['auth_ldap_port']   = 389;
+#$config['auth_ldap_prefix'] = "uid=";
+#$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+#$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
 
 ### List of networks to allow scanning-based discovery
-$config['nets'] =  array ("89.21.224.0/19", "212.9.12.0/24", "212.9.13.0/24");
-
-$config['page_refresh'] = "0";  ## Refresh the page every xx seconds
-$config['front_page'] 	= "pages/front/default.php";
-
-$config['login_message']  = "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.";
-
-### What should we warn about?
-$config['warn']['ifdown'] = false;
-
-## Should we autocreate hosts we see via discovery protocols?
-$config['cdp_autocreate'] = false;
-$config['snmp_autodiscovery'] = false;
-
-### Which interface sections should we show?
-
-$config['int_customers'] 	= 1;  # Enable Customer Port Parsing
-$config['int_transit'] 		= 1;  # Enable Transit Types
-$config['int_peering'] 		= 1;  # Enable Peering Types
-$config['int_core'] 		= 1;  # Enable Core Port Types
-$config['int_l2tp'] 		= 0;  # Enable L2TP Port Types
-
-$config['show_locations'] 	= 1;  # Enable Locations on menu
-$config['show_locations_dropdown'] = 0;  # Enable Locations dropdown on menu
-$config['show_services']        = 1;  # Enable Services on menu
-
-$config['ports_page_default']	= "details/";  
-# Default devices ports page display type. "details/", "graphs/bits/", etc
-
-#$config['port_descr_parser']            = "includes/port-descr-parser.inc.php";
-## Use parser to parse out ifAlias into type/descr/speed/circuit/notes
-
-### Which additional features should we enable?
-
-$config['enable_bgp'] 		= 1; # Enable BGP session collection and display
-$config['enable_syslog'] 	= 0; # Enable Syslog
-$config['enable_billing']	= 0; # Enable Billing
-$config['enable_inventory']	= 1; # Enable Inventory
-$config['enable_etherlike']	= 1; # Enable Etherlike
-$config['enable_port_Xbcmc']	= 1; # Enable ifXEntry broadcast/multicast
-$config['enable_pseudowires']   = 1; # Enable Pseudowires
-$config['enable_ports_junoseatmvp']   = 0; # Enable JunOSe ATM VC Discovery/Poller
-$config['enable_ports_etherlike']     = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
-$config['enable_printers']        = 0;  # Enable Printer support
-
-#$config['rancid_configs']       = '/var/lib/rancid/network/configs/';
-$config['rancid_ignorecomments'] = 0; # Ignore lines starting with #
-
-#$config['collectd_dir']         = '/var/lib/collectd/rrd';
-
-## If a syslog entry contails these strings it is deleted from the database
-$config['syslog_filter'] = array("last message repeated", "Connection from UDP: [127.0.0.1]:"); 
-
-$config['syslog_age']    = "1 month"; ## Time to keep syslog for in 
-                                      ## MySQL DATE_SUB format (eg '1 day', '1 month')
-
-### Interface name strings to ignore
-$config['bad_if'] = array("null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
-             "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "container",
-             "async", "plip", "-physical", "-signalling", "control", "container", "unrouted",
-             "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
-             "span rp", "span sp", "sslvpn");
-
-$config['bad_if_regexp'] = array("/serial[0-9]:/");
-
-$config['allow_entity_sensor']['amperes'] = 1;
-$config['allow_entity_sensor']['celsius'] = 1;
-$config['allow_entity_sensor']['dBm'] = 1;
-$config['allow_entity_sensor']['voltsDC'] = 1;
-$config['allow_entity_sensor']['voltsAC'] = 1;
-$config['allow_entity_sensor']['watts'] = 1;
-$config['allow_entity_sensor']['truthvalue'] = 1;
-$config['allow_entity_sensor']['specialEnum'] = 1;
-
-### Hardcoded ASN descriptions
-
-# $config['astext'][65333] = "Cymru Bogon Feed";
-
-### Default warning settings
-
-$config['defaults']['temp_limit'] = 60;
-
-### Style Options
-
-$list_colour_a = "#ffffff";
-$list_colour_b = "#eeeeee";
-
-$list_colour_a_a = "#f9f9f9";
-$list_colour_a_b = "#f0f0f0";
-
-$list_colour_b_a = "#f0f0f0";
-$list_colour_b_b = "#e3e3e3";
-
-$list_highlight  = "#ffcccc";
-
-$warn_colour_a = "#ffeeee";
-$warn_colour_b = "#ffcccc";
-
-/// Many colour schemes for graphs. Feel free to fiddle!
-
-#$config['graph_colours'] = array("000066","330066","990066","990066","CC0033","FF0000"); ## Purple to Red
-#$config['graph_colours'] = array("006600","336600","996600","996600","CC3300","FF0000"); ## Green to Red
-#$config['graph_colours'] = array("002200","004400","006600","008800","00AA00","00CC00"); ## Green
-#$config['graph_colours'] = array("220000","440000","660000","880000","AA0000","CC0000"); ## Red
-#$config['graph_colours'] = array("001122","002244","003366","004488","0055AA","0066CC"); ## Blue
-#$config['graph_colours'] = array("002233","004466","006699","0088CC","0099FF");          ## Sky-Blue
-#$config['graph_colours'] = array("110022","330066","440088","6600AA","8800FF");          ## Purple
-#$config['graph_colours'] = array("002200","004400","006600","008800","00AA00","00AA00","00CC00"); ## Forest Greens
-#$config['graph_colours']['greens']  = array("112200","224400","336600","448800","66AA00","88FF00");          ## Grass Greens
-#$config['graph_colours']['greens']  = array("95FFA7","4EFF97","33FF66","336600","224400","112200");
-#$config['graph_colours']['greens'] = array("B7d6A9","8fcb73","50b91d","3ab419","0a8612","034f11");
-#$config['graph_colours']['blues']   = array("b5d7ff","6eb7ff","0064ff","0082ff","0019d5","0016cb","00007d"); ## Cold Blues
-
-$config['graph_colours']['mixed']  = array("CC0000", "008C00", "4096EE", "73880A", "D01F3C", "36393D", "FF0084");
-
-$config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
-$config['graph_colours']['pinks']   = array('D0558F','B34773','943A57','792C38','5C1F1E','401F10');
-$config['graph_colours']['blues']   = array('A0A0E5','8080BD','606096','40406F','202048','000033');
-$config['graph_colours']['purples'] = array('CC7CCC','AF63AF','934A93','773177','5B185B','3F003F');
-$config['graph_colours']['default'] = $config['graph_colours']['blues'];
+$config['nets'][] = "172.22.0.0/16";
+$config['nets'][] = "192.168.0.0/24";
 
 include("includes/static-config.php");
 
