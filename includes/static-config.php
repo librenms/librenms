@@ -53,11 +53,13 @@ $config['os']['iosxe']['group']		= "ios";
 $config['os']['iosxe']['text']		= "Cisco IOS-XE";
 $config['os']['iosxe']['type']		= "network";
 $config['os']['iosxe']['ifXmcbc']       = 1;
+$config['os']['iosxe']['icon']		= "ios";
 
 $config['os']['iosxr']['group']		= "ios";
 $config['os']['iosxr']['text']		= "Cisco IOS-XR";
 $config['os']['iosxr']['type']		= "network";
 $config['os']['iosxr']['ifXmcbc']       = 1;
+$config['os']['iosxr']['icon']		= "ios";
 
 $config['os']['asa']['group']		= "ios";
 $config['os']['asa']['text']		= "Cisco ASA";
@@ -90,6 +92,7 @@ $config['os']['routeros']['nobulk']	= 1;
 
 $config['os']['junose']['text']		= "Juniper JunOSe";
 $config['os']['junose']['type']		= "network";
+$config['os']['junose']['icon']		= "junos";
 
 $config['os']['generic']['text']        = "Generic Device";
 
@@ -126,14 +129,17 @@ $config['os']['dlinkap']['type']        = "network";
 $config['os']['dlinkap']['icon']        = "dlink";
 
 $config['os']['axiscam']['text']        = "AXIS Network Camera";
+$config['os']['axiscam']['icon']        = "axis";
 
 $config['os']['axisdocserver']['text']  = "AXIS Network Document Server";
+$config['os']['axisdocserver']['icon']  = "axis";
 
 $config['os']['gamatronicups']['text']  = "Gamatronic UPS Stack";
 $config['os']['gamatronicups']['type']  = "power";
 
 $config['os']['airport']['type'] 	= "network";
 $config['os']['airport']['text']  	= "Apple AirPort";
+$config['os']['airport']['icon']  	= "apple";
 
 $config['os']['windows']['text']        = "Microsoft Windows";
 $config['os']['windows']['ifname']	= 1;
