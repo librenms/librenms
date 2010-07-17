@@ -184,17 +184,6 @@ function device_traffic_image($device, $width, $height, $from, $to)
   return "<img src='graph.php?device=" . $device . "&amp;type=device_bits&amp;from=" . $from . "&amp;to=" . $to . "&amp;width=" . $width . "&amp;height=" . $height . "&amp;legend=no' />";
 }
 
-function devclass($device) 
-{
-   if (isset($device['status']) && $device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
-   if (isset($device['ignore']) && $device['ignore'] == '1') {
-     $class = "list-device-ignored";
-     if (isset($device['status']) && $device['status'] == '1') { $class = "list-device-ignored-up"; }
-   }
-   if (isset($device['disabled']) && $device['disabled'] == '1') { $class = "list-device-disabled"; }
-  return $class;
-}
-
 function getImage($host) 
 {
   global $config;

@@ -292,5 +292,16 @@ function print_message($text)
   echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle">'.$text.'</td></tr></table>');
 }
 
+function devclass($device) 
+{
+   if (isset($device['status']) && $device['status'] == '0') { $class = "list-device-down"; } else { $class = "list-device"; }
+   if (isset($device['ignore']) && $device['ignore'] == '1') {
+     $class = "list-device-ignored";
+     if (isset($device['status']) && $device['status'] == '1') { $class = "list-device-ignored-up"; }
+   }
+   if (isset($device['disabled']) && $device['disabled'] == '1') { $class = "list-device-disabled"; }
+  return $class;
+}
+
 
 ?>
