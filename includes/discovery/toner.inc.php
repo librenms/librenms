@@ -5,8 +5,8 @@ if ($config['enable_printers'])
   $valid_toner = array();
   
   echo("Toner : ");
-  
-  if ($device['os'] == "dell-laser" || $device['os'] == "jetdirect") 
+
+  if ($device['os_group'] == 'printer') 
   {
     $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
     if ($debug) { echo($oids."\n"); }
