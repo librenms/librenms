@@ -5,6 +5,32 @@
 
 #$config['snmp']['timeout'] = 300; # timeout in ms
 #$config['snmp']['retries'] = 6; # how many times to retry the query
+
+function snmp_get_multi ($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir = NULL)
+{
+  global $debug; global $config; global $runtime_stats;
+  $cmd  = $config['snmpget'] . " -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
+  if($options) { $cmd .= " " . $options; }
+  if($mib) { $cmd .= " -m " . $mib; }
+  if($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
+  #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  $cmd .= " ".$oids;
+  if($debug) { echo("$cmd\n"); }
+  $data = trim(shell_exec($cmd));
+  $runtime_stats['snmpget']++;
+  if($debug) { echo("$data\n"); }
+  foreach(explode("\n", $data) as $entry) {
+    list($oid,$value) = explode("=", $entry);
+    $oid = trim($oid); $value = trim($value);
+    list($oid, $index) = explode(".", $oid);
+    if (!strstr($value, "at this OID") && isset($oid) && isset($index)) {
+      $array[$index][$oid] = $value;
+    }
+  }
+  return $array;
+}
+
+
     
 function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL) 
 {

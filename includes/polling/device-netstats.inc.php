@@ -51,13 +51,25 @@ if($device[os] != "Snom") {
       $snmpstring .= " $oid.0"; 
     }
     if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
-    $snmpdata_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
-    $snmpdata     = trim(shell_exec($snmpdata_cmd));
+    #$snmpdata_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
+    #$snmpdata     = trim(shell_exec($snmpdata_cmd));
+    $data = snmp_get_multi($device ,$snmpstring);
+
+#    print_r($data);
+    
     $rrdupdate = "N";
-    foreach(explode("\n", $snmpdata) as $data) {
-      if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = "0"; }
-      $rrdupdate .= ":$data";
+
+    foreach($oids[$proto] as $oid){
+      if(is_numeric($data[0][$oid])) { $value = $data[0][$oid]; } else { $value = "0"; } 
+      $rrdupdate .= ":$value";
     }
+
+#    $rrdupdate = "N";
+#    foreach(explode("\n", $snmpdata) as $data) {
+#      if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = "0"; }
+#      $rrdupdate .= ":$data";
+#    }
+
     unset($snmpstring);
     rrdtool_update($rrdfile, $rrdupdate);
   }
