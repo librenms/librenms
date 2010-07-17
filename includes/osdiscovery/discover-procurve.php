@@ -2,7 +2,7 @@
 
 if(!$os) {
 
-  if(strstr($sysDescr, "ProCurve")) { $os = "procurve"; }
+  if(stristr($sysDescr, "ProCurve")) { $os = "procurve"; }
 
 }
 

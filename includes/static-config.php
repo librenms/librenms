@@ -100,16 +100,27 @@ $config['os']['extremeware']['ifname']  = 1;
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
 $config['os']['powerconnect']['type']   = "network";
+$config['os']['powerconnect']['icon']   = "dell";
 
 $config['os']['powervault']['text']     = "Dell PowerVault";
+$config['os']['powervault']['icon']     = "dell";
 
 $config['os']['drac']['text']           = "Dell DRAC";
+$config['os']['drac']['icon']           = "dell";
 
 $config['os']['bcm963']['text']		= "Broadcom BCM963xxx";
 $config['os']['bcm963']['icon']		= "broadcom";
 
 $config['os']['netopia']['text']        = "Motorola Netopia";
 $config['os']['netopia']['type']        = "network";
+
+$config['os']['dlink']['text']          = "D-Link Switch";
+$config['os']['dlink']['type']          = "network";
+$config['os']['dlink']['icon']          = "dlink";
+
+$config['os']['dlinkap']['text']        = "D-Link Access Point";
+$config['os']['dlinkap']['type']        = "network";
+$config['os']['dlink']['icon']          = "dlink";
 
 $config['os']['axiscam']['text']        = "AXIS Network Camera";
 
@@ -135,6 +146,15 @@ $config['os']['zywall']['text']     	= "ZyXEL ZyWALL";
 $config['os']['zywall']['type']     	= "firewall";
 $config['os']['zywall']['overgraph'][]  = "device_bits";
 $config['os']['zywall']['overtext']     = "Traffic";
+$config['os']['zywall']['icon']         = "zyxel";
+
+$config['os']['prestige']['text']     	= "ZyXEL Prestige";
+$config['os']['prestige']['type']     	= "network";
+$config['os']['prestige']['icon']       = "zyxel";
+
+$config['os']['ies']['text']     	= "ZyXEL IES DSLAM";
+$config['os']['ies']['type']     	= "network";
+$config['os']['ies']['icon']            = "zyxel";
 
 $config['os']['allied']['text']         = "AlliedWare";
 $config['os']['allied']['type']         = "network";
@@ -193,10 +213,30 @@ $config['os']['jetdirect']['overtext']     = "Toner";
 $config['os']['jetdirect']['ifname']	   = 1;
 $config['os']['jetdirect']['type']         = "printer";
 
-$config['os']['3com']['text']             = "3Com";
-$config['os']['3com']['overgraph'][]      = "";
-$config['os']['3com']['overtext']         = "";
-$config['os']['3com']['type']             = "network";
+$config['os']['ricoh']['group'] 	   = "printer";
+$config['os']['ricoh']['text']  	   = "Ricoh Printer";
+$config['os']['ricoh']['overgraph'][]      = "device_toner";
+$config['os']['ricoh']['overtext']         = "Toner";
+$config['os']['ricoh']['type']             = "printer";
+
+$config['os']['konica']['group'] 	   = "printer";
+$config['os']['konica']['text']  	   = "Konica-Minolta Printer";
+$config['os']['konica']['overgraph'][]     = "device_toner";
+$config['os']['konica']['overtext']        = "Toner";
+$config['os']['konica']['ifname']	   = 1;
+$config['os']['konica']['type']            = "printer";
+
+$config['os']['kyocera']['group'] 	   = "printer";
+$config['os']['kyocera']['text']  	   = "Kyocera Mita Printer";
+$config['os']['kyocera']['overgraph'][]    = "device_toner";
+$config['os']['kyocera']['overtext']       = "Toner";
+$config['os']['kyocera']['ifname']	   = 1;
+$config['os']['kyocera']['type']           = "printer";
+
+$config['os']['3com']['text']              = "3Com";
+$config['os']['3com']['overgraph'][]       = "";
+$config['os']['3com']['overtext']          = "";
+$config['os']['3com']['type']              = "network";
 
 if(!$config['graph_colours']['greens']) {
   $config['graph_colours']['greens']  = array('B6D14B','91B13C','6D912D','48721E','24520F','003300');
