@@ -2,7 +2,7 @@
 
 if(!$os) {
 
-  if(strpos($sysDescr, "ZyXEL IES-") !== FALSE) { $os = "ies"; }
+  if(strpos($sysDescr, "IES-") !== FALSE) { $os = "ies"; }
 
 }
 
