@@ -105,6 +105,9 @@ $config['os']['powervault']['text']     = "Dell PowerVault";
 
 $config['os']['drac']['text']           = "Dell DRAC";
 
+$config['os']['bcm963']['text']		= "Broadcom BCM963xxx";
+$config['os']['bcm963']['icon']		= "broadcom";
+
 $config['os']['netopia']['text']        = "Motorola Netopia";
 $config['os']['netopia']['type']        = "network";
 
