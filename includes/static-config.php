@@ -27,6 +27,9 @@ $config['os']['netbsd']['text']  	= "NetBSD";
 $config['os']['dragonfly']['group'] 	= "unix";
 $config['os']['dragonfly']['text']  	= "DragonflyBSD";
 
+$config['os']['netware']['text']  	= "Novell Netware";
+$config['os']['netware']['icon']  	= "novell";
+
 $config['os']['monowall']['group'] 	= "unix";
 $config['os']['monowall']['text']  	= "m0n0wall";
 $config['os']['monowall']['type']  	= "firewall";
@@ -120,7 +123,7 @@ $config['os']['dlink']['icon']          = "dlink";
 
 $config['os']['dlinkap']['text']        = "D-Link Access Point";
 $config['os']['dlinkap']['type']        = "network";
-$config['os']['dlink']['icon']          = "dlink";
+$config['os']['dlinkap']['icon']        = "dlink";
 
 $config['os']['axiscam']['text']        = "AXIS Network Camera";
 
@@ -156,6 +159,10 @@ $config['os']['zywall']['icon']         = "zyxel";
 $config['os']['prestige']['text']     	= "ZyXEL Prestige";
 $config['os']['prestige']['type']     	= "network";
 $config['os']['prestige']['icon']       = "zyxel";
+
+$config['os']['zyxeles']['text']     	= "ZyXEL Ethernet Switch";
+$config['os']['zyxeles']['type']     	= "network";
+$config['os']['zyxeles']['icon']        = "zyxel";
 
 $config['os']['ies']['text']     	= "ZyXEL IES DSLAM";
 $config['os']['ies']['type']     	= "network";
