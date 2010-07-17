@@ -169,9 +169,11 @@ $config['os']['mgeups']['group']        = "ups";
 $config['os']['mgeups']['overgraph'][]	= "device_current";
 $config['os']['mgeups']['overtext']	= "Current";
 $config['os']['mgeups']['type']		= "power";
+$config['os']['mgeups']['icon']		= "mge";
 
 $config['os']['mgepdu']['text']         = "MGE PDU";
 $config['os']['mgepdu']['type']		= "power";
+$config['os']['mgepdu']['icon']		= "mge";
 
 $config['os']['apc']['text']            = "APC Management Module";
 $config['os']['apc']['overgraph'][]	= "device_current";
