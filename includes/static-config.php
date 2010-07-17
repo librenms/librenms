@@ -220,6 +220,13 @@ $config['os']['dell-laser']['overtext']    = "Toner";
 $config['os']['dell-laser']['ifname']	   = 1;
 $config['os']['dell-laser']['type']        = "printer";
 
+$config['os']['xerox']['group'] 	   = "printer";
+$config['os']['xerox']['text']  	   = "Xerox Printer";
+$config['os']['xerox']['overgraph'][]      = "device_toner";
+$config['os']['xerox']['overtext']         = "Toner";
+$config['os']['xerox']['ifname']	   = 1;
+$config['os']['xerox']['type']             = "printer";
+
 $config['os']['jetdirect']['group'] 	   = "printer";
 $config['os']['jetdirect']['text']  	   = "HP Printer";
 $config['os']['jetdirect']['overgraph'][]  = "device_toner";
