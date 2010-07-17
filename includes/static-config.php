@@ -219,6 +219,7 @@ $config['os']['dell-laser']['overgraph'][] = "device_toner";
 $config['os']['dell-laser']['overtext']    = "Toner";
 $config['os']['dell-laser']['ifname']	   = 1;
 $config['os']['dell-laser']['type']        = "printer";
+$config['os']['dell-laser']['icon']        = "dell";
 
 $config['os']['xerox']['group'] 	   = "printer";
 $config['os']['xerox']['text']  	   = "Xerox Printer";
