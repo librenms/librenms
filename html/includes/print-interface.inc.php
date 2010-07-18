@@ -15,6 +15,10 @@
 
   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
+  $port_adsl_query = mysql_query("SELECT * FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'");
+  $port_adsl = mysql_fetch_assoc($port_adsl_query); 
+
+
   if($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) { 
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
   } else { $error_img = ""; }
@@ -88,16 +92,30 @@
       echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
     }   
   }
+  if($port_adsl['adslLineCoding']) {
 
-  echo("</td><td width=150>");
-  if($interface['ifType'] && $interface['ifType'] != "") { echo("<span class=box-desc>" . fixiftype($interface['ifType']) . "</span>"); } else { echo("-"); } 
-  echo("<br />");
-  if($ifHardType && $ifHardType != "") { echo("<span class=box-desc>" . $ifHardType . "</span>"); } else { echo("-"); }
-  echo("</td><td width=150>");
-  if($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . $interface['ifPhysAddress'] . "</span>"); } else { echo("-"); }
-  echo("<br />");
-  if($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
+    echo("</td><td width=150>");
+    echo($port_adsl['adslLineCoding']."/".$port_adsl['adslLineType']);
+    echo("<br />");
+    echo("Sync:".formatRates($port_adsl['adslAtucChanCurrTxRate']) . "/". formatRates($port_adsl['adslAturChanCurrTxRate']));
+    echo("<br />");
+    echo("Max:".formatRates($port_adsl['adslAtucCurrAttainableRate']) . "/". formatRates($port_adsl['adslAturCurrAttainableRate']));
+    echo("</td><td width=150>");
+    echo("Atten:".$port_adsl['adslAtucCurrAtn'] . "dB/". $port_adsl['adslAturCurrAtn'] . "dB");
+    echo("<br />");
+    echo("SNR:".$port_adsl['adslAtucCurrSnrMgn'] . "dB/". $port_adsl['adslAturCurrSnrMgn']. "dB");
 
+
+  } else {
+    echo("</td><td width=150>");
+    if($interface['ifType'] && $interface['ifType'] != "") { echo("<span class=box-desc>" . fixiftype($interface['ifType']) . "</span>"); } else { echo("-"); } 
+    echo("<br />");
+    if($ifHardType && $ifHardType != "") { echo("<span class=box-desc>" . $ifHardType . "</span>"); } else { echo("-"); }
+    echo("</td><td width=150>");
+    if($interface['ifPhysAddress'] && $interface['ifPhysAddress'] != "") { echo("<span class=box-desc>" . $interface['ifPhysAddress'] . "</span>"); } else { echo("-"); }
+    echo("<br />");
+    if($interface['ifMtu'] && $interface['ifMtu'] != "") { echo("<span class=box-desc>MTU " . $interface['ifMtu'] . "</span>"); } else { echo("-"); }
+  }
 #}
 
 echo("</td>");

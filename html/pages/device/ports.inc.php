@@ -8,7 +8,9 @@ print_optionbar_start();
 
 echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | Graphs: ");
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | 
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/adsl/'>ADSL</a> |
+Graphs: ");
 
 $graph_types = array("bits" => "Bits",
                      "upkts" => "Unicast Packets",
@@ -51,6 +53,18 @@ if($_GET['optc'] == thumbs) {
 } else {
   if($_GET['opta'] == "arp" ) { 
     include("arp.inc.php");
+  } elseif($_GET['opta'] == "adsl") {
+    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
+
+    echo("<tr><th>Port</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>");
+    $i = "0";
+    $interface_query = mysql_query("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = '".$device['device_id']."' AND A.interface_id = P.interface_id AND P.deleted = '0' ORDER BY `ifIndex` ASC");
+    while($interface = mysql_fetch_array($interface_query)) {
+      include("includes/print-interface-adsl.inc.php");
+      $i++;
+    }
+    echo("</table></div>");
+    echo("<div style='min-height: 150px;'></div>");
   } else {
     if($_GET['opta'] == "details" ) { $port_details = 1; }
     echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
