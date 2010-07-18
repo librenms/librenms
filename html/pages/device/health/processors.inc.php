@@ -6,7 +6,7 @@
   $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "'");
   while($proc = mysql_fetch_array($procs)) {
 
-    $proc_url   = "?page=device/".$device['device_id']."/health/processors/";
+    $proc_url   = $config['base_url']."/device/".$device['device_id']."/health/processors/";
 
     $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
@@ -34,8 +34,6 @@
             </a></td>
          </tr>");
 
-
- 
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
   $daily_graph   = "graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$day&to=$now&width=211&height=100";
