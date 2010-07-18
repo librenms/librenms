@@ -9,7 +9,6 @@ $oids = array();
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorType", $oids, "ENTITY-SENSOR-MIB");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorScale", $oids, "ENTITY-SENSOR-MIB");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorValue", $oids, "ENTITY-SENSOR-MIB");
-$oids = snmpwalk_cache_multi_oid($device, "entPhySensorMeasuredEntity", $oids, "ENTITY-SENSOR-MIB");
 
 if(is_array($oids[$device['device_id']]))
 {
@@ -20,7 +19,6 @@ if(is_array($oids[$device['device_id']]))
     if($entry['entPhySensorType'] == "celsius" && is_numeric($entry['entPhySensorValue']) && is_numeric($index) && $entry['entPhySensorValue'] > "0" && $entry['entPhySensorValue'] < "1000")
     {
       $entPhysicalIndex = $index;
-      $entPhysicalIndex_measured = $entry['entPhySensorMeasuredEntity']; 
       $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-SENSOR-MIB");
       $oid = ".1.3.6.1.2.1.99.1.1.1.4.".$index;
       $current = $entry['entPhySensorValue'];
