@@ -49,6 +49,8 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   $update_query .= " WHERE `mempool_id` = '".$mempool['mempool_id']."'";
 
   mysql_query($update_query);
+  if($debug) { echo($update_query); }
+
 
 }
 
