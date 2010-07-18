@@ -36,7 +36,6 @@ if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms')
       }
     }
   }
-  break;
 }
 
 ?>
