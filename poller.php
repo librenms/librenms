@@ -50,7 +50,8 @@ if (isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 $where  ORDER BY `device_id` ASC");
-while ($device = mysql_fetch_array($device_query)) {
+while ($device = mysql_fetch_array($device_query)) 
+{
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
 
@@ -152,17 +153,22 @@ while ($device = mysql_fetch_array($device_query)) {
       $poll_separator = ", ";
     } 
 
-    if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) {
+    if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) 
+    {
       /// OS Specific
       include($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php");
-    }elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) {
+    }
+    elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) 
+    {
       /// OS Group Specific
       include($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php");
-    }else{
-      echo("Generic :(");
+    }
+    else
+    {
+      echo("Generic :(\n");
     }
 
-    echo("Hardware:".$hardware." Version:".$version." Features:".$features."\n");
+    echo("Hardware: ".$hardware." Version: ".$version." Features: ".$features."\n");
 
     $sysLocation = str_replace("\"","", $sysLocation); 
   
@@ -183,62 +189,63 @@ while ($device = mysql_fetch_array($device_query)) {
     include("includes/polling/toner.inc.php");
     include("includes/polling/ucd-diskio.inc.php");
     include("includes/polling/applications.inc.php");
+    include("includes/polling/wireless.inc.php");
 
-  unset( $update ) ;
-  unset( $seperator) ;
+    unset( $update ) ;
+    unset( $seperator) ;
+  
+    if ( $serial && $serial != $device['serial'] ) {
+      $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
+      $poll_separator = ", ";
+      log_event("Serial -> $serial", $device['device_id'], 'system');
+    }
+  
+    if ( $sysContact && $sysContact != $device['sysContact'] ) {
+      $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
+      $poll_separator = ", ";
+      log_event("Contact -> $sysContact", $device['device_id'], 'system');
+    }
+  
+    if ( $sysName && $sysName != $device['sysName'] ) {
+      $poll_update .= $poll_separator . "`sysName` = '$sysName'";
+      $poll_separator = ", ";
+      log_event("sysName -> $sysName", $device['device_id'], 'system');
+    }
+  
+    if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
+      $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
+      $poll_separator = ", ";
+      log_event("sysDescr -> $sysDescr", $device['device_id'], 'system');
+    }
+  
+    if ( $sysLocation && $device['location'] != $sysLocation ) {
+      $poll_update .= $poll_separator . "`location` = '$sysLocation'";
+      $poll_separator = ", ";
+      log_event("Location -> $sysLocation", $device['device_id'], 'system');
+    }
+  
+    if ( $version && $device['version'] != $version ) {
+      $poll_update .= $poll_separator . "`version` = '$version'";
+      $poll_separator = ", ";
+      log_event("OS Version -> $version", $device['device_id'], 'system');
+    }
+  
+    if ( $features != $device['features'] ) {
+      $poll_update .= $poll_separator . "`features` = '$features'";
+      $poll_separator = ", ";
+      log_event("OS Features -> $features", $device['device_id'], 'system');
+    }
+  
+    if ( $hardware && $hardware != $device['hardware'] ) {
+      $poll_update .= $poll_separator . "`hardware` = '$hardware'";
+      $poll_separator = ", ";
+      log_event("Hardware -> $hardware", $device['device_id'], 'system');
+    }
 
-  if ( $serial && $serial != $device['serial'] ) {
-    $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
+    $poll_update .= $poll_separator . "`last_polled` = NOW()";
     $poll_separator = ", ";
-    log_event("Serial -> $serial", $device['device_id'], 'system');
-  }
-
-  if ( $sysContact && $sysContact != $device['sysContact'] ) {
-    $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
-    $poll_separator = ", ";
-    log_event("Contact -> $sysContact", $device['device_id'], 'system');
-  }
-
-  if ( $sysName && $sysName != $device['sysName'] ) {
-    $poll_update .= $poll_separator . "`sysName` = '$sysName'";
-    $poll_separator = ", ";
-    log_event("sysName -> $sysName", $device['device_id'], 'system');
-  }
-
-  if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
-    $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
-    $poll_separator = ", ";
-    log_event("sysDescr -> $sysDescr", $device['device_id'], 'system');
-  }
-
-  if ( $sysLocation && $device['location'] != $sysLocation ) {
-    $poll_update .= $poll_separator . "`location` = '$sysLocation'";
-    $poll_separator = ", ";
-    log_event("Location -> $sysLocation", $device['device_id'], 'system');
-  }
-
-  if ( $version && $device['version'] != $version ) {
-    $poll_update .= $poll_separator . "`version` = '$version'";
-    $poll_separator = ", ";
-    log_event("OS Version -> $version", $device['device_id'], 'system');
-  }
-
-  if ( $features != $device['features'] ) {
-    $poll_update .= $poll_separator . "`features` = '$features'";
-    $poll_separator = ", ";
-    log_event("OS Features -> $features", $device['device_id'], 'system');
-  }
-
-  if ( $hardware && $hardware != $device['hardware'] ) {
-    $poll_update .= $poll_separator . "`hardware` = '$hardware'";
-    $poll_separator = ", ";
-    log_event("Hardware -> $hardware", $device['device_id'], 'system');
-  }
-
-  $poll_update .= $poll_separator . "`last_polled` = NOW()";
-  $poll_separator = ", ";
-  $polled_devices++;
-  echo("\n");
+    $polled_devices++;
+    echo("\n");
   } 
 
   if ($poll_update) {
@@ -264,6 +271,5 @@ $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time =
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
 shell_exec("echo '".$string."' >> ".$config['install_dir']."/observium.log"); # FIXME EWW
-
 
 ?>
