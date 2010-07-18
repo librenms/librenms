@@ -84,6 +84,7 @@ echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/inte
 
 print_optionbar_end();
 
+echo("<div style='margin: 5px;'>");
 include("pages/device/port/".mres($_GET['optb']).".inc.php");
-
+echo("</div>");
 ?>
