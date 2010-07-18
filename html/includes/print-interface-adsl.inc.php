@@ -22,8 +22,7 @@
 
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
   onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
-           <td valign=top width=350>");
-
+   <td valign=top width=350>");
   echo("        <span class=list-large>
                 " . generateiflink($interface, $interface['ifIndex'] . ". ".$interface['label']) . "
 
@@ -50,36 +49,44 @@
 
   $width="120"; $height="40"; $from = $day;
 
-  echo("</td><td width=150>");
-  echo("".formatRates($interface['adslAtucChanCurrTxRate']) . "/". formatRates($interface['adslAturChanCurrTxRate']));
+  echo("</td><td width=125>");
+  echo(formatRates($interface['ifInOctets_rate'] * 8)."/".formatRates($interface['ifOutOctets_rate'] * 8));
+  echo("<br />");
+  $interface['graph_type'] = "port_bits";
+  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  str_replace("#","", $row_colour)."'>", $interface['graph_type']));
+
+
+  echo("</td><td width=125>");
+  echo("".formatRates($interface['adslAturChanCurrTxRate']) . "/". formatRates($interface['adslAtucChanCurrTxRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_speed";
   echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
-  echo("</td><td width=150>");
-  echo("".formatRates($interface['adslAtucCurrAttainableRate']) . "/". formatRates($interface['adslAturCurrAttainableRate']));
+  echo("</td><td width=125>");
+  echo("".formatRates($interface['adslAturCurrAttainableRate']) . "/". formatRates($interface['adslAtucCurrAttainableRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attainable";
   echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
   
-  echo("</td><td width=150>");
-  echo("".$interface['adslAtucCurrAtn'] . "dB/". $interface['adslAturCurrAtn'] . "dB");
+  echo("</td><td width=125>");
+  echo("".$interface['adslAturCurrAtn'] . "dB/". $interface['adslAtucCurrAtn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attenuation";
   echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
-  echo("</td><td width=150>");
-  echo("".$interface['adslAtucCurrSnrMgn'] . "dB/". $interface['adslAturCurrSnrMgn'] . "dB");
+  echo("</td><td width=125>");
+  echo("".$interface['adslAturCurrSnrMgn'] . "dB/". $interface['adslAtucCurrSnrMgn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_snr";
   echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
-  echo("</td><td width=150>");
-  echo("".$interface['adslAtucCurrOutputPwr'] . "dBm/". $interface['adslAturCurrOutputPwr'] . "dBm");
+  echo("</td><td width=125>");
+  echo("".$interface['adslAturCurrOutputPwr'] . "dBm/". $interface['adslAtucCurrOutputPwr'] . "dBm");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_power";
   echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&port=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".

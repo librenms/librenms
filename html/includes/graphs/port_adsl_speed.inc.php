@@ -13,14 +13,13 @@ $port = mysql_fetch_array($query);
   $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . "-adsl.rrd");
 #}
 
-
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AtucChanCurrTxRate";
+$rrd_list[0]['rra'] = "AturChanCurrTxRate";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AturChanCurrTxRate";
+$rrd_list[1]['rra'] = "AtucChanCurrTxRate";
 
 
 $unit_text = "Bits/sec";
