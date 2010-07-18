@@ -8,8 +8,8 @@ Release 0.10.7 ( 18th July 2010 )
 * Support of ADSL-LINE-MIB and new ports display mode designed
   for service providers with DSLAMs and MSANs
 * Discovery of new device/os types : 
-  Apple Airport, Axis Camera, Motorola Netopia, APC Switch PDU,
-  Extreme Extremware, Redback, ZyXEL ZyWALL, DELL DRAC,
+  Apple Airport, Axis Camera, Motorola Netopia, APC Switched PDU,
+  Extreme Extremeware, Redback, ZyXEL ZyWALL, DELL DRAC,
   Dell PowerVault, Allied Telesis, Cisco NX-OS, MGE Evolution UPS
   HP JetDirect printers, APC STS/ATS, Mikrotic RouterOS,
   AKCP SensorProbe3
@@ -17,7 +17,7 @@ Release 0.10.7 ( 18th July 2010 )
 * Temperature detection from CISCO-ENTITY-SENSOR-MIB
 * Graphing of statistics from DISKIO-MIB
 * Ongoing unification of all sensors into one 'sensors' framework
-* Detection and polling of frequency, voltage and ampage stats
+* Detection and polling of frequency, voltage and amperage stats
   for many UPSes and power switching hardware
 * Detection of Extremeware / XOS versions and hardware
 * Detection of several Allied Telesis devices and their versions
