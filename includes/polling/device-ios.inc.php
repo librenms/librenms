@@ -31,6 +31,14 @@
    $ciscomodel = str_replace("\"","",$ciscomodel);
    if($ciscomodel) { $hardware = $ciscomodel; unset($ciscomodel); }
 
+   if(strpos($sysDescr, "IOS XR")) { 
+    list(,$version) = explode(",", $sysDescr);
+    $version = trim($version);
+    list(,$version) = explode(" ", $version);
+    list($version) = explode("\n", $version);
+    trim($version);
+   }
+
 
    $cpu5m = shell_exec($config['snmpget'] . " -M ".$config['mibdir'] . " -m OLD-CISCO-CPU-MIB -O qv -$snmpver -c $community $hostname:$port avgBusy5.0");
    $cpu5m = $cpu5m + 0;

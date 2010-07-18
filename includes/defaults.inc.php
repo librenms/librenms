@@ -127,6 +127,7 @@ $config['enable_pseudowires']   	= 1; # Enable Pseudowires
 $config['enable_ports_junoseatmvp'] 	= 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_etherlike'] 	= 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_printers']  		= 0;  # Enable Printer support
+$config['enable_ports_adsl']            = 1; # Enable ADSL-LINE-MIB
 
 ### External Integration
 
@@ -151,7 +152,7 @@ $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 
-$config['device_traffic_iftype']  = array('/loopback/','/other/','/tunnel/','/virtual/','/mpls/');
+$config['device_traffic_iftype']  = array('/loopback/','/tunnel/','/virtual/','/mpls/');
 $config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/');
 
 ### Authentication
