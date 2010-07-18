@@ -1,0 +1,1622 @@
+CTRON-SSR-POLICY-MIB DEFINITIONS ::= BEGIN
+ 
+--  This module provides authoritative definitions for Enterasys
+--  Networks' enterprise-specific Smart Switch Router specific MIB
+--  branches.
+--
+--  This module will be extended, as required.
+ 
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+ 
+--  Copyright 1998-2003 Enterasys Networks, Inc.
+ 
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, TimeTicks, IpAddress, Counter32, Gauge32,
+   Integer32
+   FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, DisplayString, RowStatus, TruthValue, MacAddress
+   FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP
+   FROM SNMPv2-CONF
+   dot1qVlanStaticEntry 
+   FROM Q-BRIDGE-MIB
+   ssrMibs 
+   FROM CTRON-SSR-SMI-MIB;
+
+policyMIB MODULE-IDENTITY
+    LAST-UPDATED "200312191712Z"  -- Fri Dec 19 17:12 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+     "This module defines a schema to control filters on a device capable
+      of Layer 3 filters also called Access Control Lists (ACLs) and at
+      layer 2. It may also be used to configure static IP routes that use
+      other IP header fields in addition to destination IP address."
+
+    REVISION     "200312191712Z"  -- Fri Dec 19 17:12 GMT 2003
+    DESCRIPTION
+         "Defined bit 0 of polL2Dot1qVlanStaticProtocols as reserved."
+
+    REVISION     "200307211501Z"  -- Mon Jul 21 15:01 GMT 2003
+    DESCRIPTION
+         "Revision #5. Add static VLAN protocol filtering to the polL2Group.
+          Update contact information."
+
+    REVISION     "200007150000Z"
+    DESCRIPTION
+         "Revision #4. Update contact information."
+
+    REVISION     "9908110000Z"
+    DESCRIPTION
+         "Revision #3. Define Policy Based Routing in polL4Group."
+
+    REVISION     "9907210000Z"
+    DESCRIPTION
+         "Revision #2. Define Layer 2 flow security objects in polL2Group."
+
+    REVISION     "9808040000Z"
+    DESCRIPTION
+         "Revision #1. Define Layer 3 flow objects in polL3Group."
+        ::= { ssrMibs 210 }   
+
+
+-- ### Textual conventions
+
+   -- InterfaceIndex contains the semantics of ifIndex and
+   -- should be used for any objects defined on other MIB
+   -- modules that need these semantics.
+
+   InterfaceIndex ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "A unique value, greater than zero, for each interface
+               or interface sub-layer in the managed system.  It is
+               recommended that values are assigned contiguously
+               starting from 1.  The value for each interface sub-
+               layer must remain constant at least from one re-
+               initialization of the entity's network management
+               system to the next re-initialization."
+       SYNTAX       Integer32 (1..2147483647)
+
+   InterfaceIndexOrZero ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This textual convention is an extension of the
+               InterfaceIndex convention.  The latter defines a
+               greater than zero value used to identify an interface
+               or interface sub-layer in the managed system.  This
+               extension permits the additional value of zero.  the
+               value zero is object-specific and must therefore be
+               defined as part of the description of any object which
+               uses this syntax.  Examples of the usage of zero might
+               include situations where interface was unknown, or
+               when none or all interfaces need to be referenced."
+       SYNTAX       Integer32 (0..2147483647)
+
+
+   SSRPortComparator ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+	"Comparison operator used by ACL's to permit src/dst port addresses."
+       SYNTAX     INTEGER {
+            notused(1), -- no port comparison to be made	
+            eq(2),   -- equals
+            neq(3),  -- not equals
+            lt(4),   -- less than
+            gt(5),   -- greater than
+          range(6)   -- contains X-Y inclusive
+       }
+
+   SSRProtocol ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+	"Protocols supported by L3 ACLs."
+       SYNTAX     INTEGER {
+            ip(1),      -- Internet Protocol Version 4
+            tcp(2),     -- Transmission Control Protocol
+            udp(3),     -- User Datagram Protocol
+            icmp(4),    -- Internet Control Management Protocol
+            igmp(5),    -- Internet Group Management Protocol (Multicast)
+            ipx(6),     -- Novell IPX protocol
+            ipxsap(7),  -- Novell IPX SAP protocol
+            ipxrip(8)   -- Novell IPX RIP protocol
+       }
+
+   SSRsocketId ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+	"A TCP or UDP port or socket end point."
+       SYNTAX INTEGER (0..65535)
+
+
+   SSRVlanIndex  ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+	"An 802.1Q VLAN Identifier with same semantics as Q-BRIDGE-MIB VlanId.
+         SSR uses Vid 1 for the default VLAN. All ports by default belong to this VLAN
+         unless assigned to one or more user defined VLANs. A value of 4100 is used to match
+         all VLANs. 4094 to 4099 are reserved local VLAN ids on the SSR."
+       SYNTAX INTEGER (1..4100)
+
+   SSRPortList ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION 
+         "List of ifIndexes that make up the ports to apply a layer 2 filter to.
+          The ifIndexes are numbered sparsely starting from 1. An example string
+          might be: 
+                1,2,32 
+                1,6,9,
+          Each ifIndex must represent a physical port or link aggregation aka Smart 
+          Trunk ifType of propMultiplexor(54). Note ifIndexes may change across 
+          system resets per RFC 2233."
+      SYNTAX    OCTET STRING (SIZE (0..255))
+
+SSRFlowPolicyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Type of Flow Policy. permitFlow allows matching traffic to be forwarded. denyFlow
+         causes matching traffic to be discarded."
+    SYNTAX      INTEGER { permitFlow(1), denyFlow(2) }
+
+SSRFlowPolicyAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "When deciding when to apply policy there are three potential methods. 
+         policyBeforeRouteLookup provides a way to special case normal traffic patterns 
+         so that certain traffic can be routed according to policy. 
+         policyAfterRouteLookup is useful when a default route does not exist and the traffic
+         to route does not match existing route tables. 
+         useOnlyPolicyLookup bypasses normal route lookup altogether."
+    SYNTAX  INTEGER { policyBeforeRouteLookup(1), policyAfterRouteLookup(2), useOnlyPolicyLookup(3) }
+
+SSRFlowPolicyAclList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A blank separated list of ACL names used to match flows against from the polAclTable.
+         The keyword, everything, may be used to match all traffic. ASCII printable characters only"
+    SYNTAX      OCTET STRING (SIZE(1..4096))
+
+SSRFlowNextHopList  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A blank separated list of from one to four l4fNextHopRouter ipaddresses or
+         the keyword null. Null represents the null interface"
+    SYNTAX      OCTET STRING (SIZE(1..4096))
+
+SSRFlowLoadPolicy  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "round robin evenly distributes flows among the next hops. firstAvailable 
+          will make flows go to the first available next hop in the ordered list."
+    SYNTAX  INTEGER { firstAvailable(2), roundRobin(3) }
+
+-- ### groups ###
+
+-- Layer 3 Policy Group
+
+polL3Group  OBJECT IDENTIFIER   ::= { ssrMibs 12 }
+
+   polAclServer  OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"This is true when Access Control Lists (ACLs) are defined by a 
+         Policy Server else false.
+	 At boot, this value is false. After the first valid set of any 
+         policy object, the value changes to true."
+       ::= { polL3Group 1 }
+
+   polAclNumber  OBJECT-TYPE
+       SYNTAX      INTEGER (0..2147483647) 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of Layer 3 Access Control Lists defined in the SSR."
+       ::= { polL3Group 2 }
+
+   polAclLastChanged  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The time the Access Control List were last changed."
+       ::= { polL3Group 3 }
+
+   -- The Layer 3 Access Control List Configuration Table
+
+   polAclTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolAclEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A list of Access Control List entries."
+       ::= { polL3Group 4 }
+
+   polAclEntry OBJECT-TYPE
+       SYNTAX      PolAclEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A record containing a Access Control List."
+       INDEX   { polAclName, polAclItem }
+       ::= { polAclTable 1 }
+
+   PolAclEntry ::=
+       SEQUENCE {
+           polAclName		DisplayString,
+           polAclItem           INTEGER,
+           polAclRestriction	INTEGER,
+           polAclProtocol	SSRProtocol,
+           polAclSrcIp		IpAddress,
+           polAclSrcMask	IpAddress,
+           polAclDstIp		IpAddress,
+           polAclDstMask	IpAddress,
+           polAclTOS     	INTEGER,
+           polAclSrcPort	SSRsocketId,
+           polAclDstPort	SSRsocketId,
+           polAclSrcOperator	SSRPortComparator,
+           polAclDstOperator	SSRPortComparator,
+           polAclSrcHighRange	INTEGER,
+           polAclDstHighRange	INTEGER,
+           polAclAuditTrail     TruthValue, 
+           polAclCheckpoint     INTEGER,
+           polAclRowStatus      RowStatus
+       }
+
+   polAclName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The administratively assigned name to this static route entry."
+       ::= { polAclEntry 1 }
+
+   polAclItem OBJECT-TYPE
+       SYNTAX INTEGER (0..256)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "This row's unique identifier within a given ACL set. Member of the ACL set 
+                are numbered from 1 to 256. If Item is set to 0, and rowStatus is destroy, 
+                all rows for this set are destroyed."
+       ::= { polAclEntry 2 }
+
+   polAclRestriction OBJECT-TYPE
+       SYNTAX      INTEGER {
+           permit(1),
+           deny(2)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The permissions/restrictions given to this static route entry."
+       ::= { polAclEntry 3 }
+
+   polAclProtocol OBJECT-TYPE
+       SYNTAX      SSRProtocol
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The IETF protocol this ACL applies to."
+       ::= { polAclEntry 4 }
+
+   polAclSrcIp OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP Address this ACL applies to."
+       ::= { polAclEntry 5 }
+
+   polAclSrcMask OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP Mask this ACL Applies to."
+       ::= { polAclEntry 6 }
+
+   polAclDstIp OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP Address this ACL applies to."
+       ::= { polAclEntry 7 }
+
+   polAclDstMask OBJECT-TYPE
+       SYNTAX     IpAddress
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP Mask this ACL Applies to."
+       ::= { polAclEntry 8 }
+
+   polAclTOS OBJECT-TYPE
+       SYNTAX     INTEGER (0..15)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP Type of Service field."
+       ::= { polAclEntry 9 }
+
+   polAclSrcPort OBJECT-TYPE
+       SYNTAX    SSRsocketId
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP source port/socket ACL applies to."
+       ::= { polAclEntry 10 }
+
+   polAclDstPort OBJECT-TYPE
+       SYNTAX    SSRsocketId
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The source L3 IP destination port/socket ACL applies to."
+       ::= { polAclEntry 11 }
+
+   polAclSrcOperator OBJECT-TYPE
+       SYNTAX     SSRPortComparator
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "polAclSrcPort is compared using this operator."
+       DEFVAL { eq }
+       ::= { polAclEntry 12 }
+
+   polAclDstOperator OBJECT-TYPE
+       SYNTAX     SSRPortComparator
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "polAclDstPort is compared using this operator."
+       DEFVAL { eq }
+       ::= { polAclEntry 13 }
+
+       
+   polAclSrcHighRange OBJECT-TYPE
+       SYNTAX     INTEGER (-1..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The high range source L3 IP port. Used
+                only when SrcOperator == range. polAclSrcPort is
+                used as the lower bounds of the range."
+       DEFVAL { -1 }
+       ::= { polAclEntry 14 }
+
+   polAclDstHighRange OBJECT-TYPE
+       SYNTAX     INTEGER (-1..65535)
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The high range destination L3 IP port. Used
+                only when SrcOperator == range. polAclDstPort is 
+                used as the lower bounds of the range."
+       DEFVAL { -1 }
+       ::= { polAclEntry 15 }
+
+   polAclAuditTrail  OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"Flows matching this ACL are logged for Accounting when true."
+       ::= { polAclEntry 16 }
+
+   polAclCheckpoint  OBJECT-TYPE
+       SYNTAX      INTEGER  {
+                      hourly(1), 
+                      daily(2), 
+                      weekly(3), 
+                      monthly(4),
+                      endofcall(5)  
+       } 
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"How long to keep flow at which point a checkpoint should be done.
+         A checkpoint may trigger earlier than this time should the maximum
+         batch size be reached."
+       ::= { polAclEntry 17 }
+
+   polAclRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"SNMP V2 RowStatus control for this table."
+       ::= { polAclEntry 18 }
+
+
+-- ACL's created must be applied to either an Interface or service
+
+   polAclServiceNumber  OBJECT-TYPE
+       SYNTAX      INTEGER (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of Layer 3 Access Control Lists in service in the SSR."
+       ::= { polL3Group 5 }
+
+   polAclServiceLastChanged  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The time the ACLs in service were last changed."
+       ::= { polL3Group 6 }
+
+   -- The Layer 3 Access Control List Configuration Table
+
+   polAclServiceTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolAclServiceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A list of ACL's currently in service."
+       ::= { polL3Group 7 }
+
+   polAclServiceEntry OBJECT-TYPE
+       SYNTAX      PolAclServiceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A record containing a Access Control Lists applied to Interfaces."
+       INDEX   { polAclServiceIfIndex, polAclName2 }
+       ::= { polAclServiceTable 1 }
+
+   PolAclServiceEntry ::=
+       SEQUENCE {
+           polAclServiceIfIndex         InterfaceIndex,
+           polAclName2			DisplayString,
+           polAclServiceDirection     	INTEGER,
+           polAclServiceRowStatus	RowStatus
+       }
+
+   polAclServiceIfIndex  OBJECT-TYPE
+       SYNTAX     InterfaceIndex  
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The ifIndex of the IP Interface the ACL is applied to. 
+         An SSR IP Interface has ifType 142"
+       ::= { polAclServiceEntry 1 }
+
+   polAclName2  OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The name of the ACL applied to the particular port."
+       ::= { polAclServiceEntry 2 }
+
+   polAclServiceDirection  OBJECT-TYPE
+       SYNTAX      INTEGER {
+            ingress(1),
+            egress(2),
+            both(3)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"The direction the ACL is applied to the particular port."
+       ::= { polAclServiceEntry 3 }
+
+   polAclServiceRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+	"SNMP V2 RowStatus control for this table."
+       ::= { polAclServiceEntry 6 }
+
+-- List of IP Interfaces and their policy status 
+
+   polAclRemoteAllowed  OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"Remote Policy Configuration is allowed when true only 
+         local (to SSR) policy may be applied."
+       ::= { polL3Group 9 }
+
+   polAclInterfaceNumber  OBJECT-TYPE
+       SYNTAX      INTEGER (0..2147483647)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of Layer 3 Interfaces in service in the SSR."
+       ::= { polL3Group 10 }
+
+   polAclInterfaceLastChanged  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The time the Interfaces in service were last changed with regard to policy."
+       ::= { polL3Group 11 }
+
+   polAclInterfaceTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolAclInterfaceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A list of IP Interfaces in service and their policy status. Each IP Interface can be
+         defined to use local static policy or remote dynamic policy in the config."
+       ::= { polL3Group 12 }
+
+   polAclInterfaceEntry OBJECT-TYPE
+       SYNTAX      PolAclInterfaceEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A record containing a Access Control Lists applied to Interfaces."
+       INDEX   { polAclInterfaceIfIndex, polAclInterfaceDirection }
+       ::= { polAclInterfaceTable 1 }
+
+   PolAclInterfaceEntry ::=
+       SEQUENCE {
+           polAclInterfaceIfIndex         InterfaceIndex,
+           polAclInterfaceDirection       INTEGER,
+           polAclPolicyStatus             INTEGER
+       }
+
+   polAclInterfaceIfIndex  OBJECT-TYPE
+       SYNTAX     InterfaceIndex  
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The ifIndex of the IP Interface the ACL is applied to."
+       ::= { polAclInterfaceEntry 1 }
+
+   polAclInterfaceDirection  OBJECT-TYPE
+       SYNTAX      INTEGER {  -- TBD: Make into TC
+            ingress(1),
+            egress(2),
+            both(3)
+       }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The direction the ACL is applied to the particular port."
+       ::= { polAclInterfaceEntry 2 }
+
+   polAclPolicyStatus  OBJECT-TYPE
+       SYNTAX      INTEGER {
+           local(1),  -- ACLs can be applied via local mgmt only
+           remote(2)  -- ACLs can be applied via local or remote
+       }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"Rules for what type of management can apply ACLs to a particular interface. If set to remote,
+         then a Policy Manager via SNMP may change dynamically the ACLs applied to an interface. Note,
+         ACLs applied dynamically are not maintained across system reboot. Use local ACLs to setup the basic
+         rules then apply dynamic rules as necessary."
+       ::= { polAclInterfaceEntry 3 }
+
+--
+--    L2 Policy Policy Group
+--
+
+polL2Group  OBJECT IDENTIFIER   ::= { ssrMibs 16 }
+
+   polL2FilterNumber  OBJECT-TYPE
+       SYNTAX      INTEGER (0..2147483647) 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of Layer 3 Access Control Lists defined in the SSR."
+       ::= { polL2Group 1 }
+
+   polL2FilterLastChanged  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The time the Access Control List were last changed."
+       ::= { polL2Group 2 }
+
+   polL2FilterTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolL2FilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A list of Layer 2 filters."
+       ::= { polL2Group 3 }
+
+   polL2FilterEntry OBJECT-TYPE
+       SYNTAX      PolL2FilterEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An entry containing a layer 2 filter."
+       INDEX   { polL2FilterIndex }
+       ::= { polL2FilterTable 1 }
+
+   PolL2FilterEntry ::=
+       SEQUENCE {
+           polL2FilterIndex         INTEGER,
+           polL2FilterDesc          DisplayString,
+           polL2FilterType          INTEGER,
+           polL2FilterRestrictions  INTEGER,
+           polL2FilterDstMacAddr    MacAddress,
+           polL2FilterSrcMacAddr    MacAddress,
+           polL2FilterVlanId        SSRVlanIndex,
+           polL2FilterInPorts       SSRPortList,
+           polL2FilterOutPorts      SSRPortList,
+           polL2FilterCreationTime  TimeTicks,
+           polL2FilterStatus        RowStatus
+       }
+
+   polL2FilterIndex  OBJECT-TYPE
+       SYNTAX      INTEGER (1..65535)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A unique index into the table representing a single filter entry. This value 
+          will remain unique and the relationship between the index and the underlying filter
+          is valid until the next reboot."
+       ::= { polL2FilterEntry 1 }
+
+   polL2FilterDesc  OBJECT-TYPE
+       SYNTAX       DisplayString (SIZE (0..25))
+       MAX-ACCESS   read-create	
+       STATUS      current
+       DESCRIPTION
+         "A string used to describe the filter. It should contain
+          the creator IP address, and other descriptive information about the filter.
+          It is recommended that names be unique within a given filter type.
+          This object may not be modified if the associated.
+          polL2FilterStatus object is equal to active(1)."
+       ::= { polL2FilterEntry 2 }
+
+   polL2FilterType  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   staticEntry(1),
+                   addressFilter(2),
+                   portAddressLock(3),
+                   securePort(4)
+                   }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The types of filters, as explained below.
+
+           static-entry
+ 
+               Based on the restrictions and the presence of
+               source, destination MAC address they can be of 
+               three types :
+
+               source-static-entry - All frames with a source
+               address equal to srcMAC, coming through any of 
+               the inPorts will be allowed/disallowed to go 
+               to any port that is a member of the outPorts
+               list.
+
+               destination-static-entry - All frames with a 
+               destination address equal to dstMAC, coming 
+               through any of the inPorts  will be allowed/
+               disallowed/forced to go to any port that is a 
+               member of the outPorts list.
+
+               flow-static-entry - All frames with a source
+               address equal to srcMAC and a destination address
+               equal to dstMAC, coming through any of the inPorts 
+               list will be allowed/disallowed to go to any port 
+               that is a member of the outPorts list. Ports
+               must be in flow-bridging mode in order to use
+               filters with both src and dst mac specified.               
+
+           address-filter
+ 
+               Based on the restrictions and the presence of
+               source, destination MAC address they can be of 
+               three types :
+
+               source-address-filter - All frames with a source
+               address equal to srcMAC, coming through any of 
+               the inPorts will be filtered out.
+
+               destination-address-filter - All frames with a 
+               destination address equal to dstMAC, coming through 
+               any of the inPorts will be filtered out.
+
+               flow-filter - All frames with a source address equal 
+               to srcMAC and a destination address equal to dstMAC, 
+               coming through any of the inPorts list will be 
+               filtered out. Ports must be in flow mode in order
+               to set a filter using both source and destination 
+               address.
+
+           port-address-lock
+
+               This locks a source address to a port. It allows 
+               learning of srcMAC addresses only on any of the ports
+               in inPorts. The following objects are mandatory
+               and must be set by mgmt station to activate a row:
+               polL2FilterDesc, polL2FilterSrcMacAddr, polL2FilterInPorts
+
+           secure-port
+
+               This blocks all traffic in a given direction to a port.
+               Used with static entries, it is effective in allowing only
+               certain well defined source/destination mac addresses.
+               The following objects must be set by mgmt station to
+               activate an entry:
+               polL2FilterDesc, r, polL2FilterInPorts
+
+          This object may not be modified if the associated.
+          polL2FilterStatus object is equal to active(1)."
+        DEFVAL { staticEntry }
+       ::= { polL2FilterEntry 3 }
+
+   polL2FilterRestrictions  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                   allow(1),
+                   disallow(2),
+                   force(3),
+                   none(4),
+                   blockIngress(5),
+                   blockEgress(6)
+                   }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The first 3 restrictions, allow, disallow, force apply when the filterType 
+          is static-entry. When polL2FilterType is addressFilter or portAddressLock,
+          this object does not apply. For securePort, the blockIngress, blockEgress
+          values apply.
+          This object may not be modified if the associated.
+          polL2FilterStatus object is equal to active(1)."
+
+       DEFVAL { none }
+       ::= { polL2FilterEntry 4 }
+
+   polL2FilterSrcMacAddr  OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The source MAC address, which is present in case
+                of a Flow, that has been learned by the switch."
+       ::= { polL2FilterEntry 5 }
+
+   polL2FilterDstMacAddr  OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "The destination MAC address which has been learned.
+
+          This object may not be modified if the associated.
+          polL2FilterStatus object is equal to active(1)."
+       ::= { polL2FilterEntry 6 }
+
+   polL2FilterVlanId  OBJECT-TYPE
+       SYNTAX      SSRVlanIndex
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+       "The VLAN the destination MAC address belongs to. The default VLAN 
+        is id 1 on SSR.
+
+        This object may not be modified if the associated.
+        polL2FilterStatus object is equal to active(1)."
+       DEFVAL {1}
+       ::= { polL2FilterEntry 7 }
+
+   polL2FilterInPorts  OBJECT-TYPE
+       SYNTAX      SSRPortList
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+         "The set of Ports to which this filter applies on input.
+
+        This object may not be modified if the associated.
+        polL2FilterStatus object is equal to active(1)."
+       ::= { polL2FilterEntry 8 }
+
+   polL2FilterOutPorts  OBJECT-TYPE
+       SYNTAX      SSRPortList
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+       "The set of ports to which this filter applies on output.
+
+        This object may not be modified if the associated.
+        polL2FilterStatus object is equal to active(1)."
+       ::= { polL2FilterEntry 9 }
+
+   polL2FilterCreationTime  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The value of sysUpTime when this filter was made active(1)."
+       ::= { polL2FilterEntry 10 }
+
+   polL2FilterStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+	"SMIv2 RowStatus control for this table. Use createAndWait or createAndGo
+         to create a filter, use destroy to remove an entry or notInService to 
+         disengage a filter without destroying it. A row in the notReady state has
+         not had all the mandatory objects set."
+       ::= { polL2FilterEntry 11 }
+
+
+-- VLAN Protocol Filtering
+
+    polL2Dot1qVlanStaticTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolL2Dot1qVlanStaticEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "A table containing hardware specific VLAN behavior configuration
+        information for VLANs created with the dot1qVlanStaticTable.
+        Configuration information for each VLAN configured into the device by (local or
+        network) management."
+       ::= { polL2Group 4 }
+
+   polL2Dot1qVlanStaticEntry OBJECT-TYPE
+       SYNTAX      PolL2Dot1qVlanStaticEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+        "An entry containing additional hardware
+        specific objects for a dot1qVlanStaticEntry."
+       AUGMENTS   { dot1qVlanStaticEntry }
+       ::= { polL2Dot1qVlanStaticTable 1 }
+
+   PolL2Dot1qVlanStaticEntry ::=
+       SEQUENCE {
+           polL2Dot1qVlanStaticProtocols    BITS,
+           polL2Dot1qVlanStaticL4Bridging   TruthValue
+       }
+
+   polL2Dot1qVlanStaticProtocols  OBJECT-TYPE
+       SYNTAX      BITS {
+                   reserved (0),
+                   bridged-protocols (1),
+                   ip(2),
+                   ipx(3),
+                   appletalk(4),
+                   dec(5),
+                   sna(6),
+                   ipv6(7)
+                   }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+        "Specifies the types of traffic that will be forwarded on this VLAN.  
+         Protocols not set in this definition will be filtered. The types of protocols
+         supported on this VLAN corresponds to the type option in the CLI command 
+         vlan create <vlan name> <type>. If no protocols are specified, all
+         protocols are forwarded. This corresponds to the port-based CLI
+         option.
+           reserved(0) - this bit is reserved and has no defined behavior.
+           bridged-protocols(1) - this VLAN supports all bridged protocols
+           excluding IP and IPX. Includes appletalk(4), dec(5), sna(6), and
+           ipv6(7) if none of these protocols are set. If any are set, only
+           those that are set are included.
+           ip(2) - this VLAN supports IP protocol.
+           ipx(3) - this VLAN supports IPX protocol.
+           appletalk(4) - this VLAN supports Appletalk protocol.
+           dec(5) - this VLAN supports DEC protocol.
+           sna(6) - this VLAN supports SNA protocol.
+           ipv6(7) - this VLAN supports IPv6 protocol."
+       DEFVAL { { ip } }
+       ::= { polL2Dot1qVlanStaticEntry 1 }
+
+polL2Dot1qVlanStaticL4Bridging  OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+        "If this object has a value of false(2), the L4 Bridging feature is not
+         enabled on this VLAN. If this object has a value of true(1), the L4 Bridging 
+         feature is enabled for this VLAN. This corresponds to the CLI command
+         vlan enable l4-bridging." 
+       DEFVAL { true }
+       ::= { polL2Dot1qVlanStaticEntry 2 }
+
+--
+-- Layer 4 Flow Management
+--
+polL4Group  OBJECT IDENTIFIER   ::= { ssrMibs 15 }
+
+   polL4PolicyBasedRoutingEnabled  OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The state of Policy Based Routing on this network element."
+       ::= { polL4Group 1 }
+
+   polL4NumRouters  OBJECT-TYPE
+       SYNTAX      INTEGER (0..10)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of next hop routers currently available."
+       ::= { polL4Group 5 }
+
+   polL4NextHopTableLastChange  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The value of sysUpTime when a row was last added 
+         or deleted from polL4NextHopTable."
+       ::= { polL4Group 10 }
+  
+
+   --
+   -- the Next Hop Control Table
+   --
+   -- The Next Hop Control table contains information on 
+   -- what next hop routers can be used to redirect existing L4 IP Flows
+
+   polL4NextHopTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolL4NextHopEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A list of next hop IP routers."
+       ::= { polL4Group 20 }
+
+   polL4NextHopEntry OBJECT-TYPE
+       SYNTAX      PolL4NextHopEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"An entry contains the status of a next hop router."
+       INDEX   { polL4NextHopRouter }
+       ::= { polL4NextHopTable 1 }
+
+   PolL4NextHopEntry ::=
+       SEQUENCE {
+           polL4NextHopRouter            IpAddress,
+           polL4NextHopState             INTEGER,          
+           polL4NextHopPortOfExit        InterfaceIndexOrZero,
+           polL4NextHopMacAddress        MacAddress,
+           polL4NextHopLastChange        TimeTicks
+       }
+
+   polL4NextHopRouter OBJECT-TYPE
+       SYNTAX      IpAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The IP Address of the next hop router flow will be sent to."
+       ::= { polL4NextHopEntry 1 }
+
+   polL4NextHopState OBJECT-TYPE
+       SYNTAX      INTEGER {
+          unknown(1),
+          waitingForArp(2),
+          macAcquired(3),
+          noArpReply(4)
+
+       }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+         "The current status of the polL4NextHopRouter. 
+          If no entry found when a policy route is activated, 
+          then arp for the request the state will be waitingForArp(2). 
+          If a reply is found the state will go to macAcquired(3) 
+          else noArpReply(4). If NextHop is not local, mac is actual
+          nexthop router."
+       ::= { polL4NextHopEntry 2 }
+
+    polL4NextHopPortOfExit OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"IfIndex of port we learned this router on or else zero if not known."
+       ::= { polL4NextHopEntry 3 }
+
+    polL4NextHopMacAddress OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"MAC Address of next hop router learned from ARP."
+       ::= { polL4NextHopEntry 4 }
+
+    polL4NextHopLastChange  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The value of sysUpTime when this polL4NextHopState changed."
+       ::= { polL4NextHopEntry 5 }
+
+
+--
+-- Layer 4 Flow Control Table
+--
+-- This table provides a means to redirect a given flow next hop router from the next hop Router Table
+-- 
+
+   polL4lowControlTableLastChange  OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The value of sysUpTime when a row was last added or deleted from polL4lowControlTable."
+       ::= { polL4Group 25 }
+
+   polL4NumPolicies  OBJECT-TYPE
+       SYNTAX      INTEGER (0..100000)
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+	"The number of policies currently available."
+       ::= { polL4Group 26 }
+
+   polL4lowControlTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PolL4lowControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "Contains Control rows that indicate which flows have been redirected. As flows
+                are aged out and recreated, these rules will enforce flow redirection policy."
+       ::= { polL4Group 30 }
+
+   polL4lowControlEntry OBJECT-TYPE
+       SYNTAX      PolL4lowControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "This table is an ordered collection of route policies. For SSR, this maps
+                to the command: ip-policy Name [permit|deny] acl acl-list"
+       INDEX {  
+          polL4PolicyName,
+          polL4PolicySequence,
+          polL4PolicyInstance
+       }
+       ::= { polL4lowControlTable 1 }
+
+   PolL4lowControlEntry ::=
+       SEQUENCE {
+           polL4PolicyName       DisplayString,
+           polL4PolicySequence   Integer32,
+           polL4PolicyInstance   Integer32,
+
+           polL4PolicyType       SSRFlowPolicyType,
+           polL4PolicyAction     SSRFlowPolicyAction,
+           polL4PolicyMatch      SSRFlowPolicyAclList,   
+          
+           polL4PolicyNextHops   SSRFlowNextHopList,
+           polL4PolicyLoading    SSRFlowLoadPolicy,
+           polL4PolicyWatch      TruthValue,
+
+           polL4lowCreationTime  TimeTicks,  -- read only
+           polL4lowActiveGates   Gauge32,    -- read only
+           polL4lowAppliedTimes  Counter32,  -- read only
+
+           polL4lowControlStatus RowStatus
+       }
+
+   polL4PolicyName   OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+	"A unique name for this flow policy."
+       ::= { polL4lowControlEntry 1 }
+
+   polL4PolicySequence OBJECT-TYPE
+   	   SYNTAX  Integer32 (1..65535)
+	   MAX-ACCESS  not-accessible
+	   STATUS  current
+	   DESCRIPTION
+           "The evaluation order of this object. When two objects have the same value,
+            the value of the instance value decides which is evaluated first.
+            than higher numbers."
+       ::= { polL4lowControlEntry 2 }
+
+   polL4PolicyInstance OBJECT-TYPE
+   	   SYNTAX  Integer32 (1..65535)
+	   MAX-ACCESS  not-accessible
+	   STATUS  current
+	   DESCRIPTION
+           "The sequence of this policy based route. Lower numbers have higher precedence 
+            than higher numbers."
+       ::= { polL4lowControlEntry 3 }
+
+   polL4PolicyType   OBJECT-TYPE
+       SYNTAX      SSRFlowPolicyType
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+	"Controls if packets are forwarded or not for this policy."
+       DEFVAL { permitFlow }
+       ::= { polL4lowControlEntry 4 }
+
+   polL4PolicyAction   OBJECT-TYPE
+       SYNTAX      SSRFlowPolicyAction
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+	"Define when this policy should be used during normal packet forwarding process."
+       DEFVAL { policyBeforeRouteLookup }
+       ::= { polL4lowControlEntry 5 }
+
+   polL4PolicyMatch OBJECT-TYPE
+   	   SYNTAX  SSRFlowPolicyAclList
+	   MAX-ACCESS  read-create
+	   STATUS  current
+	   DESCRIPTION
+	  "Up to twenty (20) separate ACLs may be defined to match for this policy.
+           This object is mandatory. Use active row from polAclTable."
+       ::= { polL4lowControlEntry 6 }
+ 
+   polL4PolicyNextHops OBJECT-TYPE
+   	   SYNTAX  SSRFlowNextHopList
+	   MAX-ACCESS  read-create
+	   STATUS  current
+	   DESCRIPTION
+	  "Up to for IpAddresses may be specified to route data to next. Load balancing
+           If more than one next hop ip address is specified, the default load balancing
+           scheme is round robin. This object is mandatory. Use objects from polL4NextHopTable."
+       ::= { polL4lowControlEntry 7 }
+ 
+   polL4PolicyLoading OBJECT-TYPE
+   	   SYNTAX  SSRFlowLoadPolicy
+	   MAX-ACCESS  read-create
+	   STATUS  current
+	   DESCRIPTION
+	  "When more than one next hop is defined and available, set loading policy here."
+          DEFVAL { firstAvailable }
+       ::= { polL4lowControlEntry 8 }
+   
+   polL4PolicyWatch OBJECT-TYPE
+   	   SYNTAX  TruthValue
+	   MAX-ACCESS  read-create
+	   STATUS  current
+	   DESCRIPTION
+	  "When True, use icmp echo to actively maintain status of next hop. This 
+           is useful to prevent data sinks with static routes."
+           DEFVAL { false }
+       ::= { polL4lowControlEntry 9 }
+
+   polL4lowCreationTime OBJECT-TYPE
+   	   SYNTAX  TimeTicks
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The value of sysUpTime when policy went was created then activated."
+       ::= { polL4lowControlEntry 10 }
+
+   polL4lowActiveGates OBJECT-TYPE
+   	   SYNTAX  Gauge32
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The number of currently active nexthop gateways."
+       ::= { polL4lowControlEntry 11 }
+
+   polL4lowAppliedTimes OBJECT-TYPE
+   	   SYNTAX  Counter32
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+           "The number of times this policy was used."
+       ::= { polL4lowControlEntry 12 }
+
+   polL4lowControlStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+	"Entries in active state cause a flow to remain programmed with the next hop router specified.
+	 If the next hop router goes down, the rowStatus will become inactive. New flows that match this
+         specification will assume this next hop router over any other route directive. 
+         This assumes polL4PolicyBasedRouteState value is true."
+       ::= { polL4lowControlEntry 13 }
+
+--
+-- Summary Statistics for Flow Control SNMP API
+--
+polL4GroupStats  OBJECT IDENTIFIER   ::= { polL4Group 35 }
+
+	polL4lowLostRouters OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of times routers were disabled from NextHopTable due to lost contact."
+       ::= { polL4GroupStats 1 }
+
+	polL4lowControlTableActivates OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of successful activations of flow control policies made."
+       ::= { polL4GroupStats 2 }
+
+	polL4lowControlTableActivateFails OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of unsuccessful flow control policies made."
+       ::= { polL4GroupStats 3 }
+
+       polL4lowArpMappingChanges OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of mac to next hop IP address mapping changes
+           affecting policy based route tables."
+       ::= { polL4GroupStats 4 }
+
+       polL4lowIcmpRedirects OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of next hop route redirects received that
+            match a policy in the polL4lowControlTable.
+           This can help to determine if bad route policies are in effect."
+       ::= { polL4GroupStats 16 }
+
+       polL4lowMatchAttempts OBJECT-TYPE
+   	   SYNTAX  Counter32 
+	   MAX-ACCESS  read-only
+	   STATUS  current
+	   DESCRIPTION
+	  "The count of total number of policy based flow lookups
+           made against policy based route table. "
+       ::= { polL4GroupStats 17 }
+
+
+
+-- Compliance Statements 
+
+polConformance OBJECT IDENTIFIER ::= { policyMIB 2 }
+polCompliances OBJECT IDENTIFIER ::= { polConformance 1 }
+polGroups OBJECT IDENTIFIER ::= { polConformance 2 }
+ 
+polComplianceV10 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for the policyMIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { polGroupV10 }
+    ::= { polCompliances 1 }
+
+
+polComplianceV11 MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+            "The compliance statement for the policyMIB for version 1.1."
+    MODULE  -- this module
+        MANDATORY-GROUPS { polGroupV11 }
+    ::= { polCompliances 2 }
+
+polComplianceV12 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the policyMIB for version 1.2."
+    MODULE  -- this module
+        MANDATORY-GROUPS { polGroupV12 }
+    ::= { polCompliances 3 }
+ 
+polComplianceV13 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the policyMIB for version 1.3."
+    MODULE  -- this module
+        MANDATORY-GROUPS { polGroupV13 }
+    ::= { polCompliances 4 }
+ 
+polGroupV10  OBJECT-GROUP
+   OBJECTS {
+   polAclServer,
+   polAclNumber,
+   polAclLastChanged,
+   polAclName,
+   polAclItem,
+   polAclRestriction,
+   polAclProtocol,
+   polAclSrcIp,
+   polAclSrcMask,
+   polAclDstIp,
+   polAclDstMask,
+   polAclTOS,
+   polAclSrcPort,
+   polAclDstPort,
+   polAclSrcOperator,
+   polAclDstOperator,
+   polAclSrcHighRange,
+   polAclDstHighRange,
+   polAclAuditTrail,
+   polAclCheckpoint,
+   polAclRowStatus,
+
+   polAclServiceNumber,
+   polAclServiceLastChanged,
+   polAclServiceIfIndex,
+   polAclName2,	
+   polAclServiceDirection,
+   polAclServiceRowStatus,
+
+   polAclRemoteAllowed,
+   polAclInterfaceNumber,
+   polAclInterfaceLastChanged,
+   polAclInterfaceIfIndex,
+   polAclInterfaceDirection,
+   polAclPolicyStatus
+}
+STATUS deprecated
+DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the SSR Flow Policy MIB."
+   ::= { polGroups 1 }
+
+polGroupV11  OBJECT-GROUP
+   OBJECTS {
+   polAclServer,
+   polAclNumber,
+   polAclLastChanged,
+   polAclName,
+   polAclItem,
+   polAclRestriction,
+   polAclProtocol,
+   polAclSrcIp,
+   polAclSrcMask,
+   polAclDstIp,
+   polAclDstMask,
+   polAclTOS,
+   polAclSrcPort,
+   polAclDstPort,
+   polAclSrcOperator,
+   polAclDstOperator,
+   polAclSrcHighRange,
+   polAclDstHighRange,
+   polAclAuditTrail,
+   polAclCheckpoint,
+   polAclRowStatus,
+
+   polAclServiceNumber,
+   polAclServiceLastChanged,
+   polAclServiceIfIndex,
+   polAclName2,	
+   polAclServiceDirection,
+   polAclServiceRowStatus,
+
+   polAclRemoteAllowed,
+   polAclInterfaceNumber,
+   polAclInterfaceLastChanged,
+   polAclInterfaceIfIndex,
+   polAclInterfaceDirection,
+   polAclPolicyStatus,
+
+   polL2FilterLastChanged,
+   polL2FilterNumber,
+   polL2FilterDesc,
+   polL2FilterType,
+   polL2FilterRestrictions,
+   polL2FilterSrcMacAddr,
+   polL2FilterDstMacAddr,
+   polL2FilterVlanId,
+   polL2FilterInPorts,
+   polL2FilterOutPorts,
+   polL2FilterCreationTime,
+   polL2FilterStatus
+
+}
+STATUS deprecated
+DESCRIPTION
+  "A set of managed objects that make up version 1.1 of the SSR Flow Policy MIB."
+   ::= { polGroups 2 }
+
+polGroupV12  OBJECT-GROUP
+   OBJECTS {
+   polAclServer,
+   polAclNumber,
+   polAclLastChanged,
+   polAclName,
+   polAclItem,
+   polAclRestriction,
+   polAclProtocol,
+   polAclSrcIp,
+   polAclSrcMask,
+   polAclDstIp,
+   polAclDstMask,
+   polAclTOS,
+   polAclSrcPort,
+   polAclDstPort,
+   polAclSrcOperator,
+   polAclDstOperator,
+   polAclSrcHighRange,
+   polAclDstHighRange,
+   polAclAuditTrail,
+   polAclCheckpoint,
+   polAclRowStatus,
+
+   polAclServiceNumber,
+   polAclServiceLastChanged,
+   polAclServiceIfIndex,
+   polAclName2,	
+   polAclServiceDirection,
+   polAclServiceRowStatus,
+
+   polAclRemoteAllowed,
+   polAclInterfaceNumber,
+   polAclInterfaceLastChanged,
+   polAclInterfaceIfIndex,
+   polAclInterfaceDirection,
+   polAclPolicyStatus,
+
+   polL2FilterLastChanged,
+   polL2FilterNumber,
+   polL2FilterDesc,
+   polL2FilterType,
+   polL2FilterRestrictions,
+   polL2FilterSrcMacAddr,
+   polL2FilterDstMacAddr,
+   polL2FilterVlanId,
+   polL2FilterInPorts,
+   polL2FilterOutPorts,
+   polL2FilterCreationTime,
+   polL2FilterStatus,
+
+   polL4PolicyBasedRoutingEnabled,
+   polL4NumRouters,
+   polL4NextHopTableLastChange,
+   polL4NextHopRouter,
+   polL4NextHopState,
+   polL4NextHopPortOfExit,
+   polL4NextHopMacAddress,
+   polL4NextHopLastChange,
+   polL4lowControlTableLastChange,
+   polL4NumPolicies,
+   polL4PolicyType,
+   polL4PolicyAction,
+   polL4PolicyMatch,
+   polL4PolicyNextHops,
+   polL4PolicyLoading,
+   polL4PolicyWatch,
+   polL4lowCreationTime,
+   polL4lowActiveGates,
+   polL4lowAppliedTimes,
+   polL4lowControlStatus,
+   polL4lowLostRouters,
+   polL4lowControlTableActivates,
+   polL4lowControlTableActivateFails,
+   polL4lowArpMappingChanges,
+   polL4lowIcmpRedirects,
+   polL4lowMatchAttempts
+}
+STATUS current
+DESCRIPTION
+  "A set of managed objects that make up version 1.2 of the SSR Flow Policy MIB."
+   ::= { polGroups 3 }
+
+polGroupV13  OBJECT-GROUP
+   OBJECTS {
+   polAclServer,
+   polAclNumber,
+   polAclLastChanged,
+   polAclName,
+   polAclItem,
+   polAclRestriction,
+   polAclProtocol,
+   polAclSrcIp,
+   polAclSrcMask,
+   polAclDstIp,
+   polAclDstMask,
+   polAclTOS,
+   polAclSrcPort,
+   polAclDstPort,
+   polAclSrcOperator,
+   polAclDstOperator,
+   polAclSrcHighRange,
+   polAclDstHighRange,
+   polAclAuditTrail,
+   polAclCheckpoint,
+   polAclRowStatus,
+
+   polAclServiceNumber,
+   polAclServiceLastChanged,
+   polAclServiceIfIndex,
+   polAclName2,	
+   polAclServiceDirection,
+   polAclServiceRowStatus,
+
+   polAclRemoteAllowed,
+   polAclInterfaceNumber,
+   polAclInterfaceLastChanged,
+   polAclInterfaceIfIndex,
+   polAclInterfaceDirection,
+   polAclPolicyStatus,
+
+   polL2FilterLastChanged,
+   polL2FilterNumber,
+   polL2FilterDesc,
+   polL2FilterType,
+   polL2FilterRestrictions,
+   polL2FilterSrcMacAddr,
+   polL2FilterDstMacAddr,
+   polL2FilterVlanId,
+   polL2FilterInPorts,
+   polL2FilterOutPorts,
+   polL2FilterCreationTime,
+   polL2FilterStatus,
+
+   polL2Dot1qVlanStaticProtocols,
+   polL2Dot1qVlanStaticL4Bridging,
+
+   polL4PolicyBasedRoutingEnabled,
+   polL4NumRouters,
+   polL4NextHopTableLastChange,
+   polL4NextHopRouter,
+   polL4NextHopState,
+   polL4NextHopPortOfExit,
+   polL4NextHopMacAddress,
+   polL4NextHopLastChange,
+   polL4lowControlTableLastChange,
+   polL4NumPolicies,
+   polL4PolicyType,
+   polL4PolicyAction,
+   polL4PolicyMatch,
+   polL4PolicyNextHops,
+   polL4PolicyLoading,
+   polL4PolicyWatch,
+   polL4lowCreationTime,
+   polL4lowActiveGates,
+   polL4lowAppliedTimes,
+   polL4lowControlStatus,
+   polL4lowLostRouters,
+   polL4lowControlTableActivates,
+   polL4lowControlTableActivateFails,
+   polL4lowArpMappingChanges,
+   polL4lowIcmpRedirects,
+   polL4lowMatchAttempts
+}
+STATUS current
+DESCRIPTION
+  "A set of managed objects that make up version 1.3 of the SSR Flow Policy MIB."
+   ::= { polGroups 4 }
+
+END

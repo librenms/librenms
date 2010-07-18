@@ -1,0 +1,647 @@
+CT-CONTAINER-MIB DEFINITIONS ::= BEGIN
+
+        --  ct-container-mib.txt
+        --  Revision: 1.02.01
+        --  Part Number:  
+        --  Date:  March 26, 1998
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific container MIB..
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+                NetworkAddress, Counter, TimeTicks
+                        FROM RFC1155-SMI
+                ctChassis2
+                        FROM CTRON-MIB-NAMES
+                DisplayString
+                        FROM RFC1213-MIB
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+        --  This MIB module uses the extended OBJECT-TYPE macro as defined
+        --  RFC 1212
+
+        --  Textual convention
+
+        --  DisplayString ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax, unless explicitly stated, are declared as having:
+        --
+        --  SIZE (0..255)
+
+        --  containerTypeDevice is, in generic terms, similar to sysObjectID in
+        --  MIB-II.  It is defined for the sake of completeness, and
+        --  in order to negate dependencies on other MIBs.
+
+        --===============   Group Definitions          ===================
+
+        contType                OBJECT IDENTIFIER  ::= { ctChassis2 1 }
+        contLogical             OBJECT IDENTIFIER  ::= { ctChassis2 2 }
+        contPhysical            OBJECT IDENTIFIER  ::= { ctChassis2 3 }
+        contResource            OBJECT IDENTIFIER  ::= { ctChassis2 4 }
+        contCommStr             OBJECT IDENTIFIER  ::= { ctChassis2 5 }
+        contAddress             OBJECT IDENTIFIER  ::= { ctChassis2 6 }
+        contTypeID              OBJECT IDENTIFIER  ::= { ctChassis2 7 }
+
+        --===============    contType group          ===================
+
+        contTypeDevice  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies the type of device or container. This
+                 could be a chassis, module, a standalone box etc.
+                 A vendor's authoritative identification of this
+                 device or container.  By convention, this value is
+                 allocated within the SMI enterprises subtree(1.3.6.1.4.1),
+                 and provides an easy and unambiguous means for
+                 determining `what kind of box' is being managed.  If this
+                 information is not present or unknown, its value should
+                 be set to the contUnknownTypeID, which is defined below."
+            ::= { contType 1 }
+
+        contTypePhysicalEntries  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Number of slots in the device.  For bounded, slot-less
+                 systems, the value of this object shall be zero(0)."
+            ::= { contType 2 }
+
+        contTypePhysicalChanges  OBJECT-TYPE
+            SYNTAX   Counter
+            ACCESS   read-only
+            STATUS   mandatory
+            DESCRIPTION
+                "Depicts the number of physical changes that have occured
+                 to this MIB.  This includes additions and
+                 removal of components in the component table."
+            ::= { contType 3 }
+
+        contTypeLogicalChanges  OBJECT-TYPE
+            SYNTAX   Counter
+            ACCESS   read-only
+            STATUS   mandatory
+            DESCRIPTION
+                "Depicts the number of logical changes that have occured
+                 to this MIB.  This includes all sets to name strings etc."
+            ::= { contType 4 }
+
+        contTypeSerialNumber OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Reflects the revision level of the device.  If no
+                serial number is available for the device then this
+                object will be the zero length string."
+            ::= { contType 5 }
+
+        contTypeContainingDevice  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies the type of device or container that 
+                 this device or containeris installed or contained.
+                 A vendor's authoritative identification of this
+                 container or device.  By convention, this value is
+                 allocated within the SMI enterprises subtree(1.3.6.1.4.1),
+                 and provides an easy and unambiguous means for
+                 determining `what kind of box' .  If this
+                 information is not present or unknown, its value should
+                 be set to the OBJECT IDENTIFIER { 0 0 }, which is a
+                 syntactically valid object identifier."
+            ::= { contType 6 }
+
+        contTypeContainingPhysicalEntries OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Number of slots in the container in which the device is
+                 installed.  For bounded, slot-less
+                 systems, the value of this object shall be zero(0)."
+            ::= { contType 7 }
+
+        contTypeContainingPhysicalEntryID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number in a container in which the device is
+                 installed. If the slot number is unknown then this value
+                 will be zero."
+            ::= { contType 8 }
+
+        contTypeContainingSerialNumber          OBJECT-TYPE
+            SYNTAX      DisplayString
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Reflects the revision level of the device or container
+                 in which this device is installed.  If no
+                 serial number is available for the device or container
+                 then this object will be the zero length string."
+            ::= { contType 9 }
+
+--===============    contLogicalEntry group          ====================
+
+        --  Component Table and Definitions
+        --  Components are instances of functional devices.  For
+        --  example, if two routers and three bridges were installed
+        --  in a container, said container accommodates five components.
+
+        contLogicalEntryTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ContLogicalEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of components installed in this container."
+            ::= { contLogical 1 }
+
+        contLogicalEntry  OBJECT-TYPE
+            SYNTAX  ContLogicalEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A component entry containing objects for a particular
+                 component."
+            INDEX   { contLogicalEntryID }
+            ::= { contLogicalEntryTable 1 }
+
+        ContLogicalEntry  ::= 
+            SEQUENCE {
+                contLogicalEntryID              INTEGER,
+                contLogicalEntryType            OBJECT IDENTIFIER,
+                contLogicalEntryName            DisplayString,
+                contLogicalEntryVersion         DisplayString,
+                contLogicalEntryROCommStr       OCTET STRING,
+                contLogicalEntryRWCommStr       OCTET STRING,
+                contLogicalEntrySUCommStr       OCTET STRING,
+                contLogicalEntryAdminStatus     INTEGER,
+                contLogicalEntryOperStatus      INTEGER
+            }
+
+        contLogicalEntryID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value identifying a component, which includes,
+                 but is not limited to, routers, bridges, and terminal
+                 servers.  Multiple instances of a functional device may
+                 exist within the same container."
+            ::= { contLogicalEntry 1 }
+
+        contLogicalEntryType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies a component within this container.  A vendor's
+                 authoritative identification of this component type.
+                 By convention, this value is allocated within the SMI
+                 enterprises subtree(1.3.6.1.4.1), and provides an easy
+                 and unambiguous means for determining the component
+                 type.  If this information is not present or unknown,
+                 its value should be set to the OBJECT IDENTIFIER { 0 0 },
+                 which is a syntactically valid object identifier."
+            ::= { contLogicalEntry 2 }
+
+        contLogicalEntryName  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-only 
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the component."
+            ::= { contLogicalEntry 3 }
+
+        contLogicalEntryVersion  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (0..32))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A textual description of the version/revision level for
+                 this component's software."
+            ::= { contLogicalEntry 4 }
+
+        contLogicalEntryROCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the read only community string to
+                 access MIBs registered to this component."
+            ::= { contLogicalEntry 5 }
+
+        contLogicalEntryRWCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the read write community string to
+                 access MIBs registered to this component."
+            ::= { contLogicalEntry 6 }
+
+        contLogicalEntrySUCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the super user community string to
+                 access MIBs registered to this component."
+            ::= { contLogicalEntry 7 }
+
+        contLogicalEntryAdminStatus     OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(3),
+                        disable(7),
+                        reset(9)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                ""
+            ::= { contLogicalEntry 8 }
+
+        contLogicalEntryOperStatus      OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        unknown(1),             --  none of the following
+                        invalid(2),
+                        enabled(3),
+                        testing(4),
+                        operational(5),
+                        error(6),
+                        disabled(7),
+                        delete(8)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                ""
+            ::= { contLogicalEntry 9 }
+
+        --===============    contPhysicalEntry group  ====================
+
+        --  Slot Table and definitions
+        --  A module is the physical entity that resides in a container slot.
+        --  A module may be a board or card or even a chassis.A component may
+        --  be realized by one or more modules, or one or more components
+        --  may be realized by the same module.
+        --  The slot table provides a physical representation of a container
+        --  and its components.
+
+        contPhysicalEntryTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ContPhysicalEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of modules installed in this container.  A component,
+                 such as a router, may be incorporated on one or more
+                 modules.  More than one component may be incorporated on
+                 each module."
+            ::= { contPhysical 1 }
+
+        contPhysicalEntry  OBJECT-TYPE
+            SYNTAX  ContPhysicalEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing objects for a particular
+                 module."
+            INDEX  { contPhysicalEntryID }
+            ::= { contPhysicalEntryTable 1 }
+
+        ContPhysicalEntry  ::=
+            SEQUENCE {
+                contPhysicalEntryID             INTEGER,
+                contPhysicalEntries             INTEGER,
+                contPhysicalEntryClass          OBJECT IDENTIFIER,
+                contPhysicalEntryType           OBJECT IDENTIFIER,
+                contPhysicalEntryTimeStamp      TimeTicks,
+                contPhysicalEntryStatus         INTEGER
+            }
+
+        contPhysicalEntryID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number containing this module."
+            ::= { contPhysicalEntry 1 }
+
+        contPhysicalEntries     OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The number of slots that this module occupies.  Some
+                modules require more than one physical front panel slot
+                while only using a single backpanel slot.  In this case
+                this object will reflect the number of slots occupied
+                by the physical module.  This object will have a value
+                of 1 for all single slot modules."
+            ::= { contPhysicalEntry 2 }
+
+        contPhysicalEntryClass  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The class (or type) of slot.  For example, in a chassis
+                slots that only allow for power supply modules fall into
+                a class that is different from slots that allow only 
+                interface cards."
+            ::= { contPhysicalEntry 3 }
+
+        contPhysicalEntryType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Uniquely defines the module type.  A vendor's
+                 authoritative identification for a module.  By
+                 convention, this value is allocated within the SMI
+                 enterprises subtree(1.3.6.1.4.1), and provides an easy
+                 and unambiguous means for determining the type of
+                 module."
+            ::= { contPhysicalEntry 4 }
+
+        contPhysicalEntryTimeStamp  OBJECT-TYPE
+            SYNTAX  TimeTicks
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The value of sysUpTime for this management entity, when
+                 this module was last (re-)initialized."
+            ::= { contPhysicalEntry 5 }
+
+        contPhysicalEntryStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        reset(1),
+                        powerOff(2),
+                        busy(3),
+                        crippled(4),
+                        operational(5),
+                        error(6),
+                        testing(7),
+                        booting(11)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The module status."
+            ::= { contPhysicalEntry 6 }
+
+        --  Pysical to Logical Map Table and definitions
+        --  This table specifies the logical entries that reside
+    --  in a physical entry.                                                          
+
+        contLogicalToPhysicalMapTable OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ContLogicalToPhysicalMapEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of components that reside in a container slot.  More 
+                 than one component may reside in a container slot." 
+            ::= { contPhysical 2 }
+
+        contLogicalToPhysicalMapEntry  OBJECT-TYPE
+            SYNTAX  ContLogicalToPhysicalMapEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A slot entry containing the objects for a particular
+                 module."
+            INDEX  { contPhysicalEntryID, contLogicalEntryID }
+            ::= { contLogicalToPhysicalMapTable 1 }
+
+        ContLogicalToPhysicalMapEntry  ::=
+            SEQUENCE {
+                        contPhysicalEntryMapID  INTEGER,
+                        contLogicalEntryMapID   INTEGER
+            }
+
+        contPhysicalEntryMapID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The slot number of a container slot.  An unique
+                 value, in the range between 0 and and the value of
+                 containerNumSlots.  This object is similiar to 
+                 contPhysicalEntryID."
+            ::= { contLogicalToPhysicalMapEntry 1 }
+
+        contLogicalEntryMapID  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The ID value for the component incorporated within this
+                 module.  This object is similar to contLogicalEntryID."
+            ::= { contLogicalToPhysicalMapEntry 2 }
+
+        --===============    contResource group       ====================
+
+        contResourceTable       OBJECT-TYPE
+            SYNTAX      SEQUENCE OF ContResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table defines the potential physical resources that may be
+                 utilized by a given physical module within the container."
+        ::= { contResource 1 }
+
+        contResourceEntry       OBJECT-TYPE
+            SYNTAX      ContResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines a specific physical resource entry"
+            INDEX { contResourceID }
+        ::= { contResourceTable 1 }
+
+        ContResourceEntry ::= SEQUENCE {
+                contResourceID          INTEGER,
+                contResourceType        OBJECT IDENTIFIER,
+                contResourceMibPointer  OBJECT IDENTIFIER
+                }
+
+        contResourceID          OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                "A unique index that defines a specific physcial resource for
+                 which this relationship exists."
+        ::= { contResourceEntry 1 }
+
+        contResourceType                OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines the type of physical resource for which this
+                 relationship is defined."
+        ::= { contResourceEntry 2 }
+
+        contResourceMibPointer  OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The value of this object defines the start of a MIB that can
+                 be used to determine more specific information about
+                 the given resource.  This may include information about
+                 what physcial modules the resource is connected.  It also
+                 may provide specific control information about the
+                 physcial resource.  For example for a backplane the MIB
+                 may refer contain information on insert/bypass status
+                 of any given physical module."
+            ::= { contResourceEntry 3 }
+
+        --===============    Community String  group  ===============
+
+        --  This group provides the means to globally
+        --  modify the community strings associated with Logical Entries
+        --  from both the Chassis Manager and from the Module Manager levels.
+
+        contROCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the base read only community string to
+                 access MIBs in this container or on this module. A write to
+                 this object will change all instances of
+                 contLogicalEntryROCommStr."
+            ::= { contCommStr 1 }
+
+        contRWCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the read write community string to
+                 access MIBs in this container or on this module.A write to
+                 this object will change all instances of
+                 contLogicalEntryRWCommStr."
+            ::= { contCommStr 2 }
+
+        contSUCommStr  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This is defined as the super user community string to
+                 access MIBs in this container or on this module.A write to
+                 this object will change all instances of 
+                 contLogicalEntrySUCommStr."
+            ::= { contCommStr 3 }
+
+        -- Container Network Address Table
+        -- Maintains and controls the network addresses through
+        -- which this entity is managed.
+
+        contNetAddressTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF ContNetAddressEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of Global network addresses with which this device 
+         can be managed."
+            ::= { contAddress 1 }
+
+        contNetAddressEntry  OBJECT-TYPE
+            SYNTAX  ContNetAddressEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular
+                 network address."
+            INDEX   { contNetAddressIndex }
+            ::= { contNetAddressTable 1 }
+
+        ContNetAddressEntry  ::= 
+            SEQUENCE {
+                contNetAddressIndex
+                        INTEGER,
+                contNetAddressNetworkType
+                        OBJECT IDENTIFIER,
+                contNetAddress
+                        NetworkAddress,
+                contNetAddressMask
+                        NetworkAddress
+                }
+
+        contNetAddressIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value identifying a network address."
+            ::= { contNetAddressEntry 1 }
+
+        contNetAddressNetworkType  OBJECT-TYPE
+            SYNTAX  OBJECT IDENTIFIER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Identifies the Network type e.g Inband, etc."
+            ::= { contNetAddressEntry 2 }
+
+        contNetAddress                  OBJECT-TYPE
+        SYNTAX   NetworkAddress
+        ACCESS   read-write
+        STATUS   mandatory
+            DESCRIPTION
+                "Indicates the network address of the device for a 
+                 particular network."
+            ::= { contNetAddressEntry 3 }
+
+        contNetAddressMask              OBJECT-TYPE
+            SYNTAX      NetworkAddress
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                "Indicates the subnet mask for the network address of the
+                 device for a particular network"
+            ::= { contNetAddressEntry 4 }
+
+        -- Cont Type Identifiers
+
+        contUnknownTypeID       OBJECT IDENTIFIER  ::= { contTypeID 1 }
+
+END

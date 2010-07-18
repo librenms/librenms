@@ -1,0 +1,685 @@
+       HP-ICF-CHASSIS DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Counter32,
+           OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, TimeStamp
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, hpicfCommon, hpicfCommonTrapsPrefix
+               FROM HP-ICF-OID;
+
+       hpicfChassisMib MODULE-IDENTITY
+            LAST-UPDATED "200011032216Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module describes chassis devices in the
+                    HP Integrated Communication Facility product 
+                    line.  Note that most of this module will be
+                    superceded by the standard Entity MIB.  However,
+                    the hpicfSensorTable will still be valid."
+
+            REVISION     "200011032216Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9703060334Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added NOTIFICATION-GROUP information."
+            REVISION     "9609100245Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB.  Added compliance statement for use by
+                    non-chassis devices or devices that are
+                    implementing another chassis MIB (like Entity MIB)
+                    but still want to use the hpicfSensorTable.
+                    Changed STATUS clause to deprecated for those
+                    objects that are superceded by the Entity MIB."
+            REVISION     "9507130000Z"  -- July 13, 1995
+            DESCRIPTION
+                    "Added the hpicfSensorTrap."
+            REVISION     "9411200000Z"  -- November 20, 1994
+            DESCRIPTION
+                    "Added the hpicfChassisAddrTable."
+            REVISION     "9307090000Z"  -- July 9, 1993
+            DESCRIPTION
+                    "Initial version."
+            ::= { hpicfObjectModules 3 }
+
+
+       hpicfChassis          
+           OBJECT IDENTIFIER ::= { hpicfCommon 2 }
+
+       -- The Chassis group contains detailed information about what
+       -- is inside a particular chassis.  The intent is that an 
+       -- agent can provide information about the box that it is in. 
+
+       hpicfChassisId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (6))
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   An identifier that uniquely identifies this 
+                   particular chassis.  This will be the same value 
+                   as the instance of hpicfChainId for this chassis."
+           ::= { hpicfChassis 1 }
+
+       hpicfChassisNumSlots OBJECT-TYPE
+           SYNTAX     Integer32 (0..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The number of slots in this chassis."
+           ::= { hpicfChassis 2 }
+
+       -- The slot table contains one entry for each slot in this
+       -- chassis.
+
+       hpicfSlotTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfSlotEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A table that contains information on all the 
+                   slots in this chassis."
+           ::= { hpicfChassis 3 }
+
+       hpicfSlotEntry OBJECT-TYPE
+           SYNTAX     HpicfSlotEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   Information about a slot in a chassis"
+           INDEX      { hpicfSlotIndex }
+           ::= { hpicfSlotTable 1 }
+
+       HpicfSlotEntry ::=
+           SEQUENCE {
+               hpicfSlotIndex                  Integer32,
+               hpicfSlotObjectId               OBJECT IDENTIFIER,
+               hpicfSlotLastChange             TimeStamp,
+               hpicfSlotDescr                  DisplayString
+           }
+
+       hpicfSlotIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The slot number within the box for which this 
+                   entry contains information."
+           ::= { hpicfSlotEntry 1 }
+
+       hpicfSlotObjectId OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The authoritative identification of the card 
+                   plugged into this slot in this chassis.  A value 
+                   of { 0 0 } indicates an empty slot."
+           ::= { hpicfSlotEntry 2 }
+
+       hpicfSlotLastChange OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The value of the agent's sysUpTime at which a 
+                   card in this slot was last inserted or removed.  
+                   If no module has been inserted or removed since 
+                   the last reinitialization of the agent, this 
+                   object has a zero value."
+           ::= { hpicfSlotEntry 3 }
+
+       hpicfSlotDescr OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A textual description of the card plugged into 
+                   this slot in this chassis, including the product 
+                   number and version information."
+           ::= { hpicfSlotEntry 4 }
+
+       -- The entity table contains a list of logical network devices
+       -- contained in this chassis, whether or not that agent can 
+       -- actually manage the device.  The intent is that any agent 
+       -- for a box will have a complete picture of the entities in 
+       -- that box.
+
+       hpicfEntityTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfEntityEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A table that contains information about the 
+                   (logical) networking devices contained in this
+                   chassis."
+           ::= { hpicfChassis 4 }
+
+       hpicfEntityEntry OBJECT-TYPE
+           SYNTAX     HpicfEntityEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   Information about a single logical networking 
+                   device contained in this chassis."
+           INDEX      { hpicfEntityIndex }
+           ::= { hpicfEntityTable 1 }
+
+       HpicfEntityEntry ::=
+           SEQUENCE {
+               hpicfEntityIndex                Integer32,
+               hpicfEntityFunction             Integer32,
+               hpicfEntityObjectId             OBJECT IDENTIFIER,
+               hpicfEntityDescr                DisplayString,
+               hpicfEntityTimestamp            TimeStamp
+           }
+
+       hpicfEntityIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   An index that uniquely identifies the logical 
+                   network device for which this entry contains 
+                   information."
+           ::= { hpicfEntityEntry 1 }
+
+       hpicfEntityFunction OBJECT-TYPE
+           SYNTAX     Integer32 (0..63)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The generic function provided by the logical 
+                   network device.  The value is a sum.  Starting 
+                   from zero, for each type of generic function that 
+                   the entity performs, 2 raised to a power is added 
+                   to the sum.  The powers are according to the 
+                   following table:
+
+                       Function        Power
+                       other           1
+                       repeater        0
+                       bridge          2
+                       router          3
+                       agent           5
+
+                   For example, an entity performing both bridging 
+                   and routing functions would have a value of 12 
+                   (2^2 + 2^3)."
+           ::= { hpicfEntityEntry 2 }
+
+       hpicfEntityObjectId OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The authoritative identification of the logical 
+                   network device which provides an unambiguous means
+                   of determining the type of device.  The value of 
+                   this object is analagous to MIB-II's sysObjectId."
+           ::= { hpicfEntityEntry 3 }
+
+       hpicfEntityDescr OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A textual description of this device, including 
+                   the product number and version information.  The 
+                   value of this object is analogous to MIB-II's 
+                   sysDescr."
+           ::= { hpicfEntityEntry 4 }
+
+       hpicfEntityTimestamp OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The value of the agent's sysUpTime at which this 
+                   logical network device was last reinitialized.  If
+                   the entity has not been reinitialized since the 
+                   last reinitialization of the agent, then this 
+                   object has a zero value."
+           ::= { hpicfEntityEntry 5 }
+
+       -- The hpicfSlotMapTable is used to convey which logical
+       -- network devices occupy which slots in the chassis.  For
+       -- example, if a chassis contains a repeater entity, with an
+       -- hpicfEntityIndex of 2, which is made up of three cards
+       -- located in slots 2, 4, and 5 of the chassis, this table
+       -- will contain entries indexed by { 2 2 }, { 4 2 } and
+       -- { 5 2 }.
+
+       hpicfSlotMapTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfSlotMapEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A table that contains information about which 
+                   entities are in which slots in this chassis."
+           ::= { hpicfChassis 5 }
+
+       hpicfSlotMapEntry OBJECT-TYPE
+           SYNTAX     HpicfSlotMapEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A relationship between a slot and an entity in
+                   this chassis.  Such a relationship exists if the 
+                   particular slot is occupied by a physical module 
+                   performing part of the function of the particular 
+                   entity."
+           INDEX      { hpicfSlotMapSlot, hpicfSlotMapEntity }
+           ::= { hpicfSlotMapTable 1 }
+
+       HpicfSlotMapEntry ::=
+           SEQUENCE {
+               hpicfSlotMapSlot                Integer32,
+               hpicfSlotMapEntity              Integer32
+           }
+
+       hpicfSlotMapSlot OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A slot number within the chassis which contains 
+                   (part of) this entity."
+           ::= { hpicfSlotMapEntry 1 }
+
+       hpicfSlotMapEntity OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The entity described in this mapping."
+           ::= { hpicfSlotMapEntry 2 }
+
+       -- The sensor table contains one entry for each sensor in this
+       -- chassis.
+
+       hpicfSensorTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfSensorEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table that contains information on all the
+                   sensors in this chassis"
+           ::= { hpicfChassis 6 }
+
+       hpicfSensorEntry OBJECT-TYPE
+           SYNTAX     HpicfSensorEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "Information about a sensor in a chassis"
+           INDEX      { hpicfSensorIndex }
+           ::= { hpicfSensorTable 1 }
+
+       HpicfSensorEntry ::=
+           SEQUENCE {
+               hpicfSensorIndex                Integer32,
+               hpicfSensorObjectId             OBJECT IDENTIFIER,
+               hpicfSensorNumber               Integer32,
+               hpicfSensorStatus               INTEGER,
+               hpicfSensorWarnings             Counter32,
+               hpicfSensorFailures             Counter32,
+               hpicfSensorDescr                DisplayString
+           }
+
+       hpicfSensorIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "An index that uniquely identifies the sensor for
+                   which this entry contains information."
+           ::= { hpicfSensorEntry 1 }
+
+       hpicfSensorObjectId OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The authoritative identification of the kind of
+                   sensor this is."
+           ::= { hpicfSensorEntry 2 }
+
+       hpicfSensorNumber OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A number which identifies a particular sensor
+                   from other sensors of the same kind.  For
+                   instance, if there are many temperature sensors in
+                   this chassis, this number whould identify a
+                   particular temperature sensor in this chassis."
+           ::= { hpicfSensorEntry 3 }
+
+       hpicfSensorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          unknown(1),
+                          bad(2),
+                          warning(3),
+                          good(4),
+                          notPresent(5)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "Actual status indicated by the sensor."
+           ::= { hpicfSensorEntry 4 }
+
+       hpicfSensorWarnings OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of times hpicfSensorStatus has entered
+                   the 'warning'(3) state."
+           ::= { hpicfSensorEntry 5 }
+
+       hpicfSensorFailures OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of times hpicfSensorStatus has entered
+                   the 'bad'(2) state."
+           ::= { hpicfSensorEntry 6 }
+
+       hpicfSensorDescr OBJECT-TYPE
+           SYNTAX     DisplayString
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the sensor."
+           ::= { hpicfSensorEntry 7 }
+
+       hpicfChassisAddrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfChassisAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   A table of network addresses for entities in this
+                   chassis.  The primary use of this table is to map
+                   a specific entity address to a specific chassis.
+                   Note that this table may not be a complete list of
+                   network addresses for this entity."
+           ::= { hpicfChassis 7 }
+
+       hpicfChassisAddrEntry OBJECT-TYPE
+           SYNTAX     HpicfChassisAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   An entry containing a single network address being
+                   used by a logical network device in this chassis."
+           INDEX      { hpicfChasAddrType, hpicfChasAddrAddress }
+           ::= { hpicfChassisAddrTable 1 }
+
+       HpicfChassisAddrEntry ::=
+           SEQUENCE {
+               hpicfChasAddrType               INTEGER,
+               hpicfChasAddrAddress            OCTET STRING,
+               hpicfChasAddrEntity             Integer32
+           }
+
+       hpicfChasAddrType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          ipAddr(1),
+                          ipxAddr(2),
+                          macAddr(3)
+                      }
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The kind of network address represented in this
+                   entry."
+           ::= { hpicfChassisAddrEntry 1 }
+
+       hpicfChasAddrAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(4..10))
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The network address being used by the logical
+                   network device associated with this entry, formatted
+                   according to the value of the associated instance of
+                   hpicfChasAddrType.
+
+                   For hpicfChasAddrType of ipAddr, this value is four
+                   octets long, with each octet representing one byte of
+                   the IP address, in network byte order.
+
+                   For hpicfChasAddrType of ipxAddr, this value is ten
+                   octets long, with the first four octets representing
+                   the IPX network number in network byte order,
+                   followed by the six byte host number in network byte
+                   order.
+
+                   For hpicfChasAddrType of macAddr, this value is six
+                   octets long, representing the MAC address in
+                   canonical order."
+           ::= { hpicfChassisAddrEntry 2 }
+
+       hpicfChasAddrEntity OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   An index that uniquely identifies the logical 
+                   network device in this chassis that is using this
+                   network address.."
+           ::= { hpicfChassisAddrEntry 3 }
+
+
+       -- Common Traps
+
+
+       hpicfSensorTrap NOTIFICATION-TYPE
+           OBJECTS    { hpicfSensorStatus, hpicfSensorDescr }
+           STATUS     current
+           DESCRIPTION
+                   "An hpicfSensorTrap indicates that there has been a
+                   change of state on one of the sensors in this
+                   chassis.  The hpicfSensorStatus indicates the new
+                   status value for the changed sensor."
+           ::=  { hpicfCommonTrapsPrefix 3 }
+
+       -- conformance information
+
+       hpicfChassisConformance
+           OBJECT IDENTIFIER ::= { hpicfChassisMib 1 }
+
+       hpicfChassisCompliances
+           OBJECT IDENTIFIER ::= { hpicfChassisConformance 1 }
+       hpicfChassisGroups
+           OBJECT IDENTIFIER ::= { hpicfChassisConformance 2 }
+
+       -- compliance statements
+
+       hpicfChasAdvStkCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   A compliance statement for AdvanceStack chassis
+                   devices."
+           MODULE
+               MANDATORY-GROUPS { hpicfChassisBasicGroup }
+
+               GROUP    hpicfSensorGroup
+               DESCRIPTION
+                       "This group should be implemented on any
+                       AdvanceStack device with redundant power
+                       supplies or other appropriate sensors."
+
+               GROUP    hpicfSensorNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented on any
+                       AdvanceStack device with redundant power
+                       supplies or other appropriate sensors."
+
+               ::= { hpicfChassisCompliances 1 }
+
+       hpicfChasAdvStk2Compliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   An updated compliance statement for AdvanceStack
+                   chassis devices that includes the
+                   hpicfChassisAddrGroup."
+           MODULE
+               MANDATORY-GROUPS { hpicfChassisBasicGroup,
+                                  hpicfChassisAddrGroup }
+
+               GROUP    hpicfSensorGroup
+               DESCRIPTION
+                       "This group should be implemented on any
+                       AdvanceStack device with redundant power
+                       supplies or other appropriate sensors."
+
+               GROUP    hpicfSensorNotifyGroup
+               DESCRIPTION
+                       "This group should be implemented on any
+                       AdvanceStack device with redundant power
+                       supplies or other appropriate sensors."
+
+               ::= { hpicfChassisCompliances 2 }
+
+       hpicfChasSensorCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "A compliance statement for non-chassis devices,
+                   or chassis devices implementing a standards-based
+                   MIB for obtaining chassis information, which
+                   contain redundant power supplies or other
+                   appropriate sensors."
+           MODULE
+               MANDATORY-GROUPS { hpicfSensorGroup,
+                                  hpicfSensorNotifyGroup }
+
+           ::= { hpicfChassisCompliances 3 }
+
+
+       -- units of conformance
+
+       hpicfChassisBasicGroup OBJECT-GROUP
+           OBJECTS    { hpicfChassisId,
+                        hpicfChassisNumSlots,
+                        hpicfSlotIndex,
+                        hpicfSlotObjectId,
+                        hpicfSlotLastChange,
+                        hpicfSlotDescr,
+                        hpicfEntityIndex,
+                        hpicfEntityFunction,
+                        hpicfEntityObjectId,
+                        hpicfEntityDescr,
+                        hpicfEntityTimestamp,
+                        hpicfSlotMapSlot,
+                        hpicfSlotMapEntity
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects for determining the
+                   contents of an ICF chassis device."
+           ::= { hpicfChassisGroups 1 }
+
+       hpicfSensorGroup OBJECT-GROUP
+           OBJECTS    { hpicfSensorIndex,
+                        hpicfSensorObjectId,
+                        hpicfSensorNumber,
+                        hpicfSensorStatus,
+                        hpicfSensorWarnings,
+                        hpicfSensorFailures,
+                        hpicfSensorDescr
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for monitoring the status
+                   of sensors in an ICF chassis."
+           ::= { hpicfChassisGroups 2 }
+
+       hpicfChassisAddrGroup OBJECT-GROUP
+           OBJECTS    { hpicfChasAddrEntity }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects to allow a management
+                   station to determine which devices are in the same
+                   chassis."
+           ::= { hpicfChassisGroups 3 }
+
+       hpicfSensorNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfSensorTrap }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   changes in the status of sensors."
+           ::= { hpicfChassisGroups 4 }
+
+       END
+

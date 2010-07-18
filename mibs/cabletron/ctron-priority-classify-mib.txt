@@ -1,0 +1,714 @@
+CTRON-PRIORITY-CLASSIFY-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+--  ct-priority-classify-mib.txt
+--  Revision: 01.00.02
+--  Part Number:
+--  Date: "200203121855Z"  Tue Mar 12 18:55 GMT 2002
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@cabletron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific Priority classification MIB.
+--
+--  This module will be extended, as required.
+--
+-- -------------------------------------------------------------
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--
+--  Copyright 1999-2002 Cabletron Systems
+-- -------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+--  PortList
+--      FROM Q-BRIDGE-MIB
+    ctPriorityExt
+        FROM CTRON-MIB-NAMES;
+
+ctPriClassify MODULE-IDENTITY
+    LAST-UPDATED "200203121855Z"  -- Tue Mar 12 18:55 GMT 2002
+    ORGANIZATION "Cabletron Systems, Inc"
+    CONTACT-INFO
+        "       Cabletron Systems, Inc.
+        Postal: 35 Industrial Way, P.O. Box 5005
+                Rochester, NH 03867-0505
+         Phone: (603) 332-9400
+         Email: support@cabletron.com
+           Web: http://www.cabletron.com"
+    DESCRIPTION
+        "The Cabletron Priority Classify MIB module for controlling
+        Cabletron specific priority classification criteria based
+        on packet content."
+    ::= { ctPriorityExt 6 }
+
+ctPriClassifyObjects OBJECT IDENTIFIER ::= { ctPriClassify 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+CtPriClassifyType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each enumerated value represents a unique classification
+        type.  Different types have different rules regarding
+        how data is interpreted during classification.  These
+        rules are spelled out in the comments preceding each type."
+    SYNTAX      INTEGER {
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The EtherType field which is present
+        --               in Ethernet II type packets.
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(1526..65535)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        etherType(1),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The DSAP/SSAP pair present in 802.3
+        --               framed packets
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..65535) further limitations
+        --               may exist on an implementation by  
+        --               implementation basis (DSAP must equal
+        --               SSAP for example)                    
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        llcDsapSsap(2),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The Type of Service field present in IP
+        --               packets (3 bits of precedence, plus     
+        --               bits for delay, throughput, and reli-
+        --               ability)                              
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipTypeOfService(3),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The IP Protocol field (ref. RFC 1700)
+        --               examples include (TCP,UDP,ICMP,etc)                                             
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipProtocolType(4),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Transmission control used by IPX 
+        --               routers, set to zero before network
+        --               transmision.                       
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..255)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipxClassOfService(5),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  IPX packet type, administered by Novell
+        --               0 ...... Hello or SAP                      
+        --               1 ...... RIP
+        --               2 ...... Echo Packet                      
+        --               3 ...... Error Packet                      
+        --               4 ...... Netware 386 or SAP
+        --               5 ...... Sequenced Packet Protocol
+        --               17 ..... Netware 286
+        --               16-31 .. Experimental protocols
+        -- LIMITATIONS:
+        --     DataVal:  INTEGER(0..31)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipxPacketType(6),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  This group represents IP addresses
+        --               which are present in packets using
+        --               the IP protocol.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same IP unique, only one entry
+        --               from this group may exist for a given
+        --               IP address.  Additional entries fail.
+        --
+        --     DataVal:  Each octet of an IP address uses one
+        --               octet of this Unsigned32 value starting
+        --               with the most significant octet (e.g.,
+        --               an IP address of 170.187.204.221 is
+        --               represented by a value of 0xaabbccdd.
+        --
+        --     DataMask: Follows the same form as DataVal
+        --               (e.g., 255.255.240.0 is 0x00000fff)
+        --               Remember that DataMask is one's
+        --               complement.  Also, starting with the
+        --               most significant bit, only one "0 to 1"
+        --               transition may occur. (e.g., 0x000fefff
+        --               is not valid.
+        -- -----------------------------------------------------
+        ipAddressSource(7),      -- Source IP address only.
+        ipAddressDestination(8), -- Destination IP address only.
+        ipAddressBilateral(9),   -- Both Source and Dest IP.
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  The network number assigned to this 
+        --               IPX network (zero is the local network)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same Network Number unique
+        --               only one entry from this group may
+        --               exist for a given Network Number
+        --               Additional entries fail.
+        --
+        --     DataVal:  INTEGER
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipxNetworkSource(10),
+        ipxNetworkDestination(11),
+        ipxNetworkBilateral(12),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a UDP/IP port(socket).  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same port unique, only one
+        --               entry from this group may exist for a
+        --               given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipUdpPortSource(13),
+        ipUdpPortDestination(14),
+        ipUdpPortBilateral(15),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a TCP/IP port(socket).  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts. (ref. RFC 762)
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same port unique, only one
+        --               entry from this group may exist for a
+        --               given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipTcpPortSource(16),
+        ipTcpPortDestination(17),
+        ipTcpPortBilateral(18),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a IPX socket.  These
+        --               values are used by higher protocols
+        --               to target specific applications among
+        --               hosts
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same port unique, only one
+        --               entry from this group may exist for a
+        --               given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER(0..65535)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipxSocketSource(19),
+        ipxSocketDestination(20),
+        ipxSocketBilateral(21),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes a MAC address.  These
+        --               values uniquely describe nodes on a
+        --               OSI Layer 2 network.
+        --
+        -- LIMITATIONS:  While the distinction of Source/
+        --               Destination/Bilateral makes entries
+        --               with the same MAC address unique, only
+        --               one entry from this group may exist for
+        --               a given port.  Additional entries fail.
+        --
+        --     DataVal:  INTEGER holding the first 4 bytes of
+        --               the 6 byte MAC address.
+        --    DataMask:  INTEGER holding the last 2 bytes of
+        --               the 6 byte MAC address in the 2 most
+        --               significant bytes of the INTEGER, the
+        --               two least significant bytes must be
+        --               zero.
+        --     Example:  MAC address is 00-12-34-56-78-9A,
+        --               DataVal is  00123456
+        --               DataMask is 789A0000
+        -- -----------------------------------------------------
+        macAddressSource(22),
+        macAddressDestination(23),
+        macAddressBilateral(24),
+
+        -- -----------------------------------------------------
+        -- DESCRIPTION:  Describes IP Fragments.  IP frames
+        --               which exceed the MTU of the media on
+        --               which they travel may be fragmented
+        --               into smaller packets.  These packets
+        --               no longer contain the UDP/TCP port
+        --               numbers, although they do still
+        --               contain the IP addresses from the
+        --               original frame.
+        --
+        -- LIMITATIONS:
+        --     DataVal:  Val not used (0)
+        --     DataMask: Mask not used (0)
+        -- -----------------------------------------------------
+        ipFragments(25)
+
+    }
+
+-- -------------------------------------------------------------
+-- The PortList TEXTUAL-CONVENTION is from the Q-BRIDGE-MIB
+-- as defined in draft-ietf-bridge-bridgemib-05.txt.
+-- When Q-BRIDGE-MIB is officially adopted, this definition
+-- should be removed and added to IMPORTS above.  That of course
+-- assumes that these definitions do not change in a manner such
+-- that they are incompatible with the existing definitions.
+-- -------------------------------------------------------------
+
+PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+-- -------------------------------------------------------------
+-- Priority Classification Group
+-- -------------------------------------------------------------
+
+ctPriClassifyStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allows the Priority Classification feature to be globally
+        enabled/disabled.  A value of disable(2), functionally
+        supersedes the RowStatus of individual entries in the
+        ctPriClassifyTable, but does not change their actual
+        RowStatus value."
+    DEFVAL { disable }
+    ::= { ctPriClassifyObjects 1}
+
+ctPriClassifyMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+        ctPriClassifyTable."
+    ::= { ctPriClassifyObjects 2}
+
+ctPriClassifyNumEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the ctPriClassifyTable."
+    ::= { ctPriClassifyObjects 3}
+
+-- -------------------------------------------------------------
+-- Priority Classification Table
+-- -------------------------------------------------------------
+
+ctPriClassifyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtPriClassifyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing configuration information for each
+        Priority classification configured into the device by (local
+        or network) management.  All entries are permanent and
+        will be restored after the device is reset."
+    ::= { ctPriClassifyObjects 4 }
+
+ctPriClassifyEntry OBJECT-TYPE
+    SYNTAX      CtPriClassifyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes a particular entry of ctPriClassifyTable."
+    INDEX   { ctPriClassifyPriority, ctPriClassifyDataMeaning,
+              ctPriClassifyDataVal,  ctPriClassifyDataMask }
+    ::= { ctPriClassifyTable 1 }
+
+CtPriClassifyEntry ::=
+    SEQUENCE {
+        ctPriClassifyPriority
+            INTEGER,
+        ctPriClassifyDataMeaning
+            CtPriClassifyType,
+        ctPriClassifyDataVal
+            Unsigned32,
+        ctPriClassifyDataMask
+            Unsigned32,
+        ctPriClassifyIngressList
+            PortList,
+        ctPriClassifyRowStatus
+            RowStatus,
+        ctPriClassifyRowInfo
+            DisplayString,
+        ctPriClassifyTOSStatus
+            INTEGER,
+        ctPriClassifyTOSValue
+            INTEGER
+    }
+
+ctPriClassifyPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The priority for this entry.  Any packet meeting the
+        classification criteria specified by this conceptual row
+        will be given the priority indicated by this object."
+    ::= { ctPriClassifyEntry 1 }
+
+ctPriClassifyDataMeaning OBJECT-TYPE
+    SYNTAX      CtPriClassifyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The meaning of the ctPriClassifyDataVal leaf for this
+        conceptual row.  The ctPriClassifyDataVal specifies a
+        particular value which, when compared to packet data,
+        is used to classify that packet to a particular priority.
+        The part of the packet (if any), to which this data
+        comparison applies, is determined by this object.
+
+        For example, the value ipAddressBilateral(8) means that
+        the value ctPriClassifyDataVal for this entry is an IP
+        address.  It further means that the given IP address
+        will be compared against both source and destination
+        IP address fields in a packet.  Such an entry obviously
+        would not not match against any non-IP packets.
+
+        Additionally, the value of this leaf will impose certain
+        implicit ranges and interpretations of data contained
+        within the ctPriClassifyDataVal leaf for this entry.  The
+        specific limitations of each type should be spelled out
+        in the comments for that type."
+    ::= { ctPriClassifyEntry 2 }
+
+ctPriClassifyDataVal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The data value associated with ctPriClassifyDataMeaning.
+        The explicit range of this value is any unsigned 32-bit
+        integer(0..4294967295).  This range may vary, however, 
+        depending upon the value of ctPriClassifyDataMeaning.
+        Illegal values should not be allowed."
+    ::= { ctPriClassifyEntry 3 }
+
+ctPriClassifyDataMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object is the one's complement of a 32-bit mask.
+        This mask is applicable to the data comparison of
+        ctPriClassifyDataVal.  The mask is applied to the actual
+        packet data under consideration through a logical bitwise
+        AND operation.  This result is then compared to the data.
+
+        For example, we want to classify according to a bilateral
+        IP address of 134.141.0.0 with a mask of 255.255.240.0.
+        This would be reflected by the following values:
+
+        ctPriClassifyDataMeaning: ipAddressBilateral(8)
+        ctPriClassifyDataVal:     0x868d0000
+        ctPriClassifyDataMask:    0x00000fff
+
+        Again there are contextual implications for this leaf
+        depending upon the value of ctPriClassifyDataMeaning.
+        Not all types will use the mask, and others will impose
+        restrictions.  This value should however be a true
+        indication of the masking operation.  In other words,
+        data types that don't use a mask should only allow a
+        value of zero, indicating that all data bits are
+        significant in the comparison.
+
+        The specific restrictions of each type should be spelled
+        out in the comments for that type.  Illegal values should
+        not be allowed."
+    ::= { ctPriClassifyEntry 4 }
+
+ctPriClassifyIngressList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports on which this classification rule applies.
+        Classification occurs on ingress.  An agent implementation
+        should allow a set operation of this object to create a
+        row if it does not exist."
+    DEFVAL      { '0000'H }
+    ::= { ctPriClassifyEntry 5 }
+
+ctPriClassifyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object provides both control and status for the
+        associated conceptual row in the table.  Rows can be
+        created in two ways.
+
+        createAndGo - The specified row will be created and
+            activated if the instance is allowable.  If not, an
+            inconsistentValue exception will be returned and the
+            row will not be created.  This provides the most
+            optimal method of creating an active row, but provides
+            the user no explanation if the row cannot be created.
+
+        createAndWait - The specified row will be created and put
+            in the notInService state if the instance is allowable.
+            A subsequent activation of this row will bring it into
+            the active state.  If the instance is not allowable,
+            the row will be created and put in the notReady state.
+            A subsequent activation of this row will fail.  Since
+            the inappropriate information is always contained in the
+            indexing leaves, activation will never succeed and the
+            row should be removed by the management station.  When
+            a row is in the notReady state, the ctPriClassifyRowInfo
+            may be retrieved to obtain a plain English explanation
+            of why this row cannot be activated.  createAndWait is
+            the preferred method for this reason.
+        
+        Both methods described above leave ctPriClassifyIngressList
+        in it's default state, requiring an additional set operation
+        in order to modify it.  An even more optimal twist on the
+        createAndWait method is to set the ctPriClassifyIngressList
+        to it's desired value as a method for row creation.  This
+        will essentially cause an implicit createAndWait since it
+        too will leave the row in either the notInService or
+        notReady state.  This leaves only activation or error
+        analysis as the last step.
+
+        Any rows left in the notReady or notInService state for
+        more than 5 minutes should be automatically removed by
+        the agent implementation."
+    ::= { ctPriClassifyEntry 6 }
+
+ctPriClassifyRowInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object provides info about this row in the form of
+        an ASCII string, suitable for display purposes.  The
+        intended purpose of this object is to provide an
+        'agent-specific' explanation as to why the
+        ctPriClassifyRowStatus for this conceptual row is in
+        the 'notReady' state.  A management station should read
+        this object and display it to the user in this case.
+
+        A conceptual row that does not fall into this category may
+        simply return a single NULL, but may also provide any useful
+        info of its choice.  A management station may attempt to
+        display such info if it so chooses, but is under no burden
+        to do so."
+    ::= { ctPriClassifyEntry 7 }
+
+ctPriClassifyTOSStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether an IP Type Of Service (TOS)
+        value, defined by ctPriClassifyTOSValue, should be written
+        into the TOS field of the IP header for any packet matching
+        the classification specified by this conceptual row. This
+        object may be set to enable only for the conceptual rows
+        whose ctPriClassifyDataMeaning and ctPriClassifyDataVal have
+        the following values:
+
+        ctPriClassifyDataMeaning     ctPriClassifyDataVal
+        ------------------------     --------------------
+        etherType(1)                 0x0800 (IP)
+        llcDsapSsap(2)               0x0606 (IP)
+        ipTypeOfService(3)           any
+        ipProtocolType(4)            any
+        ipAddressSource(7)           any
+        ipAddressDestination(8)      any
+        ipAddressBilateral(9)        any
+        ipUdpPortSource(13)          any
+        ipUdpPortDestination(14)     any
+        ipUdpPortBilateral(15)       any
+        ipTdpPortSource(16)          any
+        ipTdpPortDestination(17)     any
+        ipTdpPortBilateral(18)       any
+        ipFrag(25)                   not applicable
+
+        A conceptual row that does not fall into these categories may
+        be set to disable(2) and will return disable(2)."
+    ::= { ctPriClassifyEntry 8 }
+
+ctPriClassifyTOSValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value to be written into the IP TOS field of the IP header
+        of any packet that matches the classification specified by the
+        conceptual row."
+    ::= { ctPriClassifyEntry 9 }
+
+-- -------------------------------------------------------------
+-- Supported Ability Table
+-- -------------------------------------------------------------
+
+ctPriClassifyAbilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtPriClassifyAbilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information for each of the priority
+        classification types.  Types for which there is no
+        corresponding row are not supported by this device."
+    ::= { ctPriClassifyObjects 5 }
+
+ctPriClassifyAbilityEntry OBJECT-TYPE
+    SYNTAX      CtPriClassifyAbilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes a particular entry of ctPriClassifyAbilityTable."
+    INDEX   { ctPriClassifyAbility }
+    ::= { ctPriClassifyAbilityTable 1 }
+
+CtPriClassifyAbilityEntry ::=
+    SEQUENCE {
+        ctPriClassifyAbility
+            CtPriClassifyType,
+        ctPriClassifyPorts
+            PortList
+    }
+
+ctPriClassifyAbility OBJECT-TYPE
+    SYNTAX      CtPriClassifyType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The priority classification type associated with this entry."
+    ::= { ctPriClassifyAbilityEntry 1 }
+
+ctPriClassifyPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports on which the classification type
+        specified by ctPriClassifyAbility is supported."
+    ::= { ctPriClassifyAbilityEntry 2 }
+
+ctPriClassifyTableLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the sysUpTime at which the last
+         change was made to the ctPriClassifyTable."
+    ::= { ctPriClassifyObjects 6}
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+ctPriClassifyConformance OBJECT IDENTIFIER ::= { ctPriClassify 2 }
+
+ctPriClassifyGroups      OBJECT IDENTIFIER ::= { ctPriClassifyConformance 1 }
+ctPriClassifyCompliances OBJECT IDENTIFIER ::= { ctPriClassifyConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+ctPriClassifyBaseGroup OBJECT-GROUP
+    OBJECTS {
+        ctPriClassifyStatus,
+        ctPriClassifyMaxEntries,
+        ctPriClassifyNumEntries,
+        ctPriClassifyIngressList,
+        ctPriClassifyRowStatus,
+        ctPriClassifyRowInfo,
+        ctPriClassifyTOSStatus,
+        ctPriClassifyTOSValue,
+        ctPriClassifyPorts,
+        ctPriClassifyTableLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control
+        and status information for Priority classification."
+    ::= { ctPriClassifyGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+ctPriClassifyCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support
+        Priority classification."
+
+    MODULE
+        MANDATORY-GROUPS { ctPriClassifyBaseGroup }
+
+    ::= { ctPriClassifyCompliances 1 }
+
+END

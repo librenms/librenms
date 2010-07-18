@@ -1,0 +1,173 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+WLSX-ESI-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+	   ArubaESIServerMode,
+	   ArubaESIServerStatus
+	   		FROM ARUBA-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxESIMIB MODULE-IDENTITY 
+       LAST-UPDATED "0601221834Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the External Services Interface (ESI) in the 
+			Aruba controller."
+       REVISION        "0601221834Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 10 }
+
+   wlsxESIConfigGroup     	OBJECT IDENTIFIER ::= { wlsxESIMIB 1 }
+
+   wlsxESIServerTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF WlsxESIServerEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			This table lists all ESI servers configured on the controller.
+            "
+        ::= { wlsxESIConfigGroup 1 }
+
+	wlsxESIServerEntry OBJECT-TYPE
+		SYNTAX		WlsxESIServerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"ESI Server Entry"
+			INDEX { esiServerName }
+		::= { wlsxESIServerTable 1 }
+
+		WlsxESIServerEntry ::= 
+		SEQUENCE {
+			esiServerName			DisplayString,
+			esiServerGroup			DisplayString,
+			esiServerMode			ArubaESIServerMode,
+			esiServerTrustedIP		IpAddress,
+			esiServerUntrustedIP	IpAddress,
+			esiServerTrustedSlot	Integer32,
+			esiServerTrustedPort	Integer32,
+			esiServerUntrustedSlot	Integer32,
+			esiServerUntrustedPort	Integer32,
+			esiServerStatus 		ArubaESIServerStatus
+		}
+
+	esiServerName OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"The name of the ESI Server"
+		::= { wlsxESIServerEntry 1 }
+
+	esiServerGroup OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The name of the ESI server group to which this server belongs."
+		::= { wlsxESIServerEntry 2 }
+
+	esiServerMode OBJECT-TYPE
+		SYNTAX		ArubaESIServerMode
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The mode of this server"
+		::= { wlsxESIServerEntry 3 }
+
+	esiServerTrustedIP OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The trusted IP address of this server, or 0.0.0.0 if it is not set"
+		::= { wlsxESIServerEntry 4 }
+
+	esiServerUntrustedIP OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"
+			 The untrusted IP address of this server, or 0.0.0.0 if it is 
+			 not set
+			 "
+		::= { wlsxESIServerEntry 5 }
+
+	esiServerTrustedSlot OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The slot number of the trusted interface for this server."
+		::= { wlsxESIServerEntry 6 }
+
+	esiServerTrustedPort OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The port number of the trusted interface for this server."
+		::= { wlsxESIServerEntry 7 }
+
+	esiServerUntrustedSlot OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The slot number of the untrusted interface for this server."
+		::= { wlsxESIServerEntry 8 }
+
+	esiServerUntrustedPort OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The port number of the untrusted interface for this server."
+		::= { wlsxESIServerEntry 9 }
+
+	esiServerStatus OBJECT-TYPE
+		SYNTAX		ArubaESIServerStatus
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Indicates the status of this ESI server."
+		::= { wlsxESIServerEntry 10 }
+
+END

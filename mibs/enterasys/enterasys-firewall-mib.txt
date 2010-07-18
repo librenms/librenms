@@ -1,0 +1,2941 @@
+ENTERASYS-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-firewall-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Firewall MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright April, 2003 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32,
+        Unsigned32, Gauge32
+        FROM SNMPv2-SMI
+    RowStatus, StorageType, TruthValue, TimeStamp, 
+        VariablePointer, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InetAddressType, InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    ifIndex
+        FROM IF-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysFirewallMIB MODULE-IDENTITY
+    LAST-UPDATED "200411172222Z"  -- Wed Nov 17 22:22 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01801-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+   
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP MIB under
+         the Enterasys Networks enterprise OID pertaining to 
+         the configuration, policy, and monitoring of firewall
+         network devices."
+
+    REVISION    "200411172222Z"  -- Wed Nov 17 22:22 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 37 } 
+
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysFWConfigurationObjects OBJECT IDENTIFIER ::= { etsysFirewallMIB 1 }
+etsysFWPolicyObjects        OBJECT IDENTIFIER ::= { etsysFirewallMIB 2 }
+etsysFWMonitoringObjects    OBJECT IDENTIFIER ::= { etsysFirewallMIB 3 }
+
+etsysFWPolicyGroups     OBJECT IDENTIFIER ::= { etsysFWPolicyObjects 1 }
+etsysFWPolicyRules      OBJECT IDENTIFIER ::= { etsysFWPolicyObjects 2 }
+etsysFWPolicyNetworks   OBJECT IDENTIFIER ::= { etsysFWPolicyObjects 3 }
+etsysFWPolicyServices   OBJECT IDENTIFIER ::= { etsysFWPolicyObjects 4 }
+etsysFWPolicyFilters    OBJECT IDENTIFIER ::= { etsysFWPolicyObjects 5 }
+
+-- -------------------------------------------------------------
+-- Firewall Configuration Objects
+-- -------------------------------------------------------------
+
+etsysFWFirewallEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current state of the firewall is returned when this value
+         is read.  Setting the value to true causes the firewall to
+         start inspecting packets.  Setting the value to false causes
+         the firewall to stop inspecting packets.  The value read could
+         be different than the last value set if the state is changed by
+         a means other than this MIB."
+    ::= { etsysFWConfigurationObjects 1 }
+
+etsysFWTcpTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Firewalls can perform stateful inspection of TCP sessions.  TCP
+         sessions are created and deleted by monitoring TCP SYNC/ACK/FIN
+         flags.  Inactivity for the period specified by this object will
+         delete the TCP session."
+    DEFVAL { 1200 }
+    ::= { etsysFWConfigurationObjects 2 }
+
+etsysFWUdpTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Firewalls can perform stateful inspection of UDP sessions.  UDP
+         sessions are created on the first outbound UDP packet.
+         Inactivity for the period specified by this object will delete
+         the UDP session."
+    DEFVAL { 600 }
+    ::= { etsysFWConfigurationObjects 3 }
+
+etsysFWIcmpTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ICMP sessions are created on an outbound ICMP echo request.
+         Inactivity for the period specified by this object will delete
+         the ICMP session."
+    DEFVAL { 60 }
+    ::= { etsysFWConfigurationObjects 4 }
+
+etsysFWAuthTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Firewalls can be configured to only allow packets from IP
+         addresses that have been authenticated.  An authenticated IP address
+         will need to re-authenticate if there is no traffic from that address
+         for the period specified by this object."
+    DEFVAL { 60 }
+    ::= { etsysFWConfigurationObjects 5 }
+
+etsysFWAuthPort OBJECT-TYPE
+    SYNTAX      Integer32 (1024..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Firewalls can be configured to only allow packets from IP
+         addresses that have been authenticated. This object specifies the
+         port on which the firewall listens for authentication requests."
+    DEFVAL { 3000 }
+    ::= { etsysFWConfigurationObjects 6 }
+
+etsysFWLoggingThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for firewall event logging.  Events with
+         severity equal to or less than the value specified
+         will be logged.  The value corresponds to syslog severity
+         levels as defined in RFC3164."
+    DEFVAL { 3 }
+    ::= { etsysFWConfigurationObjects 7 }
+
+etsysFWRPCMicrosoftTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The idle session timeout on packet inspection for Remote 
+        Procedure Call (RPC) -based applications. This Application Level
+        Gateway (ALG) supports two types of RPCs - SUN (used by most UNIX
+        systems) and Microsoft. If the RPC-based session is idle for the
+        specified period, it will be shutdown."
+    DEFVAL { 3 }
+    ::= { etsysFWConfigurationObjects 8 }
+
+etsysFWRPCSunTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The idle session timeout on packet inspection for Remote 
+        Procedure Call (RPC) -based applications. This Application Level
+        Gateway (ALG) supports two types of RPCs - SUN (used by most UNIX
+        systems) and Microsoft. If the RPC-based session is idle for the
+        specified period, it will be shutdown."
+    DEFVAL { 3 }
+    ::= { etsysFWConfigurationObjects 9 }
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Interface to Firewall State Table 
+-- -------------------------------------------------------------
+
+etsysFWFirewallOnIntfLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWFirewallOnIntfTable was last
+         modified."
+    ::= { etsysFWConfigurationObjects 10 }
+
+etsysFWFirewallOnIntfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWFirewallOnIntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the state of the firewall on
+         individual interfaces.  The firewall may be enabled
+         or disabled for each interface on the device.  The effective
+         state of the firewall depends on the setting of
+         etsysFWFirewallEnabled.
+
+
+                            |                              | interface
+     etsysFWFirewallEnabled | etsysFWFirewallOnIntfEnabled | effective
+                            |                              |   state
+     -----------------------------------------------------------------
+           true                         true                  enabled
+           true                         false                 disabled
+           false                        true                  disabled
+           false                        false                 disabled
+
+         If an interface is not represented in this table, then its
+         effective state is determined by etsysFWFirewallEnabled.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWFirewallOnIntfStorageType for a given SNMP context may
+         be readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWFirewallOnIntfStorageType
+         value could allow the row to be modified or deleted."
+    ::= { etsysFWConfigurationObjects 11 }
+
+etsysFWFirewallOnIntfEntry OBJECT-TYPE
+    SYNTAX      EtsysFWFirewallOnIntfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining whether firewall is enabled for a particular
+         interface."
+    INDEX   { ifIndex }
+    ::= { etsysFWFirewallOnIntfTable 1 }
+
+EtsysFWFirewallOnIntfEntry ::=
+    SEQUENCE {
+        etsysFWFirewallOnIntfEnabled        TruthValue,
+        etsysFWFirewallOnIntfStorageType    StorageType,
+        etsysFWFirewallOnIntfRowStatus      RowStatus
+    }
+
+etsysFWFirewallOnIntfEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The current state of the firewall is returned when
+         this value is read.  This setting is only effective when
+         etsysFWFirewallEnabled is true.  Setting the value to true
+         causes the firewall to start inspecting packets, if
+         etsysFWFirewallEnabled is true.  Setting the value to false
+         causes the firewall to stop inspecting packets, if
+         etsysFWFirewallEnabled is true."
+    DEFVAL { false }
+    ::= { etsysFWFirewallOnIntfEntry 1 }
+
+etsysFWFirewallOnIntfStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWFirewallOnIntfEntry 2 }
+
+etsysFWFirewallOnIntfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+          
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWFirewallOnIntfEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- Interface to Firewall Filter Table 
+-- -------------------------------------------------------------
+
+etsysFWFirewallIntfFilterLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWFirewallIntfFilterTable 
+         was last modified."
+    ::= { etsysFWConfigurationObjects 12 }
+
+etsysFWFirewallIntfFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWFirewallIntfFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the IP filters applied to 
+         individual interfaces. 
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWFirewallIntfFilterStorageType for a given SNMP context may
+         be readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWFirewallIntfFilterStorageType
+         value could allow the row to be modified or deleted."
+    ::= { etsysFWConfigurationObjects 13 }
+
+etsysFWFirewallIntfFilterEntry OBJECT-TYPE
+    SYNTAX      EtsysFWFirewallIntfFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining the IP filters applied to individual interfaces."
+    INDEX   { ifIndex, etsysFWFirewallIntfFilterType }
+    ::= { etsysFWFirewallIntfFilterTable 1 }
+
+EtsysFWFirewallIntfFilterEntry ::=
+    SEQUENCE {
+        etsysFWFirewallIntfFilterType        INTEGER,
+        etsysFWFirewallIntfFilterDirection   INTEGER,
+        etsysFWFirewallIntfFilterStorageType StorageType,
+        etsysFWFirewallIntfFilterRowStatus   RowStatus
+    }
+
+etsysFWFirewallIntfFilterType OBJECT-TYPE
+    SYNTAX      INTEGER { ipBroadcast (1),
+                          ipMulticast (2),
+                          ipOptionAll (3),
+                          ipOptionOther (4),
+                          ipOptionLooseSourceRoute (5),
+                          ipOptionRecordRoute (6),
+                          ipOptionStrictSourceRoute (7),
+                          ipOptionTimeStamp (8)  }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of IP filter that applies on a particular interface.
+
+             ipBroadcast -
+                This filter type allows incoming/outgoing IP packets 
+                through the firewall with 255.255.255.255 set as the 
+                destination address. It enables broadcast protocols 
+                such as DHCP to traverse the firewall.
+
+             ipMulticast -
+                This filter type allows incoming/outgoing IP packets
+                with a multicast destination address through the 
+                firewall. It enables multicast protocols such as RIP
+                and OSPF to traverse the firewall.
+
+             ipOptionAll -
+                All IP options allowed.
+
+             ipOptionOther -
+                Any IP option other than those explicitly supported 
+                by the command.
+
+            ipOptionLooseSourceRoute -
+                Requests routing that includes the specified routers. 
+                This routing path includes a sequence of IP addresses 
+                a datagram must follow to its destination but allows 
+                multiple network hops between successive addresses on 
+                the list.
+
+            ipOptionRecordRoute -
+                Traces a route. It allows the source to create an 
+                empty list of IP addresses and arrange for each 
+                router that router that handles a datagram to add 
+                its IP address to the list. When a datagram arrives, 
+                the destination device can extract and and process 
+                the list of addresses.
+
+            ipOptionStrictSourceRoute -
+                Specifies an exact route through the Internet. 
+                This routing path includes a sequence of IP addresses 
+                a datagram must follow, hop by hop, from its source 
+                to destination. The path between two successive 
+                addresses in the list must consist of a single 
+                physical network.
+
+            ipOptionTimeStamp -
+                Records timestamps along a route. It is similar to 
+                the record route option in that every router from 
+                source to destination adds its IP address, and a 
+                timestamp, to the list. The timestamp notes the 
+                time and date a router handled the datagram, 
+                expressed in milliseconds since midnight, 
+                Universal Time."
+    ::= { etsysFWFirewallIntfFilterEntry 1 }
+
+etsysFWFirewallIntfFilterDirection OBJECT-TYPE
+    SYNTAX      INTEGER { none (1),
+                          in (2),
+                          out (3),
+                          both (4)  }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The direction which the filter is applied.
+            none - Denies the packet that matched the filter type.
+            in   - Allows the packet that matched the filter type 
+                   to enter the interface.
+            out  - Allows the packet that matched the filter type 
+                   to exit the interface.
+            both - Allows the packet that matched the filter type 
+                   to enter and exit the interface."
+    DEFVAL { none }
+    ::= { etsysFWFirewallIntfFilterEntry 2 }
+
+
+etsysFWFirewallIntfFilterStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWFirewallIntfFilterEntry 3 }
+
+etsysFWFirewallIntfFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+          
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWFirewallIntfFilterEntry 4 }
+
+
+
+
+-- -------------------------------------------------------------
+-- Firewall Policy Objects
+-- -------------------------------------------------------------
+
+etsysFWSystemPolicyGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the policy group containing the global
+         system policy.  The value of etsysFWSystemPolicyGroupName
+         should be used as an index into the etsysFWGroupPolicyTable to
+         determine the list of rules that MUST be applied to the system.
+         A zero length string indicates no system wide policy exists,
+         and the default policy of 'allow' should be executed until one
+         is imposed by either this object or by the interface processing
+         the packet.
+         
+         Since policy group names are unique, the
+         etsysFWSystemPolicyGroupName MUST NOT be equal to any
+         etsysFWIntfToGroupName objects."
+    ::= { etsysFWPolicyGroups 1 }
+
+-- -------------------------------------------------------------
+-- Interface to Policy Group Table 
+-- -------------------------------------------------------------
+
+etsysFWIntfToGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWIntfToGroupTable was last
+         modified."
+    ::= { etsysFWPolicyGroups 2 }
+
+etsysFWIntfToGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWIntfToGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the group of firewall rules applied to
+         individual interfaces.  Rules for this group will be
+         applied in the etsysFWGroupPolicyTable.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWIntfToGroupStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWIntfToGroupStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyGroups 3 }
+
+etsysFWIntfToGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysFWIntfToGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining the group name for a particular interface."
+    INDEX   { ifIndex,
+              etsysFWIntfToGroupIntfDirection,
+              etsysFWIntfToGroupName }
+    ::= { etsysFWIntfToGroupTable 1 }
+
+EtsysFWIntfToGroupEntry ::=
+    SEQUENCE {
+        etsysFWIntfToGroupIntfDirection           INTEGER,
+        etsysFWIntfToGroupName                    SnmpAdminString,
+        etsysFWIntfToGroupStorageType             StorageType,
+        etsysFWIntfToGroupRowStatus               RowStatus
+    }
+
+etsysFWIntfToGroupIntfDirection OBJECT-TYPE
+    SYNTAX       INTEGER { ingress(1),
+                           egress(2)  }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the direction of the packets to inspect, incoming
+         (ingress), or outgoing (egress)."
+    ::= { etsysFWIntfToGroupEntry 1 }
+
+etsysFWIntfToGroupName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group name for this interface.  The value of
+         etsysFWIntfToGroupName should be used as index into the
+         etsysFWGroupPolicyTable to determine the list of rules that
+         MUST be applied to this interface.
+         
+         Since policy group names are unique, the etsysFWIntfToGroupName
+         MUST NOT be equal to the etsysFWSystemPolicyGroupName object."
+    ::= { etsysFWIntfToGroupEntry 2 }
+
+etsysFWIntfToGroupStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWIntfToGroupEntry 3 }
+
+etsysFWIntfToGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWIntfToGroupEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Group Policy Rules Table
+-- -------------------------------------------------------------
+
+etsysFWGroupPolicyLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWGroupPolicyTable was last
+         modified."
+    ::= { etsysFWPolicyGroups 4 }
+
+etsysFWGroupPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWGroupPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the firewall rules applied to groups.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWGroupPolicyStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWGroupPolicyStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyGroups 5 }
+
+etsysFWGroupPolicyEntry OBJECT-TYPE
+    SYNTAX      EtsysFWGroupPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining a particular group policy rule and its priority."
+    INDEX   { etsysFWGroupPolicyName, etsysFWGroupPolicyRuleDef }
+    ::= { etsysFWGroupPolicyTable 1 }
+
+EtsysFWGroupPolicyEntry ::=
+    SEQUENCE {
+        etsysFWGroupPolicyName                 SnmpAdminString,
+        etsysFWGroupPolicyRuleDef              SnmpAdminString,
+        etsysFWGroupPolicyPriority             Integer32,
+        etsysFWGroupPolicyStorageType          StorageType,
+        etsysFWGroupPolicyRowStatus            RowStatus
+    }
+
+etsysFWGroupPolicyName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the group.  These names should be either
+         the etsysFWSystemPolicyGroupName or the
+         etsysFWIntfToGroupName  from the etsysFWIntfToGroupTable."
+    ::= { etsysFWGroupPolicyEntry 1 }
+
+etsysFWGroupPolicyRuleDef OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An etsysFWPolicyRuleDefName from the etsysFWPolicyRuleDefTable."
+    ::= { etsysFWGroupPolicyEntry 2 }
+
+etsysFWGroupPolicyPriority  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The priority of rule in the group.  The firewall applies the
+         rules from the lowest to the highest priority.
+         Priority can only be in the range of 0 to the maximum number of 
+         policyRuleDef in the group + 1. i.e. If there are 5 policies in 
+         the group. The maximum priority the user can create is 6."
+    ::= { etsysFWGroupPolicyEntry 3 }
+
+etsysFWGroupPolicyStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWGroupPolicyEntry 4 }
+
+etsysFWGroupPolicyRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWGroupPolicyEntry 5 }
+
+-- -------------------------------------------------------------
+-- Policy Rule Definition Table
+-- -------------------------------------------------------------
+
+etsysFWPolicyRuleDefMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWPolicyRuleDefTable."
+    ::= { etsysFWPolicyRules 1 }
+
+etsysFWPolicyRuleDefNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWPolicyRuleDefTable."
+    ::= { etsysFWPolicyRules 2 }
+
+etsysFWPolicyRuleDefLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWPolicyRuleDefTable was last
+         modified."
+    ::= { etsysFWPolicyRules 3 }
+
+etsysFWPolicyRuleDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWPolicyRuleDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines a policy rule by associating a network
+         objects with a filter or a set of filters and an action to take
+         when the filter is true.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWPolicyRuleDefStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted.  In
+         another SNMP context, the etsysFWPolicyRuleDefStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyRules 4 }
+
+etsysFWPolicyRuleDefEntry OBJECT-TYPE
+    SYNTAX      EtsysFWPolicyRuleDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining a particular policy definition.  A rule
+         definition binds a filter pointer to an action."
+    INDEX   { etsysFWPolicyRuleDefName }
+    ::= { etsysFWPolicyRuleDefTable 1 }
+
+EtsysFWPolicyRuleDefEntry ::=
+    SEQUENCE {
+        etsysFWPolicyRuleDefName                  SnmpAdminString,
+        etsysFWPolicyRuleDefSrcNetwork            VariablePointer,
+        etsysFWPolicyRuleDefDstNetwork            VariablePointer,
+        etsysFWPolicyRuleDefBidirectional         TruthValue,
+        etsysFWPolicyRuleDefService               VariablePointer,
+        etsysFWPolicyRuleAuthName                 SnmpAdminString,
+        etsysFWPolicyRuleDefAction                INTEGER,
+        etsysFWPolicyRuleDefLogging               TruthValue,
+        etsysFWPolicyRuleDefStorageType           StorageType,
+        etsysFWPolicyRuleDefRowStatus             RowStatus
+    }
+
+etsysFWPolicyRuleDefName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "etsysFWPolicyRuleDefName is the administratively assigned
+         name of the policy rule."
+    ::= { etsysFWPolicyRuleDefEntry 1 }
+
+etsysFWPolicyRuleDefSrcNetwork OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the source address of the packet is in the set of
+         addresses defined by the network object pointed to by
+         etsysFWPolicyRuleDefSrcNetwork and the destination address
+         is in the set of addresses defined by the network object
+         pointed to by etsysFWPolicyRuleDefDstNetwork, the firewall
+         will evaluate the etsysFWPolicyRuleDefFilter for the packet.
+
+         This MIB defines the following tables which may
+         be pointed to by this column.  Implementations may choose to
+         provide support for other network tables or scalars as well:
+
+                etsysFWNetworkGroupTable
+                etsysFWNetworkTable
+
+         If this column is set to a VariablePointer value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the VariablePointer is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWPolicyRuleDefEntry 2 }
+
+etsysFWPolicyRuleDefDstNetwork OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the source address of the packet is in the set of
+         addresses defined by the network object pointed to by
+         etsysFWPolicyRuleDefSrcNetwork and the destination address
+         is in the set of addresses defined by the network object
+         pointed to by etsysFWPolicyRuleDefDstNetwork, the firewall
+         will evaluate the etsysFWPolicyRuleDefFilter for the packet.
+
+         This MIB defines the following tables which may
+         be pointed to by this column.  Implementations may choose to
+         provide support for other network tables or scalars as well:
+
+                etsysFWNetworkGroupTable
+                etsysFWNetworkTable
+
+         If this column is set to a VariablePointer value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the VariablePointer is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWPolicyRuleDefEntry 3 }
+
+etsysFWPolicyRuleDefBidirectional OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A policy may be specified as bidirectional to mean that it also
+         operates with the etsysFWPolicyRuleDefSrcNetwork and
+         etsysFWPolicyRuleDefDstNetwork reversed.
+         If this column is false, the policy operates only in the
+         direction defined by etsysFWPolicyRuleDefSrcNetwork and
+         etsysFWPolicyRuleDefDstNetwork."
+    DEFVAL { false }
+    ::= { etsysFWPolicyRuleDefEntry 4 }
+
+etsysFWPolicyRuleDefService OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "etsysFWPolicyRuleDefFilter points to a filter which is used to
+         evaluate whether the action associated with this row should
+         be fired or not.  The action will only fire if the filter
+         referenced by this object evaluates to true.
+
+         This MIB defines the following tables which may
+         be pointed to by this column.  Implementations may choose to
+         provide support for other filter tables or scalars as well:
+
+                etsysFWIpHeaderFilterTable
+                etsysFWIpOptionsFilterTable
+
+         If this column is set to a VariablePointer value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the VariablePointer is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWPolicyRuleDefEntry 5 }
+
+etsysFWPolicyRuleAuthName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The authentication group name to use."
+    ::= { etsysFWPolicyRuleDefEntry 6 }
+
+etsysFWPolicyRuleDefAction OBJECT-TYPE
+    SYNTAX       INTEGER { allow (1),
+                           allowAuth (2),
+                           drop (3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The action to take when the filter is true.
+                allow:      the packet should be allowed
+                drop:       the packet should be dropped
+                allowAuth:  the packet is allowed if the source
+                            address has been authenticated to the
+                            group."
+    ::= { etsysFWPolicyRuleDefEntry 7 }
+
+etsysFWPolicyRuleDefLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the filter is true, log the activity of this rule."
+    DEFVAL { false }
+    ::= { etsysFWPolicyRuleDefEntry 8 }
+
+etsysFWPolicyRuleDefStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWPolicyRuleDefEntry 9 }
+
+etsysFWPolicyRuleDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+
+         This object SHOULD NOT be set to active until the containing
+         networks and filters have been defined.  Once active, it
+         MUST remain active until no etsysFWGroupPolicyRuleDef
+         entries are referencing it."
+    ::= { etsysFWPolicyRuleDefEntry 10 }
+
+
+-- -------------------------------------------------------------
+-- Network Group Table
+-- -------------------------------------------------------------
+
+etsysFWNetworkGroupMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWNetworkGroupTable."
+    ::= { etsysFWPolicyNetworks 1 }
+
+etsysFWNetworkGroupNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWNetworkGroupTable."
+    ::= { etsysFWPolicyNetworks 2 }
+
+etsysFWNetworkGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWNetworkGroupTable was last
+         modified."
+    ::= { etsysFWPolicyNetworks 3 }
+
+etsysFWNetworkGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWNetworkGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining a group of network objects from the 
+         etsysFWNetworkTable or a network group in
+         etsysFWNetworkGroupTable. The networks contained in the group
+         are defined in the etsysFWNetwkInNetGrpTable.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The 
+         etsysFWNetworkGroupStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWNetworkGroupStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyNetworks 4 }
+
+etsysFWNetworkGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysFWNetworkGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysFWNetworkGroupTable."
+    INDEX       { etsysFWNetworkGroupName }
+    ::= { etsysFWNetworkGroupTable 1 }
+
+EtsysFWNetworkGroupEntry ::=
+    SEQUENCE {
+        etsysFWNetworkGroupName               SnmpAdminString,
+        etsysFWNetworkGroupStorageType        StorageType,
+        etsysFWNetworkGroupRowStatus          RowStatus
+    }
+
+etsysFWNetworkGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name of the network group."
+    ::= { etsysFWNetworkGroupEntry 1 }
+
+etsysFWNetworkGroupStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWNetworkGroupEntry 2 }
+
+etsysFWNetworkGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+
+         Once active, it MAY NOT have its value changed if any active
+         rows in the etsysFWNetwkInNetGrpTable or the 
+         etsysFWFilterDefTable are currently pointing at this row."
+    ::= { etsysFWNetworkGroupEntry 3 }
+
+-- -------------------------------------------------------------
+-- Networks in Network Group Table
+-- -------------------------------------------------------------
+
+etsysFWNetworkGroupMaxNetworks OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of networks allowed in a network group."
+    ::= { etsysFWPolicyNetworks 5 }
+
+etsysFWNetwkInNetGrpLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWNetwkInNetGrpTable was last
+         modified."
+    ::= { etsysFWPolicyNetworks 6 }
+
+etsysFWNetwkInNetGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWNetwkInNetGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the networks in a network group.
+         All etsysFWNetwkInNetGrpSubNetwork objects in a
+         etsysFWNetworkGroupName must have the same 
+         etsysFWNetworkIPVersion and etsysFWNetworkRealm.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The 
+         etsysFWNetwkInNetGrpStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWNetwkInNetGrpStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyNetworks 7 }
+
+etsysFWNetwkInNetGrpEntry OBJECT-TYPE
+    SYNTAX      EtsysFWNetwkInNetGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysFWNetwkInNetGrpTable."
+    INDEX       { etsysFWNetworkGroupName, etsysFWNetwkInNetGrpSubNetwork }
+    ::= { etsysFWNetwkInNetGrpTable 1 }
+
+EtsysFWNetwkInNetGrpEntry ::=
+    SEQUENCE {
+        etsysFWNetwkInNetGrpSubNetwork         SnmpAdminString,
+        etsysFWNetwkInNetGrpStorageType        StorageType,
+        etsysFWNetwkInNetGrpRowStatus          RowStatus
+    }
+
+etsysFWNetwkInNetGrpSubNetwork OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The location of the contained network.  The MIB defines the
+         following tables which may be pointed to by this column:
+         
+                 etsysFWNetworkTable
+                 
+         Implementations should prevent recursion and return the
+         inconsistentName exception if the SnmpAdminString value
+         references an etsysFWNetworkGroupTable row that already 
+         contains the etsysFWNetworkGroupName of this row.
+
+         If this column is set to a SnmpAdminString value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the SnmpAdminString is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWNetwkInNetGrpEntry 1 }
+
+etsysFWNetwkInNetGrpStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWNetwkInNetGrpEntry 2 }
+
+etsysFWNetwkInNetGrpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+         
+         This object cannot be made active until the network or 
+         network group referenced by the etsysFWNetwkInNetGrpSubNetwork
+         is both defined and is active.  An attempt to do so will
+         result in an inconsistentValue error."
+    ::= { etsysFWNetwkInNetGrpEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- Network Table
+-- -------------------------------------------------------------
+
+etsysFWNetworkMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWNetworkTable."
+    ::= { etsysFWPolicyNetworks 8 }
+
+etsysFWNetworkNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWNetworkTable."
+    ::= { etsysFWPolicyNetworks 9 }
+
+etsysFWNetworkLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWNetworkTable was last
+         modified."
+    ::= { etsysFWPolicyNetworks 10 }
+
+etsysFWNetworkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the networks associated with filters to create
+         the firewall policy rules.  Networks can be defined with a
+         network IP address and mask, an IP address range, or a single
+         IP host address.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWNetworkStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWNetworkStorageType value could
+         allow the row to be modified or deleted."
+    ::= { etsysFWPolicyNetworks 11 }
+
+etsysFWNetworkEntry OBJECT-TYPE
+    SYNTAX      EtsysFWNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysFWNetworkTable."
+    INDEX       { etsysFWNetworkName }
+    ::= { etsysFWNetworkTable 1 }
+
+EtsysFWNetworkEntry ::=
+    SEQUENCE {
+        etsysFWNetworkName               SnmpAdminString,
+        etsysFWNetworkRealm              INTEGER,
+        etsysFWNetworkRangeOrMask        INTEGER,
+        etsysFWNetworkIPVersion          InetAddressType,
+        etsysFWNetworkIPAddressBegin     InetAddress,
+        etsysFWNetworkIPAddressEnd       InetAddress,
+        etsysFWNetworkIPAddressMask      InetAddress,
+        etsysFWNetworkStorageType        StorageType,
+        etsysFWNetworkRowStatus          RowStatus
+    }
+
+etsysFWNetworkName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name of the network."
+    ::= { etsysFWNetworkEntry 1 }
+
+etsysFWNetworkRealm OBJECT-TYPE
+    SYNTAX INTEGER { internal (1),
+                     external (2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A network is qualified as either an internal or external
+         address."
+    ::= { etsysFWNetworkEntry 2 }
+
+etsysFWNetworkRangeOrMask OBJECT-TYPE
+    SYNTAX INTEGER { useIpAddrRange (1),
+                     useIpAddrMask (2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When set to useIpAddrRange, the etsysFWNetworkIPAddrBegin
+         and etsysFWNetworkIPAddrEnd define the network object in this
+         row.
+         When set to useIpAddrMask, the etsysFWNetworkIPAddrBegin 
+         and etsysFWNetworkIPAddrMask define the network object in this
+         row."
+    ::= { etsysFWNetworkEntry 3 }
+
+etsysFWNetworkIPVersion OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Internet Protocol version the addresses are to match
+         against.  The value of this property determines the size and
+         format of the etsysFWNetworkIPAddressBegin,
+         etsysFWNetworkIPAddressEnd and etsysFWNetworkIPAddressMask
+         objects.
+
+         Values of unknown, ipv4z, ipv6z and dns are not legal values
+         for this object."
+    DEFVAL { ipv4 }
+    ::= { etsysFWNetworkEntry 4 }
+
+etsysFWNetworkIPAddressBegin OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The IP address that with either the etsysFWNetworkIPAddrEnd
+         or etsysFWNetworkIPAddrMask define the network object for this
+         row."
+    ::= { etsysFWNetworkEntry 5 }
+
+etsysFWNetworkIPAddressEnd OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When etsysFWNetworkRangeOrMask is set to useIpAddrRange, this
+         is the end of the IP address range.  To define a single host
+         set this to the value of etsysFWNetworkIpAddrBegin."
+    ::= { etsysFWNetworkEntry 6 }
+
+etsysFWNetworkIPAddressMask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When etsysFWNetworkRangeOrMask is set to useIpAddrMask, this
+         is the mask that define the IP network.  To define a single 
+         host set this to all 1's."
+    ::= { etsysFWNetworkEntry 7 }
+
+etsysFWNetworkStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWNetworkEntry 8 }
+
+etsysFWNetworkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+         
+         Once active, it MAY NOT have its value changed if any active
+         rows in the etsysFWNetwkInNetGrpTable or the 
+         etsysFWFilterDefTable are currently pointing at this row."
+    ::= { etsysFWNetworkEntry 9 }
+
+
+-- -------------------------------------------------------------
+-- Service Group Table
+-- -------------------------------------------------------------
+
+etsysFWServiceGroupMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWServiceGroupTable."
+    ::= { etsysFWPolicyServices 1 }
+
+etsysFWServiceGroupNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWServiceGroupTable."
+    ::= { etsysFWPolicyServices 2 }
+
+etsysFWServiceGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWServiceGroupTable was last
+         modified."
+    ::= { etsysFWPolicyServices 3 }
+
+etsysFWServiceGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWServiceGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining a group of service objects from the 
+         etsysFWServiceTable or a service group in
+         etsysFWServiceGroupTable. The services contained in the group
+         are defined in the etsysFWNetwkInNetGrpTable.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The 
+         etsysFWServiceGroupStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWServiceGroupStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyServices 4 }
+
+etsysFWServiceGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysFWServiceGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysFWServiceGroupTable."
+    INDEX       { etsysFWServiceGroupName }
+    ::= { etsysFWServiceGroupTable 1 }
+
+EtsysFWServiceGroupEntry ::=
+    SEQUENCE {
+        etsysFWServiceGroupName               SnmpAdminString,
+        etsysFWServiceGroupStorageType        StorageType,
+        etsysFWServiceGroupRowStatus          RowStatus
+    }
+
+etsysFWServiceGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned name of the service group."
+    ::= { etsysFWServiceGroupEntry 1 }
+
+etsysFWServiceGroupStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWServiceGroupEntry 2 }
+
+etsysFWServiceGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+
+         Once active, it MAY NOT have its value changed if any active
+         rows in the etsysFWNetwkInNetGrpTable or the 
+         etsysFWFilterDefTable are currently pointing at this row."
+    ::= { etsysFWServiceGroupEntry 3 }
+
+-- -------------------------------------------------------------
+-- Services in Service Group Table
+-- -------------------------------------------------------------
+
+etsysFWServiceGroupMaxServices OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of services allowed in a service group."
+    ::= { etsysFWPolicyServices 5 }
+
+etsysFWServiceInSvcGrpLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWServiceInSvcTable was last
+         modified."
+    ::= { etsysFWPolicyServices 6 }
+
+etsysFWServiceInSvcGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWServiceInSvcGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the services in a service group.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The 
+         etsysFWServiceInSvcGrpStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWServiceInSvcGrpStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyServices 7 }
+
+etsysFWServiceInSvcGrpEntry OBJECT-TYPE
+    SYNTAX      EtsysFWServiceInSvcGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the etsysFWServiceInSvcGrpTable."
+    INDEX       { etsysFWServiceGroupName, etsysFWServiceInSvcGrpSubService }
+    ::= { etsysFWServiceInSvcGrpTable 1 }
+
+EtsysFWServiceInSvcGrpEntry ::=
+    SEQUENCE {
+        etsysFWServiceInSvcGrpSubService         SnmpAdminString,
+        etsysFWServiceInSvcGrpStorageType        StorageType,
+        etsysFWServiceInSvcGrpRowStatus          RowStatus
+    }
+
+etsysFWServiceInSvcGrpSubService OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The location of the contained service.  The MIB defines the
+         following tables which may be pointed to by this column:
+         
+                 etsysFWServiceTable
+                 
+         Implementations should prevent recursion and return the
+         inconsistentName exception if the SnmpAdminString value
+         references an etsysFWServiceGroupTable row that already 
+         contains the etsysFWServiceGroupName of this row.
+
+         If this column is set to a SnmpAdminString value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the SnmpAdminString is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWServiceInSvcGrpEntry 1 }
+
+etsysFWServiceInSvcGrpStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWServiceInSvcGrpEntry 2 }
+
+etsysFWServiceInSvcGrpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+         
+         This object cannot be made active until the service or 
+         service group referenced by the etsysFWNetwkInNetGrpSubService
+         is both defined and is active.  An attempt to do so will
+         result in an inconsistentValue error."
+    ::= { etsysFWServiceInSvcGrpEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- IP Service Table
+-- -------------------------------------------------------------
+
+etsysFWServiceMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWServiceTable."
+    ::= { etsysFWPolicyServices 8 }
+
+etsysFWServiceNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWServiceTable."
+    ::= { etsysFWPolicyServices 9 }
+
+etsysFWServiceLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWServiceTable was last
+         modified."
+    ::= { etsysFWPolicyServices 10 }
+
+etsysFWServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of service definitions to be used
+         within the etsysFWPolicyRuleDefTable.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWServiceStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWServiceStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyServices 11 }
+
+etsysFWServiceEntry OBJECT-TYPE
+    SYNTAX      EtsysFWServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A definition of a service."
+    INDEX       {  etsysFWServiceName }
+    ::= { etsysFWServiceTable 1 }
+
+EtsysFWServiceEntry ::=
+    SEQUENCE {
+        etsysFWServiceName                 SnmpAdminString,
+        etsysFWServiceSrcLowPort           InetPortNumber,
+        etsysFWServiceSrcHighPort          InetPortNumber,
+        etsysFWServiceDstLowPort           InetPortNumber,
+        etsysFWServiceDstHighPort          InetPortNumber,
+        etsysFWServiceProtocol             INTEGER,
+        etsysFWServiceStorageType          StorageType,
+        etsysFWServiceRowStatus            RowStatus
+    }
+
+etsysFWServiceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administrative name for this filter."
+    ::= { etsysFWServiceEntry 1 }
+
+etsysFWServiceSrcLowPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The low port of the port range a packet's source must match
+         against.  To match, the port number must be greater than or
+         equal to this value.
+
+         This object is only used if sourcePort is set in
+         etsysFWServiceType, in which case the value of 0 for
+         this object is illegal."
+    ::= { etsysFWServiceEntry 2 }
+
+etsysFWServiceSrcHighPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The high port of the port range a packet's source must match
+         against.  To match, the port number must be less than or
+         equal to this value.
+
+         This object is only used if sourcePort is set in
+         etsysFWServiceType, in which case the value of 0 for
+         this object is illegal."
+    ::= { etsysFWServiceEntry 3 }
+
+etsysFWServiceDstLowPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The low port of the port range a packet's destination must
+         match against.  To match, the port number must be greater
+         than or equal to this value.
+
+         This object is only used if destinationPort is set in
+         etsysFWServiceType, in which case the value of 0 for
+         this object is illegal."
+    ::= { etsysFWServiceEntry 4 }
+
+etsysFWServiceDstHighPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The high port of the port range a packet's destination must
+         match against.  To match, the port number must be less than
+         or equal to this value.
+
+         This object is only used if destinationPort is set in
+         etsysFWServiceType, in which case the value of 0 for
+         this object is illegal."
+    ::= { etsysFWServiceEntry 5 }
+
+etsysFWServiceProtocol OBJECT-TYPE
+    SYNTAX       INTEGER { tcp (1),
+                           udp (2)  }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The protocol number the incoming packet must match against
+         for this filter to be evaluated as true.
+
+         This object is only used if protocol is set in
+         etsysFWServiceType."
+    ::= { etsysFWServiceEntry 6 }
+
+etsysFWServiceStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWServiceEntry 7 }
+
+etsysFWServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWServiceEntry 8 }
+
+
+-- -------------------------------------------------------------
+-- Filter Definition Table
+-- -------------------------------------------------------------
+
+etsysFWFilterDefMaxEntries OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysFWFilterDefTable."
+    ::= { etsysFWPolicyFilters 1 }
+
+etsysFWFilterDefNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWFilterDefTable."
+    ::= { etsysFWPolicyFilters 2 }
+
+etsysFWFilterDefLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWFilterDefTable was last
+         modified."
+    ::= { etsysFWPolicyFilters 3 }
+
+etsysFWFilterDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWFilterDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines a policy rule by associating a network
+         objects with a filter or a set of filters and an action to take
+         when the filter is true.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWFilterDefStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted.  In
+         another SNMP context, the etsysFWFilterDefStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyFilters 4 }
+
+etsysFWFilterDefEntry OBJECT-TYPE
+    SYNTAX      EtsysFWFilterDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining a particular filter definition.  A rule
+         definition binds a filter pointer to an action."
+    INDEX   { etsysFWFilterDefName }
+    ::= { etsysFWFilterDefTable 1 }
+
+EtsysFWFilterDefEntry ::=
+    SEQUENCE {
+        etsysFWFilterDefName                  SnmpAdminString,
+        etsysFWFilterDefSrcNetwork            VariablePointer,
+        etsysFWFilterDefDstNetwork            VariablePointer,
+        etsysFWFilterDefBidirectional         TruthValue,
+        etsysFWFilterDefProtocol              Integer32,
+        etsysFWFilterDefICMPType              Integer32,
+        etsysFWFilterDefLogging               TruthValue,
+        etsysFWFilterDefStorageType           StorageType,
+        etsysFWFilterDefRowStatus             RowStatus
+    }
+
+etsysFWFilterDefName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "etsysFWFilterDefName is the administratively assigned
+         name of the policy rule."
+    ::= { etsysFWFilterDefEntry 1 }
+
+etsysFWFilterDefSrcNetwork OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the source address of the packet is in the set of
+         addresses defined by the network object pointed to by
+         etsysFWFilterDefSrcNetwork and the destination address
+         is in the set of addresses defined by the network object
+         pointed to by etsysFWFilterDefDstNetwork, the firewall
+         will evaluate the etsysFWFilterDefFilter for the packet.
+
+         This MIB defines the following tables which may
+         be pointed to by this column.  Implementations may choose to
+         provide support for other network tables or scalars as well:
+
+                etsysFWNetworkGroupTable
+                etsysFWNetworkTable
+
+         If this column is set to an SnmpAdminString value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the VariablePointer is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWFilterDefEntry 2 }
+
+etsysFWFilterDefDstNetwork OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the source address of the packet is in the set of
+         addresses defined by the network object pointed to by
+         etsysFWFilterDefSrcNetwork and the destination address
+         is in the set of addresses defined by the network object
+         pointed to by etsysFWFilterDefDstNetwork, the firewall
+         will evaluate the etsysFWFilterDefFilter for the packet.
+
+         This MIB defines the following tables which may
+         be pointed to by this column.  Implementations may choose to
+         provide support for other network tables or scalars as well:
+
+                etsysFWNetworkGroupTable
+                etsysFWNetworkTable
+
+         If this column is set to a VariablePointer value which
+         references a non-existent row in an otherwise supported
+         table, the inconsistentName exception should be returned.
+         If the table or scalar pointed to by the VariablePointer is
+         not supported at all, then an inconsistentValue exception
+         should be returned."
+    ::= { etsysFWFilterDefEntry 3 }
+
+etsysFWFilterDefBidirectional OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A policy may be specified as bidirectional to mean that it also
+         operates with the etsysFWFilterDefSrcNetwork and
+         etsysFWFilterDefDstNetwork reversed.
+         If this column is false, the policy operates only in the
+         direction defined by etsysFWFilterDefSrcNetwork and
+         etsysFWFilterDefDstNetwork."
+    DEFVAL { false }
+    ::= { etsysFWFilterDefEntry 4 }
+
+etsysFWFilterDefProtocol OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "x"
+    ::= { etsysFWFilterDefEntry 5 }
+
+etsysFWFilterDefICMPType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "x"
+    ::= { etsysFWFilterDefEntry 6 }
+
+etsysFWFilterDefLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When the filter is true, log the activity of this rule."
+    DEFVAL { false }
+    ::= { etsysFWFilterDefEntry 7 }
+
+etsysFWFilterDefStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWFilterDefEntry 8 }
+
+etsysFWFilterDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified.
+
+         This object SHOULD NOT be set to active until the containing
+         networks and filters have been defined.  Once active, it
+         MUST remain active until no etsysFWGroupFilterDef
+         entries are referencing it."
+    ::= { etsysFWFilterDefEntry 9 }
+
+-- -------------------------------------------------------------
+-- Command Line String Filters
+-- -------------------------------------------------------------
+
+etsysFWCLSFilterMaxFilters OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of CLS filters allowed per
+         etsysFWPolicyRuleDefName."
+    ::= { etsysFWPolicyFilters 5 }
+
+etsysFWCLSFilterLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWCLSFilterTable was last
+         modified."
+    ::= { etsysFWPolicyFilters 6 }
+
+etsysFWCLSFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWCLSFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table defines the command line string filters that can be
+         applied to a policy rule definition.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWGroupPolicyStorageType for a given SNMP context may be
+         readOnly, meaning the row cannot be modified or deleted. In
+         another SNMP context, the etsysFWGroupPolicyStorageType value
+         could allow the row to be modified or deleted."
+    ::= { etsysFWPolicyFilters 7 }
+
+etsysFWCLSFilterEntry OBJECT-TYPE
+    SYNTAX      EtsysFWCLSFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row defining a particular command line string filter."
+    INDEX   { etsysFWPolicyRuleDefName, etsysFWCLSFilterIndex }
+    ::= { etsysFWCLSFilterTable 1 }
+
+EtsysFWCLSFilterEntry ::=
+    SEQUENCE {
+        etsysFWCLSFilterIndex                Integer32,
+        etsysFWCLSFilterWord                 SnmpAdminString,
+        etsysFWCLSFilterStorageType          StorageType,
+        etsysFWCLSFilterRowStatus            RowStatus
+    }
+
+etsysFWCLSFilterIndex  OBJECT-TYPE
+    SYNTAX      Integer32  (1..256)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { etsysFWCLSFilterEntry 1 }
+
+etsysFWCLSFilterWord  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { etsysFWCLSFilterEntry 2 }
+
+etsysFWCLSFilterStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWCLSFilterEntry 3 }
+
+etsysFWCLSFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWCLSFilterEntry 4 }
+
+-- -------------------------------------------------------------
+-- HTML Filter Table
+-- -------------------------------------------------------------
+
+etsysFWHTMLFilterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWHTMLFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains filters that applies to the HTML protocol.
+
+         The implementation may choose to allow modifications to this
+         table only under certain SNMP contexts.  The
+         etsysFWIpOptionsHeadFiltStorageType for a given SNMP context
+         may be readOnly, meaning the row cannot be modified or
+         deleted. In another SNMP context, the
+         etsysFWIpOptionsHeadFiltStorageType value could allow the row
+         to be modified or deleted."
+    ::= { etsysFWPolicyFilters 8 }
+
+etsysFWHTMLFilterEntry OBJECT-TYPE
+    SYNTAX      EtsysFWHTMLFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A definition of a particular filter."
+    INDEX       {  etsysFWHTMLFilterName }
+    ::= { etsysFWHTMLFilterTable 1 }
+
+EtsysFWHTMLFilterEntry ::=
+    SEQUENCE {
+        etsysFWHTMLFilterName                SnmpAdminString,
+        etsysFWHTMLFilterType                INTEGER,
+        etsysFWHTMLFilterNetwork             SnmpAdminString,
+        etsysFWHTMLFilterLogging             TruthValue,
+        etsysFWHTMLFilterStorageType         StorageType,
+        etsysFWHTMLFilterRowStatus           RowStatus
+    }
+
+etsysFWHTMLFilterName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administrative name for this HTML filter."
+    ::= { etsysFWHTMLFilterEntry 1 }
+
+etsysFWHTMLFilterType OBJECT-TYPE
+    SYNTAX      INTEGER { none (1),
+                          selected (2),
+                          all (3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { etsysFWHTMLFilterEntry 2 }
+
+etsysFWHTMLFilterNetwork OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { etsysFWHTMLFilterEntry 3 }
+
+etsysFWHTMLFilterLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { etsysFWHTMLFilterEntry 4 }
+
+etsysFWHTMLFilterStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The storage type for this row."
+    DEFVAL { volatile }
+    ::= { etsysFWHTMLFilterEntry 5 }
+
+etsysFWHTMLFilterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the conceptual status of this row.
+
+         The value of this object has no effect on whether other
+         objects in this conceptual row can be modified."
+    ::= { etsysFWHTMLFilterEntry 6 }
+
+-- -------------------------------------------------------------
+-- Firewall Monitoring Objects
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Policy Rule True Table
+-- -------------------------------------------------------------
+
+etsysFWPolicyRuleTrueNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWPolicyRuleTrueTable."
+    ::= { etsysFWMonitoringObjects 1 }
+
+etsysFWPolicyRuleTrueLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWPolicyRuleTrueTable was last
+         modified."
+    ::= { etsysFWMonitoringObjects 2 }
+
+etsysFWPolicyRuleTrueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWPolicyRuleTrueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a counter for the number of times each
+         policy rule has been true during packet inspection since the
+         last restart of the device."
+    ::= { etsysFWMonitoringObjects 3 }
+
+etsysFWPolicyRuleTrueEntry OBJECT-TYPE
+    SYNTAX      EtsysFWPolicyRuleTrueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in the table for a named policy rule definition."
+    INDEX   { etsysFWPolicyRuleTrueIndex }
+    ::= { etsysFWPolicyRuleTrueTable 1 }
+
+EtsysFWPolicyRuleTrueEntry ::=
+    SEQUENCE {
+        etsysFWPolicyRuleTrueIndex            Integer32,
+        etsysFWPolicyRuleTrueName             SnmpAdminString,
+        etsysFWPolicyRuleTrueEvents           Counter32,
+        etsysFWPolicyRuleTrueLastEvent        DateAndTime
+    }
+
+etsysFWPolicyRuleTrueIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..99999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for this row."
+    ::= { etsysFWPolicyRuleTrueEntry 1 }
+
+etsysFWPolicyRuleTrueName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the policy rule."
+    ::= { etsysFWPolicyRuleTrueEntry 2 }
+
+etsysFWPolicyRuleTrueEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times since the device has restarted that the
+         rule has been true during packet inspection."
+    ::= { etsysFWPolicyRuleTrueEntry 3 }
+
+etsysFWPolicyRuleTrueLastEvent OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time when this rule was last true during packet
+         inspection."
+    ::= { etsysFWPolicyRuleTrueEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Session Totals Table
+-- -------------------------------------------------------------
+
+etsysFWSessionTotalsNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWSessionTotalsTable."
+    ::= { etsysFWMonitoringObjects 4 }
+
+etsysFWSessionTotalsLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWSessionTotalsTable was last
+         modified."
+    ::= { etsysFWMonitoringObjects 5 }
+
+etsysFWSessionTotalsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWSessionTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The firewall can perform stateful inspection of packets
+         to allow incoming traffic associated with outgoing packets.
+         These associations are sessions.  This table returns data
+         about the total sessions indexed by protocol-id (as defined
+         by the assigned protocol-numbers of the IANA)."
+    ::= { etsysFWMonitoringObjects 6 }
+
+etsysFWSessionTotalsEntry OBJECT-TYPE
+    SYNTAX      EtsysFWSessionTotalsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row with the session counters for a particular protocol-id."
+    INDEX   { etsysFWSessTotIndex }
+    ::= { etsysFWSessionTotalsTable 1 }
+
+EtsysFWSessionTotalsEntry ::=
+    SEQUENCE {
+        etsysFWSessTotIndex                  Integer32,
+        etsysFWSessTotProtocolID             Unsigned32,
+        etsysFWSessTotActiveSessions         Counter32,
+        etsysFWSessTotPeakSessions           Counter32,
+        etsysFWSessTotBlockedSessions        Counter32,
+        etsysFWSessTotLastBlock              DateAndTime
+    }
+
+etsysFWSessTotIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..999999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for this row."
+    ::= { etsysFWSessionTotalsEntry 1 }
+
+etsysFWSessTotProtocolID OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol-id for this row."
+    ::= { etsysFWSessionTotalsEntry 2 }
+
+etsysFWSessTotActiveSessions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of active sessions for this protocol."
+    ::= { etsysFWSessionTotalsEntry 3 }
+
+etsysFWSessTotPeakSessions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peak number of sessions for this protocol since the last
+         restart of the device."
+    ::= { etsysFWSessionTotalsEntry 4 }
+
+etsysFWSessTotBlockedSessions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of sessions that have been blocked
+         for this protocol since the last restart of the device."
+    ::= { etsysFWSessionTotalsEntry 5 }
+
+etsysFWSessTotLastBlock OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last blocked session for this
+         protocol."
+    ::= { etsysFWSessionTotalsEntry 6 }
+
+-- -------------------------------------------------------------
+-- IP Sessions Table
+-- -------------------------------------------------------------
+
+etsysFWIpSessionNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWIpSessionTable."
+    ::= { etsysFWMonitoringObjects 7 }
+
+etsysFWIpSessionLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWIpSessionTable was last
+         modified."
+    ::= { etsysFWMonitoringObjects 8 }
+
+etsysFWIpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWIpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The firewall can perform stateful inspection of packets
+         to allow incoming traffic associated with outgoing packets.
+         These associations are sessions.  This table returns data
+         about the current active sessions."
+    ::= { etsysFWMonitoringObjects 9 }
+
+etsysFWIpSessionEntry OBJECT-TYPE
+    SYNTAX      EtsysFWIpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row that defines an active session."
+    INDEX   { etsysFWIpSessionIndex }
+    ::= { etsysFWIpSessionTable 1 }
+
+EtsysFWIpSessionEntry ::=
+    SEQUENCE {
+        etsysFWIpSessionIndex                 Integer32,
+        etsysFWIpSessionIPVersion             InetAddressType,
+        etsysFWIpSessionSrcAddress            InetAddress,
+        etsysFWIpSessionDstAddress            InetAddress,
+        etsysFWIpSessionSrcPort               InetPortNumber,
+        etsysFWIpSessionDstPort               InetPortNumber,
+        etsysFWIpSessionProtocolID            Unsigned32,
+        etsysFWIpSessionCreation              DateAndTime
+    }
+
+etsysFWIpSessionIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..999999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for this row."
+    ::= { etsysFWIpSessionEntry 1 }
+
+etsysFWIpSessionIPVersion OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Internet Protocol version.  The value of this property
+         affects the size and format of the etsysFWIpSessionSrcAddress
+         and etsysFWIpSessionDstAddress objects."
+    ::= { etsysFWIpSessionEntry 2 }
+
+etsysFWIpSessionSrcAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source IP address of this session."
+    ::= { etsysFWIpSessionEntry 3 }
+
+etsysFWIpSessionDstAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The destination IP address of this session."
+    ::= { etsysFWIpSessionEntry 4 }
+
+etsysFWIpSessionSrcPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source port of this session."
+    ::= { etsysFWIpSessionEntry 5 }
+
+etsysFWIpSessionDstPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The destination port of this session."
+    ::= { etsysFWIpSessionEntry 6 }
+
+etsysFWIpSessionProtocolID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol-id of this session (as defined
+         by the assigned protocol-numbers of the IANA)."
+    ::= { etsysFWIpSessionEntry 7 }
+
+etsysFWIpSessionCreation OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The date and time this session was created."
+    ::= { etsysFWIpSessionEntry 8 }
+
+-- -------------------------------------------------------------
+-- Authenticated Addresses Table
+-- -------------------------------------------------------------
+
+etsysFWAuthAddressNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWAuthAddressTable."
+    ::= { etsysFWMonitoringObjects 10 }
+
+etsysFWAuthAddressLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWAuthAddressTable was last
+         modified."
+    ::= { etsysFWMonitoringObjects 11 }
+
+etsysFWAuthAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWAuthAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The firewall has an action to allow traffic only to
+         IP addresses that have authenticated with the firewall.
+         After authentication, the authenticated address remains
+         in a cache as long as there are packets from the address.
+         This table returns the cached authenticated IP addresses.
+         The table rows are removed when the IP address is idle
+         for the number of seconds specified in etsysFWAuthTimeout."
+    ::= { etsysFWMonitoringObjects 12 }
+
+etsysFWAuthAddressEntry OBJECT-TYPE
+    SYNTAX      EtsysFWAuthAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row that defines an authenticated IP address."
+    INDEX   { etsysFWAuthAddressIndex }
+    ::= { etsysFWAuthAddressTable 1 }
+
+EtsysFWAuthAddressEntry ::=
+    SEQUENCE {
+        etsysFWAuthAddressIndex            Integer32,
+        etsysFWAuthAddressIPVersion        InetAddressType,
+        etsysFWAuthAddressIPAddress        InetAddress,
+        etsysFWAuthAddressGroupName        SnmpAdminString,
+        etsysFWAuthAddressIdleTime         Integer32
+    }
+
+etsysFWAuthAddressIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..999999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique index for this row."
+    ::= { etsysFWAuthAddressEntry 1 }
+
+etsysFWAuthAddressIPVersion OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Internet Protocol version.  The value of this property
+         affects the size and format of the etsysFWAuthAddressIPAddress
+         object."
+    ::= { etsysFWAuthAddressEntry 2 }
+
+etsysFWAuthAddressIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The authenticated IP address."
+    ::= { etsysFWAuthAddressEntry 3 }
+
+etsysFWAuthAddressGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The group name of the authenticated IP address."
+    ::= { etsysFWAuthAddressEntry 4 }
+
+etsysFWAuthAddressIdleTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds this IP address has been idle."
+    ::= { etsysFWAuthAddressEntry 5 }
+
+-- -------------------------------------------------------------
+-- Denial of Service (DoS) Attacks Blocked Table
+-- -------------------------------------------------------------
+
+etsysFWDoSBlockedNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the
+         etsysFWDoSBlockedTable."
+    ::= { etsysFWMonitoringObjects 13 }
+
+etsysFWDoSBlockedLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime at which the etsysFWDoSBlockedTable was last
+         modified."
+    ::= { etsysFWMonitoringObjects 14 }
+
+etsysFWDoSBlockedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysFWDoSBlockedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Firewalls can provide protection from some common forms of
+         Denial of Service attacks.  The firewall will return the total
+         number of times the specific DoS attack has been blocked and
+         the IP address and time of the last blocked attack."
+    ::= { etsysFWMonitoringObjects 15 }
+
+etsysFWDoSBlockedEntry OBJECT-TYPE
+    SYNTAX      EtsysFWDoSBlockedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row that defines the statistics for a particular DoS attack."
+    INDEX   { etsysFWDoSAttackName }
+    ::= { etsysFWDoSBlockedTable 1 }
+
+EtsysFWDoSBlockedEntry ::=
+    SEQUENCE {
+        etsysFWDoSAttackName                  SnmpAdminString,
+        etsysFWDoSSrcIPVersion                InetAddressType,
+        etsysFWDoSSrcIPAddress                InetAddress,
+        etsysFWDoSAttackTime                  DateAndTime,
+        etsysFWDoSBlockedAttacks              Counter32
+    }
+
+etsysFWDoSAttackName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of a DoS attack.  Example names are
+         'SYN Flood', 'Tear Drop', and 'ICMP Flood'."
+    ::= { etsysFWDoSBlockedEntry 1 }
+
+etsysFWDoSSrcIPVersion OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Internet Protocol version.  The value of this property
+         affects the size and format of the etsysFWDoSScrIPAddress
+         object."
+    ::= { etsysFWDoSBlockedEntry 2 }
+
+etsysFWDoSSrcIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source IP address of the last blocked attack."
+    ::= { etsysFWDoSBlockedEntry 3 }
+
+etsysFWDoSAttackTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time of the last blocked attack."
+    ::= { etsysFWDoSBlockedEntry 4 }
+
+etsysFWDoSBlockedAttacks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times this DoS attack has been blocked since
+         the last restart of the device."
+    ::= { etsysFWDoSBlockedEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysFirewallConformance    OBJECT IDENTIFIER 
+    ::= { etsysFirewallMIB 4 }
+
+etsysFirewallGroups         OBJECT IDENTIFIER
+    ::= { etsysFirewallConformance 1 }
+
+etsysFirewallCompliances    OBJECT IDENTIFIER
+    ::= { etsysFirewallConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysFWFirewallEnabledGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWFirewallEnabled
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall Enabled Group."
+    ::= { etsysFirewallGroups 1 } 
+    
+etsysFWFirewallConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWTcpTimeout,
+        etsysFWUdpTimeout,
+        etsysFWIcmpTimeout,
+        etsysFWAuthTimeout,
+        etsysFWAuthPort,
+        etsysFWLoggingThreshold,
+        etsysFWRPCMicrosoftTimeout,
+        etsysFWRPCSunTimeout
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall Configuration Group for general system parameters."
+    ::= { etsysFirewallGroups 2 }
+
+etsysFWFirewallIntfGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWFirewallOnIntfLastChange,
+        etsysFWFirewallOnIntfEnabled,
+        etsysFWFirewallOnIntfStorageType,
+        etsysFWFirewallOnIntfRowStatus,
+        etsysFWFirewallIntfFilterLastChange,
+        etsysFWFirewallIntfFilterDirection,
+        etsysFWFirewallIntfFilterStorageType,
+        etsysFWFirewallIntfFilterRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall on Interface Enabled Group for enabling
+         the firewall on individual interfaces."
+    ::= { etsysFirewallGroups 3 }     
+                
+
+etsysFWSystemPolicyNameGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWSystemPolicyGroupName
+    }
+    STATUS current
+    DESCRIPTION
+        "The System Policy Group Name Group."
+    ::= { etsysFirewallGroups 4 }
+
+etsysFWInterfacePolicyGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysFWIntfToGroupLastChange,
+        etsysFWIntfToGroupStorageType,
+        etsysFWIntfToGroupRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Interface to Policy Table Group."
+    ::= { etsysFirewallGroups 5 }
+
+etsysFWGroupPolicyGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWGroupPolicyLastChange,
+        etsysFWGroupPolicyPriority,
+        etsysFWGroupPolicyStorageType,
+        etsysFWGroupPolicyRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Group Policy to Rule Definition Table Group."
+    ::= { etsysFirewallGroups 6 }
+
+etsysFWPolicyRuleDefGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWPolicyRuleDefMaxEntries,
+        etsysFWPolicyRuleDefNumEntries,
+        etsysFWPolicyRuleDefLastChange,
+        etsysFWPolicyRuleDefSrcNetwork,
+        etsysFWPolicyRuleDefDstNetwork,
+        etsysFWPolicyRuleDefBidirectional,
+        etsysFWPolicyRuleDefService,
+        etsysFWPolicyRuleAuthName,
+        etsysFWPolicyRuleDefAction,
+        etsysFWPolicyRuleDefLogging,
+        etsysFWPolicyRuleDefStorageType,
+        etsysFWPolicyRuleDefRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Policy Rule Definition Table Group."
+    ::= { etsysFirewallGroups 7 }
+
+etsysFWNetworkGroupGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysFWNetworkGroupMaxEntries,
+        etsysFWNetworkGroupNumEntries,
+        etsysFWNetworkGroupLastChange,
+        etsysFWNetworkGroupStorageType,
+        etsysFWNetworkGroupRowStatus,
+        etsysFWNetworkGroupMaxNetworks,
+        etsysFWNetwkInNetGrpLastChange,
+        etsysFWNetwkInNetGrpStorageType,
+        etsysFWNetwkInNetGrpRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Network Group Network In Network Group Tables Group"
+    ::= { etsysFirewallGroups 8 }
+
+etsysFWNetworkGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWNetworkMaxEntries,
+        etsysFWNetworkNumEntries,
+        etsysFWNetworkLastChange,
+        etsysFWNetworkRealm,
+        etsysFWNetworkRangeOrMask,
+        etsysFWNetworkIPVersion,
+        etsysFWNetworkIPAddressBegin,
+        etsysFWNetworkIPAddressEnd,
+        etsysFWNetworkIPAddressMask,
+        etsysFWNetworkStorageType,
+        etsysFWNetworkRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Network Table Group."
+    ::= { etsysFirewallGroups 9 }
+
+etsysFWServiceGroupGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysFWServiceGroupMaxEntries,
+        etsysFWServiceGroupNumEntries,
+        etsysFWServiceGroupLastChange,
+        etsysFWServiceGroupStorageType,
+        etsysFWServiceGroupRowStatus,
+        etsysFWServiceGroupMaxServices,
+        etsysFWServiceInSvcGrpLastChange,
+        etsysFWServiceInSvcGrpStorageType,
+        etsysFWServiceInSvcGrpRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Service Group in Servce Group Tables Group."
+    ::= { etsysFirewallGroups 10 }
+
+etsysFWServiceGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysFWServiceMaxEntries,
+        etsysFWServiceNumEntries,
+        etsysFWServiceLastChange,
+        etsysFWServiceSrcLowPort,
+        etsysFWServiceSrcHighPort,
+        etsysFWServiceDstLowPort,
+        etsysFWServiceDstHighPort,
+        etsysFWServiceProtocol,
+        etsysFWServiceStorageType,
+        etsysFWServiceRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Service Table Group."
+    ::= { etsysFirewallGroups 11 }
+
+etsysFWFilterGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWFilterDefMaxEntries,
+        etsysFWFilterDefNumEntries,
+        etsysFWFilterDefLastChange,
+        etsysFWFilterDefSrcNetwork,
+        etsysFWFilterDefDstNetwork,
+        etsysFWFilterDefBidirectional,
+        etsysFWFilterDefProtocol,
+        etsysFWFilterDefICMPType,
+        etsysFWFilterDefLogging,
+        etsysFWFilterDefStorageType,
+        etsysFWFilterDefRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Filter Table Group."
+    ::= { etsysFirewallGroups 12 }
+
+etsysFWCLSFilterGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWCLSFilterMaxFilters,
+        etsysFWCLSFilterLastChange,
+        etsysFWCLSFilterWord,
+        etsysFWCLSFilterStorageType,
+        etsysFWCLSFilterRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The CLS Filter Table Group."
+    ::= { etsysFirewallGroups 13 }
+
+etsysFWHTMLFilterGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWHTMLFilterType,
+        etsysFWHTMLFilterNetwork,
+        etsysFWHTMLFilterLogging,
+        etsysFWHTMLFilterStorageType,
+        etsysFWHTMLFilterRowStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The HTML Filter Table Group."
+    ::= { etsysFirewallGroups 14 }
+
+etsysFWPolicyRuleTrueGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWPolicyRuleTrueNumEntries,
+        etsysFWPolicyRuleTrueLastChange,
+        etsysFWPolicyRuleTrueIndex,
+        etsysFWPolicyRuleTrueName,
+        etsysFWPolicyRuleTrueEvents,
+        etsysFWPolicyRuleTrueLastEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The Policy Rule True Table Group."
+    ::= { etsysFirewallGroups 15 } 
+    
+etsysFWSessionTotalsGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWSessionTotalsNumEntries,
+        etsysFWSessionTotalsLastChange,
+        etsysFWSessTotIndex,
+        etsysFWSessTotProtocolID,
+        etsysFWSessTotActiveSessions,
+        etsysFWSessTotPeakSessions,
+        etsysFWSessTotBlockedSessions,
+        etsysFWSessTotLastBlock
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall Session Totals Table Group."
+    ::= { etsysFirewallGroups 16 }
+
+etsysFWIpSessionGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWIpSessionNumEntries,
+        etsysFWIpSessionLastChange,
+        etsysFWIpSessionIndex,
+        etsysFWIpSessionIPVersion,
+        etsysFWIpSessionSrcAddress,
+        etsysFWIpSessionDstAddress,
+        etsysFWIpSessionSrcPort, 
+        etsysFWIpSessionDstPort,
+        etsysFWIpSessionProtocolID,
+        etsysFWIpSessionCreation
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall IP Sessions Table Group."
+    ::= { etsysFirewallGroups 17 }
+
+etsysFWAuthAddressGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWAuthAddressNumEntries,
+        etsysFWAuthAddressLastChange,
+        etsysFWAuthAddressIndex,
+        etsysFWAuthAddressIPVersion,
+        etsysFWAuthAddressIPAddress,
+        etsysFWAuthAddressGroupName,
+        etsysFWAuthAddressIdleTime
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall Authenticated Addresses Table Group."
+    ::= { etsysFirewallGroups 18 }
+
+etsysFWDoSBlockedGroup OBJECT-GROUP
+    OBJECTS {
+        etsysFWDoSBlockedNumEntries,
+        etsysFWDoSBlockedLastChange,
+        etsysFWDoSAttackName,
+        etsysFWDoSSrcIPVersion,
+        etsysFWDoSSrcIPAddress,
+        etsysFWDoSAttackTime,
+        etsysFWDoSBlockedAttacks
+    }
+    STATUS current
+    DESCRIPTION
+        "The Firewall DoS Blocked Attacks Table Group."
+    ::= { etsysFirewallGroups 19 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysFirewallCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         etsysFirewallMIB."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS { etsysFWFirewallEnabledGroup,
+                           etsysFWGroupPolicyGroup,
+                           etsysFWPolicyRuleDefGroup,
+                           etsysFWNetworkGroup }
+
+        GROUP etsysFWFirewallConfigGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+             which support these global configuration settings."
+
+        GROUP etsysFWFirewallIntfGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+             which support enabling packet inspection on
+             individual interfaces."
+
+        GROUP etsysFWSystemPolicyNameGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support a system or global
+             firewall policy."
+
+        GROUP etsysFWInterfacePolicyGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support distinct policy on
+             individual interfaces."
+
+        GROUP etsysFWNetworkGroupGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support network groups."
+
+        GROUP etsysFWServiceGroupGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support service group."
+
+        GROUP etsysFWServiceGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support service 
+             defined in this MIB."
+
+        GROUP etsysFWFilterGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support filters."
+
+        GROUP etsysFWCLSFilterGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support CLS filters."
+
+        GROUP etsysFWHTMLFilterGroup
+        DESCRIPTION
+            "This group is mandatory for firewall policy
+             implementations which support HTML filters."
+
+        GROUP etsysFWPolicyRuleTrueGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+            which support a counter for the number of times a
+            policy rule is true."  
+            
+        GROUP etsysFWSessionTotalsGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+            which support counters for IP protocol sessions."
+
+        GROUP etsysFWIpSessionGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+            which support active session information."
+
+        GROUP etsysFWAuthAddressGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+            which support current authenticated address information."
+
+        GROUP etsysFWDoSBlockedGroup
+        DESCRIPTION
+            "This group is mandatory for firewall implementations
+            which support blocking common DoS attacks."
+
+    ::= { etsysFirewallCompliances 1 }
+
+END

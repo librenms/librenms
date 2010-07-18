@@ -1,0 +1,286 @@
+CTRON-PPC-BAD-PACKETS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-ppc-bad-packets.txt
+--  Revision: 00.00.01
+--  Part Number:
+--  Date: March 18, 1999
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides definitions for Cabletron's
+--  enterprise-specific PPC Bad Packets MIB.
+--
+--  This module will be extended, as needed.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright March 1999 Cabletron Systems
+
+IMPORTS
+
+      OBJECT-TYPE
+            FROM RFC-1212
+      ctFWDebug
+            FROM CTRON-MIB-NAMES;
+
+
+ctPPCBadPkts  OBJECT IDENTIFIER ::= { ctFWDebug 1 }
+
+ctPPCBadPktsTotalTx OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The total number of Transmit Errors PPC has registered on this device (all ports)"
+    ::= { ctPPCBadPkts 1 }
+
+ctPPCBadPktsTotalRx OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The total number of Receive Errors PPC has registered on this device (all ports)"
+    ::= { ctPPCBadPkts 2 }
+
+------------------------------------------------------------
+
+ctPPCBadPktsTxTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtPPCBadPktsTxEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides traffic error statistics (Transmit side)" 
+     ::= { ctPPCBadPkts 3 }
+
+
+ctPPCBadPktsTxEntry  OBJECT-TYPE
+    SYNTAX CtPPCBadPktsTxEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       each port."
+    INDEX { ctPPCBadPktsTxIndex }
+    ::= { ctPPCBadPktsTxTable 1 }
+
+CtPPCBadPktsTxEntry ::= 
+  SEQUENCE {
+      ctPPCBadPktsTxIndex
+            INTEGER,
+      ctPPCBadPktsTxQueues
+            INTEGER,
+      ctPPCBadPktsTxFulls
+            INTEGER
+  }
+
+ctPPCBadPktsTxIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A value which uniquely identifies a conceptual row in the
+         table. Physical port id."
+    ::= { ctPPCBadPktsTxEntry 1 }
+
+ctPPCBadPktsTxQueues OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of Transmit Queues this port is able to support."
+    ::= { ctPPCBadPktsTxEntry 2 }
+
+ctPPCBadPktsTxFulls OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of xmit events with queue been full."
+    ::= { ctPPCBadPktsTxEntry 3 }
+
+-------------------------------------------------------------------
+
+ctPPCBadPktsTxQDepthTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtPPCBadPktsTxQDepthEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides the current usage for each Tx Queue" 
+     ::= { ctPPCBadPkts 4 }
+
+
+ctPPCBadPktsTxQDepthEntry  OBJECT-TYPE
+    SYNTAX CtPPCBadPktsTxQDepthEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       each port and queue."
+    INDEX { ctPPCBadPktsTxQIndex, ctPPCBadPktsQ }
+    ::= { ctPPCBadPktsTxQDepthTable 1 }
+
+CtPPCBadPktsTxQDepthEntry ::= SEQUENCE {
+      ctPPCBadPktsTxQIndex
+            INTEGER,
+      ctPPCBadPktsQ
+            INTEGER,
+      ctPPCBadPktsTxQDepth
+            INTEGER
+}
+
+ctPPCBadPktsTxQIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A value which uniquely identifies a conceptual row in the
+         table. Physical port id."
+    ::= { ctPPCBadPktsTxQDepthEntry 1 }
+
+
+ctPPCBadPktsQ OBJECT-TYPE
+    SYNTAX INTEGER (0..3)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "Index to the queue array."
+    ::= { ctPPCBadPktsTxQDepthEntry 2 }
+
+ctPPCBadPktsTxQDepth OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of currently used entries in this queue."
+    ::= { ctPPCBadPktsTxQDepthEntry 3 }
+
+
+--------------------------------------------------------------
+
+
+
+ctPPCBadPktsRxTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CtPPCBadPktsRxEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION
+       "Provides traffic error statistics (receive side)" 
+     ::= { ctPPCBadPkts 5 }
+
+
+ctPPCBadPktsRxEntry  OBJECT-TYPE
+    SYNTAX CtPPCBadPktsRxEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Defines a particular entry containing objects pertaining to
+       each port."
+    INDEX { ctPPCBadPktsRxIndex }
+    ::= { ctPPCBadPktsRxTable 1 }
+
+CtPPCBadPktsRxEntry ::= SEQUENCE {
+      ctPPCBadPktsRxIndex
+            INTEGER,
+      ctPPCBadPktsRxTotalErrors
+            INTEGER,
+      ctPPCBadPktsRxDescHigh
+            INTEGER,
+      ctPPCBadPktsRxDescLow
+            INTEGER,
+      ctPPCBadPktsRxDaSa0
+            INTEGER,
+      ctPPCBadPktsRxDaSa1
+            INTEGER,
+      ctPPCBadPktsRxDaSa2
+            INTEGER,
+      ctPPCBadPktsRxData
+            INTEGER
+}
+
+
+ctPPCBadPktsRxIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A value which uniquely identifies a conceptual row in the
+         table. Physical port id."
+    ::= { ctPPCBadPktsRxEntry 1 }
+
+ctPPCBadPktsRxTotalErrors OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of bad packets received on this port."
+    ::= { ctPPCBadPktsRxEntry 2 }
+
+
+
+ctPPCBadPktsRxDescHigh OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The first half of last bad packet descriptor."
+    ::= { ctPPCBadPktsRxEntry 3 }
+
+ctPPCBadPktsRxDescLow OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The second half of last bad packet descriptor."
+    ::= { ctPPCBadPktsRxEntry 4 }
+
+ctPPCBadPktsRxDaSa0 OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The first word of DaSa field from the last bad packet."
+    ::= { ctPPCBadPktsRxEntry 5 }
+
+ctPPCBadPktsRxDaSa1 OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The second word of DaSa field from the last bad packet."
+    ::= { ctPPCBadPktsRxEntry 6 }
+
+ctPPCBadPktsRxDaSa2 OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The third word of DaSa field from the last bad packet."
+    ::= { ctPPCBadPktsRxEntry 7 }
+
+ctPPCBadPktsRxData OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "Data word (maybe tag) from the last bad packet. "
+    ::= { ctPPCBadPktsRxEntry 8 }
+
+END

@@ -1,0 +1,1234 @@
+ENTERASYS-MSTP-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-mstp-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' implementation of the Multiple Spanning Tree Protocol
+--  defined by IEEE 802.1s.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright 2002-2006 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    BridgeId
+        FROM BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysMstpMIB MODULE-IDENTITY
+    LAST-UPDATED "200611091640Z"  -- Thu Nov  9 16:40 GMT 2006
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This mib module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         the Multiple Spanning Tree Protocol defined by IEEE 802.1s.
+
+         This MIB is used to manage devices which support MSTP.  
+         It will be supported until a standard IEEE 802.1s MIB has 
+         been defined by the IETF."
+
+    REVISION "200611091640Z"  -- Thu Nov  9 16:40 GMT 2006
+    DESCRIPTION
+        "Renamed the etsysMstpPortExtnErrorConditions object as
+         the etsysMstpPortExtnNonForwardingReason object, and
+         revamped its definition."
+
+    REVISION "200610041954Z"  -- Wed Oct  4 19:54 GMT 2006
+    DESCRIPTION
+        "Added the etsysMstpPortExtnTable, containing objects for
+         configuring the Loop Protect feature on MSTIs as well as
+         summarizing Spanning Tree error conditions on MSTIs.
+         Added the etsysMstpLoopProtectEvent notification."
+
+    REVISION "200407141625Z"  -- Wed Jul 14 16:25 GMT 2004
+    DESCRIPTION
+        "Added the etsysMstpMaxConfigurableMsts object."
+
+    REVISION "200404081959Z"  -- Thu Apr  8 19:59 GMT 2004
+    DESCRIPTION
+        "Added the etsysMstpMstiExtnTable and
+         etsysMstpMstiExtnBackupRootEnable objects."
+
+    REVISION "200402122138Z"  -- Thu Feb 12 21:38 GMT 2004
+    DESCRIPTION
+        "Added etsysMstpAutoEdgeDetection and
+         etsysMstpBridgeHelloTimeMode objects."
+
+    REVISION "200301211427Z"  -- Tue Jan 21 14:27 GMT 2003
+    DESCRIPTION
+        "Changed syntax of etsysMstpConfigDigest object from
+         SnmpAdminString to HexString.
+         Added applicable range limitations and default values to
+         read-write objects.
+         Enhanced various object descriptions for clarity."
+
+    REVISION "200210111705Z"  -- Fri Oct 11 17:05 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 28 } 
+
+etsysMstpObjects      OBJECT IDENTIFIER ::= { etsysMstpMIB 1 }
+
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+HexString  ::=  TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+        "An OCTET-STRING with a suitable display hint."
+    SYNTAX       OCTET STRING (SIZE (0..1024))
+
+
+-- ---------------------------------------------------------- --
+-- branches in the ENTERASYS-MSTP MIB
+-- ---------------------------------------------------------- --
+
+etsysMstpConfig          OBJECT IDENTIFIER ::= { etsysMstpObjects 1 }
+etsysMstpBridge          OBJECT IDENTIFIER ::= { etsysMstpObjects 2 }
+etsysMstpPort            OBJECT IDENTIFIER ::= { etsysMstpObjects 3 }
+etsysMstpExtn            OBJECT IDENTIFIER ::= { etsysMstpObjects 4 }
+etsysMstpNotifications   OBJECT IDENTIFIER ::= { etsysMstpObjects 0 }
+
+
+-- ---------------------------------------------------------- --
+-- the MST Configuration group
+-- ---------------------------------------------------------- --
+
+etsysMstpMaxMstId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum Multiple Spanning Tree (MST) instance ID 
+       that this device supports." 
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1.2.2"
+    DEFVAL { 4094 }
+    ::= { etsysMstpConfig 1 }
+
+etsysMstpMaxSupportedMsts  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of Multiple Spanning Tree instances that this
+       device supports.  The value of this object is not affected by
+       the value of etsysMstpMaxConfigurableMsts.  This object
+       represents the maximum value that etsysMstpMaxConfigurableMsts
+       can be set to."
+    REFERENCE
+      "IEEE 802.1s clause 5.1 item j"
+    DEFVAL { 64 }
+    ::= { etsysMstpConfig 2 }
+
+etsysMstpNumMsts  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The current number of Multiple Spanning Tree
+       instances that are configured in this device."
+    REFERENCE
+      "IEEE 802.1s clause 12.12.1"
+    ::= { etsysMstpConfig 3 }
+
+-- ---------------------------------------------------------- --
+-- MSTI Table
+-- ---------------------------------------------------------- --
+
+etsysMstpMstiTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpMstiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The list of configured Multiple Spanning Tree
+       instances."
+    REFERENCE
+      "IEEE 802.1s clause 12.12.1"
+    ::= { etsysMstpConfig 4 }
+
+etsysMstpMstiEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpMstiEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table entry representing a Multiple Spanning Tree
+       instance."
+    INDEX { etsysMstpMstId }
+    ::= { etsysMstpMstiTable 1 }
+
+EtsysMstpMstiEntry ::=
+    SEQUENCE { 
+     etsysMstpMstId                      Unsigned32,
+     etsysMstpMstiStatus                 RowStatus
+    }
+
+etsysMstpMstId OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The unique ID of this Multiple Spanning Tree instance.
+       This value SHALL be between 1 and etsysMstpMaxMstId 
+       inclusively."
+    ::= { etsysMstpMstiEntry 1 }
+
+etsysMstpMstiStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+      "This object allows for the dynamic creation and
+       deletion of the corresponding Spanning Tree instance.
+
+       Creation and activation of a conceptual row in this
+       table MUST be performed as a single operation -- by
+       setting this object to createAndGo(4) -- and 
+       suspension of an active conceptual row is not
+       supported.  Consequently, setting this object to
+       createAndWait(5) or notInService(2) SHALL fail.
+
+       Setting this object to destroy(6) SHALL fail if the
+       corresponding Spanning Tree instance has one or more
+       FIDs allocated to it in the FID to MSTID Allocation
+       Table (etsysMstpAllocTable).
+
+       Refer to the RowStatus convention for further details on 
+       the behavior of this object."
+    REFERENCE
+      "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { etsysMstpMstiEntry 2 }
+
+-- ---------------------------------------------------------- --
+-- FID to MSTID Allocation Table
+-- ---------------------------------------------------------- --
+
+etsysMstpAllocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpAllocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table that contains the mapping of Filtering
+       Databases to Spanning Tree instances."
+    REFERENCE
+      "IEEE 802.1s clause 12.12.2"
+    ::= { etsysMstpConfig 5 }
+
+etsysMstpAllocEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpAllocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The mapping of a particular Filtering Database to
+       a Spanning Tree instance."
+    INDEX { etsysMstpFdbId }
+    ::= { etsysMstpAllocTable 1 }
+
+EtsysMstpAllocEntry ::=
+    SEQUENCE { 
+     etsysMstpFdbId                      Unsigned32,
+     etsysMstpMstIdOfFdb                 Unsigned32
+    }
+
+etsysMstpFdbId OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The unique ID of the Filtering Database to which the 
+       information in this table entry applies.  This value 
+       SHALL be between 1 and dot1qMaxVlanId inclusively."
+    ::= { etsysMstpAllocEntry 1 }
+
+etsysMstpMstIdOfFdb OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+      "The ID of the Spanning Tree instance to which the 
+       corresponding FID is mapped.  This ID must either
+       be 0 (i.e., the CIST) or be a value which is present
+       in the MSTI Table (etsysMstpMstiTable)."
+    DEFVAL { 0 }
+    ::= { etsysMstpAllocEntry 2 }
+
+
+-- ---------------------------------------------------------- --
+-- MST Configuration Table
+-- ---------------------------------------------------------- --
+
+etsysMstpConfigTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table that contains the mapping of VLANs to
+       Spanning Tree instances.  This table is a read-only
+       table, its elements derived from the VID to FID
+       allocation table and the FID to MSTID allocation
+       table."
+    REFERENCE
+      "IEEE 802.1s clause 12.12.3"
+    ::= { etsysMstpConfig 6 }
+
+etsysMstpConfigEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The mapping of a particular VLAN to a Spanning Tree
+       instance."
+    INDEX { etsysMstpVlanId }
+    ::= { etsysMstpConfigTable 1 }
+
+EtsysMstpConfigEntry ::=
+    SEQUENCE { 
+     etsysMstpVlanId                     Unsigned32,
+     etsysMstpMstIdOfVlan                Unsigned32
+    }
+
+etsysMstpVlanId OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The unique ID of the VLAN to which the information in 
+       this table entry applies.  This value SHALL be between
+       1 and dot1qMaxVlanId inclusively."
+    ::= { etsysMstpConfigEntry 1 }
+
+etsysMstpMstIdOfVlan OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The ID of the Spanning Tree instance to which the 
+       corresponding VLAN is mapped."
+    ::= { etsysMstpConfigEntry 2 }
+
+
+-- ---------------------------------------------------------- --
+-- MST Configuration Identifier
+-- ---------------------------------------------------------- --
+
+etsysMstpFormatSelector OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The format selector value of the Configuration
+       Identifier.  This has a value of 0 to indicate the
+       format specified in the IEEE 802.1s standard."  
+    REFERENCE
+      "IEEE 802.1s clause 13.7"
+    ::= { etsysMstpConfig 7 }
+
+etsysMstpConfigName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The configuration name of the MST region to which
+       this bridge belongs.  The default value is the
+       Bridge Address of this bridge, as a text string 
+       using the Hexadecimal Representation defined in
+       IEEE Std. 802."
+    REFERENCE
+      "IEEE 802.1s clause 13.7"
+    ::= { etsysMstpConfig 8 }
+
+etsysMstpRevisionLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The revision level of the MST region to which
+       this bridge belongs."  
+    REFERENCE
+      "IEEE 802.1s clause 13.7"
+    DEFVAL { 0 }
+    ::= { etsysMstpConfig 9 } 
+
+etsysMstpConfigDigest OBJECT-TYPE
+    SYNTAX      HexString (SIZE(16))  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The Configuration Digest derived from the MST
+       Configuration Table."  
+    REFERENCE
+      "IEEE 802.1s clause 13.7"
+    ::= { etsysMstpConfig 10 }
+
+etsysMstpMaxConfigurableMsts  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of Multiple Spanning Tree instances that can
+       configured on this entity.
+
+       This object cannot be set to a value greater than the value of
+       etsysMstpMaxSupportedMsts, and cannot be set to a value that is
+       less then the number of currently configured spanning tree
+       instances."
+    REFERENCE
+      "IEEE 802.1s clause 5.1 item j"
+    DEFVAL { 64 }
+    ::= { etsysMstpConfig 11 }
+
+
+-- ---------------------------------------------------------- --
+-- the MST Bridge group
+-- ---------------------------------------------------------- --
+
+etsysMstpCistRegionalRootIdentifier OBJECT-TYPE
+    SYNTAX        BridgeId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The Bridge Identifier of the current CIST Regional
+       Root."
+    ::= { etsysMstpBridge 1 }
+
+etsysMstpCistPathCost OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The CIST path cost from this bridge to the CIST
+       Regional Root."
+    ::= { etsysMstpBridge 2 }
+
+etsysMstpMaxHopCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "The maximum number of hops that the information for a
+       particular Spanning Tree instance may traverse (via
+       relay of BPDUs within the applicable MST region) before
+       being discarded.  This value is used only if this bridge
+       is the CIST Regional Root and/or the MSTI Regional Root
+       for one or more Multiple Spanning Tree instances."
+    DEFVAL { 20 }
+    ::= { etsysMstpBridge 3 }
+
+
+etsysMstpBridgeTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpBridgeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table that contains bridge protocol parameter values
+       associated with each configured Multiple Spanning Tree
+       instance."
+    ::= { etsysMstpBridge 4 }
+
+etsysMstpBridgeEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpBridgeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A list of information maintained by each Multiple
+       Spanning Tree instance configured on this bridge."
+    INDEX { etsysMstpMstId }
+    ::= { etsysMstpBridgeTable 1 }
+
+EtsysMstpBridgeEntry ::=
+    SEQUENCE { 
+     etsysMstpBridgePriority                  Unsigned32,
+     etsysMstpTimeSinceTopologyChange         TimeTicks,
+     etsysMstpTopologyChangeCount             Counter32,
+     etsysMstpTopologyChangeInProgress        TruthValue,
+     etsysMstpDesignatedRoot                  BridgeId,
+     etsysMstpRootPathCost                    Unsigned32,
+     etsysMstpRootPort                        Unsigned32
+    }
+
+etsysMstpBridgePriority OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..61440)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+      "The value of the priority component of the Bridge
+       ID for the corresponding Spanning Tree instance.
+       Specifically, the four most significant bits of the
+       most significant octet of the (8 octet long) Bridge
+       ID followed by 12 zero bits.  Note that this object
+       may only be set to a 16-bit value in which the least
+       significant 12 bits are zero, i.e., permissible values
+       are 0-61440, in steps of 4096."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    DEFVAL { 32768 }
+    ::= { etsysMstpBridgeEntry 1 }
+
+etsysMstpTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The elapsed time, in units of hundredths of a second,
+       since the last time a topology change was detected by
+       the corresponding Spanning Tree instance (specifically,
+       the elapsed time since the tcWhile timer for any port
+       was non-zero)."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 2 }
+
+etsysMstpTopologyChangeCount OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The total number of topology changes detected by
+       the corresponding Spanning Tree instance since the 
+       management entity was last reset or initialized
+       (specifically, the count of times that the tcWhile
+       timer for any port has been non-zero)."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 3 }
+
+etsysMstpTopologyChangeInProgress OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "True(1) if the tcWhile timer is non-zero for any port
+       for the corresponding Spanning Tree instance, false(2)
+       otherwise."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 4 }
+
+etsysMstpDesignatedRoot OBJECT-TYPE
+    SYNTAX        BridgeId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The bridge identifier of the root for the corresponding
+       Spanning Tree instance."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 5 }
+
+etsysMstpRootPathCost OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The cost of the path to the root of the corresponding
+       Spanning Tree instance as seen from this bridge."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 6 }
+
+etsysMstpRootPort OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The port number of the port which offers the
+       lowest cost path from this bridge to the root
+       bridge for the corresponding Spanning Tree instance."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.1"
+    ::= { etsysMstpBridgeEntry 7 }
+
+
+-- ---------------------------------------------------------- --
+-- the MST Port group
+-- ---------------------------------------------------------- --
+
+etsysMstpPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table that contains port parameter values for
+       each configured Multiple Spanning Tree instance."
+    ::= { etsysMstpPort 1 }
+
+etsysMstpPortEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A list of information maintained for every port
+       by each Multiple Spanning Tree instance configured
+       on this bridge."     
+    INDEX { etsysMstpMstId, etsysMstpPortNumber }
+    ::= { etsysMstpPortTable 1 }
+
+EtsysMstpPortEntry ::=
+    SEQUENCE { 
+     etsysMstpPortNumber                      InterfaceIndex,
+     etsysMstpPortPriority                    Unsigned32,
+     etsysMstpPortState                       INTEGER,
+     etsysMstpPortAdminPathCost               Unsigned32,
+     etsysMstpPortOperPathCost                Unsigned32,
+     etsysMstpPortDesignatedRoot              BridgeId,
+     etsysMstpPortDesignatedCost              Unsigned32,
+     etsysMstpPortDesignatedBridge            BridgeId,
+     etsysMstpPortDesignatedPort              OCTET STRING,
+     etsysMstpPortRoleValue                   INTEGER
+    }
+
+etsysMstpPortNumber OBJECT-TYPE
+    SYNTAX        InterfaceIndex
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "The port number of the port for which this entry
+       contains Multiple Spanning Tree Protocol management
+       information."
+    ::= { etsysMstpPortEntry 1 }
+
+etsysMstpPortPriority OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..240)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+      "The value of the priority field which is contained in
+       the first (in network byte order) octet of the (2 octet
+       long) Port ID for the corresponding Spanning Tree
+       instance.  Permissible values are 0-240, in steps of 16."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    DEFVAL { 128 }
+    ::= { etsysMstpPortEntry 2 }
+
+etsysMstpPortState OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      disabled(1),
+                      blocking(2),
+                      listening(3),
+                      learning(4),
+                      forwarding(5),
+                      broken(6)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The port's current state in the corresponding Spanning
+       Tree instance as defined by application of the Multiple
+       Spanning Tree Protocol.  This state controls what action
+       a port takes on reception of a frame.  If the bridge has
+       detected a port that is malfunctioning it will place that
+       port into the broken(6) state.  For ports which are
+       administratively disabled (see dot1dStpPortEnable), this
+       object will have a value of disabled(1)."
+    ::= { etsysMstpPortEntry 3 }
+
+etsysMstpPortAdminPathCost OBJECT-TYPE
+    SYNTAX        Unsigned32 (0..200000000)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+      "The administratively assigned value for the contribution
+       of this port to the path cost of paths towards the root
+       of the corresponding Spanning Tree instance.
+
+       Writing a value of '0' assigns the automatically calculated
+       default Path Cost value to the port for this instance.  If
+       the default Path Cost is being used, this object returns
+       '0' when read.
+
+       This complements the object etsysMstpPortOperPathCost,
+       which returns the operational value of the path cost."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2, IEEE 802.1t-2001 Table 8-5"
+    DEFVAL { 0 }
+    ::= { etsysMstpPortEntry 4 }
+
+etsysMstpPortOperPathCost OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The operational value for the contribution of this port to
+       the path cost of paths towards the root of the corresponding
+       Spanning Tree instance."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2, IEEE 802.1t-2001 Table 8-5"
+    ::= { etsysMstpPortEntry 5 }
+
+etsysMstpPortDesignatedRoot OBJECT-TYPE
+    SYNTAX        BridgeId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The unique Bridge Identifier of the Bridge recorded
+       as the Root of the corresponding Spanning Tree in the
+       Configuration BPDUs transmitted by the Designated
+       Bridge for the segment to which the port is attached."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    ::= { etsysMstpPortEntry 6 }
+
+etsysMstpPortDesignatedCost OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The path cost of the Designated Port of the segment
+       connected to this port, for the corresponding
+       Spanning Tree instance.  This value is compared to
+       the Root Path Cost field in received bridge PDUs."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    ::= { etsysMstpPortEntry 7 }
+
+etsysMstpPortDesignatedBridge OBJECT-TYPE
+    SYNTAX        BridgeId
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The Bridge Identifier of the bridge which this
+       port considers to be the Designated Bridge for
+       this port's segment on the corresponding Spanning
+       Tree instance."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    ::= { etsysMstpPortEntry 8 }
+
+etsysMstpPortDesignatedPort OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The Port Identifier of the port on the Designated
+       Bridge for this port's segment on the corresponding
+       Spanning Tree instance."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    ::= { etsysMstpPortEntry 9 }
+
+etsysMstpPortRoleValue OBJECT-TYPE
+    SYNTAX      INTEGER {
+                         disabled(1), 
+                         root(2),
+                         designated(3),
+                         alternate(4),
+                         backUp(5),
+                         master(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Indicates this port's role on the corresponding
+       Spanning Tree instance.
+
+       disabled --  this port has no role on this MST instance. 
+
+       root -- this port has the role of root port on this MST
+                   instance. 
+
+       designated -- this port has the role of designated 
+                   port on this MST instance.
+
+       alternate -- this port has the role of alternate port
+                   on this MST instance.
+
+       backUp -- this port has the role of backup port on this  
+                   MST instance.
+
+       master -- this port has the role of master port on 
+                   this MST instance." 
+    ::= { etsysMstpPortEntry 10 }
+
+
+etsysMstpGlobalPortTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpGlobalPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A table that contains port parameter values which
+       apply to all Spanning Tree instances."
+    ::= { etsysMstpPort 2 }
+
+etsysMstpGlobalPortEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpGlobalPortEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A list of information maintained for every port
+       which applies to all Spanning Tree instances."
+    INDEX { etsysMstpPortNumber }
+    ::= { etsysMstpGlobalPortTable 1 }
+
+EtsysMstpGlobalPortEntry ::=
+    SEQUENCE { 
+     etsysMstpHelloTime                       Unsigned32,
+     etsysMstpPortHelloTime                   Unsigned32,
+     etsysMstpBoundaryPort                    TruthValue
+    }
+
+etsysMstpHelloTime OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "The amount of time, in hundredths of a second, between
+       the transmission of Configuration bridge PDUs on this
+       port when it has the role of designated port for any
+       Spanning Tree instance.  This is the actual value that
+       this bridge is currently using."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    ::= { etsysMstpGlobalPortEntry 1 }
+
+etsysMstpPortHelloTime OBJECT-TYPE
+    SYNTAX        Unsigned32 (100..1000)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+      "The value, in hundredths of a second, that all bridges
+       attached to this port's LAN segment use for HelloTime
+       when this bridge is acting as the CIST root."
+    REFERENCE
+      "IEEE 802.1s clause 12.8.2"
+    DEFVAL { 200 }
+    ::= { etsysMstpGlobalPortEntry 2 }
+
+etsysMstpBoundaryPort OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "True(1) if this port is attached to a LAN which is in
+       a different MST Region than this bridge, false(2)
+       otherwise."
+    ::= { etsysMstpGlobalPortEntry 3 }
+
+-- ---------------------------------------------------------- --
+-- the MST Extension group
+-- ---------------------------------------------------------- --
+
+etsysMstpAutoEdgeDetection OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of automatic edge detection."
+    REFERENCE
+        "IEEE 802.1D-D4 Section 17.25."
+    DEFVAL { enabled }
+    ::= { etsysMstpExtn 1 }
+
+etsysMstpBridgeHelloTimeMode OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The enabled/disabled status of the legacy bridge hello
+         mode of operation.  When enabled, and this bridge is
+         acting as the root bridge, dot1dStpBridgeHelloTime
+         is used.  When disabled, and this bridge is acting as
+         the root bridge, etsysMstpPortHelloTime is used."
+    REFERENCE
+        "IEEE 802.1s-2002 Section 13.22(e) and 12.8.2.1.3(s)."
+    DEFVAL { enabled }
+    ::= { etsysMstpExtn 2 }
+
+etsysMstpMstiExtnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysMstpMstiExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Extensions to the table of Multiple Spanning Tree instances."
+    ::= { etsysMstpExtn 3 }
+
+etsysMstpMstiExtnEntry OBJECT-TYPE
+    SYNTAX      EtsysMstpMstiExtnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extensions to the information maintained for
+         each Multiple Spanning Tree instance."
+    AUGMENTS { etsysMstpMstiEntry }
+    ::= { etsysMstpMstiExtnTable 1 }
+
+EtsysMstpMstiExtnEntry ::=
+    SEQUENCE { 
+        etsysMstpMstiExtnBackupRootEnable              EnabledStatus
+    }
+
+etsysMstpMstiExtnBackupRootEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the Backup Root functionality
+         on this MSTI."
+    DEFVAL { disabled }
+    ::= { etsysMstpMstiExtnEntry 1 }
+
+etsysMstpPortExtnTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysMstpPortExtnEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "Extensions to the table that contains port parameter values for
+       each configured Multiple Spanning Tree instance."
+    ::= { etsysMstpExtn 4 }
+
+etsysMstpPortExtnEntry OBJECT-TYPE
+    SYNTAX        EtsysMstpPortExtnEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "A list of extensions to the information maintained for every
+       port by each Multiple Spanning Tree instance configured
+       on this bridge."     
+    AUGMENTS { etsysMstpPortEntry }
+    ::= { etsysMstpPortExtnTable 1 }
+
+EtsysMstpPortExtnEntry ::=
+    SEQUENCE { 
+        etsysMstpPortExtnNonForwardingReason  INTEGER,
+        etsysMstpPortExtnLoopProtectEnable    EnabledStatus,
+        etsysMstpPortExtnLoopProtectBlocking  INTEGER
+    }
+
+etsysMstpPortExtnNonForwardingReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(1),
+                    disputed(2),
+                    spanGuardLocked(3),
+                    loopProtectEvent(4),
+                    loopProtectAdvisory(5),
+                    loopbackDetected(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why this port has been placed in a
+         non-forwarding state on this MSTI (other than as a result
+         of normal Spanning Tree protocol operation).
+
+         none(1) - the port has not been placed in a non-forwarding
+                   state due to any exceptional condition.
+
+         disputed(2) - the port has been placed in listening state
+                       because it has a designated role and an 
+                       inferior designated BPDU has been received.
+
+         spanGuardLocked(3) - the port has been placed in blocking
+                              state because it is configured as an
+                              admin edge port and a BPDU has been
+                              received.
+
+         loopProtectEvent(4) - the port has been placed in listening
+                               or blocking state because a BPDU
+                               timeout has occurred and the port is
+                               awaiting reception of a type 2 BPDU
+                               on a point-to-point link.
+
+         loopProtectAdvisory(5) - the port has been placed in
+                                  listening state because a BPDU
+                                  timeout has occurred (as with a
+                                  Loop Protect event), but this
+                                  condition may be normal because
+                                  the link partner does not support
+                                  the Loop Protect feature.
+
+         loopbackDetected(6) - the port has been placed in blocking
+                               state because a loopback condition
+                               has been detected."
+    ::= { etsysMstpPortExtnEntry 1 }
+
+etsysMstpPortExtnLoopProtectEnable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enabled/disabled status of the Loop Protect functionality
+         for this port on this MSTI."
+    DEFVAL { disabled }
+    ::= { etsysMstpPortExtnEntry 2 }
+
+etsysMstpPortExtnLoopProtectBlocking   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The state of this port on this MSTI with respect to
+         the Loop Protect feature.
+
+         true(1)   - this port is being held in the blocking state
+                     by the Loop Protect feature.
+
+         false(2)  - this port is not being held in the blocking 
+                     state by the Loop Protect feature.
+
+         When this object has a value of true(1) setting its value
+         to false(2) will cause the Loop Protect feature to no longer
+         hold the port in the blocking state.
+
+         All other set operations on this object are undefined and
+         MUST NOT have any effect."
+    DEFVAL { false }
+    ::= { etsysMstpPortExtnEntry 3 }
+
+
+-- ---------------------------------------------------------- --
+-- Notifications 
+-- ---------------------------------------------------------- --
+
+etsysMstpLoopProtectEvent NOTIFICATION-TYPE
+    OBJECTS     { etsysMstpMstId, etsysMstpPortNumber,
+                  etsysMstpPortExtnLoopProtectBlocking }
+    STATUS      current
+    DESCRIPTION
+        "This notification indicates that a Loop Protect event
+         has occurred on a bridge port on an MSTI."
+    ::= { etsysMstpNotifications 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysMstpConformance OBJECT IDENTIFIER ::= { etsysMstpMIB 2 }
+
+etsysMstpGroups      OBJECT IDENTIFIER ::= { etsysMstpConformance 1 }
+etsysMstpCompliances OBJECT IDENTIFIER ::= { etsysMstpConformance 2 }
+
+-- -------------------------------------------------------------
+-- Units of conformance
+-- -------------------------------------------------------------
+
+etsysMstpConfigGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpMaxMstId,
+        etsysMstpMaxSupportedMsts,
+        etsysMstpNumMsts,
+        etsysMstpMstiStatus,
+        etsysMstpMstIdOfFdb,
+        etsysMstpMstIdOfVlan,
+        etsysMstpFormatSelector,
+        etsysMstpConfigName,
+        etsysMstpRevisionLevel,
+        etsysMstpConfigDigest
+    }
+    STATUS      current
+    DESCRIPTION
+      "A collection of objects providing configuration support
+       for the Multiple Spanning Tree Protocol."
+    ::= { etsysMstpGroups 1 }
+
+etsysMstpBridgeGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpCistRegionalRootIdentifier,
+        etsysMstpCistPathCost,
+        etsysMstpMaxHopCount,
+        etsysMstpBridgePriority,
+        etsysMstpTimeSinceTopologyChange,
+        etsysMstpTopologyChangeCount,
+        etsysMstpTopologyChangeInProgress,
+        etsysMstpDesignatedRoot,
+        etsysMstpRootPathCost,
+        etsysMstpRootPort
+    }
+    STATUS      current
+    DESCRIPTION
+      "A collection of objects providing bridge-level support
+       for the Multiple Spanning Tree Protocol."
+    ::= { etsysMstpGroups 2 }
+
+etsysMstpPortGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpPortPriority,
+        etsysMstpPortState,
+        etsysMstpPortAdminPathCost,
+        etsysMstpPortOperPathCost,
+        etsysMstpPortDesignatedRoot,
+        etsysMstpPortDesignatedCost,
+        etsysMstpPortDesignatedBridge,
+        etsysMstpPortDesignatedPort,
+        etsysMstpPortRoleValue,
+        etsysMstpHelloTime,
+        etsysMstpPortHelloTime,
+        etsysMstpBoundaryPort
+    }
+    STATUS      current
+    DESCRIPTION
+      "A collection of objects providing port-level support
+       for the Multiple Spanning Tree Protocol."
+    ::= { etsysMstpGroups 3 }
+
+etsysMstpAutoEdgeDetectGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpAutoEdgeDetection
+    }
+    STATUS      current
+    DESCRIPTION
+      "An object for controlling Auto Edge Detection."
+    ::= { etsysMstpGroups 4 }
+
+etsysMstpBridgeHelloTimeGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpBridgeHelloTimeMode
+    }
+    STATUS      current
+    DESCRIPTION
+      "An object for modifying the Hello Time mode."
+    ::= { etsysMstpGroups 5 }
+
+etsysMstpBackupRootGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpMstiExtnBackupRootEnable
+    }
+    STATUS      current
+    DESCRIPTION
+      "An object for enabling and disabling the Backup Root feature."
+    ::= { etsysMstpGroups 6 }
+
+etsysMstpMaxInstancesGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpMaxConfigurableMsts
+    }
+    STATUS      current
+    DESCRIPTION
+      "An object for restricting the number of configurable MSTIs."
+    ::= { etsysMstpGroups 7 }
+
+etsysMstpNonForwardingReasonGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpPortExtnNonForwardingReason
+    }
+    STATUS      current
+    DESCRIPTION
+      "An object that indicates the reason for an exceptional
+       non-forwarding condition per port/MSTI."
+    ::= { etsysMstpGroups 8 }
+
+etsysMstpLoopProtectGroup OBJECT-GROUP
+    OBJECTS {
+        etsysMstpPortExtnLoopProtectEnable,
+        etsysMstpPortExtnLoopProtectBlocking
+    }
+    STATUS      current
+    DESCRIPTION
+      "A collection of objects providing support for the 
+       Loop Protect feature."
+    ::= { etsysMstpGroups 9 }
+
+etsysMstpLoopProtectNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysMstpLoopProtectEvent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The Loop Protect Event Notification for MSTIs."
+    ::= { etsysMstpGroups 10 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysMstpCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+      "The compliance statement for devices that support the
+       Multiple Spanning Tree Protocol."
+
+    MODULE
+        MANDATORY-GROUPS {
+            etsysMstpConfigGroup,
+            etsysMstpBridgeGroup,
+            etsysMstpPortGroup
+        }
+
+        GROUP       etsysMstpAutoEdgeDetectGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support auto edge detection."
+
+        GROUP       etsysMstpBridgeHelloTimeGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support multiple hello time modes."
+
+        GROUP       etsysMstpBackupRootGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support the Backup Root feature."
+
+        GROUP       etsysMstpMaxInstancesGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support the ability to limit the
+             number of configurable MSTIs."
+
+        GROUP       etsysMstpNonForwardingReasonGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that wish to provide the reasons for
+             exceptional non-forwarding conditions."
+
+        GROUP       etsysMstpLoopProtectGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support the Loop Protect feature."
+
+        GROUP       etsysMstpLoopProtectNotificationGroup
+        DESCRIPTION
+            "Support for this group is optional and only applies
+             to products that support the Loop Protect feature."
+
+    ::= { etsysMstpCompliances 1 }
+
+END

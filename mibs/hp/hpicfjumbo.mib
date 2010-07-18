@@ -1,0 +1,139 @@
+HP-ICF-JUMBO-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, Counter32
+            FROM SNMPv2-SMI
+        InterfaceIndex
+            FROM IF-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        hpicfObjectModules
+            FROM HP-ICF-OID
+        ;
+
+    hpicfJumboMIB MODULE-IDENTITY
+         LAST-UPDATED "200408221030Z"  -- August 22, 2004
+         ORGANIZATION "Hewlett Packard Company,
+                       Network Infrastructure Solutions"
+         CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+         DESCRIPTION  "This MIB module describes HP Jumbo information."
+
+         
+	      REVISION     "200408221030Z"  -- August 22, 2004
+         DESCRIPTION  "Initial version."
+         
+         ::= { hpicfObjectModules 13 }
+
+
+    hpicfJumboObjects OBJECT IDENTIFIER ::= { hpicfJumboMIB 1 }
+
+    hpJumboStats OBJECT IDENTIFIER ::= { hpicfJumboObjects 1 }
+
+    hpJumboStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpJumboStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains jumbos information about the
+                     physical ports of this device."
+        ::= { hpJumboStats 1 }
+
+    hpJumboStatsEntry OBJECT-TYPE
+        SYNTAX      HpJumboStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Information about the physical ports of this device."
+        INDEX       { hpJumboStatsIndex }
+        ::= { hpJumboStatsTable 1 }
+
+    HpJumboStatsEntry ::=
+        SEQUENCE {
+            hpJumboStatsIndex                           InterfaceIndex,
+            hpJumboStatsPkts1523to2047Octets            Counter32,
+            hpJumboStatsPkts2048to4095Octets            Counter32,
+            hpJumboStatsPkts4096to9216Octets            Counter32
+        }
+
+    hpJumboStatsIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interface index associated with this set of 
+                     counters."
+        ::= { hpJumboStatsEntry 1 }
+
+    hpJumboStatsPkts1523to2047Octets OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of packets (including bad
+         packets) received that were between
+         1523 and 2047 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { hpJumboStatsEntry 2 }
+
+    hpJumboStatsPkts2048to4095Octets OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         2048 and 4095 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { hpJumboStatsEntry 3 }
+
+    hpJumboStatsPkts4096to9216Octets OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         4096 and 9216 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { hpJumboStatsEntry 4 }
+
+
+-- Conformance Information
+
+   hpicfJumboConformance OBJECT IDENTIFIER ::= { hpicfJumboMIB 2 }
+ 
+   hpicfJumboGroups OBJECT IDENTIFIER ::= { hpicfJumboConformance 1 }
+
+   hpicfJumboCompliances OBJECT IDENTIFIER
+       ::= { hpicfJumboConformance 2 }
+
+
+
+-- units of conformance
+
+
+   hpicfJumboStatsGroup OBJECT-GROUP
+        OBJECTS {
+            hpJumboStatsIndex,
+            hpJumboStatsPkts1523to2047Octets,
+            hpJumboStatsPkts2048to4095Octets,
+            hpJumboStatsPkts4096to9216Octets
+        }
+        STATUS     current
+        DESCRIPTION    
+          "A collection of objects providing private HP Jumbo packet statistics."
+       ::= { hpicfJumboGroups 1 }
+
+
+-- compliance statements
+
+
+   hpicfJumboCompliance MODULE-COMPLIANCE
+       STATUS  current
+       DESCRIPTION
+           "The compliance statement for devices support of
+           HP-ICF-JUMBO MIB."
+       MODULE -- This Module
+
+          MANDATORY-GROUPS { hpicfJumboStatsGroup }   
+       ::= { hpicfJumboCompliances 1 }
+
+ END

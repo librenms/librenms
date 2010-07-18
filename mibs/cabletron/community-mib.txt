@@ -1,0 +1,130 @@
+COMMUNITY-MIB  DEFINITIONS ::= BEGIN
+
+        --  community-mib.txt
+        --  Revision: 1.02.02
+        --  Part Number:  2170550
+        --  Date: February 25, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific community table MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in
+        --  specification and other information contained in this document
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental,
+        --  indirect, special, or consequential damages whatsoever (including
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright July 96 Cabletron Systems
+
+
+        IMPORTS 
+                IpAddress, enterprises
+                        FROM RFC1155-SMI
+                OBJECT-TYPE
+                        FROM RFC-1212; 
+
+
+        cabletron             OBJECT IDENTIFIER ::= { enterprises 52 }
+
+        commsDevice           OBJECT IDENTIFIER ::= { cabletron 1 }
+
+        community             OBJECT IDENTIFIER ::= { commsDevice 52 }
+
+
+
+        communityTable  OBJECT-TYPE 
+            SYNTAX  SEQUENCE OF CommunityEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This table houses the information needed for trivial
+                    authentication and sending traps."
+            ::= { community 2 }
+
+        communityEntry  OBJECT-TYPE 
+            SYNTAX  CommunityEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION  
+                    "Each entry contains a community name and access code
+                    for SNMP trivial authentication, an enable/disable
+                    traps option, as well as network and physical
+                    addressing information for traps."
+            INDEX   { communityIndex }
+            ::= { communityTable 1 }
+
+        CommunityEntry ::=
+            SEQUENCE { 
+                communityName
+                    OCTET STRING,
+                communityTrap
+                    INTEGER,
+                communityIPAddr
+                    IpAddress,
+                communityIndex
+                    INTEGER
+            }
+
+        communityName  OBJECT-TYPE 
+            SYNTAX  OCTET STRING (SIZE (0..32))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The community name that will be used for trivial
+                    authentication for SNMP get/set requests. This is also
+                    the community name used within an SNMP trap pdu. Each
+                    community name is associated with an access code of
+                    either NO_ACCESS, RO, RW, or SU."
+            ::= { communityEntry 1 }
+
+        communityTrap  OBJECT-TYPE 
+            SYNTAX  INTEGER 
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "This object is checked to determine if traps should be
+                    sent to the corresponding network address associated
+                    with it.
+                    The possible values are:
+                                              trapOff (0),
+                                              trapOn (1)"
+
+            ::= { communityEntry 2 }
+
+        communityIPAddr  OBJECT-TYPE 
+            SYNTAX  IpAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION  
+                    "The network address of the device that will receive
+                    traps from this agent."
+            ::= { communityEntry 3 }
+
+        communityIndex  OBJECT-TYPE 
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION  
+                    "A unique value for each community entry.  "
+            ::= { communityEntry 4 }
+
+END 

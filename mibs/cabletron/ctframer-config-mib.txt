@@ -1,0 +1,202 @@
+CTFRAMER-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+--  Ctron Framer Config MIB
+--  Revision: 01.00.01
+--  Date: April 18, 1999
+--  Part Number:
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for part
+--  of the naming tree below:
+--
+--  cabletron { enterprises 52 }
+--
+--  This module will be extended, as additional sub-sections
+--  of this naming tree are defined.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 96 Cabletron Systems
+
+IMPORTS
+
+-- In the orignal text at ctron:/user/ctron/mibs/enterprise/release/ctframer-mib.txt
+-- ctFramerConfig was imported from CTRON-MIB-NAMES. But in this document 
+-- ctFramerConfig is imported from CTIF-EXT-MIB since this MIB is part 
+-- of the default database loaded by the Spectrum Browser and also contains 
+-- defintion for ctFramerConfig.
+
+        ctFramerConfig, ctIfPortPortNumber
+              FROM CTIF-EXT-MIB
+
+        ifIndex
+              FROM RFC1213-MIB
+
+        OBJECT-TYPE
+              FROM RFC-1212;
+
+--
+--=======================================================================
+-- ctFramerConfig Groups
+
+ctFramerBaseConfig        OBJECT IDENTIFIER ::= { ctFramerConfig 1 }
+ctFramerSonetConfig       OBJECT IDENTIFIER ::= { ctFramerConfig 2 }
+ctFramerDS3Config         OBJECT IDENTIFIER ::= { ctFramerConfig 3 }
+
+
+--
+--=====================================================================
+-- This table allows a user to configure the chip on the physical 
+-- medium. This chip is responsible for framing the bits in the correct
+-- manner for the wire.
+
+ctFramerConfigTable     OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtFramerConfigEntry
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION
+         "A list of framer configuration objects for a physical port on
+          a particular interface."
+     ::= { ctFramerBaseConfig 1 }
+
+ctFramerConfigEntry     OBJECT-TYPE
+     SYNTAX          CtFramerConfigEntry
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION
+         "An entry containing objects pertaining to the configuration
+          of the framer on a physical port on an interface."
+     INDEX           { ifIndex, ctIfPortPortNumber }
+     ::= { ctFramerConfigTable 1 }
+
+CtFramerConfigEntry ::=
+     SEQUENCE {
+                ctFramerStatsConfig
+                     INTEGER,
+                ctFramerAlarmsConfig
+                     INTEGER,
+                ctFramerMediumConfig
+                     INTEGER,
+                ctFramerIdleCellsConfig
+                     INTEGER,
+                ctFramerCellPayScramConfig
+                     INTEGER
+               }
+
+ctFramerStatsConfig OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         on(1),
+                         off(2)
+                     }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "Setting this object to 'on' will activate the framer MIBs as
+          specified by either RFC-1595 or RFC-1407 depending on whether
+          the interface uses SONET/SDH framing or DS3 framing respectively.
+          Note: Setting this to 'on' will permit gathering of framer
+          statistics at the expense of processing time. However, it might
+          be a valuable debugging aid to turn on the framer MIB.
+ 
+          Setting this object to 'off' will deactivate the respective
+          framer MIBs, thus saving processing time.
+ 
+          It is emphasized that collection of statistics for the framer
+          is resource (processor, memory) intensive.
+ 
+          This object is persistent."
+     DEFVAL  { off } 
+     ::= { ctFramerConfigEntry 1 }
+
+ctFramerAlarmsConfig OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         on(1),
+                         off(2)
+                     }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "This object activates/deactivates the detection and initiation
+          of framer alarms.
+
+          for SONET/SDH framed physical ports: 
+              RDI - remote defect indicator 
+              AIS - alarm indication signal
+
+          for DS3 framed physical ports: 
+              yellow signal alarms
+ 
+          This object is persistent."
+     DEFVAL  { off } 
+     ::= { ctFramerConfigEntry 2 }
+
+ctFramerMediumConfig OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         sonet(1),
+                         sdh(2)
+                     }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "This object controls whether a SONET or a SDH signal is used
+          across this physical port.
+ 
+          sonet - synchronous optical network
+          sdh - synchronous digital heirarchy
+
+          This object is persistent."
+     DEFVAL  { sonet } 
+     ::= { ctFramerConfigEntry 3 }
+
+ctFramerIdleCellsConfig OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         idle(1),
+                         unassigned(2)
+                     }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "When this object is set to idle, null cells
+          will have the CLP bit set.
+
+          When this object is set to unassigned, null
+          cells will not have the CLP bit set.
+
+          This object is persistent."
+     ::= { ctFramerConfigEntry 4 }
+
+ctFramerCellPayScramConfig OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         on(1),
+                         off(2)
+                     }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "This object activates/deactivates cell payload
+          transmit scrambling and receive descrambling.
+
+          This object is persistent."
+     ::= { ctFramerConfigEntry 5 }
+
+END

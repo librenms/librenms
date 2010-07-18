@@ -1,0 +1,45 @@
+CYCLADES-ACS-ADM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	cyACSMgmt
+		FROM CYCLADES-ACS-MIB
+	OBJECT-TYPE, MODULE-IDENTITY
+		FROM SNMPv2-SMI;
+
+cyACSAdm	MODULE-IDENTITY
+	LAST-UPDATED	"200508290000Z"
+	ORGANIZATION	"Cyclades Corporation"
+	CONTACT-INFO	"postal : Cyclades Corporation
+				  3541 Gateway Boulevard
+				  Fremont, CA 94538, USA
+			 e-mail : Technical Support
+				  support@cyclades.com"
+	DESCRIPTION	"This module defines objects of the ACS/TS administration"
+	REVISION	"200508290000Z"
+	DESCRIPTION	"Changed the Contact-Info"
+	REVISION	"200209200000Z"
+	DESCRIPTION	"First Draft"
+::= { cyACSMgmt 4 }
+
+cyACSSave	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				nosave(0),
+				save(1)
+			}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Exec saveconf command"
+::= { cyACSAdm 1 }
+                               
+cyACSSerialHUP	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				norestartportslave(0),
+				restartportslave(1)
+			}
+	MAX-ACCESS    read-write
+	STATUS          current
+	DESCRIPTION     "Exec signal_ras hup command"
+::= { cyACSAdm 2 }
+
+END
+

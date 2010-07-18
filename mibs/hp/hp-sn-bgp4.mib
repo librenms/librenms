@@ -1,0 +1,2677 @@
+-- SECTION 1: Top Level Definitions
+
+
+HP-SN-BGP4-GROUP-MIB DEFINITIONS ::= BEGIN
+
+
+-- Foundry snBgp4 Group MIB Release 1.0.0
+-- Revision 0 09/09/98
+
+-- Copyright 1996-97 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base Specification
+-- (Specification) embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+
+     IMPORTS
+             Counter, Gauge, IpAddress
+                     FROM RFC1155-SMI
+     --      mib-2
+     --              FROM RFC1213-MIB
+             OBJECT-TYPE
+                     FROM RFC-1212
+                         snBgp4 
+                                         FROM HP-SN-ROOT-MIB;
+                         
+
+-- Groups
+
+snBgp4Gen                       OBJECT IDENTIFIER ::= { snBgp4 1 }
+snBgp4AddrFilter                OBJECT IDENTIFIER ::= { snBgp4 2 }
+snBgp4AggregateAddr     OBJECT IDENTIFIER ::= { snBgp4 3 }
+snBgp4AsPathFilter              OBJECT IDENTIFIER ::= { snBgp4 4 }
+snBgp4CommunityFilter   OBJECT IDENTIFIER ::= { snBgp4 5 }
+snBgp4NeighGenCfg               OBJECT IDENTIFIER ::= { snBgp4 6 }
+snBgp4NeighDistGroup    OBJECT IDENTIFIER ::= { snBgp4 7 }
+snBgp4NeighFilterGroup  OBJECT IDENTIFIER ::= { snBgp4 8 }
+snBgp4NeighRouteMap     OBJECT IDENTIFIER ::= { snBgp4 9 }
+snBgp4Network                   OBJECT IDENTIFIER ::= { snBgp4 10 }
+snBgp4Redis                     OBJECT IDENTIFIER ::= { snBgp4 11 }
+snBgp4RouteMapFilter    OBJECT IDENTIFIER ::= { snBgp4 12 }
+snBgp4RouteMapMatch     OBJECT IDENTIFIER ::= { snBgp4 13 }
+snBgp4RouteMapSet           OBJECT IDENTIFIER ::= { snBgp4 14 }
+snBgp4NeighOperStatus   OBJECT IDENTIFIER ::= { snBgp4 15 }
+snBgp4RouteOperStatus   OBJECT IDENTIFIER ::= { snBgp4 16 }
+snBgp4NeighborSummary   OBJECT IDENTIFIER ::= { snBgp4 17 }
+snBgp4Attribute                 OBJECT IDENTIFIER ::= { snBgp4 18 }
+snBgp4ClearNeighborCmd  OBJECT IDENTIFIER ::= { snBgp4 19 }
+ 
+        
+
+--  BGP4 General Variables
+
+--  These parameters apply globally to the Router's
+--  BGP4 Process.
+
+
+     snBgp4GenAlwaysCompareMed OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To enable/disable the comparison of the Multi-Exit Discriminator for paths from 
+                        neighbors in different AS."
+         ::= { snBgp4Gen 1 }
+
+     snBgp4GenAutoSummary OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To enable/disable the default behavior of automatic summarization of subnet routes
+            into network-level routes."  
+         ::= { snBgp4Gen 2 }
+
+     snBgp4GenDefaultLocalPreference OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To set the default local preference attribute."
+         ::= { snBgp4Gen 3 }
+
+     snBgp4GenDefaultInfoOriginate OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To enable/disable the default Information Originate."
+         ::= { snBgp4Gen 4 }
+
+     snBgp4GenFastExternalFallover OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To enable/disable an action of immediately reset the BGP sessions of any
+            directly adjacent external neighbors if the link used to reach them goes
+            down."
+         ::= { snBgp4Gen 5 }
+
+     snBgp4GenNextBootNeighbors OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The next-boot configured number of neighbors in a BGP Peer Group.
+                The minimum value of this MIB is snBgp4GenMinNeighbors.
+                The maximum value of this MIB is snBgp4GenMaxNeighbors."
+         ::= { snBgp4Gen 6 }
+
+     snBgp4GenNextBootRoutes OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The next-boot configured number of Routes.
+                The minimum value of this MIB is snBgp4GenMinRoutes.
+                The maximum value of this MIB is snBgp4GenMaxRoutes."
+         ::= { snBgp4Gen 7 }
+
+     snBgp4GenSynchronization OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To enable/disable the synchronization between BGP and your IGP."
+         ::= { snBgp4Gen 8 }
+
+     snBgp4GenKeepAliveTime OBJECT-TYPE
+         SYNTAX   INTEGER (0..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The Keep alive timer."
+         ::= { snBgp4Gen 9 }
+
+     snBgp4GenHoldTime OBJECT-TYPE
+         SYNTAX   INTEGER (0..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The Hold time timer."
+         ::= { snBgp4Gen 10 }
+
+     snBgp4GenRouterId OBJECT-TYPE
+         SYNTAX   IpAddress
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "BGP Router Id."
+         ::= { snBgp4Gen 11 }
+
+     snBgp4GenTableMap OBJECT-TYPE
+                 SYNTAX  OCTET STRING (SIZE(0..32)) 
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "An octet string of the route-map name, each character of the name
+            is represented by one octet."
+         ::= { snBgp4Gen 12 }
+
+     snBgp4GenAdminStat OBJECT-TYPE
+         SYNTAX   INTEGER { disabled (0), enabled (1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The administrative status of BGP4 in the router.  The
+            value 'enabled' denotes that the BGP4 routing is active
+            in this router; 'disabled' disables BGP4 routing on this router."
+         ::= { snBgp4Gen 13 }
+
+     snBgp4GenDefaultMetric OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "To set default metric values for the BGP4 protocol."
+         ::= { snBgp4Gen 14 }
+
+     snBgp4GenMaxNeighbors OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum number of neighbors can be configured in a BGP Peer Group."
+         ::= { snBgp4Gen 15 }
+
+     snBgp4GenMinNeighbors OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The minimum number of neighbors can be configured in a BGP Peer Group."
+         ::= { snBgp4Gen 16 }
+
+     snBgp4GenMaxRoutes OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of Routes."
+         ::= { snBgp4Gen 17 }
+
+     snBgp4GenMinRoutes OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The minimum configured number of Routes."
+         ::= { snBgp4Gen 18 }
+
+     snBgp4GenMaxAddrFilters OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 address filters."
+         ::= { snBgp4Gen 19 }
+
+     snBgp4GenMaxAggregateAddresses OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 aggregate addresses."
+         ::= { snBgp4Gen 20 }
+
+     snBgp4GenMaxAsPathFilters OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 AS-PATH filters."
+         ::= { snBgp4Gen 21 }
+
+     snBgp4GenMaxCommunityFilters OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 Community filters."
+         ::= { snBgp4Gen 22 }
+
+     snBgp4GenMaxNetworks OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 Networks."
+         ::= { snBgp4Gen 23 }
+
+     snBgp4GenMaxRouteMapFilters OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of BGP4 Route-map Filters."
+         ::= { snBgp4Gen 24 }
+
+     snBgp4GenNeighPrefixMinValue OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The minimum configured value of BGP4 Neighbor Prefix."
+         ::= { snBgp4Gen 25 }
+
+     snBgp4GenOperNeighbors OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The current operational max number of neighbors configured for a BGP Group."
+         ::= { snBgp4Gen 26 }
+
+     snBgp4GenOperRoutes OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The current operational number of Routes."
+         ::= { snBgp4Gen 27 }
+
+     snBgp4GenLocalAs OBJECT-TYPE
+         SYNTAX   INTEGER (1..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "Bgp4 local autonomous system number."
+         ::= { snBgp4Gen 28 }
+
+     snBgp4GenRoutesInstalled OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+                "Bgp4 installed routes."
+         ::= { snBgp4Gen 29 }
+
+     snBgp4GenAsPathInstalled OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+                "Bgp4 installed autonomous system path."
+         ::= { snBgp4Gen 30 }
+
+     snBgp4ExternalDistance OBJECT-TYPE
+                 SYNTAX  INTEGER (1..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "Administrative distance for BGP external routes."
+         DEFVAL { 20 }
+         ::= { snBgp4Gen 31 }
+
+     snBgp4InternalDistance OBJECT-TYPE
+                 SYNTAX  INTEGER (1..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "Administrative distance for BGP internal routes."
+         DEFVAL { 200 }
+         ::= { snBgp4Gen 32 }
+
+     snBgp4LocalDistance OBJECT-TYPE
+                 SYNTAX  INTEGER (1..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "Administrative distance for BGP local routes."
+         DEFVAL { 200 }
+         ::= { snBgp4Gen 33 }
+
+     snBgp4OperNumOfAttributes OBJECT-TYPE
+                 SYNTAX  INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+                "The operational number of attribute entries."
+         ::= { snBgp4Gen 34 }
+
+     snBgp4NextBootMaxAttributes OBJECT-TYPE
+                 SYNTAX  INTEGER (200..30000)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "The next boot maximum attribute entries. 10000 means reset to default."
+         DEFVAL { 10000 }
+         ::= { snBgp4Gen 35 }
+
+     snBgp4ClusterId OBJECT-TYPE
+                 SYNTAX  INTEGER 
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "A cluster ID which is represented by 4 bytes unsigned 
+                 integer (0..0xFFFFFFFF). 0 means reset to default."
+         ::= { snBgp4Gen 36 }
+
+     snBgp4ClientToClientReflection OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "To enable/disable the client to client reflection in BGP4."
+         ::= { snBgp4Gen 37 }
+
+     snBgp4GenTotalNeighbors OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The current total number of neighbors running in a BGP Group."
+         ::= { snBgp4Gen 38 }
+
+     snBgp4GenMaxPaths OBJECT-TYPE
+         SYNTAX   INTEGER (1..8)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The maximum configured number of Paths."
+         ::= { snBgp4Gen 39 }
+
+     snBgp4GenConfedId OBJECT-TYPE
+         SYNTAX   INTEGER (1..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+                "Bgp4 Confederation Id."
+         ::= { snBgp4Gen 40 }
+
+     snBgp4GenConfedPeers OBJECT-TYPE
+         SYNTAX  OCTET STRING (SIZE(0..100))
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+                "An AS number from 1 to 0xFFFF construct confederation peers.
+                 There are 50(max peers) of them.  
+                 This integer number is represented by 2 OCTETs."
+         ::= { snBgp4Gen 41 }
+
+
+--- Bgp4 Address Filter table
+
+snBgp4AddrFilterTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4AddrFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Address Filter table."
+        ::= { snBgp4AddrFilter 1 }
+
+snBgp4AddrFilterEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4AddrFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Address Filter table."
+        INDEX   { snBgp4AddrFilterIndex }
+        ::= { snBgp4AddrFilterTable 1 }
+
+SnBgp4AddrFilterEntry ::= SEQUENCE {
+        snBgp4AddrFilterIndex
+                INTEGER,
+        snBgp4AddrFilterAction              
+                INTEGER,
+        snBgp4AddrFilterSourceIp
+                IpAddress,
+        snBgp4AddrFilterSourceMask
+                IpAddress,
+        snBgp4AddrFilterDestIp
+                IpAddress,
+        snBgp4AddrFilterDestMask
+                IpAddress,
+        snBgp4AddrFilterRowStatus
+                INTEGER
+        }
+
+snBgp4AddrFilterIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The table index for a filter entry."
+        ::= { snBgp4AddrFilterEntry 1 }
+
+snBgp4AddrFilterAction      OBJECT-TYPE
+        SYNTAX  INTEGER { deny(0), permit(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take if the bgp address match
+                with this filter."
+        ::= { snBgp4AddrFilterEntry 2 }
+
+snBgp4AddrFilterSourceIp    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Source IP address."
+        ::= { snBgp4AddrFilterEntry 3 }
+
+snBgp4AddrFilterSourceMask  OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Source IP subnet mask."
+        ::= { snBgp4AddrFilterEntry 4 }
+
+snBgp4AddrFilterDestIp      OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Destination IP address."
+        ::= { snBgp4AddrFilterEntry 5 }
+
+snBgp4AddrFilterDestMask    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Destination IP subnet mask."
+        ::= { snBgp4AddrFilterEntry 6 }
+
+snBgp4AddrFilterRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4AddrFilterEntry 7 }
+
+-- Bgp4 Aggregate Address table
+
+snBgp4AggregateAddrTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4AggregateAddrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Aggregate Address table."
+        ::= { snBgp4AggregateAddr 1 }
+
+snBgp4AggregateAddrEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4AggregateAddrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Aggregate Address table."
+        INDEX   { snBgp4AggregateAddrIp, snBgp4AggregateAddrMask, snBgp4AggregateAddrOption }
+        ::= { snBgp4AggregateAddrTable 1 }
+
+SnBgp4AggregateAddrEntry ::= SEQUENCE {
+        snBgp4AggregateAddrIp
+                IpAddress,
+        snBgp4AggregateAddrMask
+                IpAddress,
+        snBgp4AggregateAddrOption
+                INTEGER,
+        snBgp4AggregateAddrMap
+                OCTET STRING,
+        snBgp4AggregateAddrRowStatus
+                INTEGER
+        }
+
+snBgp4AggregateAddrIp    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Aggregate Address IP address."
+        ::= { snBgp4AggregateAddrEntry 1 }
+
+snBgp4AggregateAddrMask  OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Aggregate Address IP subnet mask."
+        ::= { snBgp4AggregateAddrEntry 2 }
+
+snBgp4AggregateAddrOption      OBJECT-TYPE
+        SYNTAX  INTEGER { 
+                                address(1), 
+                                asSet(2), 
+                                summaryOnly(3), 
+                                suppressMap(4), 
+                                advertiseMap(5), 
+                                attributeMap(6) 
+                                } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "address(1), asSet(2), summaryOnly(3), 
+                the suppressMap(4), advertiseMap(5), 
+                attributeMap(6) are Options for creating an aggregate entry 
+                in a BGP routing table."
+        ::= { snBgp4AggregateAddrEntry 3 }
+
+snBgp4AggregateAddrMap      OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object associates with the snBgp4AggregateAddrOption and 
+                the suppressMap(4), advertiseMap(5), attributeMap(6) of the 
+                snBgp4AggregateAddrOption are only two Options for creating 
+                an aggregate address map. A SNMP-SET error will be returned 
+                for other options.  An octet string of the map name, 
+                each character of the name is represented by one octet."
+        ::= { snBgp4AggregateAddrEntry 4 }
+
+snBgp4AggregateAddrRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4AggregateAddrEntry 5 }
+
+-- Bgp4 AS-Path Filter table
+
+snBgp4AsPathFilterTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4AsPathFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 AS-Path Filter table."
+        ::= { snBgp4AsPathFilter 1 }
+
+snBgp4AsPathFilterEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4AsPathFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 As-path Filter table."
+        INDEX   { snBgp4AsPathFilterIndex }
+        ::= { snBgp4AsPathFilterTable 1 }
+
+SnBgp4AsPathFilterEntry ::= SEQUENCE {
+        snBgp4AsPathFilterIndex
+                INTEGER,
+        snBgp4AsPathFilterAction              
+                INTEGER,
+        snBgp4AsPathFilterRegExpression
+                OCTET STRING,
+        snBgp4AsPathFilterRowStatus
+                INTEGER
+        }
+
+snBgp4AsPathFilterIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The table index for a filter entry."
+        ::= { snBgp4AsPathFilterEntry 1 }
+
+snBgp4AsPathFilterAction      OBJECT-TYPE
+        SYNTAX  INTEGER { deny(0), permit(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take if the bgp address match
+                with this filter."
+        ::= { snBgp4AsPathFilterEntry 2 }
+
+snBgp4AsPathFilterRegExpression    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..256))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Autonomous system in the filter using a regular expression.
+                Each character of the regular expression string is represented
+                by one octet."
+        ::= { snBgp4AsPathFilterEntry 3 }
+
+snBgp4AsPathFilterRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4AsPathFilterEntry 4 }
+
+
+-- Bgp4 Community Filter table
+
+snBgp4CommunityFilterTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4CommunityFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Community Filter table."
+        ::= { snBgp4CommunityFilter 1 }
+
+snBgp4CommunityFilterEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4CommunityFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Community Filter table."
+        INDEX   { snBgp4CommunityFilterIndex }
+        ::= { snBgp4CommunityFilterTable 1 }
+
+SnBgp4CommunityFilterEntry ::= SEQUENCE {
+        snBgp4CommunityFilterIndex
+                INTEGER,
+        snBgp4CommunityFilterAction              
+                INTEGER,
+        snBgp4CommunityFilterCommNum
+                OCTET STRING,
+        snBgp4CommunityFilterInternet
+                INTEGER,
+        snBgp4CommunityFilterNoAdvertise
+                INTEGER,
+        snBgp4CommunityFilterNoExport
+                INTEGER,
+        snBgp4CommunityFilterRowStatus
+                INTEGER,
+        snBgp4CommunityFilterLocalAs
+                INTEGER
+        }
+
+snBgp4CommunityFilterIndex       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The table index for a filter entry."
+        ::= { snBgp4CommunityFilterEntry 1 }
+
+snBgp4CommunityFilterAction      OBJECT-TYPE
+        SYNTAX  INTEGER { deny(0), permit(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take if the bgp address match
+                with this filter."
+        ::= { snBgp4CommunityFilterEntry 2 }
+
+snBgp4CommunityFilterCommNum    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..80))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A number from 1 to 0xFFFFFFFF. There are 20 of them.  
+                This integer number is represented by 4 OCTETs."
+        ::= { snBgp4CommunityFilterEntry 3 }
+
+snBgp4CommunityFilterInternet OBJECT-TYPE
+        SYNTAX  INTEGER { disabled(0), enabled(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Disabled/Enabled the Internet Community."
+        ::= { snBgp4CommunityFilterEntry 4 }
+
+snBgp4CommunityFilterNoAdvertise OBJECT-TYPE
+        SYNTAX  INTEGER { false(0), true(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Do not advertise this route to any peer (internal or external)."
+        ::= { snBgp4CommunityFilterEntry 5 }
+
+snBgp4CommunityFilterNoExport OBJECT-TYPE
+        SYNTAX  INTEGER { false(0), true(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Do not advertise this route to an EBGP peer."
+        ::= { snBgp4CommunityFilterEntry 6 }
+
+snBgp4CommunityFilterRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4CommunityFilterEntry 7 }
+
+snBgp4CommunityFilterLocalAs OBJECT-TYPE
+        SYNTAX  INTEGER { false(0), true(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Send this route to peers in other sub-autonomous systems within
+                the local confederation. Do not advertise this route to an 
+                external system."
+        ::= { snBgp4CommunityFilterEntry 8 }
+
+-- Bgp4 Neighbor General Configuration Table
+
+snBgp4NeighGenCfgTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighGenCfgEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Neighbor General Configuration table."
+        ::= { snBgp4NeighGenCfg 1 }
+
+snBgp4NeighGenCfgEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighGenCfgEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Community Filter table."
+        INDEX   { snBgp4NeighGenCfgNeighIp }
+        ::= { snBgp4NeighGenCfgTable 1 }
+
+SnBgp4NeighGenCfgEntry ::= SEQUENCE {
+        snBgp4NeighGenCfgNeighIp
+                IpAddress,
+        snBgp4NeighGenCfgAdvertlevel
+                INTEGER,
+        snBgp4NeighGenCfgDefOriginate             
+                INTEGER,
+        snBgp4NeighGenCfgEbgpMultihop
+                INTEGER,
+        snBgp4NeighGenCfgMaxPrefix
+                INTEGER,
+        snBgp4NeighGenCfgNextHopSelf
+                INTEGER,
+        snBgp4NeighGenCfgRemoteAs
+                INTEGER,
+        snBgp4NeighGenCfgSendComm
+                INTEGER,
+        snBgp4NeighGenCfgWeight
+                INTEGER,
+        snBgp4NeighGenCfgWeightFilterList             
+                OCTET STRING,
+        snBgp4NeighGenCfgRowStatus
+                INTEGER,
+        snBgp4NeighGenCfgUpdateSrcLpbIntf
+                INTEGER,
+        snBgp4NeighGenCfgRouteRefClient
+                INTEGER,
+        snBgp4NeighGenCfgRemovePrivateAs
+                INTEGER,
+        snBgp4NeighGenCfgEbgpMultihopTtl
+                INTEGER,
+        snBgp4NeighGenCfgShutdown
+                INTEGER,
+        snBgp4NeighGenCfgKeepAliveTime
+                INTEGER,
+        snBgp4NeighGenCfgHoldTime
+                INTEGER
+        }
+
+snBgp4NeighGenCfgNeighIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry."
+        ::= { snBgp4NeighGenCfgEntry 1 }
+
+snBgp4NeighGenCfgAdvertlevel   OBJECT-TYPE
+        SYNTAX  INTEGER (0..600) 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "To set the minimum interval between the 
+                sending of BGP routing updates."
+        ::= { snBgp4NeighGenCfgEntry 2 }
+
+snBgp4NeighGenCfgDefOriginate OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To enable/disable the default originate for this neighbor."
+        ::= { snBgp4NeighGenCfgEntry 3 }
+
+snBgp4NeighGenCfgEbgpMultihop    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To enable/disable the EBGP Muitihop for this neighbor."
+        ::= { snBgp4NeighGenCfgEntry 4 }
+
+snBgp4NeighGenCfgMaxPrefix    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To control how many prefixes can be received from a neighbor.
+       The minimum value of the maximum prefix is snBgp4GenNeighPrefixMinValue.
+       The maximum value of the maximum prefix is snBgp4GenOperRoutes."
+        ::= { snBgp4NeighGenCfgEntry 5 }
+
+snBgp4NeighGenCfgNextHopSelf    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To enable/disable the next-hop processing of BGP updates on the router."
+        ::= { snBgp4NeighGenCfgEntry 6 }
+
+snBgp4NeighGenCfgRemoteAs    OBJECT-TYPE
+    SYNTAX   INTEGER (1..65535)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To specify a neighbor with an autonomous system number(AS)."
+        ::= { snBgp4NeighGenCfgEntry 7 }
+
+snBgp4NeighGenCfgSendComm    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To specify that a COMMUNITES attribute should be sent to a BGP neighbor."
+        ::= { snBgp4NeighGenCfgEntry 8 }
+
+snBgp4NeighGenCfgWeight    OBJECT-TYPE
+    SYNTAX   INTEGER (0..65535)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To assign a weight to a neighbor connection."
+        ::= { snBgp4NeighGenCfgEntry 9 }
+
+snBgp4NeighGenCfgWeightFilterList OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+           "A number from 1 to 0xFFFF. There are 16 of them. 
+                This integer number is represented by 2 OCTETs."
+        ::= { snBgp4NeighGenCfgEntry 10 }
+
+snBgp4NeighGenCfgRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5),
+                applyDefault(6)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+         applyDefault(6)...apply default value to an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4NeighGenCfgEntry 11 }
+
+snBgp4NeighGenCfgUpdateSrcLpbIntf    OBJECT-TYPE
+    SYNTAX   INTEGER (0..8)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To allow internal BGP sessions to use any operational 
+       loopback interface (1..8) for TCP connections.  Zero
+       interface means to restore the interface assignment to the 
+       closest interface, which is called the best local address."
+        ::= { snBgp4NeighGenCfgEntry 12 }
+
+
+snBgp4NeighGenCfgRouteRefClient    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To configure the router as a BGP route reflector,
+       enable the specified neighbor as its client.
+           When all the clients are disabled, the local router
+           is no longer a route reflector."
+        ::= { snBgp4NeighGenCfgEntry 13 }
+
+snBgp4NeighGenCfgRemovePrivateAs    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To enable/disable filtering private AS number."
+        ::= { snBgp4NeighGenCfgEntry 14 }
+
+snBgp4NeighGenCfgEbgpMultihopTtl    OBJECT-TYPE
+    SYNTAX   INTEGER (0..255)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "The EBGP Muitihop TTL for this neighbor."
+        ::= { snBgp4NeighGenCfgEntry 15 }
+
+snBgp4NeighGenCfgShutdown    OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To enable/disable BGP4 Nbr Shutdown."
+        ::= { snBgp4NeighGenCfgEntry 16 }
+
+snBgp4NeighGenCfgKeepAliveTime OBJECT-TYPE
+         SYNTAX   INTEGER (0..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The Keep alive timer."
+        ::= { snBgp4NeighGenCfgEntry 17 }
+
+snBgp4NeighGenCfgHoldTime OBJECT-TYPE
+         SYNTAX   INTEGER (0..65535)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The Hold time timer."
+        ::= { snBgp4NeighGenCfgEntry 18 }
+
+
+-- Bgp4 Neighbor Distribute Group Table
+
+snBgp4NeighDistGroupTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighDistGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Neighbor Distribute Group table."
+        ::= { snBgp4NeighDistGroup 1 }
+
+snBgp4NeighDistGroupEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighDistGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Distribute Group table."
+        INDEX   { snBgp4NeighDistGroupNeighIp, snBgp4NeighDistGroupDir }
+        ::= { snBgp4NeighDistGroupTable 1 }
+
+SnBgp4NeighDistGroupEntry ::= SEQUENCE {
+        snBgp4NeighDistGroupNeighIp
+                IpAddress,
+        snBgp4NeighDistGroupDir
+                INTEGER,
+        snBgp4NeighDistGroupAccessList             
+                OCTET STRING,
+        snBgp4NeighDistGroupRowStatus
+                INTEGER
+        }
+
+snBgp4NeighDistGroupNeighIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry."
+        ::= { snBgp4NeighDistGroupEntry 1 }
+
+snBgp4NeighDistGroupDir   OBJECT-TYPE
+        SYNTAX  INTEGER { out(0), in(1) } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The incoming/outgoing advertisements to which 
+                the access list is applied."
+        ::= { snBgp4NeighDistGroupEntry 2 }
+
+snBgp4NeighDistGroupAccessList OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+           "A number from 1 to 0xFFFF. There are 16 of them.  
+                This integer number is represented by 2 OCTETs."
+        ::= { snBgp4NeighDistGroupEntry 3 }
+
+snBgp4NeighDistGroupRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4NeighDistGroupEntry 4 }
+
+-- Bgp4 Neighbor Filter Group Table
+
+snBgp4NeighFilterGroupTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighFilterGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Neighbor Filter Group table."
+        ::= { snBgp4NeighFilterGroup 1 }
+
+snBgp4NeighFilterGroupEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighFilterGroupEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Neighbor Filter Group table."
+        INDEX   { snBgp4NeighFilterGroupNeighIp, snBgp4NeighFilterGroupDir }
+        ::= { snBgp4NeighFilterGroupTable 1 }
+
+SnBgp4NeighFilterGroupEntry ::= SEQUENCE {
+        snBgp4NeighFilterGroupNeighIp
+                IpAddress,
+        snBgp4NeighFilterGroupDir
+                INTEGER,
+        snBgp4NeighFilterGroupAccessList             
+                OCTET STRING,
+        snBgp4NeighFilterGroupRowStatus
+                INTEGER
+        }
+
+snBgp4NeighFilterGroupNeighIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry."
+        ::= { snBgp4NeighFilterGroupEntry 1 }
+
+snBgp4NeighFilterGroupDir   OBJECT-TYPE
+        SYNTAX  INTEGER { out(0), in(1) } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The incoming/outgoing advertisements to which 
+                the access list is applied."
+        ::= { snBgp4NeighFilterGroupEntry 2 }
+
+snBgp4NeighFilterGroupAccessList OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+           "A number from 1 to 0xFFFF. There are 16 of them.  
+                This integer number is represented by 2 OCTETs."
+        ::= { snBgp4NeighFilterGroupEntry 3 }
+
+snBgp4NeighFilterGroupRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4NeighFilterGroupEntry 4 }
+
+
+-- Bgp4 Neighbor Route Map Table
+
+snBgp4NeighRouteMapTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighRouteMapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Neighbor Route Map table."
+        ::= { snBgp4NeighRouteMap 1 }
+
+snBgp4NeighRouteMapEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighRouteMapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Route Map table."
+        INDEX   { snBgp4NeighRouteMapNeighIp, snBgp4NeighRouteMapDir }
+        ::= { snBgp4NeighRouteMapTable 1 }
+
+SnBgp4NeighRouteMapEntry ::= SEQUENCE {
+        snBgp4NeighRouteMapNeighIp
+                IpAddress,
+        snBgp4NeighRouteMapDir
+                INTEGER,
+        snBgp4NeighRouteMapMapName             
+                OCTET STRING,
+        snBgp4NeighRouteMapRowStatus
+                INTEGER
+        }
+
+snBgp4NeighRouteMapNeighIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry."
+        ::= { snBgp4NeighRouteMapEntry 1 }
+
+snBgp4NeighRouteMapDir   OBJECT-TYPE
+        SYNTAX  INTEGER { out(0), in(1) } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The incoming/outgoing advertisements to which 
+                the access list is applied."
+        ::= { snBgp4NeighRouteMapEntry 2 }
+
+snBgp4NeighRouteMapMapName OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "An octet string of the route-map name, Each character of the name
+        is represented by one octet."
+        ::= { snBgp4NeighRouteMapEntry 3 }
+
+snBgp4NeighRouteMapRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4NeighRouteMapEntry 4 }
+
+
+-- Bgp4 Network Table
+
+snBgp4NetworkTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NetworkEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Network Weight table."
+        ::= { snBgp4Network 1 }
+
+snBgp4NetworkEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NetworkEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Network Weight table."
+        INDEX   { snBgp4NetworkIp, snBgp4NetworkSubnetMask }
+        ::= { snBgp4NetworkTable 1 }
+
+SnBgp4NetworkEntry ::= SEQUENCE {
+        snBgp4NetworkIp
+                IpAddress,
+        snBgp4NetworkSubnetMask             
+                IpAddress,
+        snBgp4NetworkWeight
+                INTEGER,
+        snBgp4NetworkBackdoor
+                INTEGER,
+        snBgp4NetworkRowStatus
+                INTEGER
+        }
+
+snBgp4NetworkIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a network entry."
+        ::= { snBgp4NetworkEntry 1 }
+
+snBgp4NetworkSubnetMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The subnet mask for a network entry."
+        ::= { snBgp4NetworkEntry 2 }
+
+snBgp4NetworkWeight    OBJECT-TYPE
+    SYNTAX   INTEGER  (0..65535)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To assign a weight to a neighbor connection."
+        ::= { snBgp4NetworkEntry 3 }
+
+snBgp4NetworkBackdoor   OBJECT-TYPE
+        SYNTAX  INTEGER { disabled (0), enabled (1) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+       "To enable/disable the backdoor for this network."
+        ::= { snBgp4NetworkEntry 4 }
+
+snBgp4NetworkRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+            modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4NetworkEntry 5 }
+
+--  BGP4 Redistribution of Routes Table
+
+
+         snBgp4RedisTable OBJECT-TYPE
+         SYNTAX   SEQUENCE OF SnBgp4RedisEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The BGP4 Redistribution contains configurations
+            that could be imported into the BGP4 domain."
+         ::= { snBgp4Redis 1 }
+
+     snBgp4RedisEntry OBJECT-TYPE
+         SYNTAX   SnBgp4RedisEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The BGP4 Redistribution Entry specifies a particular RIP 
+            or , OSPF, or Static route to be imported into the BGP4 domain."
+         INDEX { snBgp4RedisProtocol }
+         ::= { snBgp4RedisTable 1 }
+
+     SnBgp4RedisEntry ::=
+         SEQUENCE {
+             snBgp4RedisProtocol
+                 INTEGER,
+                 snBgp4RedisMetric
+                             INTEGER,
+                 snBgp4RedisRouteMap
+                             OCTET STRING,
+                 snBgp4RedisWeight
+                 INTEGER,
+             snBgp4RedisMatchInternal
+                 INTEGER,
+             snBgp4RedisMatchExternal1
+                 INTEGER,
+             snBgp4RedisMatchExternal2
+                 INTEGER,
+             snBgp4RedisRowStatus
+                 INTEGER
+         }
+
+
+    snBgp4RedisProtocol OBJECT-TYPE
+         SYNTAX   INTEGER {
+                    rip(1),
+                    ospf(2),
+                    static(3),
+                    connected(4)
+                                  }
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The imported configuration into BGP4 domain is set in the following: 
+                rip(1):         - the RIP.
+                ospf(2):        - the OSPF.
+                static(3):      - the static.
+                connected(4):   - the connected."
+         ::= { snBgp4RedisEntry 1 }
+
+        snBgp4RedisMetric OBJECT-TYPE
+         SYNTAX   INTEGER
+         ACCESS   read-write
+         STATUS   mandatory 
+         DESCRIPTION
+            "The metric of using the specified protocol Metric value."
+         ::= { snBgp4RedisEntry 2 }
+
+
+        snBgp4RedisRouteMap OBJECT-TYPE
+                 SYNTAX  OCTET STRING (SIZE(0..32)) 
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "An octet string of the route-map name, each character of the name
+            is represented by one octet."
+         ::= { snBgp4RedisEntry 3 }
+
+    snBgp4RedisWeight OBJECT-TYPE
+         SYNTAX   INTEGER (0..65535)
+         ACCESS   read-write
+         STATUS   mandatory 
+         DESCRIPTION
+            "To assign a weight for the specified protocol."
+         ::= { snBgp4RedisEntry 4 }
+
+    snBgp4RedisMatchInternal OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory 
+         DESCRIPTION
+            "This object is only applicable to the OSPF protocol."
+         ::= { snBgp4RedisEntry 5 }
+
+    snBgp4RedisMatchExternal1 OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory 
+         DESCRIPTION
+            "This object is only applicable to the OSPF protocol."
+         ::= { snBgp4RedisEntry 6 }
+
+    snBgp4RedisMatchExternal2 OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory 
+         DESCRIPTION
+            "This object is only applicable to the OSPF protocol."
+         ::= { snBgp4RedisEntry 7 }
+
+        snBgp4RedisRowStatus   OBJECT-TYPE
+                 SYNTAX  INTEGER {
+                invalid(1),
+                valid(2),
+                delete(3),
+                create(4),
+                modify(5)
+                 }
+                 ACCESS  read-write
+                 STATUS  mandatory
+                 DESCRIPTION
+                        "This object is used to create and
+                        delete row in the table and control
+                        if they are used. The values
+                        that can be written are:
+                        delete(3)...deletes the row
+                        create(4)...creates a new row
+                        modify(5)...modifies an exsisting row
+
+                        If the row exists, then a SET with
+                        value of create(4) returns error
+                        'badValue'. Deleted rows go away
+                        immediately. The following values
+                        can be returned on reads:
+                        noSuch(0)...no such row
+                        invalid(1)...Setting it to 'invalid' has the effect of
+                                         rendering it inoperative..
+                        valid(2)....the row exists and is valid"
+                 ::= { snBgp4RedisEntry 8 }
+
+-- Bgp4 Route Map Filter table
+
+snBgp4RouteMapFilterTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4RouteMapFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 RouteMap Filter table."
+        ::= { snBgp4RouteMapFilter 1 }
+
+snBgp4RouteMapFilterEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4RouteMapFilterEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 RouteMap Filter table."
+        INDEX   { snBgp4RouteMapFilterMapName, snBgp4RouteMapFilterSequenceNum}
+        ::= { snBgp4RouteMapFilterTable 1 }
+
+SnBgp4RouteMapFilterEntry ::= SEQUENCE {
+        snBgp4RouteMapFilterMapName
+                OCTET STRING,
+        snBgp4RouteMapFilterSequenceNum
+                INTEGER,
+        snBgp4RouteMapFilterAction              
+                INTEGER,
+        snBgp4RouteMapFilterRowStatus
+                INTEGER
+        }
+
+snBgp4RouteMapFilterMapName    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "An octet string of the route-map name, each character of the name
+         is represented by one octet."
+        ::= { snBgp4RouteMapFilterEntry 1 }
+
+snBgp4RouteMapFilterSequenceNum OBJECT-TYPE
+    SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A sequence number for this particular route-map."
+        ::= { snBgp4RouteMapFilterEntry 2 }
+
+snBgp4RouteMapFilterAction      OBJECT-TYPE
+        SYNTAX  INTEGER { deny(0), permit(1) } 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take if the bgp address match
+                with this filter."
+        ::= { snBgp4RouteMapFilterEntry 3 }
+
+snBgp4RouteMapFilterRowStatus   OBJECT-TYPE
+        SYNTAX   INTEGER {
+            invalid(1),
+            valid(2),
+            delete(3),
+            create(4),
+                modify(5)
+        }
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used to create and
+         delete row in the table and control
+         if they are used. The values
+         that can be written are:
+         delete(3)...deletes the row
+         create(4)...creates a new row
+         modify(5)...modifies an exsisting row
+
+         If the row exists, then a SET with
+         value of create(4) returns error
+         'badValue'. Deleted rows go away
+         immediately. The following values
+         can be returned on reads:
+         noSuch(0)...no such row
+         invalid(1)...Setting it to 'invalid' has the effect of
+                      rendering it inoperative..
+         valid(2)....the row exists and is valid"
+        ::= { snBgp4RouteMapFilterEntry 4 }
+
+
+--  BGP4 Route Map Match Configuration Table
+
+
+snBgp4RouteMapMatchTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4RouteMapMatchEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Route Map Set table."
+        ::= { snBgp4RouteMapMatch 1 }
+
+snBgp4RouteMapMatchEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4RouteMapMatchEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Route Map Match table."
+        INDEX   { snBgp4RouteMapMatchMapName, snBgp4RouteMapMatchSequenceNum }
+        ::= { snBgp4RouteMapMatchTable 1 }
+
+SnBgp4RouteMapMatchEntry ::= SEQUENCE {
+        snBgp4RouteMapMatchMapName
+                OCTET STRING,
+        snBgp4RouteMapMatchSequenceNum
+                INTEGER,
+        snBgp4RouteMapMatchAsPathFilter
+                OCTET STRING,
+        snBgp4RouteMapMatchCommunityFilter
+                OCTET STRING,
+        snBgp4RouteMapMatchAddressFilter
+                OCTET STRING,
+        snBgp4RouteMapMatchMetric              
+                INTEGER,
+        snBgp4RouteMapMatchNextHopList
+                OCTET STRING,
+        snBgp4RouteMapMatchRouteType              
+                INTEGER,
+        snBgp4RouteMapMatchTagList
+                OCTET STRING,
+        snBgp4RouteMapMatchRowMask
+                INTEGER
+        }
+
+snBgp4RouteMapMatchMapName    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "An octet string of the route-map name, each character of the name
+         is represented by one octet."
+        ::= { snBgp4RouteMapMatchEntry 1 }
+
+snBgp4RouteMapMatchSequenceNum OBJECT-TYPE
+    SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A sequence number for this particular route-map."
+        ::= { snBgp4RouteMapMatchEntry 2 }
+
+snBgp4RouteMapMatchAsPathFilter OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..20)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+                "A number from 1 to 0xFFFF and there are 10 of 2 OCTETs. 
+                This integer number is represented by 2 OCTETs.
+        To match a BGP autonomous system path access list."
+    ::= { snBgp4RouteMapMatchEntry 3 }
+
+snBgp4RouteMapMatchCommunityFilter OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..20)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+                "A number from 1 to 0xFFFF and there are 10 of 2 OCTETs. 
+                This integer number is represented by 2 OCTETs.
+        To match a BGP community access list."
+    ::= { snBgp4RouteMapMatchEntry 4 }
+
+snBgp4RouteMapMatchAddressFilter OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..20)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+                "A number from 1 to 0xFFFF and there are 10 of 2 OCTETs. 
+                This integer number is represented by 2 OCTETs.
+        To match a BGP address access list."
+    ::= { snBgp4RouteMapMatchEntry 5 }
+
+snBgp4RouteMapMatchMetric OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To match a metric for BGP routes."
+    ::= { snBgp4RouteMapMatchEntry 6 }
+
+snBgp4RouteMapMatchNextHopList OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+                "A number from 1 to 0xFFFF and there are 16 of 2 OCTETs. 
+                This integer number is represented by 2 OCTETs.
+        To match a BGP next-hop access list."
+    ::= { snBgp4RouteMapMatchEntry 7 }
+
+snBgp4RouteMapMatchRouteType OBJECT-TYPE
+    SYNTAX   INTEGER {
+                        none(0), 
+                        external(1), 
+                        externalType1(2), 
+                        externalType2(3), 
+                        internal(4), 
+                        local(5) 
+                        }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To match a route-type. 
+        Currently only externalType1(2), 
+        externalType2(3), internal(4) is supported for SNMP-SET."
+    ::= { snBgp4RouteMapMatchEntry 8 }
+
+snBgp4RouteMapMatchTagList OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To match a BGP tag access list."
+    ::= { snBgp4RouteMapMatchEntry 9 }
+
+snBgp4RouteMapMatchRowMask   OBJECT-TYPE
+        SYNTAX   INTEGER 
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used together with above
+         MIBs in the same VARBIND to set and
+         reset any MIBs in the table.
+         The bit number is referred to the 
+         snBgp4RouteMapMatchEntry number
+         of each row in the table.
+         The bit is ON  - means set,
+         The bit is OFF - means reset"
+        ::= { snBgp4RouteMapMatchEntry 10 }
+
+
+--  BGP4 Route Map Set Configuration Table
+
+snBgp4RouteMapSetTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4RouteMapSetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Route Map Set table."
+        ::= { snBgp4RouteMapSet 1 }
+
+snBgp4RouteMapSetEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4RouteMapSetEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Route Map Set table."
+        INDEX   { snBgp4RouteMapSetMapName, snBgp4RouteMapSetSequenceNum }
+        ::= { snBgp4RouteMapSetTable 1 }
+
+SnBgp4RouteMapSetEntry ::= SEQUENCE {
+        snBgp4RouteMapSetMapName
+                OCTET STRING,
+        snBgp4RouteMapSetSequenceNum              
+                INTEGER,
+        snBgp4RouteMapSetAsPathType              
+                INTEGER,
+        snBgp4RouteMapSetAsPathString
+                OCTET STRING,
+        snBgp4RouteMapSetAutoTag              
+                INTEGER,
+        snBgp4RouteMapSetCommunityType              
+                INTEGER,
+        snBgp4RouteMapSetCommunityNum              
+                INTEGER,
+        snBgp4RouteMapSetCommunityAdditive              
+                INTEGER,
+        snBgp4RouteMapSetLocalPreference              
+                INTEGER,
+        snBgp4RouteMapSetMetric              
+                INTEGER,
+        snBgp4RouteMapSetNextHop              
+                IpAddress,
+        snBgp4RouteMapSetOrigin              
+                INTEGER,
+        snBgp4RouteMapSetTag              
+                INTEGER,
+        snBgp4RouteMapSetWeight              
+                INTEGER,
+        snBgp4RouteMapSetRowMask
+                INTEGER,
+        snBgp4RouteMapSetCommunityNums              
+                OCTET STRING
+        }
+
+snBgp4RouteMapSetMapName    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "An octet string of the route-map name, each character of the name
+         is represented by one octet."
+        ::= { snBgp4RouteMapSetEntry 1 }
+
+snBgp4RouteMapSetSequenceNum OBJECT-TYPE
+    SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A sequence number for this particular route-map."
+        ::= { snBgp4RouteMapSetEntry 2 }
+
+snBgp4RouteMapSetAsPathType OBJECT-TYPE
+    SYNTAX   INTEGER { tag(0), prepend(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To modify an autonomous system path for BGP routes. 
+        tag(0) - Converts the tag of a route into an autonomous system path.
+        prepend(1) - Appends the string from snBgp4RouteMapSetAsPathString to the 
+                     as-path of the route that is matched by the route map."
+    ::= { snBgp4RouteMapSetEntry 3 }
+
+snBgp4RouteMapSetAsPathString OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..32)) 
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "as-path string. This string is used if only if the snBgp4RouteMapSetAsPathCmd
+                was sent together with the value set to prepend(1)."
+    ::= { snBgp4RouteMapSetEntry 4 }
+
+snBgp4RouteMapSetAutoTag OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To enable/disable the automatic-tag for BGP routes."
+    ::= { snBgp4RouteMapSetEntry 5 }
+
+snBgp4RouteMapSetCommunityType OBJECT-TYPE
+    SYNTAX   INTEGER { nums(0), none(3)}
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To set the BGP COMMUNITIES attribute. none means no other
+         community attributes are allowed, nums means allowing community
+         attributesi, the old values 1 and 2 are not valid since 5.03.00"
+    ::= { snBgp4RouteMapSetEntry 6 }
+
+snBgp4RouteMapSetCommunityNum OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   deprecated
+    DESCRIPTION
+        "community-number. This number is used if only if the snBgp4RouteMapSetCommunityCmd
+                was sent together with the value set to number(0)."
+    ::= { snBgp4RouteMapSetEntry 7 }
+
+snBgp4RouteMapSetCommunityAdditive OBJECT-TYPE
+    SYNTAX   INTEGER { disabled(0), enabled(1) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To add the community to the already existing communities." 
+    ::= { snBgp4RouteMapSetEntry 8 }
+
+snBgp4RouteMapSetLocalPreference OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To modify a local-preference for BGP routes."
+    ::= { snBgp4RouteMapSetEntry 9 }
+
+snBgp4RouteMapSetMetric OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To modify a metric for BGP routes."
+    ::= { snBgp4RouteMapSetEntry 10 }
+
+snBgp4RouteMapSetNextHop OBJECT-TYPE
+    SYNTAX   IpAddress
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To modify the IP address of the next hop for BGP routes."
+    ::= { snBgp4RouteMapSetEntry 11 }
+
+snBgp4RouteMapSetOrigin OBJECT-TYPE
+    SYNTAX   INTEGER { igp(0), egp(1), incomplete(2) }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To set the BGP origin code."
+    ::= { snBgp4RouteMapSetEntry 12 }
+
+snBgp4RouteMapSetTag OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To specify the tag for BGP routes."
+    ::= { snBgp4RouteMapSetEntry 13 }
+
+snBgp4RouteMapSetWeight OBJECT-TYPE
+    SYNTAX   INTEGER (0..65535)
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+        "To specify the BGP weight for the routing table."
+    ::= { snBgp4RouteMapSetEntry 14 }
+
+snBgp4RouteMapSetRowMask   OBJECT-TYPE
+        SYNTAX   INTEGER 
+        ACCESS   read-write
+        STATUS   mandatory
+        DESCRIPTION
+        "This object is used together with above
+         MIBs in the same VARBIND to set and
+         reset any MIBs in the table.
+         The bit number is referred to the 
+         snBgp4RouteMapSetEntry number
+         of each row in the table. 
+         The bit is ON  - means set,
+         The bit is OFF - means reset"
+        ::= { snBgp4RouteMapSetEntry 15 }
+
+snBgp4RouteMapSetCommunityNums OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..24))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Community number is from 1 to 0xFFFFFFFF. There are 6 of them.  
+                This integer number is represented by 4 OCTETs."
+    ::= { snBgp4RouteMapSetEntry 16 }
+
+-- Bgp4 Neighbor Operational Status Table
+
+snBgp4NeighOperStatusTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighOperStatusEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Neighbor Operational Status table."
+        ::= { snBgp4NeighOperStatus 1 }
+
+snBgp4NeighOperStatusEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighOperStatusEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Operational Status table."
+        INDEX   { snBgp4NeighOperStatusIndex }
+        ::= { snBgp4NeighOperStatusTable 1 }
+
+SnBgp4NeighOperStatusEntry ::= SEQUENCE {
+        snBgp4NeighOperStatusIndex
+                INTEGER,
+        snBgp4NeighOperStatusIp
+                IpAddress,
+        snBgp4NeighOperStatusRemoteAs
+                INTEGER,
+        snBgp4NeighOperStatusBgpType
+                INTEGER,
+        snBgp4NeighOperStatusState
+                INTEGER,
+        snBgp4NeighOperStatusKeepAliveTime
+                INTEGER,
+        snBgp4NeighOperStatusHoldTime
+                INTEGER,
+        snBgp4NeighOperStatusAdvertlevel
+                INTEGER,
+        snBgp4NeighOperStatusKeepAliveTxCounts             
+                Counter,
+        snBgp4NeighOperStatusKeepAliveRxCounts             
+                Counter,
+        snBgp4NeighOperStatusUpdateTxCounts             
+                Counter,
+        snBgp4NeighOperStatusUpdateRxCounts             
+                Counter,
+        snBgp4NeighOperStatusNotifTxCounts
+                Counter,
+        snBgp4NeighOperStatusNotifRxCounts
+                Counter,
+        snBgp4NeighOperStatusOpenTxCounts
+                Counter,
+        snBgp4NeighOperStatusOpenRxCounts
+                Counter
+        }
+
+snBgp4NeighOperStatusIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index for a neighbor entry." 
+        ::= { snBgp4NeighOperStatusEntry 1 }
+
+snBgp4NeighOperStatusIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry."
+        ::= { snBgp4NeighOperStatusEntry 2 }
+
+snBgp4NeighOperStatusRemoteAs    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show a neighbor with an autonomous system number(AS)."
+        ::= { snBgp4NeighOperStatusEntry 3 }
+
+snBgp4NeighOperStatusBgpType    OBJECT-TYPE
+    SYNTAX   INTEGER  { ebgp(0), ibgp(1) }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the type of BGP protocol whether is internal or external."
+        ::= { snBgp4NeighOperStatusEntry 4 }
+
+snBgp4NeighOperStatusState    OBJECT-TYPE
+    SYNTAX   INTEGER  { 
+                        noState(0), 
+                        idle(1), 
+                        connect(2), 
+                        active(3), 
+                        openSent(4), 
+                        openConfirm(5), 
+                        established(6) 
+                        }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the state of this neighbor."
+        ::= { snBgp4NeighOperStatusEntry 5 }
+
+snBgp4NeighOperStatusKeepAliveTime OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The Keep alive timer."
+    ::= { snBgp4NeighOperStatusEntry 6 }
+
+snBgp4NeighOperStatusHoldTime OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The Hold time timer."
+    ::= { snBgp4NeighOperStatusEntry 7 }
+
+snBgp4NeighOperStatusAdvertlevel   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "To show the minimum interval between the 
+                sending of BGP routing updates."
+        ::= { snBgp4NeighOperStatusEntry 8 }
+
+snBgp4NeighOperStatusKeepAliveTxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Keep alive message sent counts."
+        ::= { snBgp4NeighOperStatusEntry 9 }
+
+snBgp4NeighOperStatusKeepAliveRxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Keep alive message received counts."
+        ::= { snBgp4NeighOperStatusEntry 10 }
+
+snBgp4NeighOperStatusUpdateTxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Update message sent counts."
+        ::= { snBgp4NeighOperStatusEntry 11 }
+
+snBgp4NeighOperStatusUpdateRxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Update message received counts."
+        ::= { snBgp4NeighOperStatusEntry 12 }
+
+snBgp4NeighOperStatusNotifTxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Notification message sent counts."
+        ::= { snBgp4NeighOperStatusEntry 13 }
+
+snBgp4NeighOperStatusNotifRxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Notification message received counts."
+        ::= { snBgp4NeighOperStatusEntry 14 }
+
+snBgp4NeighOperStatusOpenTxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Open message sent counts."
+        ::= { snBgp4NeighOperStatusEntry 15 }
+
+snBgp4NeighOperStatusOpenRxCounts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "Open message received counts."
+        ::= { snBgp4NeighOperStatusEntry 16 }
+
+-- Bgp4 Routes Operational Status Table
+
+snBgp4RouteOperStatusTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4RouteOperStatusEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Routebor Operational Status table."
+        ::= { snBgp4RouteOperStatus 1 }
+
+snBgp4RouteOperStatusEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4RouteOperStatusEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Operational Status table."
+        INDEX   { snBgp4RouteOperStatusIndex }
+        ::= { snBgp4RouteOperStatusTable 1 }
+
+SnBgp4RouteOperStatusEntry ::= SEQUENCE {
+        snBgp4RouteOperStatusIndex
+                INTEGER,
+        snBgp4RouteOperStatusIp
+                IpAddress,
+        snBgp4RouteOperStatusSubnetMask
+                IpAddress,
+        snBgp4RouteOperStatusNextHop
+                IpAddress,
+        snBgp4RouteOperStatusMetric
+                INTEGER,
+        snBgp4RouteOperStatusLocalPreference
+                INTEGER,
+        snBgp4RouteOperStatusWeight
+                INTEGER,
+        snBgp4RouteOperStatusOrigin
+                INTEGER,
+        snBgp4RouteOperStatusStatus
+                INTEGER,
+        snBgp4RouteOperStatusRouteTag
+                INTEGER,
+        snBgp4RouteOperStatusCommunityList
+                OCTET STRING,
+        snBgp4RouteOperStatusAsPathList
+                OCTET STRING
+        }
+
+snBgp4RouteOperStatusIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index for a route entry." 
+        ::= { snBgp4RouteOperStatusEntry 1 }
+
+snBgp4RouteOperStatusIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a route entry."
+        ::= { snBgp4RouteOperStatusEntry 2 }
+
+snBgp4RouteOperStatusSubnetMask       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Subnet Mask for a route entry."
+        ::= { snBgp4RouteOperStatusEntry 3 }
+
+snBgp4RouteOperStatusNextHop       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The next-hop IP for a route entry."
+        ::= { snBgp4RouteOperStatusEntry 4 }
+
+snBgp4RouteOperStatusMetric    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the metric value of a route entry."
+        ::= { snBgp4RouteOperStatusEntry 5 }
+
+snBgp4RouteOperStatusLocalPreference    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the local preference of a route entry."
+        ::= { snBgp4RouteOperStatusEntry 6 }
+
+snBgp4RouteOperStatusWeight    OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the weight of this route."
+        ::= { snBgp4RouteOperStatusEntry 7 }
+
+snBgp4RouteOperStatusOrigin    OBJECT-TYPE
+    SYNTAX   INTEGER  { 
+                        igp(0), 
+                        egp(1),
+                        incomplete(2)
+                 }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the origin of this route."
+        ::= { snBgp4RouteOperStatusEntry 8 }
+
+snBgp4RouteOperStatusStatus    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "A bit array that contains the status of this route.
+       This is a packed bit string; The following shows the
+       meaning of each bit:
+                (bit 0 is the least significant bit and 0=FALSE, 1=TRUE).
+
+                  bit position   meaning
+                  ------------   -------
+                      6-31   reserved.
+                          5      aggregate.
+                      4      best.
+                      3      internal.
+                      2      local.
+                      1      suppressed.
+                      0      valid."
+        ::= { snBgp4RouteOperStatusEntry 9 }
+
+snBgp4RouteOperStatusRouteTag    OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the route tag of this route."
+        ::= { snBgp4RouteOperStatusEntry 10 }
+
+snBgp4RouteOperStatusCommunityList    OBJECT-TYPE
+    SYNTAX   OCTET STRING 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the community list of this route.
+       If the community list is an NULL string that means an empty list, then
+       the community is INTERNET. A number from 1 to 0xFFFFFFFF.  
+           This integer number is represented by 4 OCTETs.
+       In the community list, it could have some Well-known numbers such as:  
+       BGP_COMMUNITY_ATTRIBUTE_NO_EXPORT                0xFFFFFF01
+           BGP_COMMUNITY_ATTRIBUTE_NO_ADVERTISE         0xFFFFFF02"
+        ::= { snBgp4RouteOperStatusEntry 11 }
+
+
+snBgp4RouteOperStatusAsPathList    OBJECT-TYPE
+    SYNTAX   OCTET STRING 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the AS Path list of this route.
+       A number from 1 to 0xFFFF.  
+           This integer number is represented by 2 OCTETs."
+        ::= { snBgp4RouteOperStatusEntry 12 }
+
+-- Bgp4 Neighbor Summary Table
+
+snBgp4NeighborSummaryTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4NeighborSummaryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Routebor Operational Status table."
+        ::= { snBgp4NeighborSummary 1 }
+
+snBgp4NeighborSummaryEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4NeighborSummaryEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Operational Status table."
+        INDEX   { snBgp4NeighborSummaryIndex }
+        ::= { snBgp4NeighborSummaryTable 1 }
+
+SnBgp4NeighborSummaryEntry ::= SEQUENCE {
+        snBgp4NeighborSummaryIndex
+                INTEGER,
+        snBgp4NeighborSummaryIp
+                IpAddress,
+        snBgp4NeighborSummaryState
+                INTEGER,
+        snBgp4NeighborSummaryStateChgTime
+                INTEGER,
+        snBgp4NeighborSummaryRouteReceived
+                INTEGER,
+        snBgp4NeighborSummaryRouteInstalled
+                INTEGER
+        }
+
+snBgp4NeighborSummaryIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index for a route entry." 
+        ::= { snBgp4NeighborSummaryEntry 1 }
+
+snBgp4NeighborSummaryIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a route entry."
+        ::= { snBgp4NeighborSummaryEntry 2 }
+
+snBgp4NeighborSummaryState    OBJECT-TYPE
+    SYNTAX   INTEGER  { 
+                        noState(0), 
+                        idle(1), 
+                        connect(2), 
+                        active(3), 
+                        openSent(4), 
+                        openConfirm(5), 
+                        established(6) 
+                        }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the state of this neighbor."
+        ::= { snBgp4NeighborSummaryEntry 3 }
+
+snBgp4NeighborSummaryStateChgTime OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The time of a change of the state of this neighbor."
+    ::= { snBgp4NeighborSummaryEntry 4 }
+
+snBgp4NeighborSummaryRouteReceived OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The number of routes received of this neighbor."
+    ::= { snBgp4NeighborSummaryEntry 5 }
+
+snBgp4NeighborSummaryRouteInstalled OBJECT-TYPE
+    SYNTAX   INTEGER 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The number of routes installed of this neighbor."
+    ::= { snBgp4NeighborSummaryEntry 6 }
+
+-- Bgp4 Attribute Entries Table
+
+snBgp4AttributeTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4AttributeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Bgp4 Attribute entries table."
+        ::= { snBgp4Attribute 1 }
+
+snBgp4AttributeEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4AttributeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the Bgp4 Attribute table."
+        INDEX   { snBgp4AttributeIndex }
+        ::= { snBgp4AttributeTable 1 }
+
+SnBgp4AttributeEntry ::= SEQUENCE {
+        snBgp4AttributeIndex
+                INTEGER,
+        snBgp4AttributeNextHop
+                IpAddress,
+        snBgp4AttributeMetric
+                INTEGER,
+        snBgp4AttributeOrigin
+                INTEGER,
+        snBgp4AttributeAggregatorAs
+                INTEGER,
+        snBgp4AttributeRouterId
+                IpAddress,
+        snBgp4AttributeAtomicAggregatePresent
+                INTEGER,
+        snBgp4AttributeLocalPreference
+                INTEGER,
+        snBgp4AttributeCommunityList
+                OCTET STRING,
+        snBgp4AttributeAsPathList
+                OCTET STRING,
+        snBgp4AttributeOriginator
+                IpAddress,
+        snBgp4AttributeClusterList
+                OCTET STRING
+        }
+
+snBgp4AttributeIndex   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index for a route entry." 
+        ::= { snBgp4AttributeEntry 1 }
+
+snBgp4AttributeNextHop       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The next-hop IP for a route entry."
+        ::= { snBgp4AttributeEntry 2 }
+
+snBgp4AttributeMetric    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the metric value of a route entry."
+        ::= { snBgp4AttributeEntry 3 }
+
+snBgp4AttributeOrigin    OBJECT-TYPE
+    SYNTAX   INTEGER  { 
+                        igp(0), 
+                        egp(1),
+                        incomplete(2)
+                 }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the origin of this route."
+        ::= { snBgp4AttributeEntry 4 }
+
+snBgp4AttributeAggregatorAs    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "The aggregator AS number for an attribute entry."
+        ::= { snBgp4AttributeEntry 5 }
+
+snBgp4AttributeRouterId       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The router ID for an attribute entry."
+        ::= { snBgp4AttributeEntry 6 }
+
+snBgp4AttributeAtomicAggregatePresent    OBJECT-TYPE
+    SYNTAX   INTEGER { false(0), true(1) }
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "The atomic aggregate present in an attribute entry."
+        ::= { snBgp4AttributeEntry 7 }
+
+snBgp4AttributeLocalPreference    OBJECT-TYPE
+    SYNTAX   INTEGER
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the local preference of a route entry."
+        ::= { snBgp4AttributeEntry 8 }
+
+snBgp4AttributeCommunityList    OBJECT-TYPE
+    SYNTAX   OCTET STRING 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the community list of this attribute entry.
+       If the community list is an NULL string that means an empty list, then
+       the community is INTERNET. A number from 1 to 0xFFFFFFFF.  
+           This integer number is represented by 4 OCTETs.
+       In the community list, it could have some Well-known numbers such as:  
+       BGP_COMMUNITY_ATTRIBUTE_NO_EXPORT                0xFFFFFF01
+           BGP_COMMUNITY_ATTRIBUTE_NO_ADVERTISE         0xFFFFFF02"
+        ::= { snBgp4AttributeEntry 9 }
+
+
+snBgp4AttributeAsPathList    OBJECT-TYPE
+    SYNTAX   OCTET STRING 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the AS Path list of this attribute entry.
+       A number from 1 to 0xFFFF.  
+           This integer number is represented by 2 OCTETs."
+        ::= { snBgp4AttributeEntry 10 }
+
+snBgp4AttributeOriginator       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The originator IP address for an attribute entry."
+        ::= { snBgp4AttributeEntry 11 }
+
+snBgp4AttributeClusterList    OBJECT-TYPE
+    SYNTAX   OCTET STRING 
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+       "To show the cluster list of this attribute entry.
+       If the cluster list is an NULL string, it means an empty list. 
+       Otherwise, the list is a group of cluster ID which is
+       represented by 4 OCTETs IP address."
+        ::= { snBgp4AttributeEntry 12 }
+
+-- Bgp4 Clear Neighbor Command Table
+
+snBgp4ClearNeighborCmdTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SnBgp4ClearNeighborCmdEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Clear Bgp4 command table."
+        ::= { snBgp4ClearNeighborCmd 1 }
+
+snBgp4ClearNeighborCmdEntry       OBJECT-TYPE
+        SYNTAX  SnBgp4ClearNeighborCmdEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An entry in the clear Bgp4 neighbor command table."
+        INDEX   { snBgp4ClearNeighborCmdIp }
+        ::= { snBgp4ClearNeighborCmdTable 1 }
+
+SnBgp4ClearNeighborCmdEntry ::= SEQUENCE {
+        snBgp4ClearNeighborCmdIp
+                IpAddress,
+        snBgp4ClearNeighborCmdElement
+                INTEGER
+        }
+
+snBgp4ClearNeighborCmdIp       OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP Address for a neighbor entry. 
+                If the IP address is 255.255.255.255, it
+                means for all neighbors."
+        ::= { snBgp4ClearNeighborCmdEntry 1 }
+
+snBgp4ClearNeighborCmdElement    OBJECT-TYPE
+    SYNTAX   INTEGER  { 
+                        valid(0), 
+                        lastPacketWithError(1), 
+                        notificationErrors(2), 
+                        softOutbound(3), 
+                        traffic(4), 
+                        neighbor(5) 
+                        }
+    ACCESS   read-write
+    STATUS   mandatory
+    DESCRIPTION
+       "To send the command element of this neighbor for value(1) to (5)
+        valid(0) is received in SNMP-get."
+        ::= { snBgp4ClearNeighborCmdEntry 2 }
+
+END

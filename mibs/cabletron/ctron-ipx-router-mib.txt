@@ -1,0 +1,4792 @@
+CTRON-IPX-ROUTER-MIB  DEFINITIONS ::= BEGIN
+
+--  ctron-ipx-router-mib.txt
+--  Revision: 1.01.03
+--  Part Number: 2170987
+--  Date: August 11, 1995
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific IPX Routing Services MIB.
+--
+--
+--  This module will be extended as required.
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+
+--  Copyright August 95 Cabletron Systems
+
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString, PhysAddress
+                FROM RFC1213-MIB
+      MacAddress
+                FROM BRIDGE-MIB
+      nwRtrProtoSuites
+                FROM ROUTER-OIDS
+      Counter, TimeTicks, Gauge
+                FROM RFC1155-SMI;
+
+
+--  The IPX Router Group.
+
+nwIpxRouter             OBJECT IDENTIFIER ::= { nwRtrProtoSuites 2 }
+
+nwIpxMibs               OBJECT IDENTIFIER ::= { nwIpxRouter 1 }
+nwIpxComponents         OBJECT IDENTIFIER ::= { nwIpxRouter 2 }
+
+--  IPX Router Component Groups
+
+nwIpxSystem             OBJECT IDENTIFIER ::= { nwIpxComponents 1 }
+nwIpxForwarding         OBJECT IDENTIFIER ::= { nwIpxComponents 2 }
+nwIpxTopology           OBJECT IDENTIFIER ::= { nwIpxComponents 4 }
+nwIpxFib                OBJECT IDENTIFIER ::= { nwIpxComponents 5 }
+nwIpxEndSystems         OBJECT IDENTIFIER ::= { nwIpxComponents 6 }
+nwIpxAccessControl      OBJECT IDENTIFIER ::= { nwIpxComponents 7 }
+nwIpxFilters            OBJECT IDENTIFIER ::= { nwIpxComponents 8 }
+nwIpxRedirector         OBJECT IDENTIFIER ::= { nwIpxComponents 9 }
+nwIpxEvent              OBJECT IDENTIFIER ::= { nwIpxComponents 10 }
+nwIpxWorkGroup          OBJECT IDENTIFIER ::= { nwIpxComponents 11 }
+
+
+--  IPX Router System Groups
+
+nwIpxSysConfig          OBJECT IDENTIFIER ::= { nwIpxSystem 1 }
+nwIpxSysAdministration  OBJECT IDENTIFIER ::= { nwIpxSystem 2 }
+
+--  IPX Router Forwarding Groups
+
+nwIpxFwdSystem          OBJECT IDENTIFIER ::= { nwIpxForwarding 1 }
+nwIpxFwdInterfaces      OBJECT IDENTIFIER ::= { nwIpxForwarding 2 }
+
+nwIpxFwdCounters        OBJECT IDENTIFIER ::= { nwIpxFwdSystem 1 }
+nwIpxFwdIfConfig        OBJECT IDENTIFIER ::= { nwIpxFwdInterfaces 1 }
+nwIpxFwdIfCounters      OBJECT IDENTIFIER ::= { nwIpxFwdInterfaces 2 }
+
+
+--  IPX Router Routing Groups
+
+nwIpxDistanceVector     OBJECT IDENTIFIER ::= { nwIpxTopology 1 }
+nwIpxLinkState          OBJECT IDENTIFIER ::= { nwIpxTopology 2 }
+
+nwIpxRip                OBJECT IDENTIFIER ::= { nwIpxDistanceVector 1 }
+nwIpxSap                OBJECT IDENTIFIER ::= { nwIpxDistanceVector 2 }
+
+nwIpxRipSystem          OBJECT IDENTIFIER ::= { nwIpxRip 1 }
+nwIpxRipInterfaces      OBJECT IDENTIFIER ::= { nwIpxRip 2 }
+nwIpxRipDatabase        OBJECT IDENTIFIER ::= { nwIpxRip 3 }
+nwIpxRipFilters         OBJECT IDENTIFIER ::= { nwIpxRip 4 }
+
+nwIpxRipConfig          OBJECT IDENTIFIER ::= { nwIpxRipSystem 1 }
+nwIpxRipCounters        OBJECT IDENTIFIER ::= { nwIpxRipSystem 2 }
+
+nwIpxRipIfConfig        OBJECT IDENTIFIER ::= { nwIpxRipInterfaces 1 }
+nwIpxRipIfCounters      OBJECT IDENTIFIER ::= { nwIpxRipInterfaces 2 }
+
+nwIpxSapSystem          OBJECT IDENTIFIER ::= { nwIpxSap 1 }
+nwIpxSapInterfaces      OBJECT IDENTIFIER ::= { nwIpxSap 2 }
+nwIpxSapServerTable     OBJECT IDENTIFIER ::= { nwIpxSap 3 }
+nwIpxSapFilters         OBJECT IDENTIFIER ::= { nwIpxSap 4 }
+
+nwIpxSapConfig          OBJECT IDENTIFIER ::= { nwIpxSapSystem 1 }
+nwIpxSapCounters        OBJECT IDENTIFIER ::= { nwIpxSapSystem 2 }
+
+nwIpxSapIfConfig        OBJECT IDENTIFIER ::= { nwIpxSapInterfaces 1 }
+nwIpxSapIfCounters      OBJECT IDENTIFIER ::= { nwIpxSapInterfaces 2 }
+
+nwIpxNlsp               OBJECT IDENTIFIER ::= { nwIpxLinkState 1 }
+
+--  IPX Router Host End Systems Groups
+
+nwIpxHostsSystem        OBJECT IDENTIFIER ::= { nwIpxEndSystems 1 }
+nwIpxHostsInterfaces    OBJECT IDENTIFIER ::= { nwIpxEndSystems 2 }
+nwIpxHostsToMedia        OBJECT IDENTIFIER ::= { nwIpxEndSystems 3 }
+
+--  IPX Router Access Control Group
+
+--  IPX Router Redirector Group
+
+nwIpxNetBIOS        OBJECT IDENTIFIER ::= { nwIpxRedirector 1 }
+nwIpxBroadcast        OBJECT IDENTIFIER ::= { nwIpxRedirector 2 }
+nwIpxEcho            OBJECT IDENTIFIER ::= { nwIpxRedirector 3 }
+
+nwIpxNetBIOSSystem    OBJECT IDENTIFIER ::= { nwIpxNetBIOS 1 }
+nwIpxNetBIOSInterface    OBJECT IDENTIFIER ::= { nwIpxNetBIOS 2 }
+
+nwIpxNetBIOSConfig    OBJECT IDENTIFIER ::= { nwIpxNetBIOSSystem 1 }
+nwIpxNetBIOSCounters      OBJECT IDENTIFIER ::= { nwIpxNetBIOSSystem 2 }
+
+nwIpxNetBIOSIfConfig    OBJECT IDENTIFIER ::= { nwIpxNetBIOSInterface 1}
+nwIpxNetBIOSIfCounters  OBJECT IDENTIFIER ::= { nwIpxNetBIOSInterface 2}
+
+nwIpxBroadcastSystem    OBJECT IDENTIFIER ::= { nwIpxBroadcast 1 }
+nwIpxBroadcastInterface OBJECT IDENTIFIER ::= { nwIpxBroadcast 2 }
+
+nwIpxBroadcastConfig    OBJECT IDENTIFIER ::= { nwIpxBroadcastSystem 1 }
+nwIpxBroadcastCounters    OBJECT IDENTIFIER ::= { nwIpxBroadcastSystem 2 }
+
+nwIpxBroadcastIfConfig        OBJECT IDENTIFIER ::= { nwIpxBroadcastInterface 1 }
+nwIpxBroadcastIfCounters    OBJECT IDENTIFIER ::= { nwIpxBroadcastInterface 2 }
+
+nwIpxEchoSystem        OBJECT IDENTIFIER ::= { nwIpxEcho 1 }
+nwIpxEchoInterface    OBJECT IDENTIFIER ::= { nwIpxEcho 2 }
+
+nwIpxEchoConfig        OBJECT IDENTIFIER ::= { nwIpxEchoSystem 1 }
+nwIpxEchoCounters    OBJECT IDENTIFIER ::= { nwIpxEchoSystem 2 }
+
+nwIpxEchoIfConfig    OBJECT IDENTIFIER ::= { nwIpxEchoInterface 1 }
+nwIpxEchoIfCounters    OBJECT IDENTIFIER ::= { nwIpxEchoInterface 2 }
+
+--  IPX Router Event Log Group
+
+nwIpxEventLogConfig           OBJECT IDENTIFIER ::= { nwIpxEvent 1 }
+nwIpxEventLogFilterTable      OBJECT IDENTIFIER ::= { nwIpxEvent 2 }
+nwIpxEventLogTable            OBJECT IDENTIFIER ::= { nwIpxEvent 3 }
+
+
+--  IPX Router Work-Group Group
+
+IpxAddress ::= OCTET STRING
+-- MacAddress ::= OCTET STRING (SIZE (6))
+
+
+--  IPX MIB Group
+--  This group contains information about the revision level of this
+--  MIB within the device.  It allows verification of the released
+--  version without having to read other objects.
+
+nwIpxMibRevText OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the IPX MIB in textual 
+        format."
+    ::= { nwIpxMibs 1 }
+
+
+--  IPX Router System Group
+--  This group contains the objects related to the IPX Router at a
+--  global device-wide level.
+
+--  IPX System Configuration Group
+--  This group contains the objects that pertain to the setup and
+--  configuration of the IPX routing services at a global,
+--  device-wide level.
+
+nwIpxSysRouterId   OBJECT-TYPE
+    SYNTAX  IpxAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IPX Address used to uniquely identify the host (device) running
+        IPX Routing Services. The value of nwIpxSysRouterId is equal to the
+        highest IPX address assigned in the IPX Address Table."
+    ::= { nwIpxSysConfig 1 }
+
+--  IPX System Administration Group
+--  This group contains the objects that pertain to the administration of
+--  IPX routing services at a global, device-wide level.
+
+nwIpxSysAdminStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Sets the administrative state of IPX Routing Services system-wide.
+        Enabled (3) causes IPX Routing Services to become active on all router
+        ports configured and enabled for IPX Routing Services. Disabled (2)
+        causes IPX routing services to become inactive system-wide."
+    DEFVAL { disabled }    
+    ::= { nwIpxSysAdministration 1 }
+
+nwIpxSysOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the operating condition of IPX Routing Services system-wide.
+        The value of nwIpxSysOperStatus indicates any problem with your IPX
+        Routing Services configuration. A value of 6 indicates that regardless
+        of the value of nwIpxSysAdminStatus, IPX Routing Services is not
+        operating because of an invalid configuration."
+    ::= { nwIpxSysAdministration 2 }
+
+nwIpxSysAdminReset      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Resets IPX Routing Services system-wide. Reset (2) forces a restart
+        of IPX Routing Services without a graceful shutdown on any active
+        router ports and without affecting any other routing services."
+    DEFVAL { other }     
+    ::= { nwIpxSysAdministration 3 }
+
+nwIpxSysOperationalTimel  OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxSysOperStatus has been in its current administrative state."
+    ::= { nwIpxSysAdministration 4 }
+
+nwIpxSysVersion  OBJECT-TYPE
+    SYNTAX  DisplayString 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the IPX Routing Services
+        firmware in textual format."
+    ::= { nwIpxSysAdministration 5 }
+
+
+--  IPX Forwarding Group
+--  This group contains the managed objects used to setup and configure
+--  the IPX router port  for packet forwarding as well as the aggregate
+--  and per-interface IPX packet forwarding counters.
+
+--  IPX System-wide Packet Forwarding Counters
+--  This group contains the aggregate (device-wide) IPX packet forwarding
+--  counters. The byte counters include bytes for the network layer on
+--  up, framing is not included.
+nwIpxFwdCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (system-wide) IPX
+        packet and byte counters. Enabled (3) causes these counters to become
+        active. Disabled (2) causes these counters to become inactive."
+    DEFVAL { enabled }     
+    ::= { nwIpxFwdCounters 1 }
+
+nwIpxFwdCtrReset        OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (system-wide) IPX packet and byte counters.
+        Reset (2) resets the IPX aggregate counters to 0.
+        nwIpxFwdCtrOperationalTime is also reset to 0."
+    DEFVAL { other }      
+    ::= { nwIpxFwdCounters 2 }
+
+nwIpxFwdCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxFwdCtrAdminStatus has been in the current state."
+    ::= { nwIpxFwdCounters 3 }
+
+nwIpxFwdCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been received,
+        system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 4 }
+
+nwIpxFwdCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been transmitted,
+        system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 5 }
+
+nwIpxFwdCtrFwdPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been forwarded,
+        system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 6 }
+
+nwIpxFwdCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been
+        administratively filtered, system-wide, during
+        nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 7 }
+
+nwIpxFwdCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded,
+        system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 8 }
+
+nwIpxFwdCtrAddrErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded,
+        system-wide, during nwIpxFwdCtrOperationalTime, because of addressing
+        errors in the IPX header."
+    ::= { nwIpxFwdCounters 9 }
+
+nwIpxFwdCtrLenErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded,
+        system-wide, during nwIpxFwdCtrOperationalTime, because an invalid
+        packet length is contained in the IPX header."
+    ::= { nwIpxFwdCounters 10 }
+
+nwIpxFwdCtrHdrErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded,
+        system-wide, during nwIpxFwdCtrOperationalTime, because of an invalid
+        IPX header."
+    ::= { nwIpxFwdCounters 11 }
+
+nwIpxFwdCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been received, system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 12 }
+
+nwIpxFwdCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been transmitted, system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 13 }
+
+nwIpxFwdCtrFwdBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been forwarded, system-wide, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 14 }
+nwIpxFwdCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been administratively filtered, system-wide, during
+        nwIpxFwd-CtrOperationalTime."
+     ::= { nwIpxFwdCounters 15 }
+
+nwIpxFwdCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been discarded, system-wide during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 16 }
+
+nwIpxFwdCtrHostInPkts   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been successfully
+        delivered to the local host, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 17 }
+
+nwIpxFwdCtrHostOutPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been transmitted
+        by the local host, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 18 }
+
+nwIpxFwdCtrHostDiscardPkts OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded
+        by the local host, during nwIpxFwdCtrOperationalTime, due to a lack of
+        host resources."
+    ::= { nwIpxFwdCounters 19 }
+
+nwIpxFwdCtrHostInBytes  OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been received by the local host, during nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 20 }
+
+nwIpxFwdCtrHostOutBytes OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been transmitted by the local host, during 
+        nwIpxFwdCtrOperationalTime."
+    ::= { nwIpxFwdCounters 21 }
+
+nwIpxFwdCtrHostDiscardBytes OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been discarded by the local host, during nwIpxFwdCtrOperationalTime 
+        due to a lack of host resources."
+    ::= { nwIpxFwdCounters 22 }
+
+
+--  IPX Forwarding Interface Table
+--  This table contains the managed objects used to set-up and configure
+--  each router port.
+nwIpxFwdIfTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NwIpxFwdIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. This table is
+        indexed by nwIpxFwdIfIndex, which indicates the value of MIB2 
+        ifIndex, which identifies the router port for which the entry exists."
+    ::= { nwIpxFwdIfConfig 1 }
+
+nwIpxFwdIfEntry    OBJECT-TYPE
+    SYNTAX  NwIpxFwdIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Each entry specifies the IPX Routing Services configuration for the
+        router port for which the entry exists."
+    INDEX   { nwIpxFwdIfIndex }
+    ::= { nwIpxFwdIfTable 1 }
+
+NwIpxFwdIfEntry ::=
+        SEQUENCE {
+                nwIpxFwdIfIndex                INTEGER,
+                nwIpxFwdIfAdminStatus          INTEGER,
+                nwIpxFwdIfOperStatus           INTEGER,
+                nwIpxFwdIfOperationalTime   TimeTicks,
+                nwIpxFwdIfControl              INTEGER,
+                nwIpxFwdIfMtu                  INTEGER,
+                nwIpxFwdIfForwarding           INTEGER,
+                nwIpxFwdIfFrameType            INTEGER,
+                nwIpxFwdIfAclIdentifier        INTEGER,
+                nwIpxFwdIfAclStatus            INTEGER,
+                nwIpxFwdIfCacheControl         INTEGER,
+                nwIpxFwdIfCacheEntries        Counter,
+                nwIpxFwdIfCacheHits            Counter,
+                nwIpxFwdIfCacheMisses          Counter
+                 }
+
+nwIpxFwdIfIndex    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router 
+        port for which the entry exists."
+    ::= { nwIpxFwdIfEntry 1 }
+
+nwIpxFwdIfAdminStatus      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of IPX Routing Services on the router
+        port for which the entry exists. Enabled (3) causes IPX Routing
+        Services to become active. Disabled (2) causes it to become inactive."
+    DEFVAL { enabled }   
+    ::= { nwIpxFwdIfEntry 2 }
+
+nwIpxFwdIfOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of IPX Routing Services on
+        the router port for which the entry exists. The value of
+        nwIpxFwdIfOperStatus indicates any problem with the configuration of 
+        IPX Routing Services on the router port. A value of 6 indicates that
+        regardless of the state of nwIpxFwdIfAdminStatus IPX Routing Services
+        is not operating because of an invalid port-level configuration."
+    ::= { nwIpxFwdIfEntry 3 }
+
+nwIpxFwdIfOperationalTime   OBJECT-TYPE
+    SYNTAX  TimeTicks
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxFwdIfOperStatus has been in its current state."
+    ::= { nwIpxFwdIfEntry 4 }
+
+nwIpxFwdIfControl  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),
+                        add(2),
+                        delete(3)
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+         "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL { delete }       
+    ::= { nwIpxFwdIfEntry 5 }
+
+nwIpxFwdIfMtu      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the Maximum Transmission Unit (MTU) for IPX packets on the
+        router port for which the entry exists. This includes the IPX header
+        and data but does not include framing."
+    DEFVAL { 1500 }
+    ::= { nwIpxFwdIfEntry 6 }
+
+nwIpxFwdIfForwarding       OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls forwarding of IPX packets on the router port for which the
+        entry exists. Enabled (3) causes IPX packets to be forwarded. Disabled
+        (2) prevents IPX packets from being forwarded."
+    DEFVAL { disabled }
+    ::= { nwIpxFwdIfEntry 7 }
+
+nwIpxFwdIfFrameType        OBJECT-TYPE
+    SYNTAX         INTEGER    {             --  valid media types
+                        other(1),           --  experimental
+                        ethernet(2),        --  ethernet
+                        snap(3),            --  enet,fddi,and token ring
+                        i8022(4),           --  enet, token ring, and fddi
+                        novell(6),          --  ethernet and fddi
+                        nativewan(8),       --  wan media types
+                        encapenet(9),       --  wan media types
+                        encapenet8022(10),  --  wan media types
+                        encapenetsnap(11),  --  wan media types
+                        encapenetnovell(12), -- wan media types
+                        encaptr8022(13),    --  wan media types
+                        encaptrsnap(14),    --  wan media types
+                        encapfddi8022(15),  --  wan media types
+                        encapfddisnap(16),  --  wan media types
+                        canonical(17)       --  special, tbd
+                        }
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the framing type for IPX packets forwarded on the router
+        port for which the entry exists.  Some frame types are valid for
+        specific media types.  The comments reflect those valid media types."
+    DEFVAL { i8022 }
+    ::= { nwIpxFwdIfEntry 8 }
+
+nwIpxFwdIfAclIdentifier    OBJECT-TYPE
+    SYNTAX         INTEGER    
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Access Control ID of the Access Control List in effect
+        for IPX packets being routed on the router port for which the entry
+        exists. A value of 0 indicates that no Access Control List is in
+        effect."
+    DEFVAL { 0 }
+    ::= { nwIpxFwdIfEntry 9 }
+
+nwIpxFwdIfAclStatus        OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of any Access Control List configured for IPX
+        traffic on the router port for which the entry exists. Enabled (3)
+        applies the Access Control List indicated by the value of
+        nwIpxFwdIfAclIdentifier to all IPX traffic being routed to the port.
+        Disabled (2) prevents the Access Control List from being applied."
+    DEFVAL { disabled }
+    ::= { nwIpxFwdIfEntry 10 }
+
+nwIpxFwdIfCacheControl     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                                disable(2),
+                                enable(3)
+                        }
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+         "Controls IPX Address caching on the router port for which the entry
+        exists. When IPX Address caching is enabled, IPX Addresses used for
+        address validation, filtering, and forwarding are stored in the cache.
+        This cache is checked first before doing a full route table lookup,
+        which speeds up the switching process. Enabled (3) turns on IPX
+        Address caching. Disabled (2) turns it off."
+    DEFVAL { enable }
+    ::= { nwIpxFwdIfEntry 11 }
+
+nwIpxFwdIfCacheEntries     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the number of entries in the IPX Address cache on the router port for which the entry exists."
+    ::= { nwIpxFwdIfEntry 12 }
+
+nwIpxFwdIfCacheHits        OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the number of times entries in the IPX Adddress cache have
+        been used to provide the IPX Address required to validate, filter, or
+        forward an IPX packet on the router port."
+    ::= { nwIpxFwdIfEntry 13 }
+       
+nwIpxFwdIfCacheMisses      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the number of times the IPX Address required to validate,
+        filter, or forward an IPX packet on the router port was not found in 
+        the IPX Address cache." 
+    ::= { nwIpxFwdIfEntry 14 }
+
+
+--  The IPX Interface Address Table
+--  This table contains the managed object used to setup and configure
+--  IPX addresses on a per router port basis.
+nwIpxAddressTable    OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NwIpxAddrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains an entry for each Novell network address assigned
+        to each router port."
+    ::= { nwIpxFwdIfConfig 2 }
+
+nwIpxAddrEntry    OBJECT-TYPE
+    SYNTAX  NwIpxAddrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Each entry specifies the Novell network addressing information for 
+        the logical Novll network for which the entry exists."
+    INDEX   { nwIpxAddrIfIndex, nwIpxAddrIfAddress }
+    ::= { nwIpxAddressTable 1 }
+
+NwIpxAddrEntry ::=
+        SEQUENCE {
+                nwIpxAddrIfIndex        INTEGER,
+                nwIpxAddrIfAddress      IpxAddress,
+                nwIpxAddrIfControl      INTEGER,
+                nwIpxAddrIfAddrType     INTEGER
+                 }
+
+nwIpxAddrIfIndex    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router 
+        port for which the entry exists."
+    ::= { nwIpxAddrEntry 1 }
+
+nwIpxAddrIfAddress  OBJECT-TYPE
+    SYNTAX  IpxAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the Novell network number assigned to the logical Novell
+        network for which the entry exists. The IpxAddress consists of a 
+        network number of 4 octets."
+    ::= { nwIpxAddrEntry 2 }
+
+nwIpxAddrIfControl  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),
+                        add(2),
+                        delete(3)
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Set this object to add or delete this entry from the table."
+    DEFVAL { add }
+    ::= { nwIpxAddrEntry 3 }
+
+nwIpxAddrIfAddrType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),
+                        primary(2),
+                        secondary(3)
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies whether the Novell network number, nwIpxAddrIfAddress, is 
+        the primary or secondary address for the router port."
+    DEFVAL { primary }
+    ::= { nwIpxAddrEntry 4 }
+
+
+--  IPX Forwarding Interfaces Counter Table
+--  This table contains the objects that specify the packet and byte counters
+--  for each configured IPX router port.
+nwIpxFwdIfCtrTable         OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxFwdIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port configured and
+        enabled for IPX Routing Services."
+    ::= { nwIpxFwdIfCounters 1 }
+
+nwIpxFwdIfCtrEntry         OBJECT-TYPE
+    SYNTAX          NwIpxFwdIfCtrEntry
+    ACCESS         not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry indicates the current packet and byte count of IPX packets
+        on the port for which the entry exists."
+    INDEX           { nwIpxFwdIfCtrIfIndex }
+    ::= { nwIpxFwdIfCtrTable 1 }
+
+NwIpxFwdIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxFwdIfCtrIfIndex               INTEGER,
+                nwIpxFwdIfCtrAdminStatus           INTEGER,
+                nwIpxFwdIfCtrReset                 INTEGER,
+                nwIpxFwdIfCtrOperationalTime       TimeTicks,
+                nwIpxFwdIfCtrInPkts                Counter,
+                nwIpxFwdIfCtrOutPkts               Counter,
+                nwIpxFwdIfCtrFwdPkts               Counter,
+                nwIpxFwdIfCtrFilteredPkts          Counter,
+                nwIpxFwdIfCtrDiscardPkts           Counter,
+                nwIpxFwdIfCtrAddrErrPkts           Counter,
+                nwIpxFwdIfCtrLenErrPkts            Counter,
+                nwIpxFwdIfCtrHdrErrPkts            Counter,
+                nwIpxFwdIfCtrInBytes               Counter,
+                nwIpxFwdIfCtrOutBytes              Counter,
+                nwIpxFwdIfCtrFwdBytes               Counter,
+                nwIpxFwdIfCtrFilteredBytes         Counter,
+                nwIpxFwdIfCtrDiscardBytes          Counter,
+                nwIpxFwdIfCtrHostInPkts            Counter,
+                nwIpxFwdIfCtrHostOutPkts           Counter,
+                nwIpxFwdIfCtrHostDiscardPkts       Counter,
+                nwIpxFwdIfCtrHostInBytes           Counter,
+                nwIpxFwdIfCtrHostOutBytes          Counter,
+                nwIpxFwdIfCtrHostDiscardBytes      Counter
+                 }
+
+nwIpxFwdIfCtrIfIndex       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 1 }
+
+nwIpxFwdIfCtrAdminStatus   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the per-port IPX packet and byte
+        counters on the router port for which the entry exists. Enabled (3)
+        causes these counters to become active. Disabled (2) causes these
+        counters to become inactive."
+    DEFVAL { enabled }
+    ::= { nwIpxFwdIfCtrEntry 2 }
+
+nwIpxFwdIfCtrReset         OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+         "Resets the per-port IPX packet and byte counters on the router port
+        for which this entry exists. Reset (2) resets the counters to 0.
+        nwIpxFwdIfCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwIpxFwdIfCtrEntry 3 }
+
+nwIpxFwdIfCtrOperationalTime        OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxFwdIfCtrAdminStatus has been in the current state."
+    ::= { nwIpxFwdIfCtrEntry 4 }
+
+nwIpxFwdIfCtrInPkts        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been received,
+        during nwIpxFwdIfCtrOperationaltime, on the router port for which the
+        entry exists."
+    ::= { nwIpxFwdIfCtrEntry 5 }
+
+nwIpxFwdIfCtrOutPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been transmitted,
+        during nwIpxFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwIpxFwdIfCtrEntry 6 }
+
+nwIpxFwdIfCtrFwdPkts       OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been forwarded,
+        during nwIpxFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwIpxFwdIfCtrEntry 7 }
+
+nwIpxFwdIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been
+        administratively filtered, during nwIpxFwdIfCtrOperationalTime, on
+        the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 8 }
+
+nwIpxFwdIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded
+        (dropped), during nwIpxFwdIfCtrOperationalTime, on the router port for
+        which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 9 }
+
+nwIpxFwdIfCtrAddrErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded
+        because of IPX addressing errors in the IPX header, during
+        nwIpxFwdIfCtrOperationalTime, on the router port for which the entry
+        exists."
+    ::= { nwIpxFwdIfCtrEntry 10 }
+
+nwIpxFwdIfCtrLenErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded
+        because an invalid packet length was contained in the IPX header, 
+        during nwIpxFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwIpxFwdIfCtrEntry 11 }
+
+nwIpxFwdIfCtrHdrErrPkts        OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded
+        because of an invalid IPX header, during nwIpxFwdIfCtrOperationalTime,
+        on the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 12 }
+
+nwIpxFwdIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been received, during nwIpxFwdIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 13 }
+
+nwIpxFwdIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have
+        been transmitted, during nwIpxFwdIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 14 }
+
+nwIpxFwdIfCtrFwdBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been forwarded, during nwIpxFwdCtrOperationalTime, on the router port
+        for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 15 }
+
+nwIpxFwdIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX                  Counter
+    ACCESS                  read-only
+    STATUS                  mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets 
+        administratively filtered, during nwIpxFwdIfCtrOperationalTime, on
+        the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 16 }
+
+nwIpxFwdIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been discarded, during nwIpxFwdIfCtrOperationalTime, on the router 
+        port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 17 }
+
+nwIpxFwdIfCtrHostInPkts   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been successfully
+        delivered to the local host, during nwIpxFwdIfCtrOperationalTime, that
+        were received on the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 18 }
+
+nwIpxFwdIfCtrHostOutPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been forwarded
+        by the local host, during nwIpxFwdIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 19 }
+
+nwIpxFwdIfCtrHostDiscardPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX packets that have been discarded 
+        by the local host, due to a lack of host resources, during
+        nwIpxFwdIfCtrOperationalTime, that were received on the router port
+        for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 20 }
+
+nwIpxFwdIfCtrHostInBytes  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have been
+        successfully delivered to the local host, during
+        nwIpxFwdIfCtrOperationalTime, that were received on the router port for
+        which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 21 }
+
+nwIpxFwdIfCtrHostOutBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have been
+        transmitted by the local host, during nwIpxFwdIfCtrOperationalTime, on
+        the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 22 }
+
+nwIpxFwdIfCtrHostDiscardBytes     OBJECT-TYPE
+    SYNTAX                  Counter
+    ACCESS                  read-only
+    STATUS                  mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX packets that have 
+        been discarded by the local host, due to a lack of host resources 
+        that were received, during nwIpxFwdIfCtrOperationalTime, that were
+        received on the router port for which the entry exists."
+    ::= { nwIpxFwdIfCtrEntry 23 }
+
+
+--  DistanceVector-based Protocols
+--  This group contains the managed objects for RIP, IPX DistanceVector based
+--  routing.
+
+--  IPX RIP System Configuration Parameters
+--  This group contains the objects that pertain to the setup and
+--  configuration of the IPX RIP DistanceVector based routing protocol.
+ 
+nwIpxRipAdminStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Sets the administrative state of the IPX-RIP routing protocol
+        system-wide. Enabled (3) causes IPX-RIP to become active on all router
+        ports configured and enabled for IPX Routing Services. Disabled (2)
+        causes IPX-RIP to become inactive."
+    DEFVAL { disabled }
+    ::= { nwIpxRipConfig 1 }
+ 
+nwIpxRipOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5)     --  start-up in progress
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of IPX-RIP system-wide.
+        The value of nwIpxRipOperStatus indicates any problem with your 
+        IPX-RIP configuration. A value of 6 indicates that regardless of the
+        value of nwIpxRipAdminStatus, IPX-RIP is not operating because of an
+        invalid configuration."
+    ::= { nwIpxRipConfig 2 }
+   
+nwIpxRipAdminReset      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+          "Resets the IPX-RIP routing protocol. Reset (2) forces a system-wide
+        restart of IPX-RIP, without a graceful shutdown on any active router
+        ports."
+    DEFVAL { other }
+    ::= { nwIpxRipConfig 3 }
+   
+nwIpxRipOperationalTime  OBJECT-TYPE
+    SYNTAX  TimeTicks
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+          "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxRipOperStatus has been in its current state."
+    ::= { nwIpxRipConfig 4 }
+ 
+nwIpxRipVersion  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the IPX-RIP routing protocol
+        firmware, in textual format."
+    ::= { nwIpxRipConfig 5 }
+ 
+nwIpxRipStackSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the stack size of the IPX-RIP routing protocol thread. In
+        order for a change of this value to take effect, the protocol
+        (nwIpxRipAdminReset), IPX Routing Services (nwIpxSysAdminReset), or 
+        the device running Routing Services must be reset."
+    DEFVAL { 4096 }
+    ::= { nwIpxRipConfig 6 }
+
+nwIpxRipThreadPriority OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the run-time execution priority of the IPX-RIP routing
+        protocol thread. In order for a change of this value to take effect,
+        IPX-RIP (nwIpxRipAdminReset), IPX Routing Services (nwIpxAdminReset),
+        or the device running Routing services must be reset."
+    DEFVAL { 127 }
+    ::= { nwIpxRipConfig 7 }
+
+nwIpxRipDatabaseThreshold OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the run-time maximum number of IPX-RIP entries that can 
+        be held in the IPX-RIP route table."
+    DEFVAL { 2000 }
+    ::= { nwIpxRipConfig 8 }
+
+nwIpxRipAgeOut  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+          "Specifies the amount of time, in seconds, that an inactive route
+        table entry remains in the IPX-RIP route table before it is aged-out."
+    DEFVAL { 180 }
+    ::= { nwIpxRipConfig 9 }
+
+nwIpxRipHoldDown        OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the amount of time, in seconds, to wait before removing
+        an entry from the route table, after receiving an update indicating
+        that the destination has become unreachable. All routers exchanging
+        IPX-RIP information must have the same hold down time. The time must
+        be long enough to allow all participating routers to receive the same
+        update."
+    DEFVAL { 120 }
+    ::= { nwIpxRipConfig 10 }
+
+
+--  IPX RIP System (aggregate) Counters
+--  This group contains the aggregate (device-wide) IPX RIP packet and
+--  byte counters.
+nwIpxRipCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate system-wide IPX-RIP
+        packet and byte counters. Enabled (3) causes these counters to become
+        active on all router ports. Disabled (2) causes these counters to
+        become inactive."
+    DEFVAL { enabled }
+    ::= { nwIpxRipCounters 1 }
+
+nwIpxRipCtrReset     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate system-wide IPX-RIP protocol packet and byte
+        counters. Reset (2) resets the IPX-RIP aggregate counters to 0.
+        nwIpxRipCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwIpxRipCounters 2 }
+
+nwIpxRipCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+           "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxRipCtrAdminStatus has been in the current state."
+    ::= { nwIpxRipCounters 3 }
+
+nwIpxRipCtrInPkts                OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP packets that have been
+        received, system-wide, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 4 }
+
+nwIpxRipCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+          "Indicates the total number of IPX-RIP packets that have been
+        transmitted, system-wide, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 5 }
+
+nwIpxRipCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP packets that have been
+        administratively filtered, system-wide, during`
+        nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 6 }
+
+nwIpxRipCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+         "Indicates the total number of IPX-RIP packets that have been
+        discarded, system-wide, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 7 }
+
+nwIpxRipCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+         "Indicates the total number of bytes in the IPX-RIP packets that 
+        have been received, system-wide, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 8 }
+
+nwIpxRipCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP packets that have
+        been transmitted, system-wide, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 9 }
+
+nwIpxRipCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP packets that have
+        been administratively filtered, system-wide, during
+        nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 10 }
+
+nwIpxRipCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP packets that have
+        been discarded, during nwIpxRipCtrOperationalTime."
+    ::= { nwIpxRipCounters 11 }
+
+
+-- IPX RIP Interface Table
+-- This table contains the managed objects used to setup and configure
+-- RIP on a per router port basis.
+nwIpxRipIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NwIpxRipIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. Each entry can
+        contain different values, allowing the routing protocol configuration
+        to vary from router port to router port. This table is indexed by
+        nwIpxRipIfIndex, which indicates the value of MIB 2 ifindex, which
+        identifies the router port for which each entry exists."
+    ::= { nwIpxRipIfConfig 1 }
+
+nwIpxRipIfEntry OBJECT-TYPE
+    SYNTAX  NwIpxRipIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Each entry contains the IPX-RIP configuration for the router port for
+        which the entry exists."
+    INDEX   { nwIpxRipIfIndex }
+    ::= { nwIpxRipIfTable 1 }
+
+NwIpxRipIfEntry ::=
+        SEQUENCE {
+                nwIpxRipIfIndex             INTEGER,
+                nwIpxRipIfAdminStatus        INTEGER,
+                nwIpxRipIfOperStatus        INTEGER,
+                nwIpxRipIfOperationalTime    TimeTicks,
+                nwIpxRipIfVersion            INTEGER,
+                nwIpxRipIfAdvertisement        INTEGER,
+                nwIpxRipIfFloodDelay        INTEGER,
+                nwIpxRipIfRequestDelay        INTEGER,
+                nwIpxRipIfPriority            INTEGER,
+                nwIpxRipIfHelloTimer        INTEGER,
+                nwIpxRipIfSplitHorizon      INTEGER,
+                nwIpxRipIfPoisonReverse        INTEGER,
+                nwIpxRipIfSnooping          INTEGER,
+                nwIpxRipIfType                INTEGER,
+                nwIpxRipIfXmitCost          INTEGER,
+                nwIpxRipIfAclIdentifier     INTEGER,
+                nwIpxRipIfAclStatus         INTEGER
+                 }
+
+nwIpxRipIfIndex         OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxRipIfEntry 1 }
+
+nwIpxRipIfAdminStatus   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the IPX-RIP routing protocol on the
+        router port for which the entry exists. Enabled (3) causes IPX-RIP to
+        become active on the router port. Disabled (2) causes RIP to become
+        inactive."
+    DEFVAL { disabled }
+    ::= { nwIpxRipIfEntry 2 }
+
+nwIpxRipIfOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5)     --  start-up in progress
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of the IPX-RIP routing
+        protocol on the router port for which the entry exists. The value of
+        nwIpxRipIfOperStatus indicates any problem with your IPX-RIP
+        configuration on the router port. A value of 6 indicates that
+        regardless of the value of nwIpxRipIfAdminStatus, IPX-RIP is not
+        operating on the router port because of an invalid configuration."
+    ::= { nwIpxRipIfEntry 3 }
+
+nwIpxRipIfOperationalTime        OBJECT-TYPE
+    SYNTAX         TimeTicks    
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxRipIfOperStatus has been in its current state."
+    ::= { nwIpxRipIfEntry 4 }
+
+nwIpxRipIfVersion       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the revision level of the IPX-RIP routing protocol in 
+        textual format."
+    DEFVAL { 1 }
+    ::= { nwIpxRipIfEntry 5 }
+
+nwIpxRipIfAdvertisement OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the interval, in seconds, at which IPX-RIP advertises its route
+        table on the router port for which the entry exists. Change this value
+        to cause IPX-RIP to advertise its route table more or less frequently."
+    DEFVAL    { 60 }
+    ::= { nwIpxRipIfEntry 6 }
+
+nwIpxRipIfFloodDelay    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the length of time, in seconds, that the IPX-RIP routing
+        protocol will wait after discovering that a directly connected route
+        has gone down, before flooding updates (triggered updates) on the
+        router port for which the entry exists. A value of 0 specifies that
+        if a directly connected route goes down, updates will be sent
+        immediately."
+    DEFVAL { 2 }
+    ::= { nwIpxRipIfEntry 7 }
+
+nwIpxRipIfRequestDelay  OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the length of time, in seconds, that the IPX-RIP routing
+        protocol will wait after receiving a route request packet before
+        sending a response on the router port for which the entry exists. A
+        value of 0 specifies that if a route request packet is received on 
+        the port, a response will be sent immediately."
+    DEFVAL { 6 }
+    ::= { nwIpxRipIfEntry 8 }
+
+nwIpxRipIfPriority       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL { 1 }
+    ::= { nwIpxRipIfEntry 9 }
+
+nwIpxRipIfHelloTimer    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific 
+        MIBs. Setting this object has no effect."
+    DEFVAL { 10 }  
+    ::= { nwIpxRipIfEntry 10 }
+
+nwIpxRipIfSplitHorizon  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of Split Horizon on the router port for which
+        the entry exists. When Split Horizon is enabled, IPX-RIP keeps track
+        of which router port route information is received on, and prevents
+        information about a route from being sent back out the same router
+        port it was received on."
+    DEFVAL { enabled }
+    ::= { nwIpxRipIfEntry 11 }
+
+nwIpxRipIfPoisonReverse OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+          "Controls the operation of Poison Reverse on the router port for
+        which the entry exists. When Poison Reverse is enabled, IPX-RIP
+        advertises any downed route as unreachable during the period of time
+        that it must wait (nwIpxRipHoldDown) before removing the route from
+        the route table."
+    DEFVAL { disabled }
+    ::= { nwIpxRipIfEntry 12 }
+
+nwIpxRipIfSnooping      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+           "Controls the operation of IPX-RIP Snooping on the router port. When
+        RIP Snooping is enabled the IPX-RIP routing protocol operates in
+        passive mode, so that it receives route information, builds and
+        maintains a route table, but does not advertise or send updates on
+        the router port for which the entry exists."
+    DEFVAL { disabled }
+    ::= { nwIpxRipIfEntry 13 }
+                               
+nwIpxRipIfType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),
+                        bma(2),
+                        nbma(3)
+                 }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates whether the directly connected network segment does or 
+        does not support broadcast media access. If broadcast media access is
+        supported, IPX-RIP advertisements are sent out one broadcast packet
+        per router port. If broadcast media access is not supported, IPX-RIP
+        advertisements are sent to each neighbor directly."
+    DEFVAL { bma } 
+    ::= { nwIpxRipIfEntry 14 }
+
+nwIpxRipIfXmitCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object does not apply to this protocol. It is a common object,
+        inherited from the common MIB framework used to provide a common
+        management interface to all the Cabletron Routing Services
+        protocol-specific MIBs. Setting this object has no effect."
+    DEFVAL { 0 }
+    ::= { nwIpxRipIfEntry 15 }
+
+nwIpxRipIfAclIdentifier OBJECT-TYPE
+    SYNTAX         INTEGER    
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Access Control ID of the access control list in effect
+        for IPX-RIP routing protocol packets on the router port for which the
+        entry exists. A value of 0 indicates that there is no access control
+        list in effect for IPX-RIP routing protocol packets on the router
+        port."
+    DEFVAL { 0 } 
+    ::= { nwIpxRipIfEntry 16 }
+
+nwIpxRipIfAclStatus     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of the access control list identified by
+        nwIpxRipIfAclIdentifier. Enabled (3) applies the access control list 
+        to all IPX-RIP routing protocol packet traffic on the router port for
+        which the entry exists. Disabled (2) prevents the access control list
+        from being applied. "
+    DEFVAL { disabled }
+    ::= { nwIpxRipIfEntry 17 }
+
+--  IPX RIP Interface Counters Table
+--  This table contains the managed objects for IPX RIP packet and byte
+--  counter on a per router port basis.
+nwIpxRipIfCtrTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxRipIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port.This table is
+        indexed by nwIpxRipIfCtrIfIndex, which indicates the value of MIB2
+        ifindex, which indentifies the router port for which the entry exists."
+    ::= { nwIpxRipIfCounters 1 }
+
+nwIpxRipIfCtrEntry      OBJECT-TYPE
+    SYNTAX          NwIpxRipIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry indicates the current packet and byte count of IPX-RIP
+        routing protocol packets on the router port for which the entry
+        exists."
+    INDEX           { nwIpxRipIfCtrIfIndex }
+    ::= { nwIpxRipIfCtrTable 1 }
+
+NwIpxRipIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxRipIfCtrIfIndex            INTEGER,
+                nwIpxRipIfCtrAdminStatus        INTEGER,
+                nwIpxRipIfCtrReset              INTEGER,
+                nwIpxRipIfCtrOperationalTime    TimeTicks,
+                nwIpxRipIfCtrInPkts             Counter,
+                nwIpxRipIfCtrOutPkts            Counter,
+                nwIpxRipIfCtrFilteredPkts       Counter,
+                nwIpxRipIfCtrDiscardPkts        Counter,
+                nwIpxRipIfCtrInBytes            Counter,
+                nwIpxRipIfCtrOutBytes           Counter,
+                nwIpxRipIfCtrFilteredBytes      Counter,
+                nwIpxRipIfCtrDiscardBytes       Counter
+                 }
+
+nwIpxRipIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 1 }
+
+nwIpxRipIfCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the per-port IPX-RIP packet and 
+        byte counters on the router port for which the entry exists. 
+        Enabled (3) causes these counters to become active. Disabled (2)
+        causes these counters to become inactive."
+     DEFVAL { enabled } 
+     ::= { nwIpxRipIfCtrEntry 2 }
+
+nwIpxRipIfCtrReset      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the per-port IPX-RIP packet and byte counters on the router
+        port for which this entry exists. Reset (2) resets the counters to 0.
+        nwIpxRipIfCtrOperationalTime is also reset to 0."
+    ::= { nwIpxRipIfCtrEntry 3 }
+
+nwIpxRipIfCtrOperationalTime     OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpRipIfCtrAdminStatus has been in the current state."
+    ::= { nwIpxRipIfCtrEntry 4 }
+
+nwIpxRipIfCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP routing protocol packets that
+        have been received, during nwIpxRipIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 5 }
+
+nwIpxRipIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP routing protocol packets that
+        have been transmitted, during nwIpxRipIfCtrOperationalTime, on the
+        router port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 6 }
+
+nwIpxRipIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP routing protocol packets that
+        have been administratively filtered, during
+        nwIpxRipIfCtrOperationalTime, on the router port for which the entry
+        exists."
+    ::= { nwIpxRipIfCtrEntry 7 }
+
+nwIpxRipIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX-RIP routing protocol packets that
+        have been discarded, during nwIpxRipIfCtrOperationalTime, that were
+        received on the router port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 8 }
+
+nwIpxRipIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP routing protocol
+        packets that have been received, during nwIpxRipIfCtrOperationalTime,
+        on the router port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 9 }
+
+nwIpxRipIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP routing protocol
+        packets that have been transmitted, during
+        nwIpxRipIfCtrOperationalTime, on the router port for which the entry
+        exists."
+    ::= { nwIpxRipIfCtrEntry 10 }
+
+nwIpxRipIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP routing protocol
+        packets that have been administratively filtered, during
+        nwIpxRipIfCtrOperationalTime, on the router port for which the entry
+        exists."
+    ::= { nwIpxRipIfCtrEntry 11 }
+
+nwIpxRipIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX-RIP routing protocol
+        packets that have been discarded, during nwIpRipIfCtrOperationalTime,
+        that were received on the router port for which the entry exists."
+    ::= { nwIpxRipIfCtrEntry 12 }
+
+
+--  IPX RIP Routing Table
+--  This table contains the managed objects for IPX RIP route table.
+nwIpxRipRouteTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NwIpxRipRouteEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "This table contains the IPX-RIP route table. This table contains an
+        entry for each route learned through the IPX-RIP routing protocol. 
+        Only the best routes from this table are added to the IPX forwarding
+        table to be used for packet switching."
+    ::= { nwIpxRipDatabase 1 }
+
+nwIpxRipRouteEntry         OBJECT-TYPE
+    SYNTAX      NwIpxRipRouteEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "Each entry describes the IPX-RIP route to the destination network 
+        for which the entry exists."
+    INDEX           { nwIpxRipRtNetId, nwIpxRipRtIfIndex, nwIpxRipRtSrcNode }
+    ::= { nwIpxRipRouteTable 1 }
+
+NwIpxRipRouteEntry ::=
+        SEQUENCE {
+                nwIpxRipRtNetId                 IpxAddress,
+                nwIpxRipRtIfIndex               INTEGER,
+                nwIpxRipRtSrcNode               IpxAddress,
+                nwIpxRipRtHops                  INTEGER,
+                nwIpxRipRtTicks                 INTEGER,
+                nwIpxRipRtAge                   INTEGER,
+                nwIpxRipRtType                  INTEGER,
+                nwIpxRipRtFlags                 INTEGER
+                 }
+
+nwIpxRipRtNetId         OBJECT-TYPE
+    SYNTAX          IpxAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is the primary index into the IPX-RIP route table. This number
+        indicates the Novell Network Number of the destination for which the
+        entry exists. The IpxAddress consists of a network number of 4 octets"
+        
+    ::= { nwIpxRipRouteEntry 1 }
+
+nwIpxRipRtIfIndex       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is a secondary index into the IPX-RIP route table. This number
+        corresponds to the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxRipRouteEntry 2 }
+
+nwIpxRipRtSrcNode       OBJECT-TYPE
+    SYNTAX          IpxAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is a secondary index into the RIP route table. This number
+        indicates the MAC-layer address of the source router from which this
+        route was learned. A value of 0.0.0.0.0.0 indicates that the source
+        is on the network segment directly connected to the router port,
+        nwIpxRipRtIfIndex."
+    ::= { nwIpxRipRouteEntry 3 }
+
+nwIpxRipRtHops          OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the number of hops required to reach the destination for
+        which the entry exists."
+    ::= { nwIpxRipRouteEntry 4 }
+
+
+nwIpxRipRtTicks         OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the amount of time (number of Time Ticks) required to
+        reach the destination for which the entry exists."
+    ::= { nwIpxRipRouteEntry 5 }
+
+nwIpxRipRtAge           OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the amount of time, in seconds, since an update has been
+        received for the route for which the entry exists."
+    ::= { nwIpxRipRouteEntry 6 }
+
+nwIpxRipRtType          OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                                other(1),
+                                invalid(2),
+                                direct(3),
+                                remote(4)
+                        }
+     ACCESS          read-only
+     STATUS          mandatory
+     DESCRIPTION
+         "Indicates whether the destination network is directly connected
+         through the router port specified by nwIpxRipRtIndex, or is 
+         indirectly connected through another router, specified by
+         nwIpxRipRtSrcNode."
+     ::= { nwIpxRipRouteEntry 7 }
+
+nwIpxRipRtFlags         OBJECT-TYPE
+    SYNTAX          INTEGER  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Specifies properties of the IPX-RIP route. The bit mask is as
+        follows: source-changed (1), best source (2), local-net (4),
+        net-down (8), update-fib-only (16)."
+    ::= { nwIpxRipRouteEntry 8 }
+
+
+
+--  IPX SAP System Group
+--  This group contains the managed object for global, device-wide
+--  IPX SAP DistanceVector based routing protocol.
+
+--  IPX SAP System Configuration Parameters
+--  This group contains the objects that pertain to the setup and
+--  configuration of the IPX SAP DistanceVector based routing protocol.
+nwIpxSapAdminStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Sets the administrative state of the SAP protocol system-wide. 
+        Enabled (3) causes SAP to become active on all router ports 
+        configured and enabled for IPX routing services. Disabled (2) causes
+        the protocol to become inactive."
+    DEFVAL { disabled }
+    ::= { nwIpxSapConfig 1 }
+
+nwIpxSapOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5)     --  start-up in progress
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of the SAP protocol
+        system-wide. The value of nwIpxSapOperStatus indicates any problem 
+        with your SAP configuration. A value of 6 indicates that regardless 
+        of the value of nwIpxSAPAdminStatus, the SAP protocol is not operating
+        because of an invalid configuration."
+    ::= { nwIpxSapConfig 2 }
+
+nwIpxSapAdminReset      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Resets the SAP protocol. Reset (2) forces a system-wide restart of 
+        SAP, without a graceful shutdown on any active router ports."
+    DEFVAL { other }
+    ::= { nwIpxSapConfig 3 }
+
+nwIpxSapOperationalTime  OBJECT-TYPE
+    SYNTAX  TimeTicks
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxSapOperStatus, has been in its current state."
+    ::= { nwIpxSapConfig 4 }
+
+nwIpxSapVersion  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+          "Indicates the current revision level of the SAP protocol firmware, in
+        textual format."
+    ::= { nwIpxSapConfig 5 }
+
+nwIpxSapStackSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the stack size of the SAP protocol thread. In order for a
+        change to this value to take effect, the protocol (nwIpxSapAdminReset),
+        IPX Routing Services (nwIpxSysAdminReset), or the device running
+        Routing Services must be reset."
+    DEFVAL { 4096 }
+    ::= { nwIpxSapConfig 6 }
+
+nwIpxSapThreadPriority OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the run-time execution priority of the SAP protocol 
+        thread. In order for a change to this value to take effect, SAP
+        (nwIpxSapAdminReset), IPX Routing Services (nwIpxAdminReset), or the
+        device running Routing Services must be reset."
+    DEFVAL { 127 } 
+    ::= { nwIpxSapConfig 7 }
+
+nwIpxSapDatabaseThreshold OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the run-time maximum number of entries that can be held in
+        the SAP server table."
+    DEFVAL { 2000 } 
+    ::= { nwIpxSapConfig 8 }
+
+nwIpxSapAgeOut  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Specifies the amount of time, in seconds, that an inactive server 
+        table entry remains in the SAP server table before it is aged out."
+    DEFVAL { 180 }
+    ::= { nwIpxSapConfig 9 }
+
+nwIpxSapHoldDown        OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the amount of time, in seconds, to wait before removing an
+        entry from the SAP server table, after receiving an update indicating
+        that the destination has become unreachable. All routers exchanging
+        SAP information must have the same hold down time. The time must be
+        long enough to allow all participating routers to receive the same
+        update."
+    DEFVAL { 120 }
+    ::= { nwIpxSapConfig 10 }
+
+
+--  IPX SAP System (aggregate) Counters
+--  This group contains the aggregate (device-wide) IPX SAP packet and
+--  byte counters.
+nwIpxSapCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (system-wide) SAP
+        protocol packet and byte counters. Enabled (3) causes these counters
+        to become active on all router ports. Disabled (2) causes these 
+        counters to become inactive."
+    DEFVAL { enabled }
+    ::= { nwIpxSapCounters 1 }
+
+nwIpxSapCtrReset     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (system-wide) SAP protocol packet and byte
+        counters. Reset (2) resets the SAP aggregate counters to 0.
+        nwIpxSapCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwIpxSapCounters 2 }
+
+nwIpxSapCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxSapCtrAdminStatus, has been in the current state."
+    ::= { nwIpxSapCounters 3 }
+
+nwIpxSapCtrInPkts       OBJECT-TYPE
+    SYNTAX        Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been received,
+        system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 4 }
+
+nwIpxSapCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been transmitted,
+        system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 5 }
+
+nwIpxSapCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been
+        administratively filtered, system-wide, during
+        nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 6 }
+
+nwIpxSapCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been discarded,
+        system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 7 }
+
+nwIpxSapCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have been
+        received, system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 8 }
+
+nwIpxSapCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have
+        been transmitted, system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 9 }
+
+nwIpxSapCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have
+        been administratively filtered, system-wide, during
+        nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 10 }
+
+nwIpxSapCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have 
+        been discarded system-wide, during nwIpxSapCtrOperationalTime."
+    ::= { nwIpxSapCounters 11 }
+
+
+--  IPX SAP Interface Table
+--  This table contains the managed objects used to setup and configure
+--  SAP on a per router port basis.
+nwIpxSapIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NwIpxSapIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. Each entry can
+        contain different values, allowing the SAP configuration to vary from
+        router port to router port. This table is indexed by nwIpxSapIfIndex,
+        which indicates the value of MIB 2 ifindex, which identifies the router
+        port for which each entry exists."
+    ::= { nwIpxSapIfConfig 1 }
+
+nwIpxSapIfEntry OBJECT-TYPE
+    SYNTAX  NwIpxSapIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Each entry contains the SAP configuration for the router port for
+        which the entry exists."
+    INDEX   { nwIpxSapIfIndex }
+    ::= { nwIpxSapIfTable 1 }
+
+NwIpxSapIfEntry ::=
+        SEQUENCE {
+                nwIpxSapIfIndex             INTEGER,
+                nwIpxSapIfAdminStatus       INTEGER,
+                nwIpxSapIfOperStatus        INTEGER,
+                nwIpxSapIfOperationalTime   TimeTicks,
+                nwIpxSapIfVersion           INTEGER,
+                nwIpxSapIfAdvertisement     INTEGER,
+                nwIpxSapIfFloodDelay        INTEGER,
+                nwIpxSapIfRequestDelay      INTEGER,
+                nwIpxSapIfPriority          INTEGER,
+                nwIpxSapIfHelloTimer        INTEGER,
+                nwIpxSapIfSplitHorizon      INTEGER,
+                nwIpxSapIfPoisonReverse     INTEGER,
+                nwIpxSapIfSnooping          INTEGER,
+                nwIpxSapIfType              INTEGER,
+                nwIpxSapIfXmitCost          INTEGER,
+                nwIpxSapIfAclIdentifier     INTEGER,
+                nwIpxSapIfAclStatus         INTEGER
+                 }
+
+nwIpxSapIfIndex         OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxSapIfEntry 1 }
+
+nwIpxSapIfAdminStatus   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the SAP protocol on the router port
+        for which the entry exists. Enabled (3) causes SAP to become active
+        on the router port. Disabled (2) causes SAP to become inactive."
+    DEFVAL { disabled }
+    ::= { nwIpxSapIfEntry 2 }
+
+nwIpxSapIfOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5)     --  start-up in progress
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of the SAP protocol on the
+        router port for which the entry exists. The value of
+        nwIpxSapIfOperStatus indicates any problem with your SAP configuration
+        on the router port. A value of 6 indicates that regardless of the
+        value of nwIpxSapIfAdminStatus. SAP is not operating because of an
+        invalid configuration."
+    ::= { nwIpxSapIfEntry 3 }
+
+nwIpxSapIfOperationalTime        OBJECT-TYPE
+    SYNTAX         TimeTicks    
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxSapIfOperStatus has been in its current state."
+    ::= { nwIpxSapIfEntry 4 }
+
+nwIpxSapIfVersion       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the revision level of the SAP protocol in textual format."
+    DEFVAL { 1 }
+    ::= { nwIpxSapIfEntry 5 }
+
+nwIpxSapIfAdvertisement OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the interval, in seconds, at which SAP advertises its server
+        table on the router port for which the entry exists. Change this value
+        to cause SAP to advertise its server table more or less frequently."
+    DEFVAL    { 60 }
+    ::= { nwIpxSapIfEntry 6 }
+
+nwIpxSapIfFloodDelay    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the length of time, in seconds, that the SAP protocol will
+        wait after discovering that a directly connected route has gone down,
+        before flooding updates (triggered updates) on the router port for
+        which the entry exists. A value of 0 specifies that if a directly
+        connected route goes down, updates should be sent immediately ."
+    DEFVAL { 2 }
+    ::= { nwIpxSapIfEntry 7 }
+
+nwIpxSapIfRequestDelay  OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the length of time, in seconds, that the SAP protocol will
+        wait after receiving a server request packet, before sending a
+        response on the router port for which the entry exists. A value of 0
+        specifies that if a server request packet is received on the port, a
+        response will be sent immediately."
+    DEFVAL { 0 }
+    ::= { nwIpxSapIfEntry 8 }
+
+nwIpxSapIfPriority       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a management 
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    DEFVAL { 1 }
+    ::= { nwIpxSapIfEntry 9 }
+
+nwIpxSapIfHelloTimer    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs.Setting this object has no effect."
+    DEFVAL { 10 }
+    ::= { nwIpxSapIfEntry 10 }
+
+nwIpxSapIfSplitHorizon  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of Split Horizon on the router port for which
+        the entry exists. When Split Horizon is enabled, SAP keeps track of
+        which router port information is received on, and prevents information
+        about a server from being sent back out the same router port it was
+        received on."
+    DEFVAL { enabled }
+    ::= { nwIpxSapIfEntry 11 }
+
+nwIpxSapIfPoisonReverse OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of Poison Reverse on the router port for
+        which the entry exists. When Poison Reverse is enabled, SAP
+        advertises any downed server as unreachable during the period of time
+        that it must wait (nwIpxSapIfHoldDown) before removing the server
+        from the server table."
+    DEFVAL { disabled }
+    ::= { nwIpxSapIfEntry 12 }
+
+nwIpxSapIfSnooping      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of SAP Snooping on the router port. When SAP
+        Snooping is enabled SAP operates in passive mode, so it receives
+        service information, builds and maintains a server table, but does
+        not advertise or send updates on the router port for which the entry
+        exists. Enabled (3) turns on SAP Snooping. Disabled (2) turns off SAP
+        Snooping."
+    DEFVAL { disabled }
+    ::= { nwIpxSapIfEntry 13 }
+                                
+nwIpxSapIfType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),
+                        bma(2),
+                        nbma(3)
+                 }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates whether the directly connected network segment does or
+        does not support broadcast media access. If broadcast media access is
+        supported, SAP advertisements are sent out, one broadcast packet per
+        router port. If broadcast media access is not supported, SAP
+        advertisements are sent to each neighbor router directly."
+    DEFVAL { bma }
+    ::= { nwIpxSapIfEntry 14 }
+
+nwIpxSapIfXmitCost OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL { 0 }
+    ::= { nwIpxSapIfEntry 15 }
+
+nwIpxSapIfAclIdentifier OBJECT-TYPE
+    SYNTAX         INTEGER    
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Access Control List ID of the access control list in
+        effect for SAP protocol packets on the router port for which the entry
+        exists. A value of 0 indicates that there is no access control list 
+        in effect for SAP protocol packets on the router port for which the
+        entry exists."
+    DEFVAL { 0 }
+    ::= { nwIpxSapIfEntry 16 }
+
+nwIpxSapIfAclStatus     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of the access control list identified by
+        nwIpxSapIfAclIdentifier. Enabled (3) causes the access control list
+        to be applied to all SAP protocol packet traffic on the router port 
+        for which the entry exists. Disabled (2) prevents the access control
+        list from being applied."
+    DEFVAL { disabled }
+    ::= { nwIpxSapIfEntry 17 }
+
+--  IPX SAP Interface Counters Table
+--  This table contains the managed objects for IPX SAP packet and byte
+--  counter on a per router port basis.
+nwIpxSapIfCtrTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxSapIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. This table is
+        indexed by nwIpxSapIfCtrIfIndex which indicates the value of MIB2
+        ifindex, which indentifies the router port for which the entry 
+        exists."
+    ::= { nwIpxSapIfCounters 1 }
+
+nwIpxSapIfCtrEntry      OBJECT-TYPE
+    SYNTAX          NwIpxSapIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry indicates the current packet and byte count of SAP 
+        protocol packets on the router port for which the entry exists."
+    INDEX           { nwIpxSapIfCtrIfIndex }
+    ::= { nwIpxSapIfCtrTable 1 }
+
+NwIpxSapIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxSapIfCtrIfIndex            INTEGER,
+                nwIpxSapIfCtrAdminStatus        INTEGER,
+                nwIpxSapIfCtrReset              INTEGER,
+                nwIpxSapIfCtrOperationalTime    TimeTicks,
+                nwIpxSapIfCtrInPkts             Counter,
+                nwIpxSapIfCtrOutPkts            Counter,
+                nwIpxSapIfCtrFilteredPkts       Counter,
+                nwIpxSapIfCtrDiscardPkts        Counter,
+                nwIpxSapIfCtrInBytes            Counter,
+                nwIpxSapIfCtrOutBytes           Counter,
+                nwIpxSapIfCtrFilteredBytes      Counter,
+                nwIpxSapIfCtrDiscardBytes       Counter
+                 }
+
+nwIpxSapIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of the MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 1 }
+
+nwIpxSapIfCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the per-port SAP packet and byte
+        counters on the router port for which this entry exists. Enabled (3)
+        causes these counters to become active. Disabled (2) causes these
+        counters to become inactive."
+    DEFVAL { enabled }
+    ::= { nwIpxSapIfCtrEntry 2 }
+
+nwIpxSapIfCtrReset      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the per-port SAP packet and byte counters on the router port 
+        for which the entry exists. Reset (2) resets the counters to 0.
+        nwIpxSapIfCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwIpxSapIfCtrEntry 3 }
+
+nwIpxSapIfCtrOperationalTime     OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxSapIfCtrAdminStatus has been in the current state."
+    ::= { nwIpxSapIfCtrEntry 4 }
+
+nwIpxSapIfCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP protocol packets that have been
+        received, during nwIpxSapIfCtrOperationalTime, on the router port for
+        which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 5 }
+
+nwIpxSapIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been transmitted,
+        during nwIpxSapIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwIpxSapIfCtrEntry 6 }
+
+nwIpxSapIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been
+        administratively filtered, during nwIpxSapIfCtrOperationalTime, on 
+        the router port for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 7 }
+
+nwIpxSapIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of SAP packets that have been discarded,
+        during nwIpxSapIfCtrOperationalTime, that were received on the router
+        port for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 8 }
+
+nwIpxSapIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have 
+        been received, during nwIpxSapIfCtrOperationalTime, on the router port
+        for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 9 }
+
+nwIpxSapIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have been
+        transmitted, during nwIpxSapIfCtrOperationalTime, on the router port
+        for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 10 }
+
+nwIpxSapIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have been
+        administratively filtered, during nwIpxSapIfCtrOperationalTime, on the
+        router port for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 11 }
+
+nwIpxSapIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the SAP packets that have
+        been discarded, during nwIpxSapIfCtrOperationalTime, that were 
+        received on the router port for which the entry exists."
+    ::= { nwIpxSapIfCtrEntry 12 }
+
+--  IPX SAP Server table Table
+--  This table contains the managed objects for IPX SAP route table.
+nwIpxSapServerIfTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxSapServerIfEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "The table contains the SAP server table. This table contains an entry
+        for each service learned of through the SAP protocol."
+    ::= { nwIpxSapServerTable 1 }
+
+nwIpxSapServerIfEntry         OBJECT-TYPE
+    SYNTAX      NwIpxSapServerIfEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "Each entry contains the SAP route information for the Novell server
+        and router port for which the entry exists."
+    INDEX    { nwIpxSapServerIfNetId, nwIpxSapServerIfNode,
+                   nwIpxSapServerIfSocket, nwIpxSapServerIfServiceType,
+                   nwIpxSapServerIfIfNum, nwIpxSapServerIfSrcNode }
+    ::= { nwIpxSapServerIfTable 1 }
+
+NwIpxSapServerIfEntry ::=
+        SEQUENCE {
+                nwIpxSapServerIfNetId                 IpxAddress,
+                nwIpxSapServerIfNode                  OCTET STRING,
+                nwIpxSapServerIfSocket                OCTET STRING,
+                nwIpxSapServerIfServiceType           INTEGER,
+                nwIpxSapServerIfIfNum                 INTEGER,
+                nwIpxSapServerIfSrcNode               OCTET STRING,
+                nwIpxSapServerIfName                  OCTET STRING,
+                nwIpxSapServerIfHops                  INTEGER,
+                nwIpxSapServerIfAge                   INTEGER,
+                nwIpxSapServerIfType                  INTEGER,
+                nwIpxSapServerIfFlags                 INTEGER
+                 }
+nwIpxSapServerIfNetId       OBJECT-TYPE
+    SYNTAX          IpxAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is the primary index into the SAP server table. This number
+        corresponds to the Novell Network Number of the server offering the
+        service.  The network number consists of 4 octets."
+    ::= { nwIpxSapServerIfEntry 1 }
+
+nwIpxSapServerIfNode       OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is a secondary index into the SAP Server Table. This is the
+        MAC-layer address represented as an octetstring of the service
+        offering the server for which the entry exists, represented as an
+        octet string."
+    ::= { nwIpxSapServerIfEntry 2 }
+
+nwIpxSapServerIfSocket     OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is a secondary index into the SAP Server Table. This is the
+        socket number of the server application for which the entry exists."
+    ::= { nwIpxSapServerIfEntry 3 }
+
+nwIpxSapServerIfServiceType       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is a secondary index into the SAP Server Table. This is the
+        service type of the server application for which the entry exists."
+    ::= { nwIpxSapServerIfEntry 4 }
+
+nwIpxSapServerIfIfNum       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port through which the service for which the entry exits is available."
+    ::= { nwIpxSapServerIfEntry 5 }
+
+nwIpxSapServerIfSrcNode     OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is the MAC-layer address of the neighbor router from which the
+        service was learned about."
+    ::= { nwIpxSapServerIfEntry 6 }
+
+nwIpxSapServerIfName       OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This is the name of the server offering the service for which the
+        entry exists."
+    ::= { nwIpxSapServerIfEntry 7 }
+
+nwIpxSapServerIfHops          OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the number of hops required to reach the server offering
+        the service for which the entry exists."
+    ::= { nwIpxSapServerIfEntry 8 }
+
+nwIpxSapServerIfAge           OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the amount of time since a SAP update was last received
+        for the server and service for which the entry exits."
+    ::= { nwIpxSapServerIfEntry 9 }
+
+nwIpxSapServerIfType          OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                                other(1),
+                                invalid(2),
+                                direct(3),
+                                remote(4)
+                        }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates whether the server is on a network that is directly
+        connected through the router port for which the entry exists, or is
+        indirectly connected through another router specified by the value of
+        nwIpxSapServerIfSrcNode."
+    ::= { nwIpxSapServerIfEntry 10 }
+
+nwIpxSapServerIfFlags         OBJECT-TYPE
+    SYNTAX          INTEGER  
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Specifies properties of the SAP service for which the entry exist.
+        The bit mask is as follows: source-changed (1), best-source (2), not
+        used (4), net-down (8), not used (16)."
+    ::= { nwIpxSapServerIfEntry 11 }
+
+
+--  IPX Forward Information Base (FIB) Table
+--  This table contains the managed objects for the forwarding table of the
+--  IPX router.  This table is built from entries in the IPX routing table(s)
+--  and reflects the routes that are considered the best routes to forward on.
+nwIpxFibTable           OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxFibEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry describing each route being used to
+        forward IPX traffic to each destination Novell network and node."
+    ::= { nwIpxFib 1 }
+
+nwIpxFibEntry           OBJECT-TYPE
+    SYNTAX          NwIpxFibEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry describes the route to the destination Novell network and
+        node for which the entry exists."
+    INDEX   { nwIpxFibNetId }
+    ::= { nwIpxFibTable 1 }
+
+NwIpxFibEntry ::=
+        SEQUENCE {
+                nwIpxFibNetId           IpxAddress,
+                nwIpxFibHops            INTEGER,
+                nwIpxFibTimeTicks       TimeTicks,
+                nwIpxFibNextHopIf       INTEGER,
+                nwIpxFibNextHopNet      OCTET STRING,
+                nwIpxFibNextHopNode     MacAddress,
+                nwIpxFibRouteType       INTEGER
+                 }
+
+nwIpxFibNetId           OBJECT-TYPE
+    SYNTAX         IpxAddress
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Novell Network Number of the destination for which the
+        entry exists.  The IpxAddress consists of four octets"
+    ::= { nwIpxFibEntry 1 }
+
+nwIpxFibHops            OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the number of hops required to reach the destination for
+        which the entry exists. It is considered as metric 1."
+    DEFVAL { 0 }
+    ::= { nwIpxFibEntry 2 }
+
+nwIpxFibTimeTicks       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the amount of time, indicated by the number of TimeTicks,
+        required for a packet to reach the destination network for which the
+        entry exists. It is considered as metric 2."
+    DEFVAL { 0 }
+    ::= { nwIpxFibEntry 3 }
+
+nwIpxFibNextHopIf       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the router port through which the next hop node is 
+        available. Packets destined for the network specified by the value of
+        nwIpxFibNetId will be forwarded on this port."
+    ::= { nwIpxFibEntry 4 }
+
+nwIpxFibNextHopNet      OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the Novell Network Number portion of the fully formed next
+        hop IPX Address of the next hop node."
+    ::= { nwIpxFibEntry 5 }
+
+nwIpxFibNextHopNode     OBJECT-TYPE
+    SYNTAX          MacAddress
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the node portion of the fully formed next hop IPX Address."
+    ::= { nwIpxFibEntry 6 }
+
+nwIpxFibRouteType       OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                other(1),
+                                invalid(2),
+                                direct(3),
+                                remote(4)
+                        }
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the status of the route. A value of 3 indicates that the
+        destination is on the network segment that is directly connected to
+        the router port identified by nwIpxFibNextHopIf. A value of 4 indicates
+        that the destination is on an indirectly connected network segment,
+        which is reachable through the next hop router indicated by the value
+        of nwIpxFibNextHopNodeId. A value of 2 indicates that the route is
+        invalid."
+    DEFVAL { direct }
+    ::= { nwIpxFibEntry 7 }
+
+
+--  IPX Access Control List Table
+--  This table contains the managed objects for the Access Control Lists
+--  within the IPX Router.  Access Control Lists allow configuration of
+--  restricted access to networks and protocols reachable thru the IPX
+--  Router device.  Access Control Lists can be defined with these
+nwIpxAclValidEntries  OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the number of valid entries that exist in the access control
+        list table."
+    ::= { nwIpxAccessControl 1 }
+
+nwIpxAclTable           OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwIpxAclEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains the access control list information for IPX
+        traffic. This table contains entries, each of which allows packet
+        forwarding between source/destination pairs to be permitted or denied.
+        The list is identified by the Access Control List ID. Each list may
+        contain multiple entries ordered by sequence number. When a particular
+        access control list is searched, it is searched in sequence number
+        order and the first match found ends the search. If no match if found,
+        access defaults to permitted."
+    ::= { nwIpxAccessControl 2 }
+
+nwIpxAclEntry           OBJECT-TYPE
+    SYNTAX          NwIpxAclEntry
+    ACCESS          not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry contains IPX source/destination access information."
+    INDEX           { nwIpxAclIdentifier, nwIpxAclSequence }
+    ::= { nwIpxAclTable 1 }
+
+NwIpxAclEntry ::=
+        SEQUENCE {
+                nwIpxAclIdentifier           INTEGER,
+                nwIpxAclSequence             INTEGER,
+                nwIpxAclPermission           INTEGER,
+                nwIpxAclMatches              Counter,
+                nwIpxAclDestNetNum           OCTET STRING,
+                nwIpxAclDestNode             OCTET STRING,
+                nwIpxAclDestSocket             OCTET STRING,
+                nwIpxAclSrcNetNum            OCTET STRING,
+                nwIpxAclSrcNode              OCTET STRING,
+                nwIpxAclSrcSocket             OCTET STRING
+                 }
+
+nwIpxAclIdentifier      OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary (major) index into the IPX access control list
+        table. This value identifies the access control list by a unique
+        identifier (at least 1) arbitrarily assigned by the user. All entries
+        that have the same value for nwIpxAclIdentifier belong to the same
+        access control list."
+    ::= { nwIpxAclEntry 1 }
+
+nwIpxAclSequence        OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the secondary (minor) index into the IPX access control list
+        table. This number corresponds to a sequence number used to order
+        multiple entries within the same access control list."
+    ::= { nwIpxAclEntry 2 }
+
+nwIpxAclPermission      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            invalid(2),
+                            permit(3),
+                            deny(4),
+                            permit-bidirectional(5),
+                            deny-bidirectional(6)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies whether access is allowed or denied between the source and
+        destination address pair. Note that source and destination are
+        interchangeable when bi-directional control is selected. To remove an
+        existing entry set nwIpxAclPermission to invalid (2). Invalid entries
+        disappear after reboot."
+    DEFVAL { permit }
+    ::= { nwIpxAclEntry 3 }
+
+nwIpxAclMatches         OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the number of matches on this entry that have resulted in
+        the permit/deny access restriction being applied as part of the
+        forwarding process."
+    ::= { nwIpxAclEntry 4 }
+
+nwIpxAclDestNetNum     OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the destination Novell Network Number used to compare for
+        matches on the access control list. A 0 value is a wildcard which
+        matches any Novell Network Number."        
+    ::= { nwIpxAclEntry 5 }
+
+nwIpxAclDestNode        OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the MAC-layer address of the destination node (represented
+        as an octet string), used to compare for matches on the access control
+        list. A value 0 is a wildcard, which matches any node."
+    ::= { nwIpxAclEntry 6 }
+
+nwIpxAclDestSocket    OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the socket number of the destination socket used to compare
+        for matches on the access control list. A 0 value is a wildcard 
+        matching any socket."
+    ::= { nwIpxAclEntry 7 }
+
+nwIpxAclSrcNetNum       OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Novell Network Number of the source Novell Network used
+        to compare for matches on the access control list. A 0 value is a
+        wildcard matching any Novell Network Number."
+    ::= { nwIpxAclEntry 8 }
+
+nwIpxAclSrcNode         OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the MAC-layer address of the source node (represented as an
+         octet string), used to compare for matches on the Access Control
+         List. A 0 value is a wildcard matching any node."
+    ::= { nwIpxAclEntry 9 }
+
+nwIpxAclSrcSocket    OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the socket number of the source socket to compare for
+        matches on the Access Control List. A 0 value is a wildcard matching
+        any socket."
+    ::= { nwIpxAclEntry 10 }
+
+--  IPX Redirector Group
+
+--  IPX NetBIOS System Group
+--  In order for NetBIOS to function, an IPX routing service is provided
+--  which allows NetBIOS traffic to be flooded out all router ports with
+--  NetBIOS enabled.
+
+nwIpxNetBIOSAdminStatus    OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the administrative state of the NetBIOS Broadcast Redirector,
+        system-wide. Enabled (3) causes the NetBios Broadcast Redirector to
+        become active on any router port configured and enabled for IPX
+        Routing Services. Disabled (2) causes the NetBIOS Broadcast Redirector
+        to perform a graceful shut-down on any active IPX router port."
+    DEFVAL { disabled }
+    ::= { nwIpxNetBIOSConfig 1 }
+
+nwIpxNetBIOSOperStatus    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                      other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of the NetBIOS Broadcast
+        Redirector, system-wide. "
+     ::= { nwIpxNetBIOSConfig 2 }
+
+nwIpxNetBIOSAdminReset    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+               }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Resets the NetBIOS Broadcast Redirector, system-wide. Reset (2)
+        forces a restart of the NetBIOS Broadcast Redirector without a 
+        graceful shut-down on any active router port and without effecting any
+        other router application."
+    DEFVAL { other }
+    ::= { nwIpxNetBIOSConfig 3 }
+
+nwIpxNetBIOSOperationalTime     OBJECT-TYPE
+    SYNTAX  TimeTicks
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwIpxNetBiosOperStatus has been in the current state."
+    ::= { nwIpxNetBIOSConfig 4 }
+
+nwIpxNetBIOSVersion    OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the NetBIOS Broadcast
+        Redirector firmware, in textual format."
+    ::= { nwIpxNetBIOSConfig 5 }
+
+--    IPX NetBIOS System (aggregate) Counters
+--    This group contains the aggregate (device-wide) IPX NetBIOS packet
+--    and byte counters.
+nwIpxNetBIOSCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (system-wide) NetBIOS
+        broadcast packet and byte counters. Enabled (3) causes these counters
+        to become active on all router port. Disabled (2) causes these 
+        counters to become inactive."
+    ::= { nwIpxNetBIOSCounters 1 }
+
+nwIpxNetBIOSCtrReset     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (system-wide) NetBIOS broadcast packet and byte
+        counters. Reset (2) resets the NetBIOS broadcast aggregate counters
+        to 0. nwIpxNetBIOSCtrOperationalTime is also reset to 0."
+    ::= { nwIpxNetBIOSCounters 2 }
+
+nwIpxNetBIOSCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundreds of a second, that the
+        nwIpxNetBIOSCtrAdminStatus has been in the current state."
+    ::= { nwIpxNetBIOSCounters 3 }
+
+nwIpxNetBIOSCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS broadcast packets that have 
+        been received, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 4 }
+
+nwIpxNetBIOSCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+          "Indicates the total number of NetBIOS broadcast packets that have
+        been transmitted, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 5 }
+
+nwIpxNetBIOSCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS broadcast packets that have
+        been administratively filtered, system-wide, during
+        nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 6 }
+
+nwIpxNetBIOSCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS broadcast packets that have
+        been discarded, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 7 }
+
+nwIpxNetBIOSCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+         "Indicates the total number of bytes in the NetBIOS packets that have
+        been received, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 8 }
+
+nwIpxNetBIOSCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+        been transmitted, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 9 }
+
+nwIpxNetBIOSCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+        been administratively filtered, system-wide, during
+        nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 10 }
+
+nwIpxNetBIOSCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+        been discarded, system-wide, during nwIpxNetBIOSCtrOperationalTime."
+    ::= { nwIpxNetBIOSCounters 11 }
+
+--  IPX NetBIOS Interface Table
+--    This table contains the managed objects used to setup and configure
+--    NetBIOS on a per router port basis.
+nwIpxNetBIOSIfTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NwIpxNetBIOSIfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. Each entry can
+        contain different values, allowing the NetBIOS Broadcast Redirector
+        configuration to vary from router port to router port. This table is
+        indexed by nwIpxNetBIOSIfIndex, which indicates the value of MIB 2
+        ifindex, which identifies the router port for which the entry exists."    
+    ::= { nwIpxNetBIOSIfConfig 1 }
+
+nwIpxNetBIOSIfEntry    OBJECT-TYPE
+        SYNTAX  NwIpxNetBIOSIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Each entry contains the IPX NetBIOS broadcasting configuration for
+             the router port for which the entry exists."                                INDEX   { nwIpxNetBIOSIfIndex }
+        ::= { nwIpxNetBIOSIfTable 1 }
+
+NwIpxNetBIOSIfEntry ::=
+        SEQUENCE {
+                nwIpxNetBIOSIfIndex                INTEGER,
+                nwIpxNetBIOSIfAdminStatus        INTEGER,
+                nwIpxNetBIOSIfOperStatus        INTEGER,
+                nwIpxNetBIOSIfOperationalTime    TimeTicks
+                 }
+
+nwIpxNetBIOSIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the value in MIB 2 ifindex, which identifies the router
+             port for which the entry exists."
+    ::= { nwIpxNetBIOSIfEntry 1 }
+
+nwIpxNetBIOSIfAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the administrative state of IPX NetBIOS broadcasting on the
+             router port for which the entry exists. Enabled (3) causes this
+             router port to become active. Disabled (2) causes it to become
+             inactive."
+    DEFVAL { disabled }
+    ::= { nwIpxNetBIOSIfEntry 2 }
+
+nwIpxNetBIOSIfOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current operating condition of IPX NetBIOS
+             broadcasting on the IPX router port for which the entry exists."
+            ::= { nwIpxNetBIOSIfEntry 3 }
+
+nwIpxNetBIOSIfOperationalTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the elapsed time, in hundredths of a second, that IPX
+             NetBIOS broadcasting, nwIpxNetBIOSIfOperStatus, has been in its
+             current state on the router port for which the entry exists."
+::= { nwIpxNetBIOSIfEntry 4 }
+
+--    IPX NetBIOS Interface Counters Table
+--    This table contains the managed objects for IPX NetBIOS packet and 
+--    byte counter on a per router port basis
+
+nwIpxNetBIOSIfCtrTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwIpxNetBIOSIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains the IPX NetBIOS packet and byte counters for each
+         router port on this device."
+        ::= { nwIpxNetBIOSIfCounters 1 }
+
+nwIpxNetBIOSIfCtrEntry      OBJECT-TYPE
+    SYNTAX      NwIpxNetBIOSIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the NetBIOS Interface Counter Table.
+         This number corresponds to the index into the MIB 2 Interface Table
+         which describes the router port for which this entry exists."
+         INDEX           { nwIpxNetBIOSIfCtrIfIndex }
+         ::= { nwIpxNetBIOSIfCtrTable 1 }
+
+NwIpxNetBIOSIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxNetBIOSIfCtrIfIndex            INTEGER,
+                nwIpxNetBIOSIfCtrAdminStatus        INTEGER,
+                nwIpxNetBIOSIfCtrReset              INTEGER,
+                nwIpxNetBIOSIfCtrOperationalTime    TimeTicks,
+                nwIpxNetBIOSIfCtrInPkts             Counter,
+                nwIpxNetBIOSIfCtrOutPkts            Counter,
+                nwIpxNetBIOSIfCtrFilteredPkts       Counter,
+                nwIpxNetBIOSIfCtrDiscardPkts        Counter,
+                nwIpxNetBIOSIfCtrInBytes            Counter,
+                nwIpxNetBIOSIfCtrOutBytes           Counter,
+                nwIpxNetBIOSIfCtrFilteredBytes      Counter,
+                nwIpxNetBIOSIfCtrDiscardBytes       Counter
+                 }
+
+nwIpxNetBIOSIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the IPX NetBIOS Interface Counter Table.
+         This number correspoonds to the index into the MIB 2 Interface Table
+         which describes the router port for which the entry exists."
+        ::= { nwIpxNetBIOSIfCtrEntry 1 }
+
+nwIpxNetBIOSIfCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the IPX NetBIOS packet and bytes
+         counters on the IPX router port for which the entry exists. Enabled (3)
+         causes these counters to become active on the configured NetBIOS router
+         port. Disabled (2) causes thes counters to become inactive on the
+         configured NetBIOS router port."
+        ::= { nwIpxNetBIOSIfCtrEntry 2 }
+
+nwIpxNetBIOSIfCtrReset      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the NetBIOS packet and bvyte counters on the router port for
+         which the entry exists. Reset (2) resets the interface-specific
+         counters to 0. nwIpxNetBIOSIfCtrOperationalTime is also reset to 0."
+        ::= { nwIpxNetBIOSIfCtrEntry 3 }
+
+nwIpxNetBIOSIfCtrOperationalTime     OBJECT-TYPE
+        SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the amount of time, in hundredths of a second, that the
+         interface-specific NetBIOS packet and byte counters have been active on
+         the router port for which the entry exists."
+        ::= { nwIpxNetBIOSIfCtrEntry 4 }
+
+nwIpxNetBIOSIfCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS packets that have been recieved,
+         on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 5 }
+
+nwIpxNetBIOSIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS packets that have been
+         transmitted, on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationallTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 6 }
+
+nwIpxNetBIOSIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS packets that have been
+         administratively filtered, on the router port for which the entry
+         exists, during nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 7 }
+
+nwIpxNetBIOSIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of NetBIOS packets that have been discarded,
+         on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 8 }
+
+nwIpxNetBIOSIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+         been recieved, on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 9 }
+
+nwIpxNetBIOSIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+         been transmitted, on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 10 }
+
+nwIpxNetBIOSIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+         been administratively filtered, that were recieved on the router port
+         for which the entry exists during nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 11 }
+
+nwIpxNetBIOSIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the NetBIOS packets that have
+         been discarded, on the router port for which the entry exists, during
+         nwIpxNetBIOSIfCtrOperationalTime."
+        ::= { nwIpxNetBIOSIfCtrEntry 12 }
+
+
+--  IPX Broadcast System Group
+
+--  IPX Broadcast support allows broadcast packets that would normally be
+--  delivered to the host to also be switched out the proper router port
+--  if that router port has broadcast enabled. The router port is determined
+--  by the destination network number in the broadcast packet.
+
+nwIpxBcastAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Sets the administrative state of IPX Broadcast. Enabled (3) casuses
+             IPX Broadcast to become active on any configured IPX router port.
+             Disabled (2) causes IPX Broadcast to perform a graceful shutdown on
+             any active IPX router ports."
+    DEFVAL { disabled }
+    ::= { nwIpxBroadcastConfig 1 }
+
+nwIpxBcastOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current operating condition of the IPX Broadcast."
+    ::= { nwIpxBroadcastConfig 2 }
+
+nwIpxBcastAdminReset    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Resets the IPX Broadcast. Reset (2) will force a restart of the IPX
+             Broadcast without a graceful shutdown on any active IPX router port,
+             without effecting any other router applications."
+        DEFVAL { other }
+    ::= { nwIpxBroadcastConfig 3 }
+
+nwIpxBcastOperationalTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the amount of time, in hundredths of a second, that IPX
+             Broadcast has been in its current operational state."
+    ::= { nwIpxBroadcastConfig 4 }
+
+nwIpxBcastVersion    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current revision level of IPX Broadcast."
+    ::= { nwIpxBroadcastConfig 5 }
+
+--    IPX Broadcast System (aggregate) Counters
+--    This group contains the aggregate (device-wide) IPX Broadcast packet
+--    and byte counters.
+nwIpxBcastCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (device-wide) Broadcast packet and byte counters. enable (3) causes these counters
+ to become active on any router port running Broadcast. disabled (2) 
+causes these counters to become inactive on all router port
+        running Broadcast."
+        ::= { nwIpxBroadcastCounters 1 }
+
+nwIpxBcastCtrReset     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (device-wide) IPX Broadcast packet and byte
+         counters. Reset (2) resets the IPX Broadcast aggregate counters to 0.
+         nwIpxBcasstCtrOperationalTime is also reset to 0."
+        ::= { nwIpxBroadcastCounters 2 }
+
+nwIpxBcastCtrOperationalTime       OBJECT-TYPE
+        SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+          "Indicates the amount of time, in hundredths of a second, that the
+         aggregate (device-wide) IPX Broadcast packet and byte counters have been
+         in the current administrative state."
+        ::= { nwIpxBroadcastCounters 3 }
+
+nwIpxBcastCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         received, device-wide, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 4 }
+
+nwIpxBcastCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+          "Indicates the total number of IPX Broadcast packets that have been
+         transmitted, device-wide, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 5 }
+
+nwIpxBcastCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         administaratively filtered, device-wide, during
+         nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 6 }
+
+nwIpxBcastCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         discarded, device-wide, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 7 }
+
+nwIpxBcastCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+         "Indicates the total number of IPX Broadcast packets that have been
+         recieved, device-wide, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 8 }
+
+nwIpxBcastCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         transmitted, device-wide, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 9 }
+
+nwIpxBcastCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Broadcast packets that
+         have been administratively filtered, device-wide, during
+         nwIpxBcastOperationalTime."
+        ::= { nwIpxBroadcastCounters 10 }
+
+nwIpxBcastCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+                "Indicates the total number of bytes in the Broadcast packets that
+         have been discarded, during nwIpxBcastCtrOperationalTime."
+        ::= { nwIpxBroadcastCounters 11 }
+
+
+--  IPX Broadcast Interface Table
+--    This table contains the managed objects used to setup and configure
+--    Broadcast on a per router port basis.
+nwIpxBcastIfTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwIpxBcastIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "This table contains an entry for each router port configured for the
+             IPX distance-vector based routing protocol. Each entry can contain
+             different values, allowing the routing protocol configuration to
+             vary from router port to router port. This table is indexed by
+             nwIpxBcastIfIndex, which indicates the value of MIB 2 ifindex, which
+             identifies the router port for which the entry exists."
+        ::= { nwIpxBroadcastIfConfig 1 }
+
+nwIpxBcastIfEntry    OBJECT-TYPE
+        SYNTAX  NwIpxBcastIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Specifies the IPX Broadcast configuration information for the
+             logical IPX interface for which this entry exists."
+    INDEX   { nwIpxBcastIfIndex }
+        ::= { nwIpxBcastIfTable 1 }
+
+NwIpxBcastIfEntry ::=
+        SEQUENCE {
+                nwIpxBcastIfIndex            INTEGER,
+                nwIpxBcastIfAdminStatus        INTEGER,
+                nwIpxBcastIfOperStatus        INTEGER,
+                nwIpxBcastIfOperationalTime    TimeTicks
+                 }
+
+nwIpxBcastIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This index corresponds to the primary index into the MIB 2 Interface
+             Table, which describes the router port for which the entry exists."
+    ::= { nwIpxBcastIfEntry 1 }
+
+nwIpxBcastIfAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the administrative state of the IPX Broadcast on the router
+             port for which the entry exists. Enabled (2) causes IPX Broadcast on
+             this router port to become active. Disabled (2) causes IPX Broadcast
+             to become inactive."
+        DEFVAL { disabled }
+    ::= { nwIpxBcastIfEntry 2 }
+
+nwIpxBcastIfOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current operating condition of the IPX Broadcast on
+             the router port for which the entry exists."
+    ::= { nwIpxBcastIfEntry 3 }
+
+nwIpxBcastIfOperationalTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the elapsed time, in hundredths of a second, that
+             nwIPXBcastIfOperStatus has been in its current state."
+    ::= { nwIpxBcastIfEntry 4 }
+
+--    IPX Broadcast Interface Counters Table
+--    This table contains the managed objects for IPX Broadcast packet and 
+--    byte counter on a per router port basis.
+nwIpxBcastIfCtrTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwIpxBcastIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains the IPX Broadcast packet and byte counters for each
+         router port on this device."
+        ::= { nwIpxBroadcastIfCounters 1 }
+
+nwIpxBcastIfCtrEntry      OBJECT-TYPE
+        SYNTAX          NwIpxBcastIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the Broadcast Interface Counter Table.
+         This number corresponds to the index into the MIB 2 Interface Table
+         which describes the router port for which the entry exists."
+        INDEX           { nwIpxBcastIfCtrIfIndex }
+        ::= { nwIpxBcastIfCtrTable 1 }
+
+NwIpxBcastIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxBcastIfCtrIfIndex            INTEGER,
+                nwIpxBcastIfCtrAdminStatus        INTEGER,
+                nwIpxBcastIfCtrReset              INTEGER,
+                nwIpxBcastIfCtrOperationalTime    TimeTicks,
+                nwIpxBcastIfCtrInPkts             Counter,
+                nwIpxBcastIfCtrOutPkts            Counter,
+                nwIpxBcastIfCtrFilteredPkts       Counter,
+                nwIpxBcastIfCtrDiscardPkts        Counter,
+                nwIpxBcastIfCtrInBytes            Counter,
+                nwIpxBcastIfCtrOutBytes           Counter,
+                nwIpxBcastIfCtrFilteredBytes      Counter,
+                nwIpxBcastIfCtrDiscardBytes       Counter
+                 }
+
+nwIpxBcastIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the IPX Broadcast Interface Counter
+         Table. This number corresponds to the index into the MIB 2 Interface
+         Table which describes the router port for which the entry exists."
+        ::= { nwIpxBcastIfCtrEntry 1 }
+
+nwIpxBcastIfCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the IPX Broadcast packet and byte
+         counters on the router port for which the entry exists. Enabled (3)
+         causes these counters to become acive on the configured IPX Broadcast
+         router port. Disabled (2) causes these counters to become inactive on
+         the configured IPX Broadcast router port."
+        ::= { nwIpxBcastIfCtrEntry 2 }
+
+nwIpxBcastIfCtrReset      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the IPX Broadcast packet and byte counters on the router port for
+         which the entry exists. Reset (2) resets the interface-specific counters
+         to 0. nwIpxBcastIfCtrOperationalTime is also reset to 0."
+        ::= { nwIpxBcastIfCtrEntry 3 }
+
+nwIpxBcastIfCtrOperationalTime     OBJECT-TYPE
+        SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the amount of time, in hundredths of a second, that the
+         interface-specific IPX Broadcast packet and byte counters have been in
+         the current administrative state on the router port for which the entry
+         exists."
+        ::= { nwIpxBcastIfCtrEntry 4 }
+
+nwIpxBcastIfCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         recieved, on the router port for which the entry exists, during
+         nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 5 }
+
+nwIpxBcastIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of Broadcast packets that have been
+         transmitted, on the router port for which the entry existsl, during
+         nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 6 }
+
+nwIpxBcastIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Broadcast packets that have been
+         administratively filtered, on the router port for which the entry
+         exists, during nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 7 }
+
+nwIpxBcastIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+                "Indicates the total number of Broadcast packets that have been dis-
+        carded, on the router port for which the entry exists, during 
+        nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 8 }
+
+nwIpxBcastIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Broadcast packets that
+         have been recieved, on the router port for which the entry exists,
+         during nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 9 }
+
+nwIpxBcastIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Broadcast packets that
+         have been transmitted, on the router port for which the entry exists,
+         during nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 10 }
+
+nwIpxBcastIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Broadcast packets that
+         have been administratively filtered on the router port for which the
+         entry exists during nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 11 }
+
+nwIpxBcastIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Broadcast packets that
+         have been discarded on the router port for which the entry exists,
+         during nwIpxBcastIfCtrOperationalTime."
+        ::= { nwIpxBcastIfCtrEntry 12 }
+
+
+--  IPX Echo System Group
+--  Echo messages provide the ability to check for host reachability and
+--  network connectivity.  If the router receives an ECHO message, it
+--  sends and ECHO reply to the source of the ECHO message.
+
+nwIpxEchoAdminStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Sets the administrative state of the IPX Echo. Enabled (3) causes
+             IPX ECHO to become active on any configured IPX router ports.
+             Disabled (2) causes IPX Echo to perform a graceful shutdown on any
+             active IPX router port."
+        DEFVAL { disabled }
+    ::= { nwIpxEchoConfig 1 }
+
+nwIpxEchoOperStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the operating condition of IPX Echo."
+    ::= { nwIpxEchoConfig 2 }
+
+nwIpxEchoAdminReset    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Resets IPX Echo. Reset (2) will force a restart of IPX Echo without
+             a graceful shutdown on any active IPX router port, without effecting
+             any other router applications."
+::= { nwIpxEchoConfig 3 }
+
+nwIpxEchoOperationalTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the amount of time, in hundredths of a second, that IPX
+             Echo has been in its current administrative state,
+             nwIpxEchoOperStatus."
+::= { nwIpxEchoConfig 4 }
+
+nwIpxEchoVersion    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current revision level of IPX Echo firmware."
+    ::= { nwIpxEchoConfig 5 }
+
+--    IPX Echo System (aggregate) Counters
+--    This group contains the aggregate (device-wide) IPX Echo packet 
+--    and byte counters.
+nwIpxEchoCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregae (device-wide) IPX Echo
+         packet and byte counters. Enabled (3) causes these counters to become
+         active on any router port running IPX Echo. Disabled (2) causes these
+         counters to become inactive on all router ports."
+        ::= { nwIpxEchoCounters 1 }
+
+nwIpxEchoCtrReset     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (device-wide) IPX Echo packet and byte counters.
+         Reset (2) resets the IPX Echo aggregate counters to 0.
+         nwIpxEchoCtrOperationalTime is also reset to 0."
+        ::= { nwIpxEchoCounters 2 }
+
+nwIpxEchoCtrOperationalTime       OBJECT-TYPE
+        SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the amount of time, in hundredths of a second, that the
+         aggreagate (device-wide) IPX Echo packet and byte counters have been in
+         the current administrative state."
+        ::= { nwIpxEchoCounters 3 }
+
+nwIpxEchoCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been recieved,
+         device-wide, during nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 4 }
+
+nwIpxEchoCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+          "Indicates the total number of IPX Echo packets that have been
+         transmitted, device-wide, during nwIpxEchoCtrOperationalTIme."
+        ::= { nwIpxEchoCounters 5 }
+
+nwIpxEchoCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been
+         administratively filtered, device-wide, during
+         nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 6 }
+
+nwIpxEchoCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been discarded,
+         device-wide, during nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 7 }
+
+nwIpxEchoCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+         "Indicates the total number of IPX Echo packets that have been recieved,
+         device-wide, during nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 8 }
+
+nwIpxEchoCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been
+         transmitted, device-wide, during nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 9 }
+
+nwIpxEchoCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been
+         administratively filtered, device-wide, during
+         nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 10 }
+
+nwIpxEchoSCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+                "Indicates the total number of bytes in the Echo packets that
+         have been discarded, during nwIpxEchoCtrOperationalTime."
+        ::= { nwIpxEchoCounters 11 }
+
+
+--  IPX Echo Interface Table
+--    This table contains the managed objects used to setup and configure
+--    Echo on a per router port basis.
+nwIpxEchoIfTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwIpxEchoIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "This table contains an entry for each router port configured for IPX
+             Echo. Each entry can contain different values, allowing the routing
+             protocol configuration to vary from router port to router port. This
+             table is indexed by nwIpxEchoIfIndex, which indicates the value of
+             MIB 2 ifindex, which identifies the router port for which the entry
+             exists."    
+        ::= { nwIpxEchoIfConfig 1 }
+
+nwIpxEchoIfEntry    OBJECT-TYPE
+        SYNTAX  NwIpxEchoIfEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "Specifies the IPX Echo information for the logical IPX interface for
+             which the entry exists."
+    INDEX   { nwIpxEchoIfIndex }
+        ::= { nwIpxEchoIfTable 1 }
+
+NwIpxEchoIfEntry ::=
+        SEQUENCE {
+                nwIpxEchoIfIndex            INTEGER,
+                nwIpxEchoIfAdminStatus        INTEGER,
+                nwIpxEchoIfOperStatus        INTEGER,
+                nwIpxEchoIfOperationalTime    TimeTicks
+                  }
+
+nwIpxEchoIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This index corresponds to the primary index into the MIB 2 ifTable,
+             which describes the router port for which the entry exists."
+    ::= { nwIpxEchoIfEntry 1 }
+
+nwIpxEchoIfAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the administrative state of IPX Echo on the router port for
+             which the entry exists. Enabled (2) causes this router port to
+             become active. Disabled (3) causes this router port to become
+             inactive."
+        DEFVAL { enabled }
+    ::= { nwIpxEchoIfEntry 2 }
+
+nwIpxEchoIfOperStatus    OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the current operating condition of IPX Echo on the router
+             port for which the entry exists."
+    ::= { nwIpxEchoIfEntry 3 }
+
+nwIpxEchoIfOperationalTime     OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the elapsed time, in hundredths of a second, that
+             nwIpxEchoIfAdminStatus has been in its current state."
+    ::= { nwIpxEchoIfEntry 4 }
+
+--    IPX Echo Interface Counters Table
+--    This table contains the managed objects for IPX Echo packet and 
+--    byte counter on a per router port basis.
+nwIpxEchoIfCtrTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwIpxEchoIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains the IPX Echo packet and byte counters for each
+         router port on this device."
+        ::= { nwIpxEchoIfCounters 1 }
+
+nwIpxEchoIfCtrEntry      OBJECT-TYPE
+        SYNTAX          NwIpxEchoIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the Echo Interface Counter Table. This
+         number corresponds to the index into the MIB 2 Interface Table which
+         describes the router port for which the entry exists."
+        INDEX           { nwIpxEchoIfCtrIfIndex }
+        ::= { nwIpxEchoIfCtrTable 1 }
+
+NwIpxEchoIfCtrEntry ::=
+        SEQUENCE {
+                nwIpxEchoIfCtrIfIndex            INTEGER,
+                nwIpxEchoIfCtrAdminStatus        INTEGER,
+                nwIpxEchoIfCtrReset              INTEGER,
+                nwIpxEchoIfCtrOperationalTime    TimeTicks,
+                nwIpxEchoIfCtrInPkts             Counter,
+                nwIpxEchoIfCtrOutPkts            Counter,
+                nwIpxEchoIfCtrFilteredPkts       Counter,
+                nwIpxEchoIfCtrDiscardPkts        Counter,
+                nwIpxEchoIfCtrInBytes            Counter,
+                nwIpxEchoIfCtrOutBytes           Counter,
+                nwIpxEchoIfCtrFilteredBytes      Counter,
+                nwIpxEchoIfCtrDiscardBytes       Counter
+                 }
+
+nwIpxEchoIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary index into the IPX Echo Interface Counter Table.
+         This number corresponds to the index into the MIB 2 Interfcace Table
+         which describes the router port for which the entry exists."
+        ::= { nwIpxEchoIfCtrEntry 1 }
+
+nwIpxEchoIfCtrAdminStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the IPX Echo packet and byte counters
+         on the IPX router port for which the entry exists. Enabled (3) causes
+         these counters to become active on the router port configured for IPX
+         Echo. Disabled (2) causes these counters to become inactive on the
+         configured IPX Echo router port."
+        ::= { nwIpxEchoIfCtrEntry 2 }
+
+nwIpxEchoIfCtrReset      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the IPX Echo packet andbyte counters on the router port for which
+         the entryexists. Reset (2) resets the interface-specific counters to 0.
+         nwIpxEchoIfCtrOperationalTime is also reset to 0."
+        ::= { nwIpxEchoIfCtrEntry 3 }
+
+nwIpxEchoIfCtrOperationalTime     OBJECT-TYPE
+        SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the amount of time, in hundredths of a second, that the
+         interface-specific IPX Echo packet and byte counters have been in the
+         current administrative state on the router port for which the entry
+         exists."
+        ::= { nwIpxEchoIfCtrEntry 4 }
+
+nwIpxEchoIfCtrInPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been recieved,
+         on the router port for which the entry exists, during
+         nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 5 }
+
+nwIpxEchoIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been
+         transmitted, on the router port for which the entry exists, during
+         nwIpxEchoIfCrOperationalTIme."
+        ::= { nwIpxEchoIfCtrEntry 6 }
+
+nwIpxEchoIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been
+         administratively filtered, on the router port for which the entry
+         exists, during nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 7 }
+
+nwIpxEchoIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of IPX Echo packets that have been discaded,
+         on the router port for which the entry exists, during
+         nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 8 }
+
+nwIpxEchoIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Echo packets that have
+         been recieved, on the router port for which the entry exists, during
+         nwIpxEchoIfCtrOpeationalTime."
+        ::= { nwIpxEchoIfCtrEntry 9 }
+
+nwIpxEchoIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Echo packets that have
+         been transmitted, on the router port for which the entry exists, during
+         nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 10 }
+
+nwIpxEchoIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Echo packets that have
+         been administratively filtered and recieved on the router port for which
+         the entry exists, during nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 11 }
+
+nwIpxEchoIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the IPX Echo packets that have
+         been discarded, that were recieved on the router port for which the
+         entry exists, during nwIpxEchoIfCtrOperationalTime."
+        ::= { nwIpxEchoIfCtrEntry 12 }
+
+--
+--  IPX Hosts-to-Media Table 
+
+--  This table provides a mapping between IPX Network Protocol
+--  addresses and their corresponding circuit identifiers (if
+--  applicable), port numbers, and framing.
+
+
+nwIpxHostMapTable       OBJECT-TYPE
+    SYNTAX           SEQUENCE OF NwIpxHostMapEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+                "The Ipx Address translation table used for mapping 
+         an IPX address to a circuit identifier (if applicable), 
+         corresponding port number, and framing type."
+        ::= { nwIpxHostsToMedia 1 }
+
+nwIpxHostMapEntry     OBJECT-TYPE
+     SYNTAX         NwIpxHostMapEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+                "Each entry contains one IpxAddress to circuit
+        equivalence. Also provided is the framing required to
+        converse with this host, and the corresponding logical 
+        port number."
+        INDEX   { nwIpxHostMapIfIndex, nwIpxHostMapIpxAddr }
+        ::= { nwIpxHostMapTable 1 }
+
+ NwIpxHostMapEntry ::=
+        SEQUENCE {
+                nwIpxHostMapIfIndex     INTEGER,
+                nwIpxHostMapIpxAddr     IpxAddress,
+                nwIpxHostMapPhysAddr    PhysAddress,
+                nwIpxHostMapType        INTEGER,   
+                nwIpxHostMapCircuitID   INTEGER,
+                nwIpxHostMapFraming     INTEGER,   
+                nwIpxHostMapPortNumber  INTEGER
+                }
+
+nwIpxHostMapIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the primary (major) index into the Ipx HostMap 
+        table. This number corresponds to the index into the MIB-2 
+        Interfaces Group which describes the IPX router port for which
+        the entry exists."
+        ::= { nwIpxHostMapEntry 1 }
+ 
+nwIpxHostMapIpxAddr    OBJECT-TYPE
+        SYNTAX  IpxAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IpxAddress of the host on the corresponding interface
+        and circuit (if applicable).  The IpxAddress consists of a network
+        number of 4 octets followed by 6 octets of node identifier."
+        ::= { nwIpxHostMapEntry 2 }
+
+nwIpxHostMapPhysAddr    OBJECT-TYPE
+        SYNTAX  PhysAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The media-dependent 'physical' address. The value of
+              this object is 0 for entries indicating native-wan(8)
+              framing."
+        ::= { nwIpxHostMapEntry 3 }
+
+nwIpxHostMapType        OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            invalid(2),
+            dynamic(3),
+            static(4),
+            inactive(5)
+        }    
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                 "Setting this object to the value invalid(2) has 
+        the effect of invalidating the corresponding entry in the
+        nwIpxHostMapTable.  That is, it effectively dissasociates the
+        circuit and/or interface identified with said entry from the  
+        mapping identified with said entry.  It is an implementation-
+        specific matter as to whether the agent removes an invalidated 
+        entry from the table.  Accordingly, management stations must be 
+        prepared to receive tabular information from agents that 
+        corresponds to entries not currently in use.  Proper inter-
+        pretation of such entries requires examination of the relevant
+        wIpxHostMapType object."
+
+        ::= { nwIpxHostMapEntry 4 }
+
+nwIpxHostMapCircuitID    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The identifier for the virtual circuit present on the 
+        interface. On an interface configured for Frame Relay,
+        this number is the DLCI for the IPX Address at the end of
+        the circuit. For non-WAN interfaces, the value of this
+        object is zero."
+        ::= { nwIpxHostMapEntry 5 }
+
+nwIpxHostMapFraming    OBJECT-TYPE
+        SYNTAX INTEGER {                    --  valid media types
+                        other(1),           --  experimental
+                        ethernet(2),        --  ethernet
+                        snap(3),            --  enet,fddi,and token ring
+                        i8022(4),           --  enet, token ring, and fddi
+                        novell(6),          --  ethernet and fddi
+                        nativewan(8),       --  wan media types
+                        encapenet(9),       --  wan media types
+                        encapenet8022(10),  --  wan media types
+                        encapenetsnap(11),  --  wan media types
+                        encapenetnovell(12), -- wan media types
+                        encaptr8022(13),    --  wan media types
+                        encaptrsnap(14),    --  wan media types
+                        encapfddi8022(15),  --  wan media types
+                        encapfddisnap(16),  --  wan media types
+                        canonical(17)       --  special, tbd
+                        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the framing type required to converse with the
+         host for which this entry exists."
+        ::= { nwIpxHostMapEntry 6 }
+
+nwIpxHostMapPortNumber    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The unique value for the logical port number. It's value
+        ranges between 1 and a maximum value which is dependent on both
+        the number of configured interfaces in the system and the number
+        of circuits present on those interfaces which are of WAN type."
+        ::= { nwIpxHostMapEntry 7 }
+
+
+
+
+--  IPX Event Group
+nwIpxEventAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the administrative state of IPX event logging. Enabled (3)
+         causes the event log to become active. Disabled (2) causes the event log
+         to become inactive."
+        DEFVAL { disabled }
+        ::= { nwIpxEventLogConfig 1 }
+
+nwIpxEventMaxEntries     OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the maximum size of the event log table. When the table size
+             exceeds the maximum, the first entry is deleted until the size of
+             the table does not exceed the maximum."
+        DEFVAL { 100 }
+        ::= { nwIpxEventLogConfig 2 }
+
+nwIpxEventTraceAll OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Sets the administrative state of the event log. Enabled (3) allows
+             logging of all event types on all router ports from all protocols
+             and components. Disabled (2) causes the filter table to specify
+             which events to log."
+    DEFVAL { enabled }
+        ::= { nwIpxEventLogConfig 3 }
+
+
+--  Event Log Filter Table
+--  The Event Log Filter Table contains the managed objects used to set-up
+--  and configure log entries.
+
+nwIpxEventFilterTable            OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwIpxEventFilterEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+            "This table contains an entry for each event filter configured for
+             IPX Routing Services events."
+        ::= { nwIpxEventLogFilterTable 1 }
+
+nwIpxEventFilterEntry            OBJECT-TYPE
+        SYNTAX          NwIpxEventFilterEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+            "Each entry describes an event filter which defines a particular type
+             of event to be logged to the event log. The nwIpxEventProtocol
+             refers to the instance used in the nwRtgProtocolTable and
+             nwComponentTable specified by the Cabletron Routing Services MIB,
+             and identifies the protocol to which the entry applies."
+        INDEX   { nwIpxEventFltrProtocol, nwIpxEventFltrIfNum }
+        ::= { nwIpxEventFilterTable 1 }
+
+NwIpxEventFilterEntry ::=
+        SEQUENCE {
+                nwIpxEventFltrProtocol   INTEGER,
+                nwIpxEventFltrIfNum      INTEGER,
+                nwIpxEventFltrControl    INTEGER,
+                nwIpxEventFltrType       INTEGER,
+                nwIpxEventFltrSeverity   INTEGER,
+                nwIpxEventFltrAction     INTEGER
+                 }
+
+nwIpxEventFltrProtocol   OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Specifies the routing protocol involved in the event for which the
+             event filter exists."
+        ::= { nwIpxEventFilterEntry 1 }
+
+nwIpxEventFltrIfNum      OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Specifies the router port involved in the event for which the event
+             filter exists."
+        ::= { nwIpxEventFilterEntry 2 }
+
+nwIpxEventFltrControl    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                other(1),
+                                delete(2),
+                                add(3)
+                        }
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+            "Set this value to 3 to add the event filter to the Event Filter
+             Table. Set this value to 2 to delete the event filter from the Event
+             Filter Table."
+         DEFVAL { add }
+        ::= { nwIpxEventFilterEntry 3 }
+
+nwIpxEventFltrType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            misc(1),
+                            timer(2),
+                            rcv(4),
+                            xmit(8),
+                            event(16),
+                            error(32)
+            }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "This 6 bit mask specifies the types of events to be logged. By
+             default all 6 bits are set to 1, indicating that all types of events
+             will be logged. Setting any bit to 0 removes an event type from this
+             field and prevents that type of event from being logged. Adding
+             event types to this field will enable those types of events to be
+             logged."
+        DEFVAL { misc }
+    ::= { nwIpxEventFilterEntry 4 }
+
+nwIpxEventFltrSeverity   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             highest(1),
+                             highmed(2),
+                             highlow(3)
+            }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "This object controls the amount of logging by ignoring events of
+             lower priority than specified by this filter value. The highest
+             value will ignore all events except those of the highest severity.
+             `Highmed' will log all events highest priority through lowest.
+             `Highlow' will log all events highest priority through lowest. The
+             `highmed' severity is the default setting."
+        DEFVAL { highest }
+    ::= { nwIpxEventFilterEntry 5 }
+
+nwIpxEventFltrAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        log(1),
+                        trap(2),
+                        log-trap(3)
+            }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This field specifies how the events are to be logged. Logging to the
+         `log' stores the events in the event log table. Logging to `trap' sends
+         events out through the trap mechanism."
+        DEFVAL { log }
+    ::= { nwIpxEventFilterEntry 6 }
+
+--  Event Log Table
+--  The Event Log Table contains the logged events.
+
+nwIpxEventTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF NwIpxEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+            "This table contains an entry for each event that has been logged."
+        ::= { nwIpxEventLogTable 1 }
+
+nwIpxEventEntry          OBJECT-TYPE
+        SYNTAX          NwIpxEventEntry
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+            "Each entry contains the information about an event that has been
+             logged to the event table."
+        INDEX           { nwIpxEventNumber }
+        ::= { nwIpxEventTable 1 }
+
+NwIpxEventEntry ::=
+        SEQUENCE {
+                nwIpxEventNumber         INTEGER,
+                nwIpxEventTime           TimeTicks,
+                nwIpxEventType           INTEGER,
+                nwIpxEventSeverity       INTEGER,
+                nwIpxEventProtocol       INTEGER,
+                nwIpxEventIfNum          INTEGER,
+                nwIpxEventTextString     OCTET STRING
+                 }
+
+nwIpxEventNumber         OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "An ordinal value assigned to the event for which the entry exists.
+             nwIpxEventNumber is assigned so that each event in the event log can
+             be uniquely identified by the value of nwIpxEventNumber."
+        ::= { nwIpxEventEntry 1 }
+
+nwIpxEventTime           OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the time at which the event was logged to the event log."
+        ::= { nwIpxEventEntry 2 }
+
+nwIpxEventType           OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                misc(1),
+                                timer(2),
+                                rcv(4),
+                                xmit(8),
+                                event(16),
+                                error(32)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the type of event that was logged."
+        ::= { nwIpxEventEntry 3 }
+
+nwIpxEventSeverity               OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                highest(1),
+                                highmed(2),
+                                highlow(3)
+                        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the priority that was assigned to this type event."
+        ::= { nwIpxEventEntry 4 }
+
+nwIpxEventProtocol               OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the routing protocol that was involved in this event."
+        ::= { nwIpxEventEntry 5 }
+
+nwIpxEventIfNum          OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the router port that was involved in the event."
+        ::= { nwIpxEventEntry 6 }
+
+nwIpxEventTextString     OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Contains the actual text string that was logged."
+        ::= { nwIpxEventEntry 7 }
+
+END

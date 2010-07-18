@@ -1,0 +1,134 @@
+
+BAY-STACK-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Counter64, Integer32
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+bayStackStatsMib MODULE-IDENTITY
+    LAST-UPDATED    "200703090000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks VRRP Extension MIB
+
+         Copyright 2005-2007 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains
+         all title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+
+    REVISION "200703090000Z" -- 09 March 2007
+    DESCRIPTION "v2:  Added bayStackStatsUnitTable."
+
+    REVISION "200508120000Z" -- 12 August 2005
+    DESCRIPTION "v1:  Initial version."
+
+    ::= { bayStackMibs 12 }
+
+bayStackStatsNotifications OBJECT IDENTIFIER ::= { bayStackStatsMib 0 }
+bayStackStatsObjects       OBJECT IDENTIFIER ::= { bayStackStatsMib 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- Baystack Interface Stats Table
+-- -------------------------------------------------------------
+
+bayStackStatsIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BayStackStatsIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of per-interface statistics counters."
+    ::= { bayStackStatsObjects 1 }
+
+bayStackStatsIfEntry OBJECT-TYPE
+    SYNTAX BayStackStatsIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        ""
+    INDEX { bayStackStatsIfIndex }
+    ::= { bayStackStatsIfTable 1 }
+
+BayStackStatsIfEntry ::=
+    SEQUENCE {
+        bayStackStatsIfIndex                   InterfaceIndex,
+        bayStackStatsIfNoResourcesPktsDropped  Counter64
+    }
+
+bayStackStatsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "ifIndex value of the interface."
+    ::= { bayStackStatsIfEntry 1 }
+ 
+bayStackStatsIfNoResourcesPktsDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to a lack of resources."
+    ::= { bayStackStatsIfEntry 2 }
+
+-- -------------------------------------------------------------
+-- Baystack Unit Stats Table
+-- -------------------------------------------------------------
+
+bayStackStatsUnitTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BayStackStatsUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table of per-unit statistics counters.  This table only
+         contains entries in a stack.  On a standalone unit, this
+         table will be empty."
+    ::= { bayStackStatsObjects 2 }
+
+bayStackStatsUnitEntry OBJECT-TYPE
+    SYNTAX BayStackStatsUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        ""
+    INDEX { bayStackStatsUnitIndex }
+    ::= { bayStackStatsUnitTable 1 }
+
+BayStackStatsUnitEntry ::=
+    SEQUENCE {
+        bayStackStatsUnitIndex                   Integer32,
+        bayStackStatsUnitNoResourcesPktsDropped  Counter64
+    }
+
+bayStackStatsUnitIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Unit number."
+    ::= { bayStackStatsUnitEntry 1 }
+ 
+bayStackStatsUnitNoResourcesPktsDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped on stack up/down ports on
+         this unit due to a lack of resources."
+    ::= { bayStackStatsUnitEntry 2 }
+
+END
+

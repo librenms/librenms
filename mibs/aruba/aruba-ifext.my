@@ -1,0 +1,682 @@
+-- ArubaOS 3.2.0.0_16376
+-- vim:set ts=4 sw=4:
+
+WLSX-IFEXT-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION,
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+	ifIndex
+		  FROM RFC1213-MIB
+
+		 ArubaPoeState,
+		 ArubaDot1dState,
+		 ArubaPortMode,
+		 ArubaVlanValidRange,
+	     ArubaEnableValue,
+	     ArubaOperStateValue,
+		 ArubaPortType,
+		 ArubaPortDuplex,
+		 ArubaPortSpeed,
+		 ArubaIfType
+	   		FROM ARUBA-TC
+
+	wlsxEnterpriseMibModules
+           FROM ARUBA-MIB;
+
+	wlsxIfExtMIB MODULE-IDENTITY 
+       LAST-UPDATED "0704162151Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            System level information about the Aruba controller."
+       REVISION        "0704162151Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 3 }
+
+   wlsxIfExtGroup       OBJECT IDENTIFIER ::= { wlsxIfExtMIB 1 }
+
+-- Port Table defines all the physical ports in the controller.
+
+   wlsxIfExtPortTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxIfExtPortEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			The table of processors contained by the controller.
+		"
+      ::= { wlsxIfExtGroup 1 } 
+
+   wlsxIfExtPortEntry OBJECT-TYPE 
+	  SYNTAX       WlsxIfExtPortEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the controller.
+	  "
+	  INDEX {ifExtSlotNumber, ifExtPortNumber}
+      ::= { wlsxIfExtPortTable 1 } 
+
+   WlsxIfExtPortEntry ::=
+     SEQUENCE {
+		 ifExtSlotNumber			Integer32,
+		 ifExtPortNumber			Integer32,
+		 ifExtPortIfIndex			Integer32,
+		 ifExtAdminState			ArubaEnableValue,
+		 ifExtOperState				INTEGER,
+		 ifExtPoeState				ArubaPoeState,
+		 ifExtIsTrusted				TruthValue,
+		 ifExtDot1DState			ArubaDot1dState,
+		 ifExtMode					ArubaPortMode,
+		 ifExtAccessVlanId			ArubaVlanValidRange,
+		 ifExtTrunkNativeVlanId		ArubaVlanValidRange,
+		 ifExtTrunkIsAllowedAll		TruthValue,
+		 ifExtTrunkAllowedVlanList	OCTET STRING,
+		 ifExtIngressACLName		DisplayString,
+		 ifExtEgressACLName			DisplayString,
+		 ifExtSessionACLName		DisplayString,
+		 ifExtXsecVlan				ArubaVlanValidRange,
+		 ifExtIsMonitoring			TruthValue,
+		 ifExtIsMux					TruthValue,
+		 ifExtUserSlotNumber		Integer32,
+		 ifExtUserPortNumber		Integer32,
+		 ifExtPortSpeed				ArubaPortSpeed,
+		 ifExtPortDuplex			ArubaPortDuplex,
+		 ifExtPortType				ArubaPortType,
+		 ifExtDescr					DisplayString
+	 }
+
+   ifExtSlotNumber OBJECT-TYPE
+         SYNTAX       Integer32
+	  	 MAX-ACCESS   not-accessible		
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the Physical Slot of the Interface.
+            "
+        ::= { wlsxIfExtPortEntry 1 }
+
+   ifExtPortNumber OBJECT-TYPE
+        SYNTAX      Integer32
+	  	MAX-ACCESS   not-accessible		
+        STATUS       current
+        DESCRIPTION
+            "
+			This object represents the Physical Port of the Interface. 
+            "
+        ::= { wlsxIfExtPortEntry 2 }
+
+   ifExtPortIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			This is the ifIndex in ifTable, representing this slot and port. 
+            "
+        ::= { wlsxIfExtPortEntry 3 }
+
+   ifExtAdminState OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			The desired state of the interface.
+			"
+        ::= { wlsxIfExtPortEntry 4 }
+ 
+   ifExtOperState OBJECT-TYPE
+        SYNTAX       INTEGER{
+						up(1),
+						down(2),
+						testing(3)
+					 }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+			"
+			The current operational state of the interface.
+			"
+        ::= { wlsxIfExtPortEntry 5 }
+        
+   ifExtPoeState OBJECT-TYPE
+        SYNTAX       ArubaPoeState
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			The current state of the power over ethernet capability of the
+			port.
+			"
+        ::= { wlsxIfExtPortEntry 6 }
+   ifExtIsTrusted OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			The object indicates if the port is used in the trusted side of the
+			network or the untrusted side.
+			"
+        ::= { wlsxIfExtPortEntry 7 }
+
+   ifExtDot1DState OBJECT-TYPE
+        SYNTAX       ArubaDot1dState
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			Current Dot1d state of the Port.
+			"
+        ::= { wlsxIfExtPortEntry 8 }
+
+   ifExtMode OBJECT-TYPE
+        SYNTAX       ArubaPortMode
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object indicates if the port is in a Trunk mode or access mode.
+			"
+        ::= { wlsxIfExtPortEntry 9 }
+
+   ifExtAccessVlanId OBJECT-TYPE
+        SYNTAX       ArubaVlanValidRange
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			The VLAN Id when the port is in Access Mode.
+			"
+        ::= { wlsxIfExtPortEntry 10 }
+
+   ifExtTrunkNativeVlanId OBJECT-TYPE
+        SYNTAX       ArubaVlanValidRange
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			The native VLAN Id of the Port, when the port is in dot1q mode.
+			"
+        ::= { wlsxIfExtPortEntry 11 }
+
+   ifExtTrunkIsAllowedAll OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			When the mode of the port is Trunk, this Object indicates 
+			if the port is part of all the configured Vlans.
+			"
+        ::= { wlsxIfExtPortEntry 12 }
+
+   ifExtTrunkAllowedVlanList OBJECT-TYPE
+        SYNTAX       OCTET STRING(SIZE(0..512))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			    A string of octets containing one bit per VLAN for a
+			    total of 4096 VLANs in the management domain.  
+				The most significant bit of the octet string is the 
+				lowest value VLAN of 4096 VLANs.
+				By setting the bit(1) we indicate that the vlan is part of the
+				interface. 
+				The most significant bit of the bitmap is transmitted 
+				first. Note that if the length of this string is less than
+				512 octets, any 'missing' octets are assumed to contain
+				the value zero. 
+			"
+        ::= { wlsxIfExtPortEntry 13 }
+
+   ifExtIngressACLName OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object represents the Ingress ACL name applied to the port.
+			An Empty string indicates that there is not ACL applied on this 
+			port.
+			"
+        ::= { wlsxIfExtPortEntry 14 }
+
+   ifExtEgressACLName OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object represents the Egress ACL name applied to the port.
+			An Empty string indicates that there is not ACL applied on this 
+			port.
+			"
+        ::= { wlsxIfExtPortEntry 15 }
+
+   ifExtSessionACLName OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object represents the Session ACL name applied to the port.
+			An Empty string indicates that there is not ACL applied on this 
+			port.
+			"
+        ::= { wlsxIfExtPortEntry 16 }
+
+   ifExtXsecVlan OBJECT-TYPE
+        SYNTAX       ArubaVlanValidRange
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object indicates if the port is an Xsec Port.
+			"
+        ::= { wlsxIfExtPortEntry 17 }
+
+   ifExtIsMonitoring OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object indicates if the port is used for Port monitoring.
+			"
+        ::= { wlsxIfExtPortEntry 18 }
+
+   ifExtIsMux OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+			"
+			This object indicates if the port is used as a MUX Port.
+			"
+        ::= { wlsxIfExtPortEntry 19 }
+
+   ifExtUserSlotNumber OBJECT-TYPE
+        SYNTAX      Integer32
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			The user-visible (zero-based) slot number.
+            "
+        ::= { wlsxIfExtPortEntry 20 }
+
+   ifExtUserPortNumber OBJECT-TYPE
+        SYNTAX      Integer32
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			The user-visible (zero-based) port number.
+            "
+        ::= { wlsxIfExtPortEntry 21 }
+
+   ifExtPortSpeed OBJECT-TYPE
+        SYNTAX      ArubaPortSpeed
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			Speed of the Port.	
+            "
+        ::= { wlsxIfExtPortEntry 22 }
+
+   ifExtPortDuplex OBJECT-TYPE
+        SYNTAX      ArubaPortDuplex
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			Duplexity of the Port.
+			"
+        ::= { wlsxIfExtPortEntry 23 }
+
+   ifExtPortType OBJECT-TYPE
+        SYNTAX      ArubaPortType
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			Type of the Port.
+            "
+        ::= { wlsxIfExtPortEntry 24 }
+
+   ifExtDescr OBJECT-TYPE
+        SYNTAX      DisplayString
+	  	MAX-ACCESS   read-only		
+        STATUS       current
+        DESCRIPTION
+            "
+			Port Description.
+            "
+        ::= { wlsxIfExtPortEntry 25 }
+
+
+-- VLAN Table defines all the VLAN in the controller.
+
+   wlsxIfExtVlanTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxIfExtVlanEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		"
+      ::= { wlsxIfExtGroup 2 } 
+
+   wlsxIfExtVlanEntry OBJECT-TYPE 
+	  SYNTAX       WlsxIfExtVlanEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the controller.
+	  "
+	  INDEX {ifExtVlanId}
+      ::= { wlsxIfExtVlanTable 1 } 
+
+   WlsxIfExtVlanEntry ::=
+     SEQUENCE {
+		 ifExtVlanId			ArubaVlanValidRange,
+		 ifExtVlanName			DisplayString,
+		 ifExtVlanStatus		RowStatus
+	 }
+
+   ifExtVlanId OBJECT-TYPE
+         SYNTAX       ArubaVlanValidRange
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			This object represents the VLAN Id of the Interface.
+            "
+        ::= { wlsxIfExtVlanEntry 1 }
+
+   ifExtVlanName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+	  	MAX-ACCESS   read-create		
+        STATUS       current
+        DESCRIPTION
+            "
+			Name of the VLAN. 
+            "
+        ::= { wlsxIfExtVlanEntry 2 }
+
+   ifExtVlanStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+		 	A Row status Object used to create/modify the row.
+		 "
+        ::= { wlsxIfExtVlanEntry 3 }
+
+-- VLAN Port Member Table defines port membership in the vlan.
+
+   wlsxIfExtVlanMemberTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxIfExtVlanMemberEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		"
+      ::= { wlsxIfExtGroup 3 } 
+
+   wlsxIfExtVlanMemberEntry OBJECT-TYPE 
+	  SYNTAX       WlsxIfExtVlanMemberEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the controller.
+	  "
+	  INDEX {ifExtVlanId, ifIndex}
+      ::= { wlsxIfExtVlanMemberTable 1 } 
+
+   WlsxIfExtVlanMemberEntry ::=
+     SEQUENCE {
+		 ifExtVlanMemberStatus		RowStatus,
+		 ifExtVlanMemberSlot		Integer32,
+		 ifExtVlanMemberPort        Integer32,
+		 ifExtVlanMemberType        ArubaIfType
+	 }
+
+   ifExtVlanMemberStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+		 	A Row status Object used to create/modify and indicate the 
+			status row.
+		 "
+        ::= { wlsxIfExtVlanMemberEntry 1 }
+
+   ifExtVlanMemberSlot OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+         "
+		 	The slot index of the slot referred to by this row (1-based).
+		 "
+        ::= { wlsxIfExtVlanMemberEntry 2 }
+
+   ifExtVlanMemberPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+         "
+		 	The slot index of the slot referred to by this row (1-based).
+		 "
+        ::= { wlsxIfExtVlanMemberEntry 3 }
+
+   ifExtVlanMemberType OBJECT-TYPE
+        SYNTAX      ArubaIfType
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+         "
+		 	The VLAN member type.
+		 "
+        ::= { wlsxIfExtVlanMemberEntry 4 }
+
+-- VLAN Interface Table defines Layer3 VLAN Interfaces.
+
+   wlsxIfExtVlanInterfaceTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxIfExtVlanInterfaceEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+		"
+      ::= { wlsxIfExtGroup 4 } 
+
+   wlsxIfExtVlanInterfaceEntry OBJECT-TYPE 
+	  SYNTAX       WlsxIfExtVlanInterfaceEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  "
+	  	An entry for one processor contained by the controller.
+	  "
+	  INDEX {ifExtVlanId}
+      ::= { wlsxIfExtVlanInterfaceTable 1 } 
+
+   WlsxIfExtVlanInterfaceEntry ::=
+     SEQUENCE {
+		 ifExtVlanInterfaceIfIndex			Integer32,
+		 ifExtVlanInterfaceDescription		DisplayString,
+		 ifExtVlanInterfaceBWContract		DisplayString,
+		 ifExtVlanInterfaceAdminState		ArubaEnableValue,
+		 ifExtVlanInterfaceOperState		ArubaOperStateValue,
+		 ifExtVlanInterfaceIpAddress		IpAddress,
+		 ifExtVlanInterfaceIpMask			IpAddress,
+		 ifExtVlanInterfaceIsLocalArp		ArubaEnableValue,
+		 ifExtVlanInterfaceStatus			RowStatus,
+		 ifExtVlanInterfaceIpRouting		ArubaEnableValue,
+		 ifExtVlanInterfaceIpNatInside		ArubaEnableValue,
+		 ifExtVlanInterfaceIpIgmpSnooping	ArubaEnableValue
+
+	 }
+
+   ifExtVlanInterfaceIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This is the ifIndex in ifTable, representing VLAN Interface. 
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 1 }
+
+   ifExtVlanInterfaceDescription OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the discription of the Interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 2 }
+
+   ifExtVlanInterfaceBWContract OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..64))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the Bandwidth contract on the interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 3 }
+
+   ifExtVlanInterfaceAdminState OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the administrative state of the Interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 4 }
+
+   ifExtVlanInterfaceOperState OBJECT-TYPE
+        SYNTAX      ArubaOperStateValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the operational state of the Interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 5 }
+
+   ifExtVlanInterfaceIpAddress OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the IP Address of the Interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 6 }
+
+
+   ifExtVlanInterfaceIpMask OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates the subnet mask of the Interface.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 7 }
+
+   ifExtVlanInterfaceIsLocalArp OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates if the Local Arp is set on the Interface. 
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 8 }
+
+   ifExtVlanInterfaceStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+		 	A Row status Object used to create/modify and indicate the 
+			status row.
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 9}
+
+   ifExtVlanInterfaceIpRouting OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates if the IP routing is set on the Interface. 
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 10 }
+
+   ifExtVlanInterfaceIpNatInside OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates if the IP nat inside is set on the Interface. 
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 11 }
+
+   ifExtVlanInterfaceIpIgmpSnooping OBJECT-TYPE
+        SYNTAX       ArubaEnableValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+         "
+			This Object indicates if the IP IGMP snooping is set on the Interface. 
+		 "
+        ::= { wlsxIfExtVlanInterfaceEntry 12 }
+
+END

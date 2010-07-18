@@ -1,0 +1,104 @@
+CTRON-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-device-mib.txt
+        --  Revision: 1.02.02
+        --  Part Number:  2170555
+
+        --  LAST-UPDATED "200302241534Z"  - Mon Feb 24 15:34 GMT 2003
+        --  ORGANIZATION "Enterasys Networks, Inc"
+        --  CONTACT-INFO
+        --      "Postal:  Enterasys Networks
+        --                35 Industrial Way, P.O. Box 5005
+        --                Rochester, NH 03867-0505
+        --                USA
+        --       Phone:   +1 603 332 9400
+        --       E-mail:  support@enterasys.com
+        --       WWW:     http://www.enterasys.com"
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific device MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 1995-2003 Enterasys Networks
+
+        -- This MIB describes objects that are common to all Cabletron
+        -- devices.
+
+        IMPORTS
+                NetworkAddress                  FROM RFC1155-SMI
+                ctDevice                        FROM CTRON-MIB-NAMES
+                DisplayString, PhysAddress      FROM RFC1213-MIB
+                OBJECT-TYPE                     FROM RFC-1212;
+
+        --  Textual convention
+
+        --  DisplayString   ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax are declared as having:
+        --
+        --  SIZE (0..255)
+
+        --  PhysAddress     ::= OCTET STRING
+        --  This data type is used to model media addresses.  For many
+        --  types of media, this will be in a binary representation.  For
+        --  example, an Ethernet address would be represented as a string
+        --  of 6 octets.
+
+        commonDev       OBJECT IDENTIFIER ::= { ctDevice 1 }
+
+
+        --  The commonDevice group
+
+        --  Implementation of this group is mandatory for all Cabletron
+        --  devices.
+
+        comDeviceIPAddress OBJECT-TYPE
+            SYNTAX  NetworkAddress
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The Network address, in this case the IP address,
+                    of the device.  This object is required for use by
+                    the Local Management Interface."
+            ::= { commonDev 1 }
+
+        comDeviceTime OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(6|8))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The current time of day, in 24 hour format, as
+                    measured by the device.  The representation shall
+                    use the standard HHMMSS format."
+            ::= { commonDev 2 }
+
+        comDeviceDate  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(8))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "The current date, as measured by the device.  The
+                    representation shall use the standard MMDDYYYY
+                    format."
+            ::= { commonDev 3 }
+
+END

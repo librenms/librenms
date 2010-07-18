@@ -1,0 +1,4700 @@
+       ICF-ETWIST DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           IpAddress, Integer32, Counter32, TimeTicks,
+           OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, MacAddress
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           ifAdminStatus
+               FROM IF-MIB
+           rptrPortAdminStatus, rptrAddrTrackLastSourceAddress
+               FROM SNMP-REPEATER-MIB  -- 802.3 Repeater MIB
+           hubIntruderAddress, hubIntruderPort
+               FROM HP-ICF-GENERIC-RPTR
+           icfCommon, icfHub, icfBridge, icfConfig,
+           bridge1010, bridgeRemote, etherTwist12, etherTwist48,
+           etherTwist24S, fiberOptic, thinLAN, advStack12, advStack24,
+           advStack48, advStackU8, advStackU16, repeaterAgent,
+           hpicfEnetSMM
+               FROM HP-ICF-OID;
+
+       icfEtwistMib MODULE-IDENTITY
+            LAST-UPDATED "200011032220Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module describes devices in the HP 
+                    Integrated Communication Facility product 
+                    line."
+
+            REVISION     "200011032220Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name.  Changed most of the
+                         remaining objects to obsolete."
+
+            REVISION     "9609060258Z"  -- September 6, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB.  Obsoleted most of the objects in
+                    this module."
+            REVISION    "9402250000Z"  -- February 25, 1994
+            DESCRIPTION
+                    "Version of MIB module that provided support for
+                    the first release AdvanceStack hubs, HPJ2600A,
+                    HPJ2601A and HPJ2602A and agent module HPJ2603A.
+                    Released with agent for HPJ2603A version A.01.00.
+                    This version obsoleted the objects in the
+                    icfDownloadGroup, and deprecated most of the
+                    other objects in this module.  It also added
+                    support for the late event monitor capability."
+            REVISION     "9307090000Z"  -- July 9, 1993
+            DESCRIPTION
+                    "Version of MIB module that provided support for
+                    the EtherTwist Secure Hub, HPJ2355A.  Released
+                    with HPJ2355A version E.01.02.  This version
+                    obsoleted the objects in the icfEncryptedPassword
+                    group.  It added support for the hub polarity
+                    reversed detection capability, the address
+                    movement log, and the icfConfig group, as well as
+                    the address movement and new address traps."
+            REVISION     "9204160000Z"  -- April 16, 1992
+            DESCRIPTION
+                    "Version of MIB module that provided support for
+                    the HP ThinLAN Hub, HP28692A.  Released with
+                    agent version D.01.05 for the HP28682A, HP28688B,
+                    HP28692A, and HP28699A, agent versions D.01.00 (IP)
+                    and D.02.00 (IPX) for the HP28688A, and agent
+                    version D.01.02 for the HP28673A and HP28674A.
+                    This version of the MIB added IPX and network
+                    download support.  It also added the hub address
+                    table, backup links, and SQE detect."
+           REVISION     "9104240000Z"  -- April 24, 1991
+           DESCRIPTION
+                   "Initial version of this MIB module.  Released
+                   with the HP28688B 12 Port EtherTwist Hub Plus,
+                   the HP28699A 48 Port EtherTwist Hub Plus, the
+                   HP28682A Fiber Optic Hub, the HP28673A 10:10
+                   Bridge, and the HP28674A Remote Bridge.
+                   Initially released with agent version C.01.01
+                   for the HP28682A, HP28688B, and HP28699A, agent
+                   version C.01.02 for the HP28688A, and agent
+                   version C.01.00 for the HP28673A and HP28674A."
+            ::= { icfCommonAdmin 1 }
+
+       icfCommonAdmin        OBJECT IDENTIFIER ::= { icfCommon 11 }
+
+       icfETwistConformance OBJECT IDENTIFIER ::= { icfCommonAdmin 2 }
+
+       -- Note: Uncomment the following lines, remove the imports
+       -- from HP-ICF-OID, and and an import of enterprises from
+       -- SNMPv2-SMI, if this is not used in conjunction with the
+       -- hpicfOid MIB.
+       --
+       -- hp                 OBJECT IDENTIFIER ::= { enterprises 11 }
+       -- nm                 OBJECT IDENTIFIER ::= { hp 2 }
+       -- icf                OBJECT IDENTIFIER ::= { nm 14 }
+       -- icfCommon          OBJECT IDENTIFIER ::= { icf 1 }
+       -- icfHub             OBJECT IDENTIFIER ::= { icf 2 }
+       -- icfBridge          OBJECT IDENTIFIER ::= { icf 3 }
+       -- icfConfig          OBJECT IDENTIFIER ::= { icf 5 }
+       --
+       -- system             OBJECT IDENTIFIER ::= { nm 3 }
+       -- netElement         OBJECT IDENTIFIER ::= { system 7 }
+       -- bridge             OBJECT IDENTIFIER ::= { netElement 1 }
+       -- hub                OBJECT IDENTIFIER ::= { netElement 5 }
+       -- chassis            OBJECT IDENTIFIER ::= { netElement 8 }
+       --
+       -- bridge1010         OBJECT IDENTIFIER ::= { bridge 1 }
+       -- bridgeRemote       OBJECT IDENTIFIER ::= { bridge 2 }
+       --
+       -- etherTwist12       OBJECT IDENTIFIER ::= { hub 1 }
+       -- fiberOptic         OBJECT IDENTIFIER ::= { hub 3 }
+       -- etherTwist48       OBJECT IDENTIFIER ::= { hub 4 }
+       -- thinLAN            OBJECT IDENTIFIER ::= { hub 5 }
+       -- etherTwist24S      OBJECT IDENTIFIER ::= { hub 6 }
+       -- advStack12         OBJECT IDENTIFIER ::= { hub 7 }
+       -- advStack24         OBJECT IDENTIFIER ::= { hub 8 }
+       -- advStack48         OBJECT IDENTIFIER ::= { hub 9 }
+       -- advStackU8         OBJECT IDENTIFIER ::= { hub 11 }
+       -- advStackU16        OBJECT IDENTIFIER ::= { hub 12 }
+       --
+       -- repeaterAgent      OBJECT IDENTIFIER ::= { chassis 1 }
+       -- chassisAgents      OBJECT IDENTIFIER ::= { chassis 2 }
+       -- hpicfEnetSMM       OBJECT IDENTIFIER ::= { chassisAgents 4 }
+
+
+       -- IcfCommon group
+
+       lastSetError OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          unexpectedError(100),
+                          -- Couldn't get a packet buffer
+                          resourceLimitExceeded(101),
+                          -- See stpPortState
+                          disallowedSTPPortState(102),
+                          -- For Super objects
+                          incompleteSetlet(103),
+                          -- See evtObject
+                          invalidEventObject(104),
+                          disallowedRemoteDevice(105),
+                          -- Local must not equal remote
+                          disallowedLAPBAdrsPair(106),
+                          -- addressChunk
+                          adrsAlreadyPresent(107),
+                          -- addressChunk
+                          staticSectionFull(108),
+                          -- addressChunk
+                          cantDeletePermAdrs(109),
+                          inconsistentValues(110),
+                          downloadInProgress(111)
+                      }
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Provide more detailed, enterprise specific error
+                   type. Any error resulting from a SET request will
+                   cause this object to be updated, and the previous
+                   value overwritten. A management entity may
+                   retrieve more detailed error information than that
+                   implied by the pdu's ErrorStatus, especially in 
+                   the case of a genErr."
+           ::= { icfCommon 1 }
+
+       password OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (0..16))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This is the encrypted password for the device. The 
+                   algorithm used for the encryption process is HP 
+                   proprietary. Third party vendor support is provided
+                   by not setting a password on the device, and using
+                   the community name 'public'."
+           ::= { icfCommon 2 }
+
+       reset OBJECT-TYPE
+           SYNTAX     Integer32 --INTEGER {
+                          -- noReset(0),
+                          -- warm(1),
+                          -- cold(2)
+                      --}
+           MAX-ACCESS read-write   -- write-only on EtherTwist 'D' rev
+                                   -- and earlier
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When the reset object is set to to 'warm' it 
+                   results in a 'warm' reset, which does not clear 
+                   the parameters in NOVRAM to factory defaults. When
+                   set to 'cold', it results in NOVRAM being set to
+                   factory defaults. When this object is set, the 
+                   agent replies, dallies a short time to allow the 
+                   reply to be emitted from the device, then performs
+                   the reset.  When read, this object always returns 
+                   0."
+           ::= { icfCommon 3 }
+
+       selfTest OBJECT-TYPE
+           SYNTAX     Integer32 --INTEGER {
+                          -- stSuccess(0),
+                          -- stExecute(1)
+                      --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Self test is invoked by setting this flag to 
+                   'stExecute. When the object changes to 
+                   'stSuccess', the test has completed successfully.
+                   Icf devices will 'hard-fail' if the test does not
+                   succeed."
+           ::= { icfCommon 4 }
+
+       semaphore OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object allows a set of objects to be locked.
+                   The lock is only assured by the 'cooperation' of 
+                   other management entities; they must wait until 
+                   the lock is cleared (to value zero) prior to 
+                   setting the lock. When this object is set to a 
+                   management entity's IP address, if no other 
+                   management entity has previously set the lock, the
+                   set will succeed.  Otherwise, an error (BadValue) 
+                   will be returned. It is the responsibility of the
+                   owning management entity to clear the lock when 
+                   the transactions complete. To protect against a 
+                   management entity failure during a locked 
+                   transaction, the agent is NOT responsible for 
+                   verifying which management entity is performing 
+                   transactions on locked objects; thus, any 
+                   management entity can clear this object at any 
+                   time. The agent does not do anything with this 
+                   object except disallow multiple sets of different
+                   IP addresses (unless the object has been cleared 
+                   to zero). This means management entities can use 
+                   this for locking any valid transactions on defined
+                   sets of objects.  This object can also be used on
+                   IPX networks by specifying the low 4 bytes of the
+                   station address for the IpAddress."
+           -- INDEX  { INTEGER (1..3)
+                      -- pollResponse(1), -  lock pollResponse object
+                      -- mapObjects(2),   -  lock mapAddress, 
+                                          -- mapState, and mapPort
+                      -- eventGroup(3)    -  lock all objects in 
+                                          -- event group
+                     -- }
+           ::= { icfCommon 5 }
+
+       -- Discovery Group
+
+       discovery          OBJECT IDENTIFIER ::= { icfCommon 6 }
+
+       pollResponse OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                      --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Flag indicating whether device should respond to 
+                   multicast SNMP PDUs. When set 'true', the device 
+                   will respond to multicast SNMP PDU's. Otherwise, 
+                   the response is discarded."
+           ::= { discovery 1 }
+
+       announceAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When set to any MAC address, the device will
+                   transmit three identical packets, each with the MAC
+                   source set to the device's MAC address, the MAC
+                   destination to the value of this object, the
+                   destination SAP is F8, and the destination HP XSAP
+                   is 165D. These packets will traverse other ICF
+                   devices, allowing them to learn the port connectivity
+                   of the transmitting device."
+           ::= { discovery 2 }
+
+       mapAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When this object is set a map address search 
+                   begins. If the address is detected on only one 
+                   port, then the mapPort object is set to the port 
+                   number on which the address was detected.
+
+                   This object is obsolete.  This functionality has
+                   now been incorporated into the IETF 802.3 Repeater
+                   MIB.  Agents and management applications should
+                   implement that MIB."
+           ::= { discovery 3 }
+
+       mapState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- psNone(0),
+                          -- psSingle(1),
+                          -- psMany(2)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object will be set to 'psNone' if the 
+                   address set in the mapAddress object has not been
+                   received on any of the device's interface/ports.
+                   It will be set to 'psSingle' if the mapAddress has
+                   been detected on only one interface/port. It will
+                   be set to 'psMany' if the mapAddress has been 
+                   detected on more than one interface/port.
+
+                   This object is obsolete.  This functionality has
+                   now been incorporated into the IETF 802.3 Repeater
+                   MIB.  Agents and management applications should
+                   implement that MIB."
+           ::= { discovery 4 }
+
+       mapPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port number on which the map address was 
+                   detected. If map state is 'psNone' or 'psMany'
+                   then this object is not valid.
+
+                   This object is obsolete.  This functionality has
+                   now been incorporated into the IETF 802.3 Repeater
+                   MIB.  Agents and management applications should
+                   implement that MIB."
+           ::= { discovery 5 }
+
+       ipSubnetMask OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object is the IP subnet mask."
+           ::= { discovery 6 }
+
+
+       -- Event Group
+
+       icfEvent              OBJECT IDENTIFIER ::= { icfCommon 7 }
+
+       eventNotificationNode OBJECT IDENTIFIER ::= { icfEvent 1 }
+
+       evtIpNotify OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The network address of the manager node which is
+                   to receive the event notification trap."
+           ::= { eventNotificationNode 1 }
+
+       evtIpxNotify OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (10))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The IPX address of the manager node which is to
+                   receive the event notification trap."
+           ::= { eventNotificationNode 2 }
+
+       evtTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF EvtEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of event entries for event processing."
+           --INDEX    { evtIndex }
+           ::= { icfEvent 2 }
+
+       EvtEntry ::= 
+           SEQUENCE {
+               evtIndex                        INTEGER,
+               evtArm                          Integer32,
+               evtTimeSinceOccurrence          TimeTicks
+           }
+
+       evtIndex OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          warmStartEvent(1),
+                          coldStartEvent(2),
+                          spanTreeOrLinkBeatEvent(3),
+                          temperatureOrSegmentationEvent(4),
+                          backupLinkEvent(5),   -- hubs only
+
+                          -- The following are supported only on
+                          -- rev 'E' EtherTwist hubs or later and
+                          -- AdvanceStack 10Mbit hubs
+                          intrusionEvent(6),
+                          addressMovedEvent(7),
+                          newAddressEvent(8),
+                          rptrHealthEvent(9),
+                          rptrResetEvent(10)
+
+                          -- spanTreeEvent(3),     -  bridges only
+                          -- temperatureEvent(4),  -  bridges only
+                          -- linkBeatEvent(3),     -  hubs only
+                          -- segmentationEvent(4)  -  hubs only
+                      }
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   event to which this entry is applicable."
+           ::= { evtTable 1 }
+
+       evtArm OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- off(0),
+                          -- on(1)
+                      --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object arms and disarms events. Events are 
+                   implicitly rearmed, that is, once an event occurs,
+                   it is rearmed.  Sets to the intrusionEvent 
+                   instance of this object are ignored, since 
+                   intrusion events are actually armed through the 
+                   hubSecPtAlarmEnable object."
+           ::= { evtTable 2 }
+
+       evtTimeSinceOccurrence OBJECT-TYPE
+           SYNTAX     TimeTicks
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object specifies the number of centiseconds
+                   since this event last occurred."
+           ::= { evtTable 3 }
+
+       evtThresholdTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF EvtThresholdEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of event entries for event processing."
+           --INDEX    { evthIndex }
+           ::= { icfEvent 3 }
+
+       EvtThresholdEntry ::= 
+           SEQUENCE {
+               evthIndex                       Integer32,
+               evthArm                         Integer32,
+               evthObject                      OBJECT IDENTIFIER,
+               evthThreshold                   Integer32,
+               evthHysteresis                  Integer32,
+               evthTimeInterval                TimeTicks,
+               evthTimeSinceOccurrence         TimeTicks
+           }
+
+       evthIndex OBJECT-TYPE
+           SYNTAX     Integer32 ( 1..5 )
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   event to which this entry is applicable."
+           ::= { evtThresholdTable 1 }
+
+       evthArm OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- off(0),
+                          -- on(1)
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object arms and disarms events. The 
+                   notification node, the associated event object,
+                   threshold, hysteresis, and time interval should
+                   all be set before an event is armed. The objects
+                   do not need to be re-set if the existing values
+                   are acceptable. The device will refuse to arm an
+                   event with uninitialized objects.  Once armed, if
+                   the threshold is met or exceeded during the event
+                   time interval, a trap PDU is sent to the
+                   eventNotificationNode.  Subsequently, the
+                   monitored object must fall to or below the
+                   hysteresis before another trap can be sent via the
+                   threshold mechanism. The hysteresis may equal
+                   threshold. Events are implicitly rearmed, that is,
+                   once an event occurs, it is rearmed.  Setting this
+                   object to 'on' will result in a genErr in any of
+                   the following cases: object not set; cannot set an
+                   event on this object; time interval not set;
+                   threshold not set."
+           ::= { evtThresholdTable 2 }
+
+       evthObject OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The data of this object is itself an OBJECT
+                   IDENTIFIER which selects the mib object and
+                   instance that is to be monitored for the event.
+                   Only types INTEGER and Counter are allowed."
+           ::= { evtThresholdTable 3 }
+
+       evthThreshold OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The threshold against which the variable 
+                   specified in evthObject is tested over the time
+                   interval specified in the evthTimeInterval  When
+                   the threshold is met or exceeded, the event is
+                   triggered. The event will not trigger again until
+                   the variable falls to or below the evthHysteresis
+                   value, and then meets or exceeds the threshold."
+           ::= { evtThresholdTable 4 }
+
+       evthHysteresis OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The low value which the variable specified in
+                   evthObject must fall to or below after exceeding
+                   evthThreshold before the event can re-occur when
+                   the threshold is met or exceeded."
+           ::= { evtThresholdTable 5 }
+
+       evthTimeInterval OBJECT-TYPE
+           SYNTAX     TimeTicks
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The time interval over which the variable
+                   specified in the evthObject is sampled."
+           ::= { evtThresholdTable 6 }
+
+       evthTimeSinceOccurrence OBJECT-TYPE
+           SYNTAX     TimeTicks
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object specifies the number of centiseconds
+                   since this event was last triggered."
+           ::= { evtThresholdTable 7 }
+
+
+       -- Link Test Group
+
+       linkTest           OBJECT IDENTIFIER ::= { icfCommon 8 }
+
+       linkTestAddress    OBJECT IDENTIFIER ::= { linkTest 1 }
+
+       linkTest802MacAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   If this object is set to the MAC address of a
+                   node to link test in the same PDU that sets
+                   linkTestRepetitions to a nonzero value, the link 
+                   test performed will use IEEE 802 Test frames.
+
+                   Note that setting more than one of
+                   linkTest802MacAddress, linkTestIpAddress, and
+                   linkTestIpxAddress to a non-null value in the same
+                   PDU will result in a genErr.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTestAddress 1 }
+
+       linkTestIpAddress OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   If this object is set to the network address of a
+                   node to link test in the same PDU that sets
+                   linkTestRepetitions to a nonzero value, the link
+                   test performed will use ICMP Echo packets.
+
+                   Note that setting more than one of
+                   linkTest802MacAddress, linkTestIpAddress, and
+                   linkTestIpxAddress to a non-null value in the same
+                   PDU will result in a genErr.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTestAddress 2 }
+
+       linkTestIpxAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (10))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   If this object is set to the IPX address of a
+                   node to link test in the same PDU that sets
+                   linkTestRepetitions to a nonzero value, the link
+                   test performed will use IPX diagnostic packets.
+
+                   Note that setting more than one of
+                   linkTest802MacAddress, linkTestIpAddress, and
+                   linkTestIpxAddress to a non-null value in the same
+                   PDU will result in a genErr.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTestAddress 3 }
+
+       linkTestRepetitions OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of link tests that the device is to
+                   complete.  When this object is set to a non-zero
+                   value, the linkTestSuccess object is zeroed and
+                   the device begins a link test using IEEE 802.2
+                   Test frames, ICMP Echo packets, or IPX diagnostic
+                   packets depending on the address selected. Link
+                   test results are contained in the link test
+                   success object. This object's value decrements
+                   (to zero) as the test proceeds. The test may be
+                   canceled at any point by setting this object to
+                   0.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTest 2 }
+
+       linkTestSuccess OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   For every successful link test, this counter is
+                   incremented.  When link tests are completed, this
+                   counter contains the total number of successful
+                   tests.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTest 3 }
+
+       linkTestTimeout OBJECT-TYPE
+           SYNTAX     TimeTicks --(10..300000000)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The time interval over which a link test response
+                   must be received, or the test is counted as
+                   failed.
+
+                   This object is now obsolete.  Is functionality
+                   is being replaced by the hpicfLinktest objects."
+           ::= { linkTest 4 }
+
+       -- Icf 802.3 Mac Group.
+
+       icf8023MacTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF Icf8023MacEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of icf8023Mac entries."
+           --INDEX    { icf8023MacIndex }
+           ::= { icfCommon 9 }
+
+       Icf8023MacEntry ::= 
+           SEQUENCE {
+               icf8023MacIndex                 Integer32,
+               icf8023MacInBroadcastPkts       Counter32,
+               icf8023MacOutBroadcastPkts      Counter32,
+               icf8023MacInMulticastPkts       Counter32,
+               icf8023MacOutMulticastPkts      Counter32,
+               icf8023MacRunts                 Counter32,
+               icf8023MacGiants                Counter32,
+               icf8023MacMissedPktErrors       Counter32,
+               icf8023MacExcessDeferrals       Counter32,
+               icf8023MacTotalMediaErrors      Counter32,
+               icf8023MacSpuriousIntrs         Counter32
+           }
+
+       icf8023MacIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..2147483647)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   port to which this entry is applicable. The port
+                   identified by a particular value of this index on
+                   a hub is the same port as identified by the same
+                   value of rptrPortIndex.  Note that since this hub
+                   always has exactly 1 port group, there is no group
+                   index for this table.  For a bridge, the port
+                   identified by a particular value of this index is
+                   the same port identified by the same value of
+                   ifIndex."
+           ::= { icf8023MacTable 1 }
+
+       icf8023MacInBroadcastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the broadcast packets received."
+           ::= { icf8023MacTable 2 }
+
+       icf8023MacOutBroadcastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the broadcast packets transmitted."
+           ::= { icf8023MacTable 3 }
+
+       icf8023MacInMulticastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the multicast packets received."
+           ::= { icf8023MacTable 4 }
+
+       icf8023MacOutMulticastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the multicast packets transmitted."
+           ::= { icf8023MacTable 5 }
+
+       icf8023MacRunts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of media frames encountered that were
+                   too short (by ethernet/802.3 standards)."
+           ::= { icf8023MacTable 6 }
+
+       icf8023MacGiants OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of media frames encountered that were
+                   too long (by ethernet/802.3 standards)."
+           ::= { icf8023MacTable 7 }
+
+       icf8023MacMissedPktErrors OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of frames lost due to lack of
+                   resources (e.g. ring buffers, memory buffers,
+                   etc)."
+           ::= { icf8023MacTable 8 }
+
+       icf8023MacExcessDeferrals OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of times a frame could not be sent due
+                   to excess deferrals because another node was
+                   transmitting continually."
+           ::= { icf8023MacTable 9 }
+
+       icf8023MacTotalMediaErrors OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of all possible medium transmit and receive
+                   errors, such as crc, alignment, sequence, length,
+                   excess etc. The purpose of this object is to
+                   support aggregate LAN medium errors for event
+                   processing. Collisions and runts are not
+                   considered an error."
+           ::= { icf8023MacTable 10 }
+
+       icf8023MacSpuriousIntrs OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of times that the network interface
+                   for this port generated a spurious hardware
+                   interrupt.  A non-zero value for this object
+                   indicates a potential hardware problem."
+           ::= { icf8023MacTable 11 }
+
+       -- IcfDownload Group
+       --
+       -- The icfDownload objects are provided to download a new
+       -- version of firmware into the device.  The tftp protocol is
+       -- used for the download.  To initiate a download, the
+       -- management station must set icfDownloadIp[x]Address to the
+       -- address of a tftp server and the management station must
+       -- also set icfDownloadFilename to the path name of the file
+       -- containing the new revision of firmware.  The address and
+       -- filename must both be set in the same PDU.
+       --
+       -- Note that this group is now obsolete, and has been replaced
+       -- by the hpicfDownload group.  It is not supported in any
+       -- AdvanceStack products.
+
+       icfDownload        OBJECT IDENTIFIER ::= { icfCommon 10 }
+
+       icfDownloadAddress OBJECT IDENTIFIER ::= { icfDownload 1 }
+
+       icfDownloadIpAddress OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The IP address of the TFTP server to download
+                   firmware from."
+           ::= { icfDownloadAddress 1 }
+
+       icfDownloadIpxAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (10))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The IPX address of the TFTP server to download
+                   firmware from."
+           ::= { icfDownloadAddress 2 }
+
+       icfDownloadFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..63))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Filename and path of file to download (maximum
+                   length of 63 characters + NULL)."
+           ::= { icfDownload 2 }
+
+
+       --
+       -- Icf Hub Group
+       --
+       -- This group is implemented on both EtherTwist and AdvanceStack
+       -- 10MBit hubs.
+       --
+
+
+       hubThinlanFault OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When set to 'true' this object causes the Fault
+                   LED to blink if the ThinLan Port is segmented."
+           ::= { icfHub 1 }
+
+       -- Note: The hubGlobal counters that are composed of other
+       -- objects are provided to allow for event testing on global
+       -- error conditions.
+
+       hubGlobal          OBJECT IDENTIFIER ::= { icfHub 2 }
+
+       hubGlobalErrors OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each packet with
+                   an error received on any port. This counter does
+                   not include runts, as they are a normal media
+                   condition."
+           ::= { hubGlobal 1 }
+
+       hubGlobalCollisions OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each collision
+                   between any two or more ports (or AUI) detected by
+                   the hub."
+           ::= { hubGlobal 2 }
+
+       hubGlobalPktFragments OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is the sum of hubPortPktFragments
+                   for all ports."
+           ::= { hubGlobal 3 }
+
+       hubGlobalRunts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each runt frame
+                   received on any port."
+           ::= { hubGlobal 4 }
+
+       hubGlobalGiants OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each giant frame
+                   received on any port."
+           ::= { hubGlobal 5 }
+
+       hubGlobalCrcErrors OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each frame with a
+                   CRC error received on any port."
+           ::= { hubGlobal 6 }
+
+       hubGlobalAlignmentErrors OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each frame with
+                   an alignment error received on any port."
+           ::= { hubGlobal 7 }
+
+       hubGlobalInOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each octet
+                   received on any port."
+           ::= { hubGlobal 8 }
+
+       hubGlobalInUcastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each unicast
+                   packet received on any port."
+           ::= { hubGlobal 9 }
+
+       hubGlobalInNUcastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each non-unicast
+                   packet received on any port."
+           ::= { hubGlobal 10 }
+
+       hubGlobalInBroadcastPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented for each broadcast
+                   packet received on any port."
+           ::= { hubGlobal 11 }
+
+       -- Icf Hub Port Table
+
+       hubPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of hubPort entries."
+           --INDEX    { hubPortIndex }
+           ::= { icfHub 3 }
+
+       HubPortEntry ::= 
+           SEQUENCE {
+               hubPortIndex                    Integer32,
+               hubPortPktFragments             Counter32,
+               hubPortCollisions               Counter32,
+               hubPortSegmentation             Integer32,
+               hubPortLinkBeatStatus           Integer32,
+               hubPortLinkBeatEnable           Integer32,
+               hubPortMacAddress               MacAddress,
+               hubPortAddressState             Integer32,
+               hubPortPolarityReversed         Integer32,
+               hubPortLateEventDisable         INTEGER
+           }
+
+       hubPortIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   port to which this entry is applicable. The port
+                   identified by a particular value of this index is
+                   the same port as identified by the same value of
+                   rptrPortIndex."
+           ::= { hubPortTable 1 }
+
+       hubPortPktFragments OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented when a packet or
+                   packet fragment is encountered for a port
+                   instance."
+           ::= { hubPortTable 2 }
+
+       hubPortCollisions OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This counter is incremented when a port is
+                   involved in a collision."
+           ::= { hubPortTable 3 }
+
+       hubPortSegmentation OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This is a flag which is 'true' if the port is
+                   currently segmented and 'false' otherwise."
+           ::= { hubPortTable 4 }
+
+       hubPortLinkBeatStatus OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This is a flag which is 'true' if link beat is
+                   detected on the port and 'false' otherwise.  The
+                   value of this variable will always be 'true' when
+                   the corresponding instance of
+                   hubPortLinkBeatEnable is 'false'."
+           ::= { hubPortTable 5 }
+
+       hubPortLinkBeatEnable OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When this flag is set to 'true' the port's link
+                   beat is enabled and when set to 'false' it is
+                   disabled."
+           ::= { hubPortTable 6 }
+
+       hubPortMacAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Each port maintains the MAC address of the node
+                   currently attached to it. This address is valid
+                   only when the port state flag is set to 
+                   'psSingle'."
+           ::= { hubPortTable 7 }
+
+       hubPortAddressState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- psNone(0),
+                          -- psSingle(1),
+                          -- psMany(2)
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port state object may take on three values.
+                   'psNone' means no packets have been received on
+                   the port. 'psSingle' means all packets received on
+                   the port have originated from a single MAC
+                   address. 'psMany' means that packets originating
+                   from more than one node have been received on the
+                   port. To (re)start a search for a MAC address set
+                   the port state to 'psNone'."
+           ::= { hubPortTable 8 }
+
+       hubPortPolarityReversed OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                       --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object is used to indicate that the hub port
+                   was wired with the positive/negative polarity of
+                   its transmit and receive pairs reversed.  Note
+                   that the port will continue to operate in this
+                   state, with the hub inverting the polarity
+                   internally."
+           ::= { hubPortTable 9 }
+
+       hubPortLateEventDisable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          true(1),
+                          false(2)
+                      }
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object indicates that the hub port was
+                   disabled as a result of excessive late collisions
+                   being caused by the end node attached to this
+                   port.  This flag is cleared when the port is
+                   reenabled by setting rptrPortAdminStatus to
+                   'enabled'."
+           ::= { hubPortTable 10 }
+
+       hubBitmaps         OBJECT IDENTIFIER ::= { icfHub 4 }
+
+       hubPortsOperStatus OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (1..128))
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The hubPortsOperStatus is a bit map of the state
+                   of all hub ports.  The object has a 1 bit for each
+                   port that is enabled, not segmented, and linkbeat
+                   is detected.  Ports on which these conditions are
+                   not true have a 0 bit.  The bits are placed into
+                   the OCTET STRING in the following order:
+
+                       octet     0  octet     1  octet     2  ...
+                       bits    7-0  bits    7-0  bits    7-0  ...
+                       ports   1-8  ports  9-16  ports 17-24  ...
+
+                   Values of unused bits in the last octet are
+                   undefined."
+           ::= { hubBitmaps 1 }
+
+       hubAddressTableMaxAge OBJECT-TYPE
+           SYNTAX     TimeTicks --(60000..65535000)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The hubAddressTableMaxAge is the time beyond
+                   which an inactive MAC address will be removed from
+                   the hubPortMacAddress table and the
+                   hubAddressTable.  Although hubAddressTableMaxAge
+                   is specified in units of 10ms time ticks, the
+                   actual resolution of this timer is 10 seconds.  A
+                   value of 65535000 indicates no aging shall take
+                   place."
+           ::= { icfHub 5 }
+
+       hubAddressTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubAddressEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of entries present in the hub address
+                   table."
+           --INDEX    { hubAddressIndex }
+           ::= { icfHub 6 }
+
+       HubAddressEntry ::= 
+           SEQUENCE {
+               hubAddressIndex                 Integer32,
+               hubAddressChunk                 OCTET STRING
+           }
+
+       hubAddressIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..52)
+           MAX-ACCESS read-only           
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   chunk to which this entry is applicable."
+           ::= { hubAddressTable 1 }
+
+       hubAddressChunk OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (408))
+           MAX-ACCESS read-only           
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The hubAddressChunk object returns an opaque
+                   chunk of the address table. Each chunk can be
+                   interpreted as an array of records in the form:
+
+                       mac address [6 bytes], port number [2 bytes],
+                       inactivity time [4 bytes]
+
+                   On a Get, the returned chunk can include empty
+                   (unused) entries.  Instances are chunk numbers,
+                   which start at 1 and go to 52.  Each chunk can
+                   hold 34 addresses.
+
+                   A returned chunk might look like:
+
+                       Address       Port      Inactivity Time
+
+                       080009001234  1         0
+                       080009002345  2         10000
+                       080009003456  1         20000
+                       000000000000  1         0
+                       080009009876  EMPTY     0
+                       080009004567  EMPTY     15000
+                                     .
+                                     .
+                                     .
+                       080009005678  EOL       959000
+
+                   A value of EMPTY in the Port field indicates an
+                   unused (i.e.  aged out) entry in the table.  When
+                   the EOL (End Of List) bit is set in the Port 
+                   field, that entry is the last entry in the table.
+                   It is possible for EOL to be seen in any entry.
+                   EOL (0x4000) and EMPTY (0x8000) are bit masks
+                   which are ORed with the port number in the port
+                   field of the entry.  It is possible for both the
+                   EOL and EMPTY bits to be set in the same entry.
+
+                   The remainder of the chunk after the EOL entry
+                   will be zeroed.
+
+                   The inactivityTime and Address fields are
+                   meaningless if the EMPTY bit is set in the Port
+                   field. In this case, inactivityTime and Address
+                   are not guaranteed to be zeroed.  The Manager may
+                   start with any chunk it likes and request the
+                   chunks in any order.  It may perform multiple
+                   requests for the same chunk.  The agent does not
+                   save state from previous requests.
+
+                   A request of chunk #1 would return the contents of
+                   the first 34 address table entries,  whether they
+                   are all full, all empty, or some full and the rest
+                   empty.  A request of chunk #2 will return entries
+                   #35 through #68. And so on.
+
+                   The address table can change between Get requests.
+                   An address' location can change, or an address
+                   could age out and then be added back in at a
+                   different location in the table.  Thus, the
+                   Manager could see the address twice in the table."
+           ::= { hubAddressTable 2 }
+
+       hubNumBkpLinks OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of backup links configurable on this
+                   hub."
+           ::= { icfHub 7 }
+
+       hubBkpLinkTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubBkpLinkEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of backup link configuration entries.  For
+                   a given backup link,  the hub will periodically
+                   send a test packet to the device at the end of the
+                   link.  If there are no responses (the number is
+                   configurable), the hub will enable the backup port
+                   and disable the primary port.  After the primary
+                   link is fixed, the user must turn the primary port
+                   on to resume normal operation.
+
+                   At any time, the management station can look at
+                   rptrPortAdminStatus for the backup port to
+                   determine if it is currently in use.
+
+                   The backup link algorithm enables and disables the
+                   backup port by modifying rptrPortAdminStatus for
+                   that port.  After the backup port has been enabled
+                   by the backup link algorithm, if the primary port
+                   is subsequently enabled via the hub console port
+                   or by a set of rptrPortAdminStatus, the backup
+                   port will be turned off and the periodic test
+                   packets will begin again.
+
+                   When the backup link objects are set, the backup
+                   port will be turned off, the primary port will be
+                   turned on,  and the periodic test packets will be
+                   sent.  The time between test packets is
+                   configurable by setting hubBackupTestTime.  The
+                   number of failures needed to switch to the backup
+                   link is configured by setting
+                   hubBackupConsecutiveFails.  The backup link
+                   function can be turned off by setting
+                   hubBackupPort to 0.
+
+                   All five of the backup link objects must be set
+                   together in a single PDU except for the case of
+                   setting hubBackupPort to 0, in which case, the
+                   hubBackupPort can be set without setting the other
+                   objects.  Currently, the size of the backup link
+                   table is one; future releases may provide the
+                   ability to monitor more than one backup link."
+           ::= { icfHub 8 }
+
+       HubBkpLinkEntry ::=
+           SEQUENCE {
+               hubBkpLinkIndex                 Integer32,
+               hubBackupPort                   Integer32,
+               hubPrimaryPort                  Integer32,
+               hubBackupAddress                MacAddress,
+               hubBackupTestTime               TimeTicks,
+               hubBackupConsecutiveFails       Integer32
+           }
+
+       hubBkpLinkIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   backup link configuration entry to which the
+                   instance is applicable."
+           ::= { hubBkpLinkTable 1 }
+
+       hubBackupPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port number of the backup link.  Setting this
+                   object to zero removes the backup link
+                   configuration."
+           ::= { hubBkpLinkTable 2 }
+
+       hubPrimaryPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port number of the primary link.  It can only
+                   be set to zero if the hubBackupPort is also zero."
+           ::= { hubBkpLinkTable 3 }
+
+       hubBackupAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The MAC address of the device at the other end of
+                   the primary link which will respond to the
+                   periodic test packets sent by this hub."
+           ::= { hubBkpLinkTable 4 }
+
+       hubBackupTestTime OBJECT-TYPE
+           SYNTAX     TimeTicks --(100..1500)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The frequency, in time ticks, between sending the
+                   periodic test packets.  The actual resolution of
+                   this timer is in seconds.  The test packet
+                   response timeout is fixed at 500ms."
+           ::= { hubBkpLinkTable 5 }
+
+       hubBackupConsecutiveFails OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of test packet failures which will
+                   cause the hub to switch to the backup link (i.e.,
+                   backup port turned on, primary port turned off).
+                   A value of one is generally not recomended and
+                   will cause the backup link to be enabled upon the
+                   first failure."
+           ::= { hubBkpLinkTable 6 }
+
+       hubSqeEnabled OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   When 'true', this flag indicates that SQE has
+                   been detected for the last ten agent transmits and
+                   there is a high probability that the SQE switch on
+                   the transceiver attached to the AUI port is set to
+                   Enabled, when it should be Disabled."
+           ::= { icfHub 9 }
+
+
+       --
+       --  The Hub address movement log.  This table is implemented
+       -- only on rev 'E' or later EtherTwist hubs and AdvanceStack
+       -- 10Mbit hubs.
+       --
+
+       hubAddressMoveLogTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HubAddressMoveLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A log of the 20 most recent times that the agent
+                   detected that a source MAC address which had been
+                   heard on one port had moved to a different port."
+           ::= { icfHub 11 }
+
+       hubAddressMoveLogEntry OBJECT-TYPE
+           SYNTAX     HubAddressMoveLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A row in the hubAddressMoveLogTable containing
+                   information about a single address movement."
+           INDEX      { hubAddrMoveIndex }
+           ::= { hubAddressMoveLogTable 1 }
+
+       HubAddressMoveLogEntry ::=
+           SEQUENCE {
+               hubAddrMoveIndex                Integer32,
+               hubAddrMoveAddress              MacAddress,
+               hubAddrMoveOldGroup             Integer32,
+               hubAddrMoveOldPort              Integer32,
+               hubAddrMoveNewGroup             Integer32,
+               hubAddrMoveNewPort              Integer32
+           }
+
+       hubAddrMoveIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..20)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index of this entry in the address movement
+                   log table.  Index 1 will always contain the oldest
+                   entry.  If the table is full when a new address
+                   movement occurs, the new entry becomes index 20,
+                   and all earlier entries are shifted down by one
+                   entry, removing the old index 1."
+           ::= { hubAddressMoveLogEntry 1 }
+
+       hubAddrMoveAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The MAC address of the station that moved to a
+                   new port."
+           ::= { hubAddressMoveLogEntry 2 }
+
+       hubAddrMoveOldGroup OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The group containing the port on which this
+                   address had been operating before it moved."
+           ::= { hubAddressMoveLogEntry 3 }
+
+       hubAddrMoveOldPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port within the group on which this address
+                   had been operating before it moved."
+           ::= { hubAddressMoveLogEntry 4 }
+
+       hubAddrMoveNewGroup OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The group containing the port that the address
+                   moved to."
+           ::= { hubAddressMoveLogEntry 5 }
+
+       hubAddrMoveNewPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..1024)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port within the group that the address moved
+                   to."
+           ::= { hubAddressMoveLogEntry 6 }
+
+       hubLateEventMonitor OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          off(1),
+                          onSingle(2),
+                          onAll(3)
+                      }
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object configures the late event monitoring
+                   functionality for the hub.  This mode periodically
+                   samples the rptrMonitorPortLateEvents value for
+                   each port.  If the agent detects excessive late
+                   events on a port, the port will be disabled by
+                   setting the rptrPortAdminStatus for that port to
+                   'disabled', and the hubPortLateEventDisable flag
+                   for that port will be set to 'true'.  This mode is
+                   'off' by default.  Setting it to 'onSingle'
+                   enables the mode for all non-cascaded hub ports.
+                   Setting it to 'onAll' enables the mode for all hub
+                   ports, including cascaded ports."
+           ::= { icfHub 12 }
+
+
+       -- Icf Bridge Group
+
+       operationalState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                         -- learning(0),
+                         -- secure(1)
+                      --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object controls the forwarding nature of the
+                   bridge. In the Learning state the bridge will 
+                   learn new MAC addresses, and it ages out older MAC
+                   addresses. Statically configured addresses are
+                   discarded (they do not age). In the Secure state,
+                   the bridge will not learn new MAC addresses.
+                   Statically configured addresses are forwarded
+                   (they do not age)."
+           ::= { icfBridge 1 }
+
+       forwardDbMaxAge OBJECT-TYPE
+           SYNTAX     TimeTicks --(1000..100000000)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The value of this object controls how long a MAC
+                   address stays in the forwarding database. See
+                   802.1d, section 3.9.2 'Dynamic Entries'."
+           ::= { icfBridge 2 }
+
+       addressTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF AddressEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of address entries."
+           --INDEX    { addressIndex }
+           ::= { icfBridge 3 }
+
+       AddressEntry ::= 
+           SEQUENCE {
+               addressIndex                    Integer32,
+               addressChunk                    OCTET STRING
+           }
+
+       addressIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   chunk to which this entry is applicable."
+           ::= { addressTable 1 }
+
+       addressChunk OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(410))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object returns an opaque chunk of the
+                   address table.  The instance specifies a chunk of
+                   the address table.  Each chunk can be interpreted
+                   as an array of 41 records of the form:
+
+                       { macAddress[6bytes], port number[2bytes], 
+                         permanence[2bytes] }.
+
+                         Address         Port          Perm
+
+                   00  080009001234  1              Dynamic(0x0000)
+                   01  080009002345  2              Dynamic(0x0000)
+                   02  000000000000  EMPTY(0x8000)  Dynamic(0x0000)
+                   03  080009003456  1              Dynamic(0x0000)
+                   04  000000000000  1              Dynamic(0x0000)
+                   05  080009009876  EMPTY(0x8000)  Dynamic(0x0000)
+                   06  080009004567  EMPTY(0x8000)  Static(0x0008)
+                   07  080009041d08    
+                           ...           ...           ...
+                   40  080009005678  EOL(0x4000)    Permanent(0x0000)
+
+                   A value of EMPTY in the Port field indicates an
+                   aged out table entry.  A value of EOL in the Port
+                   field indicates that it is the last entry in the
+                   table.  Of course, EOL will only be seen in the
+                   last entry.  EOL and EMPTY are AND-able bit
+                   fields.  The Disposition and Address are
+                   meaningless if Port is EMPTY.
+
+                   When instance=1 is used on a Set, the agent clears
+                   the table prior to setting any addresses.  On
+                   subsequent Sets, the agent adds the specified
+                   addresses.  If a Set starts at instance > 1, the
+                   specified addresses will be added to the table
+                   without first clearing the table.  Addresses are
+                   already in the table are deleted and then
+                   readded."
+           ::= { addressTable 2 }
+
+       -- Bridge Port Group
+
+       brgPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF BrgPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of brgPort entries."
+           --INDEX    { brgPortIndex }
+           ::= { icfBridge 4 }
+
+       BrgPortEntry ::= 
+           SEQUENCE {
+               brgPortIndex                    Integer32,
+               brgPortCacheHits                Counter32,
+               brgPortCacheMisses              Counter32,
+               brgPortForwardedPkts            Counter32,
+               brgPortFilteredPkts             Counter32
+           }
+
+       brgPortIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   interface/port to which this entry is applicable.
+                   The interface/port identified by a particular
+                   value of this index is the same interface/port as
+                   identified by the same value of ifIndex."
+           ::= { brgPortTable 1 }
+
+       brgPortCacheHits OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the successful cache matches when
+                   looking up a destination MAC address."
+           ::= { brgPortTable 2 }
+
+       brgPortCacheMisses OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the unsuccessful cache matches when
+                   looking up a destination MAC address."
+           ::= { brgPortTable 3 }
+
+       brgPortForwardedPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the packets received on this port and
+                   forwarded to the other port."
+           ::= { brgPortTable 4 }
+
+       brgPortFilteredPkts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the frames that were received on this
+                   port and filtered."
+           ::= { brgPortTable 5 }
+
+       -- Bridge Wildcard Group
+       --
+       -- The wildcard objects constitute a super-object. 
+       -- To arm or redefine a wildcard filter, all 5 wildcard
+       -- objects (i.e. Filter, Mask, Offset, UserOffset, and Arm)
+       -- must be present and adjacent to each other within an SNMP
+       -- PDU.  There is no requirement on the ordering of the
+       -- objects within the PDU.
+       -- 
+       -- To disarm a wildcard filter, only the arm object is needed.
+       -- When the Arm object is set to OFF, any other adjacent
+       -- wildcard objects are ignored.
+       --
+
+       wildcardTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF WildcardEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of wildcard entries."
+           --INDEX    { wildcardIndex }
+           ::= { icfBridge 5 }
+
+       WildcardEntry ::= 
+           SEQUENCE {
+               wildcardIndex                   Integer32,
+               wildcardFilter                  OCTET STRING,
+               wildcardMask                    OCTET STRING,
+               wildcardOffset                  Integer32,
+               wildcardUserOffset              Integer32,
+               wildcardArm                     Integer32
+           }
+
+       wildcardIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   interface/port to which this entry is applicable.
+                   The interface/port identified by a particular
+                   value of this index is the same interface/port as
+                   identified by the same value of ifIndex."
+           ::= { wildcardTable 1 }
+
+       wildcardFilter OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(6))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object contains the binary value used to
+                   filter frames. The data in the frame at the offset
+                   specified by the Wildcard offsets is XOR'ed with
+                   this object after AND'ing with the Wildcard Mask.
+                   If zero result occurs, the packet is discarded
+                   (filtered).
+
+                   Suppose the user specifies the following values:
+                       data:   11001010 10101010 10101010 10101010
+                       mask:   11100000 00000000 00000000 00000000
+                       filter: 11100000 00000000 00000000 00000000
+
+                       AND'ing data with the mask gives:
+                               11000000 00000000 00000000 00000000
+
+                       XOR'ing that value with the filter gives:
+                               00100000 00000000 00000000 00000000
+
+                       The non-zero result indicates no match (don't
+                       discard).
+
+                   Another example:
+                       data:   10011010 10101010 10101010 10101010
+                       mask:   10010000 00000000 00000000 00000000
+                       filter: 10010000 00000000 00000000 00000000
+
+                       AND'ing data with the mask gives:
+                               10010000 00000000 00000000 00000000
+
+                       XOR'ing that value with the filter gives:
+                               00000000 00000000 00000000 00000000
+
+                       A zero result indicates a match, so we discard
+                       (filter) the packet.
+
+                   The filter AND'ed with the mask must equal the
+                   filter. This is an example of a legal filter/mask
+                   pair:
+                       filter: 00010000 00000000 00000000 00000000
+                       mask:   10010000 00000000 00000000 00000000
+                       AND'ed: 00010000 00000000 00000000 00000000
+                               (equals filter)
+
+                   Another way of saying this: if a mask bit is zero,
+                   the corresponding filter bit must be zero.
+
+                   The following would be an illegal pair:
+                       filter: 01110000 00000000 00000000 00000000
+                       mask:   10010000 00000000 00000000 00000000
+                       AND'ed: 00010000 00000000 00000000 00000000  
+                               ( != filter)"
+           ::= { wildcardTable 2 }
+
+       wildcardMask OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(6))
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object indicates which portion of the
+                   wildcardFilter is to be used in filtering. The
+                   data in the frame at the offset specified by
+                   Wildcard offsets is AND'ed with this object.  The
+                   result is XOR'ed with the Wildcard Filter object.
+                   If a zero result is obtained, the packet is
+                   discarded.
+
+                   If an all-zeros wildcardMask is specified, a
+                   genErr is returned.  Also, see mask/filter
+                   constraints in the description of the
+                   wildcardFilter object."
+           ::= { wildcardTable 3 }
+
+       wildcardOffset OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Indicates the position in a received frame which
+                   is to have the Wildcard Mask/Filter applied. The
+                   indicated packet byte is aligned with the 0th byte
+                   of the wildcard mask/filter held in network byte
+                   order.
+
+                   The MAC destination address starts at byte
+                   position (wildcardOffset) zero.
+
+                   The wildcardOffset must fall on a 2-byte boundary,
+                   0,2,4,...,1512 (violations of this constraint
+                   result in a genErr).  Filters can be aligned on
+                   non 2-byte boundaries through use of the
+                   wildcardUserOffset."
+           ::= { wildcardTable 4 }
+
+       wildcardUserOffset OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This value is a byte offset from the beginning
+                   of the packet. If this offset is such that any
+                   portion of the filter extends past the end of the
+                   packet (for wildcard filtering purposes, the FCS
+                   is part of the packet), then the filter is
+                   considered not to match, and the packet is not
+                   filtered.
+
+                   For a particular filter, the wildcardUserOffset
+                   must be greater than or equal to the
+                   wildcardOffset.
+
+                   wildcardUserOffset must be between 0 and 1514,
+                   inclusive.
+
+                   The wildcardUserOffset, wildcardOffset pair must
+                   conform to one of the following four relationships
+                   and also be subject to the range restrictions
+                   listed above. For n = 0,..,378
+
+                        Offset         4n   4n      4n      4n+2
+                        UserOffset     4n   4n+1    4n+2    4n+3
+
+                   As an example, consider four examples in the
+                   following table for locating the filter at or near
+                   the beginning of a packet:
+
+                           - 6 filter/mask bytes -      - desired  -
+                       0    1    2    3    4    5    6  - position -
+                   A|f/m0 f/m1 f/m2 f/m3  00   00   00 |0,4,8,12,...
+                   B| 00  f/m0 f/m1 f/m2 f/m3  00   00 |1,5,9,13,...
+                   C| 00   00  f/m0 f/m1 f/m2 f/m3  00 |2,6,10,14,...
+                   D| 00   00   00  f/m0 f/m1 f/m2 f/m3|3,7,11,15,...
+
+                   Example A corresponds to a UserOffset/Offset pair
+                   such as 0/0 (4n/4n).  Example B represents a pair
+                   such as 0/1 (4n/4n+1).  Example C is 0/2 
+                   (4n/4n+2). Finally, example D is 2/3 (4n+2/4n+3).
+
+                   If any of the above constraints is not honored,
+                   the SET Response will indicate genErr."
+           ::= { wildcardTable 5 }
+
+       wildcardArm OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- off(0),
+                          -- on(1)
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This object arms (enables) the Wildcard Filter
+                   provided all of the other wildcard objects have
+                   been set to proper values. To disarm a wildcard,
+                   only the wildcardArm object need be set."
+           ::= { wildcardTable 6 }
+
+       -- Bridge Spanning Tree Group
+
+       stp                OBJECT IDENTIFIER ::= { icfBridge 6 }
+
+       stpBridgeId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(8))
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A 64 bit binary bridge id composed of bridge
+                   priority and the bridge's mac address fields. see:
+                   IEEE 802.1(d) 6.8.1.1.3(1), 4.5.3.7"
+           ::= { stp 1 }
+
+       stpTopoChangeTime OBJECT-TYPE
+           SYNTAX     TimeTicks
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The time since the last topology change. see: 
+                   IEEE 802.1(d) 6.8.1.1.3(2), 4.5.3.12"
+           ::= { stp 2 }
+
+       stpTopoNumChanges OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of topo changes since initialization
+                   of STP. see: IEEE 802.1(d) 6.8.1.1.3(3)"
+           ::= { stp 3 }
+
+       stpTopoChange OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- false(0),
+                          -- true(1)
+                       --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A 1 bit flag broadcast by the root bridge
+                   indicating that a topology change is underway, and
+                   Stp bridges should use short term aging. see: IEEE
+                   802.1(d) 6.8.1.1.3(4), 4.5.3.12"
+           ::= { stp 4 }
+
+       stpDesignatedRoot OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(8))
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The binary bridge id that this bridge believes to
+                   be the root bridge for the bridged Lan. see: IEEE
+                   802.1(d) 6.8.1.1.3(5), 4.5.3.1"
+           ::= { stp 5 }
+
+       stpRootCost OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The cost of the path to the root bridge from this
+                   bridge; equal to the sum of the designated cost
+                   and the path cost held for the root port. see:
+                   IEEE 802.1(d) 6.8.1.1.3(6), 4.5.3.2"
+           ::= { stp 6 }
+
+       stpRootPort OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port id that this bridge believes to be the
+                   root bridge's root port for the bridged Lan. see:
+                   IEEE 802.1(d) 6.8.1.1.3(7), 4.5.3.3"
+           ::= { stp 7 }
+
+       stpCurrentMaxAge OBJECT-TYPE
+           SYNTAX     Integer32 (6..40)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The Max Age value received from the Root Bridge
+                   (in seconds); the Stp is currently using the
+                   value. see: IEEE 802.1(d) 6.8.1.1.3(8), 4.5.3.4"
+           ::= { stp 8 }
+
+       stpCurrentHelloTime OBJECT-TYPE
+           SYNTAX     Integer32 (1..10)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The Hello time value received from the Root
+                   Bridge (in seconds); the Stp records the value.
+                   see: IEEE 802.1(d) 6.8.1.1.3(9), 4.5.3.5"
+           ::= { stp 9 }
+
+       stpCurrentForwardDelay OBJECT-TYPE
+           SYNTAX     Integer32 (4..10)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The forward delay value received from the Root
+                   Bridge (in seconds); the Stp is currently using
+                   the value. see: IEEE 802.1(d) 6.8.1.1.3(10),
+                   4.5.3.6"
+           ::= { stp 10 }
+
+       stpMaxAge OBJECT-TYPE
+           SYNTAX     Integer32 (6..40)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The maximum age allowed of Config information for
+                   a port before a bridge will attempt to become the
+                   root (in seconds). Transmitted by this bridge when
+                   it is, or is attempting to become the root.  see:
+                   IEEE 802.1(d) 6.8.1.1.3(11), 6.8.1.2.2(1),
+                   4.5.3.8"
+           ::= { stp 11 }
+
+       stpHelloTime OBJECT-TYPE
+           SYNTAX     Integer32 (1..10)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The time between Config packet transmission when
+                   this bridge is, or is attempting to become the
+                   root (in seconds). Transmitted by this bridge when
+                   it is, or is attempting to become the root. see:
+                   IEEE 802.1(d) 6.8.1.1.3(12), 6.8.1.2.2(2),
+                   4.5.3.9"
+           ::= { stp 12 }
+
+       stpForwardDelay OBJECT-TYPE
+           SYNTAX     Integer32 (4..30)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The time spent in the Listening and Learning
+                   states used when this bridge is, or is attempting
+                   to become the root (in seconds).  Transmitted by
+                   this bridge when it is, or is attempting to become
+                   the root. see: IEEE 802.1(d) 6.8.1.1.3(13),
+                   6.8.1.2.2(3), 4.5.3.10"
+           ::= { stp 13 }
+
+       stpPriority OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The upper 16 bits of the 64 bit BridgeId composed
+                   of priority and the bridge's mac address fields.
+                   see: IEEE 802.1(d) 6.8.1.2.2(4), 4.5.3.7"
+           ::= { stp 14 }
+
+       -- Bridge Spanning Tree Port Group
+
+       stpPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF StpPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of stpPort entries."
+           --INDEX   { stpPortIndex }
+           ::= { stp 15 }
+
+       StpPortEntry ::= 
+           SEQUENCE {
+               stpPortIndex                    Integer32,
+               stpPortState                    Integer32,
+               stpPortId                       Integer32,
+               stpPortPathCost                 Integer32,
+               stpPortRootId                   OCTET STRING,
+               stpPortDesignatedCost           Integer32,
+               stpPortDesignatedBridge         OCTET STRING,
+               stpPortDesignatedPort           Integer32,
+               stpPortPriority                 Integer32
+           }
+
+       stpPortIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   port to which this entry is applicable. The port
+                   identified by a particular value of this index is
+                   the same interface/port as identified by the same
+                   value of ifIndex. Not an IEEE 802.1(d) reqmt."
+           ::= { stpPortTable 1 }
+
+       stpPortState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- stpDisabled(0),    - settable
+                          -- stpListening(1),
+                          -- stpLearning(2),
+                          -- stpForwarding(3),
+                          -- stpBlocking(4)     - settable
+                       --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The state of a port on a 2 port bridge is really
+                   the state of the bridge itself. Management is only
+                   allowed to set this object to 'stpDisabled' or
+                   'stpBlocking'. Setting the object to 'stpDisabled'
+                   will turn off spanning tree only if the state is
+                   not 'stpBlocking' (to prevent loops). Setting the
+                   object to 'stpBlocking' will turn on spanning tree
+                   only if it was previously disabled. see: IEEE
+                   802.1(d) 6.8.2.1.3(2), 4.4, 4.5.5.2"
+           ::= { stpPortTable 2 }
+
+       stpPortId OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The 16 bit port id composed of priority and the
+                   port's unique id fields. see: IEEE 802.1(d)
+                   6.8.2.1.3(3), 4.5.5.1"
+           ::= { stpPortTable 3 }
+
+       stpPortPathCost OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The contribution of the path through this port,
+                   when the port is the root port, to the total cost
+                   of the path to the root for this bridge. see: IEEE
+                   802.1(d) 6.8.2.1.3(4), 6.8.2.3.2(2), 4.5.5.3"
+           ::= { stpPortTable 4 }
+
+       stpPortRootId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(6))
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The bridge id that this port believes to be the
+                   root bridge for the bridged Lan. see: IEEE
+                   802.1(d) 6.8.2.1.3(5), 4.5.5.4"
+           ::= { stpPortTable 5 }
+
+       stpPortDesignatedCost OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The cost of the path to the root offered by the
+                   Designated Port on the LAN to which this Port is
+                   attached. see: IEEE 802.1(d) 6.8.2.1.3(6),
+                   4.5.5.5"
+           ::= { stpPortTable 6 }
+
+       stpPortDesignatedBridge OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(6))
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The Bridge Id of the designated bridge for the
+                   LAN associated with the port. see: IEEE 802.1(d)
+                   6.8.2.1.3(7), 4.5.5.6"
+           ::= { stpPortTable 7 }
+
+       stpPortDesignatedPort OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The port id of the bridge believed to be the
+                   designated port of the LAN associated with the
+                   port. see: IEEE 802.1(d) 6.8.2.1.3(8), 4.5.5.7"
+           ::= { stpPortTable 8 }
+
+       stpPortPriority OBJECT-TYPE
+           SYNTAX     Integer32 (0..255)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The upper 8 bits of the 16 bit PortId composed of
+                   priority and the port's unique id fields. see:
+                   IEEE 802.1(d) 6.8.2.3.2(3), 4.5.5.1"
+           ::= { stpPortTable 9 }
+
+       -- Icf HDLC Error Group
+
+       hdlcErrorTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HdlcErrorEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of hdlcError entries."
+           --INDEX    { hdlcErrorIndex }
+           ::= { icfBridge 7 }
+
+       HdlcErrorEntry ::= 
+           SEQUENCE {
+               hdlcErrorIndex                  Integer32,
+               hdlcErrorIndications            Counter32,
+               hdlcT1Timeouts                  Counter32,
+               hdlcMissedPackets               Counter32,
+               hdlcRcvOverruns                 Counter32,
+               hdlcXmtUnderruns                Counter32,
+               hdlcProviderLostPrimitives      Counter32,
+               hdlcRuntFrameReceives           Counter32,
+               hdlcGiantFrameReceives          Counter32,
+               hdlcBadFrameReceives            Counter32,
+               hdlcRejectFrameReceives         Counter32,
+               hdlcRejectFrameSends            Counter32,
+               hdlcFrameRejectFrameRecs        Counter32
+           }
+
+       hdlcErrorIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index value which uniquely identifies the
+                   port to which this entry is applicable. The port
+                   identified by a particular value of this index is
+                   the same interface/port as identified by the same
+                   value of ifIndex. IcfBridge.HP28674: There is only
+                   one 'real' instance of this object on port 2."
+           ::= { hdlcErrorTable 1 }
+
+       hdlcErrorIndications OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Errors occurring during information transfer
+                   which required instruction from CPU for recovery.
+                   This is a serious link problem. The local node
+                   will either reset or disconnect after receiving
+                   this message."
+           ::= { hdlcErrorTable 2 }
+
+       hdlcT1Timeouts OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The number of times the retransmission timer
+                   (x25T1Timer) timed out."
+           ::= { hdlcErrorTable 3 }
+
+       hdlcMissedPackets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the frames lost by the receiver because
+                   there wasn't a receive buffer."
+           ::= { hdlcErrorTable 4 }
+
+       hdlcRcvOverruns OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the number of times the reciever's FIFO
+                   was full when the receiver was ready to put new
+                   data into the FIFO."
+           ::= { hdlcErrorTable 5 }
+
+       hdlcXmtUnderruns OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the number of times the transmitter has
+                   aborted a frame transmission because data was
+                   late from memory."
+           ::= { hdlcErrorTable 6 }
+
+       hdlcProviderLostPrimitives OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the number of lost control frames due to
+                   802.3 priority processing on receive."
+           ::= { hdlcErrorTable 7 }
+
+       hdlcRuntFrameReceives OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the HDLC frames received that were less
+                   than the minimum legal HDLC size."
+           ::= { hdlcErrorTable 8 }
+
+       hdlcGiantFrameReceives OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the HDLC frames received that were
+                   larger than the maximum legal size that can be
+                   sent on the 802.3 LAN link."
+           ::= { hdlcErrorTable 9 }
+
+       hdlcBadFrameReceives OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the sum of: HDLC frames with bad
+                   checksum, and misaligned HDLC frames."
+           ::= { hdlcErrorTable 10 }
+
+       hdlcRejectFrameReceives OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the HDLC reject frames received."
+           ::= { hdlcErrorTable 11 }
+
+       hdlcRejectFrameSends OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the HDLC reject frames sent."
+           ::= { hdlcErrorTable 12 }
+
+       hdlcFrameRejectFrameRecs OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of the HDLC frame reject frames (FRMR)
+                   received."
+           ::= { hdlcErrorTable 13 }
+
+       -- Icf HDLC Local Group
+
+       hdlcLocalTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HdlcLocalEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of hdlcLocal entries."
+           --INDEX    { hdlcLocalIndex }
+           ::= { icfBridge 8 }
+
+       HdlcLocalEntry ::= 
+           SEQUENCE {
+               hdlcLocalIndex                  Integer32,
+               hdlcLocalResetRequests          Counter32,
+               hdlcLocalResetConfirms          Counter32,
+               hdlcLocalConnectRequests        Counter32,
+               hdlcLocalConnectConfirms        Counter32,
+               hdlcLocalDisconnectRequests     Counter32,
+               hdlcLocalDisconnectConfirms     Counter32,
+               hdlcLocalState                  Integer32,
+               hdlcLocalAddress                INTEGER,
+               hdlcLocalPhase                  Integer32
+           }
+
+       hdlcLocalIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Index into Hdlc local statistics table on a per
+                   port basis.  bridge.HP28674: There is only one
+                   'real' instance of this object on port 2."
+           ::= { hdlcLocalTable 1 }
+
+       hdlcLocalResetRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC requests to reset current
+                   logical link."
+           ::= { hdlcLocalTable 2 }
+
+       hdlcLocalResetConfirms OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC node link reset
+                   confirmations."
+           ::= { hdlcLocalTable 3 }
+
+       hdlcLocalConnectRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC node attempts to establish
+                   logical link."
+           ::= { hdlcLocalTable 4 }
+
+       hdlcLocalConnectConfirms OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC node connect request
+                   acceptances."
+           ::= { hdlcLocalTable 5 }
+
+       hdlcLocalDisconnectRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC node disconnect requests."
+           ::= { hdlcLocalTable 6 }
+
+       hdlcLocalDisconnectConfirms OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of local HDLC node disconnects granted."
+           ::= { hdlcLocalTable 7 }
+
+       hdlcLocalState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- t1HdlcStateNormal(0),
+                          -- t1HdlcStateBusy(1),
+                          -- t1HdlcStateRejectSent(2),
+                          -- t1HdlcStateDiscSent(3),
+                          -- t1HdlcStateDisconnect(4),
+                          -- t1HdlcStateConnSent(5),
+                          -- t1HdlcStateFrameRejectSent(6),
+                          -- t1HdlcStateResetSent(7),
+                          -- t1HdlcStateErrorIndication(8)
+                       --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Current local HDLC operational state."
+           ::= { hdlcLocalTable 8 }
+
+       hdlcLocalAddress OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          hdlcDTEAddress(1),
+                          hdlcDCEAddress(3)
+                      }
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The local HDLC address during communication with
+                   the remote node.  This object is valid only if a
+                   brouter is on the remote end of the HDLC link. It
+                   can only be set to one of the two values:
+                   'hdlcDTEAddress' or 'hdlcDTEAddress'. Furthermore,
+                   the setting of this object must be different from
+                   the setting of the hdlcRemoteHdlcAddress object.
+                   This object, along with hdlcRemoteAddress and
+                   hdlcRemoteNodeId, constitute a superobject.  See
+                   hdlcRemoteNodeId for more details."
+           ::= { hdlcLocalTable 9 }
+
+       hdlcLocalPhase OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- t1PhaseStopped(-1),
+                          -- t1PhaseInfo(0),
+                          -- t1PhaseDisconnect(1),
+                          -- t1PhaseReset(2),
+                          -- t1PhaseTransparentData(3)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Current HDLC operational phase."
+           ::= { hdlcLocalTable 10 }
+
+       -- Icf HDLC Remote Group
+
+       hdlcRemoteTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HdlcRemoteEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of hdlcRemote entries."
+           --INDEX    { hdlcRemoteIndex }
+           ::= { icfBridge 9 }
+
+       HdlcRemoteEntry ::= 
+           SEQUENCE {
+               hdlcRemoteIndex                 Integer32,
+               hdlcRemoteResetRequests         Counter32,
+               hdlcRemoteResetConfirms         Counter32,
+               hdlcRemoteConnectRequests       Counter32,
+               hdlcRemoteConnectConfirms       Counter32,
+               hdlcRemoteDisconnectRequests    Counter32,
+               hdlcRemoteState                 Integer32,
+               hdlcRemoteAddress               INTEGER,
+               hdlcRemoteXidCommands           Counter32,
+               hdlcRemoteXidResponses          Counter32,
+               hdlcRemoteTestCommands          Counter32,
+               hdlcRemoteTestResponses         Counter32,
+               hdlcRemoteNodeId                Integer32
+           }
+
+       hdlcRemoteIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Index into Hdlc remote statistics table on a per
+                   port basis.  bridge.HP28674: There is only one
+                   'real' instance of this object on port 2."
+           ::= { hdlcRemoteTable 1 }
+
+       hdlcRemoteResetRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of remote HDLC requests to reset current
+                   logical link."
+           ::= { hdlcRemoteTable 2 }
+
+       hdlcRemoteResetConfirms OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of remote HDLC node link reset
+                   confirmations."
+           ::= { hdlcRemoteTable 3 }
+
+       hdlcRemoteConnectRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of remote HDLC node attempts to establish
+                   logical link."
+           ::= { hdlcRemoteTable 4 }
+
+       hdlcRemoteConnectConfirms OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of remote HDLC node connect request
+                   acceptances."
+           ::= { hdlcRemoteTable 5 }
+
+       hdlcRemoteDisconnectRequests OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of remote HDLC node disconnect requests."
+           ::= { hdlcRemoteTable 6 }
+
+       hdlcRemoteState OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- t1HdlcStateNormal(0),
+                          -- t1HdlcStateBusy(1),
+                          -- t1HdlcStateRejectSent(2),
+                          -- t1HdlcStateDiscSent(3),
+                          -- t1HdlcStateDisconnect(4),
+                          -- t1HdlcStateConnSent(5),
+                          -- t1HdlcStateFrameRejectSent(6),
+                          -- t1HdlcStateResetSent(7),
+                          -- t1HdlcStateErrorIndication(8)
+                      --}
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Current remote HDLC operational state."
+           ::= { hdlcRemoteTable 7 }
+
+       hdlcRemoteAddress OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          hdlcDTEAddress(1),
+                          hdlcDCEAddress(3)
+                      }
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The remote HDLC address during communication with
+                   the local node.  This object is valid only if a
+                   brouter is on the remote end of the HDLC link. It
+                   can only be set to one of the two values:
+                   'hdlcDCEAddress' or 'hdlcDTEAddress'. Furthermore,
+                   the setting of this object must be different from
+                   the setting of the hdlcLocalAddress object. This
+                   object, along with hdlcLocalAddress and
+                   hdlcRemoteNodeId, constitute a superobject.  See
+                   hdlcRemoteNodeId for more details."
+           ::= { hdlcRemoteTable 8 }
+
+       hdlcRemoteXidCommands OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of XID commands issued by remote node."
+           ::= { hdlcRemoteTable 9 }
+
+       hdlcRemoteXidResponses OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of XID responses issued by remote node."
+           ::= { hdlcRemoteTable 10 }
+
+       hdlcRemoteTestCommands OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of Test commands issued by remote node."
+           ::= { hdlcRemoteTable 11 }
+
+       hdlcRemoteTestResponses OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Count of Test responses issued by remote node."
+           ::= { hdlcRemoteTable 12 }
+
+       hdlcRemoteNodeId OBJECT-TYPE
+           SYNTAX     Integer32 -- INTEGER {
+                          -- remoteNodeBridge(0),
+                          -- remoteNodeRouter(1),   - Settable
+                          -- remoteNodeUnknown(2)   - Settable
+                      --}
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Identification of the node at the opposite end of
+                   the HDLC link (eg. brouter or bridge).  This
+                   object, along with hdlcLocalAddress and
+                   hdlcRemoteAddress, constitute a superobject. This
+                   object may only be set to one of the two values:
+                   'remoteNodeBridge' or 'remoteNodeRouter'.  If this
+                   object is set to 'remoteNodeUnknown', then
+                   hdlcLocalAddress and hdlcRemoteAddress need not be
+                   supplied, and will be ignored if provided. In a
+                   get, this object may report 'remoteNodeBridge',
+                   but attempts to set this object to
+                   'remoteNodeBridge' will result in an error pdu
+                   with error type invalidData. If this object is set
+                   to 'remoteNodeRouter', then hdlcLocalAddress and
+                   hdlcRemoteAddress must be present and contiguous
+                   in the pdu in order to properly complete the
+                   superobject. The three objects may be in any order
+                   within the pdu."
+           ::= { hdlcRemoteTable 13 }
+
+       -- Icf X25 Group
+
+       x25Table OBJECT-TYPE
+           SYNTAX     SEQUENCE OF X25Entry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   A list of X25 entries."
+           --INDEX    { x25Index }
+           ::= { icfBridge 10 }
+
+       X25Entry ::= 
+           SEQUENCE {
+               x25Index                        Integer32,
+               x25T1Timer                      TimeTicks,
+               x25N2Count                      Integer32,
+               x25T3Timer                      TimeTicks
+           }
+
+       x25Index OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Index into X25 remote timer table on a per port
+                   basis.  bridge.HP28674: There is only one 'real'
+                   instance of this object on port 2."
+           ::= { x25Table 1 }
+
+       x25T1Timer OBJECT-TYPE
+           SYNTAX     TimeTicks --(300..2000)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Period of time used to timeout retransmits for
+                   X25."
+           ::= { x25Table 2 }
+
+       x25N2Count OBJECT-TYPE
+           SYNTAX     Integer32 (4..30)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Number of retries to be performed during X.25
+                   communication."
+           ::= { x25Table 3 }
+
+       x25T3Timer OBJECT-TYPE
+           SYNTAX     TimeTicks --(1000..3000)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Period of idle time before a disconnect is
+                   executed for X25."
+           ::= { x25Table 4 }
+
+
+       -- ICF Configuration group.
+
+       icfConfigIfTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfConfigIfEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This table contains per-interface configuration
+                   information that will take effect after the next
+                   reset of the device."
+           ::= { icfConfig 1 }
+
+       icfConfigIfEntry OBJECT-TYPE
+           SYNTAX     IcfConfigIfEntry
+           MAX-ACCESS not-accessible
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   An entry in the icfConfigIfTable containing
+                   information about a single interface."
+           INDEX      { icfConfigIfIndex }
+           ::= { icfConfigIfTable 1 }
+
+       IcfConfigIfEntry ::=
+           SEQUENCE {
+               icfConfigIfIndex                Integer32,
+               icfConfigIfIpAddress            IpAddress,
+               icfConfigIfNetMask              IpAddress,
+               icfConfigIfDefaultGate          IpAddress
+           }
+
+       icfConfigIfIndex OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   The index of the interface which this information
+                   contains configuration information for.  The
+                   interface identified by a particular value of this
+                   index is the same interface identified by the same
+                   value of ifIndex."
+           ::= { icfConfigIfEntry 1 }
+
+       icfConfigIfIpAddress OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This variable contains the IP address for this
+                   interface which will be used after the next reset
+                   of the device."
+           ::= { icfConfigIfEntry 2 }
+
+       icfConfigIfNetMask OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This variable contains the IP subnet mask for
+                   this interface which will be used after the next
+                   reset of the device."
+           ::= { icfConfigIfEntry 3 }
+
+       icfConfigIfDefaultGate OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This variable contains the IP address of the
+                   default router for this interface which will be
+                   used after the next reset of the device."
+           ::= { icfConfigIfEntry 4 }
+
+       icfConfigIpTTL OBJECT-TYPE
+           SYNTAX     Integer32 (1..255)
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   This variable contains the default IP time to
+                   live which will be used after the next reset of
+                   the device."
+           ::= { icfConfig 2 }
+
+       icfConfigBootpEnable OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS OBJECT IS OBSOLETE *********
+
+                   Setting this flag to 'enabled' (the default) will
+                   clear any existing IP address configuration for
+                   this device, and will cause the device to use the
+                   Bootp protocol to obtain its IP configuration
+                   after the next reset.  This flag must be set to
+                   'disabled' in order to configure an IP address for
+                   the device.  Setting this flag to 'disabled' will
+                   prevent the Bootp protocol from running.  Setting
+                   this flag to 'disabled' when there is no IP
+                   address configured will disable the IP protocol
+                   stack on this device."
+           ::= { icfConfig 3 }
+
+
+
+       -- Trap definitions
+       --
+       -- The following hack is needed because these traps were sent
+       -- with sysObjectId in the enterprise field even for enterprise
+       -- specific traps.  This means it needs a separate definition
+       -- for each trap for each box that can send it.
+
+       bridge1010TrapPrefix    OBJECT IDENTIFIER ::= { bridge1010 0 }
+       bridgeRemoteTrapPrefix  OBJECT IDENTIFIER ::= { bridgeRemote 0 }
+       etherTwist12TrapPrefix  OBJECT IDENTIFIER ::= { etherTwist12 0 }
+       fiberOpticTrapPrefix    OBJECT IDENTIFIER ::= { fiberOptic 0 }
+       etherTwist48TrapPrefix  OBJECT IDENTIFIER ::= { etherTwist48 0 }
+       thinLANTrapPrefix       OBJECT IDENTIFIER ::= { thinLAN 0 }
+       etherTwist24STrapPrefix OBJECT IDENTIFIER ::= { etherTwist24S 0 }
+       advStack12TrapPrefix    OBJECT IDENTIFIER ::= { advStack12 0 }
+       advStack24TrapPrefix    OBJECT IDENTIFIER ::= { advStack24 0 }
+       advStack48TrapPrefix    OBJECT IDENTIFIER ::= { advStack48 0 }
+       advStackU8TrapPrefix    OBJECT IDENTIFIER ::= { advStackU8 0 }
+       advStackU16TrapPrefix   OBJECT IDENTIFIER ::= { advStackU16 0 }
+       repeaterAgentTrapPrefix OBJECT IDENTIFIER ::= { repeaterAgent 0 }
+       hpicfEnetSMMTrapPrefix  OBJECT IDENTIFIER ::= { hpicfEnetSMM 0 }
+
+
+
+       -- ICF Common trap definitions
+
+       thresholdTrap1010 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { bridge1010TrapPrefix 0 }
+
+       thresholdTrapRem NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { bridgeRemoteTrapPrefix 0 }
+
+       thresholdTrapET12 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { etherTwist12TrapPrefix 0 }
+
+       thresholdTrapET48 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { etherTwist48TrapPrefix 0 }
+
+       thresholdTrapTLAN NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { thinLANTrapPrefix 0 }
+
+       thresholdTrapFiber NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { fiberOpticTrapPrefix 0 }
+
+       thresholdTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { etherTwist24STrapPrefix 0 }
+
+       thresholdTrapAS12 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { advStack12TrapPrefix 0 }
+
+       thresholdTrapAS24 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { advStack24TrapPrefix 0 }
+
+       thresholdTrapAS48 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { advStack48TrapPrefix 0 }
+
+       thresholdTrapASU8 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { advStackU8TrapPrefix 0 }
+
+       thresholdTrapASU16 NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { advStackU16TrapPrefix 0 }
+
+       thresholdTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { repeaterAgentTrapPrefix 0 }
+
+       thresholdTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { evthObject, evthThreshold, evthHysteresis,
+                        evthTimeInterval }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A thresholdTrap(0) is specific to ICF devices. It
+                   signifies that the threshold entity in the device
+                   has detected that the object identified by
+                   evthObject has exceeded the threshold identified
+                   by evthThreshold during the time interval
+                   evthTimeInterval. After this condition occurs, it
+                   will not reoccur until the the object identified
+                   by evthObject falls below evthHysteresis for the
+                   duration of evthTimeInterval."
+           ::= { hpicfEnetSMMTrapPrefix 0 }
+
+       -- Icf Hub trap definitions
+
+       linkBeatTrapET12 NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { etherTwist12TrapPrefix 3 }
+
+       linkBeatTrapET48 NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { etherTwist48TrapPrefix 3 }
+
+       linkBeatTrapTLAN NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { thinLANTrapPrefix 3 }
+
+       linkBeatTrapFiber NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { fiberOpticTrapPrefix 3 }
+
+       linkBeatTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { etherTwist24STrapPrefix 3 }
+
+       linkBeatTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { repeaterAgentTrapPrefix 3 }
+
+       linkBeatTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { hubPortLinkBeatStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A linkBeatTrap(3) is device type specific to ICF
+                   hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's link beat
+                   status. The current value of the port's link beat
+                   status is returned in the PDU."
+           ::= { hpicfEnetSMMTrapPrefix 3 }
+
+       segmentationTrapET12 NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { etherTwist12TrapPrefix 4 }
+
+       segmentationTrapET48 NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { etherTwist48TrapPrefix 4 }
+
+       segmentationTrapTLAN NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { thinLANTrapPrefix 4 }
+
+       segmentationTrapFiber NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { fiberOpticTrapPrefix 4 }
+
+       segmentationTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { etherTwist24STrapPrefix 4 }
+
+       segmentationTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { repeaterAgentTrapPrefix 4 }
+
+       segmentationTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { hubPortSegmentation }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A segmentationTrap(4) is device type specific to
+                   ICF hubs. It signifies that the hub hardware has
+                   detected a change of state in a port's
+                   segmentation status.  The current value of the
+                   port's segmentation status is returned in the
+                   PDU."
+           ::= { hpicfEnetSMMTrapPrefix 4 }
+
+       backupLinkTrapET12 NOTIFICATION-TYPE
+           OBJECTS    { ifAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of ifAdminStatus for a backup
+                   port on the hub.  The new value of ifAdminStatus
+                   is returned in the PDU.
+
+                   Backup links are not supported on the HP28688A
+                   hub."
+           ::= { etherTwist12TrapPrefix 5 }
+
+       backupLinkTrapET48 NOTIFICATION-TYPE
+           OBJECTS    { ifAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of ifAdminStatus for a backup
+                   port on the hub.  The new value of ifAdminStatus
+                   is returned in the PDU."
+           ::= { etherTwist48TrapPrefix 5 }
+
+       backupLinkTrapTLAN NOTIFICATION-TYPE
+           OBJECTS    { ifAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of ifAdminStatus for a backup
+                   port on the hub.  The new value of ifAdminStatus
+                   is returned in the PDU."
+           ::= { thinLANTrapPrefix 5 }
+
+       backupLinkTrapFiber NOTIFICATION-TYPE
+           OBJECTS    { ifAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of ifAdminStatus for a backup
+                   port on the hub.  The new value of ifAdminStatus
+                   is returned in the PDU."
+           ::= { fiberOpticTrapPrefix 5 }
+
+       backupLinkTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { rptrPortAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of rptrPortAdminStatus for a
+                   backup port on the hub.  The new value of
+                   rptrPortAdminStatus is returned in the PDU."
+           ::= { etherTwist24STrapPrefix 5 }
+
+       backupLinkTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { rptrPortAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of rptrPortAdminStatus for a
+                   backup port on the hub.  The new value of
+                   rptrPortAdminStatus is returned in the PDU."
+           ::= { repeaterAgentTrapPrefix 5 }
+
+       backupLinkTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { rptrPortAdminStatus }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A backupLinkTrap(5) is device type specific to
+                   most ICF hubs. It signifies that there has been a
+                   change in state of rptrPortAdminStatus for a
+                   backup port on the hub.  The new value of
+                   rptrPortAdminStatus is returned in the PDU."
+           ::= { hpicfEnetSMMTrapPrefix 5 }
+
+       intrusionTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { hubIntruderAddress, hubIntruderPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An intrusionTrap(6) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   port security violation has been detected on a
+                   port which has the hubSecPtAlarmEnable flag set
+                   to 'enabled'.  The MAC address of the intruder
+                   and the port on which the intrusion occurred are
+                   returned in the PDU."
+           ::= { etherTwist24STrapPrefix 6 }
+
+       intrusionTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { hubIntruderAddress, hubIntruderPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An intrusionTrap(6) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   port security violation has been detected on a
+                   port which has the hubSecPtAlarmEnable flag set
+                   to 'enabled'.  The MAC address of the intruder
+                   and the port on which the intrusion occurred are
+                   returned in the PDU."
+           ::= { repeaterAgentTrapPrefix 6 }
+
+       intrusionTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { hubIntruderAddress, hubIntruderPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An intrusionTrap(6) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   port security violation has been detected on a
+                   port which has the hubSecPtAlarmEnable flag set
+                   to 'enabled'.  The MAC address of the intruder
+                   and the port on which the intrusion occurred are
+                   returned in the PDU."
+           ::= { hpicfEnetSMMTrapPrefix 6 }
+
+       addressMovedTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { hubAddrMoveAddress, hubAddrMoveOldGroup,
+                        hubAddrMoveOldPort, hubAddrMoveNewGroup,
+                        hubAddrMoveNewPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An addressMovedTrap(7) is device type specific
+                   to EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   source MAC address which had been operating at
+                   one port has moved to a new port.  The MAC
+                   address that moved, the group and port that the
+                   address moved from, and the group and port that
+                   the address moved to are returned in the PDU."
+           ::= { etherTwist24STrapPrefix 7 }
+
+       addressMovedTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { hubAddrMoveAddress, hubAddrMoveOldGroup,
+                        hubAddrMoveOldPort, hubAddrMoveNewGroup,
+                        hubAddrMoveNewPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An addressMovedTrap(7) is device type specific
+                   to EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   source MAC address which had been operating at
+                   one port has moved to a new port.  The MAC
+                   address that moved, the group and port that the
+                   address moved from, and the group and port that
+                   the address moved to are returned in the PDU."
+           ::= { repeaterAgentTrapPrefix 7 }
+
+       addressMovedTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { hubAddrMoveAddress, hubAddrMoveOldGroup,
+                        hubAddrMoveOldPort, hubAddrMoveNewGroup,
+                        hubAddrMoveNewPort }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   An addressMovedTrap(7) is device type specific
+                   to EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   source MAC address which had been operating at
+                   one port has moved to a new port.  The MAC
+                   address that moved, the group and port that the
+                   address moved from, and the group and port that
+                   the address moved to are returned in the PDU."
+           ::= { hpicfEnetSMMTrapPrefix 7 }
+
+       newAddressTrapET24S NOTIFICATION-TYPE
+           OBJECTS    { rptrAddrTrackLastSourceAddress }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A newAddressTrap(8) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   new MAC address has been detected on one of the
+                   hub's ports.  The instance of
+                   rptrAddrTrackLastSourceAddress for the port with
+                   the new address is returned in the PDU."
+           ::= { etherTwist24STrapPrefix 8 }
+
+       newAddressTrapASEN NOTIFICATION-TYPE
+           OBJECTS    { rptrAddrTrackLastSourceAddress }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A newAddressTrap(8) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   new MAC address has been detected on one of the
+                   hub's ports.  The instance of
+                   rptrAddrTrackLastSourceAddress for the port with
+                   the new address is returned in the PDU."
+           ::= { repeaterAgentTrapPrefix 8 }
+
+       newAddressTrapSMM NOTIFICATION-TYPE
+           OBJECTS    { rptrAddrTrackLastSourceAddress }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A newAddressTrap(8) is device type specific to
+                   EtherTwist hubs with revision 'E' firmware or
+                   later and AdvanceStack hubs.  It signifies that a
+                   new MAC address has been detected on one of the
+                   hub's ports.  The instance of
+                   rptrAddrTrackLastSourceAddress for the port with
+                   the new address is returned in the PDU."
+           ::= { hpicfEnetSMMTrapPrefix 8 }
+
+
+       -- ICF Bridge traps
+
+       stpTrap1010 NOTIFICATION-TYPE
+           OBJECTS    { stpPortState }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A stpTrap(3) is device type specific to ICF
+                   bridges. It signifies that the Spanning Tree
+                   entity in the bridge has detected a change of
+                   state to either Blocking or Forwarding."
+           ::= { bridge1010TrapPrefix 3 }
+
+       stpTrapRem NOTIFICATION-TYPE
+           OBJECTS    { stpPortState }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A stpTrap(3) is device type specific to ICF
+                   bridges. It signifies that the Spanning Tree
+                   entity in the bridge has detected a change of
+                   state to either Blocking or Forwarding."
+           ::= { bridgeRemoteTrapPrefix 3 }
+
+       temperatureTrap1010 NOTIFICATION-TYPE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A temperatureTrap(4) is device type specific to
+                   ICF bridges. It signifies that the bridge hardware
+                   has detected an overheated condition."
+           ::= { bridge1010TrapPrefix 4 }
+
+       temperatureTrapRem NOTIFICATION-TYPE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS OBSOLETE *********
+
+                   A temperatureTrap(4) is device type specific to
+                   ICF bridges. It signifies that the bridge hardware
+                   has detected an overheated condition."
+           ::= { bridgeRemoteTrapPrefix 4 }
+
+
+       -- conformance information
+
+       icfETCompliances
+               OBJECT IDENTIFIER ::= { icfETwistConformance 1 }
+       icfETGroups
+               OBJECT IDENTIFIER ::= { icfETwistConformance 2 }
+
+       -- compliance statements
+
+
+       icfETwistHubCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for EtherTwist hub
+                   devices."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfCommonIpGroup,
+                                  icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icf8023MacGroup,
+                                  icfEncryptedPasswordGroup,
+                                  hubBasicGroup,
+                                  hubMappingGroup }
+
+               GROUP    hubLinkBeatControlGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       hubs that are capable of disabling linkbeat
+                       detection on their ports.  Note that the
+                       HP28682A Fiber Optic Hub is incapable of
+                       disabling link beat (low light)."
+
+           ::= { icfETCompliances 1 }
+
+
+       icfETwistBridgeCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for EtherTwist bridge
+                   devices."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfCommonIpGroup,
+                                  icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icf8023MacGroup,
+                                  icfEncryptedPasswordGroup,
+                                  icfBridgeBasicGroup,
+                                  icfBridgeSpanningTreeGroup }
+
+               GROUP    icfRemoteBridgeGroup
+               DESCRIPTION
+                       "This group is mandatory on all EtherTwist
+                       remote bridges."
+
+           ::= { icfETCompliances 2 }
+
+
+       icfETwistHubDCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for EtherTwist hub devices
+                   updated for Revision D firmware features."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfMappingGroup,
+                                  icf8023MacGroup,
+                                  icfEncryptedPasswordGroup,
+                                  hubBasicGroup,
+                                  hubMappingGroup,
+                                  hubBasicAddrTableGroup }
+
+               GROUP     icfCommonIpGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       devices that support the IP protocol stack.
+                       Note that the HP28688A did not support the
+                       IP protocol stack when it was running an
+                       IPX code image."
+
+               GROUP     icfCommonIpxGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       devices that support the IPX protocol stack.
+                       Note that the HP28688A did not support the
+                       IP protocol stack when it was running an
+                       IPX code image.  Also note that IPX was not
+                       supported on any release C EtherTwist agents."
+
+               GROUP     icfIpMappingGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       devices that support the IP protocol stack.
+                       Note that the HP28688A did not support the
+                       IP protocol stack when it was running an
+                       IPX code image."
+
+               GROUP     icfIpxMappingGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       devices that support the IPX protocol stack.
+                       Note that the HP28688A did not support the
+                       IP protocol stack when it was running an
+                       IPX code image.  Also note that IPX was not
+                       supported on any release C EtherTwist agents."
+
+               GROUP     icfDownloadGroup
+               DESCRIPTION
+                       "This group is appropriate on all EtherTwist
+                       devices that have network download capability.
+                       Note that the HP28688A did not have network
+                       download capability.  Also note that network
+                       download was not supported in any release C
+                       EtherTwist agents."
+
+               GROUP    hubLinkBeatControlGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       hubs that are capable of disabling linkbeat
+                       detection on their ports.  Note that the
+                       HP28682A Fiber Optic Hub is incapable of
+                       disabling link beat (low light).  Also note that
+                       the HP28692A ThinLAN Hub is incapable of
+                       disabling linkbeat (loopback)."
+
+               GROUP    hubBasicEnhancementsGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       hubs that are capable of detecting a MAU
+                       attached to the AUI port incorrectly has SQE
+                       enabled.  Note that the HP28688A hub was
+                       incapable of detecting this condition."
+
+               GROUP    hubReadableAddrTableGroup
+               DESCRIPTION
+                       "This optional group is implemented only on
+                       the HP28692A ThinLAN Hub."
+
+               GROUP    hubBackupLinkGroup
+               DESCRIPTION
+                       "This group is implemented on all EtherTwist
+                       hubs that support backup links.  Note that the
+                       HP28688A hub does not support backup links."
+
+           ::= { icfETCompliances 3 }
+
+
+       icfETwistBridgeDCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for EtherTwist hub devices
+                   updated for Revision D firmware features."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfCommonIpGroup,
+                                  icfCommonIpxGroup,
+                                  icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icfIpxMappingGroup,
+                                  icf8023MacGroup,
+                                  icfDownloadGroup,
+                                  icfEncryptedPasswordGroup,
+                                  icfBridgeBasicGroup,
+                                  icfBridgeSpanningTreeGroup }
+
+               GROUP    icfRemoteBridgeGroup
+               DESCRIPTION
+                       "This group is mandatory on all EtherTwist
+                       remote bridges."
+
+           ::= { icfETCompliances 4 }
+
+
+       icfETwistHub24SCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for secure EtherTwist
+                   hubs,updated to reflect the new features of the
+                   EtherTwist Hub/24S."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfCommonIpGroup,
+                                  icfCommonIpxGroup,
+                                  icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icfIpxMappingGroup,
+                                  icf8023MacGroup,
+                                  icfDownloadGroup,
+                                  hubBasicGroup,
+                                  hubBasicEnhancementsGroup,
+                                  hubNewEnhancementsGroup,
+                                  hubLinkBeatControlGroup,
+                                  hubMappingGroup,
+                                  hubBasicAddrTableGroup,
+                                  hubReadableAddrTableGroup,
+                                  hubBackupLinkGroup,
+                                  hubAddressMoveGroup,
+                                  icfConfigGroup }
+
+           ::= { icfETCompliances 5 }
+
+
+       icfAdvStkCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for AdvanceStack
+                   10Mbit hubs."
+           MODULE
+               MANDATORY-GROUPS { icfCommonBasicGroup,
+                                  icfCommonIpGroup,
+                                  icfCommonIpxGroup,
+                                  icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icfIpxMappingGroup,
+                                  icf8023MacGroup,
+                                  hubBasicGroup,
+                                  hubBasicEnhancementsGroup,
+                                  hubNewEnhancementsGroup,
+                                  hubLinkBeatControlGroup,
+                                  hubMappingGroup,
+                                  hubBasicAddrTableGroup,
+                                  hubReadableAddrTableGroup,
+                                  hubBackupLinkGroup,
+                                  hubAddressMoveGroup,
+                                  hubLateEventMonitorGroup,
+                                  icfConfigGroup }
+
+           ::= { icfETCompliances 6 }
+
+
+       icfAdvStkSlaveCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for AdvanceStack 10BaseT
+                   slave hubs."
+           MODULE
+               MANDATORY-GROUPS { icfSlaveMappingGroup,
+                                  icf8023MacSlaveGroup,
+                                  hubBasicSlaveGroup,
+                                  hubMappingGroup,
+                                  hubLinkBeatControlGroup,
+                                  hubBasicEnhancementsGroup,
+                                  hubNewEnhancementsGroup }
+
+           ::= { icfETCompliances 7 }
+
+
+       icfAdvStkVGCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for AdvanceStack
+                   100VG hubs."
+           MODULE
+               MANDATORY-GROUPS { icfMappingGroup,
+                                  icfIpMappingGroup,
+                                  icfIpxMappingGroup,
+                                  icfConfigGroup }
+
+           ::= { icfETCompliances 8 }
+
+
+       icfAdvStkVGSlaveCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for AdvanceStack 100VG
+                   slave hubs."
+           MODULE
+               MANDATORY-GROUPS { icfSlaveMappingGroup }
+
+           ::= { icfETCompliances 9 }
+
+
+
+
+       -- units of conformance
+
+       icfCommonBasicGroup OBJECT-GROUP
+           OBJECTS    { lastSetError,
+                        reset,
+                        selfTest,
+                        semaphore,
+                        pollResponse,
+
+                        evtIndex,
+                        evtArm,
+                        evtTimeSinceOccurrence,
+
+                        evthIndex,
+                        evthArm,
+                        evthObject,
+                        evthThreshold,
+                        evthHysteresis,
+                        evthTimeInterval,
+                        evthTimeSinceOccurrence
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of obsolete objects thate were
+                   shared by EtherTwist hubs, EtherTwist bridges,
+                   and AdvanceStack 10BaseT hubs."
+           ::= { icfETGroups 1 }
+
+       icfCommonIpGroup OBJECT-GROUP
+           OBJECTS    { ipSubnetMask,
+                        evtIpNotify
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of obsolete objects thate were
+                   shared by EtherTwist hubs, EtherTwist bridges,
+                   and AdvanceStack 10BaseT hubs that support IP."
+           ::= { icfETGroups 2 }
+
+       icfCommonIpxGroup OBJECT-GROUP
+           OBJECTS    { evtIpxNotify }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of obsolete objects thate were
+                   shared by EtherTwist hubs, EtherTwist bridges,
+                   and AdvanceStack 10BaseT hubs that support IPX."
+           ::= { icfETGroups 3 }
+
+       icfEncryptedPasswordGroup OBJECT-GROUP
+           OBJECTS    { password }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of obsolete objects that were shared
+                   by EtherTwist hubs and EtherTwist bridges.  Was
+                   not implemented on EtherTwist Hub/24S or on any
+                   AdvanceStack product."
+           ::= { icfETGroups 4 }
+
+       icfMappingGroup OBJECT-GROUP
+           OBJECTS    { announceAddress,
+                        mapAddress,
+                        mapState,
+                        mapPort,
+                        linkTest802MacAddress,
+                        linkTestRepetitions,
+                        linkTestSuccess,
+                        linkTestTimeout
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for mapping MAC addresses
+                   to device ports."
+           ::= { icfETGroups 5 }
+
+       icfIpMappingGroup OBJECT-GROUP
+           OBJECTS    { linkTestIpAddress }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for using IP-layer addresses
+                   in mapping operations."
+           ::= { icfETGroups 6 }
+
+       icfIpxMappingGroup OBJECT-GROUP
+           OBJECTS    { linkTestIpxAddress }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for using IPX-layer
+                   addresses in mapping operations."
+           ::= { icfETGroups 7 }
+
+       icfSlaveMappingGroup OBJECT-GROUP
+           OBJECTS    { mapAddress,
+                        mapState,
+                        mapPort
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for mapping MAC addresses
+                   to device ports on slave AdvanceStack devices."
+           ::= { icfETGroups 8 }
+
+       icf8023MacGroup OBJECT-GROUP
+           OBJECTS    { icf8023MacIndex,
+                        icf8023MacInBroadcastPkts,
+                        icf8023MacOutBroadcastPkts,
+                        icf8023MacInMulticastPkts,
+                        icf8023MacOutMulticastPkts,
+                        icf8023MacRunts,
+                        icf8023MacGiants,
+                        icf8023MacMissedPktErrors,
+                        icf8023MacExcessDeferrals,
+                        icf8023MacTotalMediaErrors,
+                        icf8023MacSpuriousIntrs
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of 802.3 specific statistics for
+                   device ports."
+           ::= { icfETGroups 9 }
+
+       icf8023MacSlaveGroup OBJECT-GROUP
+           OBJECTS    { icf8023MacIndex,
+                        icf8023MacRunts,
+                        icf8023MacGiants,
+                        icf8023MacMissedPktErrors,
+                        icf8023MacExcessDeferrals,
+                        icf8023MacTotalMediaErrors,
+                        icf8023MacSpuriousIntrs
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of 802.3 specific statistics for
+                   device ports. on slave AdvanceStack devices."
+           ::= { icfETGroups 10 }
+
+       icfDownloadGroup OBJECT-GROUP
+           OBJECTS    { icfDownloadIpAddress,
+                        icfDownloadIpxAddress,
+                        icfDownloadFilename
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for initiating a network
+                   download of device firmware on EtherTwist devices."
+           ::= { icfETGroups 11 }
+
+       hubBasicGroup OBJECT-GROUP
+           OBJECTS    { hubThinlanFault,
+                        hubGlobalErrors,
+                        hubGlobalCollisions,
+                        hubGlobalPktFragments,
+                        hubGlobalRunts,
+                        hubGlobalGiants,
+                        hubGlobalCrcErrors,
+                        hubGlobalAlignmentErrors,
+                        hubGlobalInOctets,
+                        hubGlobalInUcastPkts,
+                        hubGlobalInNUcastPkts,
+                        hubGlobalInBroadcastPkts,
+                        hubPortPktFragments,
+                        hubPortCollisions,
+                        hubPortSegmentation,
+                        hubPortLinkBeatStatus,
+                        hubPortsOperStatus
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for managing ICF hubs."
+           ::= { icfETGroups 12 }
+
+       hubBasicSlaveGroup OBJECT-GROUP
+           OBJECTS    { hubThinlanFault,
+                        hubGlobalErrors,
+                        hubGlobalCollisions,
+                        hubGlobalPktFragments,
+                        hubGlobalRunts,
+                        hubGlobalGiants,
+                        hubGlobalCrcErrors,
+                        hubGlobalAlignmentErrors,
+                        hubGlobalInOctets,
+                        hubPortPktFragments,
+                        hubPortCollisions,
+                        hubPortSegmentation,
+                        hubPortLinkBeatStatus,
+                        hubPortsOperStatus
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for managing slave ICF
+                   hubs."
+           ::= { icfETGroups 13 }
+
+       hubMappingGroup OBJECT-GROUP
+           OBJECTS    { hubPortIndex,
+                        hubPortMacAddress,
+                        hubPortAddressState
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects used for mapping MAC
+                   addresses to hub ports."
+           ::= { icfETGroups 14 }
+
+       hubLinkBeatControlGroup OBJECT-GROUP
+           OBJECTS    { hubPortLinkBeatEnable }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for enabling or disabling
+                   the link beat detection function on hub ports."
+           ::= { icfETGroups 15 }
+
+       hubBasicEnhancementsGroup OBJECT-GROUP
+           OBJECTS    { hubSqeEnabled }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects adding simple enhancements
+                   to the basic hub management objects."
+           ::= { icfETGroups 16 }
+
+       hubBasicAddrTableGroup OBJECT-GROUP
+           OBJECTS    { hubAddressTableMaxAge }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for controlling the hub
+                   address table, even when the table itself is not
+                   readable."
+           ::= { icfETGroups 17 }
+
+       hubReadableAddrTableGroup OBJECT-GROUP
+           OBJECTS    { hubAddressIndex,
+                        hubAddressChunk
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for accessing a MAC address
+                   to port number table on ICF hubs."
+           ::= { icfETGroups 18 }
+
+       hubBackupLinkGroup OBJECT-GROUP
+           OBJECTS    { hubNumBkpLinks,
+                        hubBkpLinkIndex,
+                        hubBackupPort,
+                        hubPrimaryPort,
+                        hubBackupAddress,
+                        hubBackupTestTime,
+                        hubBackupConsecutiveFails
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for configuring backup links
+                   on ICF hubs."
+           ::= { icfETGroups 19 }
+
+       hubNewEnhancementsGroup OBJECT-GROUP
+           OBJECTS    { hubPortPolarityReversed }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects providing new enhancements
+                   to the basic hub management objects."
+           ::= { icfETGroups 20 }
+
+       hubAddressMoveGroup OBJECT-GROUP
+           OBJECTS    { hubAddrMoveIndex,
+                        hubAddrMoveAddress,
+                        hubAddrMoveOldGroup,
+                        hubAddrMoveOldPort,
+                        hubAddrMoveNewGroup,
+                        hubAddrMoveNewPort
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for tracking station address
+                   movement between ports on a hub."
+           ::= { icfETGroups 21 }
+
+       hubLateEventMonitorGroup OBJECT-GROUP
+           OBJECTS    { hubPortLateEventDisable,
+                        hubLateEventMonitor
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects to control the late event
+                   monitor function of ICF hubs."
+           ::= { icfETGroups 22 }
+
+       icfBridgeBasicGroup OBJECT-GROUP
+           OBJECTS    { operationalState,
+                        forwardDbMaxAge,
+                        addressIndex,
+                        addressChunk,
+                        brgPortIndex,
+                        brgPortCacheHits,
+                        brgPortCacheMisses,
+                        brgPortForwardedPkts,
+                        brgPortFilteredPkts,
+                        wildcardIndex,
+                        wildcardFilter,
+                        wildcardMask,
+                        wildcardOffset,
+                        wildcardUserOffset,
+                        wildcardArm
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for managing ICF bridges."
+           ::= { icfETGroups 23 }
+
+       icfBridgeSpanningTreeGroup OBJECT-GROUP
+           OBJECTS    { stpBridgeId,
+                        stpTopoChangeTime,
+                        stpTopoNumChanges,
+                        stpTopoChange,
+                        stpDesignatedRoot,
+                        stpRootCost,
+                        stpRootPort,
+                        stpCurrentMaxAge,
+                        stpCurrentHelloTime,
+                        stpCurrentForwardDelay,
+                        stpMaxAge,
+                        stpHelloTime,
+                        stpForwardDelay,
+                        stpPriority,
+                        stpPortIndex,
+                        stpPortState,
+                        stpPortId,
+                        stpPortPathCost,
+                        stpPortRootId,
+                        stpPortDesignatedCost,
+                        stpPortDesignatedBridge,
+                        stpPortDesignatedPort,
+                        stpPortPriority
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for managing the Spanning
+                   Tree Protocol on ICF bridges."
+           ::= { icfETGroups 24 }
+
+       icfRemoteBridgeGroup OBJECT-GROUP
+           OBJECTS    { hdlcErrorIndex,
+                        hdlcErrorIndications,
+                        hdlcT1Timeouts,
+                        hdlcMissedPackets,
+                        hdlcRcvOverruns,
+                        hdlcXmtUnderruns,
+                        hdlcProviderLostPrimitives,
+                        hdlcRuntFrameReceives,
+                        hdlcGiantFrameReceives,
+                        hdlcBadFrameReceives,
+                        hdlcRejectFrameReceives,
+                        hdlcRejectFrameSends,
+                        hdlcFrameRejectFrameRecs,
+                        hdlcLocalIndex,
+                        hdlcLocalResetRequests,
+                        hdlcLocalResetConfirms,
+                        hdlcLocalConnectRequests,
+                        hdlcLocalConnectConfirms,
+                        hdlcLocalDisconnectRequests,
+                        hdlcLocalDisconnectConfirms,
+                        hdlcLocalState,
+                        hdlcLocalAddress,
+                        hdlcLocalPhase,
+                        hdlcRemoteIndex,
+                        hdlcRemoteResetRequests,
+                        hdlcRemoteResetConfirms,
+                        hdlcRemoteConnectRequests,
+                        hdlcRemoteConnectConfirms,
+                        hdlcRemoteDisconnectRequests,
+                        hdlcRemoteState,
+                        hdlcRemoteAddress,
+                        hdlcRemoteXidCommands,
+                        hdlcRemoteXidResponses,
+                        hdlcRemoteTestCommands,
+                        hdlcRemoteTestResponses,
+                        hdlcRemoteNodeId,
+                        x25Index,
+                        x25T1Timer,
+                        x25N2Count,
+                        x25T3Timer
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for managing the remote link
+                   on ICF remote bridges."
+           ::= { icfETGroups 25 }
+
+       icfConfigGroup OBJECT-GROUP
+           OBJECTS    { icfConfigIfIndex,
+                        icfConfigIfIpAddress,
+                        icfConfigIfNetMask,
+                        icfConfigIfDefaultGate,
+                        icfConfigIpTTL,
+                        icfConfigBootpEnable
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for configuring the IP
+                   protocol stack in ICF agents."
+           ::= { icfETGroups 26 }
+
+       END
+

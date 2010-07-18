@@ -1,0 +1,301 @@
+EVENT-ACTIONS-MIB DEFINITIONS ::= BEGIN
+
+--  event-actions-mib.txt
+--  Revision: 1.03.01
+--  Part Number:
+--  Date: December 9, 1997
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  Cabletron Systems reserves the right to make changes in
+--  specifications and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 95 Cabletron Systems
+
+
+IMPORTS
+        OBJECT-TYPE
+                FROM RFC-1212
+        ctActions
+                FROM CTRON-MIB-NAMES
+        DisplayString
+                FROM RFC1213-MIB
+        eventIndex
+                FROM RMON-MIB;
+
+        --  DisplayString ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax, unless explicitly stated, are declared as having:
+        --
+        --  SIZE (0..255)
+
+ctActionDefn    OBJECT IDENTIFIER ::= { ctActions 1 }
+
+ctEventActionTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtEventActionEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines actions that may take place when a given
+        RMON event is triggered.  Where action is defined as a collection
+        of snmp SET operations to defined objects.  A SET operation is
+        defined by an OID and by a value.  It is assumed that the type
+        of the object is an integer."
+    ::= { ctActionDefn 1 }
+
+ctEventActionEntry      OBJECT-TYPE
+    SYNTAX      CtEventActionEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "Describes a particular action, SET operation."
+    INDEX { eventIndex, ctActionObjectBase }
+    ::= { ctEventActionTable 1 }
+
+CtEventActionEntry ::= SEQUENCE {
+        ctActionObjectBase
+                OBJECT IDENTIFIER,
+        ctActionValue
+                INTEGER,
+        ctActionOperStatus
+                INTEGER,
+        ctActionAdminStatus
+                INTEGER,
+        ctActionDescription
+                DisplayString,
+        ctActionOrder
+                INTEGER
+        }
+
+ctActionObjectBase      OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the base OBJECT IDENTIFIER that will be used for the
+        set operation."
+::= { ctEventActionEntry 1 }
+
+ctActionValue   OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The value that will be used in the set operation that is defined
+        by this action entry."
+    ::= { ctEventActionEntry 2 }
+
+ctActionOperStatus      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2),
+        normal(4),      -- The action has executed with normal results
+        error(5),       -- The action has executed and terminated in an error
+        invalidExtension(6)
+        }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The current operational status of the action.
+
+        A value of enable(1) reflects that the action has been enabled but
+        has never executed.
+
+        A value of disable(2) reflects that the action has been disabled.
+
+        A value of normal(4) indicates that the action has executed and
+        has completed normally.
+
+        A value of error(5) indicates that the action has executed but
+        an error was detected during the operation.  Possible causes
+        are bad value, bad type of value, object out of view, incorrect
+        object extensions as defined in ctActionObjectTable.
+
+        A value of invalidExtension(6) reflects that this action can not
+        be executed since one or more of the defined extensions are in
+        error."
+::= { ctEventActionEntry 3 }
+
+ctActionAdminStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2),
+        delete(3)
+        }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the desired state for this particular action entry.
+
+        An action may be enabled by setting a value of enable(1)
+        When enabled an action will execute whenever the specified event
+        is generated.
+
+        An action may be disabled by setting a value of disable(2).
+        When disabled a given action will not be executed when the
+        specified event is generated.  However the action remains
+        valid to be enabled later."
+    DEFVAL { enable }
+::= { ctEventActionEntry 4 }
+
+ctActionDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This text string allows the end-user to provide a description 
+        of the action; it must not contain anything but printable
+        ASCII characters."
+    ::= { ctEventActionEntry 5 }
+        
+ctActionOrder       OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The value of this object controls the order of operations of actions
+         associated with a given event. Actions with lower ctActionOrder value
+         shall be executed first. It is not manditory that this object
+         be set by the NMS. The default action on creation of an action entry
+         is to create this object with a value of 1. All entries with the
+         same ctActionOrder value will be executed in lexicographical
+         order thus allowing for the preservation of the old order
+         of execution."
+    ::= { ctEventActionEntry 6 }
+
+--This table was deprecated on March 7, 1997.
+
+ctActionExtensionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtActionExtensionEntry
+    ACCESS      not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "This table defines extensions to the action table.  Extensions
+        are in the form of get requests.  The value of which appended
+        to the ctActionObjectBase. Values are appended in sequential order
+        as defined by ctActionExtensionID."
+    ::= { ctActionDefn 2 }
+
+ctActionExtensionEntry  OBJECT-TYPE
+    SYNTAX      CtActionExtensionEntry
+    ACCESS      not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Defines a particular action object extension entry."
+    INDEX { ctActionObjectBase, ctActionExtensionID }
+    ::= { ctActionExtensionTable 1 }
+
+CtActionExtensionEntry ::= SEQUENCE {
+        ctActionExtensionID
+                INTEGER,
+        ctActionExtensionOID
+                OBJECT IDENTIFIER,
+        ctActionExtensionValue
+                INTEGER,
+        ctActionExtensionOperStatus
+                INTEGER,
+        ctActionExtensionAdminStatus
+                INTEGER
+        }
+
+ctActionExtensionID     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Uniquely identifies a specific action extension."
+    ::= { ctActionExtensionEntry 1 }
+
+ctActionExtensionOID    OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    ACCESS      read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Defines the OBJECT that will be read to get the value that
+        will form the extension."
+    ::= { ctActionExtensionEntry 2 }
+
+ctActionExtensionValue  OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The result of the read operation."
+    ::= { ctActionExtensionEntry 3 }
+
+ctActionExtensionOperStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2),
+        normal(4),      -- The action has executed with normal results
+        error(5)        -- The action has executed and terminated in an error
+        }
+    ACCESS      read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The current operational status of the action extension.
+
+        A value of enable(1) reflects that the extension has been enabled but
+        has never executed.
+
+        A value of disable(2) reflects that the extension has been disabled.
+
+        A value of normal(4) indicates that the extension has executed and
+        has completed normally.
+
+        A value of error(5) indicates that the extension has executed but
+        an error was detected during the operation.  Possible causes
+        are bad value, bad type of value, object out of view, incorrect
+        object extensions as defined in ctActionExtensionTable."
+::= { ctActionExtensionEntry 4 }
+
+ctActionExtensionAdminStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2),
+        delete(3)
+        }
+    ACCESS      read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Defines the desired state for this particular action 
+        extension entry.
+
+        An extension may be enabled by setting a value of enable(1)
+        When enabled an extension will execute whenever the specified event
+        is generated.
+
+        An extension may be disabled by setting a value of disable(2).
+        When disabled a given extension will not be executed when the
+        specified event is generated.  However the extension remains
+        valid to be enabled later."
+    DEFVAL { enable }
+::= { ctActionExtensionEntry 5 }
+
+ctEventActionTableEntries       OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The number of active entries in the ctEventAction Table."
+    ::= { ctActionDefn 3 }
+
+END

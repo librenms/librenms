@@ -1,0 +1,308 @@
+RBTWS-AP-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Integer32, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+rbtwsApTc MODULE-IDENTITY
+    LAST-UPDATED "200607102335Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "Textual Conventions used by Enterasys Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent using these TCs.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200607100015Z"
+    DESCRIPTION "v1.0.1: Disallow illegal RbtwsRadioRate values 1..9
+                         while keeping zero (that means unknown rate)"
+
+    REVISION "200603300014Z"
+    DESCRIPTION "v1.0: Initial version, for 4.1 release"
+
+    ::= { rbtwsMibs 3 }
+
+
+RbtwsAccessType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the access type used by client or an AP.
+        Value 'ap(1)' indicates access point that is
+        directly attached to the switch.
+        Value 'dap(2)' indicates distributed access point
+        with attachment to the switch through the intermediate
+        network.
+        Value 'wired(3)' indicates a client that is directly
+        attached to the switch (no access point is involved)."
+    SYNTAX      INTEGER {
+            ap                  (1),
+            dap                 (2),
+            wired               (3)
+        }
+
+RbtwsApAttachType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Type of AP attachment to AC."
+    SYNTAX       INTEGER {
+                     directAttach(1),  -- informally known as "AP"
+                     networkAttach(2)  -- informally known as "DAP"
+                 }
+
+RbtwsApPortOrDapNum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "AP Port, for directly attached APs, otherwise DAP Number
+        (arbitrary number assigned when configuring the DAP on the AC).
+        A zero value means unknown."
+    SYNTAX       Unsigned32 (0..1000)
+
+RbtwsApState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "AP State, as seen by the AC."
+    SYNTAX       INTEGER {
+                     cleared         (1),
+                     init            (2),
+                     bootStarted     (3),
+                     imageDownloaded (4),
+                     connectFailed   (5),
+                     configuring     (6),
+                     configured      (7)
+                 }
+
+-- RbtwsApTransition TC used by 'rbtwsApNonOperStatusTrap'
+RbtwsApTransition ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "AP state Transition, as seen by the AC."
+    SYNTAX       INTEGER {
+                     clear            (1),
+                     timeout          (2),
+                     reset            (3),
+                     bootSuccess      (4),
+                     startConfiguring (5),
+                     connectFail      (6)
+                     -- transition to operational state is reported by
+                     -- a different trap: 'rbtwsApOperRadioStatusTrap'
+                 }
+
+RbtwsApFailDetail ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Detailed failure codes for some of the transitions
+        specified in 'RbtwsApTransition'."
+    SYNTAX       INTEGER {
+                    -- Detail code values for 'configFailed' transition.
+                    -- All 3 below cover 'rbtwsDAPConnectWarningTrap' trap.
+                    secureHandshakeFailure  (2),
+                    fingerprintRequired     (3),
+                    fingerprintMismatch     (4),
+
+                    -- Detail code values for 'timeout' transition.
+                    -- Reports the state of the physical AC port
+                    -- this AP is attached to.
+                    -- For RM, it would cover the information
+                    -- given by the standard "Port Link Up/Down" traps.
+                    portLinkUp              (11),
+                    portLinkDown            (12),
+
+                    failUnknown             (99)
+                 }
+
+RbtwsApConnectSecurityType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Security level of the connection between AP and AC:
+        secure(1)   - fingerprint matching;
+        insecure(2) - fingerprint not configured,
+                      or optional and not matching;
+        auto(3)     - Auto-DAP is intrinsically insecure:
+                      could not check fingerprint since
+                      no specific DAP is configured."
+    SYNTAX       INTEGER {
+                    secure          (1),
+                    insecure        (2),
+                    auto            (3)
+                 }
+
+RbtwsApServiceAvailability ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Level of wireless service availability."
+    SYNTAX       INTEGER {
+                    fullService     (1),
+                    -- All radios operational on the AP.
+                    noService       (2),
+                    -- No radio operational on the AP.
+                    degradedService (3)
+                    -- One radio down, one radio up.
+                 }
+
+RbtwsApBias ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Bias of AP attachment to this AC.
+        Setting an APs bias on an AC switch to high causes the switch
+        to be preferred over switches with low bias,
+        for booting and managing the AP.
+        Bias applies only to AC switches that are indirectly attached
+        to the AP through an intermediate Layer 2 or Layer 3 network.
+        An AP always attempts to boot on AP port 1 first,
+        and if an AC switch is directly attached on AP port 1,
+        the AP boots from it regardless of the bias settings."
+    SYNTAX       INTEGER {
+                     high(1),
+                     low(2)
+                 }
+
+RbtwsApSerialNum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The value is a zero length string if unknown or unavailable.
+        Otherwise the value is a serial number, which consists
+        of printable ASCII characters between 0x21 (!),
+        and 0x7d (}) with no leading, embedded, or trailing space."
+    SYNTAX       OCTET STRING (SIZE (0..32))
+
+RbtwsApFingerprint ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS       current
+    DESCRIPTION
+        "Represents a RSA key fingerprint (binary value),
+        which is the MD5 hash of the public key of the RSA key pair.
+        Or a zero length string if not known or unavailable."
+    SYNTAX       OCTET STRING (SIZE (0 | 16))
+
+RbtwsRadioNum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration for multi-radio APs."
+    SYNTAX      INTEGER {
+                    radio-1             (1),
+                    radio-2             (2),
+                    not-applicable      (3)
+                }
+
+RbtwsPowerLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The current level of transmit power expressed in dbm."
+    SYNTAX      Unsigned32 (1..18)
+
+RbtwsRadioPowerChangeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerations for why the power level was changed,
+        which occurs due to auto-tune operation."
+    SYNTAX      INTEGER {
+                    dup-pkts-threshold-exceed            (1),
+                    retransmit-threshold-exceed          (2),
+                    clients-optimal-performance-reached  (3),
+                    def-power-threshold-exceed           (4)
+                }
+
+RbtwsChannelChangeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerations for why the channel was changed, which
+        occurs due to auto-tune operation"
+    SYNTAX      INTEGER {
+                    util-index          (1),
+                    rexmit-pkt-offset   (2),
+                    noise-offset        (3),
+                    noise               (4),
+                    utilization         (5),
+                    phy-error-offset    (6),
+                    crc-errors-offset   (7),
+                    radar-detected      (8)
+                }
+                -- contains hyphens due to historical reasons
+
+RbtwsChannelNum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Channel Number"
+    SYNTAX      Unsigned32 (1..1024)
+
+RbtwsRadioEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Radio mode (administratively enabled or disabled)."
+    SYNTAX      INTEGER {
+                    enabled  (1),
+                    disabled (2)
+                }
+
+RbtwsRadioConfigState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Radio Configuration State, as seen by the AC."
+    SYNTAX      INTEGER {
+                    configInit  (1),
+                    configFail  (2),
+                    configOk    (3)
+                }
+
+RbtwsRadioRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION
+        "The possible transmission rates of an AP radio.
+        Both a and b/g rates are covered; a specific radio will report
+        the applicable transmission rates (either a or b/g).
+        Here are the possible rates, in Mbps:
+        - 802.11g radios: 54, 48, 36, 24, 18, 12, 11, 9, 6, 5.5, 2, or 1;
+        - 802.11b radios: 11, 5.5, 2, or 1;
+        - 802.11a radios: 54, 48, 36, 24, 18, 12, 9, or 6.
+        The value in MIB is specified as the rate in Mbps times 10,
+        in order to have only integer values, zero meaning unknown rate."
+    SYNTAX      Unsigned32 (0 | 10..540)
+
+RbtwsRadioType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate the Radio Type, as seen by AC."
+    SYNTAX      INTEGER {
+                    typeUnknown     (1),
+                    typeA           (2), -- 802.11a
+                    typeB           (3), -- 802.11b
+                    typeG           (4)  -- 802.11b+g
+                }
+
+RbtwsRssi ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "RSSI (Received Signal Strength Indicator) for last packet
+        received from this neighbor, in decibels referred to
+        1 milliwatt (dBm). A higher value indicates a stronger signal."
+    SYNTAX      Integer32 (-100..0)
+
+RbtwsApWasOperational ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration to indicate whether the AP was operational
+        before a transition occured. Normally used in notifications."
+    SYNTAX      INTEGER {
+                    oper    (1),
+                    nonOper (2)
+                }
+
+END

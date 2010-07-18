@@ -1,0 +1,571 @@
+CTRON-IF-REMAP-2-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-if-remap-2-mib.txt
+--  Revision: 02.00.02
+--  Part Number: 
+--  Date: September 15, 1998
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific Interface Remap MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 98 Cabletron Systems
+
+        IMPORTS
+            OBJECT-TYPE
+                FROM RFC-1212
+            ctIFRemap2
+                FROM CTRON-MIB-NAMES;
+
+
+        ctIFRemap2Config OBJECT IDENTIFIER ::= { ctIFRemap2 1 }
+
+
+-- The ctIFRemap2Config group is used to control ifremapping.  Ifremapping
+-- provides the ability to map one port or one vlan directly to another port.
+-- This control is defined by creating a row in the ctIFRemap2Table
+-- specifying source slot, source port, destination slot, and destination
+-- port with ctIFRemap2Status set to a value of enable(1) or by creating
+-- a row in the ctIFRemap2VlanTable specifying source slot, source vlan, 
+-- destination slot, destination port with ctIFRemap2VlanStatus set to a
+-- value of enable(1).
+-- 
+-- When a source port is remapped to a destination port, the destination
+-- port will transmit out all packets received or transmitted on the
+-- source port. Counters on the destination port will increment for all
+-- packets transmitted be it by normal packet forwarding or due to 
+-- ifremap.
+--
+-- When a source vlan is remapped to a destination port, the destination
+-- port will transmit out all packets received on the source vlan. Counters 
+-- on the destination port will increment for all packets transmitted be it
+-- by normal packet forwarding or due to ifremap.
+-- 
+-- All tables in this MIB contain a slot instance.  In the case of a
+-- stand-alone device the slot will always be 1.
+--
+-- Any mention of a vlan in this text refers to a Virtual Local Area Network
+-- that is compliant to IEEE Draft P802.1Q/D11.
+
+
+--
+-- The IFRemap Table
+--
+
+ctIFRemap2Table  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CtIFRemap2Entry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "This table provides the ability to remap all frames from one
+            port onto another port.  A port is defined by 
+ctIFRemap2PortIndex
+            from the ctIFRemap2PortTable below.  Only ports listed in the
+            ctIFRemap2PortTable are available for remapping.
+
+            A given source port may only be mapped to only one destination 
+            port.  Once a port is reserved as part of a ctIFRemap2Table  entry,
+            it may not be used in any other ctIFRemap2Table entries (ie. If 
+            remapping port 1 to port 3, then neither port 1 or port 3 may be
+            used as a ctIFRemap2SourcePort or ctIFRemap2DestPort in another
+            ctIFRemap2Table entry).
+
+            Each row that exists in this table defines such a relationship.
+            By disabling a row in this table the remapping relationship no 
+            longer exists.
+
+            Each entry will be referenced by slot.  In the case of a
+            stand-alone device the slot will always be 1.
+
+            If a given relationship cannot be created the set will fail
+            with a BAD-VALUE error."
+    ::= { ctIFRemap2Config 1 }
+
+
+ctIFRemap2Entry  OBJECT-TYPE
+    SYNTAX  CtIFRemap2Entry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "Describes a particular ifremap entry."
+    INDEX { ctIFRemap2SourceSlot, ctIFRemap2SourcePort,
+            ctIFRemap2DestSlot, ctIFRemap2DestPort }
+    ::= { ctIFRemap2Table 1 }
+
+
+CtIFRemap2Entry ::=
+    SEQUENCE {
+        ctIFRemap2SourceSlot
+            INTEGER,
+        ctIFRemap2SourcePort
+            INTEGER,
+        ctIFRemap2DestSlot
+            INTEGER,
+        ctIFRemap2DestPort
+            INTEGER,
+        ctIFRemap2Status
+            INTEGER,
+        ctIFRemap2PhysicalErrors
+            INTEGER,
+        ctIFRemap2EgressType
+            INTEGER
+    }
+
+
+ctIFRemap2SourceSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The slot combined with the ctIFRemap2SourcePort which will
+            have all packets redirected to the destination port as defined
+            by ctIFRemap2DestSlot and ctIFRemap2DestPort."
+    ::= { ctIFRemap2Entry 1 }
+
+
+ctIFRemap2SourcePort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The port combined with the ctIFRemap2SourceSlot which will
+            have all packets redirected to the destination port as defined
+            by ctIFRemap2DestSlot and ctIFRemap2DestPort."
+    ::= { ctIFRemap2Entry 2 }
+
+
+ctIFRemap2DestSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The slot combined with the ctIFRemap2DestPort which will
+            see all packets redirected from ctIFRemap2SourceSlot and
+            ctIFRemap2SourcePort."
+    ::= { ctIFRemap2Entry 3 }
+
+
+ctIFRemap2DestPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The port combined with the ctIFRemap2DestSlot which will
+            see all packets redirected from ctIFRemap2SourceSlot and
+            ctIFRemap2SourcePort."
+    ::= { ctIFRemap2Entry 4 }
+
+
+ctIFRemap2Status OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Defines the status of the ifremap entry.  Setting
+            ctIFRemap2Status to a value of enable(1) has the effect of
+            creating an entry in the table when it does not already exist.
+            Setting ctIFRemap2Status to a value of disable(2) disables the
+            entry and deletes the row from the table.  Therefore this
+            table only contains entries that are active."
+    DEFVAL { enable }
+    ::= { ctIFRemap2Entry 5 }
+
+
+ctIFRemap2PhysicalErrors OBJECT-TYPE
+    SYNTAX INTEGER {
+               enable(1),
+               disable(2),
+               unsupported(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+            "Enable or disable remapping of physical errors.  This object
+            controls whether or not frames with physical errors should be
+            remapped out the destination port for this entry.  By default,
+            this will be enabled when an entry is created.
+            
+            NOTE: This action is always superseded by the value of
+            ctIFRemap2PhysErrsCapable for either the source or destination
+            port specified in this remap entry.  If a port is not
+            physically capable of transmitting or receiving error frames,
+            then this object will return unsupported(3) and the value
+            cannot be changed."
+    DEFVAL { enable }
+    ::= { ctIFRemap2Entry 6 }
+
+
+ctIFRemap2EgressType OBJECT-TYPE
+    SYNTAX INTEGER {
+               normal(1),
+               alwaysTagged(2),
+               alwaysUntagged(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+            "Defines how each packet will be tagged when sent out the 
+             ctIFRemap2DestPort.  Setting ctIFRemap2EgressType to normal(1)
+             will set packets to be sent out as they are seen by 
+             ctIFRemap2SourcePort.  Setting ctIFRemap2EgressType to 
+             alwaysTagged(2) will set packets to always be sent out 
+             ctIFRemap2DestSlot and ctIFRemap2DestPort with a tag. Setting 
+             ctIFRemap2EgressType to alwaysUntagged(3) will set packets to always 
+             be sent out ctIFRemap2DestSlot and ctIFRemap2DestPort without a tag.
+             If the module is not configured to support packet tagging (i.e. 802.1d 
+             bridge mode) then setting this object to alwaysTagged(2) or 
+             alwaysUntagged(3) will return a BAD-VALUE error."
+    DEFVAL { normal }
+    ::= { ctIFRemap2Entry 7 }
+
+--
+-- The IFRemap Port Table
+--
+
+ctIFRemap2PortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CtIFRemap2PortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "This table holds all valid ports that are remappable or
+            able to accept a remapped packet."
+    ::= { ctIFRemap2Config 2 }
+
+
+ctIFRemap2PortEntry  OBJECT-TYPE
+    SYNTAX  CtIFRemap2PortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "Describes a particular supported remappable port."
+    INDEX { ctIFRemap2PortSlot, ctIFRemap2PortIndex }
+    ::= { ctIFRemap2PortTable 1 }
+
+
+CtIFRemap2PortEntry ::=
+    SEQUENCE {
+        ctIFRemap2PortSlot
+                INTEGER,
+        ctIFRemap2PortIndex
+                INTEGER,
+        ctIFRemap2PortReference
+                OBJECT IDENTIFIER,
+        ctIFRemap2PhysErrsCapable
+                INTEGER
+        }
+
+
+ctIFRemap2PortSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Defines the slot in which the remap capable module resides. 
+            In the case of a stand-alone device the slot will always be 1."
+    ::= { ctIFRemap2PortEntry 1 }
+
+
+ctIFRemap2PortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Defines an port that is remappable or is able to accept a
+            remapped packet.  Ideally indices will start with 1 and will
+            be numbered continuously through the number of available remap
+            ports.  However, this need not necessarily be the case.
+            Indices may be sparse and begin with any number if desired
+            for a particular implementation."
+    ::= { ctIFRemap2PortEntry 2  }
+
+
+ctIFRemap2PortReference OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "This object returns an OID referencing an object which
+             uniquely corresponds to this remap port.  The only criteria
+             is that this OID is a leaf, and that it exists and is
+             accessible.  For example, if remap functionality is running
+             on an 802.1d compliant bridge, remap port #1 could reference
+             dot1dBasePort.1. Alternatively you could reference a mib2
+             interface like ifIndex.1 or a Cabletron Secure Fast port.
+             Mixing these types (some refer to bridge ports, others refer
+             to SFS ports) is not advised, but not prohibited"
+    ::= { ctIFRemap2PortEntry 3  }
+
+
+ctIFRemap2PhysErrsCapable OBJECT-TYPE
+    SYNTAX INTEGER {
+               supported(1),
+               unsupported(2)
+           }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "Indicate whether the port is incapable of remapping physical
+            errors.  If the capability is supported, this object will
+            return supported(1).  If the capability is unsupported, this
+            object will return unsupported(2)."
+    ::= { ctIFRemap2PortEntry 4 }
+
+
+--
+-- The IFRemap Slot Table
+--
+
+ctIFRemap2SlotTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CtIFRemap2SlotEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "This table contains all information pertaining to the
+            abilities or limitations of a particular remap capable
+            module."
+    ::= { ctIFRemap2Config 3 }
+
+
+ctIFRemap2SlotEntry OBJECT-TYPE
+    SYNTAX  CtIFRemap2SlotEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "Describes a particular entry in the ctIFRemap2SlotTable.
+            Each entry is indexed by the physical slot in which the
+            module resides."
+    INDEX { ctIFRemap2SlotIndex }
+    ::= { ctIFRemap2SlotTable 1 }
+
+
+CtIFRemap2SlotEntry ::=
+    SEQUENCE {
+        ctIFRemap2SlotIndex
+            INTEGER,
+        ctIFRemap2SlotMaxRemaps
+            INTEGER,
+        ctIFRemap2SlotMaxRemoteDests
+            INTEGER
+    }
+
+
+ctIFRemap2SlotIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Defines the slot in which the remap capable module resides. 
+In
+            the case of a stand-alone device the slot will always be 1."
+    ::= { ctIFRemap2SlotEntry 1 }
+
+
+ctIFRemap2SlotMaxRemaps OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The maximum number of entries allowed to be sourced from the
+            module in this slot in the ctIFRemap2Table."
+    ::= { ctIFRemap2SlotEntry 2 }
+
+ctIFRemap2SlotMaxRemoteDests OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The maximum number of remote destination ports per remote
+            module.  For example, a value of 3 means that I can have no
+            more than 3 remap destination ports between this module, and
+            any other given module in the same chassis simultaneously. I
+            can have multiple source ports remapped to each of the three
+            remote destination ports.  I can also remap to up to three
+            remote destination ports on each of the other modules in the
+            chassis simultaneously."
+    ::= { ctIFRemap2SlotEntry 3 }
+
+
+--
+-- The IFRemap Vlan Table
+--
+-- The ctIFRemap2VlanTable may only be implemented on a Cabletron Bridge 
+-- which supports the use of IEEE Draft P802.1Q/D11 compliant vlans.
+-- 
+-- The implementation of this table is OPTIONAL
+
+ctIFRemap2VlanTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CtIFRemap2VlanEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "This table provides the ability to remap all frames from any
+            port on a particular vlan to a specific destination port.  
+            Each row that exists in this table defines such a relationship.
+            By disabling a row in this table the remapping relationship no
+            longer exists.
+
+            Multiple vlans may be mapped to a given destination port 
+            (ie. vlan 11 and vlan 35 may both remap to port 10).
+
+            A port is defined by ctIFRemap2PortIndex in the ctIFRemap2PortTable,
+            above.  Only ports listed in the ctIFRemap2PortTable are available
+            for remapping.  A  vlan is defined by ctVlanVID in the
+            ctVlanConfigTable. Only vlans listed in the ctVlanConfigTable are
+            available for remapping.
+
+            Each entry will be referenced by slot.  In the case of a
+            stand-alone device the slot will always be 1.
+
+            If a given relationship cannot be created the set will fail
+            with a BAD-VALUE error."
+    REFERENCE
+            "ctvlan-ext-mib .4.4.1.1"
+    ::= { ctIFRemap2Config 4 }
+
+
+ctIFRemap2VlanEntry  OBJECT-TYPE
+    SYNTAX  CtIFRemap2VlanEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "Describes a particular ifremap Vlan entry."
+    INDEX { ctIFRemap2VlanSourceSlot, ctIFRemap2VlanSourceVlan,
+            ctIFRemap2VlanDestSlot, ctIFRemap2VlanDestPort }
+    ::= { ctIFRemap2VlanTable 1 }
+
+CtIFRemap2VlanEntry ::=
+    SEQUENCE {
+        ctIFRemap2VlanSourceSlot
+            INTEGER,
+        ctIFRemap2VlanSourceVlan
+            INTEGER,
+        ctIFRemap2VlanDestSlot
+            INTEGER,
+        ctIFRemap2VlanDestPort
+            INTEGER,
+        ctIFRemap2VlanStatus
+            INTEGER,
+        ctIFRemap2VlanEgressType
+            INTEGER
+    }
+
+ctIFRemap2VlanSourceSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The slot combined with the ctIFRemap2VlanSourceVlan which will
+            have all packets redirected to the destination port as defined
+            by ctIFRemap2VlanDestSlot and ctIFRemap2VlanDestPort."
+    ::= { ctIFRemap2VlanEntry 1 }
+
+
+ctIFRemap2VlanSourceVlan OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The vlan combined with the ctIFRemap2VlanSourceSlot which will
+            have all packets redirected to the destination port as defined
+            by ctIFRemap2VlanDestSlot and ctIFRemap2VlanDestPort."
+    ::= { ctIFRemap2VlanEntry 2 }
+
+
+ctIFRemap2VlanDestSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The slot combined with the ctIFRemap2VlanDestPort which will
+            see all packets redirected from ctIFRemap2VlanSourceSlot and
+            ctIFRemap2VlanSourceVlan."
+    ::= { ctIFRemap2VlanEntry 3 }
+
+
+ctIFRemap2VlanDestPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The port combined with the ctIFRemap2VlanDestSlot which will
+            see all packets redirected from ctIFRemap2VlanSourceSlot and
+            ctIFRemap2VlanSourceVlan."
+    ::= { ctIFRemap2VlanEntry 4 }
+
+
+ctIFRemap2VlanStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "Defines the status of the ifremap vlan entry.  Setting
+            ctIFRemap2VlanStatus to a value of enable(1) has the effect of
+            creating an entry in the table when it does not already exist.
+            Setting ctIFRemap2VlanStatus to a value of disable(2) disables the
+            entry and deletes the row from the table.  Therefore this
+            table only contains entries that are active.
+   
+            If ctIFRemap2VlanSourceVlan is already being used by another
+            ctIfRemap2Vlan entry or ctifRemap2 Entry then a set to 
+            ctIFRemap2VlanStatus of value enable(1) will return with a
+            BAD-VALUE error."
+    DEFVAL { enable }
+    ::= { ctIFRemap2VlanEntry 5 }
+ 
+
+ctIFRemap2VlanEgressType OBJECT-TYPE
+    SYNTAX INTEGER {
+               received(1),
+               alwaysTagged(2),
+               alwaysUntagged(3)
+           }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+            "Defines how each packet will be tagged when sent out the 
+             ctIFRemap2VlanDestPort.  Setting ctIFRemap2VlanEgressType to 
+             received(1) will set packets to be sent out ctIFRemap2VlanDestSlot
+             and ctIFRemap2VlanDestPort exactly as they are received by 
+             ctIFRemap2VlanSourceVlan. Setting ctIFRemap2VlanEgressType to 
+             alwaysTagged(2) will set packets to be sent out 
+             ctIFRemap2VlanDestSlot and ctIFRemap2VlanDestPort with the 
+             vlan tag associated with ctIFRemap2VlanSourceVlan.  If this port
+             does not have a vlan tag associated with it then all packets will
+             be remapped without a tag.  Setting ctIFRemap2VlanEgressType to
+             alwaysUntagged(3) will set packets to be sent out 
+             ctIFRemap2VlanDestSlot and ctIFRemap2VlanDestPort without any
+             tag reguardless of ctIFRemap2VlanSourceVlan's tagging status."
+    DEFVAL { received }
+    ::= { ctIFRemap2VlanEntry 6 }
+
+END

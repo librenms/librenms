@@ -1,0 +1,4364 @@
+REPEATER-REV4-MIB DEFINITIONS ::= BEGIN
+
+--  repeater-rev4-mib.txt
+--  Revision: 2.03.01
+--  Part Number: 2170571-01
+--  Date: April 17, 1996
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific repeater MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 94 Cabletron Systems
+
+IMPORTS
+        NetworkAddress, Counter
+                        FROM  RFC1155-SMI
+        DisplayString
+                        FROM RFC1213-MIB
+        repeaterRev4
+                        FROM CTRON-MIB-NAMES
+        OBJECT-TYPE
+                        FROM RFC-1212;
+
+-- Textual Conventions
+
+--  DisplayString ::= OCTET STRING
+--  This data type is used to model textual information taken from
+--  the NVT ASCII character set.  By convention, objects with this
+--  syntax, unless explicitly stated, are declared as having:
+--
+--  SIZE (0..255)
+
+
+
+-- Repeater Node
+
+-- The following branch in the repeater MIB tree pertains to the repeater
+-- as a whole
+
+repeaterrev4    OBJECT IDENTIFIER ::= { repeaterRev4 4 }
+
+-- Repeater Management Object Definitions
+
+rptr            OBJECT IDENTIFIER ::= { repeaterrev4 1 }
+
+rptrMgmt        OBJECT IDENTIFIER ::= { rptr 1 }
+
+-- This section defines the management objects under the Repeater node.
+-- The implementation of this group of objects is mandatory.
+
+  
+rptrMgmtName     OBJECT-TYPE
+SYNTAX      DisplayString (SIZE(20))
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+    "The ASCII name assigned to this network."
+ ::= { rptrMgmt 1}
+
+rptrMgmtPortCount        OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+    "Total number of ports residing on this lan segment."
+ ::= { rptrMgmt 2}
+
+rptrMgmtPortsEnable      OBJECT-TYPE
+SYNTAX      INTEGER {
+                noEnable(1),
+                enable(2)
+                }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Setting this object to Enable will cause all the ports
+        residing in this network segment to be enabled.  Setting
+        this object to noEnable will have no effect.  When read
+        this object will always return noEnable."
+ ::= { rptrMgmt 3 }
+
+rptrMgmtPortsOn      OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get the total number of ON ports in this network."
+ ::= { rptrMgmt 4 }
+                                                                                                                                                                  
+rptrMgmtPortsOper        OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get the number of operational ports in this network."
+ ::= { rptrMgmt 5 }
+
+rptrMgmtBoardMap     OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get a map of the chassis slots occupied by the boards in
+        this network."
+ ::= { rptrMgmt 6 }
+          
+rptrMgmtInterfaceNum    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get the MIBII interface number of this network.  A return of zero will 
+        mean this network is not associated with a MIBII interface."
+ ::= { rptrMgmt 7 }
+
+rptrMgmtResetCounters   OBJECT-TYPE
+SYNTAX  INTEGER {
+        normal(1),
+        reseStaticCounters(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Setting this OID to 2 will reset the 'rptrPktStats', 'rptrProtocols' 
+        and 'rptrFrameSizes' RREV-4 branch static counters. Reading this OID 
+        will always return a 1."
+ ::= { rptrMgmt 8 }
+
+-- Repeater Packet Statistical Object Definitions
+
+rptrStats               OBJECT IDENTIFIER ::= { rptr 2 }
+
+-- This section defines the packet statistical objects under the
+-- Repeater node.
+-- The implementation of this group of objects is mandatory.
+
+rptrPktStats            OBJECT IDENTIFIER ::= { rptrStats 1 }
+
+
+rptrPktStatsPackets     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets."
+ ::= { rptrPktStats 1 }
+
+rptrPktStatsBytes       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received bytes."
+ ::= { rptrPktStats 2 }
+
+rptrPktStatsColls       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total collisions."
+ ::= { rptrPktStats 3 }
+
+rptrPktStatsErrors      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total errors."
+ ::= { rptrPktStats 4 }
+
+rptrPktStatsAlign       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total frame alignment errors."
+ ::= { rptrPktStats 5 }
+
+rptrPktStatsCRC         OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total CRC errors."
+ ::= { rptrPktStats 6 }
+
+rptrPktStatsOOW         OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total out-of-window collisions."
+ ::= { rptrPktStats 7 }
+
+rptrPktStatsNoRsc       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "This counter is the number of packets on this network that the
+        hardware has processed that the management has either not seen yet,
+        in the case of an active network, or has missed missed all
+        together, in the case of a once active network."
+
+ ::= { rptrPktStats 8 }
+
+rptrPktStatsBroadcasts  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "This counter is the number of broadcast packets on this network
+        that the hardware has processed."
+ ::= { rptrPktStats 9 }
+
+rptrPktStatsMulticasts  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "This counter is the number of multicast packets on this network
+        that the hardware has processed."
+ ::= { rptrPktStats 10 }
+
+-- Repeater Protocol Statistical Object Definitions
+-- This section defines the protocol statistical objects under the 
+-- Repeater node.   The implementation of this group is optional, but
+-- within the group all of the elements are mandatory.
+
+rptrProtocols           OBJECT IDENTIFIER ::= { rptrStats 2 }
+
+rptrProtocolsOSI        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received OSI packets."
+ ::= { rptrProtocols 1 }
+
+rptrProtocolsNovell     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received Novell packets."
+ ::= { rptrProtocols 2 }
+
+rptrProtocolsBanyan     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received Banyan packets."
+ ::= { rptrProtocols 3 }
+
+rptrProtocolsDECNet     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received DECNet packets."
+ ::= { rptrProtocols 4 }
+
+rptrProtocolsXNS        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received XNS  packets."
+ ::= { rptrProtocols 5 }
+
+rptrProtocolsIP OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received TCP/IP packets."
+ ::= { rptrProtocols 6 }
+
+rptrProtocolsCtron      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received CTRON Management packets."
+ ::= { rptrProtocols 7 }
+
+rptrProtocolsAppletalk  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received Appletalk packets."
+ ::= { rptrProtocols 8 }
+
+rptrProtocolsOther      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received unknown protocol packets."
+ ::= { rptrProtocols 9 }
+
+
+-- Repeater Frame Size Statistical Object Definitions
+
+rptrFrameSizes          OBJECT IDENTIFIER ::= { rptrStats 3 }
+
+-- This section defines the frame size statistical objects under the 
+-- Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrFrameSzRunt         OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size less than
+        64 bytes."
+ ::= { rptrFrameSizes 1 }
+
+rptrFrameSz64To127      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size between
+        64 and 127 bytes."
+ ::= { rptrFrameSizes 2 }
+
+rptrFrameSz128To255     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size between
+        128 and 255 bytes."
+ ::= { rptrFrameSizes 3 }
+
+rptrFrameSz256To511     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size between
+        256 and 511 bytes."
+ ::= { rptrFrameSizes 4 }
+
+rptrFrameSz512To1023    OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size between
+        512 and 1023 bytes."
+ ::= { rptrFrameSizes 5 }
+
+rptrFrameSz1024To1518   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size between
+        1024 and 1518 bytes."
+ ::= { rptrFrameSizes 6 }
+
+
+rptrFrameSzGiant        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this repeater's total received packets of size greater
+        than 1518 bytes."
+ ::= { rptrFrameSizes 7 }
+
+
+-- Repeater Alarm Object Definitions
+
+rptrAlarms              OBJECT IDENTIFIER ::= { rptr 3 }
+
+-- This section defines the alarm objects under the Repeater node.
+-- The implementation of this group is optional, but within the group all
+-- of the elements are mandatory.
+
+rptrAlarmsTrafEnable    OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether traffic alarms are enabled/disabled.
+        Set allows for enabling/disabling of traffic alarms."
+ ::= { rptrAlarms 1 }
+
+rptrAlarmsTrafThreshold OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The maximum number of packets that will be allowed before
+        an alarm is generated."
+ ::= { rptrAlarms 2 }
+
+rptrAlarmsCollEnable    OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether collision alarms are enabled/disabled.
+        Set allows for enabling/disabling of collision alarms."
+ ::= { rptrAlarms 3 }
+
+rptrAlarmsCollThreshold OBJECT-TYPE
+SYNTAX          INTEGER (1..15)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The collision threshold is the maximum number of collisions
+        within the time base that will be allowed before an alarm
+        is generated."
+ ::= { rptrAlarms 4 }
+
+rptrAlarmsErrEnable     OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether error alarms are enabled/disabled.
+        Set allows for enabling/disabling of error alarms."
+ ::= { rptrAlarms 5 }
+
+rptrAlarmsErrThreshold          OBJECT-TYPE
+SYNTAX          INTEGER (1..100)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The percentage of errors per good packet within
+        the timebase that will cause an alarm.  The units of this value
+        is in seconds."
+ ::= { rptrAlarms 6 }
+
+rptrAlarmsErrSource             OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set a bit encoded map of which errors to include in the
+        error sum, as follows:
+
+        CRC_errors      -       Bit 0 - Least Significant Bit
+        runts           -       Bit 1
+        OOW_colls       -       Bit 2
+        align_errs      -       Bit 3
+        undefined       -       Bit 4
+        Giants          -       Bit 5"
+ ::= { rptrAlarms 7 }
+
+rptrAlarmsAlarmTimebase   OBJECT-TYPE
+SYNTAX      INTEGER (10..999999)
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "The alarm timebase, in seconds."
+ ::= { rptrAlarms 8 }
+
+rptrAlarmsBroadEnable   OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether broadcast alarms are enabled/disabled.
+        Set allows for enabling/disabling of broadcast alarms."
+ ::= { rptrAlarms 9 }
+
+rptrAlarmsBroadThreshold        OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The broadcase threshold represents the maximum number of
+        broadcasts that are allowed during the time base before an
+        alarm is generated."
+ ::= { rptrAlarms 10 }
+
+
+-- Repeater Redundancy Object Definitions
+
+-- Repeater redundancy as a whole is an optional implementation.
+-- However, if any group concerning redundancy is implemented, all
+-- of the groups involved in the redundancy implementation must be
+-- provided.
+
+rptrRedundancy          OBJECT IDENTIFIER ::= { rptr 4 }
+
+-- This section defines the redundancy objects under the Repeater node.
+
+rptrRedund              OBJECT IDENTIFIER ::= { rptrRedundancy 1 }
+
+rptrRedundReset         OBJECT-TYPE
+SYNTAX  INTEGER {
+        noReset(1),
+        reset(2)
+        }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "If this object is set to Reset it will cause a reset
+         of the redundancy object to occur.  Setting this
+         object to NoReset will do nothing. This object will always 
+         be read as NoReset."
+ ::= { rptrRedund 1 }
+
+rptrRedundPollInterval  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the number of seconds between polls for redundancy."
+ ::= { rptrRedund 2 }
+
+rptrRedundTestTOD       OBJECT-TYPE
+SYNTAX          DisplayString (SIZE(8))
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the time of day at which the redundant circuits will
+        be tested.  The format of the time string is hh:mm:ss."
+ ::= { rptrRedund 3 }
+
+rptrRedundPerformTest   OBJECT-TYPE
+SYNTAX  INTEGER {
+        noTest(1),
+        test(2)
+        }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "If this object is set to Test it will cause a test of the
+        redundant circuits to be performed.  Setting this object to
+        NoTest will have no effect.  When read this object will always
+        return NoTest."
+ ::= { rptrRedund 4 }
+
+rptrRedundMaxCrcts              OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the maximum number of circuits which may exist on this
+        network."
+ ::= { rptrRedund 5 }
+
+-- Repeater Redundant Circuit Object Definitions
+
+-- This section defines a table of redundant circuit objects under
+-- the Repeater node.
+
+rptrRedundCrctTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrRedundCrctEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of redundant circuit objects for this repeater."
+ ::= { rptrRedundancy 2 }
+
+rptrRedundCrctEntry     OBJECT-TYPE
+SYNTAX          RptrRedundCrctEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of objects for a particular redundant circuit."
+INDEX           { rptrRedundCrctId }
+ ::= { rptrRedundCrctTable 1 }
+
+RptrRedundCrctEntry ::=
+  SEQUENCE {
+        rptrRedundCrctId
+                INTEGER,
+        rptrRedundCrctName
+                OCTET STRING,
+        rptrRedundCrctRetrys
+                INTEGER,
+        rptrRedundCrctNumBPs
+                INTEGER,
+        rptrRedundCrctNumAddr
+                INTEGER,
+        rptrRedundCrctAddAddr
+                NetworkAddress,
+        rptrRedundCrctDelAddr
+                NetworkAddress,
+        rptrRedundCrctEnable
+                INTEGER,
+        rptrRedundCrctReset
+                INTEGER
+  }     
+
+rptrRedundCrctId        OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the index for a member circuit in the table of
+        redundant circuits."
+ ::= { rptrRedundCrctEntry 1 }
+
+rptrRedundCrctName      OBJECT-TYPE
+SYNTAX          OCTET STRING
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the name of the indicated circuit."
+ ::= { rptrRedundCrctEntry 2 }
+
+rptrRedundCrctRetrys    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the the number of unanswered polls allowed for
+        the circuit."
+ ::= { rptrRedundCrctEntry 3 }
+
+rptrRedundCrctNumBPs    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get the number of board/port combinations associated with
+        the circuit."
+ ::= { rptrRedundCrctEntry 4 }
+
+rptrRedundCrctNumAddr   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get the number of IP Addresses associated with the circuit."
+ ::= { rptrRedundCrctEntry 5 }
+
+rptrRedundCrctAddAddr   OBJECT-TYPE
+SYNTAX          NetworkAddress
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Add an IP Address to the polling list for the indicated circuit."
+ ::= { rptrRedundCrctEntry 6 }
+
+rptrRedundCrctDelAddr   OBJECT-TYPE
+SYNTAX          NetworkAddress
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Delete an IP Address from the polling list of the indicated
+        circuit."
+ ::= { rptrRedundCrctEntry 7 }
+
+rptrRedundCrctEnable    OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "If this object is set to Enable, the circuit is enabled.  If
+        this object is set to Disable,  the circuit is disbabled.  When
+        read, this object returns the state of the object based on the
+        last request made."
+ ::= { rptrRedundCrctEntry 8 }
+
+
+rptrRedundCrctReset     OBJECT-TYPE
+SYNTAX          INTEGER {
+                noReset(1),
+                reset(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "If this object is set to Reset, the circuit is reset.  All
+        of the circuit's associated boards and ports are returned to
+        NOT_USED, any associated IP Addresses are purged from the
+        circuit's address list, the name is cleared, and the retry
+        count is reset to a default value.  Setting this object to
+        NoReset has no effect.  When read, NoReset is always returned."
+ ::= { rptrRedundCrctEntry 9 }
+
+
+-- Repeater Redundant Port Object Definitions
+
+-- This section defines a table of redundant port objects under
+-- the Repeater node.
+
+rptrRedundPortTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrRedundPortEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of redundant port objects for this repeater."
+ ::= { rptrRedundancy 3 }
+
+rptrRedundPortEntry     OBJECT-TYPE
+SYNTAX          RptrRedundPortEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A redundant port entry containing objects pertaining to
+        a particular redundant port."
+INDEX           { rptrRedundPortCrctId, rptrRedundPortId }
+ ::= { rptrRedundPortTable 1 }
+
+RptrRedundPortEntry ::=
+  SEQUENCE {
+        rptrRedundPortId
+                INTEGER,
+        rptrRedundPortCrctId
+                INTEGER,
+        rptrRedundPortNum
+                INTEGER,
+        rptrRedundPortBoardNum
+                INTEGER,
+        rptrRedundPortType
+                INTEGER
+  }
+
+rptrRedundPortId                OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "A unique value identifying an element in a sequence of member
+        ports which belong to a circuit in the table of redundant
+        circuits.  This value is not a port number; rather it is a value
+        which goes from 1 to the maximum number of ports which may be
+        included in a redundant circuit."
+ ::= { rptrRedundPortEntry 1 }
+
+rptrRedundPortCrctId            OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "A unique value identifying a member circuit in the table of
+        redundant circuits.  This value is similar to rptrRedundCrctId."
+ ::= { rptrRedundPortEntry 2 }
+
+rptrRedundPortNum               OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the port number of a member port belonging to a redundant
+        circuit."
+ ::= { rptrRedundPortEntry 3 }
+
+rptrRedundPortBoardNum          OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the board number of a member port belonging to a
+        redundant circuit."
+ ::= { rptrRedundPortEntry 4 }
+
+rptrRedundPortType              OBJECT-TYPE
+SYNTAX          INTEGER {
+                notUsed(1),
+                primary(2),
+                backup(3)
+                }
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return the state of a port associated with the indicated circuit."
+ ::= { rptrRedundPortEntry 5 }
+
+
+-- Repeater Redundant IP Address Object Definitions
+
+-- This section defines a table of redundant IP Address objects under
+-- the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrRedundAddrTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrRedundAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of redundant IP Address objects which belong to a circuit
+        for this repeater."
+ ::= { rptrRedundancy 4 }
+
+rptrRedundAddrEntry     OBJECT-TYPE
+SYNTAX          RptrRedundAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A entry containing objects pertaining to a particular redundant
+         IP Address which belongs to a circuit."
+INDEX           { rptrRedundAddrCrctId, rptrRedundAddrId }
+ ::= { rptrRedundAddrTable 1 }
+
+RptrRedundAddrEntry ::=
+  SEQUENCE {
+        rptrRedundAddrId
+                INTEGER,
+        rptrRedundAddrCrctId
+                INTEGER,
+        rptrRedundAddrIPAddr
+                NetworkAddress
+  }
+
+rptrRedundAddrId        OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "A unique value identifying an element in a sequence of member
+        IP Addresses which belong to a circuit in the table of redundant
+        circuits.  This value goes from 1 to the maximum number of IP
+        Addresses which may be included in a redundant circuit."
+ ::= { rptrRedundAddrEntry 1 }
+
+
+rptrRedundAddrCrctId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "A unique value identifying a member circuit in the table of
+        redundant circuits.  This value is similar to rptrRedundCrctId."
+ ::= { rptrRedundAddrEntry 2 }
+
+rptrRedundAddrIPAddr    OBJECT-TYPE
+SYNTAX          NetworkAddress
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an IP Address associated with the indicated circuit."
+
+ ::= { rptrRedundAddrEntry 3 }
+
+
+-- Repeater Source Address List Object Definitions
+-- Repeater Source Addressing List as a whole is an optional implementation.
+-- However, if any group of source addressing objects is implemented, the
+-- entire set of source addressing object groups must be implemented.
+
+rptrSourceAddress       OBJECT IDENTIFIER ::= { rptr 5 }
+
+-- This section defines a table of Source Address List objects under the
+-- Repeater node.
+
+rptrSrcAddrListTable    OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrSrcAddrListEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "This table defines the source address list that is defined at
+        the repeater level."
+ ::= { rptrSourceAddress 1 }
+
+rptrSrcAddrListEntry    OBJECT-TYPE
+SYNTAX          RptrSrcAddrListEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines a specific source address object."
+INDEX           { rptrSrcAddrListId }
+ ::= { rptrSrcAddrListTable 1 }
+
+RptrSrcAddrListEntry ::=
+  SEQUENCE {
+        rptrSrcAddrListId
+                INTEGER,
+        rptrSrcAddrAddressList
+                OCTET STRING
+  }
+
+rptrSrcAddrListId               OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index into a table of source address seen by this
+        repeater."
+ ::= { rptrSrcAddrListEntry 1 }
+
+rptrSrcAddrAddressList          OBJECT-TYPE
+SYNTAX          OCTET STRING (SIZE(6))
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns a source address seen by this repeater."
+ ::= { rptrSrcAddrListEntry 2 }
+
+
+-- Repeater Source Address Source Object Definitions
+
+-- This section defines a table of Source Address Source objects under
+-- the Repeater node.
+
+rptrSrcAddrSrcTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrSrcAddrSrcTableEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "This table defines the list of all source addresses that have been
+        seen."
+ ::= { rptrSourceAddress 2 }
+
+rptrSrcAddrSrcTableEntry        OBJECT-TYPE
+SYNTAX          RptrSrcAddrSrcTableEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Describes a particular source address source entry."
+INDEX           { rptrSrcAddrSrcTableEntryId }
+ ::= { rptrSrcAddrSrcTable 1 }
+
+RptrSrcAddrSrcTableEntry ::=
+  SEQUENCE {
+        rptrSrcAddrSrcTableEntryId
+                OCTET STRING,
+        rptrSrcAddrSrcTableEntryPort
+                INTEGER,
+        rptrSrcAddrSrcTableEntryPortGroup
+                INTEGER
+  }
+
+rptrSrcAddrSrcTableEntryId      OBJECT-TYPE
+SYNTAX          OCTET STRING (SIZE(6))
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the source address to which this table's information
+        pertains."
+ ::= { rptrSrcAddrSrcTableEntry 1 }
+
+rptrSrcAddrSrcTableEntryPort    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the port# of the port that sourced the source address."
+ ::= { rptrSrcAddrSrcTableEntry 2 }
+
+rptrSrcAddrSrcTableEntryPortGroup       OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the port group# of the port that sourced the source address."
+ ::= { rptrSrcAddrSrcTableEntry 3 }
+
+
+-- Repeater Source Address Source Object Definitions
+
+-- This section defines a table of Source Address Source objects under
+-- the Repeater node.
+
+rptrSrcAddrMgmt OBJECT IDENTIFIER ::= { rptrSourceAddress 3 }
+
+rptrSrcAddrMgmtSrcAgeInterval   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set source addressing ageing interval."
+ ::= { rptrSrcAddrMgmt 1 }
+
+rptrSrcAddrMgmtPortLock OBJECT-TYPE
+SYNTAX          INTEGER {
+                unlock(1),
+                lock(2),
+                portMisMatch(3)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Setting this object to Lock will activate the network port
+        security lock.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+ ::= { rptrSrcAddrMgmt 2 }
+
+rptrSrcAddrMgmtActiveUsers      OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get the number of active users on this network."
+ ::= { rptrSrcAddrMgmt 3 }
+
+rptrSrcAddrMgmtHashType OBJECT-TYPE
+SYNTAX  INTEGER {
+                noDecHash(1),
+                decHash(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Defines the type of hashing that will be used for source address
+        management.  In a DEC-NET environment or a combination fo DEC-NET
+        and non DEC-NET users where source address hash access is a concern
+        a value of decHash(2) may yield better results.  For non DEC-NET
+        users a value of noDecHash(1) is preferred."
+DEFVAL { noDecHash }
+::= { rptrSrcAddrMgmt 4 }
+
+-- This section control trap enables and disables at the network level.
+-- Setting these objects is equivalent to setting the same value for
+-- each port on this network.
+
+rptrTrap        OBJECT IDENTIFIER ::= { rptr 6 }
+rptrHwTrapSet   OBJECT IDENTIFIER ::= { rptrTrap 1 }
+rptrSaTrapSet   OBJECT IDENTIFIER ::= { rptrTrap 2 }
+
+rptrHwTrapSetLink   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables link traps for this network.  Setting a value
+         of disable(1) is equivalent to setting all instances of
+         rptrPortHwTrapSetLink to a value of disable(1).  Setting a value of
+         enable(2) is equivalent to setting all instances of
+         rptrPortHwTrapSetLink to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortHwTrapSetLink for this network are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortHwTrapSetLink for this network are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortHwTrapSetLink for this network are not currently
+         set to a value the same value."
+::= { rptrHwTrapSet 1 }
+
+rptrHwTrapSetSeg    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables segmentation traps for this network.  Setting a
+         value of disable(1) is equivalent to setting all instances of
+         rptrPortHwTrapSetSeg to a value of disable(1).  Setting a value of
+         enable(2) is equivalent to setting all instances of
+         rptrPortHwTrapSetSeg to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortHwTrapSetSeg for this network are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortHwTrapSetSeg for this network are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortHwTrapSetSeg for this network are not currently
+         set to a value the same value."
+::= { rptrHwTrapSet 2 }
+
+rptrSaTrapSetSrcaddr   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables source address traps for this network.  Setting
+         a value of disable(1) is equivalent to setting all instances of
+         rptrPortSaTrapSetSrcaddr to a value of disable(1).  Setting a value of
+         enable(2) is equivalent to setting all instances of
+         rptrPortSaTrapSetSrcaddr to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortSaTrapSetSrcaddr for this network are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortSaTrapSetSrcaddr for this network are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortSaTrapSetSrcaddr for this network are not currently
+         set to a value the same value."
+::= { rptrSaTrapSet 1 }
+
+rptrSaSecurity  OBJECT IDENTIFIER ::= { rptr 7 }
+
+rptrSecurityLockState   OBJECT-TYPE
+SYNTAX  INTEGER {
+        unlock(1),
+        lock(2),
+        portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Setting this object to Lock will activate the network port
+        security lock. 
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrSaSecurity 1 } 
+ 
+rptrSecuritySecureState OBJECT-TYPE
+SYNTAX  INTEGER {
+        secure(1),
+        nonSecure(2),
+        portMisMatch(3)
+        }
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The status of source address security of the network.  Ports on
+        the network that are secure(1), can be locked in order to 
+        enable security.  nonSecure(2) ports cannot be locked.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrSaSecurity 2 } 
+
+rptrSecurityLearnState  OBJECT-TYPE
+SYNTAX  INTEGER {
+        learn(1),
+        noLearn(2),
+        portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The learn state of the network. This object will only 
+        be applied to ports that are unlocked.  If set to learn(1), all 
+        addresses are deleted on the ports and learning begins once again.
+        If it is set to noLearn(2), learning stops on the port.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrSaSecurity 3 } 
+
+rptrSecurityLearnMode   OBJECT-TYPE
+SYNTAX  INTEGER {
+        oneTime(1),
+        continuous(2),
+        portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Get/Set the learn mode of the network.  If set to onetime learn mode
+        oneTime(1), each port is capable of learning two addresses and
+        securing on both destination and source addresses once they are
+        locked.  If set to continuous learn continuous(2), all addresses are
+        initially deleted and each port continuously replaces the existing
+        secure source address with the latest source address it sees.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrSaSecurity 4 } 
+
+
+
+-- Repeater Port Group Node
+
+-- The following branch in the repeater MIB tree pertains to individual
+-- Repeater Port Group Node
+
+-- The following branch in the repeater MIB tree pertains to individual
+-- groups of repeater ports
+
+rptrPortGroup           OBJECT IDENTIFIER ::= { repeaterrev4 2 }
+
+-- Repeater Port Group Management Object Definitions
+
+-- This section defines a table of Port Group Management objects under
+-- the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortGrpMgmtTable    OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpMgmtEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port management objects for this repeater node."
+ ::= { rptrPortGroup 1 }
+
+rptrPortGrpMgmtEntry    OBJECT-TYPE
+SYNTAX          RptrPortGrpMgmtEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port management
+         for a port group."
+INDEX           { rptrPortGrpMgmtGrpId }
+ ::= { rptrPortGrpMgmtTable 1 }
+
+
+RptrPortGrpMgmtEntry ::=
+  SEQUENCE {
+        rptrPortGrpMgmtGrpId
+                INTEGER,
+        rptrPortGrpMgmtName
+                DisplayString,
+        rptrPortGrpMgmtPortCount
+                INTEGER,
+        rptrPortGrpMgmtPortsEnable
+                INTEGER,
+        rptrPortGrpMgmtPortsOn
+                INTEGER,
+        rptrPortGrpMgmtPortsOper
+                INTEGER,
+        rptrPortGrpMgmtLogPortCount
+                INTEGER
+  }
+
+rptrPortGrpMgmtGrpId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+::= { rptrPortGrpMgmtEntry 1 }
+
+rptrPortGrpMgmtName             OBJECT-TYPE
+SYNTAX          DisplayString (SIZE(20))
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Gets/Sets a name for the specified port group."
+ ::= { rptrPortGrpMgmtEntry 2 }
+
+rptrPortGrpMgmtPortCount  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+                "Get total number of ports contained on the board.
+
+                Notice that this is the physical port count."
+ ::= { rptrPortGrpMgmtEntry 3 }
+
+rptrPortGrpMgmtPortsEnable    OBJECT-TYPE
+SYNTAX      INTEGER {
+                noEnable(1),
+                enable(2)
+                }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Setting this object to Enable will cause all the ports
+        residing in this network segment to be enabled.  Setting
+        this object to noEnable will have no effect.  When read
+        this object will always return noEnable."
+ ::= { rptrPortGrpMgmtEntry 4 }
+
+rptrPortGrpMgmtPortsOn    OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get total number of ON ports in this port group."
+ ::= { rptrPortGrpMgmtEntry 5 }
+
+rptrPortGrpMgmtPortsOper  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get total number of operational ports in the port group."
+ ::= { rptrPortGrpMgmtEntry 6 }
+                  
+rptrPortGrpMgmtLogPortCount  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+                "Get total number of ports contained in this port group."
+ ::= { rptrPortGrpMgmtEntry 7 }
+
+-- Repeater Port Group Statistical Object Definitions
+
+rptrPortGrpStats        OBJECT IDENTIFIER ::= { rptrPortGroup 2 }
+
+-- Repeater Port Group Packet Statistical Object Definitions
+
+-- This section defines a table of Port Group Packet Statistical objects
+-- under the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortGrpPktStatsTbl          OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpPktStatsEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "This table provides packet statistics for port group."
+ ::= { rptrPortGrpStats 1 }
+
+rptrPortGrpPktStatsEntry        OBJECT-TYPE
+SYNTAX          RptrPortGrpPktStatsEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines a specific packet statistics entry."
+INDEX           { rptrPortGrpPktStatsId }
+ ::= { rptrPortGrpPktStatsTbl 1 }
+
+RptrPortGrpPktStatsEntry ::=
+  SEQUENCE {
+        rptrPortGrpPktStatsId   
+                INTEGER,
+        rptrPortGrpPktStatsPkts 
+                Counter,
+        rptrPortGrpPktStatsBytes        
+                Counter,
+        rptrPortGrpPktStatsColls        
+                Counter,
+        rptrPortGrpPktStatsErrors       
+                Counter,
+        rptrPortGrpPktStatsAlign        
+                Counter,
+        rptrPortGrpPktStatsCRC
+                Counter,
+        rptrPortGrpPktStatsOOW  
+                Counter,
+        rptrPortGrpPktStatsBroadcasts
+                Counter,
+        rptrPortGrpPktStatsMulticasts
+                Counter
+  }
+
+rptrPortGrpPktStatsId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortGrpPktStatsEntry 1 }
+
+rptrPortGrpPktStatsPkts OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets."
+ ::= { rptrPortGrpPktStatsEntry 2 }
+
+rptrPortGrpPktStatsBytes        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received bytes."
+ ::= { rptrPortGrpPktStatsEntry 3 }
+
+rptrPortGrpPktStatsColls        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total collisions."
+ ::= { rptrPortGrpPktStatsEntry 4 }
+
+rptrPortGrpPktStatsErrors       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total errors."
+ ::= { rptrPortGrpPktStatsEntry 5 }
+
+rptrPortGrpPktStatsAlign        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total frame alignment errors."
+ ::= { rptrPortGrpPktStatsEntry 6 }
+
+rptrPortGrpPktStatsCRC  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total CRC errors."
+ ::= { rptrPortGrpPktStatsEntry 7 }
+
+rptrPortGrpPktStatsOOW  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total out-of-window collisions."
+ ::= { rptrPortGrpPktStatsEntry 8 }
+
+rptrPortGrpPktStatsBroadcasts   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received broadcast packets."
+ ::= { rptrPortGrpPktStatsEntry 9 }
+
+rptrPortGrpPktStatsMulticasts   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received multicast packets."
+ ::= { rptrPortGrpPktStatsEntry 10 }
+
+
+
+-- Repeater Port Group Protocol Statistical Object Definitions
+
+-- This section defines a table of Port Group Protocol Statistical objects
+-- under the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortGrpProtocolTbl  OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpProtocolEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Provides port group protocol statistics."
+ ::= { rptrPortGrpStats 2 }
+
+rptrPortGrpProtocolEntry        OBJECT-TYPE
+SYNTAX          RptrPortGrpProtocolEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines a specific port group protocol statistics entry."
+INDEX           { rptrPortGrpProtocolId }
+ ::= { rptrPortGrpProtocolTbl 1 }
+
+RptrPortGrpProtocolEntry ::=
+  SEQUENCE {
+        rptrPortGrpProtocolId
+                INTEGER,
+        rptrPortGrpProtocolOSI
+                Counter,
+        rptrPortGrpProtocolNovell
+                Counter,
+        rptrPortGrpProtocolBanyan
+                Counter,
+        rptrPortGrpProtocolDECNet
+                Counter,
+        rptrPortGrpProtocolXNS
+                Counter,
+        rptrPortGrpProtocolIP
+                Counter,
+        rptrPortGrpProtocolCtron
+                Counter,
+        rptrPortGrpProtocolAppletalk
+                Counter,
+        rptrPortGrpProtocolOther
+                Counter
+  }
+
+rptrPortGrpProtocolId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortGrpProtocolEntry 1 }
+
+rptrPortGrpProtocolOSI  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received OSI packets."
+ ::= { rptrPortGrpProtocolEntry 2 }
+
+rptrPortGrpProtocolNovell       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received Novell packets."
+ ::= { rptrPortGrpProtocolEntry 3 }
+
+rptrPortGrpProtocolBanyan OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received Banyan packets."
+ ::= { rptrPortGrpProtocolEntry 4 }
+
+rptrPortGrpProtocolDECNet OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received DECNet packets."
+ ::= { rptrPortGrpProtocolEntry 5 }
+
+rptrPortGrpProtocolXNS  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received XNS packets."
+ ::= { rptrPortGrpProtocolEntry 6 }
+
+rptrPortGrpProtocolIP   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received TCP/IP packets."
+ ::= { rptrPortGrpProtocolEntry 7 }
+
+rptrPortGrpProtocolCtron        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received CTRON Management packets."
+ ::= { rptrPortGrpProtocolEntry 8 }
+
+rptrPortGrpProtocolAppletalk OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received Appletalk packets."
+ ::= { rptrPortGrpProtocolEntry 9 }
+
+rptrPortGrpProtocolOther OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received unknown protocol packets."
+ ::= { rptrPortGrpProtocolEntry 10 }
+
+
+-- Repeater Port Group Frame Size Statistical Object Definitions
+
+-- This section defines a table of Port Group Frame Size Statistical
+-- objects under the Repeater node.  The implementation of this group
+-- is optional, but within the group all of the elements are mandatory.
+
+rptrPortGrpFrameSzTbl   OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpFrameSzEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines frame sizes as seen by this port group."
+ ::= { rptrPortGrpStats 3 }
+
+rptrPortGrpFrameSzEntry OBJECT-TYPE
+SYNTAX          RptrPortGrpFrameSzEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines a particular frame size entry."
+INDEX           { rptrPortGrpFrameSzId }
+ ::= { rptrPortGrpFrameSzTbl 1 }
+
+RptrPortGrpFrameSzEntry ::=
+  SEQUENCE {
+        rptrPortGrpFrameSzId
+                INTEGER,
+        rptrPortGrpFrameSzRunt
+                Counter,
+        rptrPortGrpFrameSz64To127
+                Counter,
+        rptrPortGrpFrameSz128To255
+                Counter,
+        rptrPortGrpFrameSz256To511
+                Counter,
+        rptrPortGrpFrameSz512To1023
+                Counter,
+        rptrPortGrpFrameSz1024To1518
+                Counter,
+        rptrPortGrpFrameSzGiant
+                Counter
+  }
+
+rptrPortGrpFrameSzId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortGrpFrameSzEntry 1 }
+
+rptrPortGrpFrameSzRunt OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size less
+        than 64 bytes."
+ ::= { rptrPortGrpFrameSzEntry 2 }
+
+rptrPortGrpFrameSz64To127 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size between
+        64 and 127 bytes."
+ ::= { rptrPortGrpFrameSzEntry 3 }
+
+rptrPortGrpFrameSz128To255 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size between
+        128 and 255 bytes."
+ ::= { rptrPortGrpFrameSzEntry 4 }
+
+rptrPortGrpFrameSz256To511 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size between
+        256 and 511 bytes."
+ ::= { rptrPortGrpFrameSzEntry 5 }
+
+rptrPortGrpFrameSz512To1023 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size between
+        512 and 1023 bytes."
+ ::= { rptrPortGrpFrameSzEntry 6 }
+
+rptrPortGrpFrameSz1024To1518 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size between
+        1024 and 1518 bytes."
+ ::= { rptrPortGrpFrameSzEntry 7 }
+
+rptrPortGrpFrameSzGiant OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Return this port group's total received packets of size greater
+        than 1518 bytes."
+ ::= { rptrPortGrpFrameSzEntry 8 }
+
+
+-- Repeater Port Group Alarm Object Definitions
+
+-- This section defines a table of Port Group Alarm objects under
+-- the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortGrpAlarmTable   OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpAlarmEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port group alarm objects for this repeater node."
+ ::= { rptrPortGroup 3 }
+
+rptrPortGrpAlarmEntry   OBJECT-TYPE
+SYNTAX          RptrPortGrpAlarmEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port group alarms
+        for a port group."
+INDEX           { rptrPortGrpAlarmId }
+ ::= { rptrPortGrpAlarmTable 1 }
+
+RptrPortGrpAlarmEntry ::=
+  SEQUENCE {
+        rptrPortGrpAlarmId
+                INTEGER,
+        rptrPortGrpAlarmTrafEnable
+                INTEGER,
+        rptrPortGrpAlarmTrafThreshold
+                INTEGER,
+        rptrPortGrpAlarmTrafGrpDisable
+                INTEGER,
+        rptrPortGrpAlarmCollEnable
+                INTEGER,
+        rptrPortGrpAlarmCollThreshold
+                INTEGER,
+        rptrPortGrpAlarmCollBdDisable
+                INTEGER,
+        rptrPortGrpAlarmErrEnable
+                INTEGER,
+        rptrPortGrpAlarmErrThreshold
+                INTEGER,
+        rptrPortGrpAlarmErrSource
+                INTEGER,
+        rptrPortGrpAlarmErrGrpDisable
+                INTEGER,
+        rptrPortGrpAlarmBroadEnable
+                INTEGER,
+        rptrPortGrpAlarmBroadThreshold
+                INTEGER,
+        rptrPortGrpAlarmBroadGrpDisable
+                INTEGER
+  }
+
+rptrPortGrpAlarmId      OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortGrpAlarmEntry 1 }
+
+rptrPortGrpAlarmTrafEnable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether traffic alarms are enabled/disabled.
+         Set allows for enabling/disabling of traffic alarms."
+ ::= { rptrPortGrpAlarmEntry 2 }
+
+rptrPortGrpAlarmTrafThreshold OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The maximum number of packets that will be allowed before
+        an alarm is generated."
+ ::= { rptrPortGrpAlarmEntry 3 }
+
+rptrPortGrpAlarmTrafGrpDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port group to be disabled on a traffic alarm
+        condition.  Get will show whether the port group disabling is
+        allowed or not."
+ ::= { rptrPortGrpAlarmEntry 4 }
+
+rptrPortGrpAlarmCollEnable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether collision alarms are enabled/disabled.
+        Set allows for enabling/disabling of collision alarms."
+ ::= { rptrPortGrpAlarmEntry 5 }
+
+rptrPortGrpAlarmCollThreshold OBJECT-TYPE
+SYNTAX          INTEGER (1..999999)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The collision threshold is the maximum number of collisions
+        within the time base that will be allowed before an alaram
+        is generated."
+ ::= { rptrPortGrpAlarmEntry 6 }
+
+rptrPortGrpAlarmCollBdDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port group to be disabled on a collision alarm
+        condition.  Get will show whether the port group disabling is allowed
+        or not."
+ ::= { rptrPortGrpAlarmEntry 7 }
+
+rptrPortGrpAlarmErrEnable       OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether error alarms are enabled/disabled.
+        Set allows for enabling/disabling of error alarms."
+ ::= { rptrPortGrpAlarmEntry 8 }
+
+rptrPortGrpAlarmErrThreshold OBJECT-TYPE
+SYNTAX          INTEGER (1..100)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the percentage of errors per good packet within the
+        timebase that will cause an alarm."
+ ::= { rptrPortGrpAlarmEntry 9 }
+
+rptrPortGrpAlarmErrSource OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set a bit encoded map of which errors to include in the
+        error sum, as follows:
+
+        CRC_errors      -       Bit 0 - Least Significant Bit
+        runts           -       Bit 1
+        OOW_colls       -       Bit 2
+        align_errs      -       Bit 3
+        undefined       -       Bit 4
+        Giants          -       Bit 5"
+ ::= { rptrPortGrpAlarmEntry 10 }
+
+
+rptrPortGrpAlarmErrGrpDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port group to be disabled on an error alarm
+        condition.  Get will show whether the port group disabling is
+        allowed or not."
+ ::= { rptrPortGrpAlarmEntry 11 }
+
+
+rptrPortGrpAlarmBroadEnable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether broadcast alarms are enabled/disabled.
+         Set allows for enabling/disabling of broadcast alarms."
+ ::= { rptrPortGrpAlarmEntry 12 }
+
+rptrPortGrpAlarmBroadThreshold OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The broadcase threshold represents the maximum number of
+        broadcasts that are allowed during the time base before an
+        alarm is generated."
+ ::= { rptrPortGrpAlarmEntry 13 }
+
+rptrPortGrpAlarmBroadGrpDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port group to be disabled on a broadcast alarm
+        condition.  Get will show whether the port group disabling is
+        allowed or not."
+ ::= { rptrPortGrpAlarmEntry 14 }
+
+-- Repeater Port Group Source Address Object Definitions
+
+-- This section defines a table of Port Group Source Address objects
+-- under the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortGrpSrcAddrTable OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpSrcAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "This table provides a list of the number of active users that
+        have been seen by port group."
+ ::= { rptrPortGroup 4 }
+
+rptrPortGrpSrcAddrEntry OBJECT-TYPE
+SYNTAX          RptrPortGrpSrcAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Defines a specific active user entry."
+INDEX           { rptrPortGrpSrcAddrId }
+ ::= { rptrPortGrpSrcAddrTable 1 }
+
+RptrPortGrpSrcAddrEntry ::=
+  SEQUENCE {
+        rptrPortGrpSrcAddrId
+                INTEGER,
+        rptrPortGrpSrcAddrActiveUsers
+                INTEGER
+  }
+
+rptrPortGrpSrcAddrId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortGrpSrcAddrEntry 1 }
+
+rptrPortGrpSrcAddrActiveUsers OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the total number of active users seen by this port group."
+ ::= { rptrPortGrpSrcAddrEntry 2 }
+
+
+-- port group level trap enable and disables
+
+
+rptrPortGrpTrap         OBJECT IDENTIFIER ::= { rptrPortGroup 5 }
+rptrPortGrpHwTrapSet    OBJECT IDENTIFIER ::= { rptrPortGrpTrap 1 }
+rptrPortGrpSaTrapSet    OBJECT IDENTIFIER ::= { rptrPortGrpTrap 2 }
+
+rptrPortGrpHwTrapTable  OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpHwTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of trap enable/disable at the port group level.  Disable
+        here is equivalent to disable for each port in the port group."
+::= { rptrPortGrpHwTrapSet 1 }
+
+rptrPortGrpHwTrapEntry  OBJECT-TYPE
+SYNTAX          RptrPortGrpHwTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Individual trap entries for port group enable/disable."
+INDEX   { rptrPortGrpHwTrapSetGrpId }
+::= { rptrPortGrpHwTrapTable 1 }
+
+RptrPortGrpHwTrapEntry ::= SEQUENCE {
+        rptrPortGrpHwTrapSetGrpId       INTEGER,
+        rptrPortGrpHwTrapSetLink        INTEGER,
+        rptrPortGrpHwTrapSetSeg         INTEGER
+}
+
+rptrPortGrpHwTrapSetGrpId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only 
+STATUS      mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+::= { rptrPortGrpHwTrapEntry 1 }
+
+rptrPortGrpHwTrapSetLink   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables link traps for the specified port group.
+         Setting a value of disable(1) is equivalent to setting all instances
+         of rptrPortHwTrapSetLink to a value of disable(1).  Setting a value
+         of enable(2) is equivalent to setting all instances of
+         rptrPortHwTrapSetLink to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortHwTrapSetLink for this port group are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortHwTrapSetLink for this port group are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortHwTrapSetLink for this port group are not currently
+         set to a value the same value."
+::= { rptrPortGrpHwTrapEntry 2 }
+
+rptrPortGrpHwTrapSetSeg    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables segmentation traps for the specified port group.
+         Setting a value of disable(1) is equivalent to setting all instances
+         of rptrPortHwTrapSetSeg to a value of disable(1).  Setting a value
+         of enable(2) is equivalent to setting all instances of
+         rptrPortHwTrapSetSeg to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortHwTrapSetSeg for this port group are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortHwTrapSetSeg for this port group are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortHwTrapSetSeg for this port group are not currently
+         set to a value the same value."
+::= { rptrPortGrpHwTrapEntry 3 }
+
+rptrPortGrpSaTrapTable  OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortGrpSaTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of trap enable/disable at the port group level.  Disable
+        here is equivalent to disable for each port in the port group."
+::= { rptrPortGrpSaTrapSet 1 }
+
+rptrPortGrpSaTrapEntry  OBJECT-TYPE
+SYNTAX          RptrPortGrpSaTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Individual trap entries for port group enable/disable."
+INDEX   { rptrPortGrpSaTrapSetGrpId }
+::= { rptrPortGrpSaTrapTable 1 }
+
+RptrPortGrpSaTrapEntry ::= SEQUENCE {
+        rptrPortGrpSaTrapSetGrpId       INTEGER,
+        rptrPortGrpSaTrapSetSrcaddr     INTEGER
+}
+
+rptrPortGrpSaTrapSetGrpId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only 
+STATUS      mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+::= { rptrPortGrpSaTrapEntry 1 }
+
+
+rptrPortGrpSaTrapSetSrcaddr   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2),
+        other(3)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables source address traps for the specified port group.
+         Setting a value of disable(1) is equivalent to setting all instances
+         of rtprPortSaTrapSetSrcaddr to a value of disable(1).  Setting a value
+         of enable(2) is equivalent to setting all instances of
+         rtprPortSaTrapSetSrcaddr to a value of disable(2).  Setting a value of
+         other(3) is not allowed.
+
+         This object will read with the value of disable(1) if all instances
+         of rptrPortSaTrapSetSrcaddr for this port group are currently set
+         to a value of disable(1).
+
+         This object will read with the value of enable(2) if all instances
+         of rptrPortSaTrapSetSrcaddr for this port group are currently set
+         to a value of enable(2).
+
+         This object will read with the value of other(3) if all instances
+         of rptrPortSaTrapSetSrcaddr for this port group are not currently
+         set to a value the same value."
+::= { rptrPortGrpSaTrapEntry 2 }
+
+rptrPortGrpSrcAddrLockTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF RptrPortGrpSrcAddrLockEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "This table defines the status of the port group source address
+        security locks."
+::= { rptrPortGroup 6 }
+
+rptrPortGrpSrcAddrLockEntry  OBJECT-TYPE
+SYNTAX  RptrPortGrpSrcAddrLockEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "DeDefines a status of a particular port group security lock."
+INDEX  { rptrPortGrpSrcAddrLockGrpId }
+::= { rptrPortGrpSrcAddrLockTable 1 }
+
+RptrPortGrpSrcAddrLockEntry ::= SEQUENCE {
+        rptrPortGrpSrcAddrLockGrpId
+            INTEGER,
+        rptrPortGrpSrcAddrLock
+            INTEGER,
+        rptrPortGrpSASecuritySecureState
+                INTEGER,
+        rptrPortGrpSASecurityLearnState
+                INTEGER,
+        rptrPortGrpSASecurityLearnMode
+                INTEGER
+        }
+
+rptrPortGrpSrcAddrLockGrpId  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "Defines a particular port group for which this source address
+        security lock information pertains."
+::= { rptrPortGrpSrcAddrLockEntry 1 }
+
+rptrPortGrpSrcAddrLock  OBJECT-TYPE
+SYNTAX  INTEGER {
+            unlock(1),
+            lock(2),
+            portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Allows setting of the security lock status for this port group.
+
+                unlock(1) - Unlocks the source address lock this group,
+                lock(2) - Locks the source address for this group,
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrPortGrpSrcAddrLockEntry 2 }
+
+rptrPortGrpSASecuritySecureState OBJECT-TYPE
+SYNTAX  INTEGER {
+        secure(1),
+        nonSecure(2),
+        portMisMatch(3)
+        }
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The state of the source addressing security for this port group.
+        Ports on the port group that are secure(1), can be locked
+        in order to enable security. When a value of  nonSecure(2) is
+        returned ports cannot be locked.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrPortGrpSrcAddrLockEntry 3 }
+
+rptrPortGrpSASecurityLearnState OBJECT-TYPE
+SYNTAX  INTEGER {
+        learn(1),
+        noLearn(2),
+        portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The learn state of source addressing security for this port group.
+        This object will only be applied to ports that are unlocked.  If set
+        to learn(1), all addresses are deleted on the port and learning begins
+        once again.  If it is set to noLearn(2), learning stops on the port.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrPortGrpSrcAddrLockEntry 4 }
+
+rptrPortGrpSASecurityLearnMode  OBJECT-TYPE
+SYNTAX  INTEGER {
+        oneTime(1),
+        continuous(2),
+        portMisMatch(3)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The learn mode of source addressing security port group.  If set
+        to oneTime(1), each port is capable of learning two addresses and
+        securing on both destination and source addresses once they are
+        locked.  If set to continuous(2), all addresses are initially
+        deleted and each port continuously replaces the existing secure
+        source address with latest source address it sees.
+
+        Setting a value of portMisMatch(3) is invalid.  A value of 
+        portMisMatch(3) reflects that not all ports are at the same
+        value."
+::= { rptrPortGrpSrcAddrLockEntry 5 }
+
+
+-- Repeater Port Node
+
+-- The following branch in the repeater MIB tree pertains to individual
+-- repeater ports
+
+rptrPort                OBJECT IDENTIFIER ::= { repeaterrev4 3 }
+
+
+-- Repeater Port Management Object Definitions
+
+-- This section defines a table of Port Management objects under
+-- the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortMgmtTable       OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortMgmtEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port management objects for this repeater node."
+ ::= { rptrPort 1 }
+
+rptrPortMgmtEntry       OBJECT-TYPE
+SYNTAX          RptrPortMgmtEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port management for
+        a port."
+INDEX           { rptrPortMgmtPortGrpId, rptrPortMgmtPortId }
+ ::= { rptrPortMgmtTable 1 }
+
+RptrPortMgmtEntry ::=
+  SEQUENCE {
+        rptrPortMgmtPortId
+                INTEGER,
+        rptrPortMgmtPortGrpId
+                INTEGER,
+        rptrPortMgmtName
+                DisplayString,
+        rptrPortMgmtAdminState
+                INTEGER,
+        rptrPortMgmtOperState
+                INTEGER,
+        rptrPortMgmtPortType
+                OBJECT IDENTIFIER
+  }
+
+rptrPortMgmtPortId      OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortMgmtEntry 1 }
+
+rptrPortMgmtPortGrpId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortMgmtEntry 2 }
+
+rptrPortMgmtName                        OBJECT-TYPE
+SYNTAX          DisplayString (SIZE(20))
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Sets/Gets an ASCII name assigned to this port."
+ ::= { rptrPortMgmtEntry 3 }
+
+rptrPortMgmtAdminState      OBJECT-TYPE
+SYNTAX          INTEGER {
+                        disable(1),
+                        enable(2)
+                        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Setting this object to Enable will cause port to be enabled.
+        Setting this object to Disable will cause
+        the port to be disabled.  When read this object will return
+        the state of the object per the last request."
+ ::= { rptrPortMgmtEntry 4 }
+                                                                                                        
+rptrPortMgmtOperState        OBJECT-TYPE
+SYNTAX      INTEGER {
+                        notOperational(1),
+                        operational(2)
+                        }
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+        "Get port operational status."
+ ::= { rptrPortMgmtEntry 5 }
+
+        rptrPortMgmtPortType    OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Uniquely defines the repeater port type.  A authoritative
+            identification for a port type.  By convention, this value
+            is allocated within the SMI enterprises subtree
+            (1.3.6.1.4.1), and provides an easy and unambiguous means to
+            determine the type of repeater port."
+        ::= { rptrPortMgmtEntry 6 }
+
+                                                                                                                                                   
+
+-- Repeater Port Statistical Object Definitions
+
+rptrPortStats           OBJECT IDENTIFIER ::= { rptrPort 2 }
+
+-- Repeater Port Packet Statistical Object Definitions
+
+-- This section defines a table of Port Packet Statistical objects
+-- under the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortPktStatsTbl     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortPktStatsEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Provides repeater port packet statistics."
+ ::= { rptrPortStats 1 }
+
+rptrPortPktStatsEntry   OBJECT-TYPE
+SYNTAX          RptrPortPktStatsEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Provides basic statistics for a specific port."
+INDEX           { rptrPortPktStatsPortGrpId, rptrPortPktStatsPortId }
+ ::= { rptrPortPktStatsTbl 1 }
+
+RptrPortPktStatsEntry ::=
+  SEQUENCE {
+        rptrPortPktStatsPortId
+                INTEGER,
+        rptrPortPktStatsPortGrpId
+                INTEGER,
+        rptrPortPktStatsPackets
+                Counter,
+        rptrPortPktStatsBytes
+                Counter,
+        rptrPortPktStatsColls
+                Counter,
+        rptrPortPktStatsErrors
+                Counter,
+        rptrPortPktStatsAlign
+                Counter,
+        rptrPortPktStatsCRC
+                Counter,
+        rptrPortPktStatsOOW
+                Counter,
+        rptrPortPktStatsBroadcasts
+                Counter,
+        rptrPortPktStatsMulticasts
+                Counter
+  }
+
+rptrPortPktStatsPortId  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortPktStatsEntry 1 }
+
+rptrPortPktStatsPortGrpId       OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+
+ ::= { rptrPortPktStatsEntry 2 }
+
+rptrPortPktStatsPackets OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets."
+ ::= { rptrPortPktStatsEntry 3 }
+
+rptrPortPktStatsBytes   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received bytes."
+ ::= { rptrPortPktStatsEntry 4 }
+
+rptrPortPktStatsColls   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total  collisions."
+ ::= { rptrPortPktStatsEntry 5 }
+
+rptrPortPktStatsErrors  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total errors."
+ ::= { rptrPortPktStatsEntry 6 }
+
+rptrPortPktStatsAlign   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total frame alignment errors."
+ ::= { rptrPortPktStatsEntry 7 }
+
+rptrPortPktStatsCRC     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total CRC errors."
+ ::= { rptrPortPktStatsEntry 8 }
+
+rptrPortPktStatsOOW     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total out-of-window collisions."
+ ::= { rptrPortPktStatsEntry 9 }
+
+rptrPortPktStatsBroadcasts      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received broadcast packets."
+ ::= { rptrPortPktStatsEntry 10 }
+
+rptrPortPktStatsMulticasts      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received multicast packets."
+ ::= { rptrPortPktStatsEntry 11 }
+
+-- Repeater Port Protocol Statistical Object Definitions
+
+-- This section defines a table of Port Protocol Statistical
+-- objects under the Repeater node.  The implementation of this
+-- group is optional, but within the group all of the elements
+-- are mandatory.
+
+rptrPortProtocolTbl     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortProtocolEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Provides statistics about the protocols seen by the different
+        ports."
+ ::= { rptrPortStats 2 }
+
+rptrPortProtocolEntry   OBJECT-TYPE
+SYNTAX          RptrPortProtocolEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to statistics about
+        protocols seen by different ports."
+INDEX           { rptrPortProtocolPortGrpId, rptrPortProtocolPortId }
+ ::= { rptrPortProtocolTbl 1 }
+
+RptrPortProtocolEntry ::=
+  SEQUENCE {
+        rptrPortProtocolPortId
+                INTEGER,
+        rptrPortProtocolPortGrpId
+                INTEGER,
+        rptrPortProtocolOSI
+                Counter,
+        rptrPortProtocolNovell
+                Counter,
+        rptrPortProtocolBanyan
+                Counter,
+        rptrPortProtocolDECNet
+                Counter,
+        rptrPortProtocolXNS
+                Counter,
+        rptrPortProtocolIP
+                Counter,
+        rptrPortProtocolCtron
+                Counter,
+        rptrPortProtocolAppletalk
+                Counter,
+        rptrPortProtocolOther
+                Counter
+  }
+
+rptrPortProtocolPortId  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortProtocolEntry 1 }
+
+rptrPortProtocolPortGrpId       OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortProtocolEntry 2 }
+
+rptrPortProtocolOSI     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received OSI protocol packets."
+ ::= { rptrPortProtocolEntry 3 }
+
+rptrPortProtocolNovell  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received Novell protocol packets."
+ ::= { rptrPortProtocolEntry 4 }
+
+rptrPortProtocolBanyan  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received Banyan protocol packets."
+ ::= { rptrPortProtocolEntry 5 }
+
+rptrPortProtocolDECNet  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received DECNet protocol packets."
+ ::= { rptrPortProtocolEntry 6 }
+
+rptrPortProtocolXNS     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received XNS protocol packets."
+ ::= { rptrPortProtocolEntry 7 }
+
+rptrPortProtocolIP      OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received TCP/IP protocol packets."
+ ::= { rptrPortProtocolEntry 8 }
+
+rptrPortProtocolCtron   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received CTRON Management protocol packets."
+ ::= { rptrPortProtocolEntry 9 }
+
+rptrPortProtocolAppletalk       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received Appletalk protocol packets."
+ ::= { rptrPortProtocolEntry 10 }
+
+rptrPortProtocolOther   OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received unknown protocol packets."
+ ::= { rptrPortProtocolEntry 11 }
+
+
+-- Repeater Port Frame Size Statistical Object Definitions
+
+-- This section defines a table of Port Frame Size Statistical objects
+-- under the Repeater node.  The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortFrameSzTbl      OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortFrameSzEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Provides repeater port frame size statistics."
+ ::= { rptrPortStats 3 }
+
+rptrPortFrameSzEntry    OBJECT-TYPE
+SYNTAX          RptrPortFrameSzEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Describes a set of frame size statistics for a specific port."
+INDEX           { rptrPortFrameSzPortGrpId, rptrPortFrameSzPortId }
+ ::= { rptrPortFrameSzTbl 1 }
+
+RptrPortFrameSzEntry ::=
+  SEQUENCE {
+        rptrPortFrameSzPortId
+                INTEGER,
+        rptrPortFrameSzPortGrpId
+                INTEGER,
+        rptrPortFrameSzRunt
+                Counter,
+        rptrPortFrameSz64To127
+                Counter,
+        rptrPortFrameSz128To255
+                Counter,
+        rptrPortFrameSz256To511
+                Counter,
+        rptrPortFrameSz512To1023
+                Counter,
+        rptrPortFrameSz1024To1518
+                Counter,
+        rptrPortFrameSzGiant
+                Counter
+  }
+
+rptrPortFrameSzPortId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortFrameSzEntry 1 }
+
+rptrPortFrameSzPortGrpId        OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortFrameSzEntry 2 }
+
+rptrPortFrameSzRunt     OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size less than 64 bytes."
+ ::= { rptrPortFrameSzEntry 3 }
+
+rptrPortFrameSz64To127  OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size between 64 and
+        127 bytes."
+ ::= { rptrPortFrameSzEntry 4 }
+
+rptrPortFrameSz128To255 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size between 128
+        and 255 bytes."
+ ::= { rptrPortFrameSzEntry 5 }
+
+rptrPortFrameSz256To511 OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size between 256
+        and 511 bytes."
+ ::= { rptrPortFrameSzEntry 6 }
+
+rptrPortFrameSz512To1023        OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size between 512
+        and 1023 bytes."
+ ::= { rptrPortFrameSzEntry 7 }
+
+rptrPortFrameSz1024To1518       OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size between 1024
+        and 1518 bytes."
+ ::= { rptrPortFrameSzEntry 8 }
+
+rptrPortFrameSzGiant    OBJECT-TYPE
+SYNTAX          Counter
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Get this port's total received packets of size greater than
+        1518 bytes."
+ ::= { rptrPortFrameSzEntry 9 }
+
+-- Repeater Port Alarm Object Definitions
+
+-- This section defines a table of Port Alarm objects under the
+-- Repeater node.   The implementation of this group is optional,
+-- but within the group all of the elements are mandatory.
+
+rptrPortAlarmTable      OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortAlarmEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port alarm objects for this repeater node."
+ ::= { rptrPort 3 }
+
+rptrPortAlarmEntry      OBJECT-TYPE
+SYNTAX          RptrPortAlarmEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port alarm objects
+        for a port group."
+INDEX           { rptrPortAlarmPortGrpId,  rptrPortAlarmPortId }
+ ::= { rptrPortAlarmTable 1 }
+
+RptrPortAlarmEntry ::=
+  SEQUENCE {
+        rptrPortAlarmPortId
+                INTEGER,
+        rptrPortAlarmPortGrpId
+                INTEGER,
+        rptrPortAlarmTrafEnable
+                INTEGER,
+        rptrPortAlarmTrafThreshold
+                INTEGER,
+        rptrPortAlarmTrafPortDisable
+                INTEGER,
+        rptrPortAlarmCollEnable
+                INTEGER,
+        rptrPortAlarmCollThreshold
+                INTEGER,
+        rptrPortAlarmCollPortDisable
+                INTEGER,
+        rptrPortAlarmErrEnable
+                INTEGER,
+        rptrPortAlarmErrThreshold
+                INTEGER,
+        rptrPortAlarmErrSource
+                INTEGER,
+        rptrPortAlarmErrPortDisable
+                INTEGER,
+        rptrPortAlarmBroadEnable
+                INTEGER,
+        rptrPortAlarmBroadThreshold
+                INTEGER,
+        rptrPortAlarmBroadPortDisable
+                INTEGER
+
+  }
+
+rptrPortAlarmPortId     OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortAlarmEntry 1 }
+
+rptrPortAlarmPortGrpId  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortAlarmEntry 2 }
+
+rptrPortAlarmTrafEnable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether traffic alarms are enabled/disabled.
+        Set allows for enabling/disabling of traffic alarms."
+ ::= { rptrPortAlarmEntry 3 }
+
+rptrPortAlarmTrafThreshold OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The maximum number of packets that will be allowed before
+        an alarm is generated."
+ ::= { rptrPortAlarmEntry 4 }
+
+rptrPortAlarmTrafPortDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port to be disabled on a traffic alarm
+        condition.  Get will show whether the port disabling is allowed
+        or not."
+ ::= { rptrPortAlarmEntry 5 }
+
+rptrPortAlarmCollEnable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether collision alarms are enabled/disabled.
+        Set allows for enabling/disabling of collision alarms."
+ ::= { rptrPortAlarmEntry 6 }
+
+rptrPortAlarmCollThreshold OBJECT-TYPE
+SYNTAX          INTEGER (1..999999)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The collision threshold is the maximum number of collisions
+        within the time base that will be allowed before an alaram
+        is generated."
+ ::= { rptrPortAlarmEntry 7 }
+
+rptrPortAlarmCollPortDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port to be disabled on a collision alarm
+        condition.  Get will show whether the port disabling is allowed
+        or not."
+ ::= { rptrPortAlarmEntry 8 }
+
+rptrPortAlarmErrEnable  OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether error alarms are enabled/disabled.
+        Set allows for enabling/disabling of error alarms."
+ ::= { rptrPortAlarmEntry 9 }
+
+rptrPortAlarmErrThreshold       OBJECT-TYPE
+SYNTAX          INTEGER (1..100)
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set the percentage of errors per good packet within the
+        timebase that will cause an alarm."
+ ::= { rptrPortAlarmEntry 10 }
+
+rptrPortAlarmErrSource  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set a bit encoded map of which errors to include in the
+        error sum, as follows:
+
+        CRC_errors      -       Bit 0 - Least Significant Bit
+        runts           -       Bit 1
+        OOW_colls       -       Bit 2
+        align_errs      -       Bit 3
+        undefined       -       Bit 4
+        Giants          -       Bit 5"
+ ::= { rptrPortAlarmEntry 11 }
+
+rptrPortAlarmErrPortDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port to be disabled on an error alarm condition.
+        Get will show whether the port disabling is allowed or not."
+ ::= { rptrPortAlarmEntry 12 }
+
+rptrPortAlarmBroadEnable        OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get returns whether broadcast alarms are enabled/disabled.
+        Set allows for enabling/disabling of broadcast alarms."
+ ::= { rptrPortAlarmEntry 13 }
+
+rptrPortAlarmBroadThreshold OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "The broadcase threshold represents the maximum number of
+        broadcasts that are allowed during the time base before an
+        alarm is generated."
+ ::= { rptrPortAlarmEntry 14 }
+
+rptrPortAlarmBroadPortDisable OBJECT-TYPE
+SYNTAX          INTEGER {
+                disable(1),
+                enable(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Set will permit a port to be disabled on a broadcast alarm
+        condition.  Get will show whether the port disabling is allowed
+        or not."
+ ::= { rptrPortAlarmEntry 15 }
+
+-- Repeater Port Redundancy Object Definitions
+
+-- This section defines a table of Port Redundancy objects under the
+-- Repeater node.  This group of objects may be implemented only if
+-- the entire set of redundancy object groups have been implemented.
+
+rptrPortRedundTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortRedundEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port redundancy objects for this repeater node."
+ ::= { rptrPort 4 }
+
+rptrPortRedundEntry     OBJECT-TYPE
+SYNTAX          RptrPortRedundEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port redundancy for
+        a port group."
+INDEX           { rptrPortRedundPortGrpId, rptrPortRedundPortId }
+ ::= { rptrPortRedundTable 1 }
+
+RptrPortRedundEntry ::=
+  SEQUENCE {
+        rptrPortRedundPortId
+                INTEGER,
+        rptrPortRedundPortGrpId
+                INTEGER,
+        rptrPortRedundCrctNum
+                INTEGER,
+        rptrPortRedundType
+                INTEGER,
+        rptrPortRedundStatus
+                INTEGER
+  }
+
+rptrPortRedundPortId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortRedundEntry 1 }
+
+rptrPortRedundPortGrpId OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortRedundEntry 2 }
+
+rptrPortRedundCrctNum   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set redundant circuit number of redundant circuit that port
+        is or is to be associated with."
+ ::= { rptrPortRedundEntry 3 }
+
+rptrPortRedundType      OBJECT-TYPE
+SYNTAX          INTEGER {
+                notUsed(1),
+                primary(2),
+                backup(3)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set redundant port type."
+::= { rptrPortRedundEntry 4 }
+
+rptrPortRedundStatus    OBJECT-TYPE
+SYNTAX          INTEGER {
+                notUsed(1),
+                active(2),
+                inactive(3)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "Get/Set redundant port status."
+ ::= { rptrPortRedundEntry 5 }
+
+
+-- Repeater Port Source Address Object Definitions
+
+-- This section defines a table of Port Source Address
+-- objects under the Repeater node.  This group of objects
+-- may be implemented only if the entire set of this group
+-- has been implemented.
+
+rptrPortSrcAddrTable    OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortSrcAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port source address objects for this repeater
+        node."
+ ::= { rptrPort 5 }
+
+rptrPortSrcAddrEntry    OBJECT-TYPE
+SYNTAX          RptrPortSrcAddrEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port source
+        address objects for a port group."
+INDEX           { rptrPortSrcAddrPortGrpId, rptrPortSrcAddrPortId }
+ ::= { rptrPortSrcAddrTable 1 }
+
+RptrPortSrcAddrEntry ::=
+  SEQUENCE {
+        rptrPortSrcAddrPortId
+                INTEGER,
+        rptrPortSrcAddrPortGrpId
+                INTEGER,
+        rptrPortSrcAddrTopoState
+                INTEGER,
+        rptrPortSrcAddrForceTrunk
+                INTEGER,
+        rptrPortSrcAddrActiveUsers
+                INTEGER
+  }
+
+rptrPortSrcAddrPortId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortSrcAddrEntry 1 }
+
+rptrPortSrcAddrPortGrpId        OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortSrcAddrEntry 2 }
+
+rptrPortSrcAddrTopoState        OBJECT-TYPE
+SYNTAX          INTEGER {
+                        station(1),
+                        trunk(2)
+                        }
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the topological state of the port."
+ ::= { rptrPortSrcAddrEntry 3 }
+
+rptrPortSrcAddrForceTrunk       OBJECT-TYPE
+SYNTAX          INTEGER {
+                noForce(1),
+                force(2)
+                }
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "When this object is set to Force it causes the port
+        to be placed into a Trunk topological state whether
+        the network traffic would warrant such a state or not.
+        When this object is set to NoForce it allows the port
+        to assume the topological state it would naturally
+        assume based on the network activity across it.
+        When read this object reports the current setting."
+ ::= { rptrPortSrcAddrEntry 4 }
+
+rptrPortSrcAddrActiveUsers      OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns the total number of active users seen by this port."
+ ::= { rptrPortSrcAddrEntry 5 }
+
+
+-- Repeater Port Source Address List Object Definitions
+
+-- This section defines a table of Port Source Address List 
+-- objects under the Repeater node.  This group may only be
+-- implemented if the entire set of source addressing
+-- object groups have been implemented.
+
+rptrPortSrcAddrListTable        OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortSrcAddrListEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "This table provides information about the source addresses that
+        have been seen by the differnt ports."
+ ::= { rptrPort 6 }
+
+rptrPortSrcAddrListEntry        OBJECT-TYPE
+SYNTAX          RptrPortSrcAddrListEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A specific source address that has been seen"
+INDEX           { rptrPortSrcAddrListPortGrpId, rptrPortSrcAddrListPortId,
+                rptrPortSrcAddrListId }
+ ::= { rptrPortSrcAddrListTable 1 }
+
+RptrPortSrcAddrListEntry ::=
+  SEQUENCE {
+        rptrPortSrcAddrListId
+                INTEGER,
+        rptrPortSrcAddrListPortId
+                INTEGER,
+        rptrPortSrcAddrListPortGrpId
+                INTEGER,
+        rptrPortSrcAddrAddressList
+                OCTET STRING
+  }
+
+rptrPortSrcAddrListId   OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index associated with the number of address to be returned."
+ ::= { rptrPortSrcAddrListEntry 1 }
+
+rptrPortSrcAddrListPortId       OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortSrcAddrListEntry 2 }
+
+rptrPortSrcAddrListPortGrpId    OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+ ::= { rptrPortSrcAddrListEntry 3 }
+
+rptrPortSrcAddrAddressList      OBJECT-TYPE
+SYNTAX          OCTET STRING
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns a source address seen on this port."
+ ::= { rptrPortSrcAddrListEntry 4 }
+
+
+-- Repeater Port Hardware List Object Definitions
+
+-- This section defines a table of Hardware objects under the port node.
+-- This group may only be implemented if the entire set of source addressing
+-- object groups have been implemented.
+
+rptrPortHardwareTable   OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortHardwareEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of port hardware objects for this repeater port."
+ ::= { rptrPort 7 }
+
+rptrPortHardwareEntry   OBJECT-TYPE
+SYNTAX          RptrPortHardwareEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to port hardware for a
+        hardware port group."
+INDEX           { rptrPortHardwarePortGrpId, rptrPortHardwarePortId }
+ ::= { rptrPortHardwareTable 1 }
+
+RptrPortHardwareEntry ::=
+  SEQUENCE {
+        rptrPortHardwarePortId
+                INTEGER,
+        rptrPortHardwarePortGrpId
+                INTEGER,
+        rptrPortHardwareSegStatus
+                INTEGER,
+        rptrPortHardwareLinkStatus
+                INTEGER
+  }
+
+rptrPortHardwarePortId  OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port for which the information in this
+        table pertains."
+ ::= { rptrPortHardwareEntry 1 }
+
+rptrPortHardwarePortGrpId       OBJECT-TYPE
+SYNTAX          INTEGER
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+
+ ::= { rptrPortHardwareEntry 2 }
+
+rptrPortHardwareSegStatus       OBJECT-TYPE
+SYNTAX          INTEGER {
+                        notSegmented(1),
+                        segmented(2)
+                        }
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns port segmentation status."
+ ::= { rptrPortHardwareEntry 3 }
+
+rptrPortHardwareLinkStatus      OBJECT-TYPE
+SYNTAX          INTEGER {
+                        notLinked(1),
+                        linked(2),
+                        notApplicable(3)
+                        }
+ACCESS          read-only
+STATUS          mandatory
+DESCRIPTION
+        "Returns port link status."
+ ::= { rptrPortHardwareEntry 4 }
+
+-- port level enable and disables
+
+rptrPortTrap            OBJECT IDENTIFIER ::= { rptrPort 8 }
+rptrPortHwTrapSet       OBJECT IDENTIFIER ::= { rptrPortTrap 1 }
+rptrPortSaTrapSet       OBJECT IDENTIFIER ::= { rptrPortTrap 2 }
+
+rptrPortHwTrapTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortHwTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of trap enable/disable at the port level."
+::= { rptrPortHwTrapSet 1 }
+
+rptrPortHwTrapEntry     OBJECT-TYPE
+SYNTAX          RptrPortHwTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Individual trap entries for port group enable/disable."
+INDEX   { rptrPortHwTrapSetPortGrpId, rptrPortHwTrapSetPortId }
+::= { rptrPortHwTrapTable 1 }
+
+RptrPortHwTrapEntry ::= SEQUENCE {
+        rptrPortHwTrapSetPortId         INTEGER,
+        rptrPortHwTrapSetPortGrpId      INTEGER,
+        rptrPortHwTrapSetLink           INTEGER,
+        rptrPortHwTrapSetSeg            INTEGER
+}
+
+rptrPortHwTrapSetPortId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+         "Returns an index to a port for which the information in this
+         table pertains."
+::= { rptrPortHwTrapEntry 1 }
+
+rptrPortHwTrapSetPortGrpId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only 
+STATUS      mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+::= { rptrPortHwTrapEntry 2 }
+
+rptrPortHwTrapSetLink   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables link traps for this port."
+::= { rptrPortHwTrapEntry 3 }
+
+rptrPortHwTrapSetSeg    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables segmentation traps for this port."
+::= { rptrPortHwTrapEntry 4 }
+
+rptrPortSaTrapTable     OBJECT-TYPE
+SYNTAX          SEQUENCE OF RptrPortSaTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "A list of trap enable/disable at the port level"
+::= { rptrPortSaTrapSet 1 }
+
+rptrPortSaTrapEntry     OBJECT-TYPE
+SYNTAX          RptrPortSaTrapEntry
+ACCESS          not-accessible
+STATUS          mandatory
+DESCRIPTION
+        "Individual trap entries for port group enable/disable."
+INDEX { rptrPortSaTrapSetPortGrpId, rptrPortSaTrapSetPortId }
+::= { rptrPortSaTrapTable 1 }
+
+RptrPortSaTrapEntry ::= SEQUENCE {
+        rptrPortSaTrapSetPortId         INTEGER,
+        rptrPortSaTrapSetPortGrpId      INTEGER,
+        rptrPortSaTrapSetSrcaddr        INTEGER
+}
+
+rptrPortSaTrapSetPortId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+         "Returns an index to a port for which the information in this
+         table pertains."
+::= { rptrPortSaTrapEntry 1 }
+
+rptrPortSaTrapSetPortGrpId   OBJECT-TYPE
+SYNTAX  INTEGER 
+ACCESS      read-only 
+STATUS      mandatory
+DESCRIPTION
+        "Returns an index to a port group for which the information in
+        this table pertains."
+::= { rptrPortSaTrapEntry 2 }
+
+rptrPortSaTrapSetSrcaddr   OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2)
+        }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+        "Enables and disables source address traps for this port."
+::= { rptrPortSaTrapEntry 3 }
+
+-- Port Source address lock section
+
+rptrPortSecurity        OBJECT IDENTIFIER ::= { rptrPort 9 }
+
+rptrPortSecurityTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF RptrPortSecurityEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "This table defines status of the source lock security."
+::= { rptrPortSecurity 1 }
+
+rptrPortSecurityEntry  OBJECT-TYPE
+SYNTAX  RptrPortSecurityEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "Defines lock status for this particular entry."
+INDEX { rptrPortSecurityPortGrpId, rptrPortSecurityPortId }
+::= { rptrPortSecurityTable 1 }
+
+RptrPortSecurityEntry ::= SEQUENCE {
+        rptrPortSecurityPortGrpId
+            INTEGER,
+        rptrPortSecurityPortId
+            INTEGER,
+        rptrPortSecurityLockStatus
+            INTEGER,
+        rptrPortSecurityLockAddAddress
+            OCTET STRING,
+        rptrPortSecurityLockDelAddress
+            OCTET STRING,
+        rptrPortSecurityDisableOnViolation
+            INTEGER,
+        rptrPortSecurityFullSecEnabled
+                INTEGER,
+        rptrPortSecuritySecureState
+                INTEGER,
+        rptrPortSecurityForceNonSecure
+                INTEGER,
+        rptrPortSecurityLearnState
+                INTEGER,
+        rptrPortSecurityLearnMode
+                INTEGER
+        }
+
+rptrPortSecurityPortGrpId  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        " The port Group ID for which this source address lock entry
+        pertains."
+::= { rptrPortSecurityEntry 1 }
+
+rptrPortSecurityPortId  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The port ID for which this source address lock entry pertains."
+::= { rptrPortSecurityEntry 2 }
+
+rptrPortSecurityLockStatus  OBJECT-TYPE
+SYNTAX  INTEGER {
+            unlock(1),
+            lock(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Defines the lock status for this particular port entry."
+::= { rptrPortSecurityEntry 3 }
+
+rptrPortSecurityLockAddAddress  OBJECT-TYPE
+SYNTAX  OCTET STRING (SIZE(6))
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Setting a value to this object will cause a new entry to be
+        added to the rptrPortSecurityListTable.  When read this object
+        will display an OCTET STRING of SIZE 6 with each octet containing
+        a 0.
+
+        In general it is possible to add addresses at anytime.  However
+        there are several instances where the firmware and or hardware
+        can not support the operation.  In these instances an error will
+        be returned if a addition is attempted."
+::= { rptrPortSecurityEntry 4 }
+
+rptrPortSecurityLockDelAddress  OBJECT-TYPE
+SYNTAX  OCTET STRING
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Setting a value to this object will cause corresponding entry
+        in the rptrPortSecurityListTable to be deleted.  When read
+        this object returns an OCTET STRING of length 6 with each octet
+        having the value '0'.
+
+        In general it is possible to delete locked addresses at any time.
+        however there are instances where it is not supported in which
+        case an error will be returned."
+::= { rptrPortSecurityEntry 5 }
+
+rptrPortSecurityDisableOnViolation      OBJECT-TYPE
+SYNTAX  INTEGER {
+        noDisable(1),
+        disable(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "Designates whether port is disabled if its source address
+        is violated.  A source address violation occurs when a
+        address is detected which is not in the source address list for
+        this port.  If the port is disabled due to the source address
+        violation it can be enabled by setting rptrPortMgmtAdminState."
+::= { rptrPortSecurityEntry 6 }
+
+rptrPortSecurityFullSecEnabled  OBJECT-TYPE
+SYNTAX  INTEGER {
+        partialSecurity(1),
+        fullSecurity(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "A port that is set to full security and is locked will 
+        scramble ALL packets, which are not contained in the expected
+        address list, including broadcasts and multicasts.  A port 
+        that is set to partial security will allow broadcasts and 
+        multicasts to repeat unscrambled."
+::= { rptrPortSecurityEntry 7 }
+
+rptrPortSecuritySecureState     OBJECT-TYPE
+SYNTAX  INTEGER {
+        secure(1),
+        nonSecure(2)
+        }
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The secure state of the port.  If the port is secure(1), it 
+        can be locked in order to enable security.  A nonSecure(2)
+        port cannot be locked."
+::= { rptrPortSecurityEntry 8 }
+
+
+rptrPortSecurityForceNonSecure  OBJECT-TYPE
+SYNTAX  INTEGER {
+        noForce(1),
+        forceNonSecure(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The force non-secure state of port.  If the port is Forced,
+        Non-Secure via a value of forceNonSecure(2), it is put into a
+        Non-Secure state, in which case it cannot be locked.  If a port is
+        not forced noForce(1), then it will take on its natural state,
+        according to the traffic flow on the port."
+::= { rptrPortSecurityEntry 9 }
+
+rptrPortSecurityLearnState      OBJECT-TYPE
+SYNTAX  INTEGER {
+        learn(1),
+        noLearn(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The learn state of the port.  This object will only 
+        be applied to a port that is unlocked.  If set to learn(1), all 
+        addresses are deleted on the port and learning begins once again.
+        If it is set to noLearn(2), learning stops on the port."
+::= { rptrPortSecurityEntry 10 }
+
+rptrPortSecurityLearnMode       OBJECT-TYPE
+SYNTAX  INTEGER {
+        oneTime(1),
+        continuous(2)
+        }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "The learn mode of the port. If set to oneTime(1), 
+        the port is capable of learning two addresses and securing
+        on both destination and source addresses (upon locking port).
+        If set to continuous(2), all addresses are
+        initially deleted and the port continuously replaces the existing
+        secure source address with the latest source address it sees."
+::= { rptrPortSecurityEntry 11 }
+
+rptrPortSecurityListTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF RptrPortSecurityListEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "This table defines a list of all source address locks maintained
+        for the specified port."
+::= { rptrPortSecurity 2 }
+
+rptrPortSecurityListEntry  OBJECT-TYPE
+SYNTAX  RptrPortSecurityListEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "An entry containing objects pertaining to source address locks
+        for a port group."
+INDEX { rptrPortSecurityListPortGrpId, rptrPortSecurityListPortId,
+        rptrPortSecurityListIndex }
+::= { rptrPortSecurityListTable 1 }
+
+RptrPortSecurityListEntry  ::= SEQUENCE {
+        rptrPortSecurityListPortGrpId
+            INTEGER,
+        rptrPortSecurityListPortId
+            INTEGER,
+        rptrPortSecurityListIndex
+            INTEGER,
+        rptrPortSecurityListAddress
+            OCTET STRING
+        }
+
+rptrPortSecurityListPortGrpId  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The port group for which this security list entry pertains."
+::= { rptrPortSecurityListEntry 1 }
+
+rptrPortSecurityListPortId  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The port ID for which this source address lock list pertains."
+::= { rptrPortSecurityListEntry 2 }
+
+rptrPortSecurityListIndex  OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "A unique index for the source address entries."
+::= { rptrPortSecurityListEntry 3 }
+
+rptrPortSecurityListAddress  OBJECT-TYPE
+SYNTAX  OCTET STRING
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "Defines the particular source address that has been locked."
+::= { rptrPortSecurityListEntry 4 }
+
+
+-- This group is only used for port switching MIMs that support differnt
+-- port associations.
+
+rptrPortAssoc   OBJECT IDENTIFIER ::= { repeaterrev4 4 }
+
+rptrPortAssocTable      OBJECT-TYPE
+SYNTAX  SEQUENCE OF RptrPortAssocEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "This table defines the port association for those switching
+        MIMs that support this functionality."
+::= { rptrPortAssoc 1 }
+
+rptrPortAssocEntry      OBJECT-TYPE
+SYNTAX  RptrPortAssocEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "Describes a particular port association entry."
+INDEX { rptrPortAssocBoard }
+::= { rptrPortAssocTable 1 }
+
+RptrPortAssocEntry ::= SEQUENCE {
+        rptrPortAssocBoard
+                INTEGER,
+        rptrPortAssocStatus
+                INTEGER
+        }
+
+rptrPortAssocBoard      OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+        "The board number for which this port association information
+        pertains."
+::= { rptrPortAssocEntry 1 }
+
+rptrPortAssocStatus     OBJECT-TYPE
+SYNTAX  INTEGER {
+        defaultPort(1), -- Default configuration
+        otherPort(2)    -- EPIM
+}
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "This object describes the status of the user selectable port.  
+        On a TPXMIM34 this is port 13 which may either be an EPIM or
+        default configuration.
+
+        A value of defaultPort(1) restores the default configuration.
+        A value of otherPort(2) may imply the use of the EPIM connection."
+::= { rptrPortAssocEntry 2 }
+
+-- TrapTypes 
+
+--      This section  will describe  the trap  types  that  the
+-- repeater section  of the  EMMe can  generate. These  are not
+-- objects, but  Object identifers used to indicate the specific
+-- trap. They  are taken  from the  object space  and are  thus
+-- documented here.
+
+--      The   SNMP    protocol   provides   a   mechanism   for
+-- asynchronusly notifying  management stations  of significant
+-- changes in  the network.  This mechanism  is the  SNMP  trap
+-- message. This  document will describe the general format for
+-- all trap  messages that  Cabletron products will generate as
+-- well as the specific traps that the will be generated by the
+-- EMMe.
+
+--  Trap Formats
+
+--      The  SNMP  trap  messages  are  composed  of  two  user
+-- definable areas: the specific trap type and the VarBindings
+-- (eg. the interesting information). The specific trap type is
+-- an INTEGER  that is used to determine the specific trap that
+-- has occurred. The "interesting information" contains a group
+-- of objects  identifiers (OID)  and their values that provide
+-- information about the trap.
+
+
+-- Trap Description
+--  PortSegmenting 
+
+-- Specfic Trap Type Code - 0x101
+
+--      When a  port goes from operational to segmented, a trap
+-- will be  generated. For  these purposes, the port state will
+-- be sampled  every XXX seconds, thus it will be statistically
+-- possible to miss oscillating circuits.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortUnsegementing 
+
+-- Specfic Trap Type Code - 0x102
+
+--      When it  is detected  that a  previously segmented port
+-- has gone  operational, a  trap will  be generated.   This is
+-- also sampled,  thus a  trap may  not be  generated for  each
+-- transition.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortLinkUp 
+
+-- Specfic Trap Type Code - 0x103
+
+--      This trap  will be generated when it is determined that
+-- MAU has  been attached to the MMAC. This is only appropriate
+-- for MIMs that support the concept of a link state.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortLinkDown 
+
+-- Specfic Trap Type Code - 0x104
+
+--      This trap  will be generated when a previously attached
+-- MAU  is  removed  or  powered  down.  Again,  this  is  only
+-- appropriate for MIM's that support link state.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  NewSourceAddress 
+
+-- Specfic Trap Type Code - 0x105
+
+--      This trap  will be  generated when the MMAC detects the
+-- existence of a new source address on one of it's ports.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortSourceAddr {rptrPortSrcAddrListEntry 4 }
+
+-- Trap Description
+--  SourceAddressTimeout 
+
+-- Specfic Trap Type Code - 0x106
+
+--      This trap  will indicate that the MMAC has not detected
+-- a packet  generated by  this source address within a certain
+-- timeout.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortSourceAddr {rptrPortSrcAddrListEntry 4 }
+
+-- Trap Description
+--  BoardRemoval 
+
+-- Specfic Trap Type Code - 0x107
+
+--      This trap  will be generated when the MMAC detects that
+-- MIM has been removed.
+-- The interesting information will include:
+
+--        BoardIndex {chSlotEntry 1 } in the
+--        chassisMib 1.3.6.1.4.1.52.4.1.1.2.5.1.1
+
+-- Trap Description
+--  boardInsertion 
+-- (also see chBoardInsertion, 0x136)
+-- Specfic Trap Type Code - 0x108
+
+--      This trap  will be  generated when  the MMAC determines
+--      that a new board has been inserted.
+--      The interesting information will include:
+
+--        chSlotID 
+--        deviceType 
+
+-- Trap Description
+--  ActivePortInRedundantCircuitFailed 
+
+-- Specfic Trap Type Code - 0x109
+
+--      This trap  will be  generated when the active port in a
+-- redundant circuit has failed polling. This will indicate the
+-- activation of redundancy.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortRedundCrt {rptrPortRedundEntry 3 }
+
+-- Trap Description
+--  RedundantPortActivated 
+
+-- Specfic Trap Type Code - 0x10a
+
+--      This trap  indicates that a new port has been activated
+-- in a  redundant circuit.  This does  NOT indicate  that this
+-- port is  usable, but  is being tested. If the port fails the
+-- above (3.9) trap will be generated.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortRedundCrt {rptrPortRedundEntry 3 }
+
+-- Trap Description
+--  RedundantPortTestFailed 
+
+-- Specfic Trap Type Code - 0x10b
+
+--      This trap will be generated when the MMAC executes it's
+-- periodic redundancy diagnostics and finds on of the ports in
+-- a redundant  circuit  has  failed.  This  message  will  not
+-- indicate that  redundancy has  been activated, just that the
+-- port has failed and should be fixed before it is needed.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortRedundCrt {rptrPortRedundEntry 3 }
+
+-- Trap Description
+--  BoardTrafficThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x10f
+
+--      This trap  will be  generated when  the  traffic  (good
+-- packets per  time interval) has been exceed for a particular
+-- MIM.
+-- The interesting information will include:
+
+--        BoardTrafficThreshold {rptrPortGrpAlarmEntry 3 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+
+-- Trap Description
+--  BoardErrorThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x110
+
+--      This  trap  will  be  generated  when  packets  of  the
+-- selected error  type exceeds  a threshold  percentage of the
+-- good packets for a particular interval for a particular MIM.
+-- This will most likely indicate a bad MIM.
+-- The interesting information will include:
+
+--        BoardErrorThreshold {rptrPortGrpAlarmEntry 9 }
+--        BoardErrorSource {rptrPortGrpAlarmEntry 10 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+
+-- Trap Description
+--  BoardCollisionThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x111
+
+--      This trap  will be  generated when  collisions exceed a
+-- threshold percentage  of the  good packets  for a particular
+-- interval for a particular MIM.
+-- The interesting information will include:
+
+--        BoardCollsThreshold {rptrPortGrpAlarmEntry 6 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+
+-- Trap Description
+--  PortTrafficThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x112
+
+--      This trap  will be  generated when  the  traffic  (good
+-- packets per  time interval) has been exceed for a particular
+-- port.
+-- The interesting information will include:
+
+--        PortTrafficThreshold {rptrPortAlarmEntry 4 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortErrorThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x113
+
+--      This  trap  will  be  generated  when  packets  of  the
+-- selected error  type exceeds  a threshold  percentage of the
+-- good packets  for a  particular interval  for  a  particular
+-- port.
+-- The interesting information will include:
+
+--        PortErrorThreshold {rptrPortAlarmEntry 10 }
+--        PortErrorSource {rptrPortAlarmEntry 11 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortCollisionThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x114
+
+--      This trap  will be  generated when  collisions exceed a
+-- threshold percentage  of the  good packets  for a particular
+-- interval for a particular port.
+-- The interesting information will include:
+
+--        PortCollsThreshold {rptrPortAlarmEntry 7 }
+--        RptrTimebase {rptrAlarms 8 }
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  PortTypeChanged
+
+-- Specfic Trap Type Code - 0x115
+
+--   This trap indicates that a port has changed from a 
+-- station port to a link port or vice versa.
+-- The interesting information is:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortTopologyType {rptrPortSrcAddrEntry 3 }
+
+
+-- Trap Description
+--  PortSecurityViolation
+
+-- Specfic Trap Type Code - 0x117
+
+--   This trap is generated when a source address other than those
+-- locked to a port is seen.
+-- The interesting information is:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortSourceAddr {rptrPortSrcAddrListEntry 4 } 
+
+-- Trap Description
+--  PortViolationReset
+
+-- Specfic Trap Type Code - 0x118 
+
+--   This trap is generated when management intervention has 
+-- reset a port after a violation has occurred.
+-- The interesting information is:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  EnvTempWarm
+
+-- Specfic Trap Type Code - 0x119
+
+--   This trap is generated when the device detects that the temperature
+-- within a MIM has reached a WARM condition.
+-- The interesting information is:
+
+--        BoardIndex {chSlotEntry 1 } in the
+--        chassisMib 1.3.6.1.4.1.52.4.1.1.2.5.1.1
+
+-- Trap Description
+--  EnvTempHot
+
+-- Specfic Trap Type Code - 0x11A
+
+--   This trap is generated when the device detects that the temperature
+-- within a MIM has reached a HOT condition.
+-- The interesting information is:
+
+--        BoardIndex {chSlotEntry 1 } in the
+--        chassisMib 1.3.6.1.4.1.52.4.1.1.2.5.1.1
+
+-- Trap Description
+--  EnvTempNormal
+
+-- Specfic Trap Type Code - 0x11C
+
+--   This trap is generated when the device detects that the temperature
+-- within  a MIM has returned to a NORMAL state.
+-- The interesting information is:
+
+--        BoardIndex {chSlotEntry 1 } in the
+--        chassisMib 1.3.6.1.4.1.52.4.1.1.2.5.1.1
+
+-- Trap Description
+--  EnvVoltageLow
+
+-- Specfic Trap Type Code - 0x11B
+
+--   This trap is generated when a power supply`s voltage is LOW.
+-- The interesting information is:
+
+--        PowerSupply {PowerEntry 1 } in the
+--        commonMib 1.3.6.1.4.1.52.1.6.1.4.1.1
+
+-- Trap Description
+--  EnvVoltageNormal
+
+-- Specfic Trap Type Code - 0x11D
+
+--   This trap is generated when all power supply's voltage
+-- have returned to a NORMAL state.
+-- The interesting information is:
+
+--        None
+
+-- Trap Description
+--  FanFail
+
+-- Specfic Trap Type Code - 0x11E
+
+--   This trap is generated when the device detects that the system fans
+-- have failed.
+-- The interesting information is:
+
+--        None
+
+-- Trap Description
+--  FanNormal
+
+-- Specfic Trap Type Code - 0x11F
+
+--   This trap is generated when the device detects that the system fans
+-- have returned to normal.
+-- The interesting information is:
+
+--        None
+
+-- Trap Description
+
+-- Trap Description
+--  BoardBroadcastThresholdExceeded
+--
+-- Specific Trap Type Code - 0x121
+--
+--  This trap is generated when the broadcast packets (per time
+-- interval) have exceeded the threshold for the given board.
+--
+-- The Interesting Information is:
+--  board broadcast threshold
+--  repeater alarm time base
+--  board number
+--
+ 
+-- Trap Description
+--  PortBroadcastThresholdExceeded
+--
+-- Specific Trap Type Code - 0x122
+--
+--  This trap is generated when the broadcast packets (per time
+-- interval) have exceeded the threshold for the given port.
+--
+-- The Interesting Information is:
+--  port broadcast threshold
+--  repeater alarm time base
+--  board number
+--  port number
+--
+ 
+
+--  SystemVolatgeLow
+-- Specfic Trap Type Code - 0x125
+
+--   This trap is generated when the device detects that the power
+-- to the EMMe is low.
+-- The interesting information is:
+
+--        None
+
+-- Trap Description
+--  SystemVolatgeNormal
+
+-- Specfic Trap Type Code - 0x126
+
+--   This trap is generated when the device detects that the power
+-- to the EMMe has returned to normal.
+-- The interesting information is:
+
+--        None
+
+-- Trap Description
+--  EpimRemoval 
+
+-- Specfic Trap Type Code - 0x127
+
+--      This trap  will be generated when it is detected that an EPIM
+-- has been removed.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+
+-- Trap Description
+--  Epiminsertion 
+
+-- Specfic Trap Type Code - 0x128
+
+--      This trap  will be generated when it is detected that an EPIM
+-- has been inserted.
+-- The interesting information will include:
+
+--        BoardIndex {rptrPortGrpMgmtEntry 1 }
+--        PortIndex {rptrPortMgmtEntry 1 }
+--        PortType { rptrPortMgmtEntry 6 }
+
+
+-- Trap Description
+--  RptrTrafficThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x129
+
+--      This trap  will be  generated when  the  traffic  (good
+-- packets per time interval) has been exceed for a network.
+-- The interesting information will include:
+
+--        RptrTrafficThreshold {rptrAlarms 2 }
+--        RptrTimebase {rptrAlarms 8 }
+--        RptrInterfaceNum {rptrMgmt 7 }
+
+-- Trap Description
+--  RptrErrorThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x130
+
+--      This  trap  will  be  generated  when  packets  of  the
+-- selected error  type exceeds  a threshold  percentage of the
+-- good packets for a particular interval for an entire network.
+-- The interesting information will include:
+
+--        RptrErrorThreshold {rptrAlarms 6 }
+--        RptrErrorSource {rptrAlarms 7 }
+--        RptrTimebase {rptrAlarms 8 }
+--        RptrInterfaceNum {rptrMgmt 7 }
+
+-- Trap Description
+--  RptrCollsionThresholdExceeded 
+
+-- Specfic Trap Type Code - 0x131
+
+--      This trap  will be  generated when  collisions exceed  a
+-- threshold percentage  of the  good packets  for a particular
+-- interval for an entire network.
+-- The interesting information will include:
+
+--        RptrCollsThreshold {rptrAlarms 4 }
+--        RptrTimebase {rptrAlarms 8 }
+--        RptrInterfaceNum {rptrMgmt 7 }
+
+-- Trap Description
+--  RptrLockSTATUSChanged
+
+-- Specfic Trap Type Code - 0x132
+
+--   This trap is generated when the status of the address lock 
+-- changes for a certain network.
+-- The interesting information is:
+
+--        RptrSrcAddrLocked {rptrSrcAddrMgmt 2 }
+--        RptrInterfaceNum {rptrMgmt 7 }
+
+-- Trap Description
+--  RptrBroadcastThresholdExceeded
+--
+-- Specific Trap Type Code - 0x133
+--
+--  This trap is generated when the broadcast packets (per time
+-- interval) have exceeded the threshold for the given repeater.
+--
+-- The Interesting Information is:
+--  repeater broadcast threshold
+--  repeater alarm time base
+--  repeater interface number
+
+-- Trap Description
+--      srcAddressPortGrpLockStatusChange
+--  This trap is generated when a change to the source address locking
+--  is detected at the port group level.
+--      The interesting information is:
+--
+--      { rptrPortGrpMgmtentry 1 }
+--      { rptrPortGrpSrcAddrEntry 3 }
+--  Trap code = 0x134
+
+
+-- Trap  Description
+--      srcAddressPortLockStatusChange
+--  This  trap is generated when a change to the source address locking
+--  is detected at the port level.
+--      Interesting information is:
+--
+--      port group { rptrPortGrmtMgmtEntry 1 }
+--      port { rptrPortMgmtEntry 2 }
+--      lock status { rptrPortSecurityLockEntry 3 }
+ 
+
+-- Trap Description
+--  chBoardInsertion 
+-- (also see boardInsertion, 0x108)
+
+-- Specfic Trap Type Code - 0x136
+
+--      This trap  will be  generated when  the MMAC determines
+--      that a new board has been inserted.
+--      The interesting information will include:
+
+--        chSlotID 
+--        chSlotModuleType 
+
+END

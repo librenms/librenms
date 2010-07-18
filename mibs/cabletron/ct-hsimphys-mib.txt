@@ -1,0 +1,343 @@
+CT-HSIMPHYS-MIB DEFINITIONS ::= BEGIN
+
+   --  ct-hsimphys-mib.txt
+   --  Revision: 01.00.00
+   --  Part Number:
+   --  Date: July 21, 1998
+
+   --  Cabletron Systems, Inc.
+   --  35 Industrial Way, P.O. Box 5005
+   --  Rochester, NH 03867-0505
+   --  (603) 332-9400
+   --  support@ctron.com
+
+   --  This module provides an enterprise-specific HSIM container MIB.
+   --
+   --  This module will be extended, as needed.
+   --
+
+   --  Cabletron Systems reserves the right to make changes in
+   --  specification and other information contained in this document
+   --  without prior notice.  The reader should consult Cabletron Systems
+   --  to determine whether any such changes have been made.
+   --
+   --  In no event shall Cabletron Systems be liable for any incidental,
+   --  indirect, special, or consequential damages whatsoever (including
+   --  but not limited to lost profits) arising out of or related to this
+   --  document or the information contained in it, even if Cabletron
+   --  Systems has been advised of, known, or should have known, the
+   --  possibility of such damages.
+   --
+   --  Cabletron grants vendors, end-users, and other interested parties
+   --  a non-exclusive license to use this Specification in connection
+   --  with the management of Cabletron products.
+
+   --  Copyright March 98 Cabletron Systems
+
+   --  This MIB is intended to provide a central repository & link to all
+   --  information about the physical aspect of an HSIM.  Physical info
+   --  includes items related to the HW inventory , BOOT, EPLD, and other
+   --  low level information.  For the purposes of this MIB, no difference
+   --  is recognized between a permantly-installed "option card", such as
+   --  the onboard WAN interface on the HSIM-W65/75, and an actual WPIM.
+
+   IMPORTS
+      OBJECT-TYPE
+         FROM RFC-1212
+      DisplayString
+         FROM RFC1213-MIB
+      ctHSIMPhysMib
+         FROM CTRON-MIB-NAMES;
+
+
+   --================= HSIM Info ===================
+
+   hsimInfo  OBJECT IDENTIFIER ::= { ctHSIMPhysMib 1 }
+
+   hsimBoardRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the printed circuit board
+         revision level."
+      ::= { hsimInfo 1 }
+
+   hsimBoardId  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the printed circuit board
+         idenitifer."
+      ::= { hsimInfo 2 }
+
+   hsimEpldRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the programmable
+         logic device revision level."
+      ::= { hsimInfo 3 }
+
+   hsimEpldId  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the programmable
+         logic device identifier."
+      ::= { hsimInfo 4 }
+
+   hsimFsbRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the first stage
+         boot revision level."
+      ::= { hsimInfo 5 }
+
+   hsimSsbRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the second stage
+         boot revision level."
+      ::= { hsimInfo 6 }
+
+   hsimFwRev  OBJECT-TYPE
+         SYNTAX  DisplayString
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is the HSIM firmware
+         revision level."
+      ::= { hsimInfo 7 }
+
+   --=================== HSIM Peripheral MBus Info =====================
+
+   hsimPeripheralMBusInfo OBJECT IDENTIFIER
+      ::= { hsimInfo 8 }
+
+   mBusNumberBoardsInstalled  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is number of MBus boards
+         installed in this unit."
+      ::= { hsimPeripheralMBusInfo 1 }
+
+   mBusBoardTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF MBusBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A list of MBus boards present in this unit"
+      ::= { hsimPeripheralMBusInfo 2 }
+
+   mBusBoardEntry  OBJECT-TYPE
+         SYNTAX  MBusBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is an MBus board that is
+         present in this unit"
+         INDEX   { mBusBoardID }
+      ::= { mBusBoardTable 1 }
+
+   MBusBoardEntry  ::=
+         SEQUENCE {
+                  mBusBoardID          INTEGER,
+                  mBusBoardEntryType   INTEGER,
+                  mBusBoardOIDPointer  OBJECT IDENTIFIER
+                  }
+
+   mBusBoardID OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is an index that uniquely
+         identifies the physical MBus board within the system."
+      ::= { mBusBoardEntry 1 }
+
+   mBusBoardEntryType OBJECT-TYPE
+         SYNTAX  INTEGER   {
+                           unknown(1),
+                           cmm(2)
+                           }
+
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object identifies the type of MBus
+         board installed."
+      ::= { mBusBoardEntry 2 }
+
+   mBusBoardOIDPointer OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object defines the start of a MIB that
+         can be used to determine more specific information about
+         the given MBus board."
+      ::= { mBusBoardEntry 3 }
+
+
+   --=================== HSIM Peripheral WPIM Info =====================
+
+   hsimPeripheralWpimInfo OBJECT IDENTIFIER
+      ::= { hsimInfo 9 }
+
+   wpimNumberBoardsInstalled  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is number of WPIM boards
+         installed in this unit."
+      ::= { hsimPeripheralWpimInfo 1 }
+
+   wpimBoardTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF WpimBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A list of WPIM boards present in this unit"
+      ::= { hsimPeripheralWpimInfo 2 }
+
+   wpimBoardEntry  OBJECT-TYPE
+         SYNTAX  WpimBoardEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a WPIM board that is
+         present in this unit"
+         INDEX   { wpimBoardID }
+      ::= { wpimBoardTable 1 }
+
+   WpimBoardEntry  ::=
+         SEQUENCE {
+                  wpimBoardID          INTEGER,
+                  wpimBoardEntryType   OBJECT IDENTIFIER,
+                  wpimBoardOIDPointer  OBJECT IDENTIFIER
+                  }
+
+   wpimBoardID OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is an index that uniquely
+         identifies this WPIM board."
+      ::= { wpimBoardEntry 1 }
+
+   wpimBoardEntryType OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object identifies the type of WPIM
+         board installed.  This is within the portWpim branch
+         of the namingTree (1.3.6.1.4.1.52.3.8.1.2.5)"
+      ::= { wpimBoardEntry 2 }
+
+   wpimBoardOIDPointer OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object defines the start of a MIB that
+         can be used to determine more specific information about
+         the given WPIM board."
+      ::= { wpimBoardEntry 3 }
+
+   --=================== HSIM Local HW Devices Info =====================
+
+   hsimLocalHwDevicesInfo OBJECT IDENTIFIER
+      ::= { hsimInfo 10 }
+
+   localHwDevicesTable  OBJECT-TYPE
+         SYNTAX  SEQUENCE OF LocalHwDevicesEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "A list of specific hardware devices present in this unit"
+      ::= { hsimLocalHwDevicesInfo 1 }
+
+   localHwDevicesEntry  OBJECT-TYPE
+         SYNTAX  LocalHwDevicesEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is a WPIM module that is
+         present in this unit"
+         INDEX   { localHwDeviceID }
+      ::= { localHwDevicesTable 1 }
+
+   LocalHwDevicesEntry  ::=
+         SEQUENCE {
+                  localHwDeviceID            INTEGER,
+                  localHwDeviceType          INTEGER,
+                  localHwDeviceOperStatus    INTEGER,
+                  localHwDeviceAdminStatus   INTEGER
+                  }
+
+   localHwDeviceID OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object is an index that uniquely
+         identifies the assoicated local hardware device."
+      ::= { localHwDevicesEntry 1 }
+
+   localHwDeviceType OBJECT-TYPE
+         SYNTAX  INTEGER {
+                         unknown(1),
+                         siemensMunich32(2),
+                         mitelMT8985(3)
+                         }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "The value of this object identifies the type of local
+         hardware device.  These local hardware devices are those
+         specific ICs unique to this HSIM such as Siemens
+         Munich32, or Mitel MT8985."
+      ::= { localHwDevicesEntry 2 }
+
+   localHwDeviceOperStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                   up(1),       -- ready to pass packets
+                   down(2),
+                   testing(3),  -- in some test mode
+                   unknown(4),  -- status can not be determined
+                                -- for some reason.
+                   dormant(5)
+               }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+        "This object describes the current state of the device."
+      ::= { localHwDevicesEntry 3 }
+
+   localHwDeviceAdminStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                   up(1),       -- ready execute
+                   down(2),
+                   testing(3)   -- in some test mode
+               }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+        "This object is used by the Network Management System to
+         request a change in the current state of the device."
+      ::= { localHwDevicesEntry 4 }
+
+END

@@ -1,0 +1,147 @@
+CTRON-PORTMAP-MIB DEFINITIONS ::= BEGIN
+
+      --  CTRON-PORTMAP-MIB  The Cabletron Repeater MIB for Port Mapping.
+      --  ctron-portmap-mib.txt
+      --  Revision: 1.00.01
+      --  Part Number: 
+      --  Date: May 22, 1998
+
+      --  Cabletron Systems, Inc.
+      --  35 Industrial Way, P.O. Box 5005
+      --  Rochester, NH 03867-0505
+      --  (603) 332-9400
+      --  support@ctron.com
+
+      --  This module provides authoritative definitions for part
+      --  of the naming tree below:
+      --
+      --              cabletron { enterprises 52 }
+      --
+      --  This module will be extended, as additional sub-sections
+      --  of this naming tree are defined.
+      --
+
+      --  Cabletron Systems reserves the right to make changes in
+      --  specification and other information contained in this document
+      --  without prior notice.  The reader should consult Cabletron Systems
+      --  to determine whether any such changes have been made.
+      --
+      --  In no event shall Cabletron Systems be liable for any incidental,
+      --  indirect, special, or consequential damages whatsoever (including
+      --  but not limited to lost profits) arising out of or related to this
+      --  document or the information contained in it, even if Cabletron
+      --  Systems has been advised of, known, or should have known, the
+      --  possibility of such damages.
+      --
+      --  Cabletron grants vendors, end-users, and other interested parties
+      --  a non-exclusive license to use this Specification in connection
+      --  with the management of Cabletron products.
+
+      --  Copyright August 98 Cabletron Systems
+
+        IMPORTS
+                OBJECT-TYPE     FROM RFC-1212
+                ctPortMap       FROM CTRON-MIB-NAMES;
+
+
+portMap     OBJECT IDENTIFIER ::= { ctPortMap 1 }
+
+
+portMapTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PortMapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table identifies the repeater which the port 
+                 belongs to." 
+        ::= { portMap 1 }
+
+portMapEntry  OBJECT-TYPE
+        SYNTAX  PortMapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Provides basic mapping and capability for a specific port."
+        INDEX   { portMapIndex }
+        ::= { portMapTable 1 }
+
+PortMapEntry  ::= SEQUENCE {
+        portMapIndex
+             INTEGER,
+        portMapRepeater
+             INTEGER,
+        portMapCapability
+             INTEGER, 
+        portMapOperationalMode
+             INTEGER,
+        portMapLastSeenSrcAddr 
+             OCTET STRING 
+        }
+
+portMapIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Returns an index to a port for which the information
+                 in this table pertains."
+        ::= { portMapEntry 1 }
+
+portMapRepeater OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Gives the repeater number that this port is connected to."
+        ::= { portMapEntry 2 }
+ 
+portMapCapability OBJECT-TYPE
+        SYNTAX  INTEGER (0..1023)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This indicates the technology ability of the local hardware.
+                The value of this object is the logical OR of all supported
+                technologies, where each technology is given the values below:
+                         
+                other(1)                      Undefined, or ability not known
+                Auto-Negotiation(2)           Auto-Negotiation
+                10BASE-T(4)                   10BASE-T
+                100BASE-TX(8)                 100BASE-TX
+                1000BASE(16)                  1000BASE                  
+                
+                For example, a port that has the capability of supporting 
+                10BASE-T and 100BASE-TX would have a value of 12 (4 + 8)."
+        
+        ::= { portMapEntry 3 }
+
+portMapOperationalMode OBJECT-TYPE
+       SYNTAX  INTEGER (0..1023)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                " This indicates the current operational mode of this port.
+                This value is a logical OR of the current operational mode,
+                where each technology is given the values below:
+
+                other(1)                      Undefined, or ability not known
+                Auto-Negotiation(2)           Auto-Negotiation
+                10BASE-T(4)                   10BASE-T
+                100BASE-TX(8)                 100BASE-TX
+                1000BASE(16)                  1000BASE                  
+
+                For example, a port that has auto-negotiated to a speed of 
+                100BASE-TX would have a value of 10 (2 + 8)."
+
+        ::= { portMapEntry 4 }
+
+portMapLastSeenSrcAddr OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(6))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Returns last source address seen by this repeater port."
+        
+        ::= { portMapEntry 5}
+
+END

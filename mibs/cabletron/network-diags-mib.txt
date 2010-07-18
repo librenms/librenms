@@ -1,0 +1,369 @@
+NETWORK-DIAGS DEFINITIONS ::= BEGIN
+
+        --  network-diags-mib.txt
+        --  Revision: 01.01.00
+        --  Part Number:
+        --  Date: August 11, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+IMPORTS
+        IpAddress, Counter
+                        FROM RFC1155-SMI
+        nwDiagnostics
+                        FROM CTRON-MIB-NAMES
+        OBJECT-TYPE
+                        FROM RFC-1212;
+
+nwRevision      OBJECT IDENTIFIER ::= { nwDiagnostics 1 }
+nwInternet      OBJECT IDENTIFIER ::= { nwDiagnostics 2  }
+nwIpPing        OBJECT IDENTIFIER ::= { nwInternet 1 }
+nwIpTraceRoute  OBJECT IDENTIFIER ::= { nwInternet 2 }
+
+nwRevisionLevel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This shows the current revision level of this mib."
+        ::= { nwRevision 1 }
+
+
+nwIpPingTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwIpPingEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table allows outbound ping requests to be generated from
+                the Cabletron device to a specified destination IP address.
+                It is indexed by destination address and source address to 
+                allow multiple ping requests by different owner IP addresses."
+        ::= { nwIpPing 1 }
+
+ 
+nwIpPingEntry   OBJECT-TYPE
+        SYNTAX  NwIpPingEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An IP Ping Table entry containing objects for a particular 
+                ping request." 
+        INDEX   { nwIpPingDestination, nwIpPingOwner }
+        ::= { nwIpPingTable 1 }
+
+NwIpPingEntry ::= 
+        SEQUENCE {
+                nwIpPingDestination     IpAddress,
+                nwIpPingOwner           IpAddress,
+                nwIpPingType            INTEGER,
+                nwIpPingAction          INTEGER,
+                nwIpPingStatus          INTEGER
+                }
+
+
+nwIpPingDestination      OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the host/device to be pinged."
+        ::= { nwIpPingEntry 1 }
+
+nwIpPingOwner   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the client which created this ping request.
+                A value of 0.0.0.0 indicates the request was made from the
+                local console."
+        ::= { nwIpPingEntry 2 }
+
+
+nwIpPingType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        invalid(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The administrative control of this ping request entry.  This 
+                leaf is used to create a ping request entry."
+        DEFVAL  { other }
+        ::= { nwIpPingEntry 3 }
+
+
+nwIpPingAction  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        activate(2),
+                        suspend(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The action to be performed with this ping entry."
+        DEFVAL  { activate }
+        ::= { nwIpPingEntry 4 }
+
+nwIpPingStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        not-sent(2),
+                        in-progress(3),
+                        alive(4),
+                        timeout(5),
+                        bad-results(6),
+                        failed(7),
+                        net-unreach(8),
+                        host-unreach(9),
+                        proto-unreach(10),
+                        port-unreach(11),
+                        cant-frag(12),
+                        sr-failed(13),
+                        net-unknown(14),
+                        host-unknown(15),
+                        isolated(16),
+                        no-net-comm(17),
+                        no-host-comm(18),
+                        no-net-tos(19),
+                        no-host-tos(20),
+                        source-quence(21),
+                        ttl-exceeded(22),
+                        frag-exceeded(23),
+                        parameter(24)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The results of a ping request.  A result of alive(4) means
+                the device is responding."
+        ::= { nwIpPingEntry 5 }
+
+        
+
+nwIpTraceRouteTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwIpTraceRouteEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table allows outbound traceroute requests to be generated
+                from the Cabletron device to a specified destination IP address.
+                It is indexed by destination address and source address to 
+                allow multiple requests by different owner IP addresses."
+        ::= { nwIpTraceRoute 1 }
+
+ 
+nwIpTraceRouteEntry     OBJECT-TYPE
+        SYNTAX  NwIpTraceRouteEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An IP TraceRoute Table entry containing objects for a 
+                particular traceroute request." 
+        INDEX   { nwIpTraceRouteDestination, nwIpTraceRouteOwner }
+        ::= { nwIpTraceRouteTable 1 }
+
+NwIpTraceRouteEntry ::= 
+        SEQUENCE {
+                nwIpTraceRouteDestination       IpAddress,
+                nwIpTraceRouteOwner             IpAddress,
+                nwIpTraceRouteType              INTEGER,
+                nwIpTraceRouteAction            INTEGER,
+                nwIpTraceRouteStatus            INTEGER,
+                nwIpTraceRouteNextHops          Counter
+                }
+
+
+nwIpTraceRouteDestination        OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the host/device to be traced."
+        ::= { nwIpTraceRouteEntry 1 }
+
+nwIpTraceRouteOwner     OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the client which created this trace request."
+        ::= { nwIpTraceRouteEntry 2 }
+
+
+nwIpTraceRouteType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        invalid(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The administrative control of this trace request entry.  This 
+                leaf is used to create a traceroute request entry."
+        DEFVAL  { other }
+        ::= { nwIpTraceRouteEntry 3 }
+
+
+nwIpTraceRouteAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        activate(2),
+                        suspend(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The action to be perfomed with this request."
+        DEFVAL  { activate }
+        ::= { nwIpTraceRouteEntry 4 }
+
+nwIpTraceRouteStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        not-sent(2),
+                        in-progress(3),
+                        alive(4),
+                        timeout(5),
+                        bad-results(6),
+                        failed(7),
+                        net-unreach(8),
+                        host-unreach(9),
+                        proto-unreach(10),
+                        port-unreach(11),
+                        cant-frag(12),
+                        sr-failed(13),
+                        net-unknown(14),
+                        host-unknown(15),
+                        isolated(16),
+                        no-net-comm(17),
+                        no-host-comm(18),
+                        no-net-tos(19),
+                        no-host-tos(20),
+                        source-quence(21),
+                        ttl-exceeded(22),
+                        frag-exceeded(23),
+                        parameter(24)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The results of a trace request.  A result of alive(3) means
+                the end device has responded.  Otherwise the next hop count
+                will indicate how many hops were traversed."
+        ::= { nwIpTraceRouteEntry 5 }
+
+
+
+nwIpTraceRouteNextHops  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of next-hop routers/gateways traversed.  This value
+                should be used to read entries in the TraveRouteHop Table."
+        ::= { nwIpTraceRouteEntry 6 }
+
+
+
+        
+
+nwIpTraceRouteHopTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF NwIpTraceRouteHopEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the next-hop Ip Addresses of each hop
+                traversed for a particular TraceRoute request."
+        ::= { nwIpTraceRoute 2 }
+
+ 
+nwIpTraceRouteHopEntry  OBJECT-TYPE
+        SYNTAX  NwIpTraceRouteHopEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "An IP NextHop Table entry containing objects for a 
+                particular traceroute request." 
+        INDEX   { nwIpTraceRouteHopDestination, nwIpTraceRouteHopOwner, nwIpTraceRouteHopNumber }
+        ::= { nwIpTraceRouteHopTable 1 }
+
+NwIpTraceRouteHopEntry ::= 
+        SEQUENCE {
+                nwIpTraceRouteHopDestination    IpAddress,
+                nwIpTraceRouteHopOwner          IpAddress,
+                nwIpTraceRouteHopNumber         INTEGER,
+                nwIpTraceRouteHopIp             IpAddress
+                }
+
+
+nwIpTraceRouteHopDestination     OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the host/device for which this entry exists."
+        ::= { nwIpTraceRouteHopEntry 1 }
+
+nwIpTraceRouteHopOwner  OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of the client for which this entry exists."
+        ::= { nwIpTraceRouteHopEntry 2 }
+
+
+nwIpTraceRouteHopNumber         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The hop number of this gateway in the table of next-hop
+                 routers/gateways traversed.  This value indicated how many
+                hops away this router/gateway is."
+        ::= { nwIpTraceRouteHopEntry 3 }
+
+        
+nwIpTraceRouteHopIp     OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of this next-hop gateway."
+        ::= { nwIpTraceRouteHopEntry 4 }
+
+END

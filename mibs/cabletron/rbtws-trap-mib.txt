@@ -1,0 +1,1708 @@
+RBTWS-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    IpAddress, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    RbtwsApAttachType, RbtwsRadioType,
+    RbtwsApSerialNum, RbtwsApFingerprint,
+    RbtwsAccessType, RbtwsRadioNum, RbtwsPowerLevel,
+    RbtwsRadioPowerChangeType, RbtwsChannelChangeType,
+    RbtwsApTransition, RbtwsApFailDetail, RbtwsApPortOrDapNum,
+    RbtwsRadioConfigState, RbtwsApConnectSecurityType,
+    RbtwsApServiceAvailability, RbtwsApWasOperational
+        FROM RBTWS-AP-TC
+    RbtwsClientSessionState, RbtwsClientAuthenProtocolType,
+    RbtwsClientDot1xState, RbtwsUserAccessType
+        FROM RBTWS-CLIENT-SESSION-TC
+    rbtwsTraps, rbtwsTemporary, rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+rbtwsTrapMib MODULE-IDENTITY
+    LAST-UPDATED "200705041700Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "Notifications emitted by Enterasys Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2007 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200705040055Z"
+    DESCRIPTION "v2.6.6: added one value (3)
+                to RbtwsClientIpAddrChangeReason
+                (for 6.0 release)"
+
+    REVISION "200701090050Z"
+    DESCRIPTION "v2.6.4: Added two new traps:
+                             rbtwsMobilityDomainFailOverTrap,
+                             rbtwsMobilityDomainFailBackTrap
+                and related objects:
+                             rbtwsMobilityDomainSecondarySeedIp,
+                             rbtwsMobilityDomainPrimarySeedIp
+                (for 6.0 release)"
+
+    REVISION "200609280045Z"
+    DESCRIPTION "v2.6.2: Factored out four textual conventions
+                into a new module, Client Session TC:
+                    RbtwsClientSessionState,
+                    RbtwsClientAuthenProtocolType,
+                    RbtwsClientDot1xState,
+                    RbtwsUserAccessType
+                and imported them from there."
+
+    REVISION "200608080042Z"
+    DESCRIPTION "v2.5.2: Added new trap: rbtwsApRejectLicenseExceededTrap
+                and related object: rbtwsNumLicensedActiveAPs
+                (for 6.0 release)"
+
+    REVISION "200607310040Z"
+    DESCRIPTION "v2.5.0: Added new trap:
+                rbtwsRFDetectAdhocUserDisappearTrap
+                (for 6.0 release)"
+
+    REVISION "200607280032Z"
+    DESCRIPTION "v2.4.7: Removed unused imports"
+
+    REVISION "200607230029Z"
+    DESCRIPTION "v2.4.1: Added new trap: rbtwsRFDetectBlacklistedTrap,
+                related textual convention: RbtwsBlacklistingCause
+                and objects: rbtwsBlacklistingRemainingTime,
+                             rbtwsBlacklistingCause
+                (for 6.0 release)"
+
+    REVISION "200607120028Z"
+    DESCRIPTION "v2.4.0: Added new trap: RFDetectClientViaRogueWiredAPTrap2
+                and related object: rbtwsRFDetectRogueAPMacAddr.
+                This trap obsoletes the RFDetectClientViaRogueWiredAPTrap
+                (for 6.0 release)"
+
+    REVISION "200607070026Z"
+    DESCRIPTION "v2.3.1: Added 3 new traps:
+                rbtwsClientAssociationSuccessTrap,
+                rbtwsClientAuthenticationSuccessTrap,
+                rbtwsClientDeAuthenticationTrap
+                (for 6.0 release)"
+
+    REVISION "200607070025Z"
+    DESCRIPTION "v2.3.0: Added new trap: rbtwsClientIpAddrChangeTrap
+                and related object: RbtwsClientIpAddrChangeReason
+                (for 6.0 release)"    
+
+    REVISION "200607060023Z"
+    DESCRIPTION "v2.2.0: added two values (13, 14)
+                to RbtwsAuthenticationFailureType
+                (for 6.0 release)"
+
+    REVISION "200604190022Z"
+    DESCRIPTION "v2.1.6: Updated client connection failure causes and descriptions
+                (for 5.0 release)"
+
+    REVISION "200604190021Z"
+    DESCRIPTION "v2.0.6: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { rbtwsMibs 1 }
+
+-- Branch for notifications
+rbtwsTrapsV2 OBJECT IDENTIFIER ::= { rbtwsTraps 0 }
+
+-- Textual Conventions
+RbtwsAssociationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for an AP to fail a
+    client's 802.11 association"
+    SYNTAX      INTEGER {
+            other               (1),
+            load-balance        (2),
+            quiet-period        (3),
+            dot1x               (4),
+            no-prev-assoc       (5),
+            glare               (6),
+            cipher-rejected     (7),
+            cipher-mismatch     (8),
+            wep-not-configured  (9),
+            bad-assoc-request   (10),
+            out-of-memory       (11),
+            tkip-cm-active      (12),
+            roam-in-progress    (13)
+        }
+
+RbtwsAuthenticationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for AAA authentication to fail
+     user-glob-mismatch - auth rule/user not found for console login
+     user-does-not-exist - login failed because user not found
+     invalid-password - login failed because of invalid password
+     server-timeout - unable to contact a AAA server
+     signature-failed - incorrect password for mschapv2
+     local-certificate-error - certificate error
+     all-servers-down - unable to contact any AAA server in the group
+     authentication-type-mismatch - client and switch are using different
+                                    authentication methods
+     server-rejected - received reject from AAA server
+     fallthru-auth-misconfig - problem with fallthru authentication
+     no-lastresort-auth - problem with last-resort authentication
+     exceeded-max-attempts - local user failed to login within allowed number
+                             of attempts resulting in account lockout
+     password-expired - user's password expired"
+
+    SYNTAX      INTEGER {
+            other               (1),
+            user-glob-mismatch  (2),
+            user-does-not-exist (3),
+            invalid-password    (4),
+            server-timeout      (5),
+            signature-failed    (6),
+            local-certificate-error (7),
+            all-servers-down    (8),
+            authentication-type-mismatch (9),
+            server-rejected     (10),
+            fallthru-auth-misconfig (11),
+            no-lastresort-auth  (12),
+            exceeded-max-attempts (13),
+            password-expired (14)
+        }
+
+RbtwsAuthorizationFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the reasons for AAA authorization failure"
+    SYNTAX      INTEGER {
+            other               (1),
+            user-param          (2),
+            location-policy     (3),
+            vlan-tunnel-failure (4),
+            ssid-mismatch       (5),
+            acl-mismatch        (6),
+            timeofday-mismatch  (7),
+            crypto-type-mismatch(8),
+            mobility-profile-mismatch(9),
+            start-date-mismatch (10),
+            end-date-mismatch   (11),
+            svr-type-mismatch   (12)
+        }
+
+RbtwsDot1xFailureType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of the dot1x failure reasons.
+    quiet-period occurs when client is denied access for a period of
+                 time after a failed connection attempt
+    administrative-kill means that the session was cleared using the
+                        'clear dot1x client' command
+    bad-rsnie means that client sent an invalid IE 
+    timeout is when there are excessive retransmissions
+    max-sessions-exceeded means the maximum allowed wired clients
+                          has been exceeded on the switch
+    fourway-hs-failure is for failures occuring the 4-way key handshake
+    user-glob-mismatch means the name received in the dot1x identity
+                       request does not match any configured userglobs
+                       in the system
+    reauth-disabled means that the client is trying to reauthenticate
+                    but reauthentication is disabled
+    gkhs-failure means that either there was no response from the client
+                 during the GKHS or the response did not have an IE
+    force-unauth-configured means that the client is trying to connect
+                            through a port which is configured as
+                            force-unauth
+    cert-not-installed means that there is no certificate installed on 
+                       the switch"                    
+    SYNTAX      INTEGER {
+            other               (1),
+            quiet-period        (2),
+            administrative-kill (3),
+            bad-rsnie           (4),
+            timeout             (5),
+            max-sessions-exceeded(6),
+            fourway-hs-failure  (7),
+            user-glob-mismatch  (8),
+            bonded-auth-failure (9),
+            reauth-disabled     (10),
+            gkhs-failure        (11),
+            force-unauth-configured (12),
+            cert-not-installed  (13)
+         }
+
+RbtwsRFDetectDoSType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+    "The types of denial of service (DoS) attacks"
+    SYNTAX      INTEGER {
+            probe-flood(1),
+            auth-flood(2),
+            null-data-flood(3),
+            mgmt-6-flood(4),
+            mgmt-7-flood(5),
+            mgmt-d-flood(6),
+            mgmt-e-flood(7),
+            mgmt-f-flood(8),
+            fakeap-ssid(9),
+            fakeap-bssid(10),
+            bcast-deauth(11),
+            null-probe-resp(12),
+            disassoc-spoof(13),
+            deauth-spoof(14),
+            decrypt-err(15),
+            weak-wep-iv(16),
+            wireless-bridge(17),
+            netstumbler(18),
+            wellenreiter(19),
+            adhoc-client-frame(20),
+            associate-pkt-flood(21),
+            re-associate-pkt-flood(22),
+            de-associate-pkt-flood(23)
+        }
+
+RbtwsClientIpAddrChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the reasons for client IP address changes"
+    SYNTAX      INTEGER {
+            client-connected(1),
+            other(2),
+            dhcp-to-static(3)
+        }
+
+RbtwsBlacklistingCause ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumeration of reasons for blacklisting a transmitter:
+            bl-configured: administrative action
+                           (explicitly added to the Black List),
+            bl-associate-pkt-flood: Association request flood detected,
+            bl-re-associate-pkt-flood: Re-association request flood detected,
+            bl-de-associate-pkt-flood: De-association request flood detected.
+        (The leading 'bl-' stands for 'Black-Listed';
+         reading it as 'Blocked' would also make sense)."
+    SYNTAX      INTEGER {
+            bl-configured(1),
+            bl-associate-pkt-flood(2),
+            bl-re-associate-pkt-flood(3),
+            bl-de-associate-pkt-flood(4)
+        }
+
+
+-- Object definitions
+
+rbtwsDeviceId OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Enumeration of devices as indicated in registration MIB.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 1 }
+
+rbtwsMobilityDomainIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "IP address of the other switch which the send switch is
+    reporting on. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 2 }
+
+rbtwsAPMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the AP of interest. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 3 }
+
+rbtwsClientMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the client of interest. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 4 }
+
+rbtwsRFDetectXmtrMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Describes the transmitter's MAC address. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 5 }
+
+rbtwsPortNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..22)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Port number on the AC which reported this rogue during a detection
+     sweep. This object is used within notifications and
+     is not accessible."
+    ::= { rbtwsTemporary 6 }
+
+rbtwsAPRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Radio number of the AP which reported this rogue during a detection
+     sweep. This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 7 }
+
+rbtwsRadioRssi OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+    "The received signal strength as measured by the AP radio which reported
+     this rogue during a detection sweep. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 8 }
+
+rbtwsRadioBSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The basic service set identifier of the rogue from the beacon frame
+    reported by the AP during a detection sweep. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 9 }
+
+rbtwsUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client user name as learned from the AAA process. This object
+    is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 10 }
+
+rbtwsClientAuthServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authentication server ip address. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 11 }
+
+rbtwsClientSessionState OBJECT-TYPE
+    SYNTAX      RbtwsClientSessionState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The state for a client session. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 12 }
+
+rbtwsDAPNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The DAP number on the wireless switch. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 13 }
+
+rbtwsClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client ip address. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 14 }
+
+rbtwsClientSessionId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The unique global id for a client session. This object is used
+    within notifications and is not accessible."
+    ::= { rbtwsTemporary 15 }
+
+rbtwsClientAuthenProtocolType OBJECT-TYPE
+    SYNTAX      RbtwsClientAuthenProtocolType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The authentication protocol for a client.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 16 }
+
+rbtwsClientVLANName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The vlan name a client is on. This object is used within
+    notifications and is not accessible."
+    ::= { rbtwsTemporary 17 }
+
+rbtwsClientSessionStartTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The start time of a client session, relative to the sysUptime.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 18 }
+
+rbtwsClientFailureCause OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Display string for possible failure cause for a client session.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 19 }
+
+rbtwsClientRoamedFromPortNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..20)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The port number on the AC a client has roamed from.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 20 }
+
+rbtwsClientRoamedFromRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The radio number of the AP the client is roamed from. This object is
+    used within notifications and is not accessible."
+    ::= { rbtwsTemporary 21 }
+
+rbtwsClientRoamedFromDAPNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The DAP number on the AC which reported this rogue during roam.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 22 }
+
+rbtwsUserParams OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "A display string of User Parameters for client user authorization
+    attributes learned through AAA and/or used by the system. Note
+    that the syntax will be (name=value, name=value,..) for the
+    parsing purpose. This object is used within notifications and
+    is not accessible."
+    ::= { rbtwsTemporary 23 }
+
+rbtwsClientLocationPolicyIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Index of the Location Policy rule applied to a user.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 24 }
+
+rbtwsClientAssociationFailureCause OBJECT-TYPE
+    SYNTAX      RbtwsAssociationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client association failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 25 }
+
+rbtwsClientAuthenticationFailureCause OBJECT-TYPE
+    SYNTAX      RbtwsAuthenticationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authentication failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 26 }
+
+rbtwsClientAuthorizationFailureCause OBJECT-TYPE
+    SYNTAX      RbtwsAuthorizationFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client authorization failure cause. Note that if it is
+    the user-param, we would additionally expect the failure cause
+    description to list the user attribute value that caused the
+    failure. This object is used within notifications and is
+    not accessible."
+    ::= { rbtwsTemporary 27 }
+
+rbtwsClientFailureCauseDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Display string for describing the client failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 28 }
+
+rbtwsClientRoamedFromWsIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The system IP address of the AC (wireless switch) a client roamed from.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 29 }
+
+rbtwsClientRoamedFromAccessType OBJECT-TYPE
+    SYNTAX      RbtwsAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client access type (ap, dap, wired) that a client roamed from.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 30 }
+
+rbtwsClientAccessType OBJECT-TYPE
+    SYNTAX      RbtwsAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client access type (ap, dap, wired).
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 31 }
+
+rbtwsRadioMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "AP Radio MAC address.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 32 }
+
+rbtwsRadioPowerChangeReason OBJECT-TYPE
+    SYNTAX      RbtwsRadioPowerChangeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of event that caused an AP radio power change; occurs due
+    to auto-tune operation.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 33 }
+
+rbtwsNewChannelNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "New channel number of the AP radio used after an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 34 }
+
+rbtwsOldChannelNum OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Old channel number of the AP radio used before an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 35 }
+
+rbtwsChannelChangeReason OBJECT-TYPE
+    SYNTAX      RbtwsChannelChangeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of event that caused an AP radio channel change; occurs due
+    to auto-tune operation.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 36 }
+
+rbtwsRFDetectListenerListInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..571))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The RF Detection Listener list info including a list of
+    (listener mac, rssi, channel, ssid, time).
+    There will be a maximum of 6 entries in the list.
+    Formats:
+        MAC: 18 bytes:          %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X
+        RSSI: 10 bytes:         %10d
+        CHANNEL: 3 bytes:       %3d
+        SSID: 32 bytes:         %s
+        TIME: 26 bytes:         %s
+    Maximum size per entry is 89+4+2 = 95 bytes.
+    Maximum size of the string is 6*95= 571 bytes (include NULL).
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 37 }
+
+rbtwsRadioSSID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The radio SSID string
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 38 }
+
+rbtwsNewPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "New power level of the AP radio used after an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 39 }
+
+rbtwsOldPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Old power level of the AP radio used before an auto tune event.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 40 }
+
+rbtwsRadioPowerChangeDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The radio power change description. In the case of reason being
+    dup-pkts-threshold-exceed(1), and retransmit-threshold-exceed(2),
+    clientMacAddress will be included in the description.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 41 }
+
+rbtwsCounterMeasurePerformerListInfo OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      obsolete
+    DESCRIPTION
+    "A list of information for APs performing Counter Measures including
+    a list of performer mac addresses. This object is used within
+    notifications and is not accessible.
+
+    Not used by any notification."
+    ::= { rbtwsTemporary 42 }
+
+rbtwsClientDot1xState OBJECT-TYPE
+    SYNTAX      RbtwsClientDot1xState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The state for a client 802.1X.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 43 }
+
+rbtwsClientDot1xFailureCause OBJECT-TYPE
+    SYNTAX      RbtwsDot1xFailureType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The client 802.1X failure cause.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 44 }
+
+rbtwsAPAccessType OBJECT-TYPE
+    SYNTAX      RbtwsAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The access point access type (ap, dap,).
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 45 }
+
+rbtwsUserAccessType OBJECT-TYPE
+    SYNTAX      RbtwsUserAccessType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The user access type (MAC, WEB, DOT1X, LAST-RESORT).
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 46}
+
+rbtwsClientSessionElapsedTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The elapsed time for a client session, relative to the sysUptime.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 47 }
+
+rbtwsLocalId OBJECT-TYPE
+    SYNTAX      INTEGER (1..65000)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Local Id for the session.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 48 }
+
+rbtwsRFDetectDoSType OBJECT-TYPE
+    SYNTAX      RbtwsRFDetectDoSType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of denial of service (DoS) attack.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 49 }
+
+rbtwsSourceWsIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "IP address of another AC (wireless switch).
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 50 }
+
+rbtwsClientVLANid OBJECT-TYPE
+    SYNTAX      INTEGER (0..4095)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "VLAN ID used by client traffic.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 51 }
+
+rbtwsClientVLANtag OBJECT-TYPE
+    SYNTAX      INTEGER (0..4095)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "VLAN tag used by client traffic.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 52 }
+
+rbtwsDeviceModel OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The model of a device in printable US-ASCII. If unknown
+    (or not available), then the value is a zero length string.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 53 }
+
+rbtwsDeviceSerNum OBJECT-TYPE
+    SYNTAX       RbtwsApSerialNum
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The serial number of a device in printable US-ASCII. If unknown
+    (or not available), then the value is a zero length string.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 54 }
+
+rbtwsRsaPubKeyFingerPrint OBJECT-TYPE
+    SYNTAX       RbtwsApFingerprint
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The hash of the RSA public key (of a key pair) in binary form
+    that uniquely identifies the public key of an AP.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 55 }
+
+rbtwsDAPconnectWarningType OBJECT-TYPE
+    SYNTAX       INTEGER {
+            not-configured-fingerprint-connect(1),
+            secure-handshake-failure(2),
+            not-configured-fingerprint-required(3),
+            fingerprint-mismatch(4)
+            }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+    "The type of DAP connect warning. The values are:
+      not-configured-fingerprint-connect(1)...a DAP, which has an RSA keypair
+           but did not have its fingerprint configured on the AC, has connected
+           to the AC when 'dap security' set to 'OPTIONAL'
+      secure-handshake-failure(2).............a DAP tried to connect to the
+           AC with security, but the handshake failed
+      not-configured-fingerprint-required(3)..a DAP tried to connect to the
+           AC with security, but 'dap security' set to 'REQUIRED',
+           and no fingerprint was configured for the DAP
+      fingerprint-mismatch(4).................a DAP tried to connect to the
+           AC with security and its fingerprint was configured, but
+           the fingerprint did not match the computed one
+
+      This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 56 }
+
+rbtwsClientMACAddress2 OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (6))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "MAC address of the second client of interest. This object
+    is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 57 }
+
+rbtwsApAttachType OBJECT-TYPE
+    SYNTAX      RbtwsApAttachType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "How the AP is attached to the AC
+        (directly or via L2/L3 network).
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 58 }
+
+rbtwsApPortOrDapNum OBJECT-TYPE
+    SYNTAX      RbtwsApPortOrDapNum
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Port Number if the AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 59 }
+
+rbtwsApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the AP, as assigned in AC's CLI;
+        defaults to <Access-Type><Number> (examples: 'MP01', 'DMP23');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73').
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 60 }
+
+rbtwsApTransition OBJECT-TYPE
+    SYNTAX      RbtwsApTransition
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "AP state Transition, as seen by the AC.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 61 }
+
+rbtwsApFailDetail OBJECT-TYPE
+    SYNTAX      RbtwsApFailDetail
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Detailed failure code for some of the transitions
+        specified in 'rbtwsApTransition' object.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 62 }
+
+rbtwsRadioType OBJECT-TYPE
+    SYNTAX      RbtwsRadioType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Radio Type, as seen by AC.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 63 }
+
+rbtwsRadioConfigState OBJECT-TYPE
+    SYNTAX      RbtwsRadioConfigState
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Radio State, as seen by the AC.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 64 }
+
+rbtwsApConnectSecurityType OBJECT-TYPE
+    SYNTAX      RbtwsApConnectSecurityType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the security level of the connection between AP and AC.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 65 }
+
+rbtwsApServiceAvailability OBJECT-TYPE
+    SYNTAX      RbtwsApServiceAvailability
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the level of wireless service availability.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 66 }
+
+rbtwsApWasOperational OBJECT-TYPE
+    SYNTAX      RbtwsApWasOperational
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the AP was operational
+        before a transition occured.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 67 }
+
+rbtwsClientTimeSinceLastRoam OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds since the most recent roam of a given client.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 68 }
+
+rbtwsClientIpAddrChangeReason OBJECT-TYPE
+    SYNTAX      RbtwsClientIpAddrChangeReason
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why client IP address changed.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 69 }
+
+rbtwsRFDetectRogueAPMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Describes the MAC address of the Rogue AP the transmitter is connected to.
+    This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 70 }
+
+rbtwsBlacklistingRemainingTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds remaining until a given transmitter could be
+        removed from the Black List.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 71 }
+
+rbtwsBlacklistingCause OBJECT-TYPE
+    SYNTAX      RbtwsBlacklistingCause
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the reason why a given transmitter is blacklisted.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 72 }
+
+rbtwsNumLicensedActiveAPs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates the maximum (licensed) number of active APs for this AC.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 73 }
+
+rbtwsMobilityDomainSecondarySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The secondary seed IP address to which the Mobility Domain
+        has failed over.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 79 }
+
+rbtwsMobilityDomainPrimarySeedIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The primary seed IP address to which the Mobility Domain
+        has failed back.
+        This object is used within notifications and is not accessible."
+    ::= { rbtwsTemporary 80 }
+
+
+-- Notification definitions
+
+rbtwsDeviceFailTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsDeviceId }
+    STATUS      current
+    DESCRIPTION
+    "The device has a failure indication"
+    ::= { rbtwsTrapsV2 1 }
+
+rbtwsDeviceOkayTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsDeviceId }
+    STATUS      current
+    DESCRIPTION
+    "The device has recovered"
+    ::= { rbtwsTrapsV2 2 }
+
+rbtwsPoEFailTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsPortNum }
+    STATUS      current
+    DESCRIPTION
+    "PoE has failed on the indicated port"
+    ::= { rbtwsTrapsV2 3 }
+
+rbtwsApTimeoutTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsPortNum, rbtwsAPMACAddress, rbtwsAPAccessType,
+          rbtwsDAPNum }
+    STATUS      obsolete
+    DESCRIPTION
+    "The AP entering the AC at port rbtwsPortNum with MAC
+    rbtwsRadioMacAddress and of the access type (ap or dap)
+    has not responded.
+
+    Replaced by rbtwsApNonOperStatusTrap,
+    with rbtwsApTransition = 'timeout'."
+    ::= { rbtwsTrapsV2 4 }
+
+rbtwsAPBootTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsPortNum, rbtwsAPMACAddress, rbtwsAPAccessType,
+          rbtwsDAPNum }
+    STATUS      obsolete
+    DESCRIPTION
+    "The AP entering the AC at port rbtwsPortNum with MAC
+    rbtwsRadioMacAddress and of the access type (ap or dap) has booted.
+
+    Replaced by rbtwsApNonOperStatusTrap,
+    with rbtwsApTransition = 'bootSuccess'."
+    ::= { rbtwsTrapsV2 5 }
+
+rbtwsMobilityDomainJoinTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsMobilityDomainIp }
+    STATUS      current
+    DESCRIPTION
+    "The mobility domain member has received an UP notice from the
+    remote address."
+    ::= { rbtwsTrapsV2 6 }
+
+rbtwsMobilityDomainTimeoutTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsMobilityDomainIp }
+    STATUS      current
+    DESCRIPTION
+    "The mobility domain member has declared the remote address
+    to be DOWN."
+    ::= { rbtwsTrapsV2 7 }
+
+rbtwsMpMichaelMICFailure NOTIFICATION-TYPE
+    OBJECTS     { rbtwsPortNum,
+          rbtwsRadioMACAddress,
+          rbtwsRadioSSID,
+          rbtwsAPRadioNum,
+          rbtwsClientMACAddress,
+          rbtwsClientMACAddress }
+    STATUS      obsolete
+    DESCRIPTION
+    "Two Michael MIC failures were seen within 60 seconds of each other.
+
+    This notification obsoleted by rbtwsMpMichaelMICFailure2."
+    ::= { rbtwsTrapsV2 8 }
+
+rbtwsRFDetectRogueAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds a rogue AP.
+    XmtrMacAddr is the radio MAC address from the beacon.
+    ListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 9 }
+
+rbtwsRFDetectAdhocUserTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection sweep finds a ad-hoc user.
+    rbtwsRFDetectXmtrMacAddr is the MAC address of the ad-hoc user.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 10 }
+
+rbtwsRFDetectRogueDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when a rogue has disappeared."
+    ::= { rbtwsTrapsV2 11 }
+
+rbtwsClientAuthenticationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsClientAuthenticationFailureCause,
+          rbtwsClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client authentication fails."
+    ::= { rbtwsTrapsV2 12 }
+
+rbtwsClientAuthorizationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsClientLocationPolicyIndex,
+          rbtwsUserParams,
+          rbtwsClientAuthorizationFailureCause,
+          rbtwsClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client authorization fails."
+    ::= { rbtwsTrapsV2 13 }
+
+rbtwsClientAssociationFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsClientMACAddress,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsClientAssociationFailureCause,
+          rbtwsClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client association fails."
+    ::= { rbtwsTrapsV2 14 }
+
+rbtwsClientAuthorizationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientVLANName,
+          rbtwsClientSessionState,
+          rbtwsClientSessionStartTime,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsRadioRssi }
+    STATUS      deprecated
+    DESCRIPTION
+    "This trap is sent when a client authorizes.
+    rbtwsClientAuthorizationSuccessTrap2 trap deprecates
+    this trap."
+    ::= { rbtwsTrapsV2 15 }
+
+rbtwsClientDeAssociationTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientVLANName,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client de-association occurred."
+    ::= { rbtwsTrapsV2 16 }
+
+rbtwsClientRoamingTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsClientRoamedFromAccessType,
+          rbtwsClientRoamedFromPortNum,
+          rbtwsClientRoamedFromRadioNum,
+          rbtwsClientRoamedFromDAPNum,
+          rbtwsClientRoamedFromWsIp,
+          rbtwsClientTimeSinceLastRoam }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client roams from one location to another."
+    ::= { rbtwsTrapsV2 17 }
+
+rbtwsAutoTuneRadioPowerChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRadioMACAddress,
+          rbtwsNewPowerLevel,
+          rbtwsOldPowerLevel,
+          rbtwsRadioPowerChangeReason,
+          rbtwsRadioPowerChangeDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a radio's power level has changed based
+    on auto-tune."
+    ::= { rbtwsTrapsV2 18 }
+
+rbtwsAutoTuneRadioChannelChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRadioMACAddress,
+          rbtwsNewChannelNum,
+          rbtwsOldChannelNum,
+          rbtwsChannelChangeReason }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a radio's channel has changed based on auto-tune."
+    ::= { rbtwsTrapsV2 19 }
+
+rbtwsCounterMeasureStartTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRadioMACAddress }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when counter measures are started against a rogue.
+    rbtwsRFDetectXmtrMacAddr is the mac address of the rogue we
+    are doing counter measures against.
+    rbtwsRadioMACAddress identifies the radio performing the countermeasures."
+    ::= { rbtwsTrapsV2 20 }
+
+rbtwsCounterMeasureStopTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRadioMACAddress }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when counter measures are stopped against a rogue.
+    rbtwsRFDetectXmtrMacAddr is the mac address of the rogue we
+    were doing counter measures against.
+    rbtwsRadioMACAddress identifies the radio performing the countermeasures."
+    ::= { rbtwsTrapsV2 21 }
+
+rbtwsClientDot1xFailureTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientMACAddress,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsDAPNum,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsRadioSSID,
+          rbtwsClientDot1xState,
+          rbtwsClientDot1xFailureCause,
+          rbtwsClientFailureCauseDescription }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent if a client failed 802.1X."
+    ::= { rbtwsTrapsV2 22 }
+
+rbtwsClientClearedTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsClientSessionElapsedTime,
+          rbtwsLocalId}
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when a client session is cleared."
+    ::= { rbtwsTrapsV2 23 }
+
+rbtwsClientAuthorizationSuccessTrap2 NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientVLANName,
+          rbtwsClientSessionState,
+          rbtwsClientSessionStartTime,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsUserAccessType,
+          rbtwsLocalId }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when a client authorizes.
+    This trap deprecates the rbtwsClientAuthorizationSuccessTrap."
+    ::= { rbtwsTrapsV2 24 }
+
+rbtwsRFDetectSpoofedMacAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds an AP using
+    the MAC of the listener.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 25 }
+
+rbtwsRFDetectSpoofedSsidAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds an AP using
+    the SSID of the listener, and the AP is not in the
+    mobility domain.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 26 }
+
+rbtwsRFDetectDoSTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectDoSType,
+          rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds a denial
+    of service (DoS) occurring.
+    rbtwsRFDetectDoSType specifies the type of DoS.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 27 }
+
+rbtwsRFDetectClientViaRogueWiredAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsSourceWsIp,
+          rbtwsPortNum,
+          rbtwsClientVLANid,
+          rbtwsClientVLANtag,
+          rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      obsolete
+    DESCRIPTION
+    "This trap is sent when a client is detected that connected
+    via a rogue AP that is attached to a wired port.
+    rbtwsSourceWsIp is the IP address of the AC (switch) with the wired port.
+    rbtwsPortNum is the port on the AC.
+    rbtwsClientVLANid is the VLAN ID of the client's traffic.
+    rbtwsClientVLANtag is the VLAN tag of the client's traffic.
+    rbtwsRFDetectXmtrMacAddr is the MAC address of the client.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information.
+    Obsoleted by rbtwsRFDetectClientViaRogueWiredAPTrap2."
+    ::= { rbtwsTrapsV2 28 }
+
+rbtwsRFDetectInterferingRogueAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds an interfering
+    rogue AP.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 29 }
+
+rbtwsRFDetectInterferingRogueDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when an interfering rogue has disappeared.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon."
+    ::= { rbtwsTrapsV2 30 }
+
+rbtwsRFDetectUnAuthorizedSsidTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds use of
+    an unauthorized SSID.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 31 }
+
+rbtwsRFDetectUnAuthorizedOuiTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds use of
+    an unauthorized OUI.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 32 }
+
+rbtwsRFDetectUnAuthorizedAPTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds operation
+    of an unauthorized AP.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsRFDetectListenerListInfo is a display string of a list of
+    listener information."
+    ::= { rbtwsTrapsV2 33 }
+
+rbtwsDAPConnectWarningTrap NOTIFICATION-TYPE
+    OBJECTS { rbtwsDeviceModel,
+          rbtwsDeviceSerNum,
+          rbtwsRsaPubKeyFingerPrint,
+          rbtwsDAPconnectWarningType }
+    STATUS      obsolete
+    DESCRIPTION
+    "A DAP, tried to connect to the AC.
+    rbtwsDeviceModel provides the model of the DAP.
+    rbtwsDeviceSerNum provides the serial number of the DAP.
+    rbtwsRsaPubKeyFingerPrint provides the computed
+        fingerprint of the DAP.
+    rbtwsDAPconnectWarningType provides the type
+        of connect warning.
+
+    Replaced by rbtwsApNonOperStatusTrap,
+    with rbtwsApTransition = 'connectFail'."
+    ::= { rbtwsTrapsV2 34 }
+
+rbtwsRFDetectDoSPortTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectDoSType,
+          rbtwsRFDetectXmtrMacAddr,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsDAPNum }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when RF detection finds a denial
+    of service (DoS) occurring. This has port and
+    AP info instead of 'Listener info'.
+    rbtwsRFDetectDoSType specifies the type of DoS.
+    rbtwsRFDetectXmtrMacAddr is the radio MAC address from the beacon.
+    rbtwsClientAccessType specifies whether wired, AP, or DAP.
+    rbtwsPortNum (for wired or AP), the port that is used.
+    rbtwsDAPNum (for a DAP), the ID of the DAP."
+    ::= { rbtwsTrapsV2 35 }
+
+rbtwsMpMichaelMICFailure2 NOTIFICATION-TYPE
+    OBJECTS     { rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsClientMACAddress,
+          rbtwsClientMACAddress2 }
+    STATUS      current
+    DESCRIPTION
+    "Two Michael MIC failures were seen within 60 seconds of
+    each other. Object rbtwsClientMACAddress is the source
+    of the first failure, and object rbtwsClientMACAddress2
+    source of the second failure."
+    ::= { rbtwsTrapsV2 36 }
+
+rbtwsApNonOperStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsDeviceSerNum,
+          rbtwsAPMACAddress,
+          rbtwsApAttachType,
+          rbtwsApPortOrDapNum,
+          rbtwsApName,
+          rbtwsApTransition,
+          rbtwsApFailDetail,
+          rbtwsApWasOperational }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the AP changes state
+        and the new one is a non-operational state."
+    ::= { rbtwsTrapsV2 37 }
+
+rbtwsApOperRadioStatusTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsDeviceSerNum,
+          rbtwsApAttachType,
+          rbtwsApPortOrDapNum,
+          rbtwsApName,
+          rbtwsAPRadioNum,
+          rbtwsRadioMACAddress,
+          rbtwsRadioType,
+          rbtwsRadioConfigState,
+          rbtwsApConnectSecurityType,
+          rbtwsApServiceAvailability }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the Radio changes state.
+        It also contains aggregate information about the AP
+        in operational state - security level and service availability."
+    ::= { rbtwsTrapsV2 38 }
+
+rbtwsClientIpAddrChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientVLANName,
+          rbtwsClientSessionState,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID,
+          rbtwsUserAccessType,
+          rbtwsLocalId,
+          rbtwsClientIpAddrChangeReason }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client's IP address
+        changes. The most likely case for this is when
+        the client first connects to the network."
+    ::= { rbtwsTrapsV2 39 }
+
+rbtwsClientAssociationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsClientMACAddress,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client association succeeds.
+        WARNING: DO NOT enable it in normal use.
+        It may impair switch performance!
+        Only recommended for debugging network issues."
+    ::= { rbtwsTrapsV2 40 }
+
+rbtwsClientAuthenticationSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsClientMACAddress,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client authentication succeeds."
+    ::= { rbtwsTrapsV2 41 }
+
+rbtwsClientDeAuthenticationTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsUserName,
+          rbtwsClientSessionId,
+          rbtwsClientMACAddress,
+          rbtwsClientIp,
+          rbtwsClientVLANName,
+          rbtwsClientAuthServerIp,
+          rbtwsClientAuthenProtocolType,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsAPRadioNum,
+          rbtwsDAPNum,
+          rbtwsRadioSSID }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a client de-authentication occured."
+    ::= { rbtwsTrapsV2 42 }
+
+rbtwsRFDetectBlacklistedTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr,
+          rbtwsClientAccessType,
+          rbtwsPortNum,
+          rbtwsDAPNum,
+          rbtwsBlacklistingRemainingTime,
+          rbtwsBlacklistingCause }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if an association, re-association or de-association
+        request (packet) is detected from a blacklisted transmitter 
+        (identified by MAC: 'rbtwsRFDetectXmtrMacAddr').
+        If 'rbtwsBlacklistingCause' is 'configured',
+        then 'rbtwsBlacklistingRemainingTime' will be zero, meaning indefinite
+        time (depending on administrative actions on the Black List).
+        Otherwise, 'rbtwsBlacklistingRemainingTime' will indicate the time
+        in seconds until this transmitter's requests could be allowed."
+    ::= { rbtwsTrapsV2 43 }
+
+rbtwsRFDetectClientViaRogueWiredAPTrap2 NOTIFICATION-TYPE
+    OBJECTS     { rbtwsSourceWsIp,
+          rbtwsPortNum,
+          rbtwsClientVLANid,
+          rbtwsClientVLANtag,
+          rbtwsRFDetectXmtrMacAddr,
+          rbtwsRFDetectListenerListInfo,
+          rbtwsRFDetectRogueAPMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a client is detected that connected
+        via a rogue AP that is attached to a wired port.
+        rbtwsSourceWsIp is the IP address of the AC (switch)
+        with the wired port.
+        rbtwsPortNum is the port on the AC.
+        rbtwsClientVLANid is the VLAN ID of the client's traffic.
+        rbtwsClientVLANtag is the VLAN tag of the client's traffic.
+        rbtwsRFDetectXmtrMacAddr is the MAC address of the client.
+        rbtwsRFDetectListenerListInfo is a display string of a list of
+        listener information.
+        rbtwsRFDetectRogueAPMacAddr is the MAC address of the Rogue AP (wired)
+        the client is connected to.
+        This trap obsoletes the rbtwsRFDetectClientViaRogueWiredAPTrap."
+    ::= { rbtwsTrapsV2 44 }
+
+rbtwsRFDetectAdhocUserDisappearTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsRFDetectXmtrMacAddr }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when RF detection sweep finds that
+        an ad-hoc user disappeared.
+        rbtwsRFDetectXmtrMacAddr is the MAC address of the ad-hoc user."
+    ::= { rbtwsTrapsV2 45 }
+
+rbtwsApRejectLicenseExceededTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsNumLicensedActiveAPs }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an AC (wireless switch) receives a packet
+        from an inactive AP and attaching that AP would make the AC
+        exceed the maximum (licensed) number of active APs."
+    ::= { rbtwsTrapsV2 46 }
+
+rbtwsMobilityDomainFailOverTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsMobilityDomainSecondarySeedIp }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when the Mobility Domain fails over
+    to the secondary seed."
+    ::= { rbtwsTrapsV2 50 }
+
+rbtwsMobilityDomainFailBackTrap NOTIFICATION-TYPE
+    OBJECTS     { rbtwsMobilityDomainPrimarySeedIp }
+    STATUS      current
+    DESCRIPTION
+    "This trap is sent when the Mobility Domain fails back
+    to the primary seed."
+    ::= { rbtwsTrapsV2 51 }
+
+
+END

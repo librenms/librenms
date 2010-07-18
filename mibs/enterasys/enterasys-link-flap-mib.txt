@@ -1,0 +1,593 @@
+ENTERASYS-LINK-FLAP-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-link-flap-mib.txt
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' Link Flap MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright July 2004 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, ifName
+        FROM IF-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysLinkFlapMIB MODULE-IDENTITY
+    LAST-UPDATED "200408201447Z"  -- Fri Aug 20 14:47 GMT 2004
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This is the MIB module for Enterasys Link Flap 
+         Detection, a mechanism to automatically limit
+         the effect of frequent link state transitions on
+         Enterasys devices."
+
+    REVISION "200408201447Z"  -- Fri Aug 20 14:47 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 52 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+LinkFlapIntfAction ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The possible actions that the Link Flap feature can take
+         when link flap activity exceeds the associated action
+         limits.
+
+           disableInterface(0)
+             - Operationally disable the interface, ifOperStatus for
+               the interface MUST go into the 'down' state, and 
+               MUST remain in that state until the associated
+               etsysLinkFlapIntfStatus is set to operational, the
+               Link Flap feature is disabled, or the device is
+               reset.
+
+           generateSyslogEntry(1)
+             - Generate the respective device log entry.
+
+           generateNotification(2)
+             - Generate the respective SNMP notification.
+
+         The 'generateNotification(2)' will always be performed if
+         it is a selected action, is globally enabled, and does not
+         exceed the global rate limit for such notifications.  It
+         MUST be generated in such a way that the information in the
+         notification indicates the condition on the interface after
+         any other indicated action has been taken."
+    SYNTAX BITS {
+        disableInterface(0),
+        generateSyslogEntry(1),
+        generateNotification(2)
+    }
+
+
+-- -------------------------------------------------------------
+-- Branches of the Enterasys Link Flap MIB
+-- -------------------------------------------------------------
+
+etsysLinkFlapObjects
+        OBJECT IDENTIFIER ::= { etsysLinkFlapMIB 1 }
+
+etsysLinkFlapSystemBranch
+        OBJECT IDENTIFIER ::= { etsysLinkFlapObjects 1 }
+
+etsysLinkFlapInterfaceBranch
+        OBJECT IDENTIFIER ::= { etsysLinkFlapObjects 2 }
+
+etsysLinkFlapNotificationBranch
+        OBJECT IDENTIFIER ::= { etsysLinkFlapObjects 0 }
+
+
+-- -------------------------------------------------------------
+-- Link Flap System Branch
+-- -------------------------------------------------------------
+
+etsysLinkFlapSystemState  OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current state of the active part of the Link Flap
+         feature.
+
+         enabled  (1) - All supported aspects of Link Flap are
+                        operational.
+
+         disabled (2) - Link Flap is configurable but no actions
+                        are taken. All statistical information is still
+                        gathered and available.
+
+         When this object is set to disabled the Link Flap feature
+         MUST release its control on all interfaces.  Any interfaces
+         which the Link Flap feature had operationally held in the 
+         'down' state MUST be allowed to attain their currently 
+         correct operational state.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    DEFVAL { disabled }
+    ::= { etsysLinkFlapSystemBranch 1 }
+
+etsysLinkFlapSystemSupportedActions    OBJECT-TYPE
+    SYNTAX        LinkFlapIntfAction
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The supported actions that the Link Flap feature can take
+         when link flap activity exceeds the associated threshold
+         on this interface.
+
+           disableInterface(0)
+             - Capability to set the interface operational status to 
+               'down'.
+             
+           generateSyslogEntry(1)
+             - Capability to create syslog messages.
+
+           generateNotification(2)
+             - Capability to generate SNMP notifications.
+
+         Please see the LinkFlapIntfAction textual convention defined
+         in this MIB."
+    DEFVAL { { disableInterface,
+               generateSyslogEntry,
+               generateNotification } }
+    ::= { etsysLinkFlapSystemBranch 2 }
+
+
+----------------------------------------------------------
+-- A Note on Threshold and Interval Extrema
+--
+-- The threshold and interval extrema are coupled and
+-- constrained by the fact that the Link Flap temporal
+-- resolution of linkdown events may not exceed that
+-- defined by link debounce functionality. For example,
+-- if a system's link debounce functionality limits the
+-- number of linkup transitions to 1 per N seconds,
+-- we can only bound Link Flap's threshold and interval
+-- minima in terms of the equation
+--         
+-- (threshold minimum)/(interval minimum) <= 1/N per sec
+----------------------------------------------------------
+
+etsysLinkFlapSystemLinkFlapMaximum      OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The greatest number of linkdown events which can occur
+         per ten second interval.  This is an implementation-specific
+         parameter which will determine the allowable values of
+         etsysLinkFlapIntfCountThreshold and
+         etsysLinkFlapIntfTimeInterval.  Setting either one of these
+         such that the ratio of etsysLinkFlapIntfCountThreshold to
+         etsysLinkFlapIntfTimeInterval would become greater than
+         etsysLinkFlapSystemLinkFlapMaximum will result in the set
+         operation failing with an inconsistentValue error."
+    ::= { etsysLinkFlapSystemBranch 3 }
+
+
+-- -------------------------------------------------------------
+-- Link Flap Interface Branch
+-- -------------------------------------------------------------
+
+etsysLinkFlapInterfaceTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EtsysLinkFlapInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table that provides for the configuration, status,
+         and statistics related to, the Link Flap feature
+         on a per interface basis."
+    ::= { etsysLinkFlapInterfaceBranch 1 }
+
+etsysLinkFlapInterfaceEntry OBJECT-TYPE
+    SYNTAX        EtsysLinkFlapInterfaceEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The configuration, status, and statistics related to,
+         the Link Flap feature for an individual interface."
+    INDEX { ifIndex }
+    ::= { etsysLinkFlapInterfaceTable 1 }
+
+EtsysLinkFlapInterfaceEntry::=
+    SEQUENCE {
+        etsysLinkFlapIntfEnabledStatus            INTEGER,
+        etsysLinkFlapIntfAction                   LinkFlapIntfAction,        
+        etsysLinkFlapIntfOperStatus               INTEGER,
+        etsysLinkFlapIntfClearStats               TruthValue,
+        etsysLinkFlapIntfCountThreshold           Unsigned32,
+        etsysLinkFlapIntfTimeInterval             Unsigned32,
+        etsysLinkFlapIntfDownTime                 Unsigned32,
+        etsysLinkFlapIntfLinkdownCountCurrent     Gauge32,
+        etsysLinkFlapIntfLinkdownCountTotal       Gauge32,
+        etsysLinkFlapIntfCurrentElapsed           Unsigned32,
+        etsysLinkFlapIntfLinkFlapViolations       Gauge32
+    }
+
+etsysLinkFlapIntfEnabledStatus   OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      enabled(1),
+                      disabled(2)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The enable state of Link Flap on this interface.
+
+         Transitioning from enabled(1) to disabled(2) will disable the
+         active part of the Link Flap feature as defined for the
+         etsysLinkFlapSystemState object on this interface. In this
+         event the agent MUST:
+
+         1)  Release its control on this interface.  If the interface
+             had been operationally held in the 'down' state, then the
+             interface MUST be allowed to attain its currently correct
+             operational state.
+
+         2)  etsysLinkFlapIntfOperStatus MUST be set to operational(1).
+
+         3)  The objects
+
+            etsysLinkFlapIntfLinkdownCountCurrent
+            etsysLinkFlapIntfLinkdownCountTotal
+            etsysLinkFlapIntfCurrentElapsed
+
+         MUST continue to accrue value as events occur.
+
+         In transitioning from disabled(2) to enabled(1) the objects:
+
+            etsysLinkFlapIntfLinkdownCountCurrent
+            etsysLinkFlapIntfCurrentElapsed
+
+         MUST be initialized at 0 (zero) for this interface.
+
+         Maintaining the value of this object across agent reboots is
+         REQUIRED."
+    DEFVAL { enabled }
+    ::= { etsysLinkFlapInterfaceEntry 1 }
+
+etsysLinkFlapIntfAction    OBJECT-TYPE
+    SYNTAX        LinkFlapIntfAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The configured actions that the Link Flap feature can
+         take when link flap activity exceeds the associated
+         threshold on this interface.
+
+           disableInterface(0)
+             - Interface operational status set to 'down'.
+             
+           generateSyslogEntry(1)
+             - Descriptive syslog message generated
+
+           generateNotification(2)
+             - SNMP notification generated.
+
+         Maintaining the value of this object across agent 
+         reboots is REQUIRED."
+    DEFVAL { { generateSyslogEntry,
+               generateNotification } }
+    ::= { etsysLinkFlapInterfaceEntry 2 }
+
+etsysLinkFlapIntfOperStatus              OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      operational(1),
+                      disabled(2)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The current status of the interface with respect to Link
+         Flap detection.
+
+         A read of operational(1) indicates that the Link Flap
+         feature has not taken any action to operationally limit
+         this interface.
+
+         A read of disabled(2) indicates that the Link Flap
+         feature has taken action to operationally disable
+         this interface due to excessive link state transitions.
+
+         Setting this object to operational(1) when it is disabled(2)
+         will cause Link Flap to release its control which is
+         keeping this interface operationally disabled.  Any other
+         write of this object will have no effect.
+
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    DEFVAL { operational }
+    ::= { etsysLinkFlapInterfaceEntry 3 }
+
+etsysLinkFlapIntfClearStats          OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "When set to true(1) the following objects:
+
+           etsysLinkFlapIntfLinkdownCountCurrent
+           etsysLinkFlapIntfLinkdownCountTotal
+           etsysLinkFlapIntfCurrentElapsed
+           etsysLinkFlapIntfLinkFlapViolations
+
+         in this row of the etsysLinkFlapInterfaceTable MUST
+         be set to 0 (zero). 
+         
+         Setting this object to false(2) will have no effect.
+         When read this object will always return false(2).
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    DEFVAL { false }
+    ::= { etsysLinkFlapInterfaceEntry 4 }
+
+etsysLinkFlapIntfCountThreshold    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "link state transitions"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The threshold count of link state transitions, which if 
+         exceeded within time limit etsysLinkFlapIntfTimeInterval,
+         necessitates actions specified in LinkFlapIntfAction.
+         Setting etsysLinkFlapIntfCountThreshold such that the 
+         ratio of etsysLinkFlapIntfCountThreshold to
+         etsysLinkFlapIntfTimeInterval would become greater than
+         etsysLinkFlapSystemLinkFlapMaximum will result in the set 
+         operation failing with an inconsistentValue error.
+         Maintaining the value of this object across agent reboots
+         is REQUIRED"
+    DEFVAL { 5 }
+    ::= { etsysLinkFlapInterfaceEntry 5 }
+
+etsysLinkFlapIntfTimeInterval    OBJECT-TYPE
+    SYNTAX        Unsigned32 (0|1..4294967295)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The time period during which link state transitions accrue
+         toward the threshold count etsysLinkFlapIntfCountThreshold.
+         Setting etsysLinkFlapIntfTimeInterval such that the 
+         ratio of etsysLinkFlapIntfCountThreshold to
+         etsysLinkFlapIntfTimeInterval would become greater than
+         etsysLinkFlapSystemLinkFlapMaximum will result in the set 
+         operation failing with an inconsistentValue error.
+         Note that one special value, 0 (zero) of the
+         etsysLinkFlapIntfTimeInterval is used to specify that 
+         etsysLinkFlapIntfTimeInterval is unbounded.
+         Maintaining the value of this object across agent reboots
+         is REQUIRED"
+    DEFVAL { 10 }
+    ::= { etsysLinkFlapInterfaceEntry 6 }
+
+etsysLinkFlapIntfDownTime    OBJECT-TYPE
+    SYNTAX        Unsigned32 (0|1..4294967295)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The time period during which the violating interface 
+         operational status may be held to 'down' by the LinkFlap 
+         functionality.
+         Note that one special value, 0 (zero) of the
+         etsysLinkFlapIntfDownTime is used to specify that 
+         etsysLinkFlapIntfDownTime is unbounded.
+         Maintaining the value of this object across agent reboots
+         is REQUIRED"
+    DEFVAL { 300 }
+    ::= { etsysLinkFlapInterfaceEntry 7 }
+    
+etsysLinkFlapIntfLinkdownCountCurrent    OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "link state transitions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current number of link state transitions accrued 
+         during the current monitor interval. This information
+         is always available and current. Maintaining the value
+         of this object across agent reboots is NOT RECOMMENDED."
+    ::= { etsysLinkFlapInterfaceEntry 8 }
+
+etsysLinkFlapIntfLinkdownCountTotal    OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "link state transitions"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of link state transitions accrued on 
+         this interface. Discontinuities in the value of this 
+         counter can occur at re-initialization of the management
+         system, and at other times as indicated by the value of
+         ifCounterDiscontinuityTime.
+         This information is always available and current.
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    ::= { etsysLinkFlapInterfaceEntry 9 }
+
+etsysLinkFlapIntfCurrentElapsed    OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The current number of completed system ticks accrued on 
+         this interface during the current monitor interval.
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other 
+         times as indicated by the value of ifCounterDiscontinuityTime.
+         This information is always available and current.
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    ::= { etsysLinkFlapInterfaceEntry 10 }
+
+etsysLinkFlapIntfLinkFlapViolations    OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "violations"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total number of link flap violations accrued on 
+         this interface. Discontinuities in the value of this 
+         counter can occur at re-initialization of the management
+         system, and at other times as indicated by the value of
+         ifCounterDiscontinuityTime.
+         This information is always available and current.
+         Maintaining the value of this object across agent reboots
+         is NOT RECOMMENDED."
+    ::= { etsysLinkFlapInterfaceEntry 11 }
+
+
+-- -------------------------------------------------------------
+-- Link Flap Notification Branch
+-- -------------------------------------------------------------
+
+etsysLinkFlapViolation NOTIFICATION-TYPE
+    OBJECTS { ifName, etsysLinkFlapIntfOperStatus }
+    STATUS  current
+    DESCRIPTION
+        "If the Link Flap feature is globally enabled and 
+         specifically enabled for this interface, then this trap 
+         is sent when a link state transition is detected which
+         accrues to a sum of transitions exceeding the value
+         etsysLinkFlapIntfCountThreshold over the time period
+         etsysLinkFlapIntfTimeInterval."
+    ::= { etsysLinkFlapNotificationBranch 1 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysLinkFlapConformance
+        OBJECT IDENTIFIER ::= { etsysLinkFlapMIB 2 }
+
+etsysLinkFlapGroups
+        OBJECT IDENTIFIER ::= { etsysLinkFlapConformance 1 }
+
+etsysLinkFlapCompliances
+        OBJECT IDENTIFIER ::= { etsysLinkFlapConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysLinkFlapSystemGroup OBJECT-GROUP
+    OBJECTS {
+        etsysLinkFlapSystemState,
+        etsysLinkFlapSystemSupportedActions,
+        etsysLinkFlapSystemLinkFlapMaximum
+        
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing global configuration
+         and status for the Link Flap feature."
+    ::= { etsysLinkFlapGroups 1 }
+
+etsysLinkFlapInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        etsysLinkFlapIntfEnabledStatus,
+        etsysLinkFlapIntfAction,
+        etsysLinkFlapIntfOperStatus,
+        etsysLinkFlapIntfClearStats,
+        etsysLinkFlapIntfCountThreshold,
+        etsysLinkFlapIntfTimeInterval,
+        etsysLinkFlapIntfDownTime,
+        etsysLinkFlapIntfLinkdownCountCurrent,
+        etsysLinkFlapIntfLinkdownCountTotal,
+        etsysLinkFlapIntfCurrentElapsed,
+        etsysLinkFlapIntfLinkFlapViolations
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing interface based
+         configuration, status, and statistics of the Link
+         Flap feature."
+    ::= { etsysLinkFlapGroups 2 }
+
+etsysLinkFlapNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        etsysLinkFlapViolation
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications for violation of
+         link state transition rates on individual interfaces."
+    ::= { etsysLinkFlapGroups 3 }
+
+
+-- -------------------------------------------------------------
+-- Compliance Statements
+-- -------------------------------------------------------------
+
+etsysLinkFlapCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for devices that support
+         Link Flap."
+    MODULE
+        MANDATORY-GROUPS
+        {
+            etsysLinkFlapSystemGroup,
+            etsysLinkFlapInterfaceGroup
+        }
+
+        OBJECT  etsysLinkFlapIntfClearStats
+        MIN-ACCESS  read-only
+        DESCRIPTION
+             "Write access is not REQUIRED."
+
+        GROUP   etsysLinkFlapNotificationGroup
+        DESCRIPTION
+            "This group is REQUIRED for entities that support SNMP
+             notifications or traps."
+    ::= { etsysLinkFlapCompliances 1 }
+END

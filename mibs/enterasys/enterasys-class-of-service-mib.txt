@@ -1,0 +1,2960 @@
+ENTERASYS-CLASS-OF-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-cos-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys
+--  Networks' user class of service functionality.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright 2004-2005 Enterasys Networks, Inc.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Unsigned32, 
+    Counter64, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue, TimeStamp
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ifName
+        FROM IF-MIB
+    PortList
+        FROM Q-BRIDGE-MIB
+    EnabledStatus
+        FROM P-BRIDGE-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysCosMIB   MODULE-IDENTITY
+    LAST-UPDATED "200504111535Z"  -- Mon Apr 11 15:35 GMT 2005
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise 
+         MIBs under the Enterasys enterprise OID pertaining to the
+         configuration and application of transmission and reception
+         attributes that comprise class of service for Enterasys 
+         network edge devices or access products."
+
+    REVISION "200504132122Z"  -- Wed Apr 13 21:22 GMT 2005
+    DESCRIPTION
+        "Additional branch etsysCosNotifications properly contains
+         trap information."
+
+    REVISION "200411221628Z"  -- Mon Nov 22 16:28 GMT 2004
+    DESCRIPTION
+        "Corrected the bits in the EtsysCosRlCapabilities textual
+         convention."
+
+    REVISION "200411091552Z"  -- Tue Nov  9 15:52 GMT 2004
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { etsysModules 55 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+TxqArbiterModes  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention enumerates the possible arbiter
+         modes.
+
+         strict(0)              Queues are serviced until empty or
+                                until a higher priority queue requires
+                                servicing.
+         weightedFairQ(1)       Weighted Fair Queuing. Queues are 
+                                serviced according to weight.
+         lowLatencyQ(2)         Some queues may be strict, while other 
+                                are weighted-fair."
+    SYNTAX  BITS {
+                    strict(0),
+                    weightedFairQ(1),
+                    lowLatencyQ(2)
+            }
+
+
+TxqAlgorithms  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention enumerates the possible queuing
+         algorithms.
+         
+         tailDrop(0)        The last entry in the queue is discarded
+                            in favor of new entries.
+         headDrop(1)        The first entry in the queue is discarded
+                            in favor of new entries.
+         red(2)             Random Early Discard.
+         wred(3)            Weighted Random Early Discard."
+    SYNTAX  BITS {
+                    tailDrop(0),
+                    headDrop(1),
+                    red(2),
+                    wred(3)
+            }
+
+
+TxQueueList  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+         transmit queues, with the first octet specifying queues 0
+         through 7, the second octet specifying queues 8 through 15, 
+         et cetera. Within each octet, the most significant bit 
+         represents the lowest numbered queue, and the least significant
+         bit represents the highest numbered queue. Thus, each queue
+         of the port is represented by a single bit within the value of
+         this object.  If that bit has a value of '1' then that queue
+         is included in the set of queues; the queue is not included if
+         its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+
+EtsysCosRateTypes  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention enumerates the possible inbound or
+         outbound rate types.
+
+         percentage(0)      A percentage of the total bandwidth 
+                            available.
+         pps(1)             Packet per second.
+         kbps(2)            Kilobits per second.
+         mbps(3)            Megabits per second.
+         gbps(4)            Gigabits per second.
+         tbps(5)            Terabits per second."
+    SYNTAX  BITS {
+                    percentage(0),
+                    pps(1),
+                    kbps(2),
+                    mbps(3),
+                    gbps(4),
+                    tbps(5)
+            }
+
+
+EtsysCosRlCapabilities  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention defines the supported actions for
+         inbound or outbound rate limiting.
+
+         drop(0)          Packets will be dropped.
+         reprioritize(1)  Packet priority change.
+         count(2)         Count the either packets or bits through the
+                          limiter (specified by the configured 
+                          EtsysCosRateTypes, percentage(1) not 
+         chainingAnd(3)   Link limiters together, violated if ALL 
+                          limiters of like EtsysRateLimitingType are 
+                          violated, this is the default type of chained
+                          limiters.
+         chainingOr(4)    Link limiters together, violated if ANY 
+                          limiters of like EtsysRateLimitingType are 
+                          violated.
+         syslog(5)        Syslog on first violation is supported.
+         trap(6)          SNMP Notify on first violation is supported.
+         disable(7)       Disable ingress port on first violation is 
+                          supported."
+    SYNTAX  BITS {
+                    drop(0),
+                    reprioritize(1),
+                    count(2),
+                    chainingAnd(3),
+                    chainingOr(4),
+                    syslog(5),
+                    trap(6),
+                    disable(7)
+            }
+
+
+EtsysViolationAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention defines the available actions 
+         to be taken when a RateLimiter is violated for the
+         first time (on a transition from 0 to 1 of a bit in the
+         etsysCosIrlResourceViolationPortList).
+         
+         syslog(0)  System logging messages will be sent to the console
+         trap(1)    A trap will be sent.
+         disable(2) The dot1dBasePort on which the event occurred will
+                    be operationally disabled."
+    SYNTAX  BITS {
+                    syslog(0),
+                    trap(1),
+                    disable(2)
+            }
+
+
+EtsysRateLimitingType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention defines the range of characteristics
+         that can applied to inbound or outbound rate limiters. For
+         chains of limiters, the behavior with respect to limiters of 
+         like type (drop or reprioritize) may be controlled via the
+         xxxOR nomenclature. By default ALL limiters of like type must
+         be violated for the action (drop or reprioritize) to apply 
+         (implicit AND).  The xxxOR types indicate that the action
+         (drop or reprioritize) will be applied if ANY of the limiters
+         is violated.  The count option counts packets or bits presented
+         to the limiter."
+    SYNTAX  INTEGER {
+                    drop(0),
+                    dropOR(1),
+                    rePrioritize(2),
+                    rePrioritizeOR(3),
+                    count(4)
+            }
+
+
+EtsysRateLimitResetBits  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention defines the reset properties for the
+         statistics gathering portion of the rate limiters. If bit 0
+         is set, the etsysCosIrlViolation TruthValue will be reset to
+         false. If bit 1 is set, the etsysCosIrlUnitCounter will be
+         reset to zero."
+    SYNTAX  BITS {
+                  clearViolation(0),
+                  clearUnitCounter(1)
+            }
+
+
+-- -------------------------------------------------------------
+-- MIB Objects 
+-- -------------------------------------------------------------
+
+etsysCosObjects           OBJECT IDENTIFIER ::= { etsysCosMIB 1 }
+
+etsysCosNotifications     OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 0 }
+
+etsysCosMasterReset       OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 1 }
+
+etsysCosCapabilities      OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 2 }
+
+etsysCos                  OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 3 }
+
+etsysCosTxq               OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 4 }
+
+etsysCosIrl               OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 5 }
+
+etsysCosOrl               OBJECT IDENTIFIER
+                      ::= { etsysCosObjects 6 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosMasterReset Group
+-- -------------------------------------------------------------
+
+etsysCosMibObjectAnullingBehavior OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object SHALL always read false. Setting this object to 
+         true MUST remove all existing entries from all tables in all
+         subordinate objects of etsysCosObjects, and nullify all 
+         changes to any values. The resulting behavior should yield
+         an unconfigured etsysCosMIB."
+    DEFVAL { false }
+    ::= { etsysCosMasterReset 1 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosCapabilities Group
+-- -------------------------------------------------------------
+
+etsysCosCapability OBJECT-TYPE
+    SYNTAX      BITS  {
+        supports8021Dpriority(0),
+                      -- user priority to traffic class mapping support
+        supportsTosOverwrite(1),
+                      -- Type of Service / Differentiated Service
+                      -- Code Point re-assignment support
+        supportsTosMasking(2),
+                      -- The relevant bits used in determining
+                      -- the TOS-overwrite data
+        supportsTransmitQueue(3),
+                      -- Transmit Bandwidth provisioning, weighted fair
+                      -- queuing, RED, WRED, head/tail drop support
+        supportsInboundRateLimiting(4),
+                      -- drop, reprioritize, notify, chaining
+                      -- for inbound traffic support
+        supportsOutBoundRateLimiting(5),
+                      -- drop, reprioritize, notify, chaining
+                      -- for outbound traffic support
+        supportsDropPrecedence(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A list of capabilities related to class of service support.
+        A set bit, with the value 1, indicates support for the
+        described functionality.  A clear bit, with the value
+        0, indicates the described functionality is not supported."
+    ::= { etsysCosCapabilities 1 }
+
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- etsysCos Group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+
+etsysCosMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the etsysCosTable."
+    ::= { etsysCos 1 }
+
+etsysCosNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the etsysCosTable."
+    ::= { etsysCos 2 }
+
+etsysCosLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCos Table was last modified."
+    ::= { etsysCos 3 }
+
+etsysCosEnableState OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled(1), controls configured for this MIB supersede 
+         controls for portions of BRIDGE-MIB dealing with priority
+         queue mapping, all of the CTRON-RATE-POLICING-MIB and 
+         all of the CTRON-TX-QUEUE-ARBITRATION-MIB. A setting to 
+         disabled(2) from enabled(1), results in the restoration of 
+         any existing configurations from the aforementioned MIBs."
+    DEFVAL { disabled }
+    ::= { etsysCos 4 }
+
+etsysCosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosSettingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing class of service settings to be applied
+         to a dot1dBridge port or port groups."
+    ::= { etsysCos 5 }
+
+etsysCosEntry OBJECT-TYPE
+    SYNTAX      EtsysCosSettingsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTable. Entries within this table MUST be
+         considered non-volatile and MUST be maintained across 
+         entity resets."
+    INDEX  { etsysCosIndex }
+    ::= { etsysCosTable 1 }
+
+EtsysCosSettingsEntry ::=
+    SEQUENCE {
+        etsysCosIndex
+            Unsigned32,
+        etsysCosRowStatus
+            RowStatus,
+        etsysCos8021dPriority
+            Integer32,
+        etsysCosTosValue
+            OCTET STRING,
+        etsysCosTxqReference
+            Integer32,
+        etsysCosIrlReference
+            Integer32,
+        etsysCosOrlReference
+            Integer32,
+        etsysCosDropPrecedence
+            Integer32
+    }
+
+etsysCosIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique class of service identifier for this CoS setting.
+         For reasons of backward compatibility indexes 0-7 MUST exist
+         and be configured with a etsysCos8021dPriority which
+         matches the etsysCosIndex."
+    ::= { etsysCosEntry 1 }
+
+etsysCosRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysCosTable. Entries within 
+         this table MUST be considered non-volatile and MUST be
+         maintained across entity resets."
+    ::= { etsysCosEntry 2 }
+
+etsysCos8021dPriority OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..7)
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The 802.1D priority to be associated with this Class of 
+         Service.  If this field is returned as (-1) then it has not 
+         been configured and no action will be taken for this 
+         attribute."
+         
+    DEFVAL { -1 }
+    ::= { etsysCosEntry 3 }
+
+etsysCosTosValue OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The Type of Service or Differentiated Services Code Point
+         value and mask to be associated with this Class of Service.  
+         If this field is returned as <empty-string>, then it has not 
+         been configured and no action will be taken for this 
+         attribute. The first octet shall represent the TOS/DSCP value
+         and the second octet shall represent the mask applied to that
+         value. Agents that do not support masking shall fail sets to
+         this object that include a mask octet."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosEntry 4 }
+
+etsysCosTxqReference OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The transmit queue table instance to reference for
+         this Class of Service."
+    ::= { etsysCosEntry 5 }
+
+etsysCosIrlReference OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..32767)
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The inbound rate limiting table instance to reference for
+         this Class of Service. If this instance is returned as
+         (-1), no action will be taken for this attribute."
+    ::= { etsysCosEntry 6 }
+
+etsysCosOrlReference OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..32767)
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The outbound rate limiting table instance to reference for
+         this Class of Service. If this instance is returned as
+         (-1), no action will be taken for this attribute."
+    ::= { etsysCosEntry 7 }
+
+etsysCosDropPrecedence OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..255)
+    MAX-ACCESS  read-create 
+    STATUS      current
+    DESCRIPTION
+        "The drop precedence default action. If this field is returned 
+         as (-1) then it has not been configured and no action will be 
+         taken for this attribute. If unsupported the agent may 
+         optionally implement this leaf as read-only."
+    DEFVAL { -1 }
+    ::= { etsysCosEntry 8 }
+
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- etsysCosTxq Tables
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+
+
+-- ---------------------------------------------------------------------
+-- etsysCosTxqPortTypeTable
+-- ---------------------------------------------------------------------
+
+etsysCosTxqNumPortTypes OBJECT-TYPE
+    SYNTAX      Integer32 (1..2048)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual number of distinctly unique (as defined by
+         the set of shared Transmit Queue capabilities)
+         port types available for configuration on this agent."
+    ::= { etsysCosTxq 1 }
+
+etsysCosTxqPortTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the distinctly unique transmit queue 
+         characteristics of a group of ports."
+    ::= { etsysCosTxq 2 }
+
+etsysCosTxqPortTypeEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqPortTypeTable."
+    INDEX  { etsysCosTxqPortTypeIndex }
+    ::= { etsysCosTxqPortTypeTable 1 }
+
+EtsysCosTxqPortTypeEntry ::=
+    SEQUENCE {
+        etsysCosTxqPortTypeIndex
+            Integer32,
+        etsysCosTxqPortTypeDescr
+            SnmpAdminString,
+        etsysCosTxqPortTypeEligiblePorts
+            PortList,
+        etsysCosTxqPortTypeUnselectedPorts
+            PortList,
+        etsysCosTxqPortTypeNumberOfQueues
+            Integer32,
+        etsysCosTxqPortTypeSupportedRateTypes
+            EtsysCosRateTypes,
+        etsysCosTxqPortTypeNumberOfSlices
+            Integer32,
+        etsysCosTxqPortTypeQueueAlgorithms
+            TxqAlgorithms,
+        etsysCosTxqPortTypeQueueArbiterModes
+            TxqArbiterModes,
+        etsysCosTxqPortTypeMaxDropPrecedence
+            Unsigned32,
+        etsysCosTxqPortTypeLLQEligibleQueues
+            TxQueueList
+    }
+
+etsysCosTxqPortTypeIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port type associated with the unique set of ports sharing
+         these capabilities."
+    ::= { etsysCosTxqPortTypeEntry 1 }
+
+etsysCosTxqPortTypeDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual description that represents this set of dot1dBridge
+         ports."
+    ::= { etsysCosTxqPortTypeEntry 2 }
+
+etsysCosTxqPortTypeEligiblePorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports belonging (having the same
+         capabilities) to this port type."
+    ::= { etsysCosTxqPortTypeEntry 3 }
+
+etsysCosTxqPortTypeUnselectedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports not yet bound to a user
+         created row (port group) in the etsysCosTxqPortGroupTable."
+    ::= { etsysCosTxqPortTypeEntry 4 }
+
+etsysCosTxqPortTypeNumberOfQueues OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of queues available for configuration by this
+         agent on this type of port."
+    ::= { etsysCosTxqPortTypeEntry 5 }
+
+etsysCosTxqPortTypeSupportedRateTypes OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate types available for use in these settings."
+    ::= { etsysCosTxqPortTypeEntry 6 }
+
+etsysCosTxqPortTypeNumberOfSlices OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of slices available for configuration."
+    ::= { etsysCosTxqPortTypeEntry 7 }
+
+etsysCosTxqPortTypeQueueAlgorithms OBJECT-TYPE
+    SYNTAX      TxqAlgorithms
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The queuing algorithms available for use with these settings."
+    ::= { etsysCosTxqPortTypeEntry 8 }
+
+etsysCosTxqPortTypeQueueArbiterModes OBJECT-TYPE
+    SYNTAX      TxqArbiterModes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The arbitration modes available for use with these setting."
+    ::= { etsysCosTxqPortTypeEntry 9 }
+
+etsysCosTxqPortTypeMaxDropPrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum drop precedence allowed on this port type."
+    ::= { etsysCosTxqPortTypeEntry 10 }
+
+etsysCosTxqPortTypeLLQEligibleQueues OBJECT-TYPE
+    SYNTAX      TxQueueList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The queues eligible for low latency queue configuration."
+    ::= { etsysCosTxqPortTypeEntry 11 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqUnitTable
+-- -------------------------------------------------------------
+
+etsysCosTxqUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the rate type, minimum and maximum limits 
+         of the port groups and their respective granularity."
+    ::= { etsysCosTxq 3 }
+
+etsysCosTxqUnitEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqUnitTable. Entries in this table indicate the port 
+         group boundaries for the type of port specified."
+    INDEX  { etsysCosTxqPortTypeIndex,
+             etsysCosTxqUnitTypeIndex }
+    ::= { etsysCosTxqUnitTable 1 }
+
+EtsysCosTxqUnitEntry ::=
+    SEQUENCE {
+        etsysCosTxqUnitTypeIndex
+            EtsysCosRateTypes,
+        etsysCosTxqUnitMaxRate
+            Unsigned32,
+        etsysCosTxqUnitMinRate
+            Unsigned32,
+        etsysCosTxqUnitGranularity
+            Unsigned32
+    }
+
+etsysCosTxqUnitTypeIndex OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unit identifier for this port type. The metric at which 
+         the etsysCosTxqUnitMinRate, etsysCosTxqUnitMaxRate and 
+         etsysCosTxqUnitGranularity are applied."
+    ::= { etsysCosTxqUnitEntry 1 }
+
+etsysCosTxqUnitMaxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum rate supported at the rate of units specified by
+         etsysCosTxqUnitTypeIndex."
+    ::= { etsysCosTxqUnitEntry 2 }
+
+etsysCosTxqUnitMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum rate supported at the rate of units specified by
+         etsysCosTxqUnitTypeIndex."
+    ::= { etsysCosTxqUnitEntry 3 }
+
+etsysCosTxqUnitGranularity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The smallest unit by which a rate can be modified."
+    ::= { etsysCosTxqUnitEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqPortGroupTable
+-- -------------------------------------------------------------
+
+etsysCosTxqMaxPortGroups OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of port groups supported by this agent."
+    ::= { etsysCosTxq 4 }
+
+etsysCosTxqNumPortGroups OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of assigned dot1dBridge port groups present in this
+         agent.  This number also reflects the port groups with a 
+         default system setup indicated by a zero(0) index."
+    ::= { etsysCosTxq 5 }
+
+etsysCosTxqPortGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosTxqPortTable was last 
+         modified."
+    ::= { etsysCosTxq 6 }
+
+etsysCosTxqPortGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysTxqPortCfgTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the user settings for specific types of 
+         ports and their matching transmit queue configurations."
+    ::= { etsysCosTxq 7 }
+
+etsysCosTxqPortGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysTxqPortCfgTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqPortTypeTable. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets." 
+    INDEX  { etsysCosTxqPortGroupIndex,
+             etsysCosTxqPortTypeIndex}
+    ::= { etsysCosTxqPortGroupTable 1 }
+
+EtsysTxqPortCfgTypeEntry ::=
+    SEQUENCE {
+        etsysCosTxqPortGroupIndex
+            Integer32,
+        etsysCosTxqPortGroupRowStatus
+            RowStatus,
+        etsysCosTxqPortGroupList
+            PortList,
+        etsysCosTxqPortGroupName
+            SnmpAdminString
+    }
+
+etsysCosTxqPortGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The user-specified port group for which the settings are 
+         defined.  This value MAY have meaning to the user for the
+         purposes of identifying groups of dot1dBridge ports with 
+         similar function (uplink, user, etc).
+
+         A value of zero(0) has special meaning in that it identifies
+         the default port grouping of characteristics present in the 
+         agent.  Entries indexed by a zero have a max-access of 
+         read-only.  This value will have a system defined maximum of 
+         etsysCosTxqMaxPortGroups."
+    ::= { etsysCosTxqPortGroupEntry 1 }
+
+etsysCosTxqPortGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysCosTxqPortTypeTable. Entries within
+         this table MUST be considered non-volatile and MUST be
+         maintained across entity resets.
+
+         When this object's value is active(1) the specified dot1dBridge
+         ports listed in the etsysCosTxqPortGroupList shall be removed 
+         from etsysCosTxqPortGroupUnselectedPorts.
+
+         A row in transition to the active(1) state will have its
+         port group list validated before activation. A port list that
+         cannot be made active MUST result in the row state to become
+         notReady(3) and no configuration action will be taken for this
+         row. Rows not in the active(1) state SHALL NOT be persisted 
+         across entity resets and MUST return the ports from its 
+         port group list to the etsysCosTxqPortGroupUnselectedPorts.
+
+         When this object's value is set to destroy(6) from an active(1)
+         state, all ports contained in etsysCosTxqPortList shall be 
+         returned to the etsysCosTxqPortGroupUnselectedPorts and all 
+         entries referencing this row shall be removed as well."
+    ::= { etsysCosTxqPortGroupEntry 2 }
+
+etsysCosTxqPortGroupList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports to be assigned to this group. 
+         Ports in this list MUST :
+           o Be mutually exclusive from other entries in this table
+           o Be comprised of the same port type as defined by the
+             etsysCosTxqPortTypeIndex."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosTxqPortGroupEntry 3 }
+
+etsysCosTxqPortGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned textual description of this
+         port group."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosTxqPortGroupEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqPortCfgTable
+-- -------------------------------------------------------------
+
+etsysCosTxqPortCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the queue values to be used in the 
+         entries specified.  Rows in this table are populated based
+         on rowCreation in the etsysCosTxqPortGroupTable.  Changes to 
+         this table are reflected in the etsysCosTxqPortGroupLastChange
+         value."
+    ::= { etsysCosTxq 8 }
+
+etsysCosTxqPortCfgEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqPortCfgTable. Details contained within this 
+         entry will depict the slice distributions across each queue 
+         per dot1dBridge port, as well as determine the arbiter's 
+         method for servicing the queues. Entries within this table 
+         MUST be considered non-volatile and MUST be maintained across 
+         entity resets."
+    INDEX  { etsysCosTxqPortGroupIndex,
+             etsysCosTxqPortTypeIndex }
+    ::= { etsysCosTxqPortCfgTable 1 }
+
+EtsysCosTxqPortCfgEntry ::=
+    SEQUENCE {
+        etsysCosTxqPortArbMode
+            TxqArbiterModes,
+        etsysCosTxqPortSliceSetting
+            OCTET STRING
+    }
+
+etsysCosTxqPortArbMode OBJECT-TYPE
+    SYNTAX      TxqArbiterModes
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION
+        "The mode in which the transmit queue arbiter services the 
+         queues. When in strict-mode, the queues will be services
+         by numerical priority from lowest to highest. Lower priority 
+         queues will not be services until the current queue is drained.
+         When set to weightedFairQ, the number of slices in a 
+         particular queue determines the frequency of servicing.
+         A slice configuration of 00-00...100 will set the port to
+         strict-mode."
+    ::= { etsysCosTxqPortCfgEntry 1 }
+
+etsysCosTxqPortSliceSetting OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is an octet string in which the number of octets 
+         corresponds to the number of transmit queues for each 
+         dot1dBridge port.  The value of the first octet represents the
+         number of 'slices' of transmit resources to allocate to 
+         Queue 0, the second octet represents the number for Queue 1, 
+         and so forth. The sum of all the octets in the octet string 
+         must add up to the total number of slices available for that 
+         port type as defined in etsysCosTxqNumberOfSlices.
+
+         For example, on a port having 4 transmit queues and where 
+         transmit resources are divided into 16 slices, writing an 
+         octet string of {0x00, 0x04, 0x04, 0x08} would have the 
+         following effect:
+
+           At least 50% of the frames transmitted are from Queue 3
+           At least 25% of the frames transmitted are from Queue 2
+           At least 25% of the frames transmitted are from Queue 1
+           No frames will be transmitted from Queue 0 until Queues 1, 
+           2 and 3 are empty."
+    ::= { etsysCosTxqPortCfgEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqResourceTable
+-- -------------------------------------------------------------
+
+etsysCosTxqResourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing rate, units and queuing algorithm to be
+         used in the entries specified."
+    ::= { etsysCosTxq 9 }
+
+etsysCosTxqResourceEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqResourceTable. These entries contain the specific
+         attributes of transmission rates (traffic shaping) and 
+         dropping styles to be applied to dot1dBridge ports. Entries 
+         within this table MUST be considered non-volatile and MUST be
+         maintained across entity resets."
+    INDEX  { etsysCosTxqPortGroupIndex,
+             etsysCosTxqPortTypeIndex, 
+             etsysCosTxqResourceQueueNum }
+    ::= { etsysCosTxqResourceTable 1 }
+
+EtsysCosTxqResourceEntry ::=
+    SEQUENCE {
+        etsysCosTxqResourceQueueNum
+            Integer32,
+        etsysCosTxqPortQUnit
+            EtsysCosRateTypes,
+        etsysCosTxqPortQRate
+            Integer32,
+        etsysCosTxqPortQAlgorithm
+            TxqAlgorithms,
+        etsysCosTxqPortQLLQenable
+            EnabledStatus
+    }
+    
+etsysCosTxqResourceQueueNum OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The queue number associated with this entry." 
+    ::= { etsysCosTxqResourceEntry 1 }
+    
+etsysCosTxqPortQUnit OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies the unit size for the etsysCosTxqPortRate.
+         Values MUST NOT exceed the capacity of the 
+         etsysCosTxqPortType they are associated with."
+    ::= { etsysCosTxqResourceEntry 2 }
+
+etsysCosTxqPortQRate OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies the number of units used in this queue 
+         configuration. The value (0) shall carry special meaning 
+         that indicates the settings MUST NOT be applied to the 
+         queue."
+    DEFVAL { 0 }
+    ::= { etsysCosTxqResourceEntry 3 }
+
+etsysCosTxqPortQAlgorithm OBJECT-TYPE
+    SYNTAX     TxqAlgorithms
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the rules by which discarding is applied."
+    ::= { etsysCosTxqResourceEntry 4 }
+
+etsysCosTxqPortQLLQenable OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the requested use of low latency
+         queues for this dot1dBridge port. This object is REQUIRED to 
+         fail set attempts for unsupported hardware."
+    ::= { etsysCosTxqResourceEntry 5 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqReferenceMappingTable
+-- -------------------------------------------------------------
+
+etsysCosTxqReferenceMappingMaxReference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of etsysCosTxqReferences allowed in the 
+         etsysCosTxqMappingTable."
+    ::= { etsysCosTxq 10 }
+
+etsysCosTxqReferenceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqReferenceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the user defined mappings of the TxQ
+         refences found in the etsysCosTable to physical transmit queues
+         associated with the specified port-group."
+    ::= { etsysCosTxq 11 }
+
+etsysCosTxqReferenceMappingEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqReferenceMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosTxqReferenceMappingTable. Entries within this table 
+         MUST be considered non-volatile and MUST be maintained across 
+         entity resets."
+    INDEX  { etsysCosTxqPortGroupIndex,
+             etsysCosTxqPortTypeIndex,
+             etsysCosTxqReference}
+    ::= { etsysCosTxqReferenceMappingTable 1 }
+
+EtsysCosTxqReferenceMappingEntry ::=
+    SEQUENCE {
+        etsysCosTxqResourceQueueNumber
+            Integer32
+    }
+
+etsysCosTxqResourceQueueNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The queue number to be bound to this reference." 
+    ::= { etsysCosTxqReferenceMappingEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqDropProfiles Table
+-- -------------------------------------------------------------
+
+etsysCosTxqDropProfilesMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of entries allowed in the
+         etsysCosDropProfiles Table."
+    ::= { etsysCosTxq 12 }
+
+etsysCosTxqDropProfilesNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of entries in the etsysCosQueueProfiles
+         Table."
+    ::= { etsysCosTxq 13 }
+
+etsysCosTxqDropProfilesLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosQueueProfiles Table was last 
+         modified."
+    ::= { etsysCosTxq 14 }
+
+etsysCosTxqDropProfilesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqDropProfilesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the queue profile configurations."
+    ::= { etsysCosTxq 15 }
+
+etsysCosTxqDropProfilesEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqDropProfilesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The minimum and maximum queue depth, maximum drop probability 
+         and queue depth at max drop probability for the queue 
+         specified.  These entries represent the currently configured 
+         settings for this agent. Entries indexed with (0) are default 
+         system entries. Entries within this table MUST be considered
+         non-volatile and MUST be maintained across entity resets."
+    INDEX { etsysCosTxqDropSettingIndex }
+    ::= { etsysCosTxqDropProfilesTable 1 }
+
+EtsysCosTxqDropProfilesEntry ::=
+    SEQUENCE {  etsysCosTxqDropSettingIndex
+                    Unsigned32,
+                etsysCosTxqDropProfilesRowStatus
+                    RowStatus,
+                etsysCosTxqDropProfilesMin
+                    Integer32,
+                etsysCosTxqDropProfilesMax
+                    Integer32,
+                etsysCosTxqDropProfilesMaxDropProb
+                    Integer32,
+                etsysCosTxqDropProfilesQueueDepthAtMaxProb
+                    Integer32
+    }
+
+etsysCosTxqDropSettingIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 -- (0..etsysCosTxqDropProfilesMaxEntries)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier for this queue setting. Identifiers with
+         an index of 0 MUST be read-only and depict the system default
+         settings."
+    ::= { etsysCosTxqDropProfilesEntry 1 }
+
+etsysCosTxqDropProfilesRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysCosTxqDropProfilesTable. Entries 
+         within this table MUST be considered non-volatile and MUST be
+         maintained across entity resets."
+    ::= { etsysCosTxqDropProfilesEntry 2 }
+
+etsysCosTxqDropProfilesMin OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The minimum percentage of the queue depth, above which frames 
+         will dropped at the drop probability rate."
+    DEFVAL { 0 }
+    ::= { etsysCosTxqDropProfilesEntry 3 }
+
+etsysCosTxqDropProfilesMax OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The maximum percentage of the queue depth, above which all
+         frames will be dropped. This object's value MUST be greater
+         than or equal to the etsysCosTxqDropProfilesMin."
+    DEFVAL { 100 }
+    ::= { etsysCosTxqDropProfilesEntry 4 }
+
+etsysCosTxqDropProfilesMaxDropProb OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The drop probability associated with this setting by 
+         percentage. This number represents the percentage of traffic 
+         that will be dropped once the minimum rate has been exceeded."
+    DEFVAL { 0 }
+    ::= { etsysCosTxqDropProfilesEntry 5 }
+
+etsysCosTxqDropProfilesQueueDepthAtMaxProb OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The drop probability percentage slope which defines how 
+         aggressively packets are discarded as the queue fills."
+    DEFVAL { 100 }
+    ::= { etsysCosTxqDropProfilesEntry 6 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosTxqDropPrecedence
+-- -------------------------------------------------------------
+
+etsysCosTxqDropPrecedenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosTxqDropPrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the drop precedence configurations."
+    ::= { etsysCosTxq 16 }
+
+etsysCosTxqDropPrecedenceEntry OBJECT-TYPE
+    SYNTAX      EtsysCosTxqDropPrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The drop precedence definitions for the queue specified."
+    INDEX { etsysCosTxqPortGroupIndex,
+            etsysCosTxqPortTypeIndex,
+            etsysCosTxqResourceQueueNum,
+            etsysCosTableDropPrecedence}
+    ::= { etsysCosTxqDropPrecedenceTable 1 }
+
+EtsysCosTxqDropPrecedenceEntry ::=
+    SEQUENCE {
+                etsysCosTableDropPrecedence
+                    Unsigned32,
+                etsysCosTxqDropProfileQueueCfgID
+                    Integer32
+    }
+
+etsysCosTableDropPrecedence OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The corresponding etsysCosDropPrecedence from the
+         etsysCosTable this entry refers to."
+    ::= { etsysCosTxqDropPrecedenceEntry 1 }
+
+etsysCosTxqDropProfileQueueCfgID OBJECT-TYPE
+    SYNTAX      Integer32 -- (0 .. etsysCosTxqDropProfilesMaxEntries)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The etsysCosTxqDropProfilesEntry that describes the 
+         configuration for this entry.  If this value references
+         a non-existent row in the etsysCosTxqDropPrecedenceTable the 
+         device will behave as if the row existed and was populated with
+         default parameters."
+    ::= { etsysCosTxqDropPrecedenceEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- etsysCosIrl group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- etsysCosIrlPortTypeTable
+-- -------------------------------------------------------------
+
+etsysCosIrlPortTypeMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual number of distinctly unique (as defined by
+         the set of shared inbound RateLimiting capabilities)
+         port types available for configuration on this agent."
+    ::= { etsysCosIrl 1 }
+
+etsysCosIrlPortTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the distinctly unique IRL 
+         characteristics of a group of ports."
+    ::= { etsysCosIrl 2 }
+
+etsysCosIrlPortTypeEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlPortTypeTable."
+    INDEX  { etsysCosIrlPortTypeIndex }
+    ::= { etsysCosIrlPortTypeTable 1 }
+
+EtsysCosIrlPortTypeEntry ::=
+    SEQUENCE {
+        etsysCosIrlPortTypeIndex
+            Integer32,
+        etsysCosIrlPortTypeDescr
+            SnmpAdminString,
+        etsysCosIrlPortTypeEligiblePorts
+            PortList,
+        etsysCosIrlPortTypeUnselectedPorts
+            PortList,
+        etsysCosIrlPortTypeNumberOfIRLs
+            Integer32,
+        etsysCosIrlPortTypeSupportedRateTypes
+            EtsysCosRateTypes,
+        etsysCosIrlPortTypeCapabilities
+            EtsysCosRlCapabilities
+    }
+
+etsysCosIrlPortTypeIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port type associated with the unique set of ports sharing
+         these capabilities."
+    ::= { etsysCosIrlPortTypeEntry 1 }
+
+etsysCosIrlPortTypeDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual description that represents this set of dot1dBridge
+         ports."
+    ::= { etsysCosIrlPortTypeEntry 2 }
+
+etsysCosIrlPortTypeEligiblePorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports belonging (having the same
+         capabilities) to this port type."
+    ::= { etsysCosIrlPortTypeEntry 3 }
+
+etsysCosIrlPortTypeUnselectedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports not yet bound to a user
+         created row (port group) in the etsysCosIrlPortGroupTable."
+    ::= { etsysCosIrlPortTypeEntry 4 }
+
+etsysCosIrlPortTypeNumberOfIRLs OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of inbound rate limiters supported by 
+         this agent on this type of port."
+    ::= { etsysCosIrlPortTypeEntry 5 }
+
+etsysCosIrlPortTypeSupportedRateTypes OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate types available on this type of port."
+    ::= { etsysCosIrlPortTypeEntry 6 }
+
+etsysCosIrlPortTypeCapabilities OBJECT-TYPE
+    SYNTAX      EtsysCosRlCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The EtsysCosRlCapabilities available on this type of port."
+    ::= { etsysCosIrlPortTypeEntry 7 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlUnitTable
+-- -------------------------------------------------------------
+
+etsysCosIrlUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the rate type, minimum and maximum limits 
+         of the port groups and their respective granularity."
+    ::= { etsysCosIrl 3 }
+
+etsysCosIrlUnitEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlUnitTable. Entries in this table indicate the port 
+         group boundaries for the type of port specified."
+    INDEX  { etsysCosIrlPortTypeIndex,
+             etsysCosIrlUnitTypeIndex }
+    ::= { etsysCosIrlUnitTable 1 }
+
+EtsysCosIrlUnitEntry ::=
+    SEQUENCE {
+        etsysCosIrlUnitTypeIndex
+            EtsysCosRateTypes,
+        etsysCosIrlUnitMaxRate
+            Unsigned32,
+        etsysCosIrlUnitMinRate
+            Unsigned32,
+        etsysCosIrlUnitGranularity
+            Unsigned32
+    }
+
+etsysCosIrlUnitTypeIndex OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unit identifier for this port type. The metric at which 
+         the etsysCosIrlUnitMinRate, etsysCosIrlUnitMaxRate and 
+         etsysCosIrlUnitGranularity are applied."
+    ::= { etsysCosIrlUnitEntry 1 }
+
+etsysCosIrlUnitMaxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum rate supported at the rate of units specified by
+         etsysCosIrlUnitType."
+    ::= { etsysCosIrlUnitEntry 2 }
+
+etsysCosIrlUnitMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum rate supported at the rate of units specified by
+         etsysCosIrlUnitType."
+    ::= { etsysCosIrlUnitEntry 3 }
+
+etsysCosIrlUnitGranularity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The smallest unit by which a rate can be modified."
+    ::= { etsysCosIrlUnitEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlPortGroupTable
+-- -------------------------------------------------------------
+
+etsysCosIrlPortGroupMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of port groups supported by this agent."
+    ::= { etsysCosIrl 4 }
+
+etsysCosIrlPortGroupNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of assigned dot1dBridge port groups present in this
+         agent.  This number also reflects the port groups with a 
+         default system setup indicated by a zero(0) index."
+    ::= { etsysCosIrl 5 }
+
+etsysCosIrlPortGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosIrlPortTypeTable was last 
+         modified."
+    ::= { etsysCosIrl 6 }
+
+etsysCosIrlPortGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the settings for specific types of 
+         dot1dBridge ports and their matching inbound rate limiting 
+         configurations."
+    ::= { etsysCosIrl 7 }
+
+etsysCosIrlPortGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlPortTypeTable. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets." 
+    INDEX  { etsysCosIrlPortGroupIndex,
+             etsysCosIrlPortTypeIndex }
+    ::= { etsysCosIrlPortGroupTable 1 }
+
+EtsysCosIrlPortGroupEntry ::=
+    SEQUENCE {
+        etsysCosIrlPortGroupIndex
+            Integer32,
+        etsysCosIrlPortGroupRowStatus
+            RowStatus,
+        etsysCosIrlPortGroupList
+            PortList,
+        etsysCosIrlPortGroupName
+            SnmpAdminString
+    }
+
+etsysCosIrlPortGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The user-specified port group for which the settings are 
+         defined.  This value MAY have meaning to the user for the
+         purposes of identifying groups of dot1dBridge ports with 
+         similar function (uplink, user, etc).
+
+         A value of zero(0) has special meaning in that it identifies
+         the default port grouping of characteristics present in the 
+         agent.  Entries indexed by a zero have a max-access of 
+         read-only.  This value will have a system defined maximum of 
+         etsysCosIrlPortGroupMaxEntries."
+    ::= { etsysCosIrlPortGroupEntry 1 }
+
+etsysCosIrlPortGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysCosIrlPortGroupTable. Entries within
+         this table MUST be considered non-volatile and MUST be
+         maintained across entity resets.
+
+         When this object's value is active(1) the specified dot1dBridge
+         ports listed in the PortGroupList shall be removed from 
+         UnselectedPorts.
+
+         A row in transition to the active(1) state will have its
+         port group list validated before activation. A port list that
+         cannot be made active MUST result in the row state to become
+         notReady(3) and no configuration action will be taken for this
+         row. Rows not in the active(1) state SHALL NOT be persisted 
+         across entity resets and MUST return the ports from its 
+         port group list to the etsysCosIrlPortTypeUnselectedPorts.
+
+         When this object's value is set to destroy(6) from an active(1)
+         state, all dot1dBridge ports contained in 
+         etsysCosIrlPortGroupList shall be returned to the 
+         etsysCosIrlPortTypeUnselectedPorts and all entries referencing
+         this row shall be removed as well."
+
+    ::= { etsysCosIrlPortGroupEntry 2 }
+
+etsysCosIrlPortGroupList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports to be assigned to this group. 
+         Ports in this list MUST :
+           o Be mutually exclusive from other entries in this table
+           o Be comprised of the same port type as defined by the
+             etsysCosIrlPortTypeIndex."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosIrlPortGroupEntry 3 }
+
+etsysCosIrlPortGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned textual description of this
+         port group."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosIrlPortGroupEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlPortCfgTable
+-- -------------------------------------------------------------
+
+etsysCosIrlPortCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlPortCfg
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the inbound rate limiting configurations
+         to be used in the entries specified.  Rows in this table are 
+         populated based on rowCreation in the etsysCosIrlPortGroupTable.
+         Changes to this table are reflected in the 
+         etsysCosTxqPortGroupLastChange value."
+    ::= { etsysCosIrl 8 }
+
+etsysCosIrlPortCfgEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlPortCfg
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlPortCfgTable. Details contained within this entry 
+         will depict the inbound rate limiter's reception rate and 
+         parent rate limiter. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets."
+    INDEX  { etsysCosIrlPortGroupIndex, 
+             etsysCosIrlPortTypeIndex }
+    ::= { etsysCosIrlPortCfgTable 1 }
+
+EtsysCosIrlPortCfg ::=
+    SEQUENCE {
+        etsysCosIrlPortCfgFloodLimiter
+            Integer32
+    }
+
+etsysCosIrlPortCfgFloodLimiter OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will represent the etsysCosIrlResourceNum 
+         to be used to limit flooded traffic."
+    ::= { etsysCosIrlPortCfgEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlResourceTable
+-- -------------------------------------------------------------
+
+etsysCosIrlResourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the inbound rate limiting configurations
+         to be used in the entries specified."
+    ::= { etsysCosIrl 9 }
+
+etsysCosIrlResourceEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlResourceTable. These entries contain the specific
+         attributes of policing rates (traffic clipping) and 
+         parent rate limiter. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets."
+    INDEX  { etsysCosIrlPortGroupIndex, 
+             etsysCosIrlPortTypeIndex, 
+             etsysCosIrlResourceIrlNum }
+    ::= { etsysCosIrlResourceTable 1 }
+
+EtsysCosIrlResourceEntry ::=
+    SEQUENCE {
+        etsysCosIrlResourceIrlNum
+            Unsigned32,
+        etsysCosIrlResourceUnits
+            EtsysCosRateTypes,
+        etsysCosIrlResourceRate
+            Integer32,
+        etsysCosIrlResourceParentIrl
+            Integer32,
+        etsysCosIrlResourceType
+            EtsysRateLimitingType,
+        etsysCosIrlResourceActionCosIndex
+            Integer32,
+        etsysCosIrlResourceAction
+            EtsysViolationAction,
+        etsysCosIrlResourceViolationPortList
+            PortList,
+        etsysCosIrlResourceClearCounters
+            TruthValue
+    }
+
+etsysCosIrlResourceIrlNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The inbound rate limiter number associated with this entry."
+    ::= { etsysCosIrlResourceEntry 1 }
+
+etsysCosIrlResourceUnits OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies the unit size for the etsysCosIrlPortRate.
+         Values MUST NOT exceed the capacity of the 
+         etsysCosIrlPortType they are associated with."
+    DEFVAL {{ pps }}
+    ::= { etsysCosIrlResourceEntry 2 }
+
+etsysCosIrlResourceRate OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Identifies the number of units above which packets will 
+         considered in violation. This object is read-only for limiters
+         of type count(5). The value (0) shall carry special meaning 
+         in this case of unset. Rate limiters identified as having a 
+         value of (0) shall not have this settings applied to the 
+         limiter."
+    DEFVAL { 0 }
+    ::= { etsysCosIrlResourceEntry 3 }
+
+etsysCosIrlResourceParentIrl OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to a positive value indicates the 
+         etsysCosIrlResourceIrlNum to be used in conjunction with 
+         this setting. A value of (-1) indicates the parent Irl is
+         not configured."
+    DEFVAL { -1 }
+    ::= { etsysCosIrlResourceEntry 4 }
+
+etsysCosIrlResourceType OBJECT-TYPE
+    SYNTAX      EtsysRateLimitingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The characteristics applied to this rate limiter. When 
+         chaining limiters is used, the AND / OR attribute denotes the 
+         limiter logic in handling violation. For example, option 
+         rePrioritizeAnd(2) requires that the current limiter AND it's 
+         parent be violated for the packet to be reprioritized. The 
+         rePrioritizeOr(3) option only needs one OR the other to be 
+         violated for the action to be taken."
+    ::= { etsysCosIrlResourceEntry 5 }
+
+etsysCosIrlResourceActionCosIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will represent the CoS to be applied to packets
+         in violation of the limits set when the etsysCosIrlResourceType
+         is set to one of the rePrioritize types."
+    DEFVAL { -1 }
+    ::= { etsysCosIrlResourceEntry 6 }
+
+etsysCosIrlResourceAction OBJECT-TYPE
+    SYNTAX      EtsysViolationAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows syslog, SNMP traps, or disabling actions
+         to be taken limiters are first exceeded."
+    ::= { etsysCosIrlResourceEntry 7 }
+
+etsysCosIrlResourceViolationPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The dot1dBridge ports this limiter has been violated on.
+         Writing this object will clear the dot1dBridge ports given
+         which have a corresponding bit of zero (0) in the PortList."
+    ::= { etsysCosIrlResourceEntry 8 }
+
+etsysCosIrlResourceClearCounters OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object shall always read false(2). When set to true(1) 
+         this object clears the counter associated with this entry, if 
+         the associated entry is a limiter of type count(5)."
+    ::= { etsysCosIrlResourceEntry 9 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlReferenceMappingTable
+-- -------------------------------------------------------------
+
+etsysCosIrlReferenceMappingMaxReference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of etsysCosIrlReferences allowed in the
+         etsysCosIrlMappingTable."
+    ::= { etsysCosIrl 10 }
+
+etsysCosIrlReferenceMappingLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosIrlReferenceMappingTable was 
+         last modified."
+    ::= { etsysCosIrl 11 }
+
+etsysCosIrlReferenceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlReferenceMap
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the user defined mappings of the 
+         inbound-rate-limiter-refences found in the etsysCosTable to 
+         actual inbound-rate-limiters associated with the specified 
+         port-group."
+    ::= { etsysCosIrl 12 }
+    
+etsysCosIrlReferenceMappingEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlReferenceMap
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlReferenceMappingTable. Entries within this table 
+         MUST be considered non-volatile and MUST be maintained across 
+         entity resets."
+    INDEX  { etsysCosIrlPortGroupIndex,
+             etsysCosIrlPortTypeIndex, 
+             etsysCosIrlReference }
+    ::= { etsysCosIrlReferenceMappingTable 1 }
+
+EtsysCosIrlReferenceMap ::=
+    SEQUENCE {
+        etsysCosIrlResourceIrlNumber
+            Integer32
+    }
+
+etsysCosIrlResourceIrlNumber OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inbound rate limiter bond to this reference."
+    ::= { etsysCosIrlReferenceMappingEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosIrlViolationTable
+-- -------------------------------------------------------------
+
+etsysCosIrlViolationClearTable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object SHALL always read false. Setting this object to 
+         true removes all existing entries from the
+         etsysCosIrlViolationTable."
+    ::= { etsysCosIrl 13 }
+
+etsysCosIrlViolationLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosIrlViolationTable was last 
+         modified."
+    ::= { etsysCosIrl 14 }
+
+etsysCosIrlDisabledPortsList OBJECT-TYPE
+    SYNTAX      PortList 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports disabled as a result of limiting 
+         violation.  A set to this list will clear the violation status
+         of any port which has a corresponding clear bit in the list."
+    ::= { etsysCosIrl 15 }
+
+etsysCosIrlViolationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosIrlViolationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the list of entries of all dot1dBridge ports
+         that have detected violations of the limiters current 
+         settings."
+    ::= { etsysCosIrl 16 }
+
+etsysCosIrlViolationEntry OBJECT-TYPE
+    SYNTAX      EtsysCosIrlViolationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosIrlViolationTable."
+    INDEX  { etsysCosIrlPortIndex,
+             etsysCosIrlResourceIrlNumber }
+    ::= { etsysCosIrlViolationTable 1 }
+
+EtsysCosIrlViolationEntry ::=
+    SEQUENCE {
+        etsysCosIrlPortIndex
+            Integer32,
+        etsysCosIrlViolation
+            TruthValue,
+        etsysCosIrlCounter
+            Counter64,
+        etsysCosIrlResetFlags
+            EtsysRateLimitResetBits
+    }
+
+etsysCosIrlPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The dot1dBridge port on which this violation occurred."
+    ::= { etsysCosIrlViolationEntry 1 }
+
+etsysCosIrlViolation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the violation status for this limiter.
+         If this object reads true(1) the action associated with this 
+         Irl have been taken."
+    ::= { etsysCosIrlViolationEntry 2 }
+
+etsysCosIrlCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In order for this object to have meaningful information the 
+         assigned limiter must be set up as a counter type limiter.
+         This value shall then represent the number of configured units
+         the limiter has recorded. If the associated limiter 
+         is of type pps(1) then the object represents the packets 
+         counted, otherwise it represents the octets counted."
+    ::= { etsysCosIrlViolationEntry 3 }
+
+etsysCosIrlResetFlags OBJECT-TYPE
+    SYNTAX      EtsysRateLimitResetBits
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value shall always read as 0. This object clears the 
+         statistics gathering portion of this entry. If bit 0 is set, 
+         the etsysCosIrlViolation TruthValue will be reset to false. If
+         bit 1 is set, the etsysCosIrlUnitCounter will be reset to zero.
+         Both bits set shall clear both properties."
+    ::= { etsysCosIrlViolationEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+-- etsysCosOrl group
+-- -------------------------------------------------------------
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- etsysCosOrlPortTypeTable
+-- -------------------------------------------------------------
+
+etsysCosOrlPortTypeMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual number of distinctly unique (as defined by
+         the set of shared outbound RateLimiting capabilities)
+         port types available for configuration on this agent."
+    ::= { etsysCosOrl 1 }
+
+etsysCosOrlPortTypeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table defining the distinctly unique IRL 
+         characteristics of a group of ports."
+    ::= { etsysCosOrl 2 }
+
+etsysCosOrlPortTypeEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlPortTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlPortTypeTable."
+    INDEX  { etsysCosOrlPortTypeIndex }
+    ::= { etsysCosOrlPortTypeTable 1 }
+
+EtsysCosOrlPortTypeEntry ::=
+    SEQUENCE {
+        etsysCosOrlPortTypeIndex
+            Integer32,
+        etsysCosOrlPortTypeDescr
+            SnmpAdminString,
+        etsysCosOrlPortTypeEligiblePorts
+            PortList,
+        etsysCosOrlPortTypeUnselectedPorts
+            PortList,
+        etsysCosOrlPortTypeNumberOfORLs
+            Integer32,
+        etsysCosOrlPortTypeSupportedRateTypes
+            EtsysCosRateTypes,
+        etsysCosOrlPortTypeCapabilities
+            EtsysCosRlCapabilities
+    }
+
+etsysCosOrlPortTypeIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port type associated with the unique set of ports sharing
+         these capabilities."
+    ::= { etsysCosOrlPortTypeEntry 1 }
+
+etsysCosOrlPortTypeDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The textual description that represents this set of dot1dBridge
+         ports."
+    ::= { etsysCosOrlPortTypeEntry 2 }
+
+etsysCosOrlPortTypeEligiblePorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports belonging (having the same
+         capabilities) to this port type."
+    ::= { etsysCosOrlPortTypeEntry 3 }
+
+etsysCosOrlPortTypeUnselectedPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports not yet bound to a user
+         created row (port group) in the etsysCosOrlPortGroupTable."
+    ::= { etsysCosOrlPortTypeEntry 4 }
+
+etsysCosOrlPortTypeNumberOfORLs OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of outbound rate limiters supported by 
+         this agent on this type of port."
+    ::= { etsysCosOrlPortTypeEntry 5 }
+
+etsysCosOrlPortTypeSupportedRateTypes OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate types available on this type of port."
+    ::= { etsysCosOrlPortTypeEntry 6 }
+
+etsysCosOrlPortTypeCapabilities OBJECT-TYPE
+    SYNTAX      EtsysCosRlCapabilities
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The EtsysCosRlCapabilities available on this type of port."
+    ::= { etsysCosOrlPortTypeEntry 7 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlUnitTable
+-- -------------------------------------------------------------
+
+etsysCosOrlUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the rate type, minimum and maximum limits 
+         of the port groups and their respective granularity."
+    ::= { etsysCosOrl 3 }
+
+etsysCosOrlUnitEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlUnitTable. Entries in this table indicate the port 
+         group boundaries for the type of port specified."
+    INDEX  { etsysCosOrlPortTypeIndex,
+             etsysCosOrlUnitTypeIndex }
+    ::= { etsysCosOrlUnitTable 1 }
+
+EtsysCosOrlUnitEntry ::=
+    SEQUENCE {
+        etsysCosOrlUnitTypeIndex
+            EtsysCosRateTypes,
+        etsysCosOrlUnitMaxRate
+            Unsigned32,
+        etsysCosOrlUnitMinRate
+            Unsigned32,
+        etsysCosOrlUnitGranularity
+            Unsigned32
+    }
+
+etsysCosOrlUnitTypeIndex OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unit identifier for this port type. The metric at which 
+         the etsysCosOrlUnitMinRate, etsysCosOrlUnitMaxRate and 
+         etsysCosOrlUnitGranularity are applied."
+    ::= { etsysCosOrlUnitEntry 1 }
+
+etsysCosOrlUnitMaxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum rate supported at the rate of units specified by
+         etsysCosOrlUnitType."
+    ::= { etsysCosOrlUnitEntry 2 }
+
+etsysCosOrlUnitMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum rate supported at the rate of units specified by
+         etsysCosOrlUnitType."
+    ::= { etsysCosOrlUnitEntry 3 }
+
+etsysCosOrlUnitGranularity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The smallest unit by which a rate can be modified."
+    ::= { etsysCosOrlUnitEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlPortGroupTable
+-- -------------------------------------------------------------
+
+etsysCosOrlPortGroupMaxEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of port groups supported by this agent."
+    ::= { etsysCosOrl 4 }
+
+etsysCosOrlPortGroupNumEntries OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of assigned dot1dBridge port groups present in this
+         agent.  This number also reflects the port groups with a 
+         default system setup indicated by a zero(0) index."
+    ::= { etsysCosOrl 5 }
+
+etsysCosOrlPortGroupLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosOrlPortTypeTable was last 
+         modified."
+    ::= { etsysCosOrl 6 }
+
+etsysCosOrlPortGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the settings for specific types of 
+         dot1dBridge ports and their matching outbound rate limiting 
+         configurations."
+    ::= { etsysCosOrl 7 }
+
+etsysCosOrlPortGroupEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlPortGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlPortTypeTable. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets." 
+    INDEX  { etsysCosOrlPortGroupIndex,
+             etsysCosOrlPortTypeIndex }
+    ::= { etsysCosOrlPortGroupTable 1 }
+
+EtsysCosOrlPortGroupEntry ::=
+    SEQUENCE {
+        etsysCosOrlPortGroupIndex
+            Integer32,
+        etsysCosOrlPortGroupRowStatus
+            RowStatus,
+        etsysCosOrlPortGroupList
+            PortList,
+        etsysCosOrlPortGroupName
+            SnmpAdminString
+    }
+
+etsysCosOrlPortGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The user-specified port group for which the settings are 
+         defined.  This value MAY have meaning to the user for the
+         purposes of identifying groups of dot1dBridge ports with 
+         similar function (uplink, user, etc).
+
+         A value of zero(0) has special meaning in that it identifies
+         the default port grouping of characteristics present in the 
+         agent.  Entries indexed by a zero have a max-access of 
+         read-only.  This value will have a system defined maximum of 
+         etsysCosOrlPortGroupMaxEntries."
+    ::= { etsysCosOrlPortGroupEntry 1 }
+
+etsysCosOrlPortGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the etsysCosOrlPortGroupTable. Entries within
+         this table MUST be considered non-volatile and MUST be
+         maintained across entity resets.
+
+         When this object's value is active(1) the specified dot1dBridge
+         ports listed in the PortGroupList shall be removed from 
+         UnselectedPorts.
+
+         A row in transition to the active(1) state will have its
+         port group list validated before activation. A port list that
+         cannot be made active MUST result in the row state to become
+         notReady(3) and no configuration action will be taken for this
+         row. Rows not in the active(1) state SHALL NOT be persisted 
+         across entity resets and MUST return the ports from its 
+         port group list to the etsysCosOrlPortTypeUnselectedPorts.
+
+         When this object's value is set to destroy(6) from an active(1)
+         state, all dot1dBridge ports contained in 
+         etsysCosOrlPortGroupList shall be returned to the 
+         etsysCosOrlPortTypeUnselectedPorts and all entries referencing
+         this row shall be removed as well."
+
+    ::= { etsysCosOrlPortGroupEntry 2 }
+
+etsysCosOrlPortGroupList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports to be assigned to this group. 
+         Ports in this list MUST :
+           o Be mutually exclusive from other entries in this table
+           o Be comprised of the same port type as defined by the
+             etsysCosOrlPortTypeIndex."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosOrlPortGroupEntry 3 }
+
+etsysCosOrlPortGroupName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administratively assigned textual description of this
+         port group."
+    DEFVAL { ''H }    -- the empty string
+    ::= { etsysCosOrlPortGroupEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlPortCfgTable
+-- -------------------------------------------------------------
+
+etsysCosOrlPortCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlPortCfg
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the outbound rate limiting configurations
+         to be used in the entries specified.  Rows in this table are 
+         populated based on rowCreation in the etsysCosOrlPortGroupTable.
+         Changes to this table are reflected in the 
+         etsysCosTxqPortGroupLastChange value."
+    ::= { etsysCosOrl 8 }
+
+etsysCosOrlPortCfgEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlPortCfg
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlPortCfgTable. Details contained within this entry 
+         will depict the outbound rate limiter's reception rate and 
+         parent rate limiter. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets."
+    INDEX  { etsysCosOrlPortGroupIndex, 
+             etsysCosOrlPortTypeIndex }
+    ::= { etsysCosOrlPortCfgTable 1 }
+
+EtsysCosOrlPortCfg ::=
+    SEQUENCE {
+        etsysCosOrlPortCfgFloodLimiter
+            Integer32
+    }
+
+etsysCosOrlPortCfgFloodLimiter OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will represent the etsysCosOrlResourceNum 
+         to be used to limit flooded traffic."
+    ::= { etsysCosOrlPortCfgEntry 2 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlResourceTable
+-- -------------------------------------------------------------
+
+etsysCosOrlResourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the outbound rate limiting configurations
+         to be used in the entries specified."
+    ::= { etsysCosOrl 9 }
+
+etsysCosOrlResourceEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlResourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlResourceTable. These entries contain the specific
+         attributes of policing rates (traffic clipping) and 
+         parent rate limiter. Entries within this table MUST be 
+         considered non-volatile and MUST be maintained across entity 
+         resets."
+    INDEX  { etsysCosOrlPortGroupIndex, 
+             etsysCosOrlPortTypeIndex, 
+             etsysCosOrlResourceOrlNum }
+    ::= { etsysCosOrlResourceTable 1 }
+
+EtsysCosOrlResourceEntry ::=
+    SEQUENCE {
+        etsysCosOrlResourceOrlNum
+            Unsigned32,
+        etsysCosOrlResourceUnits
+            EtsysCosRateTypes,
+        etsysCosOrlResourceRate
+            Integer32,
+        etsysCosOrlResourceParentOrl
+            Integer32,
+        etsysCosOrlResourceType
+            EtsysRateLimitingType,
+        etsysCosOrlResourceActionCosIndex
+            Integer32,
+        etsysCosOrlResourceAction
+            EtsysViolationAction,
+        etsysCosOrlResourceViolationPortList
+            PortList,
+        etsysCosOrlResourceClearCounters
+            TruthValue
+    }
+
+etsysCosOrlResourceOrlNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The outbound rate limiter number associated with this entry."
+    ::= { etsysCosOrlResourceEntry 1 }
+
+etsysCosOrlResourceUnits OBJECT-TYPE
+    SYNTAX      EtsysCosRateTypes
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Identifies the unit size for the etsysCosOrlPortRate.
+         Values MUST NOT exceed the capacity of the 
+         etsysCosOrlPortType they are associated with."
+    DEFVAL {{ pps }}
+    ::= { etsysCosOrlResourceEntry 2 }
+
+etsysCosOrlResourceRate OBJECT-TYPE
+    SYNTAX      Integer32 (0|1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Identifies the number of units above which packets will 
+         considered in violation. This object is read-only for limiters
+         of type count(5). The value (0) shall carry special meaning 
+         in this case of unset. Rate limiters identified as having a 
+         value of (0) shall not have this settings applied to the 
+         limiter."
+    DEFVAL { 0 }
+    ::= { etsysCosOrlResourceEntry 3 }
+
+etsysCosOrlResourceParentOrl OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object to a positive value indicates the 
+         etsysCosOrlResourceOrlNum to be used in conjunction with 
+         this setting. A value of (-1) indicates the parent Orl is
+         not configured."
+    DEFVAL { -1 }
+    ::= { etsysCosOrlResourceEntry 4 }
+
+etsysCosOrlResourceType OBJECT-TYPE
+    SYNTAX      EtsysRateLimitingType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The characteristics applied to this rate limiter. When 
+         chaining limiters is used, the AND / OR attribute denotes the 
+         limiter logic in handling violation. For example, option 
+         rePrioritizeAnd(2) requires that the current limiter AND it's 
+         parent be violated for the packet to be reprioritized. The 
+         rePrioritizeOr(3) option only needs one OR the other to be 
+         violated for the action to be taken."
+    ::= { etsysCosOrlResourceEntry 5 }
+
+etsysCosOrlResourceActionCosIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object will represent the CoS to be applied to packets
+         in violation of the limits set when the etsysCosOrlResourceType
+         is set to one of the rePrioritize types."
+    DEFVAL { -1 }
+    ::= { etsysCosOrlResourceEntry 6 }
+
+etsysCosOrlResourceAction OBJECT-TYPE
+    SYNTAX      EtsysViolationAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows syslog, SNMP traps, or disabling actions
+         to be taken limiters are first exceeded."
+    ::= { etsysCosOrlResourceEntry 7 }
+
+etsysCosOrlResourceViolationPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The dot1dBridge ports this limiter has been violated on.
+         Writing this object will clear the dot1dBridge ports given
+         which have a corresponding bit of zero (0) in the PortList."
+    ::= { etsysCosOrlResourceEntry 8 }
+
+etsysCosOrlResourceClearCounters OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This object shall always read false(2). When set to true(1) 
+         this object clears the counter associated with this entry, if 
+         the associated entry is a limiter of type count(5)."
+    ::= { etsysCosOrlResourceEntry 9 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlReferenceMappingTable
+-- -------------------------------------------------------------
+
+etsysCosOrlReferenceMappingMaxReference OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of etsysCosOrlReferences allowed in the
+         etsysCosOrlMappingTable."
+    ::= { etsysCosOrl 10 }
+
+etsysCosOrlReferenceMappingLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosOrlReferenceMappingTable was 
+         last modified."
+    ::= { etsysCosOrl 11 }
+
+etsysCosOrlReferenceMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlReferenceMap
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the user defined mappings of the 
+         outbound-rate-limiter-refences found in the etsysCosTable to 
+         actual outbound-rate-limiters associated with the specified 
+         port-group."
+    ::= { etsysCosOrl 12 }
+    
+etsysCosOrlReferenceMappingEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlReferenceMap
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlReferenceMappingTable. Entries within this table 
+         MUST be considered non-volatile and MUST be maintained across 
+         entity resets."
+    INDEX  { etsysCosOrlPortGroupIndex,
+             etsysCosOrlPortTypeIndex, 
+             etsysCosOrlReference }
+    ::= { etsysCosOrlReferenceMappingTable 1 }
+
+EtsysCosOrlReferenceMap ::=
+    SEQUENCE {
+        etsysCosOrlResourceOrlNumber
+            Integer32
+    }
+
+etsysCosOrlResourceOrlNumber OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..32767)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The outbound rate limiter bond to this reference."
+    ::= { etsysCosOrlReferenceMappingEntry 1 }
+
+
+-- -------------------------------------------------------------
+-- etsysCosOrlViolationTable
+-- -------------------------------------------------------------
+
+etsysCosOrlViolationClearTable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object SHALL always read false. Setting this object to 
+         true removes all existing entries from the
+         etsysCosOrlViolationTable."
+    ::= { etsysCosOrl 13 }
+
+etsysCosOrlViolationLastChange OBJECT-TYPE
+    SYNTAX      TimeStamp 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the etsysCosOrlViolationTable was last 
+         modified."
+    ::= { etsysCosOrl 14 }
+
+etsysCosOrlDisabledPortsList OBJECT-TYPE
+    SYNTAX      PortList 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of dot1dBridge ports disabled as a result of limiting 
+         violation.  A set to this list will clear the violation status
+         of any port which has a corresponding clear bit in the list."
+    ::= { etsysCosOrl 15 }
+
+etsysCosOrlViolationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysCosOrlViolationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the list of entries of all dot1dBridge ports
+         that have detected violations of the limiters current 
+         settings."
+    ::= { etsysCosOrl 16 }
+
+etsysCosOrlViolationEntry OBJECT-TYPE
+    SYNTAX      EtsysCosOrlViolationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Conceptually defines a particular entry within the
+         etsysCosOrlViolationTable."
+    INDEX  { etsysCosOrlPortIndex,
+             etsysCosOrlResourceOrlNumber }
+    ::= { etsysCosOrlViolationTable 1 }
+
+EtsysCosOrlViolationEntry ::=
+    SEQUENCE {
+        etsysCosOrlPortIndex
+            Integer32,
+        etsysCosOrlViolation
+            TruthValue,
+        etsysCosOrlCounter
+            Counter64,
+        etsysCosOrlResetFlags
+            EtsysRateLimitResetBits
+    }
+
+etsysCosOrlPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The dot1dBridge port on which this violation occurred."
+    ::= { etsysCosOrlViolationEntry 1 }
+
+etsysCosOrlViolation OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the violation status for this limiter.
+         If this object reads true(1) the action associated with this 
+         Orl have been taken."
+    ::= { etsysCosOrlViolationEntry 2 }
+
+etsysCosOrlCounter OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "In order for this object to have meaningful information the 
+         assigned limiter must be set up as a counter type limiter.
+         This value shall then represent the number of configured units
+         the limiter has recorded. If the associated limiter 
+         is of type pps(0) then the object represents the packets 
+         counted, otherwise it represents the octets counted."
+    ::= { etsysCosOrlViolationEntry 3 }
+
+etsysCosOrlResetFlags OBJECT-TYPE
+    SYNTAX      EtsysRateLimitResetBits
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value shall always read as 0. This object clears the 
+         statistics gathering portion of this entry. If bit 0 is set, 
+         the etsysCosOrlViolation TruthValue will be reset to false. If
+         bit 1 is set, the etsysCosOrlUnitCounter will be reset to zero.
+         Both bits set shall clear both properties."
+    ::= { etsysCosOrlViolationEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- Notifications
+-- -------------------------------------------------------------
+
+etsysCosIrlExceededNotification NOTIFICATION-TYPE
+    OBJECTS { ifName, etsysCosIrlViolation }
+    STATUS  current
+    DESCRIPTION
+        "This notification indicates an inbound limiter has been 
+         exceeded."
+    ::= { etsysCosNotifications 1 }
+
+etsysCosOrlExceededNotification NOTIFICATION-TYPE
+    OBJECTS { ifName, etsysCosOrlViolation }
+    STATUS  current
+    DESCRIPTION
+        "This notification indicates an outbound limiter has been 
+         exceeded."
+    ::= { etsysCosNotifications 2 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysCosConformance OBJECT IDENTIFIER ::= { etsysCosMIB 2 }
+
+etsysCosGroups OBJECT IDENTIFIER
+    ::= { etsysCosConformance 1 }
+
+etsysCosCompliances OBJECT IDENTIFIER
+    ::= { etsysCosConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysCosMasterResetGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosMibObjectAnullingBehavior
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing a mechanism of resetting
+         all objects back to an unconfigured state."
+    ::= { etsysCosGroups 1 }
+
+etsysCosCapabilitiesGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosCapability
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing the capability extent for 
+         the agent supporting this MIB."
+    ::= { etsysCosGroups 2 }
+
+etsysCosGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosMaxEntries,
+                etsysCosNumEntries,
+                etsysCosLastChange,
+                etsysCosEnableState,
+                etsysCosRowStatus,
+                etsysCos8021dPriority,
+                etsysCosTosValue,
+                etsysCosTxqReference,
+                etsysCosIrlReference,
+                etsysCosOrlReference,
+                etsysCosDropPrecedence
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing the support capacity and 
+         capability extent for the agent supporting this MIB. The
+         object etsysCosDropPrecedence is part of a required
+         group however its access may be restricted to read-only for
+         agents without the ability to support this feature and still
+         wish to implement this MIB."
+    ::= { etsysCosGroups 3 }
+
+etsysCosTxqGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosTxqReference,
+                etsysCosTxqNumPortTypes,
+                etsysCosTxqPortTypeDescr,
+                etsysCosTxqPortTypeEligiblePorts,
+                etsysCosTxqPortTypeUnselectedPorts,
+                etsysCosTxqPortTypeNumberOfQueues,
+                etsysCosTxqPortTypeSupportedRateTypes,
+                etsysCosTxqPortTypeNumberOfSlices,
+                etsysCosTxqPortTypeQueueAlgorithms,
+                etsysCosTxqPortTypeQueueArbiterModes,
+                etsysCosTxqPortTypeMaxDropPrecedence,
+                etsysCosTxqPortTypeLLQEligibleQueues,
+                etsysCosTxqUnitMaxRate,
+                etsysCosTxqUnitMinRate,
+                etsysCosTxqUnitGranularity,
+                etsysCosTxqMaxPortGroups,
+                etsysCosTxqNumPortGroups,
+                etsysCosTxqPortGroupLastChange,
+                etsysCosTxqPortGroupRowStatus,
+                etsysCosTxqPortGroupList,
+                etsysCosTxqPortGroupName,
+                etsysCosTxqPortArbMode,
+                etsysCosTxqPortSliceSetting,
+                etsysCosTxqPortQUnit,
+                etsysCosTxqPortQRate,
+                etsysCosTxqPortQAlgorithm,
+                etsysCosTxqPortQLLQenable,
+                etsysCosTxqReferenceMappingMaxReference,
+                etsysCosTxqResourceQueueNumber,
+                etsysCosTxqDropProfilesMaxEntries,
+                etsysCosTxqDropProfilesNumEntries,
+                etsysCosTxqDropProfilesLastChange,
+                etsysCosTxqDropProfilesRowStatus,
+                etsysCosTxqDropProfilesMin,
+                etsysCosTxqDropProfilesMax,
+                etsysCosTxqDropProfilesMaxDropProb,
+                etsysCosTxqDropProfilesQueueDepthAtMaxProb,
+                etsysCosTxqDropProfileQueueCfgID
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects required for creating and modifying
+         settings for transmit queue configurations."
+    ::= { etsysCosGroups 4 }
+
+etsysCosIrlGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosIrlReference,
+                etsysCosIrlPortTypeMaxEntries,
+                etsysCosIrlPortTypeDescr,
+                etsysCosIrlPortTypeEligiblePorts,
+                etsysCosIrlPortTypeUnselectedPorts,
+                etsysCosIrlPortTypeNumberOfIRLs,
+                etsysCosIrlPortTypeCapabilities,
+                etsysCosIrlPortTypeSupportedRateTypes,
+                etsysCosIrlUnitMaxRate,
+                etsysCosIrlUnitMinRate,
+                etsysCosIrlUnitGranularity,
+                etsysCosIrlPortGroupMaxEntries,
+                etsysCosIrlPortGroupNumEntries,
+                etsysCosIrlPortGroupLastChange,
+                etsysCosIrlPortGroupRowStatus,
+                etsysCosIrlPortGroupList,
+                etsysCosIrlPortGroupName,
+                etsysCosIrlPortCfgFloodLimiter,
+                etsysCosIrlResourceIrlNumber,
+                etsysCosIrlResourceUnits,
+                etsysCosIrlResourceRate,
+                etsysCosIrlResourceParentIrl,
+                etsysCosIrlResourceActionCosIndex,
+                etsysCosIrlResourceType,
+                etsysCosIrlResourceAction,
+                etsysCosIrlResourceViolationPortList,
+                etsysCosIrlResourceClearCounters,
+                etsysCosIrlReferenceMappingMaxReference,
+                etsysCosIrlReferenceMappingLastChange,
+                etsysCosIrlViolationLastChange,
+                etsysCosIrlDisabledPortsList,
+                etsysCosIrlViolation,
+                etsysCosIrlViolationClearTable,
+                etsysCosIrlCounter,
+                etsysCosIrlResetFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects required for creating and modifying
+         settings for inbound rate limiter configurations."
+    ::= { etsysCosGroups 5 }
+
+etsysCosOrlGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosOrlReference,
+                etsysCosOrlPortTypeMaxEntries,
+                etsysCosOrlPortTypeDescr,
+                etsysCosOrlPortTypeEligiblePorts,
+                etsysCosOrlPortTypeUnselectedPorts,
+                etsysCosOrlPortTypeNumberOfORLs,
+                etsysCosOrlPortTypeCapabilities,
+                etsysCosOrlPortTypeSupportedRateTypes,
+                etsysCosOrlUnitMaxRate,
+                etsysCosOrlUnitMinRate,
+                etsysCosOrlUnitGranularity,
+                etsysCosOrlPortGroupMaxEntries,
+                etsysCosOrlPortGroupNumEntries,
+                etsysCosOrlPortGroupLastChange,
+                etsysCosOrlPortGroupRowStatus,
+                etsysCosOrlPortGroupList,
+                etsysCosOrlPortGroupName,
+                etsysCosOrlPortCfgFloodLimiter,
+                etsysCosOrlResourceOrlNumber,
+                etsysCosOrlResourceUnits,
+                etsysCosOrlResourceRate,
+                etsysCosOrlResourceParentOrl,
+                etsysCosOrlResourceActionCosIndex,
+                etsysCosOrlResourceType,
+                etsysCosOrlResourceAction,
+                etsysCosOrlResourceViolationPortList,
+                etsysCosOrlResourceClearCounters,
+                etsysCosOrlReferenceMappingMaxReference,
+                etsysCosOrlReferenceMappingLastChange,
+                etsysCosOrlViolationLastChange,
+                etsysCosOrlDisabledPortsList,
+                etsysCosOrlViolation,
+                etsysCosOrlViolationClearTable,
+                etsysCosOrlCounter,
+                etsysCosOrlResetFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects required for creating and modifying
+         settings for outbound rate limiter configurations."
+    ::= { etsysCosGroups 6 }
+
+etsysCosNotificationGroup OBJECT-GROUP
+    OBJECTS {
+                etsysCosIrlExceededNotification,
+                etsysCosOrlExceededNotification
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects required for reporting rate limiter
+         violations."
+    ::= { etsysCosGroups 7 }
+
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysCosCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support Enterasys
+         class of service."
+    MODULE -- this module
+    MANDATORY-GROUPS { etsysCosMasterResetGroup,
+                       etsysCosCapabilitiesGroup,
+                       etsysCosGroup
+    }
+    GROUP etsysCosTxqGroup
+    DESCRIPTION
+        "An optional group for products that support the abilities
+         associated with the CTRON-TX-QUEUE-ARBITRATION-MIB."
+    GROUP etsysCosIrlGroup
+    DESCRIPTION
+        "An optional group for products that support the abilities
+         for inbound rate limiting."
+    GROUP etsysCosOrlGroup
+    DESCRIPTION
+        "An optional group for products that support the abilities
+         for outbound rate limiting."
+    GROUP etsysCosNotificationGroup
+    DESCRIPTION
+        "An optional group for products that support the abilities
+         for rate limiting and the ability to send traps."
+    ::= { etsysCosCompliances 1 }
+    
+END

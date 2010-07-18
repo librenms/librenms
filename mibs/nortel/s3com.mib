@@ -1,0 +1,2032 @@
+-- SECTION 1: Top Level Definitions
+
+SYNOPTICS-COMMON-MIB DEFINITIONS ::= BEGIN
+
+-- Common MIB Release 4.7.4
+-- Revision 05/29/95
+
+-- Copyright 1995 Bay Networks, Inc.
+-- All rights reserved.
+-- This Bay Networks SNMP Management Information Base Specification
+-- (Specification) embodies Bay Networks' confidential and
+-- proprietary intellectual property. Bay Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Bay Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+
+-- Imports
+
+IMPORTS
+	Counter, Gauge, TimeTicks, IpAddress
+		FROM RFC1155-SMI
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	s3SnmpAgent, series3000, SnpxBackplaneType, SnpxChassisType
+		FROM SYNOPTICS-ROOT-MIB;
+
+
+-- Textual Conventions
+
+S3ModuleType ::= INTEGER {
+	empty(1),		-- nothing installed
+	other(2),		-- none of the following
+	m3302(3),		-- STP ethernet Host Module
+	m3304-ST(4),		-- FOIRL ethernet Host Module
+	m3305(5),		-- UTP ethernet Host Module
+	m3308(6),		-- 10 base-T ethernet Host Module
+	m3313(7),		-- AUI ethernet NMM w/ RS232 port
+	m3313M(8),		-- AUI ethernet NMM w/ RS232 + modem
+	m3314-ST(9),		-- FOIRL ethernet NMM w/ RS232
+	m3314M-ST(10),		-- FOIRL ethernet NMM w/ RS232 + modem
+	m3323(11),		-- AUI Local Bridge
+	m3324-ST(12),		-- FOIRL Local Bridge
+	m3502(13),		-- STP Token Ring Host Module
+	m3532(14),		-- STP Token Ring Repeater
+	m3552(15),		-- STP Ring in/ Ring out Module
+	m3301(16),		-- Thin Net ethernet Host Module
+	m3307(17),		-- 10 base-T 50 pin Host Module
+	m3356(18),		-- Ethernet Remote Bridge
+	m3512(19),		-- T.R. NMM w/ STP ring in/ring out
+	m3514(20),		-- T.R. NMM w/ FOIRL ring in/ring out
+	m3505(21),		-- UTP Token Ring Host Module
+	m3554(22),		-- FOIRL ring in/ring out Module
+	m3534(23),		-- FOIRL Repeater
+	m3383(24),		-- AUI ethernet Local Router
+	m3384(25),		-- FOIRL ethernet Local Router
+	m331x(26),		-- ethernet NMM module w/unknown MDA type
+	m351x(27),		-- t.r. NMM module w/unknown MDA type
+	m3502-A(28),		-- STP Token Ring Host Module
+	m3902(29),		-- STP FDDI Host Module
+	m3904(30),		-- Fiber FDDI Host Module
+	m3910S(31),		-- FDDI Super NMM
+	m3386(32),		-- Cisco Remote Router
+	m3394(33),		-- Ethernet-localtalk router
+	m3395(34),		-- XYPLEX terminal server
+	m3323S(35),		-- High Speed Local Bridge with AUI
+	m3324S-ST(36),		-- High Speed Local Bridge with FOIRL
+	m3307A(37),		-- 10baseT with amp connector
+	m3308A(38),		-- 10baseT (Ibid)
+	m3505A(39),		-- UTP Token Ring Host Module
+	m3513(40),		-- STP TR repeater NMM
+	m3333(41),		-- ethernet retiming module AUI
+	m3334-ST(42),		-- ethernet retiming module FOIRL
+	m3040(43),		-- model 3040 NCE (SPARCStation on a card)
+	m3100R(44),		-- 3100R Summing Module
+	notUsed45(45),		-- not assigned
+	notUsed46(46),		-- not assigned
+	m2810-hm(47),		-- host part of 2810 non-modular Ethernet
+	m2810-nmm(48),		-- nmm part of 2810 non-modular Ethernet
+	m3313S(49),		-- Ethernet NMM+ with AUI
+	m3314S(50),		-- Ethernet NMM+ with FOIRL
+	m3368(51),		-- 10Base-T LattisSecure Host Module
+	m3512S(52),		-- Model 3512S Token Ring NMM
+	m3513S(53),		-- Model 3513S Token Ring NMM
+	m3514S(54),		-- Model 3514S Token Ring NMM
+	m3522(55),		-- Model 3522 Token Ring bridge
+	m2912(56),		-- FDDI STP workgroup concentrator
+	m2914(57),		-- FDDI Fiber workgroup concentrator
+	notUsed58(58),		-- not assigned
+	m3301-75(59),		-- Thin net Enet Host Module for 75 ohms
+	m3301-93(60),		-- Thin net Enet Host Module for 93 ohms
+	m271x-nmm(61),		-- nmm part of 271x
+	m2705-hm(62),		-- host connection to 2705
+	m2715-hm(63),		-- host part of 2715
+	m2813-nmm(64),		-- nmm part of 2813
+	m2814-nmm(65),		-- nmm part of 2814
+	m2813-hm(66),		-- host part of 2813
+	m2814-hm(67),		-- host part of 2814
+	m2803-hm(68),		-- cascaded 2803
+	m2804-hm(69),		-- cascaded 2804
+	m3395A(70),		-- Xyplex terminal server
+	m3040S(71),		-- NCE (SPARCStation on a card)
+	m3502B(72),		-- Model 3502B Token Ring Host Module
+	m3505B(73),		-- Model 3505B Token Ring Host Module
+	m2715-F-hm(74),		-- host part of 2715-F
+	m2712-hm(75),		-- host part of 2712
+	m2712-F-hm(76),		-- host part of 2712-F
+	m2702-hm(77),		-- host connection to 2702
+	m2702-C-hm(78),		-- host connection to 2702-C
+	m2705-F-hm(79),		-- host connection to 2705-F
+	m2702-F-hm(80),		-- host connection to 2702-F
+	m2705-C-hm(81),		-- host connection to 2705-C
+	m3902A(82),		-- Model 3902A FDDI host module
+	m2912A(83),		-- FDDI SDDI workgroup concentrator
+	m3313A(84),		-- Model 3313A Ethernet NMM
+	m3314A(85),		-- Model 3314A Ethernet NMM
+	m3307HD(86),		-- Model 3307HD Ethernet host module
+	m3328(87),		-- Model 3328 Ethernet Switching Engine
+	m3904-2SM(88),		-- Model 3904SM FDDI host module
+	m3910S-SM(89),		-- Model 3910SM FDDI NMM
+	m3800(90),		-- Cisco multi Media Router
+	m3910S-SD(91),		-- Model 3910S-SD FDDI SDDI NMM
+	m3904-4SM(92),		-- Model 3904-4SM FDDI single mode fiber host
+	m2915(93),		-- Model 2915 FDDI UTP workgroup concentrator
+	m3910SA(94),		-- Model 3910SA FDDI NMM II
+	m3910SA-SM(95),		-- Model 3910SA FDDI NMM II with single mode fiber
+	m3905(96),		-- Model 3905 FDDI UTP Host Module
+	m2715B-hm(97),		-- host part of 2715B
+	m2705B-hm(98),		-- host connection to 2705B
+	m2715B-F-hm(99),	-- host part of 2715B-F
+	m2712B-hm(100),		-- host part of  2712B
+	m2712B-F-hm(101),	-- host part of 2712B-F
+	m2702B-C-hm(102),	-- host connection to 2702B-C
+	m3304A(103),		-- Redundant Ethernet Host Module
+	m3486(104),		-- Model 3486 Lattis Engine / 486
+	m3308B(105),		-- Model 3308B 10BASE-T Host Module
+	m2813SA-nmm(106),	-- nmm part of 2813SA
+	m2814SA-nmm(107),	-- nmm part of 2814SA
+	m3517SA(108),		-- Model 3517SA Token Ring NMM
+	m810M(109),		-- Model 810M eight port 10BASE-T Hub
+	m3313SA(110),		-- Model 3313SA Ethernet NMM
+	m3314SA(111),		-- Model 3314SA Ethernet NMM
+	m3522A(112),		-- Model 3522A Token Ring Bridge
+	m3504-ST(113),		-- Model 3504-ST Token Ring Host
+	m3513SA(114),		-- Model 3513SA Token Ring NMM
+	mAlcatel-Eth-nmm(115),	-- nmm part of Alcatel Ethernet workgroup conc.
+	mAlcatel-Eth-hm1(116),	-- host part of Alcatel Ethernet workgroup conc.
+	mAlcatel-Eth-hm(117),	-- cascaded Alcatel Ethernet workgroup conc.
+	m2486-nmm(118),		-- nmm part of 2486
+	m2486-hm(119),		-- host part of 2486
+	m3174(120),		-- Model 3174 Communications Controller Module
+	m271xSA-nmm(121),	-- nmm part of 271xSA
+	m3299C(122),		-- Model 3299-C Terminal Multiplexor Adapter Module
+	m3299U(123),		-- Model 3299-U TTP Terminal Multiplexor Adapter Module
+	m3299F(124),		-- Model 3299-F Fiber Optic Terminal Adapter Module
+	m2300x(125),		-- Model 2300x
+	m2310x(126),		-- Model 2310x
+        m3410(127),             -- Model 3410 Fast Ethernet Network Management Module
+        m3405(128),             -- Model 3405 Fast Ethernet Host Module with 
+                                -- 12 100BASE-TX ports
+        m3475(129)              -- Model 3475 Fast Ethernet Host Module with 
+                                -- 11 100BASE-TX ports and 1 100BASE-FX port
+
+	}
+-- This type is used to specify a module.
+
+
+S3PsType ::= INTEGER {
+	other(1),		-- none of the following
+	low(2),			-- 200 watt supply (3000)
+				-- 50 watt supply (281x)
+	medium(3),		-- 360 watt supply (3000)
+				-- 110 watt supply (3030)
+				-- 85 watt supply (2715)
+				-- 33 wattt supply (2300x & 2310x)
+	high(4),		-- 460 watt supply (3000)
+				-- 150 watt supply (3030)
+				-- 150 watt supply (2914 & 2912)
+	redundantCapable(5),	-- redundant backplane (3000)
+	empty(6)		-- nothing installed
+	}
+-- This type is used to specify the power supply type. Where used,
+--   the descriptions specify the valid values.
+
+-- Groups
+
+s3AgentSw		OBJECT IDENTIFIER ::= { s3SnmpAgent 1 }
+s3AgentNetProtocol	OBJECT IDENTIFIER ::= { s3SnmpAgent 2 }
+s3AgentIpProtocol	OBJECT IDENTIFIER ::= { s3AgentNetProtocol 1 }
+-- this one is defined in the IPX MIB
+-- s3AgentIpxProtocol	OBJECT IDENTIFIER ::= { s3AgentNetProtocol 2 }
+-- this one is defined in section 3.
+-- s3AgentTrapReceiverTable	OBJECT IDENTIFIER ::= { s3SnmpAgent 3 }
+s3AgentHw		OBJECT IDENTIFIER ::= { s3SnmpAgent 4 }
+s3AgentSpecific		OBJECT IDENTIFIER ::= { s3SnmpAgent 5 }
+s3AgentLocImage		OBJECT IDENTIFIER ::= { s3SnmpAgent 6 }
+-- this one is defined in the IPX MIB
+-- s3AgentIPXTrapReceiverTable	OBJECT IDENTIFIER ::= { s3SnmpAgent 7 }
+
+s3000Chassis		OBJECT IDENTIFIER ::= { series3000 1 }
+s3000RedundantPs	OBJECT IDENTIFIER ::= { s3000Chassis 10 }
+s3000Ethernet		OBJECT IDENTIFIER ::= { series3000 2 }
+s3000TokenRing		OBJECT IDENTIFIER ::= { series3000 3 }
+s3000FDDI		OBJECT IDENTIFIER ::= { series3000 4 }
+s3000Bridge		OBJECT IDENTIFIER ::= { series3000 5 }
+s3000TerminalServer	OBJECT IDENTIFIER ::= { series3000 6 }
+s3000LattisTalk		OBJECT IDENTIFIER ::= { series3000 7 }
+s3000Trb		OBJECT IDENTIFIER ::= { series3000 8 }
+
+
+
+-- SECTION 2: Concentrator Chassis
+
+-- Chassis Group
+
+
+-- Implementation of this group is mandatory for all SynOptics
+--   Series 3000 agents
+
+
+s3ChassisType OBJECT-TYPE
+	SYNTAX	SnpxChassisType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis type."
+	::= { s3000Chassis 1 }
+
+s3ChassisBkplType OBJECT-TYPE
+	SYNTAX	SnpxBackplaneType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis backplane type."
+	::= { s3000Chassis 2 }
+
+s3ChassisBkplRev OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis backplane revision."
+	::= { s3000Chassis 3 }
+
+s3ChassisPsType OBJECT-TYPE
+	SYNTAX	S3PsType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis power supply type.  This value is
+		valid only when the backplane type is not
+		other(1).  If the chassis has a redundant backplane,
+		the agent returns redundantCapable(5), even if only
+		one power supply is installed.  The objects
+		s3RedPsPrimaryConfig and s3RedPsSecondaryConfig
+		should be consulted to determine the installed
+		power supply type(s) with redundant backplanes."
+	::= { s3000Chassis 4 }
+
+s3ChassisPsStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ok(1),			-- supply ok
+		primaryFail(2),		-- primary power supply failure
+		secondaryFail(3),	-- secondary power supply failure
+		bothFail(4)		-- both power supplies failed
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis power supply status."
+	::= { s3000Chassis 5 }
+
+s3ChassisFanStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ok(1),			-- fans are running
+		fail(2),		-- fan(s) are broken
+		other(3)		-- unknown fan status or no fan
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The status of the chassis cooling fan."
+	::= { s3000Chassis 6 }
+
+
+
+-- Chassis Slot Configuration Table
+
+
+s3SlotConfigTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S3SlotConfigEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The chassis slot configuration table."
+	::= { s3000Chassis 7 }
+
+s3SlotConfigEntry OBJECT-TYPE
+	SYNTAX	S3SlotConfigEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"What type of module is in each slot of the chassis."
+	INDEX	{ s3SlotNumber }
+	::= { s3SlotConfigTable 1 }
+
+
+S3SlotConfigEntry ::= SEQUENCE {
+	s3SlotNumber
+		INTEGER,
+	s3SlotModuleId
+		INTEGER,
+	s3SlotModuleType
+		S3ModuleType,
+	s3SlotModuleDescr
+		DisplayString,
+	s3SlotModuleLed
+		OCTET STRING,
+	s3SlotModuleMdaId
+		INTEGER
+	}
+
+s3SlotNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The 3000 Chassis slot number. Valid entries are 1-12."
+	::= { s3SlotConfigEntry 1 }
+
+s3SlotModuleId OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ID for the module.  Values are specified in
+		SynOptics technical documents."
+	::= { s3SlotConfigEntry 2 }
+
+s3SlotModuleType OBJECT-TYPE
+	SYNTAX	S3ModuleType
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"The type of module this entry represents.
+		Values are specified in SynOptics technical documents."
+	::= { s3SlotConfigEntry 3 }
+
+s3SlotModuleDescr OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..128))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Module description.  Values are specified in
+		SynOptics technical documents."
+	::= { s3SlotConfigEntry 4 }
+
+s3SlotModuleLed OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(8))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Status of the module LEDs.  Format is specified in
+		SynOptics technical documents.  NOTE: the 291x FDDI
+		workgroup concentrators actually return a string
+		with size of 10."
+	::= { s3SlotConfigEntry 5 }
+
+s3SlotModuleMdaId OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"ID of the medium-dependent part of the board.
+		The value is board dependent. Values are specified
+		in SynOptics technical documents."
+	::= { s3SlotConfigEntry 6 }
+
+
+
+-- Chassis Common Board Table
+
+
+s3CommonBoardTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S3CommonBoardEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table containing information about the boards
+		currently plugged into the 3000 Chassis.  This
+		board table contains an entry for each non-empty
+		slot in the s3SlotConfigTable, EXCEPT for those
+		slots containing Retiming Modules.
+
+		All of the information in this board table is
+		retrievable using the NMI commands that are common
+		to all boards integrated into the SynOptics
+		Series 3000 Concentrators."
+	::= { s3000Chassis 8 }
+
+s3CommonBoardEntry OBJECT-TYPE
+	SYNTAX	S3CommonBoardEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A table entry containing information about a
+		single Board currently plugged into the 3000
+		Chassis. These values can be retrieved using the
+		common board NMI commands."
+	INDEX	{ s3CommonBoardIndex }
+	::= { s3CommonBoardTable 1 }
+
+S3CommonBoardEntry ::= SEQUENCE {
+	s3CommonBoardIndex
+		INTEGER,
+	s3CommonBoardId
+		INTEGER,
+	s3CommonBoardHwVer
+		INTEGER,
+	s3CommonBoardStatus
+		INTEGER,
+	s3CommonBoardReset
+		INTEGER,
+	s3CommonBoardPartStatus
+		INTEGER,
+	s3CommonBoardNmCntlStatus
+		INTEGER,
+	s3CommonBoardPsStatus
+		INTEGER,
+	s3CommonBoardPartTime
+		TimeTicks
+	}
+
+s3CommonBoardIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A unique value for each board. Its value ranges
+		between 1 and 12. The value for each board must
+		remain constant at least from one re-initialization
+		of the entity's network management system to the
+		next re-initialization."
+	::= { s3CommonBoardEntry 1 }
+
+s3CommonBoardId OBJECT-TYPE
+	SYNTAX  INTEGER {
+	m331x(1),
+	m3302(2),
+	m332x(3),
+	m3304ST(4),
+	m3305(5),
+	m333x(6),
+	m3307(7),
+	m3308(8),
+	m3301(9),
+	m3904(10),
+	m3902(11),
+	m3910S(12),
+--	mNotAssigned13(13),
+	m331xS(14),
+	m3100R(15),
+	m3502(16),
+	m3502A(17),
+	m353x(18),
+	m3040(19),
+	m3505(20),
+	m3505A(21),
+	m355x(22),
+	m3040S(23),
+	m351x(24),
+	m332xS(25),
+	m338x(26),
+	m3328(27),
+	m3395(28),
+	m3394(29),
+	m3522(30),
+	m3395A(31),
+	m3800(32),
+--	mNotAssigned33(33),
+--	mNotAssigned34(34),
+--	mNotAssigned35(35),
+	m3368(36),
+--	mNotAssigned37(37),
+	m3308A(38),
+	m2810nmm(39),
+	m2810hm(40),
+	m3301ohms75(41),
+	m3301ohms93(42),
+	m2912(43),
+	m2914(44),
+	m3502B(45),
+	m3505B(46),
+	m3307HD(47),
+	m2702Fhm(48),
+	m2712Fhm(49),
+	m2712hm(50),
+	m2702hm(51),
+	m2813nmm(52),
+	m2813hm(53),
+	m2814hm(54),
+	m2803hm(55),
+	m3356(56),
+	m2814nmm(57),
+	m2804hm(58),
+	m2702Chm(59),
+	m2715Fhm(60),
+	m2705Fhm(61),
+	m2705Chm(62),
+	m3902A(63),
+	m2912A(64),
+	m271xnmm(65),
+	m2715hm(66),
+	m3910SSD(67),
+	m3313A(68),
+	m3314A(69),
+	m3304A(70),
+	m3910SA(71),
+	m2705hm(72),
+	m3905(73),
+	m2915(74),
+	m2715Bhm(75),
+	m2705Bhm(76),
+	m2715BFhm(77),
+	m2712Bhm(78),
+	m2712BFhm(79),
+	m2702BChm(80),
+--	mNotAssigned81(81),
+	m3486(82),
+--	mNotAssigned83(83),
+--	mNotAssigned84(84),
+--	mNotAssigned85(85),
+--	mNotAssigned86(86),
+--	mNotAssigned87(87),
+	m810m(88),
+--	mNotAssigned89(89),
+--	mNotAssigned90(90),
+--	mNotAssigned91(91),
+--	mNotAssigned92(92),
+--	mNotAssigned93(93),
+--	mNotAssigned94(94),
+--	mNotAssigned95(95),
+--	mNotAssigned96(96),
+--	mNotAssigned97(97),
+--	mNotAssigned98(98),
+--	mNotAssigned99(99),
+--	mNotAssigned100(100),
+	m3517SA(101),
+	m3308B(102),
+	m2813SAnmm(103),
+	m2814SAnmm(104),
+	m3313SA(105),
+	m3314SA(106),
+	m3174(107),
+	m3522A(108),
+	m3513SA(109),
+	m271xSAnmm(110),
+	m2300x(114), 
+	m2310x(115),
+	m3299C(116),
+	m3299U(117),
+	m3299F(119),
+        m3410(120),
+        m3405(121),
+        m3475(122),
+	mAlcatelEthConcnmm(250),
+	mAlcatelEthConchm(251),
+	mAlcatelEthExpConchm(252)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	"This is the ID of the board, which is 'hard-coded' in the
+	board, and identifies the board's basic functionality.
+	Some boards have the capability to change aspects of
+	their functionality, such as media type, interface types,
+	or power supply wattages, by plugging in different daughter
+	cards.  Other boards may identify the type of cable plugged
+	into them.  The boards that have these capabilities use 
+	different values for the object s3SlotModuleMda to identify
+	the changable portion of the functionality currently used.
+	Boards that do not support these capabilities typically set
+	the object s3SlotModuleMda to 255 or zero.  The combination
+	of the value of this object and the s3SlotModuleMda object
+	are then mapped by software to determine the type of
+	module (i.e., s3SlotModuleType).
+
+	Notes:  1.)  The object s3SlotModuleType is marked
+	             as deprecated.
+	        2.)  Agents do not implement a complete mapping of
+	             s3CommonBoardId and s3SlotModuleMda to
+	             s3SlotModuleType.  The mapping that is performed
+	             pertains to the media type of the agent.
+
+	The possible values for this object are:
+	  m331x(1)...................331x Ethernet NMM
+	  m3302(2)...................3302 Ethernet STP Host
+	  m332x(3)...................332x Ethernet Local Bridge
+	  m3304ST(4).................3304 Ethernet FOIRL-ST Host
+	  m3305(5)...................3305 Ethernet UTP Host
+	  m333x(6)...................333x Ethernet Repeater/Retiming
+	  m3307(7)...................3307 Ethernet 50 Pin UTP Host
+	  m3308(8)...................3308 10BaseT UTP Host
+	  m3301(9)...................3301 10Base2 Thin Net Host
+	  m3904(10)..................3904 FDDI Multimode Fiber Host
+	  m3902(11)..................3902 FDDI STP Host
+	  m3910S(12).................3910S FDDI NMM
+	  m331xS(14).................331xS Ethernet NMM
+	  m3100R(15).................3100R Power Supply Summing
+	  m3502(16)..................3502 Token Ring Passive STP Host
+	  m3502A(17).................3502A Token Ring Passive STP/UTP Host
+	  m353x(18)..................353x Token Ring RI/RO Repeater
+	  m3040(19)..................3040 Network Control Engine (NCE)
+	  m3505(20)..................3505 Token Ring Active UTP Host
+	  m3505A(21).................3505A Token Ring Active UTP Host
+	  m355x(22)..................355x Token Ring FOIRL RI/RO Repeater
+	  m3040S(23).................3040S Network Control Engine
+	  m351x(24)..................351x Token Ring NMM
+	  m332xS(25).................332xS Ethernet High Speed Local Bridge
+	  m338x(26)..................338x Ethernet Remote Router
+	  m3328(27)..................3328 Ethernet Switching Engine (ESE)
+	  m3395(28)..................3395 Terminal Server
+	  m3394(29)..................3394 LattisTalk Router/Repeater
+	  m3522(30)..................3522 Token Ring Local Bridge
+	  m3395A(31).................3395A Terminal Server
+	  m3800(32)..................3800 Multimedia Router
+	  m3368(36)..................3368 Ethernet LattisSecure Host
+	  m3308A(38).................3308A 10BaseT Host
+	  m2810nmm(39)...............2810 Ethernet NMM
+	  m2810hm(40)................2810 Ethernet Host
+	  m3301ohms75(41)............3301-75 Ethernet Thin Net Host (75-ohm)
+	  m3301ohms93(42)............3301-93 Ethernet Thin Net Host (93-ohm)
+	  m2912(43)..................2912 FDDI STP Concentrator
+	  m2914(44)..................2914 FDDI Fiber Concentrator
+	  m3502B(45).................3502B Token Ring Passive STP/UTP Host
+	  m3505B(46).................3505B Token Ring Active STP/UTP Host
+	  m3307HD(47)................3307HD Ethernet 100 Pin UTP Host
+	  m2702Fhm(48)...............2702F Token Ring Passive Host
+	  m2712Fhm(49)...............2712F Token Ring Passive Host
+	  m2712hm(50)................2712 Token Ring Passive Host
+	  m2702hm(51)................2702 Token Ring Passive Host
+	  m2813nmm(52)...............2813 Ethernet NMM
+	  m2813hm(53)................2813 Ethernet Host
+	  m2814hm(54)................2814 Ethernet Host
+	  m2803hm(55)................2803 Ethernet Host
+	  m3356(56)..................3356 Ethernet Remote Bridge
+	  m2814nmm(57)...............2814 Ethernet NMM
+	  m2804hm(58)................2804 Ethernet Host
+	  m2702Chm(59)...............2702C Token Ring Passive Host
+	  m2715Fhm(60)...............2715F Token Ring Active Host
+	  m2705Fhm(61)...............2705F Token Ring Active Host
+	  m2705Chm(62)...............2705C Token Ring Active Host
+	  m3902A(63).................3902A FDDI STP Host
+	  m2912A(64).................2912A FDDI STP Concentrator
+	  m271xnmm(65)...............271x Token Ring NMM
+	  m2715hm(66)................2715 Token Ring Active Host
+	  m3910SSD(67)...............3910S-SD FDDI NMM
+	  m3313A(68).................3313A Ethernet NMM
+	  m3314A(69).................3314A Ethernet NMM
+	  m3304A(70).................3304A Ethernet 10BaseF Host
+	  m3910SA(71)................3910SA FDDI NMM
+	  m2705hm(72)................2705 Token Ring Active Host
+	  m3905(73)..................3905 FDDI UTP Host
+	  m2915(74)..................2915 FDDI UTP Concentrator
+	  m2715Bhm(75)...............2715B Token Ring Active Host
+	  m2705Bhm(76)...............2505B Token Ring Active Host
+	  m2715BFhm(77)..............2715B-F Token Ring Active Host
+	  m2712Bhm(78)...............2712B Token Ring Passive Host
+	  m2712BFhm(79)..............2712B-F Token Ring Passive Host
+	  m2702BChm(80)..............2702B-C Token Ring Passive Host
+	  m3486(82)..................3486 LattisEngine/486
+	  m810m(88)..................810M Ethernet Concentrator
+	  m3517SA(101)...............3517SA Token Ring NMM
+	  m3308B(102)................3308B 10BaseT Host
+	  m2813SAnmm(103)............2813SA Ethernet NMM
+	  m2814SAnmm(104)............2814SA Ethernet NMM
+	  m3313SA(105)...............3313SA Ethernet NMM
+	  m3314SA(106)...............3314SA Ethernet NMM
+	  m3174(107).................3174 Workstation Controller
+	  m3522A(108)................3522A Token Ring Local Bridge
+	  m3513SA(109)...............3513SA Token Ring NMM
+	  m271xSAnmm(110)............271xSA Token Ring NMM
+	  m2300x(114)................2300x Product
+	  m2310x(115)................2310x Product
+	  m3299C(116)................3299-C Terminal Multiplexor Adapter
+	  m3299U(117)................3299-U TTP Terminal Multiplexor Adapter
+	  m3299F(119)................3299-F Fiber Optic Terminal Adapter
+          m3410(120).................3410 Fast Ethernet Network
+                                     Management Module
+          m3405(121).................3405 Fast Ethernet Host Module with
+                                     12 100BASE-TX ports
+          m3475(122).................3475 Fast Ethernet Host Module with
+                                     11 100BASE-TX ports and 1 100BASE-FX port
+
+	  mAlcatelEthConcnmm(250)....Alcatel Ethernet NMM
+	  mAlcatelEthConchm(251).....Alcatel Ethernet Host
+	  mAlcatelEthExpConchm(252)..Alcatel Ethernet Expansion Host"
+	::= { s3CommonBoardEntry 2 }
+
+s3CommonBoardHwVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The hardware revision of the board.
+		  0=Rev. A, 1=Rev. B, etc."
+	::= { s3CommonBoardEntry 3 }
+
+s3CommonBoardStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ok(1),			-- good status
+		fail(2)			-- bad status
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the operational status of the board."
+	::= { s3CommonBoardEntry 4 }
+
+s3CommonBoardReset OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noReset(1),		-- not resetting
+		reset(2)		-- resetting
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the reset state of the board.
+		Writing with the value reset (2) will reset
+		the board."
+	::= { s3CommonBoardEntry 5 }
+
+s3CommonBoardPartStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		enabled(1),		-- board enabled
+		partition(2),		-- board partitioned indefinitely
+		timedPartition(3)	-- board partitioned for a
+					--   time period
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Tells whether the board is partitioned or enabled.
+		Writing with the value partition(2) will partition
+		the board indefinitely and writing with the value
+		enabled(1) will enable the board.
+
+		If a timed partition is desired, then this object
+		must be written with timedPartition(3) and in the
+		same PDU a partition duration must be supplied in
+		s3CommonBoardPartTime. Timed partitions will not
+		survive across a reset. In this case the port will
+		go to the partition(2) state.
+
+		Boards cannot be partitioned in the 2810 concentrator
+		and other workgroup concentrators. These agents will
+		implement this object as read-only."
+	::= { s3CommonBoardEntry 6 }
+
+s3CommonBoardNmCntlStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		notNmControl(1),	-- board not under NM control
+		nmControl(2)		-- board under NM control
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Tells whether the board is under network management
+		control.  The value nmControl(2) indicates that the
+		board or one or more ports are being controlled by
+		network management.  This means that the board
+		or one or more ports are partitioned via a network
+		manager."
+	::= { s3CommonBoardEntry 7 }
+
+s3CommonBoardPsStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		ok(1),			-- good status
+		fail(2)			-- bad status
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the operational status of the board
+		power supply.  A fail(2) indicates that one of the
+		power supplies on the board has failed."
+	::= { s3CommonBoardEntry 8 }
+
+s3CommonBoardPartTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"When partitioning the board for a specified time, 
+		s3CommonBoardPartStatus must be set with
+		timedPartition(3) and this object must be supplied
+		with the duration value. If a PDU sets 
+		s3CommonBoardPartStatus and not this object, the
+		board will not be partitioned.  This value is
+		decremented while the board is partitioned
+		until the value reaches zero at which time the
+		board is enabled."
+	::= { s3CommonBoardEntry 9 }
+
+
+-- Packed Slot Configuration Table
+
+
+s3SlotConfigOctetString OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(12..144))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Packed octet string for the slot configuration table.
+		Format is specified in SynOptics technical documents.
+		NOTE: the 291x FDDI workgroup concentrators actually
+		return a string with size a multiple of 14."
+	::= { s3000Chassis 9 }
+
+
+
+-- Redundant Power Supply Group
+
+
+-- Support of the entire Redundant Power Supply group is mandatory
+--   for every SynOptics 4.1 agent in a chassis with redundant
+--   backplane.  (These are the agents that return the value
+--   redundantCapable(5) for s3ChassisPsType. Note: this does not
+--   include the FDDI 4.0 agents.)
+
+
+s3RedPsPlus5vCurrent OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This gauge is measured in amperes."
+	 ::={ s3000RedundantPs 1 }
+
+s3RedPsPlus12vCurrent OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This gauge is measured in amperes."
+	::={ s3000RedundantPs 2 }
+
+s3RedPsAmbientTempStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		normalTemperature(2),
+		aboveNormalTemp(3)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This status indicates whether the ambient
+		temperature is  normal, i.e., below 40 degree C."
+	 ::={ s3000RedundantPs 3 }
+
+s3RedPsAmbientTemperature OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This gauge is measured in Celsius."
+	::={ s3000RedundantPs 4 }
+
+s3RedPsPrimaryConfig OBJECT-TYPE
+	SYNTAX	S3PsType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the primary power supply type
+		(PS 1).  Note that value redundantCapable(5)
+		should not be returned for this object."
+	::={ s3000RedundantPs 5 }
+
+s3RedPsSecondaryConfig OBJECT-TYPE
+	SYNTAX	S3PsType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the secondary power supply type
+		(PS 2).  Note that value redundantCapable(5)
+		should not be returned for this object."
+	 ::={ s3000RedundantPs 6 }
+
+s3RedPsDiodeStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),		-- not applicable
+		bothOk(2),		-- both diodes ok
+		primaryFail(3),		-- primary diode fail
+		secondaryFail(4),	-- secondary diode fail
+		bothFail(5)		-- both diode fail
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This gives the status of the summing diode on the
+		3100R associated with the indicated power supply."
+	 ::={ s3000RedundantPs 7 }
+
+s3RedPsPowerAlarm OBJECT-TYPE
+	SYNTAX	INTEGER	{
+		other(1),		-- not applicable
+		bothOk(2),		-- both power supplies ok
+		primaryFail(3),		-- primary supply fail
+		secondaryFail(4),	-- secondary supply fail
+		bothFail(5)		-- both supplies fail
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This tells whether the indicated power supply is
+		sensing voltage on the backplane."
+	 ::={ s3000RedundantPs 8 }
+
+
+
+-- Channel Divider Information
+
+s3ChassisBkPlEthChanDiv OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"A value that describes the divisions of the
+		segmentable ethernet channel.  For those devices
+		that do not implement a backplane with this feature,
+		they still need to implement this object and return
+		a value (i.e., zero) to indicate that no divisions
+		are enabled.
+
+		The value is a sum (i.e., integer bit string).
+		This value initially takes the value of zero,
+		then for each division that is enabled on the channel,
+		2 raised to a power is added to the sum.  The powers
+		are according to the following table:
+
+		  Division between    Power
+		    Slots 4 and 5     0
+		    Slots 6 and 7     1
+		    Slots 8 and 9     2
+
+		For example, a channel with no divisions enabled
+		(i.e., not segmented) would have a value of 0.
+		A channel with divisions between slots 6 and 7,
+		and slots 8 and 9 enabled (i.e., having three
+		segments) would have a value of 6 (2**1 + 2**2)."
+	::= {  s3000Chassis 11 }
+
+
+s3ChassisEnetChannelAType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	   -- unknown or no Ethernet
+		aSegmentable(2),   -- Enet chan A is segmentable
+		aNotSegmentable(3) -- Enet chan A is not segmentable
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent will return aSegmentable(2) for the 3000N,
+		3000NT, 3000S, 3000SR, and any other backplanes in
+		which Ethernet channel A can be divided into multiple
+		segments.  The value aNotSegmentable(3) indicates
+		that the Ethernet backplane channel A cannot be
+		segmented.
+
+		For Token Ring or FDDI workgroup concentrators, or
+		other devices in which there is no Ethernet channel,
+		the agent will return other(1)."
+	::= {  s3000Chassis 12 }
+
+
+
+-- SECTION 3: Agent Configuration
+
+-- Agent Software Group
+
+
+-- Implementation of this group is mandatory for all SynOptics
+--   Series 3000 agents
+
+
+s3AgentType OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	-- none of the following
+		m3313(2),	-- AUI Ethernet NMM w/ RS232 port
+				--  (may also be returned by a 2810)
+		m3313M(3),	-- AUI Enet NMM w/ RS232 port + modem
+		m3314-ST(4),	-- FOIRL Ethernet NMM w/ RS232
+		m3314M-ST(5),	-- FOIRL Ethernet NMM w/ RS232 + modem
+		m2310(6),	-- Model 2310
+		m3512(7),	-- T.R. NMM w/ STP ring in/ring out
+		m3514(8),	-- T.R. NMM w/ FOIRL ring in/ring out
+		m332x(9),	-- Low Speed Local Bridge
+		m3356(10),	-- Ethernet Remote Bridge
+		m332xS(11),	-- High Speed Local Bridge
+		m3910S(12),	-- FDDI Super NMM
+		m3395(13),	-- terminal server
+		m3394(14),	-- Ethernet-localtalk router
+		m3513(15),	-- TR NMM with STP repeater
+		m331xS(16),	-- Ethernet NMM+
+		m291x(17),	-- FDDI 291x workgroup concentrator
+		m271x(18),	-- T.R. 271x workgroup concentrator
+		m281x(19),	-- Ethernet 281x workgroup concentrator
+		m331xA(20),	-- Ethernet 331xA NMM
+		m3522(21),	-- Token Ring Local Bridge Module
+		m2722(22),	-- Standalone Token Ring Local Bridge
+		m281xSA(23),	-- Ethernet 281xSA workgroup concentator
+		m810M(24),	-- Ethernet LattisHub 810M NMM
+		m351xSA(25),	-- T.R. 351xSA NMM
+		m331xSA(26),	-- Ethernet 331xSA NMM
+		m271xSA(27),	-- T.R. 271xSA workgroup concentrator
+		m2486(28),	-- LattisEngine 2486
+		m2300x(29),	-- 2300x product
+		m2310x(30)	-- 2310x product
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The 3000 series agent's Module type."
+	::= {s3AgentSw  1 }
+
+s3AgentFwVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent's module firmware version
+		0=Rev A,1=Rev B,etc."
+	::= { s3AgentSw 2 }
+
+s3AgentSwMajorVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent major software version number.
+		(version is specified as major.minor.maint or 3.0.1).
+		Object is in decimal."
+	::= { s3AgentSw 3 }
+
+s3AgentSwMinorVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent minor software version number
+		(version is specified as major.minor.maint or 3.0.1).
+		Object is in decimal."
+	::= { s3AgentSw 4 }
+
+-- NOTE: the maintenance object, s3AgentSwMaintVer, is defined below.
+
+s3AgentBootProtocol OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	-- boot protocol not listed here
+		bootp-tftp(2),
+		tftp-only(3),
+		ieee802-1e(4),
+		proprietary(5),	-- supported proprietary boot protocol
+		dll-download(6)	-- direct async binary download (Retix)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Boot protocol used to load the module with its software.
+		On Agents with the Local Load option the value return by
+		this object is valid only if the MIB object
+		s3LocImageLoadMode is remoteBoot(2) or localAsBackup(4)."
+	::= {s3AgentSw 5 }
+
+s3AgentBootFile OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..64))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the boot file that is sent to the file
+		server during boot time.  The actual boot protocol
+		used to retrieve the file is determined by 
+		s3AgentBootProtocol.
+
+		This parameter will not take effect until written 
+		into EEPROM (s3AgentWriteEeprom) and a reset
+		(s3AgentReset) is issued. This parameter is used
+		only if the s3AgentBootMode is set to use EEPROM."
+	::= { s3AgentSw 6 }
+
+s3AgentAuthTrap OBJECT-TYPE
+	SYNTAX	INTEGER {
+		disable(1),		-- disable authentication traps
+		enable(2)		-- enable authentication traps
+		}
+	ACCESS	read-write
+	STATUS	deprecated
+	DESCRIPTION
+		"Enable or disable the use of authentication error
+		trap generation.
+
+		This parameter will take effect only after a restart
+		(s3AgentRestart) is issued.  This parameter will not
+		survive a reset (s3AgentReset) unless the specific
+		NMM configuration file is updated to reflect the
+		change.
+
+		This object is now deprecated.  Managers should use
+		the snmpEnableAuthenTraps object in MIB-II instead.
+		This object is aliased to snmpEnableAuthenTraps.
+		Changing either variable will change the other
+		accordingly."
+	::= { s3AgentSw 7 }
+
+s3AgentLocation OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..64))
+	ACCESS	read-write
+	STATUS	deprecated
+	DESCRIPTION
+		"This is a informational string that could be used
+		to show the physical location (i.e. area) of the
+		NMM or concentrator.
+
+		This parameter will take effect only after a restart
+		(s3AgentRestart) is issued.  This parameter will not
+		survive a reset (s3AgentReset) unless the specific
+		NMM configuration file is updated to reflect the
+		change.
+
+		This object is now deprecated.  Managers should use
+		the sysLocation object in MIB-II instead."
+	::= { s3AgentSw 8 }
+
+s3AgentMibLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Used to determine current MIB release supported
+		by agent.  The encoding of this object is of the
+		following form: xyy, where x is the major version
+		number and yy is the minor version number.  Thus,
+		version 3.0 would be represented as 300,  version
+		3.01 would be 301 and 3.1 would be 310.  Object is
+		in decimal.  Values that correspond to each agent
+		type and version are specified in the other
+		SynOptics documentation."
+	::= { s3AgentSw 9 }
+
+s3AgentFeatureLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	deprecated
+	DESCRIPTION
+		"Used to determine feature level of the agent.
+		The encoding of this object is of the following
+		form: xyy, where x is the major version 
+		number and yy is the minor version number.  Thus,
+		feature level version 1.0 would be represented as
+		100, version 1.01 would be 101 and 1.1 would be 110.
+		Object is in decimal. The current values are the
+		following:
+		  100 - 331x V3.x
+		        - Basic Agent
+		  100 - 351x
+		        - Basic Agent
+		  100 - 271x V3.x
+		        - Basic Agent
+		  101 - 281x V5.0 
+		        - Basic Agent
+		        - Dual Stack
+		  102 - 331x V4.2.0
+		        - Basic Agent
+		        - Non Segmentable Chassis
+		        - Ethernet Common board table
+		        - Ethernet Command port table
+		        - redundant power supply group
+		  103 - 331xA V4.2.0
+		        - Basic Agent
+		        - Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply group
+		        - Ethernet plus statistics,
+		  104 - 331xA V4.2.0
+		        - Basic Agent
+		        - Non-Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply group
+		        - Ethernet plus statistics,
+		  109 - 331x V4.2.0
+		        - Basic Agent
+		        - Segmentable Chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply group
+		  112 - 281x V5.1.0
+		        - Basic Agent
+		        - Dual Stack
+		        - Network to MAC address mapping
+		  113 - 331x V5.1.0
+		        - Basic Agent
+		        - Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		  114 - 331x V5.1.0
+		        - Basic Agent
+		        - Non-Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		  115 - 331xA V5.1.0
+		        - Basic Agent
+		        - Segmentable chassis
+		        - Dual Stack
+		        - Full Truffle Support
+		        - Network to MAC address mapping
+		  116 - 331xA V5.1.0
+		        - Basic Agent
+		        - Non-Segmentable chassis
+		        - Dual Stack
+		        - Full Truffle Support
+		        - Network to MAC address mapping
+		  200 - 331x V4.0 & V4.0.1
+		        - Advanced Agent
+		  200 - 271x V4.x
+		        - Advanced Agent
+		  200 - 351x V4.x
+		        - Advanced Agent
+		  200 - all FDDI Agents
+		  201 - 331x V4.1.0, V4.1.1
+		        - Advanced Agent
+		        - redundant power supply group
+		  202 - 331xS V4.1.0, V4.1.1
+		        - Advanced Agent
+		        - redundant power supply  group
+		        - DS/SD traffic tables,
+		        - Ethernet plus statistics,
+		        - frame type distribution table
+		        - frame length distribution table
+		  203 - 281x V4.2.0
+		        - Advanced Agent
+		        - Dual Stack
+		  204 - 331x V4.2.0
+		        - Advanced Agent
+		        - Non-Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply group
+		  205 - 331xS V4.2.0
+		        - Advanced Agent
+		        - Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply  group
+		        - DS/SD traffic tables,
+		        - Ethernet plus statistics,
+		        - frame type distribution table
+		        - frame length distribution table
+		  206 - 331xS V4.2.0
+		        - Advanced Agent
+		        - Non-Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply  group
+		        - DS/SD traffic tables,
+		        - Ethernet plus statistics,
+		        - frame type distribution table
+		        - frame length distribution table
+		  207 - 331xA V4.2.0
+		        - Advanced agent
+		        - Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply  group
+		        - Ethernet plus statistics,
+		  208 - 331xA V4.2.0
+		        - Advanced agent
+		        - Non-Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Common port table
+		        - redundant power supply  group
+		        - Ethernet plus statistics,
+		  209 - 331x V4.2.0
+		        - Advanced agent
+		        - Segmentable chassis
+		        - Ethernet Common board table
+		        - Ethernet Command port table
+		        - redundant power supply group
+		  212 - 331x V5.1.0
+		        - Advanced Agent
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		  213 - 281x V5.1.0
+		        - Advanced Agent
+		        - Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		  214 - 331x V5.1.0
+		        - Advanced Agent
+		        - Non-Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		  215 - 331xA V5.1.0
+		        - Advanced Agent
+		        - Segmentable chassis
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		        - Dual Stack
+		        - Full Truffle Support
+		        - Network to MAC address mapping
+		  216 - 331xA V5.1.0
+		        - Advanced Agent
+		        - Non-Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		  217 - 331xS V5.1.0
+		        - Advanced Agent
+		        - Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		        - Bulk table retrieval for traffic matrix
+		  218 - 331xS V5.1.0
+		        - Advanced Agent
+		        - Non-Segmentable chassis
+		        - Full Truffle Support
+		        - Dual Stack
+		        - Network to MAC address mapping
+		        - RMON Ether Stats, History, Alarm, Event Groups
+		        - Bulk table retrieval for traffic matrix"
+	::= { s3AgentSw 10 }
+
+s3AgentMySlotId OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Slot where this agent currently resides.  If
+		hardware is unable to determine then a 0 should
+		be returned."
+	::= { s3AgentSw 11 }
+
+s3AgentUnAuthIp OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This object contains the IP address of the last
+		station that tried to access this agent with an
+		invalid community string.  This object is used
+		as a VarBind in an Authentication Trap PDU.  A get
+		request will return the last value used, and will
+		return the null address 0.0.0.0 if no 
+		authentication traps have been sent."
+	::= { s3AgentSw 12 }
+
+s3AgentUnAuthComm OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..20))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This object contains the community string of the
+		last unauthenticated attempt to access this agent.
+		This object is used as a VarBind in an Authentication
+		Trap PDU.  A get request will return the last value
+		used, and will return the null string (length 0) if
+		no authentication traps have been sent."
+	::= { s3AgentSw 13 }
+
+s3AgentSwLicenseCode OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(8))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The software license code assigned to this agent.
+		This code is required for initializing the agent.
+		The code consists of exactly eight printable
+		characters."
+	::= { s3AgentSw 14 }
+
+s3AgentPerformance OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This counts the CPU idle time of the agent
+		in units of 10 microseconds."
+	::= { s3AgentSw 15 }
+
+s3AgentSwMaintVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent software maintenance version number
+		(version is specified as major.minor.maint or 3.0.1).
+		Object is in decimal."
+	::= { s3AgentSw 16 }
+
+s3AgentConfigLoadMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	 -- configuration source not listed here
+		remoteConfig(2), -- use net, not local configuartion data
+		localConfig(3),	 -- use local configuration data
+		localAsBackup(4) -- try net, if fails use local
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the agent should get
+		configuration data from the network, use the local
+		configuration data, or try the network first and then
+		fall back to local configuration if the network load
+		fails.  This object applies only to agents with boot
+		prom support for agent configuration load options.
+
+		This parameter will not take effect until written into
+		EEPROM (s3AgentWriteEeprom) and a reset (s3AgentReset)
+		is issued."
+	::= { s3AgentSw 17 }
+
+s3AgentConfigActualSource OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		remoteConfig(2),
+		localConfig(3)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the agent loaded configuration
+		data from the network or used the local configuration
+		data."
+	::= { s3AgentSw 18 }
+
+s3AgentMgmtProtoMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	-- unknown or other
+		ip(2),		-- IP only, all IPX packets will be dropped
+		ipx(3),		-- IPX only, all IP packets will be dropped
+		ipAndIpx(4) 	-- both IP and IPX packets will be accepted
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates from which network transports over
+		which the agent will accept SNMP requests.  This object
+		only applies to agents with IP and IPX dual stack support.
+
+		This parameter will not take effect until written into
+		EEPROM (s3AgentWriteEeprom) and a reset (s3AgentReset)
+		or a restart (s3AgentRestart) is issued."
+	::= { s3AgentSw 19 }
+
+s3AgentActualMgmtProtocol OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		ip(2),
+		ipx(3),
+		ipAndIpx(4)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates which network transports over which
+		the agent will currently accept SNMP requests."
+	::= { s3AgentSw 20 }
+
+s3AgentImageFile OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..64))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The name of the agent image file that the NMM loads
+		at boot time.
+		
+		This parameter will not take effect until written to
+		EEPROM (s3AgentWriteEeprom) and a reset (s3AgentReset)
+		is issued.  This parameter is used only if s3AgentBootMode
+		is set to use eeprom(1), s3AgentConfigLoadMode is set to
+		localConfig(3) and s3LocImageLoadMode is not set to
+		localBoot(3)."
+	::= { s3AgentSw 21 }
+
+
+
+-- Agent Network Protocol Group
+
+
+-- Implementation of this group is mandatory for all SynOptics
+--   Series 3000 agents
+
+
+s3AgentIpAddr OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The Agent's administrative IP address. The
+		current operational IP address can be obtained
+		by the ipAdEntAddr entry in the ipAddrTable.
+
+		This parameter will take effect only after a
+		restart (s3AgentRestart) is issued. This parameter
+		will not survive a reset (s3AgentReset) unless it
+		is written into EEPROM (s3AgentWriteEeprom). This
+		parameter is used only if the s3AgentBootMode is
+		set to use EEPROM."
+	::= { s3AgentIpProtocol 1 }
+
+s3AgentNetMask OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The Agent's administrative subnet mask. The
+		current operational subnet mask can be obtained
+		by the ipAdEntNetMask entry in the ipAddrTable.
+
+		This parameter will take effect only after a
+		restart (s3AgentRestart) is issued. This parameter
+		will not survive a reset (s3AgentReset) unless it 
+		is written into EEPROM (s3AgentWriteEeprom). This
+		parameter is used only if the agentBootMode is set
+		to use EEPROM.
+
+		NOTE:  The Model 331x (3313, 3313M, 3314-ST,
+		3314M-ST) Ethernet NMM agents do not store this
+		parameter in EEPROM, so for these agents the subnet
+		mask configuration must be downloaded in the
+		configuration file."
+	::= { s3AgentIpProtocol 2 }
+
+s3AgentDefaultGateway OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The Agent's administrative default gateway IP
+		address. The current operational default gateway's
+		IP address can be obtained from the ipRoutingTable.
+
+		This parameter will take effect only after a
+		restart (s3AgentRestart) is issued.  This parameter
+		will not survive a reset (s3AgentReset) unless it 
+		is written into EEPROM (s3AgentWriteEeprom).  This
+		parameter is used only if the agentBootMode is set
+		to use EEPROM."
+	::= { s3AgentIpProtocol 3 }
+
+s3AgentBootServerAddr OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The IP address to which the requests for boot files
+		are sent. The protocol used to retrieve the boot
+		files is determined by object s3AgentBootProtocol.
+
+		This parameter will not take effect until until
+		written into EEPROM (s3AgentWriteEeprom) and a
+		reset (s3AgentReset) is issued. This parameter is
+		used only if the s3AgentBootMode is set to use EEPROM."
+	::= { s3AgentIpProtocol 4 }
+
+s3AgentSecDefaultGateway OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The agent's administrative secondary default
+		gateway IP address. This default gateway's IP
+		address will be used when the primary default
+		gateway (s3AgentDefaultGateway) is determined
+		unreachable.
+
+		This parameter will not survive a reset (s3AgentReset)
+		unless it is written into EEPROM (s3AgentWriteEeprom)."
+	::= { s3AgentIpProtocol 5 }
+
+s3AgentPingDefaultRtrSwitch OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),
+		on(2),
+		off(3)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Controls whether the agent will periodically send
+		out the icmp echos (pings) to the default router(s).
+		The values are:
+		  other(1)...unknown or other
+		  on(2)......agent will periodically send out pings
+		               to the default router(s).
+		  off(3).....agent won't send out the pings to the
+		               default router(s)."
+	::= { s3AgentIpProtocol 6}
+
+s3AgentPingDefaultRtrTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The time interval that the agent uses to send
+		out the pings periodically to the default router(s)
+		to check if the router(s) are still reachable."
+	::= { s3AgentIpProtocol 7}
+
+s3AgentBootRouter OBJECT-TYPE
+	SYNTAX	IpAddress
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The default route IP address used at boot
+		time to download the NMM's agent configuration
+		and image files from the TFTP server.
+
+		This parameter will not survive a reset
+		(s3AgentReset) unless it is written into EEPROM
+		(s3AgentWriteEeprom)."
+	::= {  s3AgentIpProtocol  8  }
+
+
+
+-- Agent Trap Receiver Table
+
+
+-- Implementation of this group is mandatory for all SynOptics
+--   Series 3000 agents
+
+
+s3AgentTrapReceiverTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF S3AgentTrapReceiverEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Table containing list of NMS's that are to receive
+		traps generated by this NMM."
+	::= { s3SnmpAgent 3 }
+
+s3AgentTrapReceiverEntry OBJECT-TYPE
+	SYNTAX	S3AgentTrapReceiverEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A destination address and community string to a
+		particular trap server, along with a trap filter
+		and entry aging capability."
+	INDEX	{ s3AgentTrapRcvrNetAddress }
+	::= { s3AgentTrapReceiverTable 1 }
+
+S3AgentTrapReceiverEntry ::= SEQUENCE {
+	s3AgentTrapRcvrStatus
+		INTEGER,
+	s3AgentTrapRcvrNetAddress
+		OCTET STRING,
+	s3AgentTrapRcvrComm
+		OCTET STRING,
+	s3AgentTrapRcvrAgeTime
+		TimeTicks
+	}
+
+s3AgentTrapRcvrStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other (1),		-- none of the following
+		valid (2),		-- a valid address
+		invalid (3)		-- an invalid address
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Setting this object to the value invalid(3) has
+		the effect of invalidating the corresponding entry
+		in the s3AgentTrapReceiverTable.  That is, it 
+		effectively disassociates the address identified
+		with the entry by removing the entry from the table.
+		On a read the value of valid(2) should be returned
+		if the entry contains a valid record, or invalid(3)
+		should be returned if the entry contains an invalid
+		record."
+	::= { s3AgentTrapReceiverEntry 1 }
+
+s3AgentTrapRcvrNetAddress OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(4))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"IP address for trap server that is to receive
+		the trap."
+	::= { s3AgentTrapReceiverEntry  2 }
+
+s3AgentTrapRcvrComm OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..20))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Community string used for traps sent to this
+		trap receiver."
+	::= { s3AgentTrapReceiverEntry  3 }
+
+s3AgentTrapRcvrAgeTime OBJECT-TYPE
+	SYNTAX	TimeTicks
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This is the time interval used to age entries out
+		of the trap receiver table.  The default value if
+		not specified will be 0, or infinite, never to be
+		aged out."
+	::= { s3AgentTrapReceiverEntry  4 }
+
+
+
+-- Agent Hardware Group
+
+
+-- Implementation of this group is mandatory for all 
+--   SynOptics Series 3000 agents
+
+
+
+s3AgentStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		offline(1),		-- the agent is offline
+		online(2)		-- the agent is online
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the NMM is online(2) and
+		operating, or offline(1) (ie: not connected to the
+		concentrator backplane)."
+	::= { s3AgentHw 1 }
+
+s3AgentMdaHwVer OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The network management module's MDA hardware
+		version number  (0=Rev. A, 1=Rev. B, etc.)."
+	::= { s3AgentHw 2 }
+
+s3AgentMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		primary(1),		-- in primary mode
+		secondary(2),		-- in secondary mode
+		other(3)		-- the other values do not apply
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the NMM is operating in
+		primary(1) or secondary(2) mode."
+	::= { s3AgentHw 3 }
+
+s3AgentReset OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noReset(1),		-- not resetting
+		reset(2)		-- reset
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Network management module reset status.  Writing
+		a reset(2) to this object will reset the NMM and
+		perform a download and restart."
+	::= { s3AgentHw 4 }
+
+s3AgentRestart OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noRestart(1),		-- not restarting
+		restart(2)		-- restart
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Network management module restart status.
+		Writing a restart(2) to this object will restart
+		the NMM.  This initializes all the counters,
+		re-reads the EEPROM data structure and starts
+		executing from the beginning of the code."
+	::= { s3AgentHw 5 }
+
+s3AgentBootMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		eeprom(1),
+		net(2),
+		otherCase(3)
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"The method for obtaining boot parameter information.
+		The possible values are:
+		  eeprom(1)......get boot info from eeprom
+		  net(2).........get boot info from remote server
+		  otherCase(3)...not eeprom or net
+
+		This parameter will not take effect until written
+		into EEPROM (s3AgentWriteEeprom) and a reset
+		(s3AgentReset) is issued.
+
+		Note: In previous versions of this MIB the name
+		      associated with the value '2' was 'other',
+		      which implied the same meaning as it does
+		      now.  Thus to prevent confusion, the name
+		      for value '3' was chosen to be 'otherCase'."
+	::= { s3AgentHw 6 }
+
+s3AgentWriteEeprom OBJECT-TYPE
+	SYNTAX	INTEGER {
+		noWriteEeprom(1),	-- not writing EEPROM 
+		writeEeprom(2)		-- write EEPROM
+		}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Network management module EEPROM write status.
+		Writing a (2) to this object will write the contents
+		of current EEPROM data structure in the EEPROM."
+	::= { s3AgentHw 7 }
+
+s3AgentBaudRate OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Specifies the baud rate in bits per second of
+		either the internal modem or the RS-232 port.
+
+		This parameter will take effect only after a
+		restart (s3AgentRestart) is issued.  This parameter
+		will not survive a reset (s3AgentReset) unless
+		the specific NMM configuration file is updated
+		to reflect the change."
+	::= { s3AgentHw 8 }
+
+s3AgentInitString OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..64))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This is the initialization string used to establish
+		the out-of-band connection. (i.e. could contain the
+		string ATDT,415-960-1100 for an internal or external
+		modem). This is used as a hint for the network manager
+		since this string is not used by the agent to initiate
+		a connection to a management station.
+
+		This parameter will take effect only after a restart
+		(s3AgentRestart) is issued.  This parameter will not
+		survive a reset (s3AgentReset) unless the specific
+		NMM configuration file is updated to reflect
+		the change."
+	::= { s3AgentHw 9 }
+
+s3AgentEepromSize OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The size of the EEPROM of the agent in units of bytes."
+	::= { s3AgentHw 10 }
+
+s3AgentEpromSize OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The size of the EPROM of the agent in units of bytes."
+	::= { s3AgentHw 11 }
+
+s3AgentDramSize OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION		
+		"The size of the DRAM of the agent in units of bytes."
+	::= { s3AgentHw 12 }
+
+s3AgentHexDisplay OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..4))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The current 4 ASCII character display of the agent.
+
+		Agents with no hex display hardware should return a
+		zero length string."
+	::= { s3AgentHw 13 }
+
+s3AgentFlashStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),	-- unknown status
+		ok(2),		-- the flash device is valid
+		fail(3)		-- the flash device is invalid
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates the operational status of the flash
+		device of the agent.  A fail(3) indicates that either
+		the flash device configuration on board is not valid
+		or the flash EEPROMs on the board have failed."
+	::= { s3AgentHw 14 }
+
+
+
+-- Agent Local Image Group
+
+
+-- This group is mandatory for agents with image code stored in
+--   local EPROM.  Other agents should return NoSuch if asked for
+--   any of the objects in this group.
+
+
+s3LocImageValid OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),		-- unknown status
+		localImageValid(2),	-- local image is valid
+		localImageInvalid(3)	-- local image is invalid
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the agent has a valid local
+		code image on board.  An EPROM checksum failure would
+		cause the agent to return localImageInvalid(3)."
+	::= { s3AgentLocImage 1 }
+
+s3LocImageMajorVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The major software version number of the
+		locally-stored image.  This object applies only to
+		agents with valid local image.  Other agents 
+		should return zero."
+	::= { s3AgentLocImage 2 }
+
+s3LocImageMinorVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The minor software version number of the
+		locally-stored image.  This object applies only
+		to agents with valid local image.  Other agents
+		should return zero."
+	::= { s3AgentLocImage 3 }
+
+s3LocImageLoadMode OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),		-- unknown status
+		remoteBoot(2),		-- use net, not local image,
+					--   and update local image
+					--   if net image is different
+		localBoot(3),		-- boot from local image, not net
+		localAsBackup(4),	-- try net, if fails use local,
+					--   but if net is OK, then update
+					--   local image when net image
+					--   is different
+		remoteNoUpdate(5),	-- use net, not local image,
+					--   and don't update local image
+		remoteNewUpdate(6),	-- use net, not local image,
+					--   update local image if new
+					--   image is newer
+		localAutoUpdate(7)	-- check net image, if newer,
+					--   then update local image,
+					--   and use this image
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the agent should get code
+		from the network, use a local image, or try the
+		network first and then fall back to local image if 
+		the network boot fails. The localBoot(3) and
+		localAsBackup(4) values apply only to agents with
+		local load option. Note: on agents that have
+		no local storage, either remoteBoot(2), or
+		remoteNoUpdate(5) may be specified, however
+		the value remoteBoot(2) is prefered due to
+		backwards compatibility "
+	::= { s3AgentLocImage 4 }
+
+s3LocImageActualSource OBJECT-TYPE
+	SYNTAX	INTEGER {
+		other(1),		-- unknown status
+		remoteImage(2),		-- downloaded code from network
+		localImage(3)		-- loaded code from local EPROM
+	}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This indicates whether the agent loaded code from
+		the network or used a local image.  When the the
+		ImageLoadMode is localAsBackup, this variable
+		indicates whether the network load was successful."
+	::= { s3AgentLocImage 5 }
+
+s3LocImageMaintVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The maintenance software version number of the
+		locally-stored image.  This object applies only
+		to agents with valid local image.  Other agents
+		should return zero."
+	::= { s3AgentLocImage 6 }
+
+
+END
