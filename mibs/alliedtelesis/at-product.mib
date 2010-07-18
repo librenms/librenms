@@ -1,9 +1,5 @@
 -- ============================================================================
--- AT-PRODUCTS.MIB, Allied Telesis enterprise MIB: product bridge,router,switch
---
--- Extracted from ATROUTER.MIB of pre 2.9.1 release
---
--- June 2006, Stan Xiang
+-- AT-PRODUCTS.MIB, Allied Telesis enterprise MIB
 --
 -- Copyright (c) 2006 by Allied Telesis, Inc.
 -- All rights reserved.
@@ -20,21 +16,33 @@ IMPORTS
 	alliedTelesis
 		FROM AT-SMI-MIB
 ;
-	   		
+
 products MODULE-IDENTITY
-	LAST-UPDATED "200703210000Z"
+	LAST-UPDATED "200803061300Z"
 	ORGANIZATION "Allied Telesis, Inc."
 	CONTACT-INFO
 		"  http://www.alliedtelesis.com"
 	DESCRIPTION
-		"products is the root OBJECT IDENTIFIER. Beneath it there are subtree 
+		"This file defines the identities of Allied Telesis products.
+		 OID products is the root OBJECT IDENTIFIER. Beneath it there are subtree 
 		 bridgeRouter and routerSwitch, which are is defined in AT-SMI-MIB."
+
+	REVISION      "200803061300Z"
+	DESCRIPTION
+		" Added systemOID 69,70,75,76,77. "
+	
+	REVISION      "200711150000Z"
+	DESCRIPTION
+		"Changed systemOID 67 from AT-8824R to 8724SL-V2."
+	
 	REVISION      "200703210000Z"
 	DESCRIPTION
 		"Added systemOID for x900-48FS."
+	
 	REVISION      "200702070000Z"
 	DESCRIPTION
 		"Added systemOID for AT-8824R."
+	
 	REVISION      "200606140000Z"
 	DESCRIPTION
 		"Initial version of this MIB module."
@@ -52,7 +60,6 @@ routerSwitch OBJECT-IDENTITY
 	DESCRIPTION
 		"subtree beneath which router and switch product MIB object ids are assigned."
 	::= { products 14 }
-
 
 -- bridge router
     centreCOMAR300Router    OBJECT IDENTIFIER ::= { bridgeRouter 8 }
@@ -160,12 +167,36 @@ routerSwitch OBJECT-IDENTITY
 	at86482SP               OBJECT IDENTIFIER ::= { routerSwitch 58 }
 	at9924Ti                OBJECT IDENTIFIER ::= { routerSwitch 59 }
 	at9924SPi               OBJECT IDENTIFIER ::= { routerSwitch 60 }
-	at9924Tsi               OBJECT IDENTIFIER ::= { routerSwitch 61 }
-	at9924SPsi              OBJECT IDENTIFIER ::= { routerSwitch 62 }
+--
+--1.3.6.1.4.1.207.1.14.61 AW version x900-24XT
+	at9924Tsi  			 OBJECT IDENTIFIER ::= { routerSwitch 61 }
+--
+--1.3.6.1.4.1.207.1.14.62 AW version x900-24XST
+	at9924SPsi	             OBJECT IDENTIFIER ::= { routerSwitch 62 }
+--
 	at8948iN               OBJECT IDENTIFIER ::= { routerSwitch 63 }
-	at9924TsiN             OBJECT IDENTIFIER ::= { routerSwitch 64 }
+	at9924TsiN			 OBJECT IDENTIFIER ::= { routerSwitch 64 }
     atRapier48w             OBJECT IDENTIFIER ::= { routerSwitch 65 }
-    at8824R                 OBJECT IDENTIFIER ::= { routerSwitch 67 }
-	x90048FS				 OBJECT IDENTIFIER ::= { routerSwitch 68 }
+    at8724SLV2             OBJECT IDENTIFIER ::= { routerSwitch 67 }
+	x90048FS			     OBJECT IDENTIFIER ::= { routerSwitch 68 }
+	atSwitchBladex908		 OBJECT IDENTIFIER ::= { routerSwitch 69 }
+	atx90012XTS			 OBJECT IDENTIFIER ::= { routerSwitch 70 }
+	atRapier48wb            OBJECT IDENTIFIER ::= { routerSwitch 71 }
+	atRapier48wAC          OBJECT IDENTIFIER ::= { routerSwitch 72 }
+	atRapier48wbAC         OBJECT IDENTIFIER ::= { routerSwitch 73 }
+--
+--1.3.6.1.4.1.207.1.14.75 AWPlus version x900-24XT
+	atx90024XT			 OBJECT IDENTIFIER ::= { routerSwitch 75 }
+--
+--1.3.6.1.4.1.207.1.14.76 AWPlus version x900-24XS
+	atx90024XS			 OBJECT IDENTIFIER ::= { routerSwitch 76 }
+--
+--1.3.6.1.4.1.207.1.14.77 AWPlus version x900-24XT-N
+	atx90024XTN			 OBJECT IDENTIFIER ::= { routerSwitch 77 }
+
+	atx60024Ts			 OBJECT IDENTIFIER ::= { routerSwitch 80 }
+	atx60024TsXP			 OBJECT IDENTIFIER ::= { routerSwitch 81 }
+	atx60048Ts			 OBJECT IDENTIFIER ::= { routerSwitch 82 }
+	atx60048TsXP			 OBJECT IDENTIFIER ::= { routerSwitch 83 }
 
 END
