@@ -162,6 +162,8 @@ while ($device = mysql_fetch_array($device_query)) {
       echo("Generic :(");
     }
 
+    echo("Hardware:".$hardware." Version:".$version." Features:".$features."\n");
+
     $sysLocation = str_replace("\"","", $sysLocation); 
   
     include("includes/polling/temperatures.inc.php");
