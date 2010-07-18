@@ -12,7 +12,7 @@ $oids = snmpwalk_cache_multi_oid($device, "entPhySensorValue", $oids, "ENTITY-SE
 
 if(is_array($oids[$device['device_id']]))
 {
-  foreach($oids[$device[device_id]] as $index => $entry)
+  foreach($oids[$device['device_id']] as $index => $entry)
   {
     #echo("[" . $entry['entPhySensorType'] . "|" . $entry['entPhySensorValue']. "|" . $index . "]");
 

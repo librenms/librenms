@@ -15,7 +15,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
   if(is_array($oids[$device['device_id']]))
   {
-    foreach($oids[$device[device_id]] as $index => $entry)
+    foreach($oids[$device['device_id']] as $index => $entry)
     {
       #echo("[" . $entry['entSensorType'] . "|" . $entry['entSensorValue']. "|" . $index . "]");
 
