@@ -99,7 +99,7 @@ function getHostOS($device)
   $dir_handle = @opendir($config['install_dir'] . "/includes/osdiscovery") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
-    if ( preg_match("/^discover-([a-z0-9\-]*).php$/", $file) )
+    if ( preg_match("/.php$/", $file) )
     {
       include($config['install_dir'] . "/includes/osdiscovery/" . $file);
     }
