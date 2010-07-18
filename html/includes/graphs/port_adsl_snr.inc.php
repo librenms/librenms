@@ -15,11 +15,11 @@ $port = mysql_fetch_array($query);
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AtucCurrSnrMgn";
+$rrd_list[0]['rra'] = "AturCurrSnrMgn";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AturCurrSnrMgn";
+$rrd_list[1]['rra'] = "AtucCurrSnrMgn";
 
 $unit_text = "dB";
 
