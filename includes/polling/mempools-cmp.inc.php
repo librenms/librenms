@@ -6,7 +6,7 @@
   $pool_cmd .= " ciscoMemoryPoolUsed.$oid ciscoMemoryPoolFree.$oid ciscoMemoryPoolLargestFree.$oid";
   $pool_cmd .= " | cut -f 1 -d ' '";
 
-  echo("$pool_cmd");
+  if($debug) {echo("$pool_cmd");}
 
   $pool = shell_exec($pool_cmd);
 

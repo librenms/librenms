@@ -5,18 +5,24 @@ Release 0.10.7 ( SVN )
 
 * Project name has changed to Observium
 * rrdcached support
+* Support of ADSL-LINE-MIB and new ports display mode designed
+  for service providers with DSLAMs and MSANs
 * Discovery of new device/os types : 
   Apple Airport, Axis Camera, Motorola Netopia, APC Switch PDU,
   Extreme Extremware, Redback, ZyXEL ZyWALL, DELL DRAC,
   Dell PowerVault, Allied Telesis, Cisco NX-OS, MGE Evolution UPS
   HP JetDirect printers, APC STS/ATS, Mikrotic RouterOS,
   AKCP SensorProbe3
+* New structure for device graphing to aid 3rd party addons
 * Temperature detection from CISCO-ENTITY-SENSOR-MIB
 * Graphing of statistics from DISKIO-MIB
 * Ongoing unification of all sensors into one 'sensors' framework
 * Detection and polling of frequency, voltage and ampage stats
   for many UPSes and power switching hardware
-
+* Detection of Extremeware / XOS versions and hardware
+* Detection of several Allied Telesis devices and their versions
+  and hardware
+* Added a lot of MIBs
 
 Release 0.10.6 ( 21st June 2010 )
 
