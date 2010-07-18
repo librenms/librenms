@@ -1,0 +1,365 @@
+ENTERASYS-TLS-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-tls-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Secure Socket, Transport Layer Security (TLS) MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright August, 2002 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF   
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysTlsMIB MODULE-IDENTITY
+    LAST-UPDATED "200211141534Z"  -- Thu Nov 14 15:34 GMT 2002
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal: Enterasys Networks
+                 35 Industrial Way, P.O. Box 5005
+                 Rochester, NH 03867-0505
+
+         Phone:  +1 603 332 9400
+         E-mail: support@enterasys.com
+         WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         Transport Layer Security (TLS) system [RFC2246] management 
+         functionality, specifically for embedded system 
+         implementations.  This is a subset of the objects that 
+         would be required for a full-featured, host-based 
+         implementation.
+
+         It provides configuration controls for Enterasys Networks'
+         Secure Socket system management -- a feature that enhances 
+         system security by authenticating and encrypting the remote
+         system management function."
+
+    REVISION    "200211141534Z"  -- Thu Nov 14 15:34 GMT 2002
+    DESCRIPTION "Removed the etsysTlsServerCertBranch OID and
+                 added a completed pending enumeration to the
+                 etsysTlsGenerateKeys object."
+
+    REVISION    "200211012109Z"  -- Fri Nov  1 21:09 GMT 2002
+    DESCRIPTION "The initial version of this MIB module."
+
+    ::= { etsysModules 30 }
+
+
+etsysTlsObjects
+        OBJECT IDENTIFIER ::= { etsysTlsMIB 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- Branches of the Enterasys Secure Socket MIB
+-- ---------------------------------------------------------- --
+
+etsysTlsGeneralBranch
+        OBJECT IDENTIFIER ::= { etsysTlsObjects 1 }
+etsysTlsNetworkBranch
+        OBJECT IDENTIFIER ::= { etsysTlsObjects 2 }
+etsysTlsServerKeyBranch
+        OBJECT IDENTIFIER ::= { etsysTlsObjects 3 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Socket Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysTlsEnabled OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                      enable (1), 
+                      disable (2), 
+                      reinitialize (3)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Controls the operation of the Transport Layer Security
+         server task on the embedded system. When enabled, the
+         TLS server will accept connection requests and create
+         a secure transport layer on which to transmit target
+         system configuration data."
+    DEFVAL { 2 }
+    ::= { etsysTlsGeneralBranch 1 }
+
+etsysTlsNumSoftConnects OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The soft limit for the maximum number of concurrent connections.
+         If a new connection is initiated and it would exceed the soft
+         limit, a '530 Service Unavailable' error will be reported to the
+         client.  Managed entities are free to enforce implementation
+         specific limits on the upper limit of this object."
+    DEFVAL { 30 }
+    ::= { etsysTlsGeneralBranch 2 }
+
+etsysTlsNumHardConnects OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The hard limit for the maximum number of concurrent connections.
+         If a new connection is initiated and it would exceed the hard
+         limit, the connection is closed unconditionally.  Managed 
+         entities are free to enforce implementation specific limits on
+         the upper limit of this object."
+    DEFVAL { 50 }
+    ::= { etsysTlsGeneralBranch 3 }
+
+etsysTlsMaxHardConnects OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of concurrent connections a platform supports.
+         Allows managed entities to enforce implementation specific limits on
+         the upper limit of the etsysTlsNumHardConnects object."
+    DEFVAL { 50 }
+    ::= { etsysTlsGeneralBranch 4 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Socket Network Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysTlsKeepOpenTimeout OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "How long in time a 'Keep-Alive' connection is kept open if new
+         requests are not seen. The timeout is given in seconds."
+    DEFVAL { 30 }
+    ::= { etsysTlsNetworkBranch 1 }
+
+etsysTlsHttpsPort OBJECT-TYPE
+    SYNTAX        INTEGER (1..65535)
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The TCP port that the HTTPs server will listen to."
+    DEFVAL { 443 }
+    ::= { etsysTlsNetworkBranch 2 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Socket Key Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysTlsGenerateKeys OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                      notInitiated (1), 
+                      completed (2), 
+                      failed (3), 
+                      generate (4),
+                      completedPending (5)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Causes the host to generate a new key pair using the
+         cipher algorithm currently selected in etsysTlsAdminKeyType.
+         Note that this can be compute intensive on many platforms.
+        
+         The meaning of the values are as follows:
+        
+         notInitiated (1) On a write, this is a no-operation,
+                          on a read, it indicates that no key
+                          material generation operation has
+                          ever been initiated, at least since
+                          the last reset to factory defaults
+                          initialization of the managed entity.
+                          No key material exists.
+        
+         completed (2)    On a write, this is a no-operation,
+                          on a read, this indicates that a key
+                          pair has been successfully generated.
+                         
+         failed (3)       On a write, this is a no-operation,
+                          on a read, it indicates that the key
+                          generation operation has failed.                 
+                         
+         generate (4)     On a write, this causes the managed
+                          entity to generate a new key pair,
+                          on a read, it indicates that the
+                          managed entity is still working on
+                          creating the new keys.
+
+         completedPending (5)
+                          On a write, this is a no-operation,
+                          on a read, this indicates that a key
+                          pair has been successfully generated
+                          but its use is pending due to another
+                          required operation, such as a reboot."
+
+    ::= { etsysTlsServerKeyBranch 1 }
+
+etsysTlsAdminKeyType OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                      dsa512  (1),  
+                      rsa512  (2),
+                      dsa768  (3),  
+                      rsa768  (4),
+                      dsa1024 (5), 
+                      rsa1024 (6), 
+                      dsa2048 (7), 
+                      rsa2048 (8), 
+                      dsa3072 (9), 
+                      rsa3072 (10) 
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Determines the type of the key to be (re)created
+         on the next key (re)creation operation.  The 
+         etsysTlsOperKeyType object returns the type of
+         key that is currently being used by the TLS server."
+    DEFVAL { rsa512 }
+    ::= { etsysTlsServerKeyBranch 2 }
+
+etsysTlsOperKeyType OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                      dsa512  (1),  
+                      rsa512  (2),  
+                      dsa768  (3),  
+                      rsa768  (4),  
+                      dsa1024 (5), 
+                      rsa1024 (6), 
+                      dsa2048 (7), 
+                      rsa2048 (8), 
+                      dsa3072 (9), 
+                      rsa3072 (10),
+                      none    (99) 
+                  }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the type of the key pair currently in
+         effect on the managed entity.  The value of the 
+         etsysTlsAdminKeyType object is copied to the
+         etsysTlsOperKeyType object upon successful completion
+         of the (re)creation of a key pair."
+    DEFVAL { rsa512 }
+    ::= { etsysTlsServerKeyBranch 3 }
+
+etsysTlsSignatureType OBJECT-TYPE
+    SYNTAX        INTEGER { 
+                      dhAnon (1), 
+                      dsaSha1 (2), 
+                      dsaSha (3),
+                      rsaSha1 (4), 
+                      rsaMd2 (5),
+                      rsaMd5 (6) 
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Denotes the signature method that is used for 
+         authenticating the exchange of keys.
+         
+         DSS (Digital Signature Standard)              
+         DSA (Digital Signature Algorithm, DSS compliant)         
+         RSA (Rivest, Shamir and Adelman)
+         Sha (Secure Hash Algorithm)
+         Md5 (Message Digest 5)
+         
+         dhAnon  (1) - Anonymous Diffie Hellmen, no signatures
+         dsaSha1 (2) - DSS , Sha-1 Hash
+         dsaSha  (3) - DSS signatures, Sha Hash
+         rsaSha1 (4) - RSA signatures, Sha-1 Hash
+         rsaMd2  (5) - RSA signatures, Md2 Hash
+         rsaMd5  (6) - RSA signatures, Md5 Hash
+         "
+    DEFVAL { dhAnon }
+    ::= { etsysTlsServerKeyBranch 4 }
+
+
+-- ---------------------------------------------------------- --
+-- Enterasys Transport Layer Security (TLS) MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysTlsConformance
+    OBJECT IDENTIFIER ::= { etsysTlsMIB 2 }
+
+etsysTlsGroups      
+    OBJECT IDENTIFIER ::= { etsysTlsConformance 1 }
+
+etsysTlsCompliances
+    OBJECT IDENTIFIER ::= { etsysTlsConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysTlsBaseGroup OBJECT-GROUP
+    OBJECTS {
+            etsysTlsEnabled,
+            etsysTlsNumSoftConnects,
+            etsysTlsNumHardConnects,  
+            etsysTlsMaxHardConnects,
+            etsysTlsKeepOpenTimeout,
+            etsysTlsHttpsPort,
+            etsysTlsGenerateKeys,
+            etsysTlsAdminKeyType,
+            etsysTlsOperKeyType,
+            etsysTlsSignatureType
+            }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration
+         information for the TLS service."
+    ::= { etsysTlsGroups 1 }
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysTlsCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys Secure Socket (TLS) MIB."
+
+    MODULE  -- this module
+
+    GROUP    etsysTlsBaseGroup
+    DESCRIPTION
+        "Mandatory for all implementations."
+         
+    ::= { etsysTlsCompliances 1 }
+
+END

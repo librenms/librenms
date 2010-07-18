@@ -1,0 +1,813 @@
+NORTEL-NETWORKS-RAPID-SPANNING-TREE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, Counter32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    dot1dStpPort, dot1dBaseBridgeAddress, dot1dStpDesignatedRoot,
+    BridgeId, Timeout
+        FROM BRIDGE-MIB
+    bayStackMibs
+        FROM SYNOPTICS-ROOT-MIB;
+
+nnRapidSpanningTreeMib MODULE-IDENTITY
+    LAST-UPDATED    "200402240000Z"
+    ORGANIZATION    "Nortel Networks"
+    CONTACT-INFO    "Nortel Networks"
+    DESCRIPTION
+        "Nortel Networks Rapid Spanning-Tree MIB
+
+         Copyright 2003 Nortel Networks, Inc.
+         All rights reserved.
+         This Nortel Networks SNMP Management Information Base
+         Specification embodies Nortel Networks' confidential and
+         proprietary intellectual property. Nortel Networks retains all
+         title and ownership in the Specification, including any
+         revisions.
+
+         This Specification is supplied 'AS IS,' and Nortel Networks
+         makes no warranty, either express or implied, as to the use,
+         operation, condition, or performance of the Specification."
+    REVISION "200402240000Z" -- 24 Feb 2004
+    DESCRIPTION "v001:  Initial version."
+    ::= { bayStackMibs 4 }
+
+nnRstNotifications OBJECT IDENTIFIER ::= { nnRapidSpanningTreeMib 0 }
+nnRstObjects       OBJECT IDENTIFIER ::= { nnRapidSpanningTreeMib 1 }
+
+
+--
+-- nnRstDot1d group, extensions to the BRIDGE-MIB
+--
+
+nnRstDot1d OBJECT IDENTIFIER ::= { nnRstObjects 1 }
+nnRstDot1dScalars OBJECT IDENTIFIER ::= { nnRstDot1d 1 }
+
+nnRstDot1dStpVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    stpCompatible(0),
+                    rstp(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The version of Spanning Tree Protocol the bridge is
+         currently running.  The value 'stpCompatible(0)'
+         indicates the Spanning Tree Protocol specified in
+         IEEE 802.1D and 'rstp(2)' indicates the Rapid Spanning
+         Tree Protocol specified in IEEE 802.1w.  New value may
+         be defined as future versions of the protocol become
+         available."
+    REFERENCE
+        "IEEE 802.1w clause 14.8.1, 17.12, 17.16.1"
+    DEFVAL      { rstp }
+    ::= { nnRstDot1dScalars 1 }
+
+nnRstDot1dStpTxHoldCount OBJECT-TYPE
+    SYNTAX      INTEGER (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used by the Port Transmit state machine to limit
+         the maximum transmission rate."
+    REFERENCE
+        "IEEE 802.1w clause 17.16.6"
+    DEFVAL      { 3 }
+    ::= { nnRstDot1dScalars 2 }
+
+nnRstDot1dStpPathCostDefault OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    stp8021d1998(1),
+                    stp8021t2001(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The version of the Spanning Tree default Path Costs that
+         are to be used by this Bridge.  A value of 8021d1998(1)
+         uses the 16-bit default Path Costs from IEEE Std. 802.1D-1998.
+         A value of stp8021t2001(2) uses the 32-bit default Path
+         Costs from IEEE Std. 802.1t."
+    REFERENCE
+        "IEEE 802.1D & 802.1t Table 8-5"
+    ::= { nnRstDot1dScalars 3 }
+
+nnRstDot1dStpPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NnRstDot1dStpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains port-specific Rapid Spanning Tree
+         information."
+    ::= { nnRstDot1d 2 }
+
+nnRstDot1dStpPortEntry OBJECT-TYPE
+    SYNTAX      NnRstDot1dStpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Rapid Spanning Tree information maintained by
+         each port."
+    INDEX { dot1dStpPort }
+    ::= { nnRstDot1dStpPortTable 1 }
+
+NnRstDot1dStpPortEntry ::=
+    SEQUENCE {
+        nnRstDot1dStpPortProtocolMigration
+            TruthValue,
+        nnRstDot1dStpPortAdminEdgePort
+            TruthValue,
+        nnRstDot1dStpPortOperEdgePort
+            TruthValue,
+        nnRstDot1dStpPortAdminPointToPoint
+            INTEGER,
+        nnRstDot1dStpPortOperPointToPoint
+            TruthValue,
+        nnRstDot1dStpPortParticipating
+            TruthValue
+    }
+
+nnRstDot1dStpPortProtocolMigration OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When operating in RSTP (version 2) mode, writing TRUE(1)
+         to this object forces this port to transmit RSTP BPDUs.
+         Any other operation on this object has no effect and
+         it always returns FALSE(2) when read."
+    REFERENCE
+        "IEEE 802.1w clause 14.8.2.4, 17.18.10, 17.26"
+    ::= { nnRstDot1dStpPortEntry 1 }
+
+nnRstDot1dStpPortAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative value of the Edge Port parameter.  A
+         value of TRUE(1) indicates that this port should be
+         assumed as an edge-port and a value of FALSE(2) indicates
+         that this port should be assumed as a non-edge-port."
+    REFERENCE
+        "IEEE 802.1t clause 14.8.2, 18.3.3"
+    ::= { nnRstDot1dStpPortEntry 2 }
+
+nnRstDot1dStpPortOperEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational value of the Edge Port parameter.  The
+         object is initialized to the value of
+         nnRstDot1dStpPortAdminEdgePort and is set FALSE on reception
+         of a BPDU."
+    REFERENCE
+        "IEEE 802.1t clause 14.8.2, 18.3.4"
+    ::= { nnRstDot1dStpPortEntry 3 }
+
+nnRstDot1dStpPortAdminPointToPoint OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative point-to-point status of the LAN segment
+         attached to this port.  A value of forceTrue(0) indicates that
+         this port should always be treated as if it is connected to
+         a point-to-point link.  A value of forceFalse(1) indicates
+         that this port should be treated as having a shared media
+         connection.  A value of auto(2) indicates that this port is
+         considered to have a point-to-point link if it is an Aggregator
+         and all of its members are aggregatable, or if the MAC entity
+         is configured for full duplex operation, either through
+         auto-negotiation or by management means."
+   REFERENCE
+       "IEEE 802.1w clause 6.4.3, 6.5, 14.8.2"
+   ::= { nnRstDot1dStpPortEntry 4 }
+
+nnRstDot1dStpPortOperPointToPoint OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational point-to-point status of the LAN segment
+         attached to this port.  It indicates whether a port is
+         considered to have a point-to-point connection or not.
+         The value is determined by management or by auto-detection,
+         as described in the nnRstDot1dStpPortAdminPointToPoint object."
+    REFERENCE
+        "IEEE 802.1w clause 6.4.3, 6.5, 14.8.2"
+    ::= { nnRstDot1dStpPortEntry 5 }
+
+nnRstDot1dStpPortParticipating OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object specifies whether a port is participating in the
+         802.1w protocol."
+    ::= { nnRstDot1dStpPortEntry 6 }
+
+--
+-- nnRstDot1w group, rapid spanning tree extensions
+--
+
+nnRstDot1w OBJECT IDENTIFIER ::= { nnRstObjects 2 }
+nnRstDot1wScalars OBJECT IDENTIFIER ::= { nnRstDot1w 1 }
+
+nnRstDot1wRstpUpCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of times RSTP Module has been enabled.
+       A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wScalars 1 }
+
+nnRstDot1wRstpDownCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of times RSTP Module has been disabled.
+       A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wScalars 2 }
+
+nnRstDot1wNewRootIdCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of times this Bridge has detected a Root Identifier
+       change.  A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wScalars 3 }
+
+nnRstDot1wPortRoleSelSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  initbridge (0),
+                  roleselection (1)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+      "This indicates the current state of the Port Role Selection State
+       Machine.  This object will hold the value 'initbridge' when the
+       Port Role Selection state machine is in the INIT_BRIDGE state and
+       the value of 'roleselection' when the state machine is in the
+       ROLE_SELECTION state."
+   ::= { nnRstDot1wScalars 4 }
+
+nnRstDot1wOldDesignatedRoot OBJECT-TYPE
+       SYNTAX  BridgeId
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The bridge identifier of the old root of the spanning
+               tree as determined by the Spanning Tree Protocol
+               as executed by this node. "
+       ::= { nnRstDot1wScalars 5 }
+
+nnRstDot1wPortTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF NnRstDot1wPortEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+      "This is a table that is an extension to the nnRstDot1dStpPortTable.
+      This contains object(s) that are Port-based."
+   ::= { nnRstDot1w 2 }
+
+nnRstDot1wPortEntry OBJECT-TYPE
+   SYNTAX      NnRstDot1wPortEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Each entry in this table is for each port present in the system.
+      This table is indexed by the nnRstDot1wPort."
+   INDEX { nnRstDot1wPort }
+   ::= { nnRstDot1wPortTable 1 }
+      
+NnRstDot1wPortEntry ::=
+   SEQUENCE {
+      nnRstDot1wPort
+         Integer32,
+      nnRstDot1wPortRole
+         INTEGER,
+      nnRstDot1wPortOperVersion
+         INTEGER,
+      nnRstDot1wPortInfoSmState
+         INTEGER,
+      nnRstDot1wPortMigSmState
+         INTEGER,
+      nnRstDot1wPortRoleTransSmState
+         INTEGER,
+      nnRstDot1wPortStateTransSmState
+         INTEGER,
+      nnRstDot1wPortTopoChSmState
+         INTEGER,
+      nnRstDot1wPortTxSmState
+         INTEGER,
+      nnRstDot1wPortRxRstBpduCount
+         Counter32,
+      nnRstDot1wPortRxConfigBpduCount
+         Counter32,
+      nnRstDot1wPortRxTcnBpduCount
+         Counter32,
+      nnRstDot1wPortTxRstBpduCount
+         Counter32,
+      nnRstDot1wPortTxConfigBpduCount
+         Counter32,
+      nnRstDot1wPortTxTcnBpduCount
+         Counter32,
+      nnRstDot1wPortInvalidRstBpduRxCount
+         Counter32,
+      nnRstDot1wPortInvalidConfigBpduRxCount
+         Counter32,
+      nnRstDot1wPortInvalidTcnBpduRxCount
+         Counter32,
+      nnRstDot1wPortProtocolMigrationCount
+         Counter32,
+      nnRstDot1wPortEffectivePortState
+         TruthValue
+      }
+
+nnRstDot1wPort OBJECT-TYPE
+   SYNTAX      Integer32 (1..4096)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A unique value, greater than zero, indicating the Port number."
+   ::= { nnRstDot1wPortEntry 1 }
+
+nnRstDot1wPortRole OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  disabledPort(0),
+                  alternatePort(1),
+                  backupPort(2),
+                  rootPort(3),
+                  designatedPort(4)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current Port Role assumed by this Port."
+   ::= { nnRstDot1wPortEntry 2 }
+
+
+nnRstDot1wPortOperVersion OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  stpCompatible(0),
+                  rstp(2)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates whether the Port is operationally in the Rstp
+      mode or the Stp-compatible mode i.e., whether the Port is 
+      transmitting RST BPDUs or Config/TCN BPDUs."
+   ::= { nnRstDot1wPortEntry 3 }
+
+nnRstDot1wPortInfoSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  disabled (0),
+                  aged (1),
+                  update (2),
+                  superior (3),
+                  repeat (4),
+                  agreement (5),
+                  present (6),
+                  receive (7)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Port Information state machine.
+      
+      This object will hold the value 'disabled' when the Port Information state
+      machine is in the DISABLED state, the value 'aged' when the state machine 
+      is in the AGED state, the value 'update' when the state machine is in the
+      UPDATE state, the value 'superior' when the state machine is in the
+      SUPERIOR state, the value 'repeat' when the state machine is in the REPEAT
+      state, the value 'agreement' when the state machine is in the AGREEMENT
+      state, the value 'present' when the state machine is in the CURRENT state
+      and the value 'receive' when the state machine is in the RECEIVE state."
+   ::= { nnRstDot1wPortEntry 4 }
+
+nnRstDot1wPortMigSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  init (0),
+                  sendrstp (1),
+                  sendingrstp (2),
+                  sendstp (3),
+                  sendingstp (4)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Port Protocol Migration state machine.
+      
+      This object will hold the value 'init' when the Protocol Migration state
+      machine is in the INIT state, the value 'sendrstp' when the state machine 
+      is in the SEND_RSTP state, the value 'sendingrstp' when the state machine
+      is in the SENDING_RSTP state, the value 'sendstp' when the state machine
+      is in the SEND_STP state and the value 'sendingstp' when the state machine
+      is in the SENDING_STP state."  
+   ::= { nnRstDot1wPortEntry 5 }
+
+nnRstDot1wPortRoleTransSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  init (0),
+                  blockport (1),
+                  blockedport (2),
+                  rootport (3),
+                  designatedport (4),
+                  backupport (5),
+                  rootproposed (6),
+                  rootagreed(7),
+                  reroot (8),
+                  rootforward (9),
+                  rootlearn (10),
+                  rerooted (11),
+                  designatedpropose (12),
+                  designatedsynced (13),
+                  designatedretired (14),
+                  designatedforward (15),
+                  designatedlearn (16),
+                  designatedlisten (17)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Port Role Transition state machine.
+      
+      This object will hold the value 'init' when the Port Role Transition state
+      machine is in the INIT state, the value 'blockport' when the state machine 
+      is in the BLOCK_PORT state, the value 'blockedport' when the state machine
+      is in the BLOCKED_PORT state, the value 'rootport' when the state machine
+      is in the ROOT_PORT state, the value 'desgport' when the state machine is in
+      the DESIGNATED_PORT state, the value 'backupport' when the state machine is in
+      BACKUP_PORT state, the value 'rootproposed' when the state machine is in the
+      ROOT_PROPOSED state, the value 'rootagreed' when the state machine is in the
+      ROOT_AGREED state, the value 'reroot' when the state machine is in the REROOT
+      state, the value 'rootforward' when the state machine is in the ROOT_FORWARD
+      state, the value 'rootlearn' when the state machine is in the ROOT_LEARN
+      state, the value 'rerooted' when the state machine is in the REROOTED state,
+      the value 'designatedpropose' when the state machine is in the 
+      DESIGNATED_PROPOSE state, the value 'designatedsynced' when the state machine
+      is in the DESIGNATED_SYNCED state, the value 'designatedretired' when the 
+      state machine is in the DESIGNATED_RETIRED state, the value 'designatedforward'
+      when the state machine is in the DESIGNATED_FORWARD state, the value
+      'designatedlearn' when the state machine is in the DESIGNATED_LEARN state and
+      the value 'designatedlisten' when the state machine is in the DESIGNATED_LISTEN
+      state."
+   ::= { nnRstDot1wPortEntry 6 }
+
+nnRstDot1wPortStateTransSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  discarding (0),
+                  learning (1),
+                  forwarding (2)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Port State Transition state machine.
+      
+      This object will hold the value 'discarding' when the Port State Transition
+      state machine is in the DISCARDING state, the value 'learning' when the state
+      machine is in the LEARNING state and the value 'forwarding' when the state
+      machine is in the FORWARDING state." 
+   ::= { nnRstDot1wPortEntry 7 }
+
+nnRstDot1wPortTopoChSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  init (0),
+                  inactive (1),
+                  active (2),
+                  detected (3),
+                  notifiedtcn (4),
+                  notifiedtc (5),
+                  propagating (6),
+                  acknowledged (7)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Topology Change state machine.
+      
+      This object will hold the value 'init' when the Topology Change state machine
+      is in the INIT state, the value 'inactive' when the state machine is in the
+      INACTIVE state, the value 'active' when the state machine is in the ACTIVE
+      state, the value 'detected' when the state machine is in the DETECTED state,
+      the value 'notifiedtcn' when the state machine is in the NOTIFIED_TCN state,
+      the value 'notifiedtc' when the state machine is in the NOTIFIED_TC state,
+      the value 'propagating' state when the state machine is in the PROPAGATING
+      state and the value 'acknowledged' when the state machine is in the 
+      ACKNOWLEDGED state." 
+   ::= { nnRstDot1wPortEntry 8 }
+
+nnRstDot1wPortTxSmState OBJECT-TYPE
+   SYNTAX      INTEGER {
+                  transmitinit (0),
+                  transmitperiodic (1),
+                  transmitconfig (2),
+                  transmittcn (3),
+                  transmitrstp (4),
+                  idle (5)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "This indicates the current state of the Port Transmit state machine.
+      This object will hold the value 'transmitinit' when the Port Transmit state
+      machine is in the TRANSMIT_INIT state, the value 'transmitperiodic' when the
+      state machine is in the TRANSMIT_PERIODIC state, the value 'transmitconfig'
+      when the state machine is in the TRANSMIT_CONFIG state, the value 'transmittcn',
+      when the state machine is in the TRANSMIT_TCN state, the value 'transmitrstp',
+      when the state machine is in the TRANSMIT_RSTP state and the value 'idle' when
+      the state machine is in the IDLE state."
+   ::= { nnRstDot1wPortEntry 9 }
+
+
+nnRstDot1wPortRxRstBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of RST BPDUs that have been received on this Port."
+   ::= { nnRstDot1wPortEntry 10 }
+
+nnRstDot1wPortRxConfigBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Config BPDUs that have been received on this Port."
+   ::= { nnRstDot1wPortEntry 11 }
+
+nnRstDot1wPortRxTcnBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of TCN BPDUs that have been received on this Port."
+   ::= { nnRstDot1wPortEntry 12 }
+
+nnRstDot1wPortTxRstBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of RST BPDUs that have been transmitted by this Port."
+   ::= { nnRstDot1wPortEntry 13 }
+
+nnRstDot1wPortTxConfigBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of Config BPDUs that have been transmitted by this Port."
+   ::= { nnRstDot1wPortEntry 14 }
+
+nnRstDot1wPortTxTcnBpduCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of TCN BPDUs that have been transmitted by this Port."
+   ::= { nnRstDot1wPortEntry 15 }
+
+nnRstDot1wPortInvalidRstBpduRxCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of invalid RSTP BPDUs that have been received on this Port.
+       A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wPortEntry 16 }
+
+nnRstDot1wPortInvalidConfigBpduRxCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of invalid Configuration BPDUs that have been received on 
+      this Port. A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wPortEntry 17 }
+
+nnRstDot1wPortInvalidTcnBpduRxCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of invalid TCN BPDUs that have been received on this Port.
+       A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wPortEntry 18 }
+
+nnRstDot1wPortProtocolMigrationCount OBJECT-TYPE
+   SYNTAX      Counter32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The number of times this Port has migrated from one STP protocol 
+       version to another. The relevant protocols are STP-COMPATIBLE and RSTP.
+       A Trap is generated on the occurence of this event."
+   ::= { nnRstDot1wPortEntry 19 }
+
+nnRstDot1wPortEffectivePortState OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only            
+      STATUS      current
+      DESCRIPTION
+          "The effective Operational state of the port. This object will be
+           set to TRUE only when the port is operationally up in the interface
+           manager and the force Port State for this port and specified port
+           state is enabled. Otherwise this object is set to FALSE."
+      ::= { nnRstDot1wPortEntry 20 }
+
+--
+-- nnRstNotificationControl group, rapid spanning tree
+--
+
+nnRstNotificationControl OBJECT IDENTIFIER ::= { nnRstObjects 3 }
+nnRstNotificationControlScalars OBJECT IDENTIFIER
+                                        ::= { nnRstNotificationControl 1 }
+
+nnRstSetNotifications OBJECT-TYPE
+        SYNTAX   Integer32 (0..255)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This object is used to enable and  disable  specific
+           RSTP traps. Currently the following are defined
+           0 - Notifications are not enabled.
+           1 - General Notifications like protocol up or down  
+           2 - Exception Notifications like memory failure or buffer failure 
+                    or port protocol migration or invalid packet rcvd in port
+           3 - All the above Notifications "
+    ::= { nnRstNotificationControlScalars 1 }
+
+nnRstGenNotificationType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    up (1),
+                    down (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "The general events like 
+           none - none of the below values
+           up - protocol UP,
+           down - protocol DOWN" 
+   ::= { nnRstNotificationControlScalars 2 }
+
+nnRstErrNotificationType OBJECT-TYPE
+       SYNTAX   INTEGER   {
+                    none (0),
+                    memfail (1),
+                    bufffail (2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "The error event like
+            none - none of the below values
+            memfail - memory allocation failure
+            bufffail - buffer allocation failure"
+   ::= { nnRstNotificationControlScalars 3 }
+
+nnRstPortNotificationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF NnRstPortNotificationEntry 
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " This table is used to store the notification information
+         occured in each of the port for protocol migration and 
+         invalid packet received  "
+   ::= { nnRstNotificationControl 2 }
+
+nnRstPortNotificationEntry OBJECT-TYPE
+   SYNTAX      NnRstPortNotificationEntry 
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       " This entry is used to store the notification information"
+   INDEX { nnRstPortNotificationIndex }
+   ::= { nnRstPortNotificationTable 1 }
+
+NnRstPortNotificationEntry ::=
+        SEQUENCE {
+               nnRstPortNotificationIndex         Integer32,
+               nnRstPortNotificationMigrationType INTEGER,
+               nnRstPortNotificationPktErrType    INTEGER,
+               nnRstPortNotificationPktErrVal     Integer32
+        }
+
+nnRstPortNotificationIndex OBJECT-TYPE
+   SYNTAX      Integer32 (1..4096)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "A unique value, greater than zero, indicating the Port number."
+   ::= { nnRstPortNotificationEntry 1 }
+
+nnRstPortNotificationMigrationType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  sendstp (0),
+                  sendrstp (1)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Port Protocol migration type occured in the port"
+   ::= { nnRstPortNotificationEntry 2 }
+
+nnRstPortNotificationPktErrType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                  protocolIdErr(0),
+                  invalidBpdu(1),
+                  configLengthErr(2),
+                  tcnLengthErr(3),
+                  rstpLengthErr(4),
+                  maxAgeErr(5),
+                  fwdDelayErr(6),
+                  helloTimeErr(7)
+                  }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Type of invalid packet received in each of the port "
+   ::= { nnRstPortNotificationEntry 3 }
+
+nnRstPortNotificationPktErrVal OBJECT-TYPE
+       SYNTAX   Integer32   
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+           "Packet error value corresponding to the above type "
+   ::= { nnRstPortNotificationEntry 4 }
+
+--
+-- Notifications
+--
+
+nnRstGeneralEvent NOTIFICATION-TYPE
+    OBJECTS {
+      dot1dBaseBridgeAddress,
+      nnRstGenNotificationType 
+    }
+    STATUS             current
+    DESCRIPTION
+         "Generated when any of the general events like protocol up or 
+          protocol down occurs"
+   ::= { nnRstNotifications 1 }
+
+nnRstErrorEvent NOTIFICATION-TYPE
+        OBJECTS {
+      dot1dBaseBridgeAddress,
+           nnRstErrNotificationType
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when any of the error events like memory failure or buffer failure
+          or protocol migration or new root or topology change occurs "
+   ::= { nnRstNotifications 2 }
+
+nnRstNewRoot NOTIFICATION-TYPE
+        OBJECTS {
+                  dot1dBaseBridgeAddress,
+                  nnRstDot1wOldDesignatedRoot,
+                  dot1dStpDesignatedRoot
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated whenever a new root bridge is selected in the topology "
+   ::= { nnRstNotifications 3 }
+
+nnRstTopologyChange NOTIFICATION-TYPE
+        OBJECTS {
+                 dot1dBaseBridgeAddress
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when topology change is detected "
+   ::= { nnRstNotifications 4 }
+
+nnRstProtocolMigration NOTIFICATION-TYPE
+        OBJECTS {
+            dot1dBaseBridgeAddress,
+            nnRstDot1dStpVersion,
+            nnRstPortNotificationMigrationType 
+                }
+        STATUS             current
+        DESCRIPTION
+         "Generated when port protocol migration happens in the port "
+   ::= { nnRstNotifications 5 }
+
+END
+

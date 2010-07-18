@@ -1,0 +1,4642 @@
+-- COPYRIGHT NOTICE
+-- Copyright (c) Alteon WebSystems, Inc. 2001
+-- All rights reserved
+-- 
+-- HISTORY
+-- $Log: tigonNetwork.mib,v $
+-- Revision 1.1.1.1  2004/11/01 16:55:42  maxbaker
+-- initial import
+--
+-- Revision work_rmundhra/41 2001/11/28 23:04:47 rmundhra
+-- 	Fixed CR Q00173292: Require apply action after delete ospf
+-- 	area entry.
+-- 	Made delete functionality work thr'o standard mib and doing
+-- 	the ospf config validation i.e if the delete is allowed or
+-- 	not in the rs_routines rather than in an apply as being done
+-- 	previously. Removed the ospfNewCfgAreaDelete mib object.
+-- 
+-- Revision ge_wyin/1 2001/11/28 17:58:45 wyin
+-- 	Corrected description on ospf auth type.
+-- 
+-- Revision work_rmundhra/38 2001/11/27 23:45:27 rmundhra
+-- 	Fixed the enum values for ospfAreaAuthType to be 1 and 2 as
+-- 	0 is not allowed.
+-- 
+-- Revision work_rmundhra/36 2001/11/07 00:53:39 rmundhra
+-- 	Added entries ospfCurCfgAreaAuthType and ospfNewCfgAreaAuthType as the
+-- 	corresponding entry in rfc1850.mib has been declared obsolete.
+-- 
+-- Revision work_rmundhra/34 2001/10/30 19:37:28 rmundhra
+-- 	Added 2 mib entries ospfAreaInfoId and ospfIfInfoIpAddress
+-- 	to map the private mib tables with the standard RFC1850
+-- 	mib as the way they are indexed is different.
+-- 
+-- Revision ge_rrekha/2 2001/10/23 00:16:18 rrekha
+-- 	Added enumeration ospf(13) to MIB object ipRouteInfoTag.
+-- 
+-- Revision work_rmundhra/32 2001/10/13 02:12:42 rmundhra
+-- 	Changed the indexing of ospfCurCfgAreaTable and
+-- 	ospfNewCfgAreaTable to be indexed by 2 indicies.
+-- 	Added MIB objects ospfCurCfgAreaId, ospfNewCfgAreaId
+-- 	and removed ospfCurCfgAreaDelete as its redundant.
+-- 
+-- Revision work_rmundhra/30 2001/09/13 19:04:12 rmundhra
+-- 	Modified comment.
+-- 
+-- Revision work_rmundhra/28 2001/09/13 18:36:58 rmundhra
+-- 	Added MIB objects ospfIntfTableMaxSize, ospfAreaTableMaxSize,
+--      ospfRangeTableMaxSize, ospfVirtIntfTableMaxSize &
+-- 	ospfHostTableMaxSize.
+-- 
+-- Revision work_rmundhra/26 2001/09/11 23:48:34 rmundhra
+-- 	Fixed 13071: Added MIB objects ospfCurCfgAreaDelete and
+-- 	ospfNewCfgAreaDelete objects to support delete functionality
+-- 	thro tigonNetwork.mib as this functionality cannot be 
+-- 	provided thr'o std-mibs.
+-- 
+-- Revision work_rmundhra/24 2001/07/10 22:12:41 rmundhra
+-- 	Keeping again.
+-- 
+-- Revision jmoLatest_jamesob/4 2001/07/02 22:03:26 jamesob
+-- 	CR11586 - Added ripCurCfgVip and ripNewCfgVip objects.
+-- 
+-- Revision work_rmundhra/21 2001/06/22 18:39:36 rmundhra
+-- 	Modified description not to exceed 80 characters / 
+--      line as per coding guidelines.
+-- 
+-- Revision work_rmundhra/20 2001/06/22 18:37:11 rmundhra
+-- 	Added MIB objects ospfIntfInfoTable to retrieve information of
+-- 	an OSPF interface.
+-- 
+-- Revision genie_rekha/19 2001/06/21 23:18:01 rekha
+-- 	Fixed 11690: Changed ipNewCfgGwInterval and ipCurCfgGwInterval
+-- 	range to 0..60 from 1..60 for consistency with CLI.
+-- 
+-- Revision genie_rekha/17 2001/06/20 01:11:05 rekha
+-- 	Removed the range for the index field of a table as these should
+-- 	be obtained from the maxTableSize MIB objects since the range
+-- 	maybe different for AD3 versus AD4.
+-- 
+-- Revision work_rmundhra/17 2001/06/18 18:02:12 rmundhra
+-- 	Added MIB objects ospf-info, ospfGeneralInfo, ospfAreaInfoTable for
+-- 	providing SNMP support for OSPF information.
+-- 
+-- Revision work_rmundhra/15 2001/06/15 18:26:24 rmundhra
+-- 	Associated ospfCfg with iprouting and not with switch beause
+-- 	of relevance.
+-- 
+-- Revision work_rmundhra/14 2001/06/14 19:12:13 rmundhra
+-- 	Added SNMP support for OSPF statistics. Added MIB objects
+-- 	ospfStats, ospfGeneral, ospfInterface (Table), ospfArea (Table)
+-- 
+-- Revision genie_rekha/15 2001/06/14 17:41:33 rekha
+-- 	Added MIB objects ipCurCfgGwVlan and ipNewCfgGwVlan.
+-- 
+-- Revision genie_rekha/13 2001/06/04 19:24:28 rekha
+-- 	Added MIB objects to support VRRP oper commands.
+-- 
+-- Revision genie_rekha/11 2001/05/31 01:06:03 rekha
+-- 	Added MIB objects vrrpInfoVirtRtrOwnership, vrrpInfoVirtRtrServer
+-- 	and vrrpInfoVirtRtrProxy.
+-- 
+-- Revision genie_rekha/9 2001/05/29 22:54:39 rekha
+-- 	Removed 'other' from most of the enumerations.
+-- 
+-- Revision work_rmundhra/10 2001/05/18 19:02:28 rmundhra
+-- 	Added SNMP support for Tigon OSPF. Added entries
+-- 	ospfGeneral, ospfCurCfgArea Table and ospfNewCfgArea
+-- 	Table to the tigonNetwork mib and ctl files.
+-- 
+-- Revision genie_rekha/7 2001/05/11 23:01:27 rekha
+-- 	CR4320: Added MIB object ripStatRoutesAgedOut.
+-- 
+-- Revision jmoLatest_jamesob/2 2001/03/27 12:52:05 jamesob
+-- 	CR10892 VRRP: Track HSRP bu VLAN (HSRV)
+-- 	Added MIB objects to support tracking of
+-- 	HSRP by vlan. New Objects: vrrpCurCfgVirtRtrTckHsrv,
+-- 	vrrpNewCfgVirtRtrTckHsrv
+-- 	Added mib objects to support HSRV priority increment.
+-- 	New objects: vrrpCurCfgGenTckHsrvInc, vrrpNewCfgGenTckHsrvInc
+-- 	Added vrrpCurCfgVirtRtrGrpTckHsrv and vrrpCurCfgVirtRtrGrpTckHsrv
+-- 	to support vrrp group track hsrv
+-- 
+-- Revision work_rmundhra/3 2001/03/01 16:43:52 rmundhra
+-- 	Fixed 10832: OIDs changed in mib.
+-- 
+-- Revision work_rmundhra/2 2001/03/01 00:30:03 rmundhra
+-- 	Corrected the oids associated with ipFwdCurCfgLocalTable,
+-- 	ipFwdNewCfgLocalTable, ipFwdCurCfgState & ipFwdNewCfgState and
+-- 	unused oid's which are obsoleted. 
+-- 
+-- Revision genie_rekha/5 2001/02/27 20:17:16 rekha
+-- 	Added SNMP support for BOOTP relay per IP interface.
+-- 
+-- Revision genie_rekha/2 2001/02/08 18:18:03 rekha
+-- 	As part of the code cleanup split the Tigon MIB into smaller
+-- 	modules. Instead of altswitch.mib these 5 new modules should be
+-- 	used.
+-- 
+-- $EndLog$
+-- 
+-- Version 10.0.x
+--
+
+ALTEON-TS-NETWORK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Counter, Gauge 
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    PhysAddress, DisplayString
+        FROM RFC1213-MIB
+    switch 
+        FROM ALTEON-ROOT-MIB
+    stats, information, operCmds
+        FROM ALTEON-TIGON-SWITCH-MIB;
+
+iprouting	  OBJECT IDENTIFIER ::= { switch 3 }
+vrrp              OBJECT IDENTIFIER ::= { switch 15 }
+
+ripStats  	  OBJECT IDENTIFIER ::= { stats  1 }
+arpStats  	  OBJECT IDENTIFIER ::= { stats  3 }
+routeStats  	  OBJECT IDENTIFIER ::= { stats  4 }
+dnsStats  	  OBJECT IDENTIFIER ::= { stats  5 }
+vrrpStats         OBJECT IDENTIFIER ::= { stats  9 }
+ospfStats	  OBJECT IDENTIFIER ::= { stats  22 }
+
+ip-info	  	  OBJECT IDENTIFIER ::= { information 3 }
+vrrp-info         OBJECT IDENTIFIER ::= { information 4 }
+ospfinfo          OBJECT IDENTIFIER ::= { information 5 }
+
+vrrpOper          OBJECT IDENTIFIER ::= { operCmds 5 }
+
+-- IP Configuration
+
+ipInterfaceTableMax OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the IP interface table."
+    ::= { iprouting 1 }
+
+ipCurCfgIntfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpCurCfgIntfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of IP interface configuration."
+    ::= { iprouting 2 }
+
+ipCurCfgIntfEntry OBJECT-TYPE
+    SYNTAX  IpCurCfgIntfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the Ip interface table"
+    INDEX   { ipCurCfgIntfIndex }
+    ::= { ipCurCfgIntfTable 1 }
+
+IpCurCfgIntfEntry ::= SEQUENCE {
+    ipCurCfgIntfIndex         INTEGER,
+    ipCurCfgIntfAddr          IpAddress,
+    ipCurCfgIntfMask          IpAddress,
+    ipCurCfgIntfBroadcast     IpAddress,
+    ipCurCfgIntfVlan          INTEGER,
+    ipCurCfgIntfState         INTEGER,
+    ipCurCfgIntfBootpRelay    INTEGER
+    }
+ 
+ipCurCfgIntfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The interface number for which the IP information is related."
+    ::= { ipCurCfgIntfEntry 1}
+
+ipCurCfgIntfAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the interface."
+    ::= { ipCurCfgIntfEntry 2 }
+
+ipCurCfgIntfMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory  
+    DESCRIPTION
+        "The subnet mask of the interface."
+    ::= { ipCurCfgIntfEntry 3 }
+
+ipCurCfgIntfBroadcast OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory  
+    DESCRIPTION
+        "The broadcast address of the interface."
+    ::= { ipCurCfgIntfEntry 4 }
+
+ipCurCfgIntfVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    ACCESS  read-only
+    STATUS  mandatory  
+    DESCRIPTION
+        "The VLAN associated with the interface."
+    ::= { ipCurCfgIntfEntry 5 }
+
+ipCurCfgIntfState OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	enabled(2),
+	disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory  
+    DESCRIPTION
+        "The state of the interface."
+    ::= { ipCurCfgIntfEntry 6 }
+
+ipCurCfgIntfBootpRelay OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	enabled(1),
+	disabled(2)
+	}
+    ACCESS  read-only
+    STATUS  mandatory  
+    DESCRIPTION
+        "Enable/disable BOOTP relay."
+    ::= { ipCurCfgIntfEntry 7 }
+
+ipNewCfgIntfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpNewCfgIntfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of interface configuration in the New Configuration Block."
+    ::= { iprouting 3 }
+
+ipNewCfgIntfEntry OBJECT-TYPE
+    SYNTAX  IpNewCfgIntfEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the Ip interface table"
+    INDEX   { ipNewCfgIntfIndex }
+    ::= { ipNewCfgIntfTable 1 }
+ 
+IpNewCfgIntfEntry ::= SEQUENCE {
+    ipNewCfgIntfIndex         INTEGER,
+    ipNewCfgIntfAddr          IpAddress,
+    ipNewCfgIntfMask          IpAddress,
+    ipNewCfgIntfBroadcast     IpAddress,
+    ipNewCfgIntfVlan          INTEGER,
+    ipNewCfgIntfState         INTEGER,
+    ipNewCfgIntfDelete	      INTEGER,
+    ipNewCfgIntfBootpRelay    INTEGER
+    }
+ 
+ipNewCfgIntfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The interface number for which the IP information is related."
+    ::= { ipNewCfgIntfEntry 1 }
+
+ipNewCfgIntfAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the interface."
+    ::= { ipNewCfgIntfEntry 2 }
+
+ipNewCfgIntfMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION
+        "The subnet mask of the interface."
+    ::= { ipNewCfgIntfEntry 3 }
+
+ipNewCfgIntfBroadcast OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION
+        "The broadcast address of the interface."
+    ::= { ipNewCfgIntfEntry 4 }
+
+ipNewCfgIntfVlan OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION
+        "The VLAN associated with the interface."
+    ::= { ipNewCfgIntfEntry 5 }
+
+ipNewCfgIntfState OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	enabled(2),
+	disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION
+        "The state of the interface."
+    ::= { ipNewCfgIntfEntry 6 }
+
+ipNewCfgIntfDelete OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	other(1),
+        delete(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than 2(delete) has no effect on the state of the row."
+    ::= { ipNewCfgIntfEntry 7 }
+
+ipNewCfgIntfBootpRelay OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	enabled(1),
+	disabled(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION
+        "Enable/disable BOOTP relay."
+    ::= { ipNewCfgIntfEntry 8 }
+
+-- IP Gateway Table Configuration
+
+ipGatewayTableMax OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the IP gateway table."
+    ::= { iprouting 4 }
+
+ipCurCfgGwTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpCurCfgGwEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of gateways  in the Current configuration Block."
+    ::= { iprouting 5 }
+
+ipCurCfgGwEntry OBJECT-TYPE
+    SYNTAX  IpCurCfgGwEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the Ip gateway table"
+    INDEX   { ipCurCfgGwIndex }
+    ::= { ipCurCfgGwTable 1 }
+
+IpCurCfgGwEntry ::= SEQUENCE {
+    ipCurCfgGwIndex         INTEGER,
+    ipCurCfgGwAddr          IpAddress,
+    ipCurCfgGwInterval      INTEGER,
+    ipCurCfgGwRetry         INTEGER,
+    ipCurCfgGwState         INTEGER,
+    ipCurCfgGwArp           INTEGER,
+    ipCurCfgGwVlan          INTEGER
+    }
+
+ipCurCfgGwIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The gateway number for which the information is related."
+    ::= { ipCurCfgGwEntry 1}
+
+ipCurCfgGwAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the default gateway."
+    ::= { ipCurCfgGwEntry 2 }
+
+ipCurCfgGwInterval OBJECT-TYPE 
+    SYNTAX  INTEGER (0..60)
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The interval between ping attempts." 
+    ::= { ipCurCfgGwEntry 3 }
+
+ipCurCfgGwRetry OBJECT-TYPE
+    SYNTAX  INTEGER (1..120)   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of failed attempts to declare the default gateway DOWN."
+    ::= { ipCurCfgGwEntry 4 }
+
+ipCurCfgGwState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of the default gateway."
+    ::= { ipCurCfgGwEntry 5 }
+
+ipCurCfgGwArp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        } 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of ARP only health checks."
+    ::= { ipCurCfgGwEntry 6 }
+
+ipNewCfgGwTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpNewCfgGwEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of gateway configuration in the new configuration block."
+    ::= { iprouting 6 }
+
+ipCurCfgGwVlan OBJECT-TYPE
+    SYNTAX  INTEGER (0..4094)   
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN number for this gateway. The first 4 entries in the table 
+         are only used for default gateway load balancing hence the VLAN 
+         cannot be specified for the first 4 entries."
+    ::= { ipCurCfgGwEntry 7 }
+
+ipNewCfgGwEntry OBJECT-TYPE
+    SYNTAX  IpNewCfgGwEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the Ip default gateway table"
+    INDEX   { ipNewCfgGwIndex }
+    ::= { ipNewCfgGwTable 1 }
+
+IpNewCfgGwEntry ::= SEQUENCE {
+    ipNewCfgGwIndex         INTEGER,
+    ipNewCfgGwAddr          IpAddress,
+    ipNewCfgGwInterval      INTEGER,
+    ipNewCfgGwRetry         INTEGER,
+    ipNewCfgGwState         INTEGER,
+    ipNewCfgGwDelete        INTEGER,
+    ipNewCfgGwArp           INTEGER,
+    ipNewCfgGwVlan          INTEGER
+    }
+
+ipNewCfgGwIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The gateway number for which the information is related."
+    ::= { ipNewCfgGwEntry 1}
+
+ipNewCfgGwAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of the default gateway."
+    ::= { ipNewCfgGwEntry 2 }
+
+ipNewCfgGwInterval OBJECT-TYPE 
+    SYNTAX  INTEGER (0..60)
+    ACCESS  read-write 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The interval in seconds between ping attempts." 
+    ::= { ipNewCfgGwEntry 3 }
+
+ipNewCfgGwRetry OBJECT-TYPE
+    SYNTAX  INTEGER (1..120)   
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of failed attempts to declare the default gateway DOWN."
+    ::= { ipNewCfgGwEntry 4 }
+
+ipNewCfgGwState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of the default gateway."
+    ::= { ipNewCfgGwEntry 5 }
+
+ipNewCfgGwDelete OBJECT-TYPE
+    SYNTAX  INTEGER {
+	other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other is returned. Setting the value to anything other 
+         than 2(delete) has no effect on the state of the row."
+    ::= { ipNewCfgGwEntry 6 }
+
+ipNewCfgGwArp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of the ARP only health checks."
+    ::= { ipNewCfgGwEntry 7 }
+
+ipNewCfgGwVlan OBJECT-TYPE
+    SYNTAX  INTEGER (0..4094)   
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The VLAN number for this gateway. The first 4 entries in the table 
+         are only used for default gateway load balancing hence the VLAN 
+         cannot be specified for the first 4 entries."
+    ::= { ipNewCfgGwEntry 8 }
+
+ipCurCfgStaticRouteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpCurCfgStaticRouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of static routes in the current configuration block."
+    ::= { iprouting 7 }
+
+ipCurCfgStaticRouteEntry OBJECT-TYPE
+    SYNTAX  IpCurCfgStaticRouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the static IP route table"
+    INDEX   { ipCurCfgStaticRouteIndx }
+    ::= { ipCurCfgStaticRouteTable 1 }
+
+IpCurCfgStaticRouteEntry ::= SEQUENCE {
+    ipCurCfgStaticRouteIndx         INTEGER,
+    ipCurCfgStaticRouteDestIp       IpAddress,
+    ipCurCfgStaticRouteMask         IpAddress,
+    ipCurCfgStaticRouteGateway      IpAddress,
+    ipCurCfgStaticRouteInterface    INTEGER
+    }
+
+ipCurCfgStaticRouteIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the static routing table."
+    ::= { ipCurCfgStaticRouteEntry 1}
+
+ipCurCfgStaticRouteDestIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP address of this route."
+    ::= { ipCurCfgStaticRouteEntry 2}
+
+ipCurCfgStaticRouteMask OBJECT-TYPE 
+    SYNTAX  IpAddress
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The destination IP address of this route."
+    ::= { ipCurCfgStaticRouteEntry 3}
+
+ipCurCfgStaticRouteGateway OBJECT-TYPE 
+    SYNTAX  IpAddress
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The destination IP address of this route."
+    ::= { ipCurCfgStaticRouteEntry 4}
+
+ipCurCfgStaticRouteInterface OBJECT-TYPE 
+    SYNTAX  INTEGER
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The IP interface of this route.  The IP address of the specified 
+         interface shall be use as source IP when performs routing."
+    ::= { ipCurCfgStaticRouteEntry 5}
+
+ipNewCfgStaticRouteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpNewCfgStaticRouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of static routes in the new configuration block."
+    ::= { iprouting 8 }
+
+ipNewCfgStaticRouteEntry OBJECT-TYPE
+    SYNTAX  IpNewCfgStaticRouteEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the static IP route table"
+    INDEX   { ipNewCfgStaticRouteIndx }
+    ::= { ipNewCfgStaticRouteTable 1 }
+
+IpNewCfgStaticRouteEntry ::= SEQUENCE {
+    ipNewCfgStaticRouteIndx         INTEGER,
+    ipNewCfgStaticRouteDestIp       IpAddress,
+    ipNewCfgStaticRouteMask         IpAddress,
+    ipNewCfgStaticRouteGateway      IpAddress,
+    ipNewCfgStaticRouteAction       INTEGER,
+    ipNewCfgStaticRouteInterface    INTEGER
+    }
+
+ipNewCfgStaticRouteIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the static routing table."
+    ::= { ipNewCfgStaticRouteEntry 1}
+
+ipNewCfgStaticRouteDestIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP address of this route."
+    ::= { ipNewCfgStaticRouteEntry 2}
+
+ipNewCfgStaticRouteMask OBJECT-TYPE 
+    SYNTAX  IpAddress
+    ACCESS  read-write 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The subnet mask of this route."
+    ::= { ipNewCfgStaticRouteEntry 3}
+
+ipNewCfgStaticRouteGateway OBJECT-TYPE 
+    SYNTAX  IpAddress
+    ACCESS  read-write 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The IP address of the gateway for this route."
+    ::= { ipNewCfgStaticRouteEntry 4}
+
+ipNewCfgStaticRouteAction OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+       }  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other is returned. Setting the value to anything other 
+         than 2(delete) has no effect on the state of the row."
+    ::= { ipNewCfgStaticRouteEntry 5 }
+
+ipNewCfgStaticRouteInterface OBJECT-TYPE 
+    SYNTAX  INTEGER
+    ACCESS  read-write 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The IP interface of this route.  The IP address of the specified 
+         interface shall be use as source IP when performs routing."
+    ::= { ipNewCfgStaticRouteEntry 6 }
+
+-- Forwarding group 
+
+ipForward         OBJECT IDENTIFIER ::= { iprouting 9 }
+ripConfig	  OBJECT IDENTIFIER ::= { ipForward 1 }
+
+ripCurCfgSupply OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(2),	
+	disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable supplying route updates."
+    ::= { ripConfig 1 }
+
+ripNewCfgSupply OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable supplying route updates."
+    ::= { ripConfig 2 }
+
+ripCurCfgListen OBJECT-TYPE 
+    SYNTAX  INTEGER {
+        enabled(2),      
+        disabled(3) 
+	}
+    ACCESS  read-only 
+    STATUS  mandatory  
+    DESCRIPTION 
+        "Enable or disable listening to route updates." 
+    ::= { ripConfig 3 }
+
+ripNewCfgListen OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable listening to route updates."
+    ::= { ripConfig 4 }
+
+ripCurCfgDefListen OBJECT-TYPE 
+    SYNTAX  INTEGER {
+        enabled(2),      
+        disabled(3) 
+	}
+    ACCESS  read-only 
+    STATUS  mandatory  
+    DESCRIPTION 
+        "Enable or disable listening to default routes." 
+    ::= { ripConfig 5 }
+
+ripNewCfgDefListen OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable listening to default routes."
+    ::= { ripConfig 6 }
+
+ripCurCfgStaticSupply OBJECT-TYPE 
+    SYNTAX  INTEGER {
+        enabled(2),      
+        disabled(3) 
+	}
+    ACCESS  read-only 
+    STATUS  mandatory  
+    DESCRIPTION 
+        "Enable or disable supplying static route updates." 
+    ::= { ripConfig 7 }
+
+ripNewCfgStaticSupply OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable supplying static route updates."
+    ::= { ripConfig 8 }
+
+ripCurCfgUpdatePeriod OBJECT-TYPE
+    SYNTAX  INTEGER  (1..120)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Update Period in seconds."
+    ::= { ripConfig 9 }
+
+ripNewCfgUpdatePeriod OBJECT-TYPE
+    SYNTAX  INTEGER (1..120)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Update period in seconds."
+    ::= { ripConfig 10 }
+
+ripCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "RIP global state."
+    ::= { ripConfig 11 }
+
+ripNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Globally turn RIP on or off."
+    ::= { ripConfig 12 }
+
+ripCurCfgPoisonReverse OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "RIP poison reverse."
+    ::= { ripConfig 13 }
+ 
+ripNewCfgPoisonReverse OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "RIP poison reverse."
+    ::= { ripConfig 14 }
+
+ripCurCfgVip OBJECT-TYPE
+      SYNTAX  INTEGER {
+                enabled(2),
+                disabled(3)
+                }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+              "Advertise VIP Host Routes."
+      ::= { ripConfig 15 }
+
+ripNewCfgVip OBJECT-TYPE
+      SYNTAX  INTEGER {
+                enabled(2),
+                disabled(3)
+                }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+              "Advertise VIP Host Routes."
+      ::= { ripConfig 16 }
+
+-- Table to turn on/off forwarding per port
+
+ipFwdCurCfgPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpFwdCurCfgPortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of ports and their forwarding states"
+    ::= { ipForward 2 }
+
+ipFwdCurCfgPortEntry OBJECT-TYPE
+    SYNTAX  IpFwdCurCfgPortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the ipFwdCurCfgPortTable "
+    INDEX   { ipFwdCurCfgPortIndex }
+    ::= { ipFwdCurCfgPortTable 1 }
+
+IpFwdCurCfgPortEntry ::= SEQUENCE {
+    ipFwdCurCfgPortIndex	INTEGER,
+    ipFwdCurCfgPortState	INTEGER
+    }
+
+ipFwdCurCfgPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port number for which the forwarding state information pertains."
+    ::= { ipFwdCurCfgPortEntry 1 }
+ 
+ipFwdCurCfgPortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+	enabled(2),
+	disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The forwarding state of the port."
+    ::= { ipFwdCurCfgPortEntry 2 }
+
+ipFwdNewCfgPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpFwdNewCfgPortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of ports and their forwarding states"
+    ::= { ipForward 3 }
+ 
+ipFwdNewCfgPortEntry OBJECT-TYPE
+    SYNTAX  IpFwdNewCfgPortEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the ipFwdNewCfgPortTable "
+    INDEX   { ipFwdNewCfgPortIndex }
+    ::= { ipFwdNewCfgPortTable 1 }
+ 
+IpFwdNewCfgPortEntry ::= SEQUENCE {
+    ipFwdNewCfgPortIndex           INTEGER,
+    ipFwdNewCfgPortState           INTEGER
+    }
+ 
+ipFwdNewCfgPortIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The port number for which the forwarding state information pertains."
+    ::= { ipFwdNewCfgPortEntry 1 }
+ 
+ipFwdNewCfgPortState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write  
+    STATUS  mandatory
+    DESCRIPTION
+        "The forwarding state of the port."
+    ::= { ipFwdNewCfgPortEntry 2 }
+
+--The following oid's are obsoleted and should not be used
+--ipFwdCurCfgLocalSubnet  OBJECT IDENTIFIER ::= { ipForward 4 }   obsoleted
+--ipFwdNewCfgLocalSubnet  OBJECT IDENTIFIER ::= { ipForward 5 }   obsoleted
+--ipFwdCurCfgLocalMask    OBJECT IDENTIFIER ::= { ipForward 6 }   obsoleted
+--ipFwdNewCfgLocalMask    OBJECT IDENTIFIER ::= { ipForward 7 }   obsoleted
+
+ipFwdCurCfgLocalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpFwdCurCfgLocalEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of local network definition."
+    ::= { ipForward 14 }
+
+ipFwdCurCfgLocalEntry OBJECT-TYPE
+    SYNTAX  IpFwdCurCfgLocalEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the ipFwdCurCfgLocalTable "
+    INDEX   { ipFwdCurCfgLocalIndex }
+    ::= { ipFwdCurCfgLocalTable 1 }
+
+IpFwdCurCfgLocalEntry ::= SEQUENCE {
+    ipFwdCurCfgLocalIndex	INTEGER,
+    ipFwdCurCfgLocalSubnet	IpAddress,
+    ipFwdCurCfgLocalMask	IpAddress
+    }
+
+ipFwdCurCfgLocalIndex OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of ipFwdCurCfgLocalTable."
+    ::= { ipFwdCurCfgLocalEntry 1 }
+
+ipFwdCurCfgLocalSubnet OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current local IP subnet."
+    ::= { ipFwdCurCfgLocalEntry 2 }
+
+ipFwdCurCfgLocalMask OBJECT-TYPE 
+    SYNTAX  IpAddress 
+    ACCESS  read-only 
+    STATUS  mandatory
+    DESCRIPTION 
+        "The current local IP subnet mask." 
+    ::= { ipFwdCurCfgLocalEntry 3 } 
+ 
+ipFwdNewCfgLocalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpFwdNewCfgLocalEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of local network definition."
+    ::= { ipForward 15 }
+
+ipFwdNewCfgLocalEntry OBJECT-TYPE
+    SYNTAX  IpFwdNewCfgLocalEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the ipFwdNewCfgLocalTable "
+    INDEX   { ipFwdNewCfgLocalIndex }
+    ::= { ipFwdNewCfgLocalTable 1 }
+
+IpFwdNewCfgLocalEntry ::= SEQUENCE {
+    ipFwdNewCfgLocalIndex	INTEGER,
+    ipFwdNewCfgLocalSubnet	IpAddress,
+    ipFwdNewCfgLocalMask	IpAddress,
+    ipFwdNewCfgLocalDelete      INTEGER
+    }
+
+ipFwdNewCfgLocalIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of ipFwdNewCfgLocalTable."
+    ::= { ipFwdNewCfgLocalEntry 1 }
+
+ipFwdNewCfgLocalSubnet OBJECT-TYPE 
+    SYNTAX  IpAddress 
+    ACCESS  read-write 
+    STATUS  mandatory
+    DESCRIPTION 
+        "The new local IP subnet." 
+    ::= { ipFwdNewCfgLocalEntry 2 }
+
+ipFwdNewCfgLocalMask OBJECT-TYPE  
+    SYNTAX  IpAddress  
+    ACCESS  read-write  
+    STATUS  mandatory
+    DESCRIPTION  
+        "The new local IP subnet mask."  
+    ::= { ipFwdNewCfgLocalEntry 3 }
+
+ipFwdNewCfgLocalDelete OBJECT-TYPE
+    SYNTAX INTEGER { 
+        other(1),
+        delete(2)
+	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than 2(delete) has no effect on the state of the row."
+    ::= { ipFwdNewCfgLocalEntry 4 }
+
+ipFwdCurCfgState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on(2),
+        off(3)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "IP forwarding global state."
+    ::= { ipForward 8 }
+
+ipFwdNewCfgState OBJECT-TYPE
+    SYNTAX  INTEGER { 
+        on(2),
+        off(3) 
+	}
+    ACCESS  read-write
+    STATUS  mandatory  
+    DESCRIPTION 
+        "IP forwarding global state." 
+    ::= { ipForward 9 }
+
+ipFwdCurCfgDirectedBcast OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Enable or disable forwarding directed broadcasts."
+    ::= { ipForward 10 }
+
+ipFwdNewCfgDirectedBcast OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(2),
+        disabled(3)
+	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Enable or disable forwarding directed broadcasts."
+    ::= { ipForward 11 }
+
+ipFwdPortTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the IP Port table."
+    ::= { ipForward 12 }
+
+ipFwdLocalTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the Local table."
+    ::= { ipForward 13 }
+
+arpCurCfgReARPPeriod OBJECT-TYPE
+    SYNTAX INTEGER (2..120)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Re-ARP Period in seconds."
+    ::= { iprouting 10 }
+
+arpNewCfgReARPPeriod OBJECT-TYPE 
+    SYNTAX  INTEGER (2..120)
+    ACCESS  read-write
+    STATUS  mandatory 
+    DESCRIPTION 
+        "Re-ARP Period in seconds." 
+    ::= { iprouting 11 }
+
+ipCurCfgGwMetric OBJECT-TYPE
+    SYNTAX  INTEGER {
+        strict(1),
+        roundrobin(2)
+        }  
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The default gateway metric."
+    ::= { iprouting 12 }
+
+ipNewCfgGwMetric OBJECT-TYPE
+    SYNTAX  INTEGER {
+        strict(1),
+        roundrobin(2)
+        }  
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The default gateway metric."
+    ::= { iprouting 13 }
+
+ipCurCfgBootpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of BOOTP server."
+    ::= { iprouting 14 }
+
+ipNewCfgBootpAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of BOOTP server."
+    ::= { iprouting 15 }
+
+ipCurCfgBootpAddr2 OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of second BOOTP server."
+    ::= { iprouting 16 }
+
+ipNewCfgBootpAddr2 OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IP address of second BOOTP server."
+    ::= { iprouting 17 }
+
+ipCurCfgBootpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of BOOTP relay."
+    ::= { iprouting 18 }
+
+ipNewCfgBootpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(2),
+        disabled(3)
+        }
+    ACCESS  read-write  
+    STATUS  mandatory
+    DESCRIPTION
+        "The state of BOOTP relay."
+    ::= { iprouting 19 }
+
+ipStaticRouteTableMaxSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of rows in the Static Route table."
+    ::= { iprouting 20 }
+
+-- VRRP (Virtual Router Redundantcy Protocol) Group
+
+vrrpGeneral       OBJECT IDENTIFIER ::= { vrrp 1 }
+
+vrrpCurCfgGenState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VRRP operation globally."
+    ::= { vrrpGeneral 1 }
+
+vrrpNewCfgGenState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable VRRP operation globally."
+    ::= { vrrpGeneral 2 }
+
+vrrpCurCfgGenTckVirtRtrInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of other virtual routers."
+    ::= { vrrpGeneral 3 }
+
+vrrpNewCfgGenTckVirtRtrInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of other virtual routers."
+    ::= { vrrpGeneral 4 }
+
+vrrpCurCfgGenTckIpIntfInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of other router interfaces."
+    ::= { vrrpGeneral 5 }
+
+vrrpNewCfgGenTckIpIntfInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of other router interfaces."
+    ::= { vrrpGeneral 6 }
+
+vrrpCurCfgGenTckVlanPortInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the port state of ports that belongs to the 
+         same virtual LAN as the virtual router."
+    ::= { vrrpGeneral 7 }
+
+vrrpNewCfgGenTckVlanPortInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the port state of ports that belongs to the 
+         same virtual LAN as the virtual router."
+    ::= { vrrpGeneral 8 }
+
+vrrpCurCfgGenTckL4PortInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the Layer 4 port states. This is valid when 
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpGeneral 9 }
+
+vrrpNewCfgGenTckL4PortInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the Layer 4 port states. This is valid when 
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpGeneral 10 }
+
+vrrpCurCfgGenTckRServerInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of real servers under the virtual 
+         server which is configured as a VRRP virtual router."
+    ::= { vrrpGeneral 11 }
+
+vrrpNewCfgGenTckRServerInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority. The priority is 
+         adjusted by tracking the state of real servers under the virtual 
+         server which is configured as a VRRP virtual router."
+    ::= { vrrpGeneral 12 }
+
+vrrpCurCfgGenTckHsrpInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority.  The
+	 priority is adjusted by tracking the HSRP advertisements."
+    ::= { vrrpGeneral 13 }
+
+vrrpNewCfgGenTckHsrpInc OBJECT-TYPE
+    SYNTAX  INTEGER (0..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The increment of VRRP virtual router priority.  The
+         priority is adjusted by tracking the HSRP advertisements."
+    ::= { vrrpGeneral 14 }
+
+vrrpCurCfgGenHotstandby OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable hotstandby processing."
+    ::= { vrrpGeneral 15 }
+
+vrrpNewCfgGenHotstandby OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable hotstandby processing."
+    ::= { vrrpGeneral 16 }
+
+vrrpCurCfgGenTckHsrvInc OBJECT-TYPE
+        SYNTAX  INTEGER (0..254)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The increment of VRRP virtual router priority.  The
+                 priority is adjusted by tracking the HSRP advertisements
+                 by VLAN."
+        ::= { vrrpGeneral 17 }
+ 
+vrrpNewCfgGenTckHsrvInc OBJECT-TYPE
+        SYNTAX  INTEGER (0..254)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The increment of VRRP virtual router priority.  The
+                 priority is adjusted by tracking the HSRP advertisements
+                 by VLAN."
+        ::= { vrrpGeneral 18 }
+
+vrrpCurCfgVirtRtrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpCurCfgVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP virtual routers configuration in current_config."
+    ::= { vrrp 2 }
+ 
+vrrpCurCfgVirtRtrTableEntry OBJECT-TYPE
+    SYNTAX  VrrpCurCfgVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP virtual router."
+    INDEX   { vrrpCurCfgVirtRtrIndx }
+    ::= { vrrpCurCfgVirtRtrTable 1 }
+ 
+VrrpCurCfgVirtRtrTableEntry ::= SEQUENCE {
+    vrrpCurCfgVirtRtrIndx         INTEGER,
+    vrrpCurCfgVirtRtrID           INTEGER,
+    vrrpCurCfgVirtRtrAddr         IpAddress,
+    vrrpCurCfgVirtRtrIfIndex      INTEGER,
+    vrrpCurCfgVirtRtrInterval     INTEGER,
+    vrrpCurCfgVirtRtrPriority     INTEGER,
+    vrrpCurCfgVirtRtrPreempt      INTEGER,
+    vrrpCurCfgVirtRtrState        INTEGER,
+    vrrpCurCfgVirtRtrSharing      INTEGER,
+    vrrpCurCfgVirtRtrTckVirtRtr   INTEGER,
+    vrrpCurCfgVirtRtrTckIpIntf    INTEGER,
+    vrrpCurCfgVirtRtrTckVlanPort  INTEGER,
+    vrrpCurCfgVirtRtrTckL4Port    INTEGER,
+    vrrpCurCfgVirtRtrTckRServer   INTEGER,
+    vrrpCurCfgVirtRtrTckHsrp      INTEGER,
+    vrrpCurCfgVirtRtrTckHsrv      INTEGER
+    }
+
+vrrpCurCfgVirtRtrIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router table index."
+    ::= { vrrpCurCfgVirtRtrTableEntry 1 }
+
+vrrpCurCfgVirtRtrID OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router identifier."
+    ::= { vrrpCurCfgVirtRtrTableEntry 2 }
+
+vrrpCurCfgVirtRtrAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router IP address."
+    ::= { vrrpCurCfgVirtRtrTableEntry 3 }
+
+vrrpCurCfgVirtRtrIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IfIndex that the VRRP virtual router is representing."
+    ::= { vrrpCurCfgVirtRtrTableEntry 4 }
+
+vrrpCurCfgVirtRtrInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The time interval between VRRP advertisements in seconds."
+    ::= { vrrpCurCfgVirtRtrTableEntry 5 }
+
+vrrpCurCfgVirtRtrPriority OBJECT-TYPE
+    SYNTAX  INTEGER (1..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The priority value to be used by the specified VRRP virtual routers."
+    ::= { vrrpCurCfgVirtRtrTableEntry 6 }
+
+vrrpCurCfgVirtRtrPreempt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is for controlling whether a higher priority Backup
+          VRRP virtual router preempts a low priority Master.
+
+          enabled(1)  - allow preemption
+          disabled(2) - prohibit preemption"
+    ::= { vrrpCurCfgVirtRtrTableEntry 7 }
+
+vrrpCurCfgVirtRtrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrTableEntry 8 }
+
+vrrpCurCfgVirtRtrSharing OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable load sharing of non-master virtual router."
+    ::= { vrrpCurCfgVirtRtrTableEntry 9 }
+
+vrrpCurCfgVirtRtrTckVirtRtr OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other virtual routers for priority 
+         adjustment. The priority increment is defined 
+         in vrrpCurCfgGenTckVirtRtrInc."
+    ::= { vrrpCurCfgVirtRtrTableEntry 10 }
+
+vrrpCurCfgVirtRtrTckIpIntf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other router interfaces for 
+	 priority adjustment. The priority increment is defined 
+	 in vrrpCurCfgGenTckIpIntfInc."
+    ::= { vrrpCurCfgVirtRtrTableEntry 11 }
+
+vrrpCurCfgVirtRtrTckVlanPort OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking port state of VLAN ports 
+	 for priority adjustment. The priority increment is 
+	 defined in vrrpCurCfgGenTckVlanPortInc."
+    ::= { vrrpCurCfgVirtRtrTableEntry 12 }
+
+vrrpCurCfgVirtRtrTckL4Port OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking Layer 4 port states for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpCurCfgGenTckL4PortInc.  This is applied when 
+	 virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrTableEntry 13 }
+
+vrrpCurCfgVirtRtrTckRServer OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking real server states for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpCurCfgGenTckRServerInc.  This is applied when 
+	 virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrTableEntry 14 }
+
+vrrpCurCfgVirtRtrTckHsrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking HSRP advertisements for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpCurCfgGenTckHsrpInc.  This is applied when 
+	 virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrTableEntry 15 }
+
+vrrpCurCfgVirtRtrTckHsrv OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable or disable tracking HSRP advertisements by VLAN for
+                 priority adjustment.  The priority increment is defined
+                 in vrrpCurCfgGenTckHsrvInc.  This is applied when
+                 virtual server is configured as a VRRP virtual router."
+        ::= { vrrpCurCfgVirtRtrTableEntry 16 }
+
+vrrpNewCfgVirtRtrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpNewCfgVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP virtual routers configuration in current_config."
+    ::= { vrrp 3 }
+
+vrrpNewCfgVirtRtrTableEntry OBJECT-TYPE
+    SYNTAX  VrrpNewCfgVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP virtual router."
+    INDEX   { vrrpNewCfgVirtRtrIndx }
+    ::= { vrrpNewCfgVirtRtrTable 1 }
+
+VrrpNewCfgVirtRtrTableEntry ::= SEQUENCE {
+    vrrpNewCfgVirtRtrIndx         INTEGER,
+    vrrpNewCfgVirtRtrID           INTEGER,
+    vrrpNewCfgVirtRtrAddr         IpAddress,
+    vrrpNewCfgVirtRtrIfIndex      INTEGER,
+    vrrpNewCfgVirtRtrInterval     INTEGER,
+    vrrpNewCfgVirtRtrPriority     INTEGER,
+    vrrpNewCfgVirtRtrPreempt      INTEGER,
+    vrrpNewCfgVirtRtrState        INTEGER,
+    vrrpNewCfgVirtRtrDelete       INTEGER,
+    vrrpNewCfgVirtRtrSharing      INTEGER,
+    vrrpNewCfgVirtRtrTckVirtRtr   INTEGER,
+    vrrpNewCfgVirtRtrTckIpIntf    INTEGER,
+    vrrpNewCfgVirtRtrTckVlanPort  INTEGER,
+    vrrpNewCfgVirtRtrTckL4Port    INTEGER,
+    vrrpNewCfgVirtRtrTckRServer   INTEGER,
+    vrrpNewCfgVirtRtrTckHsrp      INTEGER,
+    vrrpNewCfgVirtRtrTckHsrv      INTEGER
+    }
+
+vrrpNewCfgVirtRtrIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router table index."
+    ::= { vrrpNewCfgVirtRtrTableEntry 1 }
+
+vrrpNewCfgVirtRtrID OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router identifier."
+    ::= { vrrpNewCfgVirtRtrTableEntry 2 }
+
+vrrpNewCfgVirtRtrAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router IP address."
+    ::= { vrrpNewCfgVirtRtrTableEntry 3 }
+
+vrrpNewCfgVirtRtrIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IfIndex that the VRRP virtual router is representing."
+   ::= { vrrpNewCfgVirtRtrTableEntry 4 }
+
+vrrpNewCfgVirtRtrInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The time interval between VRRP advertisements in seconds."
+    ::= { vrrpNewCfgVirtRtrTableEntry 5 }
+
+vrrpNewCfgVirtRtrPriority OBJECT-TYPE
+    SYNTAX  INTEGER (1..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The priority value to be used by the specified VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 6 }
+
+vrrpNewCfgVirtRtrPreempt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is for controlling whether a higher priority Backup
+         VRRP virtual router preempts a low priority Master.
+
+         enabled(1)  - allow preemption
+         disabled(2) - prohibit preemption"
+    ::= { vrrpNewCfgVirtRtrTableEntry 7 }
+
+vrrpNewCfgVirtRtrState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 8 }
+
+vrrpNewCfgVirtRtrDelete OBJECT-TYPE
+    SYNTAX  INTEGER { 
+	other(1),
+        delete(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than delete(2) has no effect on the state of the row."
+    ::= { vrrpNewCfgVirtRtrTableEntry 9 }
+
+vrrpNewCfgVirtRtrSharing OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable load sharing of non-master virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 10 }
+
+vrrpNewCfgVirtRtrTckVirtRtr OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other virtual routers for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpNewCfgGenTckVirtRtrInc."
+    ::= { vrrpNewCfgVirtRtrTableEntry 11 }
+
+vrrpNewCfgVirtRtrTckIpIntf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+         "Enable or disable tracking other router interfaces for 
+	  priority adjustment.  the priority increment is defined 
+	  in vrrpNewCfgGenTckIpIntfInc."
+    ::= { vrrpNewCfgVirtRtrTableEntry 12 }
+
+vrrpNewCfgVirtRtrTckVlanPort OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking port state of VLAN ports 
+	 for priority adjustment.  the priority increment is 
+	 defined in vrrpNewCfgGenTckVlanPortInc."
+    ::= { vrrpNewCfgVirtRtrTableEntry 13 }
+
+vrrpNewCfgVirtRtrTckL4Port OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+         "Enable or disable tracking Layer 4 port states for 
+	  priority adjustment.  the priority increment is defined 
+	  in vrrpNewCfgGenTckL4PortInc.  This is applied when 
+	  virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 14 }
+
+vrrpNewCfgVirtRtrTckRServer OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking real server states for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpNewCfgGenTckRServerInc.  This is applied when 
+	 virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 15 }
+
+vrrpNewCfgVirtRtrTckHsrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking HSRP advertisements for 
+	 priority adjustment.  the priority increment is defined 
+	 in vrrpNewCfgGenTckHsrpInc.  This is applied when 
+	 virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrTableEntry 16 }
+
+vrrpNewCfgVirtRtrTckHsrv OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable or disable tracking HSRP by VLAN advertisements for
+                 priority adjustment.  The priority increment is defined
+                 in vrrpNewCfgGenTckHsrvInc.  This is applied when
+                 virtual server is configured as a VRRP virtual router."
+        ::= { vrrpNewCfgVirtRtrTableEntry 17 }
+
+-- VRRP Interface Table
+
+vrrpCurCfgIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpCurCfgIfTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP interface configuration in current_config."
+    ::= { vrrp 4 }
+ 
+vrrpCurCfgIfTableEntry OBJECT-TYPE
+    SYNTAX  VrrpCurCfgIfTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP interface."
+    INDEX   { vrrpCurCfgIfIndx }
+    ::= { vrrpCurCfgIfTable 1 }
+ 
+VrrpCurCfgIfTableEntry ::= SEQUENCE {
+    vrrpCurCfgIfIndx         INTEGER,
+    vrrpCurCfgIfAuthType     INTEGER,
+    vrrpCurCfgIfPasswd       DisplayString
+    }
+
+vrrpCurCfgIfIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP interface index.  This is eqivalent to IfIndex."
+    ::= { vrrpCurCfgIfTableEntry 1 }
+
+vrrpCurCfgIfAuthType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        simple-text-password(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Type of authentication being used.
+	 none(1) - no authentication
+	 simple-text-password(2) - use password specified in 
+         vrrpCurCfgIfPasswd for authentication."
+    ::= { vrrpCurCfgIfTableEntry 2 }
+
+vrrpCurCfgIfPasswd OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..7))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The password for authentication."
+    ::= { vrrpCurCfgIfTableEntry 3 }
+
+vrrpNewCfgIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpNewCfgIfTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP interface configuration in current_config."
+    ::= { vrrp 5 }
+ 
+vrrpNewCfgIfTableEntry OBJECT-TYPE
+    SYNTAX  VrrpNewCfgIfTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP interface."
+    INDEX   { vrrpNewCfgIfIndx }
+    ::= { vrrpNewCfgIfTable 1 }
+ 
+VrrpNewCfgIfTableEntry ::= SEQUENCE {
+    vrrpNewCfgIfIndx         INTEGER,
+    vrrpNewCfgIfAuthType     INTEGER,
+    vrrpNewCfgIfPasswd       DisplayString,
+    vrrpNewCfgIfDelete       INTEGER
+    }
+
+vrrpNewCfgIfIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP interface index.  This is eqivalent to IfIndex."
+    ::= { vrrpNewCfgIfTableEntry 1 }
+
+vrrpNewCfgIfAuthType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        simple-text-password(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Type of authentication being used.
+	 none(1) - no authentication
+	 simple-text-password(2) - use password specified in 
+         vrrpNewCfgIfPasswd for authentication."
+    ::= { vrrpNewCfgIfTableEntry 2 }
+
+vrrpNewCfgIfPasswd OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..7))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The password for authentication."
+    ::= { vrrpNewCfgIfTableEntry 3 }
+
+vrrpNewCfgIfDelete OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than delete(2) has no effect on the state of the row."
+    ::= { vrrpNewCfgIfTableEntry 4 }
+
+-- Failover Virtual Router Groups
+
+vrrpCurCfgVirtRtrGrpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpCurCfgVirtRtrGrpTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP virtual router group in current_config."
+    ::= { vrrp 6 }
+
+vrrpCurCfgVirtRtrGrpTableEntry OBJECT-TYPE
+    SYNTAX  VrrpCurCfgVirtRtrGrpTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP failover virtual router."
+    INDEX   { vrrpCurCfgVirtRtrGrpIndx }
+    ::= { vrrpCurCfgVirtRtrGrpTable 1 }
+
+VrrpCurCfgVirtRtrGrpTableEntry ::= SEQUENCE {
+    vrrpCurCfgVirtRtrGrpIndx         INTEGER,
+    vrrpCurCfgVirtRtrGrpID           INTEGER,
+    vrrpCurCfgVirtRtrGrpIfIndex      INTEGER,
+    vrrpCurCfgVirtRtrGrpInterval     INTEGER,
+    vrrpCurCfgVirtRtrGrpPriority     INTEGER,
+    vrrpCurCfgVirtRtrGrpPreempt      INTEGER,
+    vrrpCurCfgVirtRtrGrpState        INTEGER,
+    vrrpCurCfgVirtRtrGrpSharing      INTEGER,
+    vrrpCurCfgVirtRtrGrpTckVirtRtr   INTEGER,
+    vrrpCurCfgVirtRtrGrpTckIpIntf    INTEGER,
+    vrrpCurCfgVirtRtrGrpTckVlanPort  INTEGER,
+    vrrpCurCfgVirtRtrGrpTckL4Port    INTEGER,
+    vrrpCurCfgVirtRtrGrpTckRServer   INTEGER,
+    vrrpCurCfgVirtRtrGrpTckHsrp      INTEGER,
+    vrrpCurCfgVirtRtrGrpTckHsrv      INTEGER
+    }
+ 
+vrrpCurCfgVirtRtrGrpIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router table index."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 1 }
+ 
+vrrpCurCfgVirtRtrGrpID OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router identifier."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 2 }
+ 
+vrrpCurCfgVirtRtrGrpIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The IfIndex that the VRRP virtual router is representing."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 3 }
+
+vrrpCurCfgVirtRtrGrpInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The time interval between VRRP advertisements in seconds."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 4 }
+
+vrrpCurCfgVirtRtrGrpPriority OBJECT-TYPE
+    SYNTAX  INTEGER (1..254)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The priority value to be used by the specified VRRP virtual routers."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 5 }
+
+vrrpCurCfgVirtRtrGrpPreempt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is for controlling whether a higher priority Backup
+         VRRP virtual router preempts a low priority Master.
+
+         enabled(1)  - allow preemption
+         disabled(2) - prohibit preemption"
+   ::= { vrrpCurCfgVirtRtrGrpTableEntry 6 }
+
+vrrpCurCfgVirtRtrGrpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 7 }
+
+vrrpCurCfgVirtRtrGrpSharing OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable load sharing of non-master virtual router."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 8 }
+
+vrrpCurCfgVirtRtrGrpTckVirtRtr OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other virtual routers for
+         priority adjustment.  the priority increment is defined
+         in vrrpCurCfgGenTckVirtRtrInc."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 9 }
+
+vrrpCurCfgVirtRtrGrpTckIpIntf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other router interfaces for
+         priority adjustment.  the priority increment is defined
+         in vrrpCurCfgGenTckIpIntfInc."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 10 }
+
+vrrpCurCfgVirtRtrGrpTckVlanPort OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking port state of VLAN ports
+         for priority adjustment.  the priority increment is
+         defined in vrrpCurCfgGenTckVlanPortInc."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 11 }
+
+vrrpCurCfgVirtRtrGrpTckL4Port OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking Layer 4 port states for
+         priority adjustment.  the priority increment is defined
+         in vrrpCurCfgGenTckL4PortInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 12 }
+
+vrrpCurCfgVirtRtrGrpTckRServer OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking real server states for
+         priority adjustment.  the priority increment is defined
+         in vrrpCurCfgGenTckRServerInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 13 }
+
+vrrpCurCfgVirtRtrGrpTckHsrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking HSRP advertisements for
+         priority adjustment.  the priority increment is defined
+         in vrrpCurCfgGenTckHsrpInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpCurCfgVirtRtrGrpTableEntry 14 }
+
+vrrpCurCfgVirtRtrGrpTckHsrv OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable or disable tracking HSRP by VLAN advertisements for
+                 priority adjustment.  The priority increment is defined
+                 in vrrpCurCfgGenTckHsrvInc.  This is applied when
+                 virtual server is configured as a VRRP virtual router."
+        ::= { vrrpCurCfgVirtRtrGrpTableEntry 15 }
+
+vrrpNewCfgVirtRtrGrpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpNewCfgVirtRtrGrpTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP virtual router group configuration in new_config."
+    ::= { vrrp 7 }
+
+vrrpNewCfgVirtRtrGrpTableEntry OBJECT-TYPE
+    SYNTAX  VrrpNewCfgVirtRtrGrpTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Information about a VRRP failover virtual router."
+    INDEX   { vrrpNewCfgVirtRtrGrpIndx }
+    ::= { vrrpNewCfgVirtRtrGrpTable 1 }
+ 
+VrrpNewCfgVirtRtrGrpTableEntry ::= SEQUENCE {
+    vrrpNewCfgVirtRtrGrpIndx         INTEGER,
+    vrrpNewCfgVirtRtrGrpID           INTEGER,
+    vrrpNewCfgVirtRtrGrpIfIndex      INTEGER,
+    vrrpNewCfgVirtRtrGrpInterval     INTEGER,
+    vrrpNewCfgVirtRtrGrpPriority     INTEGER,
+    vrrpNewCfgVirtRtrGrpPreempt      INTEGER,
+    vrrpNewCfgVirtRtrGrpState        INTEGER,
+    vrrpNewCfgVirtRtrGrpDelete       INTEGER,
+    vrrpNewCfgVirtRtrGrpSharing      INTEGER,
+    vrrpNewCfgVirtRtrGrpTckVirtRtr   INTEGER,
+    vrrpNewCfgVirtRtrGrpTckIpIntf    INTEGER,
+    vrrpNewCfgVirtRtrGrpTckVlanPort  INTEGER,
+    vrrpNewCfgVirtRtrGrpTckL4Port    INTEGER,
+    vrrpNewCfgVirtRtrGrpTckRServer   INTEGER,
+    vrrpNewCfgVirtRtrGrpTckHsrp      INTEGER,
+    vrrpNewCfgVirtRtrGrpTckHsrv      INTEGER
+    }
+ 
+vrrpNewCfgVirtRtrGrpIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router table index."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 1 }
+ 
+vrrpNewCfgVirtRtrGrpID OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router identifier."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 2 }
+ 
+vrrpNewCfgVirtRtrGrpIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The IfIndex that the VRRP virtual router is representing."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 3 }
+
+vrrpNewCfgVirtRtrGrpInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The time interval between VRRP advertisements in seconds."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 4 }
+
+vrrpNewCfgVirtRtrGrpPriority OBJECT-TYPE
+    SYNTAX  INTEGER (1..254)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The priority value to be used by the specified VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 5 }
+
+vrrpNewCfgVirtRtrGrpPreempt OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This is for controlling whether a higher priority Backup
+         VRRP virtual router preempts a low priority Master.
+
+         enabled(1)  - allow preemption
+         disabled(2) - prohibit preemption"
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 6 }
+
+vrrpNewCfgVirtRtrGrpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable the VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 7 }
+
+vrrpNewCfgVirtRtrGrpDelete OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        delete(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to the value of 2 (delete), the entire row is deleted. 
+         When read, other(1) is returned. Setting the value to anything 
+         other than delete(2) has no effect on the state of the row."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 8 }
+
+vrrpNewCfgVirtRtrGrpSharing OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable load sharing of non-master virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 9 }
+
+vrrpNewCfgVirtRtrGrpTckVirtRtr OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other virtual routers for
+         priority adjustment.  the priority increment is defined
+         in vrrpNewCfgGenTckVirtRtrInc."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 10 }
+
+vrrpNewCfgVirtRtrGrpTckIpIntf OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking other router interfaces for
+         priority adjustment.  the priority increment is defined
+         in vrrpNewCfgGenTckIpIntfInc."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 11 }
+
+vrrpNewCfgVirtRtrGrpTckVlanPort OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking port state of VLAN ports
+         for priority adjustment.  the priority increment is
+         defined in vrrpNewCfgGenTckVlanPortInc."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 12 }
+
+vrrpNewCfgVirtRtrGrpTckL4Port OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking Layer 4 port states for
+         priority adjustment.  the priority increment is defined
+         in vrrpNewCfgGenTckL4PortInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 13 }
+
+vrrpNewCfgVirtRtrGrpTckRServer OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking real server states for
+         priority adjustment.  the priority increment is defined
+         in vrrpNewCfgGenTckRServerInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 14 }
+
+vrrpNewCfgVirtRtrGrpTckHsrp OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable or disable tracking HSRP advertisements for
+         priority adjustment.  the priority increment is defined
+         in vrrpNewCfgGenTckHsrpInc.  This is applied when
+         virtual server is configured as a VRRP virtual router."
+    ::= { vrrpNewCfgVirtRtrGrpTableEntry 15 }
+
+vrrpNewCfgVirtRtrGrpTckHsrv OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable or disable tracking HSRP by VLAN advertisements for
+                 priority adjustment.  The priority increment is defined
+                 in vrrpNewCfgGenTckHsrvInc.  This is applied when
+                 virtual server is configured as a VRRP virtual router."
+        ::= { vrrpNewCfgVirtRtrGrpTableEntry 16 }
+
+vrrpVirtRtrTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries in VRRP virtual router table."
+    ::= { vrrp 8 }
+
+vrrpIfTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries in VRRP interface table."
+    ::= { vrrp 9 }
+
+vrrpVirtRtrGrpTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries in VRRP Group table."
+    ::= { vrrp 10 }
+
+-- Statistics
+
+-- RIP Statistics Group
+
+ripStatInPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of good RIP packets recieved."
+    ::= { ripStats 1 }
+
+ripStatOutPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of RIP packets transmitted."
+    ::= { ripStats 2 }
+
+ripStatInErrorPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of error RIP packets recieved."
+    ::= { ripStats 3 }
+
+ripStatRoutesAgedOut OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of RIP routes which have aged out."
+    ::= { ripStats 4 }
+
+-- ARP Statistics Group
+
+arpStatEntries OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current number of ARP entries."
+    ::= { arpStats 1 }
+
+arpStatHighWater OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The highest number of ARP entries."
+    ::= { arpStats 2 }
+
+arpStatMaxEntries OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of ARP entries."
+    ::= { arpStats 3 }
+
+-- ROUTE Statistics Group
+
+routeStatEntries OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current number of IP routes."
+    ::= { routeStats 1 }
+
+routeStatHighWater OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The highest number of IP routes."
+    ::= { routeStats 2 }
+
+routeStatMaxEntries OBJECT-TYPE
+    SYNTAX  Gauge 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum number of IP routes."
+    ::= { routeStats 3 }
+
+-- DNS Statistics
+
+dnsStatInGoodDnsRequests OBJECT-TYPE 
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The number of good DNS requests which are received."
+    ::= { dnsStats 1 }
+
+dnsStatInBadDnsRequests OBJECT-TYPE 
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The number of bad DNS requests which are received."
+    ::= { dnsStats 2 }
+
+-- The VRRP Statistics
+
+vrrpStatInAdvers OBJECT-TYPE 
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The number of good VRRP advertisements which are received."
+    ::= { vrrpStats 1 }
+
+vrrpStatOutAdvers OBJECT-TYPE 
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The number of good VRRP advertisements which are transmitted."
+    ::= { vrrpStats 2 }
+
+vrrpStatOutBadAdvers OBJECT-TYPE 
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The number of bad VRRP advertisements which are received."
+    ::= { vrrpStats 3 }
+
+-- Information - Run-time IP Route Table 
+
+ipRouteInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpRouteInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of run-time IP routes."
+    ::= { ip-info 1 }
+
+ipRouteInfoEntry OBJECT-TYPE
+    SYNTAX  IpRouteInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the run-time IP route table"
+    INDEX   { ipRouteInfoIndx }
+    ::= { ipRouteInfoTable 1 }
+
+IpRouteInfoEntry ::= SEQUENCE {
+    ipRouteInfoIndx	        INTEGER,
+    ipRouteInfoDestIp           IpAddress,
+    ipRouteInfoMask             IpAddress,
+    ipRouteInfoGateway          IpAddress,
+    ipRouteInfoTag       	INTEGER,
+    ipRouteInfoType       	INTEGER,
+    ipRouteInfoInterface        INTEGER
+    }
+
+ipRouteInfoIndx OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of this route table."
+    ::= { ipRouteInfoEntry 1 }
+
+ipRouteInfoDestIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP address of this route."
+    ::= { ipRouteInfoEntry 2 }
+
+ipRouteInfoMask OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP mask of this route."
+    ::= { ipRouteInfoEntry 3 }
+ 
+ipRouteInfoGateway OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The next-hop router address for this route."
+    ::= { ipRouteInfoEntry 4 }
+
+ipRouteInfoTag OBJECT-TYPE
+    SYNTAX  INTEGER {
+	fixed(1),
+  	icmp(2),
+  	static(3),
+	snmp(4),
+	addr(5),
+	rip(6),
+	broadcast(7),
+	martian(8),
+	multicast(9),
+        vip(10),
+        bgp(11),
+        none(12),
+        ospf(13)
+	}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The tag-type for this route."
+    ::= { ipRouteInfoEntry 5 }
+
+ipRouteInfoType OBJECT-TYPE 
+    SYNTAX  INTEGER {
+	indirect(1),
+	direct(2),
+	local(3),
+	broadcast(4),
+	martian(5),
+	multicast(6),
+	other(7)
+	}
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The type of the route." 
+    ::= { ipRouteInfoEntry 6 }
+
+ipRouteInfoInterface OBJECT-TYPE 
+    SYNTAX  INTEGER
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The interface number for which the destination	address is applicable."
+    ::= { ipRouteInfoEntry 7 }
+
+--
+-- IP OSPF configuration
+--
+ospfCfg           OBJECT IDENTIFIER ::= { iprouting 21 }
+ospfGeneral	OBJECT IDENTIFIER ::= { ospfCfg 1 }
+
+ospfCurCfgDefaultRouteMetric OBJECT-TYPE
+    SYNTAX INTEGER (0..16777215)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Specify the metric to be assigned."
+    ::= { ospfGeneral 1 }
+
+ospfNewCfgDefaultRouteMetric OBJECT-TYPE
+    SYNTAX INTEGER (0..16777215)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Specify the metric to be assigned."
+    ::= { ospfGeneral 2 }
+
+ospfCurCfgDefaultRouteMetricType OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        type1(2),
+        type2(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Specify the AS External metric type to be assigned."
+    ::= { ospfGeneral 3 }
+
+ospfNewCfgDefaultRouteMetricType OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(1),
+        type1(2),
+        type2(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"Specify the AS External metric type to be assigned."
+    ::= { ospfGeneral 4 }
+
+ospfIntfTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the OSPF Interface table."
+    ::= { ospfGeneral 5 }
+
+ospfAreaTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the OSPF Area table."
+    ::= { ospfGeneral 6 }
+
+ospfRangeTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the OSPF Range table."
+    ::= { ospfGeneral 7 }
+
+ospfVirtIntfTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the OSPF Virtual Interface
+         table."
+    ::= { ospfGeneral 8 }
+
+ospfHostTableMaxSize OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of rows in the OSPF Host table."
+    ::= { ospfGeneral 9 }
+
+ospfCurCfgAreaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfCurCfgAreaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area configuration in the current_config."
+    ::= { ospfCfg 2 }
+
+ospfCurCfgAreaEntry OBJECT-TYPE
+    SYNTAX OspfCurCfgAreaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Information about a OSPF area."
+    INDEX { ospfCurCfgAreaIndex, ospfCurCfgAreaId }
+    ::= { ospfCurCfgAreaTable 1 }
+ 
+OspfCurCfgAreaEntry ::= SEQUENCE {
+    ospfCurCfgAreaIndex         INTEGER,
+    ospfCurCfgAreaId            IpAddress,
+    ospfCurCfgAreaSpfInterval   INTEGER,
+    ospfCurCfgAreaAuthType      INTEGER
+    }
+ 
+ospfCurCfgAreaIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..2)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF area number for which the OSPF area table is related."
+    ::= { ospfCurCfgAreaEntry 1}
+
+ospfCurCfgAreaId OBJECT-TYPE
+    SYNTAX IpAddress 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The IP Address of the OSPF area." 
+    ::= { ospfCurCfgAreaEntry 2 }
+
+ospfCurCfgAreaSpfInterval OBJECT-TYPE
+    SYNTAX INTEGER (0..255) 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The SPF interval for the OSPF area." 
+    ::= { ospfCurCfgAreaEntry 3 }
+
+ospfCurCfgAreaAuthType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        password(2)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Type of authentication being used.
+	 none(1) - no authentication
+	 password(2) - use password."
+    ::= { ospfCurCfgAreaEntry 4 }
+
+ospfNewCfgAreaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfNewCfgAreaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area configuration in the new_config."
+    ::= { ospfCfg 3 }
+
+ospfNewCfgAreaEntry OBJECT-TYPE
+    SYNTAX OspfNewCfgAreaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Information about a OSPF area."
+    INDEX { ospfNewCfgAreaIndex, ospfNewCfgAreaId }
+    ::= { ospfNewCfgAreaTable 1 }
+ 
+OspfNewCfgAreaEntry ::= SEQUENCE {
+    ospfNewCfgAreaIndex         INTEGER,
+    ospfNewCfgAreaId            IpAddress, 
+    ospfNewCfgAreaSpfInterval   INTEGER,
+    ospfNewCfgAreaAuthType      INTEGER
+    }
+ 
+ospfNewCfgAreaIndex OBJECT-TYPE
+    SYNTAX INTEGER (0..2)
+    ACCESS read-only 
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF area number for which the OSPF area table is related."
+    ::= { ospfNewCfgAreaEntry 1}
+
+ospfNewCfgAreaId OBJECT-TYPE
+    SYNTAX IpAddress 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The IP Address of the OSPF area." 
+    ::= { ospfNewCfgAreaEntry 2 }
+
+ospfNewCfgAreaSpfInterval OBJECT-TYPE
+    SYNTAX INTEGER (0..255) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+	"The SPF interval for the OSPF area." 
+    ::= { ospfNewCfgAreaEntry 3 }
+
+ospfNewCfgAreaAuthType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1),
+        password(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Type of authentication being used.
+	 none(1) - no authentication
+	 password(2) - use password."
+    ::= { ospfNewCfgAreaEntry 4 }
+
+-- Ospf Statistics 
+
+-- Ospf Statistics for all interfaces and OSPF areas 
+ospfGeneralStats       OBJECT IDENTIFIER ::= { ospfStats  1 }
+ospfCumRxTxStats       OBJECT IDENTIFIER ::= { ospfGeneralStats  1 }
+ospfCumNbrChangeStats  OBJECT IDENTIFIER ::= { ospfGeneralStats  2 }
+ospfCumIntfChangeStats OBJECT IDENTIFIER ::= { ospfGeneralStats  3 }
+ospfTimersKickOffStats OBJECT IDENTIFIER ::= { ospfGeneralStats  4 }
+
+-- Ospf Statistics / Area
+ospfArea	       OBJECT IDENTIFIER ::= { ospfStats  2 }
+
+ospfAreaRxTxStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfAreaRxTxStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area Rx/Tx Statistics."
+    ::= { ospfArea 1 }
+
+ospfAreaRxTxStatsEntry OBJECT-TYPE
+    SYNTAX OspfAreaRxTxStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Rx Tx packet Statistics about a OSPF area."
+    INDEX { ospfAreaRxTxIndex }
+    ::= { ospfAreaRxTxStats 1 }
+ 
+OspfAreaRxTxStatsEntry ::= SEQUENCE {
+    ospfAreaRxTxIndex          INTEGER,
+    ospfAreaRxPkts             Counter,
+    ospfAreaTxPkts             Counter,
+    ospfAreaRxHello            Counter,
+    ospfAreaTxHello            Counter,
+    ospfAreaRxDatabase         Counter,
+    ospfAreaTxDatabase         Counter,
+    ospfAreaRxlsReqs           Counter,
+    ospfAreaTxlsReqs           Counter,
+    ospfAreaRxlsAcks           Counter,
+    ospfAreaTxlsAcks           Counter,
+    ospfAreaRxlsUpdates        Counter,
+    ospfAreaTxlsUpdates        Counter
+    }
+
+ospfAreaRxTxIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the ospf Area for which these statistics apply."
+    ::= { ospfAreaRxTxStatsEntry 1 }
+
+ospfAreaRxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of OSPF packets received in this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 2 }
+ 
+ospfAreaTxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of OSPF packets transmitted in this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 3 }
+ 
+ospfAreaRxHello OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received in this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 4 }
+
+ospfAreaTxHello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets transmitted in this OSPF
+         area."
+    ::= { ospfAreaRxTxStatsEntry 5 }
+ 
+ospfAreaRxDatabase OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets transmitted 
+         for this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 6 }
+
+ospfAreaTxDatabase OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets transmitted 
+         for this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 7 }
+ 
+ospfAreaRxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Request packets received for 
+         this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 8 }
+
+ospfAreaTxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Request packets transmitted for 
+         this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 9 }
+
+ospfAreaRxlsAcks OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Acknowledgement packets received for 
+         this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 10 }
+ 
+ospfAreaTxlsAcks OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Acknowledgement packets transmitted
+         for this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 11 }
+
+ospfAreaRxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Update packets received for 
+         this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 12 }
+ 
+ospfAreaTxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Update packets transmitted for 
+         this OSPF area."
+    ::= { ospfAreaRxTxStatsEntry 13 }
+
+
+ospfAreaNbrChangeStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfAreaNbrChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area Neighbour Statistics."
+    ::= { ospfArea 2 }
+
+ospfAreaNbrChangeStatsEntry OBJECT-TYPE
+    SYNTAX OspfAreaNbrChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Area Neighbour Change Statistics about a OSPF area."
+    INDEX { ospfAreaNbrIndex }
+    ::= { ospfAreaNbrChangeStats 1 }
+ 
+OspfAreaNbrChangeStatsEntry ::= SEQUENCE {
+    ospfAreaNbrIndex  	       	INTEGER,
+    ospfAreaNbrhello           	Counter,
+    ospfAreaNbrStart           	Counter,
+    ospfAreaNbrAdjointOk       	Counter,
+    ospfAreaNbrNegotiationDone 	Counter,
+    ospfAreaNbrExchangeDone     Counter,
+    ospfAreaNbrBadRequests      Counter,
+    ospfAreaNbrBadSequence      Counter,
+    ospfAreaNbrLoadingDone      Counter,
+    ospfAreaNbrN1way        	Counter,
+    ospfAreaNbrRstAd        	Counter,
+    ospfAreaNbrDown        	Counter
+    }
+
+ospfAreaNbrIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the ospf Area for which these statistics apply."
+    ::= { ospfAreaNbrChangeStatsEntry 1 }
+
+ospfAreaNbrhello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received from neighbours
+         in this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 2 }
+
+ospfAreaNbrStart OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state (i.e. an indication
+         that  Hello packets should now be sent to the neighbour at intervals
+         of HelloInterval seconds.) in this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 3 }
+
+ospfAreaNbrAdjointOk OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of decisions to be made (again) as to whether
+         an adjacency should be established/maintained with the neighbour.
+         for this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 4 }
+
+ospfAreaNbrNegotiationDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state wherein the 
+         Master/slave relationship has been negotiated, and sequence
+         numbers have been exchanged, for this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 5 }
+
+ospfAreaNbrExchangeDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state (i.e. in an
+         adjacency's final state) having transimitted a full sequence 
+         of Database Description packets, for this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 6 }
+
+ospfAreaNbrBadRequests OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of Link State Requests which have been received
+         for a link state advertisement not contained in the database across
+         this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 7 }
+
+ospfAreaNbrBadSequence OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets which have been
+         received that either 
+         a) has an unexpected DD sequence number
+         b) Unexpectedly has the init bit set
+         c) Has an options field differing from the last Options field
+            received in a Database Description packet.
+         Any of these conditions indicate that some error has occured during
+         adjacency establishment for this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 8 }
+
+ospfAreaNbrLoadingDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of link state updates received for all 
+         out-of-date portions of the database in this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 9 }
+
+ospfAreaNbrN1way OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received from neighbours, in
+         which this router is not mentioned in this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 10 }
+
+ospfAreaNbrRstAd OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of times the Neighbour adjacency has been reset
+         across this OPSF area."
+    ::= { ospfAreaNbrChangeStatsEntry 11 }
+
+ospfAreaNbrDown OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Neighbouring routers down (i.e. in the initial
+         state of a neighbour conversation.) in this OSPF area."
+    ::= { ospfAreaNbrChangeStatsEntry 12 }
+
+
+ospfAreaChangeStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfAreaChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area Change Statistics."
+    ::= { ospfArea 3 }
+
+ospfAreaChangeStatsEntry OBJECT-TYPE
+    SYNTAX OspfAreaChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Area  Change Statistics about a OSPF area."
+    INDEX { ospfAreaIntfIndex }
+    ::= { ospfAreaChangeStats 1 }
+ 
+OspfAreaChangeStatsEntry ::= SEQUENCE {
+    ospfAreaIntfIndex     	INTEGER,
+    ospfAreaIntfHello           Counter,
+    ospfAreaIntfDown           	Counter,
+    ospfAreaIntfLoop       	Counter,
+    ospfAreaIntfUnloop 		Counter,
+    ospfAreaIntfWaitTimer     	Counter,
+    ospfAreaIntfBackup	        Counter,
+    ospfAreaIntfNbrChange       Counter
+    }
+
+ospfAreaIntfIndex OBJECT-TYPE
+    SYNTAX    INTEGER
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The index of the OSPF Area for which these statistics apply."
+    ::= { ospfAreaChangeStatsEntry 1 }
+
+ospfAreaIntfHello OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The total number of Hello packets sent on this OSPF area."
+    ::= { ospfAreaChangeStatsEntry 2 }
+
+ospfAreaIntfDown OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The total number of interfaces down in this OSPF area."
+    ::= { ospfAreaChangeStatsEntry 3 }
+
+ospfAreaIntfLoop OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The total number of interfaces no longer connected to 
+         the attatched network in this OSPF area."
+    ::= { ospfAreaChangeStatsEntry 4 }
+
+ospfAreaIntfUnloop OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The total number of interfaces connected to the attatched
+	 network in this OSPF area.."
+    ::= { ospfAreaChangeStatsEntry 5 }
+
+
+ospfAreaIntfWaitTimer OBJECT-TYPE
+    SYNTAX        Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The total number of times the Wait Timer has been fired,
+         (indicating the end of the waiting period that is required
+          before electing a (Backup) Designated Router) for this 
+          OSPF area."
+    ::= { ospfAreaChangeStatsEntry 6 }
+
+ospfAreaIntfBackup OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of Backup Designated Routers on the attatched
+         network for this OSPF area."
+    ::= { ospfAreaChangeStatsEntry 7 }
+
+
+ospfAreaIntfNbrChange OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of changes in the set of bidirectional neighbours
+         associated with the interface in this OSPF area."
+    ::= { ospfAreaChangeStatsEntry 8 }
+
+
+-- Ospf Statistics / Interface
+ospfInterface	       OBJECT IDENTIFIER ::= { ospfStats  3 }
+
+ospfIntfRxTxStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfIntfRxTxStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Interface Rx/Tx packet Statistics."
+    ::= { ospfInterface 1 }
+
+ospfIntfRxTxStatsEntry OBJECT-TYPE
+    SYNTAX OspfIntfRxTxStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "OSPF interface Rx/Tx packet statistics."
+    INDEX { ospfIntfRxTxIndex }
+    ::= { ospfIntfRxTxStats 1 }
+
+OspfIntfRxTxStatsEntry ::= SEQUENCE {
+    ospfIntfRxTxIndex          INTEGER,
+    ospfIntfRxPkts             Counter,
+    ospfIntfTxPkts             Counter,
+    ospfIntfRxHello            Counter,
+    ospfIntfTxHello            Counter,
+    ospfIntfRxDatabase         Counter,
+    ospfIntfTxDatabase         Counter,
+    ospfIntfRxlsReqs           Counter,
+    ospfIntfTxlsReqs           Counter,
+    ospfIntfRxlsAcks           Counter,
+    ospfIntfTxlsAcks           Counter,
+    ospfIntfRxlsUpdates        Counter,
+    ospfIntfTxlsUpdates        Counter
+    }
+
+ospfIntfRxTxIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The OSPF interface for which these statistics apply."
+    ::= { ospfIntfRxTxStatsEntry 1 }
+
+ospfIntfRxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of OSPF packets received for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 2 }
+ 
+ospfIntfTxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of OSPF packets transmitted for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 3 }
+ 
+ospfIntfRxHello OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received 
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 4 }
+
+ospfIntfTxHello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets transmitted 
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 5 }
+ 
+ospfIntfRxDatabase OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets received 
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 6 }
+
+ospfIntfTxDatabase OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets transmitted 
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 7 }
+ 
+ospfIntfRxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Request packets received
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 8 }
+
+ospfIntfTxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Request packets transmitted
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 9 }
+
+ospfIntfRxlsAcks OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Acknowledgement packets received
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 10 }
+ 
+ospfIntfTxlsAcks OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Acknowledgement packets transmitted
+         for this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 11 }
+
+ospfIntfRxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Update packets received for 
+         this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 12 }
+ 
+ospfIntfTxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Update packets transmitted for 
+         this OSPF interface."
+    ::= { ospfIntfRxTxStatsEntry 13 }
+
+
+ospfIntfNbrChangeStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfIntfNbrChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Interface Neighbour change Statistics."
+    ::= { ospfInterface 2 }
+
+ospfIntfNbrChangeStatsEntry OBJECT-TYPE
+    SYNTAX OspfIntfNbrChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "OSPF interface Neighbour Change statistics."
+    INDEX { ospfIntfNbrIndex }
+    ::= { ospfIntfNbrChangeStats 1 }
+
+OspfIntfNbrChangeStatsEntry ::= SEQUENCE {
+    ospfIntfNbrIndex     	INTEGER,
+    ospfIntfNbrhello           	Counter,
+    ospfIntfNbrStart           	Counter,
+    ospfIntfNbrAdjointOk       	Counter,
+    ospfIntfNbrNegotiationDone 	Counter,
+    ospfIntfNbrExchangeDone     Counter,
+    ospfIntfNbrBadRequests      Counter,
+    ospfIntfNbrBadSequence      Counter,
+    ospfIntfNbrLoadingDone      Counter,
+    ospfIntfNbrN1way        	Counter,
+    ospfIntfNbrRstAd        	Counter,
+    ospfIntfNbrDown        	Counter
+    }
+
+ospfIntfNbrIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the OSPF Interface for which these statistics apply."
+    ::= { ospfIntfNbrChangeStatsEntry 1 }
+
+ospfIntfNbrhello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received from neighbours
+         in this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 2 }
+
+ospfIntfNbrStart OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state (i.e. an indication
+         that  Hello packets should now be sent to the neighbour at intervals
+         of HelloInterval seconds.) in this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry  3 }
+
+ospfIntfNbrAdjointOk OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of decisions to be made (again) as to whether
+         an adjacency should be established/maintained with the neighbour.
+         for this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 4 }
+
+ospfIntfNbrNegotiationDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state wherein the 
+         Master/slave relationship has been negotiated, and sequence
+         numbers have been exchanged, for this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 5 }
+
+ospfIntfNbrExchangeDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of neighbours in this state (i.e. in an
+         adjacency's final state) having transimitted a full sequence 
+         of Database Description packets, for this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 6 }
+
+ospfIntfNbrBadRequests OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Link State Requests which have been received
+         for a link state advertisement not contained in the database for
+         this interface."
+    ::= { ospfIntfNbrChangeStatsEntry 7 }
+
+ospfIntfNbrBadSequence OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Database Description packets which have been
+         received that either 
+         a) has an unexpected DD sequence number
+         b) Unexpectedly has the init bit set
+         c) Has an options field differing from the last Options field
+            received in a Database Description packet.
+         Any of these conditions indicate that some error has occured during
+         adjacency establishment for this interface."
+    ::= { ospfIntfNbrChangeStatsEntry 8 }
+
+ospfIntfNbrLoadingDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of link state updates received for all 
+         out-of-date portions of the database for this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 9 }
+
+ospfIntfNbrN1way OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Hello packets received from neighbours, in
+         which this router is not mentioned for this OSPF interface."
+    ::= { ospfIntfNbrChangeStatsEntry 10 }
+
+ospfIntfNbrRstAd OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of times the Neighbour adjacency has been reset
+         on this interface."
+    ::= { ospfIntfNbrChangeStatsEntry 11 }
+
+ospfIntfNbrDown OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Neighbouring routers down (i.e. in the initial
+         state of a neighbour conversation.) for this interface."
+    ::= { ospfIntfNbrChangeStatsEntry 12 }
+
+
+ospfIntfChangeStats OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfIntfChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Interface change Statistics."
+    ::= { ospfInterface 3 }
+
+ospfIntfChangeStatsEntry OBJECT-TYPE
+    SYNTAX OspfIntfChangeStatsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "OSPF interface Change statistics."
+    INDEX { ospfIntfIndex }
+    ::= { ospfIntfChangeStats 1 }
+
+OspfIntfChangeStatsEntry ::= SEQUENCE {
+    ospfIntfIndex     	       	INTEGER,
+    ospfIntfHello           	Counter,
+    ospfIntfDown           	Counter,
+    ospfIntfLoop       		Counter,
+    ospfIntfUnloop 		Counter,
+    ospfIntfWaitTimer     	Counter,
+    ospfIntfBackup	        Counter,
+    ospfIntfNbrChange       	Counter
+    }
+
+ospfIntfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index of the OSPF Interface for which these statistics apply."
+    ::= { ospfIntfChangeStatsEntry 1 }
+
+
+ospfIntfHello OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The total number of Hello packets sent by this interface."
+    ::= { ospfIntfChangeStatsEntry 2 }
+
+ospfIntfDown OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The total number of times the interface was down."
+    ::= { ospfIntfChangeStatsEntry 3 }
+
+ospfIntfLoop OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The total number of times the interface was no longer connected to 
+         the attatched network."
+    ::= { ospfIntfChangeStatsEntry 4 }
+
+ospfIntfUnloop OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The total number of times the interface, connected back to
+         the attatched network."
+    ::= { ospfIntfChangeStatsEntry 5 }
+
+ospfIntfWaitTimer OBJECT-TYPE
+    SYNTAX        Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The total number of times the Wait Timer has been fired,
+         (indicating the end of the waiting period that is required
+          before electing a (Backup) Designated Router) for this 
+          OSPF interface."
+    ::= { ospfIntfChangeStatsEntry 6 }
+
+ospfIntfBackup OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of Backup Designated Routers on the attatched
+         network for this OSPF interface."
+    ::= { ospfIntfChangeStatsEntry 7 }
+
+ospfIntfNbrChange OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of changes in the set of bidirectional neighbours
+         associated with the interface for this OSPF interface."
+    ::= { ospfIntfChangeStatsEntry 8 }
+
+
+-- Ospf General Statistics contains the cumulative stats for all
+-- areas / interfaces
+ospfCumRxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all OSPF packets received on all OSPF areas
+         and interfaces."
+    ::= { ospfCumRxTxStats 1 }
+ 
+ospfCumTxPkts OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all OSPF packets transmitted on all OSPF areas
+         and interfaces."
+    ::= { ospfCumRxTxStats 2 }
+ 
+ospfCumRxHello OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Hello packets received on all OSPF areas
+         and interfaces."
+    ::= { ospfCumRxTxStats 3 }
+
+ospfCumTxHello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Hello packets transmitted on all OSPF areas
+         and interfaces."
+    ::= { ospfCumRxTxStats 4 }
+ 
+ospfCumRxDatabase OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Database Description packets received on
+         all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 5 }
+
+ospfCumTxDatabase OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Database Description packets transmitted on
+         all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 6 }
+ 
+ospfCumRxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Request packets received on
+         all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 7 }
+
+ospfCumTxlsReqs OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Request packets transmitted on
+         all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 8 }
+
+ospfCumRxlsAcks OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Acknowledgement packets received
+         on all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 9 }
+ 
+ospfCumTxlsAcks OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Acknowledgement packets transmitted
+         on all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 10 }
+
+ospfCumRxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Update packets received
+         on all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 11 }
+ 
+ospfCumTxlsUpdates OBJECT-TYPE
+    SYNTAX  Counter 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Link State Update packets transmitted
+         on all OSPF areas and interfaces."
+    ::= { ospfCumRxTxStats 12 }
+
+ospfCumNbrhello OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total of all Hello packets received from neighbours
+         on all OSPF areas and interfaces."
+    ::= { ospfCumNbrChangeStats 1 }
+
+ospfCumNbrStart OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of neighbours in this state (i.e. an indication
+         that  Hello packets should now be sent to the neighbour at intervals
+         of HelloInterval seconds.) across all OSPF areas and interfaces."
+    ::= { ospfCumNbrChangeStats 2 }
+
+ospfCumNbrAdjointOk OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of decisions to be made (again) as to whether
+         an adjacency should be established/maintained with the neighbour
+         across all OSPF areas and interfaces."
+    ::= { ospfCumNbrChangeStats 3 }
+
+ospfCumNbrNegotiationDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of neighbours in this state wherein the 
+         Master/slave relationship has been negotiated, and sequence
+         numbers have been exchanged, across all OSPF areas and 
+         interfaces."
+    ::= { ospfCumNbrChangeStats 4 }
+
+ospfCumNbrExchangeDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of neighbours in this state (i.e. in an
+         adjacency's final state) having transimitted a full sequence 
+         of Database Description packets, across all OSPF areas
+         and interfaces."
+    ::= { ospfCumNbrChangeStats 5 }
+
+ospfCumNbrBadRequests OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of Link State Requests which have been received
+         for a link state advertisement not contained in the database across
+         all interfaces and OSPF areas."
+    ::= { ospfCumNbrChangeStats 6 }
+
+ospfCumNbrBadSequence OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of Database Description packets which have been
+         received that either 
+         a) has an unexpected DD sequence number
+         b) Unexpectedly has the init bit set
+         c) Has an options field differing from the last Options field
+            received in a Database Description packet.
+         Any of these conditions indicate that some error has occured during
+         adjacency establishment for all OSPF areas and interfaces."
+    ::= { ospfCumNbrChangeStats 7 }
+
+ospfCumNbrLoadingDone OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of link state updates received for all 
+         out-of-date portions of the database across all OSPF areas
+         and interfaces."
+    ::= { ospfCumNbrChangeStats 8 }
+
+ospfCumNbrN1way OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of Hello packets received from neighbours, in
+         which this router is not mentioned across all OSPF interfaces
+         and areas."
+    ::= { ospfCumNbrChangeStats 9 }
+
+ospfCumNbrRstAd OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The sum total number of times the Neighbour adjacency has been reset
+         across all OPSF areas and interfaces."
+    ::= { ospfCumNbrChangeStats 10 }
+
+ospfCumNbrDown OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of Neighbouring routers down (i.e. in the initial
+         state of a neighbour conversation.) across all OSPF areas and 
+         interfaces."
+    ::= { ospfCumNbrChangeStats 11 }
+
+ospfCumIntfHello OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The sum total number of Hello packets sent on all interfaces 
+         and areas"
+    ::= { ospfCumIntfChangeStats 1 }
+
+ospfCumIntfDown OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The sum total number of interfaces down in all OSPF areas."
+    ::= { ospfCumIntfChangeStats 2 }
+
+ospfCumIntfLoop OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The sum total of interfaces no longer connected to 
+         the attatched network across all OSPF areas and interfaces."
+    ::= { ospfCumIntfChangeStats 3 }
+
+ospfCumIntfUnloop OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The sum total number of interfaces, connected to
+         the attatched network in all OSPF areas."
+    ::= { ospfCumIntfChangeStats 4 }
+
+ospfCumIntfWaitTimer OBJECT-TYPE
+    SYNTAX        Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The sum total number of times the Wait Timer has been fired,
+         (indicating the end of the waiting period that is required
+          before electing a (Backup) Designated Router) across all 
+          OSPF areas and interfaces."
+    ::= { ospfCumIntfChangeStats 5 }
+
+ospfCumIntfBackup OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The sum total number of Backup Designated Routers on the attatched
+         network for all OSPF areas and interfaces."
+    ::= { ospfCumIntfChangeStats 6 }
+
+ospfCumIntfNbrChange OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The sum total number of changes in the set of bidirectional
+         neighbours associated with any interface across all OSPF areas."
+    ::= { ospfCumIntfChangeStats 7 }
+
+ospfTmrsKckOffHello OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The sum total number of times the Hello timer has been fired
+         (which triggers the send of a Hello packet) across all OPSF 
+         areas and interfaces."
+    ::= { ospfTimersKickOffStats 1 }
+
+ospfTmrsKckOffRetransmit OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The sum total number of times the Retransmit timer has been
+         fired across all OPSF areas and interfaces."
+    ::= { ospfTimersKickOffStats 2 }
+
+ospfTmrsKckOffLsaLock OBJECT-TYPE
+    SYNTAX    Counter
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The sum total number of times the Lsa Lock timer has been 
+         fired across all OSPF areas and interfaces."
+    ::= { ospfTimersKickOffStats 3 }
+
+ospfTmrsKckOffLsaAck OBJECT-TYPE
+    SYNTAX   Counter
+    ACCESS   read-only
+    STATUS   mandatory
+    DESCRIPTION
+        "The sum total number of times the Lsa Ack timer has been 
+         fired across all ospf areas and interfaces."
+    ::= { ospfTimersKickOffStats 4 }
+
+ospfTmrsKckOffDbage OBJECT-TYPE
+    SYNTAX        Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "The total number of times the Dbage has been fired."
+    ::= { ospfTimersKickOffStats 5 }
+
+ospfTmrsKckOffSummary OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of times the Summary timer has been fired."
+    ::= { ospfTimersKickOffStats 6 }
+
+ospfTmrsKckOffAseExport OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The total number of times the ASE Export timer has been fired."
+    ::= { ospfTimersKickOffStats 7 }
+
+
+-- Ospf Information 
+
+ospfGeneralInfo  OBJECT IDENTIFIER ::= { ospfinfo 1 }
+
+ospfStartTime OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The time when ospf has been started."   
+    ::= { ospfGeneralInfo 1 }
+
+ospfProcessUptime OBJECT-TYPE   
+    SYNTAX  Counter 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The time since ospf has been started."   
+    ::= { ospfGeneralInfo 2 }
+
+ospfLsTypesSupported OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The Link State Types that are supported."   
+    ::= { ospfGeneralInfo 3 }
+
+ospfIntfCountForRouter OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The number of interfaces for this router." 
+    ::= { ospfGeneralInfo 4 }
+
+ospfVlinkCountForRouter OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The number of virtual links for this router." 
+    ::= { ospfGeneralInfo 5 }
+
+ospfTotalNeighbours OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The total number of OSPF neighbours." 
+    ::= { ospfGeneralInfo 6 }
+
+ospfNbrInInitState OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The number of neighbours in the initial state of exchange." 
+    ::= { ospfGeneralInfo 7 }
+
+ospfNbrInExchState OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The number of neighbours in the exchange state." 
+    ::= { ospfGeneralInfo 8 }
+
+ospfNbrInFullState OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The number of neighbours in the Full state of exchange." 
+    ::= { ospfGeneralInfo 9 }
+
+ospfTotalAreas OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The Total number of areas." 
+    ::= { ospfGeneralInfo 10 }
+
+ospfTotalTransitAreas OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The Total number of Transit areas." 
+    ::= { ospfGeneralInfo 11 }
+
+ospfTotalNssaAreas OBJECT-TYPE   
+    SYNTAX  INTEGER 
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The Total number of NSSA areas." 
+    ::= { ospfGeneralInfo 12 }
+
+ospfAreaInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfAreaInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Area information."
+    ::= { ospfinfo 2 }
+
+ospfAreaInfoEntry OBJECT-TYPE
+    SYNTAX OspfAreaInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Information about a OSPF area."
+    INDEX { ospfAreaInfoIndex }
+    ::= { ospfAreaInfoTable 1 }
+ 
+OspfAreaInfoEntry ::= SEQUENCE {
+    ospfAreaInfoIndex             INTEGER,
+    ospfTotalNumberOfInterfaces   INTEGER,
+    ospfNumberOfInterfacesUp   	  INTEGER,
+    ospfNumberOfLsdbEntries   	  INTEGER,
+    ospfAreaInfoId   	          IpAddress
+
+    }
+ 
+ospfAreaInfoIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF area number for which the OSPF info table is related."
+    ::= { ospfAreaInfoEntry 1}
+
+ospfTotalNumberOfInterfaces OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The total number of interfaces for this OSPF area." 
+    ::= { ospfAreaInfoEntry 2}
+
+ospfNumberOfInterfacesUp OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of interfaces UP in area." 
+    ::= { ospfAreaInfoEntry 3}
+
+ospfNumberOfLsdbEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of Link State Database entries for this OSPF area." 
+    ::= { ospfAreaInfoEntry 4}
+
+ospfAreaInfoId OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The IP address of the OSPF area." 
+    ::= { ospfAreaInfoEntry 5}
+
+ospfIntfInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfIntfInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Interface information."
+    ::= { ospfinfo 3 }
+
+ospfIntfInfoEntry OBJECT-TYPE
+    SYNTAX OspfIntfInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Information about a OSPF interface."
+    INDEX { ospfIfInfoIndex }
+    ::= { ospfIntfInfoTable 1 }
+ 
+OspfIntfInfoEntry ::= SEQUENCE {
+    ospfIfInfoIndex               	INTEGER,
+    ospfIfDesignatedRouterIP   	  	IpAddress,
+    ospfIfBackupDesignatedRouterIP  	IpAddress,
+    ospfIfWaitInterval   	        INTEGER,
+    ospfIfTotalNeighbours   	  	INTEGER,
+    ospfIfInfoIpAddress   	  	IpAddress
+    }
+ 
+ospfIfInfoIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF interface number for which the OSPF info table is related."
+    ::= { ospfIntfInfoEntry 1}
+
+ospfIfDesignatedRouterIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF Designated Router ID (IP Address) for this OSPF interface." 
+    ::= { ospfIntfInfoEntry 2}
+
+ospfIfBackupDesignatedRouterIP OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF Backup Designated Router ID (IP Address) for this OSPF
+         interface." 
+    ::= { ospfIntfInfoEntry 3}
+
+ospfIfWaitInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF Wait interval for this OSPF interface." 
+    ::= { ospfIntfInfoEntry 4}
+
+ospfIfTotalNeighbours OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The Total number of neighbours for this OSPF interface." 
+    ::= { ospfIntfInfoEntry 5}
+
+ospfIfInfoIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The IP address of the OSPF interface." 
+    ::= { ospfIntfInfoEntry 6}
+
+ospfRouterLSAInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfRouterLSAInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "The table of OSPF Router LSA information."
+    ::= { ospfinfo 4 }
+
+ospfRouterLSAInfoEntry OBJECT-TYPE
+    SYNTAX OspfRouterLSAInfoEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "A row in the Router LSA Table indexed by area, routerlink and routerId."
+    INDEX { routerLSAAreaIndex, routerLSALinkIndex,
+            routerLSAId }
+    ::= { ospfRouterLSAInfoTable 1 }
+ 
+OspfRouterLSAInfoEntry ::= SEQUENCE {
+    routerLSAAreaIndex               	INTEGER,
+    routerLSALinkIndex               	INTEGER,
+    routerLSAId               		IpAddress,
+    routerLSALinkID   	  		IpAddress,
+    routerLSALinkData  			IpAddress,
+    routerLSALinkIfIndex  		INTEGER,
+    routerLSANoOfTOSMetrics   	        INTEGER,
+    routerLSANoOfTOSZeroMetrics 	INTEGER
+    }
+ 
+routerLSAAreaIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF AreaID for which the OSPF Router LSA info table is related."
+    ::= { ospfRouterLSAInfoEntry 1}
+
+routerLSALinkIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF Link ID for which the OSPF Router LSA info table is related."
+    ::= { ospfRouterLSAInfoEntry 2}
+
+routerLSAId OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The OSPF RouterID for which the OSPF Router LSA info table is related."
+    ::= { ospfRouterLSAInfoEntry 3}
+
+
+routerLSALinkID OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"Identifes the object that this router link connects to. Value
+	 depends on the link's type."
+    ::= { ospfRouterLSAInfoEntry 4}
+
+routerLSALinkData OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"This value depends on the link's Type field. For connections
+	 to stub networks, Link Data specifies the network's IP address
+	 mask. For unnumbered point-to-point connections, it specifies
+         the interface's MIB-II ifIndex value and the value of Link Data
+         is redundant. For the other link types it specifies the router
+         interface's IP address."
+    ::= { ospfRouterLSAInfoEntry 5}
+
+routerLSALinkIfIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	 "For unnumbered point-to-point connections, LinkIfIndex specifies
+         the interface's MIB-II ifIndex value." 
+    ::= { ospfRouterLSAInfoEntry 6}
+
+routerLSANoOfTOSMetrics OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of different TOS metrics given for this link, 
+         not counting the required link metric(referred to as the TOS 0
+         metric)." 
+    ::= { ospfRouterLSAInfoEntry 7}
+
+routerLSANoOfTOSZeroMetrics OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+	"The number of Zero TOS metrics given for this link." 
+    ::= { ospfRouterLSAInfoEntry 8}
+
+-- Run Time ARP Table
+
+arpInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AgArpInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of ARP entries."
+    ::= { ip-info 2 }
+
+arpInfoEntry OBJECT-TYPE
+    SYNTAX  AgArpInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the ARP table"
+    INDEX   { arpInfoDestIp }
+    ::= { arpInfoTable 1 }
+
+AgArpInfoEntry ::= SEQUENCE {
+    arpInfoDestIp         IpAddress,
+    arpInfoMacAddr        PhysAddress,
+    arpInfoVLAN        	  INTEGER,
+    arpInfoSrcPort        INTEGER,
+    arpInfoRefPorts       INTEGER,
+    arpInfoFlag           INTEGER
+    }
+
+arpInfoDestIp OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The destination IP address of the ARP entry."
+    ::= { arpInfoEntry 1 }
+
+arpInfoMacAddr OBJECT-TYPE
+    SYNTAX  PhysAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The MAC address for the ARP entry."
+    ::= { arpInfoEntry 2 }
+
+arpInfoVLAN OBJECT-TYPE 
+    SYNTAX  INTEGER 
+    ACCESS  read-only 
+    STATUS  mandatory 
+    DESCRIPTION 
+        "The VLAN identifier for the ARP entry." 
+    ::= { arpInfoEntry 3 }
+
+arpInfoSrcPort OBJECT-TYPE  
+    SYNTAX  INTEGER 
+    ACCESS  read-only  
+    STATUS  mandatory  
+    DESCRIPTION  
+        "The  port number on which this entry's equivalence is effective."  
+    ::= { arpInfoEntry 4 }
+
+arpInfoRefPorts OBJECT-TYPE   
+    SYNTAX  INTEGER  
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The rference ports associated with this ARP entry."   
+    ::= { arpInfoEntry 5 }
+
+arpInfoFlag OBJECT-TYPE   
+    SYNTAX  INTEGER {
+	clear(1),
+	unresolved(2),
+	permanent(3),
+	indirect(4)
+	}
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The flag associated with this ARP entry."   
+    ::= { arpInfoEntry 6 }
+
+-- VRRP Information
+
+vrrpInfoVirtRtrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpInfoVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The table of VRRP virtual router run-time information."
+    ::= { vrrp-info 1 }
+
+vrrpInfoVirtRtrTableEntry OBJECT-TYPE
+    SYNTAX  VrrpInfoVirtRtrTableEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The run-time information about a VRRP virtual router."
+    INDEX   { vrrpInfoVirtRtrIndex }
+    ::= { vrrpInfoVirtRtrTable 1 }
+ 
+VrrpInfoVirtRtrTableEntry ::= SEQUENCE {
+    vrrpInfoVirtRtrIndex      INTEGER,
+    vrrpInfoVirtRtrState      INTEGER,
+    vrrpInfoVirtRtrOwnership  INTEGER,
+    vrrpInfoVirtRtrServer     INTEGER,
+    vrrpInfoVirtRtrProxy      INTEGER
+    }
+
+vrrpInfoVirtRtrIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The VRRP virtual router index." 
+    ::= { vrrpInfoVirtRtrTableEntry 1 }
+
+vrrpInfoVirtRtrState OBJECT-TYPE   
+    SYNTAX  INTEGER {
+	init(1),
+	master(2),
+	backup(3)
+	}
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The VRRP virtual router state."   
+    ::= { vrrpInfoVirtRtrTableEntry 2 }
+
+vrrpInfoVirtRtrOwnership OBJECT-TYPE   
+    SYNTAX  INTEGER {
+	owner(1),
+	renter(2)
+	}
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The VRRP virtual router ownership status."   
+    ::= { vrrpInfoVirtRtrTableEntry 3 }
+
+vrrpInfoVirtRtrServer OBJECT-TYPE   
+    SYNTAX  INTEGER {
+	yes(1),
+	no(2)
+	}
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The VRRP server state identifies virtual routers that support 
+         Layer 4 services."   
+    ::= { vrrpInfoVirtRtrTableEntry 4 }
+
+vrrpInfoVirtRtrProxy OBJECT-TYPE   
+    SYNTAX  INTEGER {
+	yes(1),
+	no(2)
+	}
+    ACCESS  read-only   
+    STATUS  mandatory   
+    DESCRIPTION   
+        "The VRRP proxy state identifies virtual proxy routers."
+    ::= { vrrpInfoVirtRtrTableEntry 5 }
+
+
+vrrpOperVirtRtrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VrrpOperVirtRtrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry in the table of virtual routers."
+    ::= { vrrpOper 1 }
+
+vrrpOperVirtRtrEntry OBJECT-TYPE
+    SYNTAX  VrrpOperVirtRtrEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A row in the vrrpOperVirtRtrTable "
+    INDEX   { vrrpOperVirtRtrIndex }
+    ::= { vrrpOperVirtRtrTable 1 }
+
+VrrpOperVirtRtrEntry ::= SEQUENCE {
+    vrrpOperVirtRtrIndex              INTEGER,
+    vrrpOperVirtRtrBackup             INTEGER
+    }
+
+vrrpOperVirtRtrIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The index for the  VRRP virtual router." 
+    ::= { vrrpOperVirtRtrEntry 1 }
+
+vrrpOperVirtRtrBackup OBJECT-TYPE
+    SYNTAX  INTEGER {
+	ok(1),
+	backup(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to a value of 'backup(2)' it forces the specified 
+         master virtual router into backup mode.
+         'ok(1)' is returned when the object os read."
+    ::= { vrrpOperVirtRtrEntry 2 }
+
+vrrpOperVirtRtrGroupBackup OBJECT-TYPE
+    SYNTAX  INTEGER {
+	ok(1),
+	backup(2)
+	}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "When set to a value of 'backup(2)' it forces the specified 
+         master virtual router group into backup mode.
+         'ok(1)' is returned when the object os read."
+    ::= { vrrpOper 2 }
+
+END

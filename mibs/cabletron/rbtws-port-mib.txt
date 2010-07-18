@@ -1,0 +1,177 @@
+RBTWS-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+rbtwsPortMib MODULE-IDENTITY
+    LAST-UPDATED "200611090059Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "Port information MIB.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200611090001Z"
+    DESCRIPTION "v1.0.1: Fixed imports and compliance group"
+
+    REVISION "200604060000Z"
+    DESCRIPTION "v1.0: Initial version, for 5.0 release"
+
+    ::= { rbtwsMibs 6 }
+
+-- Textual conventions
+
+
+RbtwsPhysPortNumber ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "Physical port number"
+        SYNTAX          Unsigned32 (1..1024)
+
+RbtwsPortMode ::= TEXTUAL-CONVENTION 
+        STATUS          current
+        DESCRIPTION
+                "Enumeration of the port modes status."
+        SYNTAX          INTEGER {
+                                directAttachAP  (1),
+                                networkPort     (2),
+                                wired           (3)
+                                }
+
+RbtwsPortPoeMode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "Enumeration of the port POE capablities"
+
+        SYNTAX          INTEGER {
+                                poeEnable  (1),
+                                poeDisable (2)
+                                }
+
+--
+-- The Port MIB Tree
+--
+
+rbtwsPortObjects      OBJECT IDENTIFIER ::= { rbtwsPortMib 1 }
+rbtwsPortDataObjects  OBJECT IDENTIFIER ::= { rbtwsPortObjects 1 }
+
+
+-- Object definitions
+
+rbtwsPortConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RbtwsPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+                "Port configuration table"
+        ::= { rbtwsPortDataObjects 1 }
+
+rbtwsPortConfigEntry OBJECT-TYPE
+        SYNTAX          RbtwsPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Port configuration entry"
+        INDEX   { rbtwsPortConfigPortNumber }
+        ::= { rbtwsPortConfigTable 1 }        
+
+RbtwsPortConfigEntry ::= SEQUENCE {
+        rbtwsPortConfigPortNumber          RbtwsPhysPortNumber,
+        rbtwsPortConfigPortMode            RbtwsPortMode,
+        rbtwsPortConfigPoeMode             RbtwsPortPoeMode,
+        rbtwsPortConfigTrunkMaster         RbtwsPhysPortNumber
+        }
+
+rbtwsPortConfigPortNumber  OBJECT-TYPE
+        SYNTAX          RbtwsPhysPortNumber
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Physical Port Number"
+        ::= { rbtwsPortConfigEntry 1 }
+        
+rbtwsPortConfigPortMode   OBJECT-TYPE
+        SYNTAX          RbtwsPortMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Indicates whether this port is configured for
+                 directly attached AP, network port or wired
+                 access."
+        ::= { rbtwsPortConfigEntry 2 }
+                         
+rbtwsPortConfigPoeMode     OBJECT-TYPE
+        SYNTAX          RbtwsPortPoeMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Indicates whether this port is configured to 
+                 supply POE (Power Over Ethernet)."
+        ::= { rbtwsPortConfigEntry 3 }
+
+rbtwsPortConfigTrunkMaster OBJECT-TYPE
+        SYNTAX          RbtwsPhysPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The master port of the group this port belongs to
+                 (identified by the physical port number).
+                 A zero value means information is not available
+                 (usually if this port is not part of any port group)."
+        ::= { rbtwsPortConfigEntry 4 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+rbtwsPortConformance  OBJECT IDENTIFIER ::= { rbtwsPortObjects 2 }
+rbtwsPortCompliances  OBJECT IDENTIFIER ::= { rbtwsPortConformance 1 }
+rbtwsPortGroups       OBJECT IDENTIFIER ::= { rbtwsPortConformance 2 }
+
+-- Compliance
+
+rbtwsPortCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement
+        the Port MIB."
+    MODULE  -- rbtwsPortMib
+
+    MANDATORY-GROUPS { rbtwsPortConfigGroup }
+
+    ::= { rbtwsPortCompliances 1 }
+
+-- Units of Conformance
+
+rbtwsPortConfigGroup OBJECT-GROUP
+        OBJECTS {
+                 rbtwsPortConfigPortMode,
+                 rbtwsPortConfigPoeMode,
+                 rbtwsPortConfigTrunkMaster     
+                }
+        STATUS      current
+        DESCRIPTION
+        "Mandatory group of objects implemented to provide
+         Port configuration info."
+        ::= { rbtwsPortGroups 1 }
+
+END

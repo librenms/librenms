@@ -1,0 +1,1822 @@
+RBTWS-AP-STATUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE,
+    IpAddress, Unsigned32, Gauge32, Integer32, Counter32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress
+        FROM SNMPv2-TC
+    RbtwsApAttachType, RbtwsApState, RbtwsApSerialNum, RbtwsApFingerprint,
+    RbtwsRadioNum, RbtwsPowerLevel, RbtwsChannelNum,
+    RbtwsRadioEnable, RbtwsRadioConfigState, RbtwsRadioRate,
+    RbtwsRadioType, RbtwsApPortOrDapNum
+        FROM RBTWS-AP-TC
+    rbtwsMibs
+        FROM RBTWS-ROOT-MIB;
+
+
+rbtwsApStatusMib MODULE-IDENTITY
+    LAST-UPDATED "200609271552Z"
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "www.enterasys.com"
+    DESCRIPTION
+        "AP Status objects for Enterasys Networks wireless switches.
+
+        AP = Access Point;
+        AC = Access Controller (wireless switch),
+             the device that runs a SNMP Agent implementing this MIB.
+
+        Copyright 2006 Enterasys Networks, Inc.
+        All rights reserved.
+        This SNMP Management Information Base
+        Specification (Specification) embodies
+        confidential and proprietary intellectual property.
+
+        This Specification is supplied 'AS IS' and Enterasys Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200609270043Z"
+    DESCRIPTION "v3.0.3: Added 6 tables:
+                2 for Operational Rate Set per Radio Service,
+                2 for Operational Statistics per Radio,
+                2 for the statistics detailed per Data Transmission Rate.
+                Names are:
+                rbtwsApStatRadioServiceOpRateSet,
+                rbtwsApStatRadioServiceOpRateSetMac,
+                rbtwsApStatRadioOpStatistics,
+                rbtwsApStatRadioOpStatisticsMac,
+                rbtwsApStatRadioRateOpStatistics,
+                rbtwsApStatRadioRateOpStatisticsMac.
+                (for 6.0 release)"
+
+    REVISION "200607280035Z"
+    DESCRIPTION "v2.2.2: Removed unused imports"
+
+    REVISION "200607280034Z"
+    DESCRIPTION "v2.2.1: Fixed imports and compliance group"
+
+    REVISION "200606260020Z"
+    DESCRIPTION "v2.1.1: Adding Software Version and Boot Version per AP
+                (for 6.0 release)"
+
+    REVISION "200606210018Z"
+    DESCRIPTION "v2.1.0: Adding Max Power and Phy Type per radio
+                (for 6.0 release)"
+
+    REVISION "200605100017Z"
+    DESCRIPTION "v2.0: Adding number of client sessions per AP, radio
+                (for 5.0 release)"
+
+    REVISION "200603300016Z"
+    DESCRIPTION "v1.0: Initial version, for 4.1 release"
+
+    ::= { rbtwsMibs 5 }
+
+
+-- Textual conventions
+
+RbtwsRadioOpRateSetSingleValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A data rate value at which the radio may transmit data.
+         The octet contains a value representing a rate.
+         The rate shall be within the range from 2 to 127,
+         corresponding to data transmission rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s."
+    SYNTAX OCTET STRING (SIZE(1))
+
+RbtwsRadioOpRateSetMandatory ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A set of data rates at which the radio may transmit data.
+         Each octet contains a value representing a rate.
+         Each rate shall be within the range from 2 to 127,
+         corresponding to data rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s.
+         The set must have at least one member at all times."
+    SYNTAX OCTET STRING (SIZE(1..126))
+
+RbtwsRadioOpRateSetDisabled ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A set of data rates the radio must NOT use to transmit data.
+         Each octet contains a value representing a rate.
+         Each rate shall be within the range from 2 to 127,
+         corresponding to data rates in increments of
+         500 kbit/s from 1 Mbit/s to 63.5 Mbit/s.
+         If no such constraint is present in the system configuration,
+         the zero-length OCTET STRING will be reported."
+    SYNTAX OCTET STRING (SIZE(0..126))
+
+
+-- Object definitions
+
+--
+-- The AP Status MIB Tree
+--
+
+rbtwsApStatusObjects    OBJECT IDENTIFIER ::= { rbtwsApStatusMib 1 }
+rbtwsApStatDataObjects  OBJECT IDENTIFIER ::= { rbtwsApStatusObjects 1 }
+
+
+-- ==================================
+--
+-- Scalars
+--
+
+rbtwsApStatNumAps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of APs present and seen by AC (AP in ''ALIVE'' state)."
+    ::= { rbtwsApStatDataObjects 1 }
+
+
+-- ==================================
+-- AP Status table
+
+rbtwsApStatApStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatApStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by MAC in
+        'rbtwsApStatApStatusMacTable'."
+    ::= { rbtwsApStatDataObjects 2 }
+
+rbtwsApStatApStatusEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatApStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular AP attached to the AC."
+    INDEX   { rbtwsApStatApStatusSerialNum }
+    ::= { rbtwsApStatApStatusTable 1 }
+
+RbtwsApStatApStatusEntry ::= SEQUENCE {
+        rbtwsApStatApStatusSerialNum      RbtwsApSerialNum,
+
+        rbtwsApStatApStatusBaseMac        MacAddress,
+
+        rbtwsApStatApStatusAttachType     RbtwsApAttachType,
+        rbtwsApStatApStatusPortOrDapNum   RbtwsApPortOrDapNum,
+
+        rbtwsApStatApStatusApState        RbtwsApState,
+        rbtwsApStatApStatusModel          DisplayString,
+        rbtwsApStatApStatusFingerprint    RbtwsApFingerprint,
+        rbtwsApStatApStatusApName         DisplayString,
+
+        rbtwsApStatApStatusVlan           DisplayString,
+        rbtwsApStatApStatusIpAddress      IpAddress,
+        rbtwsApStatApStatusUptimeSecs     Unsigned32,
+
+        rbtwsApStatApStatusCpuInfo        DisplayString,
+        rbtwsApStatApStatusManufacturerId DisplayString,
+        rbtwsApStatApStatusRamBytes       Unsigned32,
+        rbtwsApStatApStatusHardwareRev    DisplayString,
+
+        rbtwsApStatApStatusClientSessions Unsigned32,
+
+        rbtwsApStatApStatusSoftwareVer    DisplayString,
+        rbtwsApStatApStatusBootVer        DisplayString
+    }
+
+rbtwsApStatApStatusSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of this AP."
+    ::= { rbtwsApStatApStatusEntry 1 }
+
+rbtwsApStatApStatusBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this AP."
+    ::= { rbtwsApStatApStatusEntry 2 }
+
+rbtwsApStatApStatusAttachType OBJECT-TYPE
+    SYNTAX      RbtwsApAttachType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How this AP is attached to the AC
+        (directly or via L2/L3 network)."
+    ::= { rbtwsApStatApStatusEntry 3 }
+
+rbtwsApStatApStatusPortOrDapNum OBJECT-TYPE
+    SYNTAX      RbtwsApPortOrDapNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Number if this AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network."
+    ::= { rbtwsApStatApStatusEntry 4 }
+
+rbtwsApStatApStatusApState OBJECT-TYPE
+    SYNTAX      RbtwsApState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The State of this AP."
+    ::= { rbtwsApStatApStatusEntry 5 }
+
+rbtwsApStatApStatusModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this AP."
+    ::= { rbtwsApStatApStatusEntry 6 }
+
+rbtwsApStatApStatusFingerprint OBJECT-TYPE
+    SYNTAX      RbtwsApFingerprint
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RSA key fingerprint configured on this AP (binary value:
+        it is the MD5 hash of the public key of the RSA key pair).
+        For directly attached APs the fingerprint is a zero length string."
+    ::= { rbtwsApStatApStatusEntry 7 }
+
+rbtwsApStatApStatusApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this AP, as assigned in AC's CLI;
+        defaults to <Access-Type><Number> (examples: 'MP01', 'DMP23');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73')."
+    ::= { rbtwsApStatApStatusEntry 8 }
+
+rbtwsApStatApStatusVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the VLAN associated with this DAP.
+        Only valid for network attached APs, otherwise zero length string."
+    ::= { rbtwsApStatApStatusEntry 9 }
+
+rbtwsApStatApStatusIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of this DAP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { rbtwsApStatApStatusEntry 10 }
+
+rbtwsApStatApStatusUptimeSecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds since this AP's last boot."
+    ::= { rbtwsApStatApStatusEntry 11 }
+
+rbtwsApStatApStatusCpuInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's CPU."
+    ::= { rbtwsApStatApStatusEntry 12 }
+
+rbtwsApStatApStatusManufacturerId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's manufacturer."
+    ::= { rbtwsApStatApStatusEntry 13 }
+
+rbtwsApStatApStatusRamBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The memory capacity of this AP (in bytes)."
+    ::= { rbtwsApStatApStatusEntry 14 }
+
+rbtwsApStatApStatusHardwareRev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hardware revision of this AP (e.g. 'A3')."
+    ::= { rbtwsApStatApStatusEntry 15 }
+
+rbtwsApStatApStatusClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this AP."
+    ::= { rbtwsApStatApStatusEntry 16 }
+
+rbtwsApStatApStatusSoftwareVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version for this AP."
+    ::= { rbtwsApStatApStatusEntry 17 }
+
+rbtwsApStatApStatusBootVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The boot loader version for this AP."
+    ::= { rbtwsApStatApStatusEntry 18 }
+
+
+-- ===================================
+-- AP Status table indexed by Base MAC
+
+rbtwsApStatApStatusMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatApStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by Serial Number in
+        'rbtwsApStatApStatusTable'."
+    ::= { rbtwsApStatDataObjects 3 }
+
+rbtwsApStatApStatusMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatApStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular AP attached to the AC."
+    INDEX   { rbtwsApStatApStatusMacBaseMac }
+    ::= { rbtwsApStatApStatusMacTable 1 }
+
+RbtwsApStatApStatusMacEntry ::= SEQUENCE {
+        rbtwsApStatApStatusMacBaseMac        MacAddress,
+
+        rbtwsApStatApStatusMacSerialNum      RbtwsApSerialNum,
+
+        rbtwsApStatApStatusMacAttachType     RbtwsApAttachType,
+        rbtwsApStatApStatusMacPortOrDapNum   RbtwsApPortOrDapNum,
+
+        rbtwsApStatApStatusMacApState        RbtwsApState,
+        rbtwsApStatApStatusMacModel          DisplayString,
+        rbtwsApStatApStatusMacFingerprint    RbtwsApFingerprint,
+        rbtwsApStatApStatusMacApName         DisplayString,
+
+        rbtwsApStatApStatusMacVlan           DisplayString,
+        rbtwsApStatApStatusMacIpAddress      IpAddress,
+        rbtwsApStatApStatusMacUptimeSecs     Unsigned32,
+
+        rbtwsApStatApStatusMacCpuInfo        DisplayString,
+        rbtwsApStatApStatusMacManufacturerId DisplayString,
+        rbtwsApStatApStatusMacRamBytes       Unsigned32,
+        rbtwsApStatApStatusMacHardwareRev    DisplayString,
+
+        rbtwsApStatApStatusMacClientSessions Unsigned32,
+
+        rbtwsApStatApStatusMacSoftwareVer    DisplayString,
+        rbtwsApStatApStatusMacBootVer        DisplayString
+    }
+
+rbtwsApStatApStatusMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this AP."
+    ::= { rbtwsApStatApStatusMacEntry 1 }
+
+rbtwsApStatApStatusMacSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of this AP."
+    ::= { rbtwsApStatApStatusMacEntry 2 }
+
+rbtwsApStatApStatusMacAttachType OBJECT-TYPE
+    SYNTAX      RbtwsApAttachType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "How this AP is attached to the AC
+        (directly or via L2/L3 network)."
+    ::= { rbtwsApStatApStatusMacEntry 3 }
+
+rbtwsApStatApStatusMacPortOrDapNum OBJECT-TYPE
+    SYNTAX      RbtwsApPortOrDapNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Number if this AP is directly attached,
+        or the CLI-assigned DAP Number if attached via L2/L3 network."
+    ::= { rbtwsApStatApStatusMacEntry 4 }
+
+rbtwsApStatApStatusMacApState OBJECT-TYPE
+    SYNTAX      RbtwsApState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The State of this AP."
+    ::= { rbtwsApStatApStatusMacEntry 5 }
+
+rbtwsApStatApStatusMacModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Model name of this AP."
+    ::= { rbtwsApStatApStatusMacEntry 6 }
+
+rbtwsApStatApStatusMacFingerprint OBJECT-TYPE
+    SYNTAX      RbtwsApFingerprint
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RSA key fingerprint configured on this AP (binary value:
+        it is the MD5 hash of the public key of the RSA key pair).
+        For directly attached APs the fingerprint is a zero length string."
+    ::= { rbtwsApStatApStatusMacEntry 7 }
+
+rbtwsApStatApStatusMacApName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of this AP, as assigned in AC's CLI;
+        defaults to <Access-Type><Number> (examples: 'MP01', 'DMP23');
+        could have been changed from CLI to a meaningful name,
+        for example the location of the AP (example: 'MeetingRoom73')."
+    ::= { rbtwsApStatApStatusMacEntry 8 }
+
+rbtwsApStatApStatusMacVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the VLAN associated with this DAP.
+        Only valid for network attached APs, otherwise zero length string."
+    ::= { rbtwsApStatApStatusMacEntry 9 }
+
+rbtwsApStatApStatusMacIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of this DAP.
+        Only valid for network attached APs, otherwise 0.0.0.0."
+    ::= { rbtwsApStatApStatusMacEntry 10 }
+
+rbtwsApStatApStatusMacUptimeSecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds since this AP's last boot."
+    ::= { rbtwsApStatApStatusMacEntry 11 }
+
+rbtwsApStatApStatusMacCpuInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's CPU."
+    ::= { rbtwsApStatApStatusMacEntry 12 }
+
+rbtwsApStatApStatusMacManufacturerId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information about this AP's manufacturer."
+    ::= { rbtwsApStatApStatusMacEntry 13 }
+
+rbtwsApStatApStatusMacRamBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The memory capacity of this AP (in bytes)."
+    ::= { rbtwsApStatApStatusMacEntry 14 }
+
+rbtwsApStatApStatusMacHardwareRev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hardware revision of this AP (e.g. 'A3')."
+    ::= { rbtwsApStatApStatusMacEntry 15 }
+
+rbtwsApStatApStatusMacClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this AP."
+    ::= { rbtwsApStatApStatusMacEntry 16 }
+
+rbtwsApStatApStatusMacSoftwareVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The software version for this AP."
+    ::= { rbtwsApStatApStatusMacEntry 17 }
+
+rbtwsApStatApStatusMacBootVer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The boot loader version for this AP."
+    ::= { rbtwsApStatApStatusMacEntry 18 }
+
+
+-- ==================================
+-- Radio Status table
+
+rbtwsApStatRadioStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios on all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by Radio Base MAC in
+        'rbtwsApStatRadioStatusMacTable'."
+    ::= { rbtwsApStatDataObjects 4 }
+
+rbtwsApStatRadioStatusEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular radio on an AP attached to the AC."
+    INDEX   { rbtwsApStatRadioStatusApSerialNum,
+              rbtwsApStatRadioStatusRadioNum }
+    ::= { rbtwsApStatRadioStatusTable 1 }
+
+RbtwsApStatRadioStatusEntry ::= SEQUENCE {
+        rbtwsApStatRadioStatusApSerialNum    RbtwsApSerialNum,
+        rbtwsApStatRadioStatusRadioNum       RbtwsRadioNum,
+        rbtwsApStatRadioStatusBaseMac        MacAddress,
+
+        rbtwsApStatRadioStatusEnable             RbtwsRadioEnable,
+        rbtwsApStatRadioStatusRadioConfigState   RbtwsRadioConfigState,
+        rbtwsApStatRadioStatusCurrentPowerLevel  RbtwsPowerLevel,
+        rbtwsApStatRadioStatusCurrentChannelNum  RbtwsChannelNum,
+
+        rbtwsApStatRadioStatusClientSessions     Unsigned32,
+
+        rbtwsApStatRadioStatusMaxPowerLevel      RbtwsPowerLevel,
+        rbtwsApStatRadioStatusRadioPhyType       RbtwsRadioType
+    }
+
+rbtwsApStatRadioStatusApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioStatusEntry 1 }
+
+rbtwsApStatRadioStatusRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioStatusEntry 2 }
+
+rbtwsApStatRadioStatusBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { rbtwsApStatRadioStatusEntry 3 }
+
+rbtwsApStatRadioStatusEnable OBJECT-TYPE
+    SYNTAX      RbtwsRadioEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured mode (enable/disable) of this radio."
+    ::= { rbtwsApStatRadioStatusEntry 4 }
+
+rbtwsApStatRadioStatusRadioConfigState OBJECT-TYPE
+    SYNTAX      RbtwsRadioConfigState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configuration state of this radio (INIT, FAIL, OK)."
+    ::= { rbtwsApStatRadioStatusEntry 5 }
+
+rbtwsApStatRadioStatusCurrentPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Power Level of this radio."
+    ::= { rbtwsApStatRadioStatusEntry 6 }
+
+rbtwsApStatRadioStatusCurrentChannelNum OBJECT-TYPE
+    SYNTAX      RbtwsChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Channel Number of this radio."
+    ::= { rbtwsApStatRadioStatusEntry 7 }
+
+rbtwsApStatRadioStatusClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this radio."
+    ::= { rbtwsApStatRadioStatusEntry 8 }
+
+rbtwsApStatRadioStatusMaxPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Power Level for this radio, with the current antenna,
+         on the current channel (rbtwsApStatRadioStatusCurrentChannelNum),
+         as constrained by the current regulatory domain."
+    ::= { rbtwsApStatRadioStatusEntry 9 }
+
+rbtwsApStatRadioStatusRadioPhyType OBJECT-TYPE
+    SYNTAX      RbtwsRadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Physical Type of this radio
+        (typeUnknown, typeA, typeB, typeG)."
+    ::= { rbtwsApStatRadioStatusEntry 10 }
+
+
+-- ============================================
+-- Radio Status table indexed by Radio Base MAC
+
+rbtwsApStatRadioStatusMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radios on all the APs currently present
+        and managed by this AC (APs in ''ALIVE'' state).
+        Same data is available indexed by AP Serial Number and Radio Number in
+        'rbtwsApStatRadioStatusTable'."
+    ::= { rbtwsApStatDataObjects 5 }
+
+rbtwsApStatRadioStatusMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioStatusMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular radio on an AP attached to the AC."
+    INDEX   { rbtwsApStatRadioStatusMacBaseMac }
+    ::= { rbtwsApStatRadioStatusMacTable 1 }
+
+RbtwsApStatRadioStatusMacEntry ::= SEQUENCE {
+        rbtwsApStatRadioStatusMacBaseMac        MacAddress,
+        rbtwsApStatRadioStatusMacApSerialNum    RbtwsApSerialNum,
+        rbtwsApStatRadioStatusMacRadioNum       RbtwsRadioNum,
+
+        rbtwsApStatRadioStatusMacEnable             RbtwsRadioEnable,
+        rbtwsApStatRadioStatusMacRadioConfigState   RbtwsRadioConfigState,
+        rbtwsApStatRadioStatusMacCurrentPowerLevel  RbtwsPowerLevel,
+        rbtwsApStatRadioStatusMacCurrentChannelNum  RbtwsChannelNum,
+
+        rbtwsApStatRadioStatusMacClientSessions     Unsigned32,
+
+        rbtwsApStatRadioStatusMacMaxPowerLevel      RbtwsPowerLevel,
+        rbtwsApStatRadioStatusMacRadioPhyType       RbtwsRadioType
+    }
+
+rbtwsApStatRadioStatusMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 1 }
+
+rbtwsApStatRadioStatusMacApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 2 }
+
+rbtwsApStatRadioStatusMacRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioStatusMacEntry 3 }
+
+rbtwsApStatRadioStatusMacEnable OBJECT-TYPE
+    SYNTAX      RbtwsRadioEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured mode (enable/disable) of this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 4 }
+
+rbtwsApStatRadioStatusMacRadioConfigState OBJECT-TYPE
+    SYNTAX      RbtwsRadioConfigState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configuration state of this radio (INIT, FAIL, OK)."
+    ::= { rbtwsApStatRadioStatusMacEntry 5 }
+
+rbtwsApStatRadioStatusMacCurrentPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Power Level of this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 6 }
+
+rbtwsApStatRadioStatusMacCurrentChannelNum OBJECT-TYPE
+    SYNTAX      RbtwsChannelNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current Channel Number of this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 7 }
+
+rbtwsApStatRadioStatusMacClientSessions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of client sessions on this radio."
+    ::= { rbtwsApStatRadioStatusMacEntry 8 }
+
+rbtwsApStatRadioStatusMacMaxPowerLevel OBJECT-TYPE
+    SYNTAX      RbtwsPowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Power Level for this radio, with the current antenna,
+         on the current channel (rbtwsApStatRadioStatusMacCurrentChannelNum),
+         as constrained by the current regulatory domain."
+    ::= { rbtwsApStatRadioStatusMacEntry 9 }
+
+rbtwsApStatRadioStatusMacRadioPhyType OBJECT-TYPE
+    SYNTAX      RbtwsRadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current Physical Type of this radio
+        (typeUnknown, typeA, typeB, typeG)."
+    ::= { rbtwsApStatRadioStatusMacEntry 10 }
+
+
+-- ==================================
+-- Radio Service table
+
+rbtwsApStatRadioServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by BSSID in
+        'rbtwsApStatRadioServiceMacTable'."
+    ::= { rbtwsApStatDataObjects 6 }
+
+rbtwsApStatRadioServiceEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { rbtwsApStatRadioServApSerialNum,
+              rbtwsApStatRadioServRadioNum,
+              rbtwsApStatRadioServSsid }
+    ::= { rbtwsApStatRadioServiceTable 1 }
+
+RbtwsApStatRadioServiceEntry ::= SEQUENCE {
+        rbtwsApStatRadioServApSerialNum          RbtwsApSerialNum,
+        rbtwsApStatRadioServRadioNum             RbtwsRadioNum,
+        rbtwsApStatRadioServSsid                 DisplayString,
+
+        rbtwsApStatRadioServBssid                MacAddress,
+        rbtwsApStatRadioServServiceProfileName   DisplayString
+    }
+
+rbtwsApStatRadioServApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioServiceEntry 1 }
+
+rbtwsApStatRadioServRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioServiceEntry 2 }
+
+rbtwsApStatRadioServSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { rbtwsApStatRadioServiceEntry 3 }
+
+rbtwsApStatRadioServBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { rbtwsApStatRadioServiceEntry 4 }
+
+rbtwsApStatRadioServServiceProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Name of the Service Profile having this SSID
+        and associated to the (only) radio profile of this radio."
+    ::= { rbtwsApStatRadioServiceEntry 5 }
+
+
+-- ==========================================
+-- Radio Service table indexed by MAC (BSSID)
+
+rbtwsApStatRadioServiceMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioServiceMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by AP Serial Number,
+        Radio Number and SSID in 'rbtwsApStatRadioServiceTable'."
+    ::= { rbtwsApStatDataObjects 7 }
+
+rbtwsApStatRadioServiceMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioServiceMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { rbtwsApStatRadioServMacBssid }
+    ::= { rbtwsApStatRadioServiceMacTable 1 }
+
+RbtwsApStatRadioServiceMacEntry ::= SEQUENCE {
+        rbtwsApStatRadioServMacBssid                MacAddress,
+
+        rbtwsApStatRadioServMacApSerialNum          RbtwsApSerialNum,
+        rbtwsApStatRadioServMacRadioNum             RbtwsRadioNum,
+        rbtwsApStatRadioServMacSsid                 DisplayString,
+        rbtwsApStatRadioServMacServiceProfileName   DisplayString
+    }
+
+rbtwsApStatRadioServMacBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { rbtwsApStatRadioServiceMacEntry 1 }
+
+rbtwsApStatRadioServMacApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioServiceMacEntry 2 }
+
+rbtwsApStatRadioServMacRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioServiceMacEntry 3 }
+
+rbtwsApStatRadioServMacSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { rbtwsApStatRadioServiceMacEntry 4 }
+
+rbtwsApStatRadioServMacServiceProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Name of the Service Profile having this SSID
+        and associated to the (only) radio profile of this radio."
+    ::= { rbtwsApStatRadioServiceMacEntry 5 }
+
+
+-- ============================================
+-- Operational Rate Set per Radio Service table
+
+rbtwsApStatRadioServiceOpRateSetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioServiceOpRateSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by BSSID in
+        'rbtwsApStatRadioServiceOpRateSetMacTable'."
+    ::= { rbtwsApStatDataObjects 8 }
+
+rbtwsApStatRadioServiceOpRateSetEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioServiceOpRateSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { rbtwsApStatRadioSORSetApSerialNum,
+              rbtwsApStatRadioSORSetRadioNum,
+              rbtwsApStatRadioSORSetSsid }
+    ::= { rbtwsApStatRadioServiceOpRateSetTable 1 }
+
+RbtwsApStatRadioServiceOpRateSetEntry ::= SEQUENCE {
+        rbtwsApStatRadioSORSetApSerialNum  RbtwsApSerialNum,
+        rbtwsApStatRadioSORSetRadioNum     RbtwsRadioNum,
+        rbtwsApStatRadioSORSetSsid         DisplayString,
+
+        rbtwsApStatRadioSORSetMandatory  RbtwsRadioOpRateSetMandatory,
+        rbtwsApStatRadioSORSetDisabled   RbtwsRadioOpRateSetDisabled,
+        rbtwsApStatRadioSORSetBeacon     RbtwsRadioOpRateSetSingleValue,
+        rbtwsApStatRadioSORSetMulticast  RbtwsRadioOpRateSetSingleValue
+    }
+
+rbtwsApStatRadioSORSetApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 1 }
+
+rbtwsApStatRadioSORSetRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 2 }
+
+rbtwsApStatRadioSORSetSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The service/SSID name in use on this radio."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 3 }
+
+rbtwsApStatRadioSORSetMandatory OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetMandatory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mandatory Rate Set configured for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 4 }
+
+rbtwsApStatRadioSORSetDisabled OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disabled Rate Set configured for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 5 }
+
+rbtwsApStatRadioSORSetBeacon OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Beacon Rate for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 6 }
+
+rbtwsApStatRadioSORSetMulticast OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Multicast Rate for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetEntry 7 }
+
+
+-- ============================================
+-- Operational Rate Set per Radio Service table
+-- indexed by MAC (BSSID)
+
+rbtwsApStatRadioServiceOpRateSetMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioServiceOpRateSetMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table describing the radio services associated with
+        the APs currently present and managed by this AC.
+        Same data is available indexed by AP Serial Number,
+        Radio Number and SSID in 'rbtwsApStatRadioServiceOpRateSetTable'."
+    ::= { rbtwsApStatDataObjects 9 }
+
+rbtwsApStatRadioServiceOpRateSetMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioServiceOpRateSetMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a particular service (SSID) on a radio."
+    INDEX   { rbtwsApStatRadioSORSetMacBssid }
+    ::= { rbtwsApStatRadioServiceOpRateSetMacTable 1 }
+
+RbtwsApStatRadioServiceOpRateSetMacEntry ::= SEQUENCE {
+        rbtwsApStatRadioSORSetMacBssid      MacAddress,
+
+        rbtwsApStatRadioSORSetMacMandatory  RbtwsRadioOpRateSetMandatory,
+        rbtwsApStatRadioSORSetMacDisabled   RbtwsRadioOpRateSetDisabled,
+        rbtwsApStatRadioSORSetMacBeacon     RbtwsRadioOpRateSetSingleValue,
+        rbtwsApStatRadioSORSetMacMulticast  RbtwsRadioOpRateSetSingleValue
+    }
+
+rbtwsApStatRadioSORSetMacBssid OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address (a.k.a. BSSID) of this service/SSID on this radio."
+    ::= { rbtwsApStatRadioServiceOpRateSetMacEntry 1 }
+
+rbtwsApStatRadioSORSetMacMandatory OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetMandatory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Mandatory Rate Set configured for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetMacEntry 2 }
+
+rbtwsApStatRadioSORSetMacDisabled OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Disabled Rate Set configured for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetMacEntry 3 }
+
+rbtwsApStatRadioSORSetMacBeacon OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Beacon Rate for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetMacEntry 4 }
+
+rbtwsApStatRadioSORSetMacMulticast OBJECT-TYPE
+    SYNTAX      RbtwsRadioOpRateSetSingleValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Multicast Rate for this radio service."
+    ::= { rbtwsApStatRadioServiceOpRateSetMacEntry 5 }
+
+
+-- ==================================
+-- Radio Operational Statistics table
+
+rbtwsApStatRadioOpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        for all radios on all APs attached to this switch.
+        Same data is available indexed by Radio Base MAC
+        in 'rbtwsApStatRadioOpStatisticsMacTable'."
+    ::= { rbtwsApStatDataObjects 10 }
+
+rbtwsApStatRadioOpStatisticsEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular radio."
+    INDEX   { rbtwsApStatRadioOpStatsApSerialNum, 
+              rbtwsApStatRadioOpStatsRadioNum }
+    ::= { rbtwsApStatRadioOpStatisticsTable 1 }
+
+RbtwsApStatRadioOpStatisticsEntry ::= SEQUENCE {
+        rbtwsApStatRadioOpStatsApSerialNum    RbtwsApSerialNum,
+        rbtwsApStatRadioOpStatsRadioNum       RbtwsRadioNum,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'RbtwsApStatRadioRateOpStatisticsEntry'
+        -- => for each data rate separately
+
+        rbtwsApStatRadioOpStatsTxUniPkt       Counter64,
+        rbtwsApStatRadioOpStatsTxUniOctet     Counter64,
+        rbtwsApStatRadioOpStatsTxMultiPkt     Counter64,
+        rbtwsApStatRadioOpStatsTxMultiOctet   Counter64,
+        rbtwsApStatRadioOpStatsRxPkt          Counter64,
+        rbtwsApStatRadioOpStatsRxOctet        Counter64,
+        rbtwsApStatRadioOpStatsUndcrptPkt     Counter64,
+        rbtwsApStatRadioOpStatsUndcrptOctet   Counter64,
+        rbtwsApStatRadioOpStatsPhyErr         Counter64,
+
+        -- the following fields are not detailed per data transmission rate
+
+        rbtwsApStatRadioOpStatsResetCount                  Counter32,
+        rbtwsApStatRadioOpStatsAutoTuneChannelChangeCount  Counter32,
+        rbtwsApStatRadioOpStatsTxRetriesCount              Counter32,
+        rbtwsApStatRadioOpStatsUserSessions                Gauge32,
+        rbtwsApStatRadioOpStatsNoiseFloor                  Integer32
+    }
+
+rbtwsApStatRadioOpStatsApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Serial Number of the AP containing this radio."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 1 }
+
+rbtwsApStatRadioOpStatsRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Number of this Radio on the AP."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 2 }
+    
+rbtwsApStatRadioOpStatsTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 3 }
+
+rbtwsApStatRadioOpStatsTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 4 }
+
+rbtwsApStatRadioOpStatsTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 5 }
+
+rbtwsApStatRadioOpStatsTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 6 }
+
+rbtwsApStatRadioOpStatsRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 7 }
+
+rbtwsApStatRadioOpStatsRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 8 }
+
+rbtwsApStatRadioOpStatsUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 9 }
+
+rbtwsApStatRadioOpStatsUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 10 }
+
+rbtwsApStatRadioOpStatsPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 11 }
+
+rbtwsApStatRadioOpStatsResetCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reset operations for this radio."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 12 }
+
+rbtwsApStatRadioOpStatsAutoTuneChannelChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Channel Changes, in Auto-Tuning mode only,
+        since the AP containing this radio became operational.
+        Note that manual channel changes are not counted."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 13 }
+
+rbtwsApStatRadioOpStatsTxRetriesCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Transmission Retries."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 14 }
+
+rbtwsApStatRadioOpStatsUserSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of client sessions using this radio at the current moment."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 15 }
+
+rbtwsApStatRadioOpStatsNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise Floor in dBm."
+    ::= { rbtwsApStatRadioOpStatisticsEntry 16 }
+
+
+-- ============================================================
+-- Radio Operational Statistics table indexed by Radio Base MAC
+
+rbtwsApStatRadioOpStatisticsMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        for all radios on all APs attached to this switch.
+        Same data is available indexed by AP Serial Number
+        and Radio Number in 'rbtwsApStatRadioOpStatisticsTable'."
+    ::= { rbtwsApStatDataObjects 11 }
+
+rbtwsApStatRadioOpStatisticsMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular radio."
+    INDEX   { rbtwsApStatRadioOpStatsMacBaseMac }
+    ::= { rbtwsApStatRadioOpStatisticsMacTable 1 }
+
+RbtwsApStatRadioOpStatisticsMacEntry ::= SEQUENCE {
+        rbtwsApStatRadioOpStatsMacBaseMac        MacAddress,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'RbtwsApStatRadioRateOpStatisticsMacEntry'
+        -- => for each data rate separately
+
+        rbtwsApStatRadioOpStatsMacTxUniPkt       Counter64,
+        rbtwsApStatRadioOpStatsMacTxUniOctet     Counter64,
+        rbtwsApStatRadioOpStatsMacTxMultiPkt     Counter64,
+        rbtwsApStatRadioOpStatsMacTxMultiOctet   Counter64,
+        rbtwsApStatRadioOpStatsMacRxPkt          Counter64,
+        rbtwsApStatRadioOpStatsMacRxOctet        Counter64,
+        rbtwsApStatRadioOpStatsMacUndcrptPkt     Counter64,
+        rbtwsApStatRadioOpStatsMacUndcrptOctet   Counter64,
+        rbtwsApStatRadioOpStatsMacPhyErr         Counter64,
+
+        -- the following fields are not detailed per data transmission rate
+
+        rbtwsApStatRadioOpStatsMacResetCount                  Counter32,
+        rbtwsApStatRadioOpStatsMacAutoTuneChannelChangeCount  Counter32,
+        rbtwsApStatRadioOpStatsMacTxRetriesCount              Counter32,
+        rbtwsApStatRadioOpStatsMacUserSessions                Gauge32,
+        rbtwsApStatRadioOpStatsMacNoiseFloor                  Integer32
+    }
+
+rbtwsApStatRadioOpStatsMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Base MAC address of this radio."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 1 }
+
+rbtwsApStatRadioOpStatsMacTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 2 }
+
+rbtwsApStatRadioOpStatsMacTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 3 }
+
+rbtwsApStatRadioOpStatsMacTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 4 }
+
+rbtwsApStatRadioOpStatsMacTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 5 }
+
+rbtwsApStatRadioOpStatsMacRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 6 }
+
+rbtwsApStatRadioOpStatsMacRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 7 }
+
+rbtwsApStatRadioOpStatsMacUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 8 }
+
+rbtwsApStatRadioOpStatsMacUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 9 }
+
+rbtwsApStatRadioOpStatsMacPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 10 }
+
+rbtwsApStatRadioOpStatsMacResetCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reset operations for this radio."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 11 }
+
+rbtwsApStatRadioOpStatsMacAutoTuneChannelChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Channel Changes, in Auto-Tuning mode only,
+        since the AP containing this radio became operational.
+        Note that manual channel changes are not counted."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 12 }
+
+rbtwsApStatRadioOpStatsMacTxRetriesCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Transmission Retries."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 13 }
+
+rbtwsApStatRadioOpStatsMacUserSessions OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of client sessions using this radio at the current moment."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 14 }
+
+rbtwsApStatRadioOpStatsMacNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise Floor in dBm."
+    ::= { rbtwsApStatRadioOpStatisticsMacEntry 15 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per data transmission Rate table
+
+rbtwsApStatRadioRateOpStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioRateOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per transmission Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by Radio Base MAC and Data Transmission Rate
+        in 'rbtwsApStatRadioRateOpStatisticsMacTable'."
+    ::= { rbtwsApStatDataObjects 12 }
+
+rbtwsApStatRadioRateOpStatisticsEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioRateOpStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { rbtwsApStatRadioRateOpStatsApSerialNum,
+              rbtwsApStatRadioRateOpStatsRadioNum,
+              rbtwsApStatRadioRateOpStatsRate }
+    ::= { rbtwsApStatRadioRateOpStatisticsTable 1 }
+
+RbtwsApStatRadioRateOpStatisticsEntry ::= SEQUENCE {
+        rbtwsApStatRadioRateOpStatsApSerialNum    RbtwsApSerialNum,
+        rbtwsApStatRadioRateOpStatsRadioNum       RbtwsRadioNum,
+        rbtwsApStatRadioRateOpStatsRate           RbtwsRadioRate,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'RbtwsApStatRadioOpStatisticsEntry' => totals for all data rates
+
+        rbtwsApStatRadioRateOpStatsTxUniPkt       Counter64,
+        rbtwsApStatRadioRateOpStatsTxUniOctet     Counter64,
+        rbtwsApStatRadioRateOpStatsTxMultiPkt     Counter64,
+        rbtwsApStatRadioRateOpStatsTxMultiOctet   Counter64,
+        rbtwsApStatRadioRateOpStatsRxPkt          Counter64,
+        rbtwsApStatRadioRateOpStatsRxOctet        Counter64,
+        rbtwsApStatRadioRateOpStatsUndcrptPkt     Counter64,
+        rbtwsApStatRadioRateOpStatsUndcrptOctet   Counter64,
+        rbtwsApStatRadioRateOpStatsPhyErr         Counter64
+    }
+
+rbtwsApStatRadioRateOpStatsApSerialNum OBJECT-TYPE
+    SYNTAX      RbtwsApSerialNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 1 }
+
+rbtwsApStatRadioRateOpStatsRadioNum OBJECT-TYPE
+    SYNTAX      RbtwsRadioNum
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 2 }
+
+rbtwsApStatRadioRateOpStatsRate OBJECT-TYPE
+    SYNTAX      RbtwsRadioRate
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 3 }
+
+rbtwsApStatRadioRateOpStatsTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 4 }
+
+rbtwsApStatRadioRateOpStatsTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 5 }
+
+rbtwsApStatRadioRateOpStatsTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 6 }
+
+rbtwsApStatRadioRateOpStatsTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 7 }
+
+rbtwsApStatRadioRateOpStatsRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 8 }
+
+rbtwsApStatRadioRateOpStatsRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 9 }
+
+rbtwsApStatRadioRateOpStatsUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 10 }
+
+rbtwsApStatRadioRateOpStatsUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 11 }
+
+rbtwsApStatRadioRateOpStatsPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { rbtwsApStatRadioRateOpStatisticsEntry 12 }
+
+
+-- =============================================================
+-- Radio Operational Statistics per data transmission Rate table
+-- with radio identified by Radio Base MAC
+
+rbtwsApStatRadioRateOpStatisticsMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RbtwsApStatRadioRateOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table providing the Radio Operational Statistics
+        per transmission Rate for all radios on all APs attached to this switch.
+        Same data is available indexed by AP Serial Number, Radio Number
+        and Data Transmission Rate in 'rbtwsApStatRadioRateOpStatisticsTable'."
+    ::= { rbtwsApStatDataObjects 13 }
+
+rbtwsApStatRadioRateOpStatisticsMacEntry OBJECT-TYPE
+    SYNTAX      RbtwsApStatRadioRateOpStatisticsMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operational statistics (counters) for a particular data transmission rate
+             on a particular radio."
+    INDEX   { rbtwsApStatRadioRateOpStatsMacBaseMac,
+              rbtwsApStatRadioRateOpStatsMacRate }
+    ::= { rbtwsApStatRadioRateOpStatisticsMacTable 1 }
+
+RbtwsApStatRadioRateOpStatisticsMacEntry ::= SEQUENCE {
+        rbtwsApStatRadioRateOpStatsMacBaseMac        MacAddress,
+        rbtwsApStatRadioRateOpStatsMacRate           RbtwsRadioRate,
+
+        -- the following nine Tx/Rx counters are also
+        -- in 'RbtwsApStatRadioOpStatisticsMacEntry' => totals for all data rates
+
+        rbtwsApStatRadioRateOpStatsMacTxUniPkt       Counter64,
+        rbtwsApStatRadioRateOpStatsMacTxUniOctet     Counter64,
+        rbtwsApStatRadioRateOpStatsMacTxMultiPkt     Counter64,
+        rbtwsApStatRadioRateOpStatsMacTxMultiOctet   Counter64,
+        rbtwsApStatRadioRateOpStatsMacRxPkt          Counter64,
+        rbtwsApStatRadioRateOpStatsMacRxOctet        Counter64,
+        rbtwsApStatRadioRateOpStatsMacUndcrptPkt     Counter64,
+        rbtwsApStatRadioRateOpStatsMacUndcrptOctet   Counter64,
+        rbtwsApStatRadioRateOpStatsMacPhyErr         Counter64
+    }
+
+rbtwsApStatRadioRateOpStatsMacBaseMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 1 }
+
+rbtwsApStatRadioRateOpStatsMacRate OBJECT-TYPE
+    SYNTAX      RbtwsRadioRate
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table index."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 2 }
+
+rbtwsApStatRadioRateOpStatsMacTxUniPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unicast packets transmitted."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 3 }
+
+rbtwsApStatRadioRateOpStatsMacTxUniOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in unicast packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 4 }
+
+rbtwsApStatRadioRateOpStatsMacTxMultiPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of multicast packets transmitted."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 5 }
+
+rbtwsApStatRadioRateOpStatsMacTxMultiOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets transmitted in multicast packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 6 }
+
+rbtwsApStatRadioRateOpStatsMacRxPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 7 }
+
+rbtwsApStatRadioRateOpStatsMacRxOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 8 }
+
+rbtwsApStatRadioRateOpStatsMacUndcrptPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of undecrypted packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 9 }
+
+rbtwsApStatRadioRateOpStatsMacUndcrptOctet OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets in undecrypted packets."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 10 }
+
+rbtwsApStatRadioRateOpStatsMacPhyErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of Physical Errors occurred."
+    ::= { rbtwsApStatRadioRateOpStatisticsMacEntry 11 }
+
+
+-- ============================================================================
+--
+-- Conformance
+--
+
+rbtwsApStatusConformance  OBJECT IDENTIFIER ::= { rbtwsApStatusObjects 2 }
+rbtwsApStatusCompliances  OBJECT IDENTIFIER ::= { rbtwsApStatusConformance 1 }
+rbtwsApStatusGroups       OBJECT IDENTIFIER ::= { rbtwsApStatusConformance 2 }
+
+-- Compliance
+
+rbtwsApStatusCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that implement AP Status MIB."
+    MODULE  -- rbtwsApStatusMib
+
+    MANDATORY-GROUPS {
+            rbtwsApStatusCommonGroup
+            }
+
+    ::= { rbtwsApStatusCompliances 1 }
+
+-- Units of Conformance
+
+rbtwsApStatusCommonGroup OBJECT-GROUP
+        OBJECTS {
+                 rbtwsApStatNumAps,
+                 rbtwsApStatApStatusBaseMac,
+                 rbtwsApStatApStatusAttachType,
+                 rbtwsApStatApStatusPortOrDapNum,
+                 rbtwsApStatApStatusApState,
+                 rbtwsApStatApStatusModel,
+                 rbtwsApStatApStatusFingerprint,
+                 rbtwsApStatApStatusApName,
+                 rbtwsApStatApStatusVlan,
+                 rbtwsApStatApStatusIpAddress,
+                 rbtwsApStatApStatusUptimeSecs,
+                 rbtwsApStatApStatusCpuInfo,
+                 rbtwsApStatApStatusManufacturerId,
+                 rbtwsApStatApStatusRamBytes,
+                 rbtwsApStatApStatusHardwareRev,
+                 rbtwsApStatApStatusMacSerialNum,
+                 rbtwsApStatApStatusMacAttachType,
+                 rbtwsApStatApStatusMacPortOrDapNum,
+                 rbtwsApStatApStatusMacApState,
+                 rbtwsApStatApStatusMacModel,
+                 rbtwsApStatApStatusMacFingerprint,
+                 rbtwsApStatApStatusMacApName,
+                 rbtwsApStatApStatusMacVlan,
+                 rbtwsApStatApStatusMacIpAddress,
+                 rbtwsApStatApStatusMacUptimeSecs,
+                 rbtwsApStatApStatusMacCpuInfo,
+                 rbtwsApStatApStatusMacManufacturerId,
+                 rbtwsApStatApStatusMacRamBytes,
+                 rbtwsApStatApStatusMacHardwareRev,
+                 rbtwsApStatRadioStatusBaseMac,
+                 rbtwsApStatRadioStatusEnable,
+                 rbtwsApStatRadioStatusRadioConfigState,
+                 rbtwsApStatRadioStatusCurrentPowerLevel,
+                 rbtwsApStatRadioStatusCurrentChannelNum,
+                 rbtwsApStatRadioStatusMacApSerialNum,
+                 rbtwsApStatRadioStatusMacRadioNum,
+                 rbtwsApStatRadioStatusMacEnable,
+                 rbtwsApStatRadioStatusMacRadioConfigState,
+                 rbtwsApStatRadioStatusMacCurrentPowerLevel,
+                 rbtwsApStatRadioStatusMacCurrentChannelNum,
+                 rbtwsApStatRadioServBssid,
+                 rbtwsApStatRadioServServiceProfileName,
+                 rbtwsApStatRadioServMacApSerialNum,
+                 rbtwsApStatRadioServMacRadioNum,
+                 rbtwsApStatRadioServMacSsid,
+                 rbtwsApStatRadioServMacServiceProfileName
+                }
+        STATUS      current
+        DESCRIPTION
+        "Mandatory group of objects implemented to provide AP Status info."
+        ::= { rbtwsApStatusGroups 1 }
+
+END

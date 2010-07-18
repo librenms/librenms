@@ -1,0 +1,1636 @@
+ENTERASYS-SERVICE-LEVEL-REPORTING-MIB DEFINITIONS ::= BEGIN 
+
+--  enterasys-service-level-reporting-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Service Level Reporting MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright Aug, 2003 Enterasys Networks, Inc.
+
+ 
+IMPORTS 
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32 
+        FROM SNMPv2-SMI 
+    RowStatus, StorageType, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC 
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+        FROM SNMPv2-CONF 
+    SnmpAdminString 
+        FROM SNMP-FRAMEWORK-MIB 
+    InetAddressType, InetAddress  
+        FROM INET-ADDRESS-MIB 
+    etsysModules
+         FROM ENTERASYS-MIB-NAMES;
+ 
+etsysServiceLevelReportingMIB MODULE-IDENTITY 
+    LAST-UPDATED "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    ORGANIZATION "Enterasys Networks Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+   DESCRIPTION   
+       "This memo defines a portion of the Management Information Base 
+       (MIB) for use with network management protocols in TCP/IP-based 
+       internets. In particular, it specifies the objects used for 
+       managing the results of the service level metrics measurements."
+
+    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    DESCRIPTION "Corrected the postal code in the CONTACT-INFO clause."
+
+    REVISION    "200310241902Z"  -- Fri Oct 24 19:02 GMT 2003
+    DESCRIPTION "Changed the name of the bit at position zero in the
+                 EtsysSrvcLvlStandardMetrics textual convention from
+                 'none' to 'reserved' and added a comment for it in 
+                 the description clause."
+
+    REVISION    "200310222332Z"  -- Wed Oct 22 23:32 GMT 2003
+    DESCRIPTION "Initial version of this MIB module."
+    ::= { etsysModules 39 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+EtsysSrvcLvlOwnerString ::= TEXTUAL-CONVENTION     
+   STATUS       current 
+   DESCRIPTION 
+       "An OwnerString. The string length is limited to 32 octets."
+   SYNTAX OCTET STRING (SIZE (0..32)) 
+ 
+TimeUnit ::= TEXTUAL-CONVENTION     
+   STATUS       current 
+   DESCRIPTION 
+       "A enumerated list of time units." 
+   SYNTAX       INTEGER { 
+       year(1), 
+       month(2), 
+       week(3), 
+       day(4), 
+       hour(5), 
+       second(6), 
+       millisecond(7), 
+       microsecond(8), 
+       nanosecond(9) 
+   } 
+ 
+EtsysSrvcLvlStandardMetrics ::= TEXTUAL-CONVENTION  
+   STATUS      current 
+   DESCRIPTION 
+       " Each standard metric is identified below. In order to allow for
+       several metrics to be calculated in a single measure, there is a
+       need to describe in a bit string the metrics to be measured.  
+       This textual convention defines a BITS construct that gathers in 
+       a bit string a sequence of bits. The bit order corresponds to the
+       order of the metric identifiers in the registry.  
+       The first bit (most significant bit) of the string has the index 
+       0. The index 1 corresponds to the first metric of the registry 
+       (instantaneousUnidirectionalConnectivity ).  
+        
+       Example:   
+       One-way-Delay(6) is identified as 6. One-way-Packet-Loss(12) is 
+       as 12. A network measure performing both One-way-Delay(6) and 
+       One-way-Packet-Loss(12) will be described as '0000001000001000'b,
+       '208'B.         
+
+       Below is a list of defined metrics:
+
+       reserved (0)
+           Setting this reserved bit has no effect.
+
+       instantUnidirectionConnectivity (1)
+           The identifier for the Type-P-Instantaneous-Unidirectional-
+           Connectivity metric. 
+           REFERENCE RFC2678, section 2. 
+       
+       instantBidirectionConnectivity (2)
+           The identifier for the Type-P-Instantaneous-Bidirectional-
+           Connectivity metric. 
+           REFERENCE RFC2678, section 3. 
+       
+       intervalUnidirectionConnectivity (3)
+           The identifier for the Type-P-Interval-Unidirectional-
+           Connectivity metric. 
+           REFERENCE RFC2678, section 4. 
+       
+       intervalBidirectionConnectivity (4)
+           The identifier for the Type-P-Interval-Bidirectional-
+           Connectivity metric. 
+           REFERENCE RFC2678, section 5. 
+       
+       intervalTemporalConnectivity (5)
+           The identifier for the Type-P1-P2-Interval-Temporal-
+           Connectivity metric. 
+           REFERENCE RFC2678, section 6. 
+       
+       oneWayDelay (6)
+           The identifier for the Type-P-One-way-Delay metric. 
+           REFERENCE RFC2679, section 3. 
+       
+       oneWayDelayPoissonStream (7)
+           The identifier for the Type-P-One-way-Delay-Poisson-Stream 
+           metric. 
+           REFERENCE RFC2679, section 4. 
+       
+       oneWayDelayPercentile (8)
+           The identifier for the Type-P-One-way-Delay-Percentile 
+           metric. 
+           REFERENCE RFC2679, section 5.1. 
+       
+       oneWayDelayMedian (9)
+           The identifier for the Type-P-One-way-Delay-Median metric. 
+           REFERENCE RFC2679, section 5.2. 
+       
+       oneWayDelayMinimum (10)
+           The identifier for the Type-P-One-way-Delay-Minimum metric. 
+           REFERENCE RFC2679, section 5.3. 
+       
+       oneWayDelayInversePercentile (11)
+           The identifier for the Type-P-One-way-Delay-Inverse-
+           Percentile metric.  
+           REFERENCE RFC2679, section 5.4. 
+       
+       oneWayPacketLoss (12)
+           The identifier for the Type-P-One-way-Packet-Loss metric. 
+           REFERENCE RFC2680, section 2. 
+       
+       oneWayPacketLossPoissonStream (13)
+           The identifier for the Type-P-One-way-Packet-Loss-Poisson-
+           Stream metric. 
+           REFERENCE RFC2680, section 3. 
+       
+       oneWayPacketLossAverage (14)
+           The identifier for the Type-P-One-way-Packet-Loss-Average 
+           metric. 
+           REFERENCE RFC2680, section 4. 
+
+       roundtripDelay (15)
+           The identifier for the Type-P-Round-trip-Delay metric. 
+           REFERENCE  section 2 of the rfc2681. 
+       
+       roundtripDelayPoissonStream (16)
+           The identifier for the Type-P-Round-trip-Delay-Poisson-Stream
+           metric. 
+           REFERENCE RFC2681, section 4. 
+       
+       roundtripDelayPercentile (17)
+           The identifier for the Type-P-Round-trip-Delay-Percentile 
+           metric. 
+           REFERENCE RFC2681, section 4.1. 
+       
+       roundtripDelayMedian (18)
+           The identifier for the Type-P-Round-trip-Delay-Median metric.
+           REFERENCE RFC2681, section 4.2. 
+       
+       roundtripDelayMinimum (19)
+           The identifier for the Type-P-Round-trip-Delay-Minimum 
+           metric. 
+           REFERENCE RFC2681, section 4.3. 
+       
+       roundtripDelayInversePercentile (20)
+           The identifier for the Type-P-Round-trip-Inverse-Percentile 
+           metric. 
+           REFERENCE RFC2681, section 4.4. 
+       
+       oneWayLossDistanceStream (21)
+           The identifier for the Type-P-One-Way-Loss-Distance-Stream 
+           metric. 
+           REFERENCE  RFC3357, section 5.4.1. 
+       
+       oneWayLossPeriodStream (22)
+           The identifier for the Type-P-One-Way-Loss-Period-Stream 
+           metric. 
+           REFERENCE  RFC3357, section 5.4.2. 
+       
+       oneWayLossNoticeableRate (23)
+           The identifier for the Type-P-One-Way-Loss-Noticeable-Rate 
+           metric. 
+           REFERENCE  RFC3357, section 6.1. 
+       
+       oneWayLossPeriodTotal (24)
+           The identifier for the Type-P-One-Way-Loss-Period-Total 
+           metric. 
+           REFERENCE  RFC3357, section 6.2. 
+       
+       oneWayLossPeriodLengths (25)
+           The identifier for the Type-P-One-Way-Loss-Period-Lengths 
+           metric. 
+           REFERENCE  RFC3357, section 6.3. 
+       
+       oneWayInterLossPeriodLengths (26)
+           The identifier for the Type-P-One-Way-Inter-Loss-Period-
+           Lengths metric. 
+           REFERENCE  RFC3357, section 6.4. 
+       
+       oneWayIpdv (27)
+           The identifier for the Type-P-One-way-ipdv metric. 
+           REFERENCE  RFC3393, section 2. 
+       
+       oneWayIpdvPoissonStream (28)
+           The identifier for the Type-P-One-way-ipdv-Poisson-stream 
+           metric. 
+           REFERENCE  RFC3393, section 3. 
+       
+       oneWayIpdvPercentile (29)
+         The identifier for the Type-P-One-way-ipdv-percentile metric. 
+           REFERENCE  RFC3393, section 4.3. 
+       
+       oneWayIpdvInversePercentile (30)
+           The identifier for the Type-P-One-way-ipdv-inverse-percentile
+           metric. 
+           REFERENCE  RFC3393, section 4.4. 
+       
+       oneWayIpdvJitter (31)
+           The identifier for the Type-P-One-way-ipdv-jitter metric. 
+           REFERENCE  RFC3393, section 4.5. 
+       
+       oneWayPeakToPeakIpdv (32)
+           The identifier for the Type-P-One-way-peak-to-peak-ipdv 
+           metric. 
+           REFERENCE  RFC3393, section 4.6. 
+       
+       oneWayDelayPeriodicStream (33)
+           The identifier for the Type-P-One-way-Delay-Periodic-Stream 
+           metric. 
+           REFERENCE  RFC3432, section 4. 
+
+       roundtripDelayAverage (34)
+           The identifier for the Type-P-Round-trip-Delay-Average 
+           metric. 
+
+       roundtripPacketLoss (35)
+           The identifier for the Type-P-Round-trip-Packet-Loss metric. 
+
+       roundtripPacketLossAverage (36)
+           The identifier for the Type-P-Round-trip-Packet-Loss-Average 
+           metric. 
+
+       roundtripIpdv (37)
+           The identifier for the Type-P-Round-trip-ipdv metric."  
+   SYNTAX BITS {
+     reserved (0),
+     instantUnidirectionConnectivity (1),
+     instantBidirectionConnectivity (2),
+     intervalUnidirectionConnectivity (3),
+     intervalBidirectionConnectivity (4),
+     intervalTemporalConnectivity (5),
+     oneWayDelay (6),
+     oneWayDelayPoissonStream (7),
+     oneWayDelayPercentile (8),
+     oneWayDelayMedian (9),
+     oneWayDelayMinimum (10),
+     oneWayDelayInversePercentile (11),
+     oneWayPacketLoss (12),
+     oneWayPacketLossPoissonStream (13),
+     oneWayPacketLossAverage (14),
+     roundtripDelay (15),
+     roundtripDelayPoissonStream (16),
+     roundtripDelayPercentile (17),
+     roundtripDelayMedian (18),
+     roundtripDelayMinimum (19),
+     roundtripDelayInversePercentile (20),
+     oneWayLossDistanceStream (21),
+     oneWayLossPeriodStream (22),
+     oneWayLossNoticeableRate (23),
+     oneWayLossPeriodTotal (24),
+     oneWayLossPeriodLengths (25),
+     oneWayInterLossPeriodLengths (26),
+     oneWayIpdv (27),
+     oneWayIpdvPoissonStream (28),
+     oneWayIpdvPercentile (29),
+     oneWayIpdvInversePercentile (30),
+     oneWayIpdvJitter (31),
+     oneWayPeakToPeakIpdv (32),
+     oneWayDelayPeriodicStream (33),
+     roundtripDelayAverage (34),
+     roundtripPacketLoss (35),
+     roundtripPacketLossAverage (36),
+     roundtripIpdv (37)
+   }
+ 
+GMTTimeStamp ::= TEXTUAL-CONVENTION 
+   STATUS       current 
+   DESCRIPTION 
+       "The value at which a specific occurrence happened. The specific 
+       occurrence must be defined in the description of any object 
+       defined using this type. 
+        
+       field  octets  contents                  range 
+       -----  ------  --------                  ----- 
+       1       1-4    second since 1 Jan 2000 0H00*    0..2^31 - 1 
+       2       5-8    fractional part of the second*   0..2^32 - 1 
+       * the value is in network-byte order 
+        
+       The timestamp format is directly inspired from the NTP timestamp 
+       format. 
+       It differs because it counts the second since 1 Jan 2000 0H00 
+       instead of 1 Jan 1900 0H00. The most significant bit of the part 
+       that represents the second is reserved. It will wrap in year 2068
+       (The NTP timestamp will wrap in year 2036).  
+        
+       This bit is set to indicate if the fractional part of the second 
+       contains a precision field and a synchronization field.  
+        
+       When this bit is not set the resolution is maximal. 
+        
+       The maximal resolution is close to 250 picoseconds.  
+        
+       The precision of the timestamp is provided in
+       etsysSrvcLvlSystemClockResolution." 
+   SYNTAX       OCTET STRING (SIZE (8)) 
+
+TypeP  ::= TEXTUAL-CONVENTION     
+   STATUS       current 
+   DESCRIPTION 
+       "This textual convention is a display string used to describe the
+       protocol encapsulation list of a packet, and is used as the value
+       of the SYNTAX clause for the type of the Src and Dst of a 
+       measure. The RFC2895 specifies a macro named PROTOCOL-IDENTIFIER 
+       for the definition of protocol identifiers, while its companion 
+       document, the RFC2896 defines a set of protocol identifiers. 
+        
+       TypeP is defined as a display string. It consists of a list of 
+       dot separated protocol names. Each protocol name has been 
+       previously defined using the macro PROTOCOL-IDENTIFIER of the RFC
+       2895. 
+        
+       Examples: 
+       The RFC2896 defines the protocol identifiers 'ether2', 'ip', 
+       'ipip4', 'udp', 'tcp', 'telnet'... 
+        
+       The TypeP of the source address corresponding to telnet is the 
+       string 'ip.tcp.telnet'. 
+        
+       The TypeP of the source address corresponding to UDP packets sent
+       in an IP tunnel is the string 'ip.ipip4.udp'. 
+        
+       Note:  
+       A performance measure is active, so generally a TypeP value does
+       not describe the link layer (i.e. ether2...). Valid Internet 
+       packets are sent from Src to Dst. Then the choice of the link 
+       layer relies on the Internet stack." 
+   SYNTAX       OCTET STRING (SIZE (0..512)) 
+ 
+TypePaddress ::= TEXTUAL-CONVENTION     
+   DISPLAY-HINT "255a" 
+   STATUS       current 
+   DESCRIPTION 
+       "This textual convention is a Display string used to describe the
+       parameters of the protocol encapsulation list of a packet, 
+       basically the address. 
+        
+       TypePaddress is defined as a display string. It consists in a 
+       list of space separated parameter list. Each parameter in the 
+       list corresponds to a parameter of a PROTOCOL-IDENTIFIER of the 
+       TypeP. 
+       Example: 
+       The TypeP 'ip.ipip4' has 2 parameters. A valid TypePaddress value
+       is '192.168.1.1 128.2.6.7'." 
+   SYNTAX       OCTET STRING (SIZE (0..512)) 
+ 
+
+-- -------------------------------------------------------------
+-- MIB Objects
+-- -------------------------------------------------------------
+
+etsysSrvcLvlConfigObjects OBJECT IDENTIFIER
+        ::= { etsysServiceLevelReportingMIB 1 }   
+ 
+etsysSrvcLvlSystem  OBJECT IDENTIFIER
+        ::= { etsysSrvcLvlConfigObjects 1 } 
+
+etsysSrvcLvlOwners  OBJECT IDENTIFIER
+        ::= { etsysSrvcLvlConfigObjects 2 } 
+
+etsysSrvcLvlHistory OBJECT IDENTIFIER
+        ::= { etsysSrvcLvlConfigObjects 3 } 
+
+etsysSrvcLvlMeasure OBJECT IDENTIFIER
+        ::= { etsysSrvcLvlConfigObjects 4 } 
+ 
+
+-- -------------------------------------------------------------
+-- etsysSrvcLvlSystem  Group 
+-- -------------------------------------------------------------
+
+etsysSrvcLvlSystemTime OBJECT-TYPE 
+   SYNTAX GMTTimeStamp 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "The current time of the system."
+   ::= { etsysSrvcLvlSystem  1 } 
+
+etsysSrvcLvlSystemClockResolution OBJECT-TYPE
+   SYNTAX     Integer32
+   UNITS      "picoseconds"
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+      "etsysSrvcLvlSystemClockResolution provides the precision of the 
+       clock used for the measures . The unit is the picosecond. For 
+       example, the clock on an old Unix host might advance only once 
+       every msec, and thus have a resolution of 1 msec. So its 
+       resolution is 1,000,000,000 picosecond and the value of 
+       etsysSrvcLvlSystemClockResolution is 1000000000."
+   ::= { etsysSrvcLvlSystem 2 }
+
+etsysSrvcLvlMetricTable OBJECT-TYPE 
+   SYNTAX     SEQUENCE OF EtsysSrvcLvlMetricEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "This table is mandatory. It describes the current 
+       implementation. Each defined metric must be described 
+       in the table.  
+       etsysSrvcLvlMetricTable content is read only." 
+   ::= { etsysSrvcLvlSystem 3 } 
+ 
+etsysSrvcLvlMetricEntry OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlMetricEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "An entry describes the static capabilities of a metric 
+       implementation." 
+   INDEX { etsysSrvcLvlMetricIndex } 
+   ::= { etsysSrvcLvlMetricTable 1 } 
+ 
+EtsysSrvcLvlMetricEntry ::= 
+SEQUENCE { 
+   etsysSrvcLvlMetricIndex           INTEGER, 
+   etsysSrvcLvlMetricCapabilities    INTEGER, 
+   etsysSrvcLvlMetricType            INTEGER, 
+   etsysSrvcLvlMetricUnit            INTEGER, 
+   etsysSrvcLvlMetricDescription     SnmpAdminString 
+} 
+ 
+etsysSrvcLvlMetricIndex OBJECT-TYPE 
+     SYNTAX      INTEGER {
+       instantUnidirectionConnectivity (1),
+       instantBidirectionConnectivity (2),
+       intervalUnidirectionConnectivity (3),
+       intervalBidirectionConnectivity (4),
+       intervalTemporalConnectivity (5),
+       oneWayDelay (6),
+       oneWayDelayPoissonStream (7),
+       oneWayDelayPercentile (8),
+       oneWayDelayMedian (9),
+       oneWayDelayMinimum (10),
+       oneWayDelayInversePercentile (11),
+       oneWayPacketLoss (12),
+       oneWayPacketLossPoissonStream (13),
+       oneWayPacketLossAverage (14),
+       roundtripDelay (15),
+       roundtripDelayPoissonStream (16),
+       roundtripDelayPercentile (17),
+       roundtripDelayMedian (18),
+       roundtripDelayMinimum (19),
+       roundtripDelayInversePercentile (20),
+       oneWayLossDistanceStream (21),
+       oneWayLossPeriodStream (22),
+       oneWayLossNoticeableRate (23),
+       oneWayLossPeriodTotal (24),
+       oneWayLossPeriodLengths (25),
+       oneWayInterLossPeriodLengths (26),
+       oneWayIpdv (27),
+       oneWayIpdvPoissonStream (28),
+       oneWayIpdvPercentile (29),
+       oneWayIpdvInversePercentile (30),
+       oneWayIpdvJitter (31),
+       oneWayPeakToPeakIpdv (32),
+       oneWayDelayPeriodicStream (33),
+       roundtripDelayAverage (34),
+       roundtripPacketLoss (35),
+       roundtripPacketLossAverage (36),
+       roundtripIpdv (37)
+     }
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "etsysSrvcLvlMetricIndex defines an unambiguous index for each 
+       standardized metric. It identifies a metric. Its value is 
+       defined above. This value is the same in any implementation
+       of the ENTERASYS-SERVICE-LEVEL-REPORTING-MIB. See
+       EtsysSrvcLvlStandardMetrics for description of the metrics.
+        
+       Example: 
+       onewayPacketLossAverage is defined as the 14.
+       Consequently the index of the metric onewayPacketLossAverage in 
+       the EtsysSrvcLvlMetricTable will always be '14'" 
+   ::= { etsysSrvcLvlMetricEntry 1 } 
+ 
+etsysSrvcLvlMetricCapabilities OBJECT-TYPE 
+   SYNTAX INTEGER { 
+   notImplemented(0), 
+   implemented(1) 
+   } 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "A value of notImplemented implies the metric is not implemented.
+       A value of implemented implies the metric is implemented."
+   DEFVAL { implemented } 
+   ::= { etsysSrvcLvlMetricEntry 2 } 
+ 
+etsysSrvcLvlMetricType OBJECT-TYPE 
+   SYNTAX INTEGER { 
+   network(0), 
+   aggregated(1) 
+   } 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "Indicates the metric type, whether it is network or aggregated" 
+   DEFVAL { aggregated } 
+   ::= { etsysSrvcLvlMetricEntry 3 } 
+ 
+etsysSrvcLvlMetricUnit OBJECT-TYPE 
+   SYNTAX INTEGER { 
+        noUnit(0), 
+        second(1), 
+        millisecond(2), 
+        microsecond(3), 
+        nanosecond(4), 
+        percentage(5), 
+        packet(6), 
+        byte(7), 
+        kilobyte(8), 
+        megabyte(9) 
+        } 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "The unit used in the current entity for the results of the 
+       measurement of this metric." 
+   ::= { etsysSrvcLvlMetricEntry 4 } 
+ 
+etsysSrvcLvlMetricDescription OBJECT-TYPE 
+   SYNTAX SnmpAdminString 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "A textual description of the metric implementation following 
+       the exact name of this metric in the registry. For example: 
+       oneWayDelay: text ." 
+   ::= { etsysSrvcLvlMetricEntry 5 } 
+ 
+
+-- -------------------------------------------------------------
+-- etsysSrvcLvlOwners Group 
+-- -------------------------------------------------------------
+
+-- 
+-- The etsysSrvcLvlOwners objects are responsible for managing 
+-- the owners access to the measurements. 
+--  
+
+etsysSrvcLvlOwnersTable OBJECT-TYPE 
+   SYNTAX     SEQUENCE OF EtsysSrvcLvlOwnersEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "A management entity wishing to create and activate remote 
+       EtsysSrvcLvl measurements in an agent must previously be 
+       registered in the etsysSrvcLvlOwnersTable.  
+       etsysSrvcLvlOwnersTable content is read-create. It contains at 
+       least the owner 'monitor'."
+   ::= { etsysSrvcLvlOwners 1 } 
+ 
+etsysSrvcLvlOwnersEntry OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlOwnersEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The description of the resources granted to an SNMP application.
+       For example, an instance of etsysSrvcLvlOwnersOwner with an 
+       EtsysSrvcLvlOwnerString 'acme', which represents the 14th owner 
+       created in etsysSrvcLvlOwnersTable would be named 
+       etsysSrvcLvlOwnersEntryOwner.14. 
+        
+       Notes: 
+        
+       The etsysSrvcLvlOwnersIndex value is a local index managed 
+       directly by the agent. The management application must poll to 
+       get the next available index value. 
+       It is not used in anyway in other tables." 
+   INDEX { etsysSrvcLvlOwnersIndex } 
+   ::= { etsysSrvcLvlOwnersTable 1 } 
+ 
+EtsysSrvcLvlOwnersEntry ::= SEQUENCE { 
+   etsysSrvcLvlOwnersIndex              Integer32, 
+   etsysSrvcLvlOwnersOwner              EtsysSrvcLvlOwnerString, 
+   etsysSrvcLvlOwnersGrantedMetrics     EtsysSrvcLvlStandardMetrics, 
+   etsysSrvcLvlOwnersQuota              Integer32, 
+   etsysSrvcLvlOwnersIpAddressType      InetAddressType, 
+   etsysSrvcLvlOwnersIpAddress          InetAddress, 
+   etsysSrvcLvlOwnersEmail              SnmpAdminString, 
+   etsysSrvcLvlOwnersSMS                SnmpAdminString, 
+   etsysSrvcLvlOwnersStatus             RowStatus 
+} 
+ 
+etsysSrvcLvlOwnersIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "An arbitrary index that identifies an entry in the owners 
+       table." 
+   ::= { etsysSrvcLvlOwnersEntry 1 } 
+ 
+etsysSrvcLvlOwnersOwner OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlOwnerString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The owner described by this entry." 
+   ::= { etsysSrvcLvlOwnersEntry 2 } 
+ 
+etsysSrvcLvlOwnersGrantedMetrics OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlStandardMetrics 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Defines the metrics granted to an owner for which measurements 
+       can be performed." 
+   ::= { etsysSrvcLvlOwnersEntry 3 } 
+
+etsysSrvcLvlOwnersQuota OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The maximum number of records that this owner may have in the 
+       history table."
+   ::= { etsysSrvcLvlOwnersEntry 4 } 
+ 
+etsysSrvcLvlOwnersIpAddressType OBJECT-TYPE 
+   SYNTAX     InetAddressType  
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The IP address type of the management entity corresponding to 
+       this owner. 
+       InetAddressType is restricted to ipv4(1),ipv6(2)and dns(16)." 
+   ::= { etsysSrvcLvlOwnersEntry 5 } 
+ 
+etsysSrvcLvlOwnersIpAddress OBJECT-TYPE 
+   SYNTAX     InetAddress  (SIZE  (1..128)) 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The IP address of the management entity corresponding to this 
+       owner." 
+   ::= { etsysSrvcLvlOwnersEntry 6 } 
+ 
+etsysSrvcLvlOwnersEmail OBJECT-TYPE 
+   SYNTAX     SnmpAdminString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The email address of the management entity corresponding to this
+       owner." 
+   ::= { etsysSrvcLvlOwnersEntry 7 } 
+ 
+etsysSrvcLvlOwnersSMS OBJECT-TYPE 
+   SYNTAX     SnmpAdminString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The SMS phone number of the management entity corresponding to 
+       this owner." 
+   ::= { etsysSrvcLvlOwnersEntry 8 } 
+
+etsysSrvcLvlOwnersStatus OBJECT-TYPE 
+   SYNTAX     RowStatus 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The status of this table entry." 
+   ::= { etsysSrvcLvlOwnersEntry 9 } 
+ 
+ 
+-- -------------------------------------------------------------
+-- etsysSrvcLvlHistory  Group 
+-- -------------------------------------------------------------
+ 
+-- -------------------------------------------------------------
+-- etsysSrvcLvlHistoryTable 
+-- -------------------------------------------------------------
+ 
+etsysSrvcLvlHistoryTable OBJECT-TYPE 
+   SYNTAX     SEQUENCE OF EtsysSrvcLvlHistoryEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The table containing the measurement results." 
+   ::= { etsysSrvcLvlHistory 1 } 
+ 
+   etsysSrvcLvlHistoryEntry OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlHistoryEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "An etsysSrvcLvlHistoryEntry entry is one of the results of a 
+       measure identified by etsysSrvcLvlHistoryMeasureOwner, 
+       etsysSrvcLvlHistoryMeasureIndex, etsysSrvcLvlHistoryMetricIndex 
+       and etsysSrvcLvlHistoryIndex.  
+        
+       In the index : 
+        
+       + etsysSrvcLvlHistoryMeasureOwner identifies the owner of the 
+       measure
+        
+       + etsysSrvcLvlHistoryMeasureIndex identifies the measure in the 
+       owner namespace 
+        
+       + etsysSrvcLvlHistoryMetricIndex identifies the metric measured 
+       by the measure. The metric is described in the corresponding 
+       entry of the n etsysSrvcLvlMetricTable 
+        
+       + etsysSrvcLvlHistoryIndex is the local index of the result on 
+       the history table." 
+
+   INDEX { etsysSrvcLvlHistoryMeasureOwner, 
+   etsysSrvcLvlHistoryMeasureIndex, etsysSrvcLvlHistoryMetricIndex, 
+   etsysSrvcLvlHistoryIndex }  
+   ::= { etsysSrvcLvlHistoryTable 1 } 
+ 
+EtsysSrvcLvlHistoryEntry ::= 
+   SEQUENCE { 
+       etsysSrvcLvlHistoryMeasureOwner      EtsysSrvcLvlOwnerString, 
+       etsysSrvcLvlHistoryMeasureIndex      Integer32, 
+       etsysSrvcLvlHistoryMetricIndex       Integer32, 
+       etsysSrvcLvlHistoryIndex             Integer32, 
+       etsysSrvcLvlHistorySequence          Integer32, 
+       etsysSrvcLvlHistoryTimestamp         GMTTimeStamp, 
+       etsysSrvcLvlHistoryValue             Integer32 
+   } 
+    
+etsysSrvcLvlHistoryMeasureOwner OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlOwnerString 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The owner of the measure that produced this result." 
+   ::= { etsysSrvcLvlHistoryEntry 1 } 
+    
+etsysSrvcLvlHistoryMeasureIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       " The index (in owner's namespace) of the measure that produced 
+       this result." 
+   ::= { etsysSrvcLvlHistoryEntry 2 } 
+ 
+etsysSrvcLvlHistoryMetricIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       " etsysSrvcLvlHistoryMetricIndex identifies the metric measured 
+       by the measure. The metric is described in the corresponding 
+       entry of the etsysSrvcLvlMetricTable." 
+   ::= { etsysSrvcLvlHistoryEntry 3 } 
+    
+etsysSrvcLvlHistoryIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       " A local index that identifies a result in the history table." 
+       ::= { etsysSrvcLvlHistoryEntry 4 } 
+
+etsysSrvcLvlHistorySequence OBJECT-TYPE 
+       SYNTAX Integer32 (0.. 65535) 
+       MAX-ACCESS read-only 
+       STATUS     current 
+       DESCRIPTION 
+       "etsysSrvcLvlHistorySequence is the sequence index of the 
+       measurement results for a metric. 
+        
+       Network metrics:  
+       It's the sequence index of a measurement packet. Typically, it 
+       identifies the order of the packet in the stream of packets sends
+       by the source. 
+        
+       Aggregated metrics: 
+       It is the sequence index of the computed aggregated metric 
+       result." 
+   ::= { etsysSrvcLvlHistoryEntry 5 } 
+ 
+etsysSrvcLvlHistoryTimestamp OBJECT-TYPE 
+   SYNTAX GMTTimeStamp 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "The timestamp when the measurement occurred." 
+   ::= { etsysSrvcLvlHistoryEntry 6 } 
+    
+etsysSrvcLvlHistoryValue OBJECT-TYPE 
+   SYNTAX Integer32 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "The observed value of the measurement." 
+   ::= { etsysSrvcLvlHistoryEntry 7 } 
+ 
+ 
+-- -------------------------------------------------------------
+-- etsysSrvcLvlMeasure Group 
+-- -------------------------------------------------------------
+ 
+-- -------------------------------------------------------------
+-- etsysSrvcLvlNetMeasureTable 
+-- -------------------------------------------------------------
+ 
+etsysSrvcLvlNetMeasureTable OBJECT-TYPE 
+   SYNTAX     SEQUENCE OF EtsysSrvcLvlNetMeasureEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "An entry is a measurement that performs network measures and 
+       provides results. 
+       It performs several metric measurements per packet exchange. Each
+       step of a measure produces a singleton result per metric. The 
+       time of the measurement and the value of the metric are saved in 
+       the etsysSrvcLvlHistoryTable." 
+   ::= { etsysSrvcLvlMeasure 1 } 
+ 
+etsysSrvcLvlNetMeasureEntry OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlNetMeasureEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The EtsysSrvcLvlNetMeasureTable is mandatory. 
+        
+       The etsysSrvcLvlNetMeasureMetrics is set to a list of metrics 
+       to be computed from the same raw packet exchange. Each step of 
+       measurement delivers a singleton per chosen metric. Results are 
+       timestamped and saved in the etsysSrvcLvlHistoryTable. 
+        
+       The etsysSrvcLvlNetMeasureTable typical usage consists in 
+       providing network measure indices in order  to allow aggregated 
+       measures to perform aggregation on the results of network 
+       measures."
+   INDEX { etsysSrvcLvlNetMeasureOwner, etsysSrvcLvlNetMeasureIndex } 
+   ::= { etsysSrvcLvlNetMeasureTable 1 } 
+ 
+EtsysSrvcLvlNetMeasureEntry ::= SEQUENCE { 
+   etsysSrvcLvlNetMeasureOwner              EtsysSrvcLvlOwnerString, 
+   etsysSrvcLvlNetMeasureIndex              Integer32, 
+   etsysSrvcLvlNetMeasureName               SnmpAdminString, 
+   etsysSrvcLvlNetMeasureMetrics            EtsysSrvcLvlStandardMetrics,
+   etsysSrvcLvlNetMeasureBeginTime          GMTTimeStamp, 
+   etsysSrvcLvlNetMeasureDurationUnit       TimeUnit, 
+   etsysSrvcLvlNetMeasureDuration           Integer32, 
+   etsysSrvcLvlNetMeasureHistorySize        Integer32, 
+   etsysSrvcLvlNetMeasureFailureMgmtMode    INTEGER, 
+   etsysSrvcLvlNetMeasureResultsMgmt        INTEGER, 
+   etsysSrvcLvlNetMeasureSrcTypeP           TypeP, 
+   etsysSrvcLvlNetMeasureSrc                TypePaddress, 
+   etsysSrvcLvlNetMeasureDstTypeP           TypeP, 
+   etsysSrvcLvlNetMeasureDst                TypePaddress, 
+   etsysSrvcLvlNetMeasureTxMode             INTEGER, 
+   etsysSrvcLvlNetMeasureTxPacketRateUnit   TimeUnit, 
+   etsysSrvcLvlNetMeasureTxPacketRate       Integer32, 
+   etsysSrvcLvlNetMeasureDevtnOrBurstSize   Integer32,   
+   etsysSrvcLvlNetMeasureMedOrIntBurstSize  Integer32, 
+   etsysSrvcLvlNetMeasureLossTimeout        Integer32, 
+   etsysSrvcLvlNetMeasureL3PacketSize       Integer32, 
+   etsysSrvcLvlNetMeasureDataPattern        OCTET STRING, 
+   etsysSrvcLvlNetMeasureMap                SnmpAdminString, 
+   etsysSrvcLvlNetMeasureSingletons         Integer32, 
+   etsysSrvcLvlNetMeasureOperState          INTEGER 
+} 
+ 
+etsysSrvcLvlNetMeasureOwner OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlOwnerString 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The owner of the network measurement." 
+   ::= { etsysSrvcLvlNetMeasureEntry 1 } 
+    
+etsysSrvcLvlNetMeasureIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The index (in owner's namespace) of the network measure. " 
+   ::= { etsysSrvcLvlNetMeasureEntry 2 } 
+ 
+etsysSrvcLvlNetMeasureName OBJECT-TYPE 
+   SYNTAX SnmpAdminString 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "The name of the metric instance. It illustrates the specificity 
+       of the metric and includes the metric and the TypeP. 
+    
+       Example:  
+       IP-TCP-HTTP-One-way-Delay: free text " 
+   ::= { etsysSrvcLvlNetMeasureEntry 3 } 
+
+etsysSrvcLvlNetMeasureMetrics OBJECT-TYPE 
+   SYNTAX EtsysSrvcLvlStandardMetrics 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Defines the metrics to compute within this measure. ONLY network 
+       metrics of the same type are allowed in this field. 
+       A measure may be configured for the result of different metric 
+       singletons to be archived in the etsysSrvcLvlHistoryTable. The 
+       etsysSrvcLvlMetricIndex of the created result has the value of 
+       the bit index of the corresponding etsysSrvcLvlMeasureMetrics as 
+       explained above in the etsysSrvcLvlMetricIndex definition. 
+      
+       Example: 
+       A measure asking for One-way-Delay(6) and One-way-Packet-Loss(12) 
+       generated a flow of singletons which are logged in the 
+       etsysSrvcLvlHistoryTable. The singletons created for the 
+       One-way-Delay measure have a value of etsysSrvcLvlMetricIndex of 
+       6 while the created singletons for the One-way-Packet-Loss 
+       measure have a value of etsysSrvcLvlMetricIndex of 12. 
+      
+       One measure may perform simultaneously  
+              either several network metrics 
+              either several aggregated metrics" 
+   -- { one-way-Delay, one-way-Packet-Loss } 
+   ::= { etsysSrvcLvlNetMeasureEntry 4 } 
+ 
+etsysSrvcLvlNetMeasureBeginTime OBJECT-TYPE
+   SYNTAX GMTTimeStamp
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+       "Specifies the time at which the measurement begins."
+   ::= { etsysSrvcLvlNetMeasureEntry 5 }
+ 
+etsysSrvcLvlNetMeasureDurationUnit OBJECT-TYPE 
+   SYNTAX TimeUnit  
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the measurement duration unit." 
+   DEFVAL { second } 
+   ::= { etsysSrvcLvlNetMeasureEntry 6 } 
+ 
+etsysSrvcLvlNetMeasureDuration OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the measurement duration." 
+   ::= { etsysSrvcLvlNetMeasureEntry 7 } 
+ 
+etsysSrvcLvlNetMeasureHistorySize OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the maximum number of results saved for each metric of 
+       this measure. 
+       Overflow condition will be managed by the object 
+       etsysSrvcLvlNetMeasureResultsMgmt." 
+   ::= { etsysSrvcLvlNetMeasureEntry 8 } 
+ 
+etsysSrvcLvlNetMeasureFailureMgmtMode OBJECT-TYPE 
+   SYNTAX     INTEGER { 
+       auto(1), 
+       manual(2), 
+       discarded(3) 
+   } 
+   MAX-ACCESS  read-write
+   STATUS      current 
+   DESCRIPTION 
+       "This object defines whether this row is discarded on failure.
+       'auto'  
+          the failure is handled automatically depending on the 
+          implementation.
+       'manual'  
+          the entry should be discarded manually.
+       'discarded'  
+          the entry is discarded all the time." 
+   DEFVAL { auto } 
+   ::= { etsysSrvcLvlNetMeasureEntry 9 } 
+ 
+etsysSrvcLvlNetMeasureResultsMgmt OBJECT-TYPE 
+   SYNTAX INTEGER { 
+       wrap(1), 
+       suspend(2), 
+       delete(3) 
+   } 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       " 
+       Action to take when the log is full. The user may choose 
+       to either wrap, in which case the agent writes over existing 
+       records. The user may choose to suspend writing to the log in the 
+       event that he wishes to archive the data. The delete action 
+       causes the agent to begin to write in the log, and assumes the 
+       data has been cleared. 
+       This object indicates the way the measurement results are managed 
+       when the owner quota has been exceeded: 
+       'wrap'  
+          continue the measurement and erase the older entries in the 
+       history. 
+       'suspend'  
+          stop the measure and keep the results in the history. 
+       'delete' 
+          remove the results from the history." 
+   ::= { etsysSrvcLvlNetMeasureEntry 10 } 
+    
+etsysSrvcLvlNetMeasureSrcTypeP OBJECT-TYPE 
+   SYNTAX TypeP 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Defines the type P of the source address of the packets sent by 
+       the measure." 
+   DEFVAL { "ip" }  
+   ::= { etsysSrvcLvlNetMeasureEntry 11 } 
+ 
+etsysSrvcLvlNetMeasureSrc OBJECT-TYPE 
+   SYNTAX TypePaddress 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the address of the source of the measure. 
+       It is represented as a list of parameters corresponding to those 
+       of the PROTOCOL IDENTIFIER sets in 
+       etsysSrvcLvlNetMeasureSrcTypeP." 
+   ::= { etsysSrvcLvlNetMeasureEntry 12} 
+ 
+etsysSrvcLvlNetMeasureDstTypeP OBJECT-TYPE 
+   SYNTAX TypeP 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Defines the type P of the destination address of the packets 
+       sent by the measure." 
+   DEFVAL { "ip" }  
+   ::= { etsysSrvcLvlNetMeasureEntry 13 } 
+ 
+etsysSrvcLvlNetMeasureDst OBJECT-TYPE 
+   SYNTAX TypePaddress 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the address of the destination of the measure. 
+       It is represented as a list of parameters corresponding to those 
+       of the PROTOCOL IDENTIFIER set in 
+       etsysSrvcLvlNetMeasureDstTypeP." 
+   ::= { etsysSrvcLvlNetMeasureEntry 14 } 
+ 
+etsysSrvcLvlNetMeasureTxMode OBJECT-TYPE 
+   SYNTAX INTEGER { 
+       other(0), 
+       periodic(1), 
+       poisson(2), 
+       multiburst(3) 
+          } 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "The transmit mode used to send the packets: 
+       'other'  
+          The rule used to send the packets is unknown. 
+       'periodic'  
+          Packets are sent periodically at 
+          etsysSrvcLvlNetMeasureTxPacketRate rate.  
+       'poisson'  
+          Packets are sent using a Poisson law, the median is the value 
+       of etsysSrvcLvlNetMeasureMedOrIntBurstSize, the deviation is 
+       etsysSrvcLvlNetMeasureDevtnOrBurstSize.  
+       'multiburst'  
+          Packets are sent bursty at etsysSrvcLvlNetMeasureTxPacketRate.
+          The size of the burst is made of 
+          etsysSrvcLvlNetMeasureDevtnOrBurstSize packets." 
+   ::= { etsysSrvcLvlNetMeasureEntry 15 } 
+    
+etsysSrvcLvlNetMeasureTxPacketRateUnit      OBJECT-TYPE 
+   SYNTAX TimeUnit 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "The packet rate unit used to send the packets." 
+   ::= { etsysSrvcLvlNetMeasureEntry 16 } 
+    
+etsysSrvcLvlNetMeasureTxPacketRate OBJECT-TYPE 
+   SYNTAX Integer32  
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "The rate the packets are sent." 
+   ::= { etsysSrvcLvlNetMeasureEntry 17 } 
+ 
+etsysSrvcLvlNetMeasureDevtnOrBurstSize   OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Indicates the average number of packets per seconds sent using a 
+       poisson law." 
+   ::= { etsysSrvcLvlNetMeasureEntry 18 } 
+    
+etsysSrvcLvlNetMeasureMedOrIntBurstSize   OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "According to the transmit mode, this value indicates the average 
+       number of packets per seconds sent using a poisson law, or the 
+       number of packets to wait between consecutive bursts." 
+   ::= { etsysSrvcLvlNetMeasureEntry 19 } 
+ 
+etsysSrvcLvlNetMeasureLossTimeout OBJECT-TYPE 
+   SYNTAX     Integer32
+   UNITS      "Milliseconds" 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the delay after which the packet is considered lost
+        by the sink." 
+   ::= { etsysSrvcLvlNetMeasureEntry 20 } 
+ 
+etsysSrvcLvlNetMeasureL3PacketSize OBJECT-TYPE 
+   SYNTAX     Integer32
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the size of the packets counted at the IP network 
+       layer in regards to the TypeP definition. 
+        
+       Example: For a TypeP 'ip ipip4' the L3 size will be the size of 
+       the packet at ipip4 level." 
+   ::= { etsysSrvcLvlNetMeasureEntry 21 }        
+ 
+etsysSrvcLvlNetMeasureDataPattern OBJECT-TYPE 
+   SYNTAX     OCTET STRING 
+   MAX-ACCESS read-write 
+   STATUS     current 
+   DESCRIPTION 
+       "The pattern used to fill the payload of the packet." 
+   ::= { etsysSrvcLvlNetMeasureEntry 22 }        
+    
+etsysSrvcLvlNetMeasureMap OBJECT-TYPE 
+   SYNTAX SnmpAdminString 
+   MAX-ACCESS read-write
+   STATUS     current 
+   DESCRIPTION 
+       "An administrative name of a network management map to which
+       the measure belongs." 
+   DEFVAL { "" } 
+   ::= { etsysSrvcLvlNetMeasureEntry 23 } 
+ 
+etsysSrvcLvlNetMeasureSingletons  OBJECT-TYPE 
+   SYNTAX Integer32 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "Reports the number of singletons performed per metric by the 
+       measure since the beginning of the measure. This parameters is 
+       required for aggregation." 
+   ::= { etsysSrvcLvlNetMeasureEntry 24 } 
+ 
+etsysSrvcLvlNetMeasureOperState OBJECT-TYPE 
+   SYNTAX INTEGER { 
+       unknown(0), 
+       running(1), 
+       stopped(2) 
+   } 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "Reports the operational status of the network measure."
+   ::= { etsysSrvcLvlNetMeasureEntry 25 } 
+ 
+ 
+-- -------------------------------------------------------------
+-- etsysSrvcLvlAggrMeasureTable 
+-- -------------------------------------------------------------
+ 
+etsysSrvcLvlAggrMeasureTable OBJECT-TYPE 
+   SYNTAX     SEQUENCE OF EtsysSrvcLvlAggrMeasureEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       " An aggregated measure summarizes the results of previous 
+       network or aggregated measures. The results may be saved in the 
+       etsysSrvcLvlHistoryTable. 
+       Each step of the calculation for the measure produces a singleton 
+       result per metric." 
+   ::= { etsysSrvcLvlMeasure 2 } 
+ 
+etsysSrvcLvlAggrMeasureEntry OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlAggrMeasureEntry 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "Typically the configuration operation sets the value of 
+       the EtsysSrvcLvlAggrMeasureEntry.  
+        
+       etsysSrvcLvlAggrMeasureTable is mandatory. 
+        
+        
+       The etsysSrvcLvlAggrMeasureMetrics defines the metric to compute. 
+       The results of the measure to summarize are identified by:  
+       + etsysSrvcLvlAggrMeasureHistoryOwner,  
+       + etsysSrvcLvlAggrMeasureHistoryOwnerIndex and  
+       + etsysSrvcLvlAggrMeasureHistoryMetric 
+        
+       The aggregated task starts at etsysSrvcLvlAggrMeasureBeginTime 
+       and ends after etsysSrvcLvlAggrMeasureDuration. An aggregated 
+       result is performed and saved in the etsysSrvcLvlHistoryTable 
+       for each etsysSrvcLvlAggrMeasureAggrPeriod." 
+   INDEX { etsysSrvcLvlAggrMeasureOwner, etsysSrvcLvlAggrMeasureIndex } 
+   ::= { etsysSrvcLvlAggrMeasureTable 1 } 
+ 
+EtsysSrvcLvlAggrMeasureEntry ::= SEQUENCE { 
+   etsysSrvcLvlAggrMeasureOwner             EtsysSrvcLvlOwnerString, 
+   etsysSrvcLvlAggrMeasureIndex             Integer32, 
+   etsysSrvcLvlAggrMeasureName              SnmpAdminString, 
+   etsysSrvcLvlAggrMeasureMetrics           EtsysSrvcLvlStandardMetrics,
+   etsysSrvcLvlAggrMeasureBeginTime         GMTTimeStamp, 
+   etsysSrvcLvlAggrMeasureAggrPeriodUnit    TimeUnit, 
+   etsysSrvcLvlAggrMeasureAggrPeriod        Integer32, 
+   etsysSrvcLvlAggrMeasureDurationUnit      TimeUnit, 
+   etsysSrvcLvlAggrMeasureDuration          Integer32, 
+   etsysSrvcLvlAggrMeasureHistorySize       Integer32, 
+   etsysSrvcLvlAggrMeasureStorageType       StorageType, 
+   etsysSrvcLvlAggrMeasureHistoryOwner      EtsysSrvcLvlOwnerString, 
+   etsysSrvcLvlAggrMeasureHistoryOwnerIndex Integer32, 
+   etsysSrvcLvlAggrMeasureHistoryMetric     Integer32, 
+   etsysSrvcLvlAggrMeasureAdminState        INTEGER, 
+   etsysSrvcLvlAggrMeasureMap               SnmpAdminString, 
+   etsysSrvcLvlAggrMeasureResultsMgmt       INTEGER, 
+   etsysSrvcLvlAggrMeasureStatus            RowStatus 
+} 
+etsysSrvcLvlAggrMeasureOwner OBJECT-TYPE 
+   SYNTAX     EtsysSrvcLvlOwnerString 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The owner who has configured this entry." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 1 } 
+    
+etsysSrvcLvlAggrMeasureIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS not-accessible 
+   STATUS     current 
+   DESCRIPTION 
+       "The index (in owner's namespace) of the measure. The value is 
+       managed by the owner." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 2 } 
+ 
+etsysSrvcLvlAggrMeasureName OBJECT-TYPE 
+   SYNTAX SnmpAdminString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The name of the instance of the metric. It illustrates the 
+       specificity of the metric and includes the metric and the typeP. 
+        
+       example: IP-port-HTTP-connectivity" 
+   ::= { etsysSrvcLvlAggrMeasureEntry 3 } 
+ 
+etsysSrvcLvlAggrMeasureMetrics OBJECT-TYPE 
+   SYNTAX EtsysSrvcLvlStandardMetrics 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Defines the metrics to compute within this aggregated measure.  
+        
+       ONLY aggregated metrics of the same type are allowed in this 
+       field. 
+        A measure may be configured for the result of different metric 
+       singletons to be archived in the etsysSrvcLvlHistoryTable. The 
+       etsysSrvcLvlMetricIndex of the created result has the value of 
+       the bit index of the corresponding etsysSrvcLvlAggrMeasureMetrics
+       as explained above in the etsysSrvcLvlMetricIndex definition. 
+        
+       Example: 
+       A measure asking for One-way-Delay(6) and One-way-Packet-Loss(12) 
+       generated a flow of singletons which are logged in the 
+       etsysSrvcLvlHistoryTable. The singletons created for the 
+       One-way-Delay measure have a value of etsysSrvcLvlMetricIndex of 
+       6 while the created singletons for the One-way-Packet-Loss 
+       measure have a value of etsysSrvcLvlMetricIndex of 12."  
+   ::= { etsysSrvcLvlAggrMeasureEntry 4 } 
+ 
+etsysSrvcLvlAggrMeasureBeginTime OBJECT-TYPE 
+   SYNTAX GMTTimeStamp 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the time at which the aggregated measure starts." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 5 } 
+    
+etsysSrvcLvlAggrMeasureAggrPeriodUnit OBJECT-TYPE 
+   SYNTAX TimeUnit 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the unit of the aggregated measure period." 
+   DEFVAL { second } 
+   ::= { etsysSrvcLvlAggrMeasureEntry 6 } 
+ 
+etsysSrvcLvlAggrMeasureAggrPeriod OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the amount of time between 2 measurement action 
+       intervals. The action is specific to the semantic of the measure. 
+                
+       They are performed periodically on a sequence of results of other
+       measures. The period corresponds to the interval between two 
+       successive computations of the metric. The value of 
+       etsysSrvcLvlHistoryTimestamp result of a aggregated metric 
+       computed corresponds to the value of the 
+       etsysSrvcLvlHistoryTimestamp of the last metric result of the 
+       sequence used in to compute the aggregated metric." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 7 } 
+ 
+etsysSrvcLvlAggrMeasureDurationUnit OBJECT-TYPE 
+   SYNTAX TimeUnit 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the unit of the measure duration." 
+   DEFVAL { second } 
+   ::= { etsysSrvcLvlAggrMeasureEntry 8 } 
+ 
+etsysSrvcLvlAggrMeasureDuration OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the duration of the measure." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 9 } 
+ 
+etsysSrvcLvlAggrMeasureHistorySize OBJECT-TYPE 
+   SYNTAX     Integer32 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "Specifies the maximum number of results saved for each metric of 
+       this measure. Overflow condition will be managed by the object 
+       etsysSrvcLvlAggrMeasureResultsMgmt. " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 10 } 
+ 
+etsysSrvcLvlAggrMeasureStorageType OBJECT-TYPE 
+   SYNTAX     StorageType 
+   MAX-ACCESS  read-create 
+   STATUS      current 
+   DESCRIPTION 
+       "This object defines whether this row and the corresponding 
+       entry in the etsysSrvcLvlNetMeasureTable is kept in volatile 
+       storage and lost upon reboot or if this row is backed up 
+       by non-volatile or permanent storage. 
+       Possible values are: other(1), volatile(2), nonVolatile(3), 
+       permanent(4), readOnly(5)." 
+   DEFVAL { volatile } 
+   ::= { etsysSrvcLvlAggrMeasureEntry 11 } 
+    
+etsysSrvcLvlAggrMeasureResultsMgmt OBJECT-TYPE 
+   SYNTAX INTEGER { 
+       wrap(1), 
+       suspend(2) 
+   } 
+   MAX-ACCESS read-only 
+   STATUS     current 
+   DESCRIPTION 
+       "This object displays the way the history of the aggregated 
+       measure is managed. 
+       'wrap'  
+          continue the measure and erase the older entries in the 
+       history. 
+       'suspend'  
+          stop the measure and keep the results in the history. 
+       " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 12 } 
+ 
+etsysSrvcLvlAggrMeasureHistoryOwner OBJECT-TYPE 
+   SYNTAX EtsysSrvcLvlOwnerString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The owner of the measure to summarize. " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 13 } 
+ 
+etsysSrvcLvlAggrMeasureHistoryOwnerIndex OBJECT-TYPE 
+   SYNTAX Integer32 (1.. 65535) 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The index (in owner's namespace) of the measure to summarize. " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 14 } 
+ 
+etsysSrvcLvlAggrMeasureHistoryMetric OBJECT-TYPE 
+   SYNTAX Integer32 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The metric of the measure to summarize. " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 15 } 
+ 
+etsysSrvcLvlAggrMeasureAdminState OBJECT-TYPE 
+   SYNTAX INTEGER { 
+       start(0), 
+       stop(1) 
+   } 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "This object controls the activity of the aggregated measure. 
+       'start'  
+          The aggregated measure is started. 
+       'stop'  
+          The aggregated measure is stopped. 
+       " 
+   ::= { etsysSrvcLvlAggrMeasureEntry 16 } 
+    
+etsysSrvcLvlAggrMeasureMap OBJECT-TYPE 
+   SYNTAX SnmpAdminString 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "This object allows for classification of the measure. It is 
+       typically the name of an administrative map. 
+       " 
+   DEFVAL { "" } 
+   ::= { etsysSrvcLvlAggrMeasureEntry 17 } 
+
+etsysSrvcLvlAggrMeasureStatus OBJECT-TYPE 
+   SYNTAX     RowStatus 
+   MAX-ACCESS read-create 
+   STATUS     current 
+   DESCRIPTION 
+       "The status of this table entry. Once the entry status is set to 
+       active, the associate entry cannot be modified. 
+        
+       The creation of an aggregated measure forced the creation of the 
+       corresponding entry in etsysSrvcLvlNetMeasureTable." 
+   ::= { etsysSrvcLvlAggrMeasureEntry 18 } 
+    
+ 
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+etsysSrvcLvlReportingConformance    OBJECT IDENTIFIER 
+    ::= { etsysServiceLevelReportingMIB 2 }
+
+etsysSrvcLvlReportingGroups         OBJECT IDENTIFIER
+    ::= { etsysSrvcLvlReportingConformance 1 }
+
+etsysSrvcLvlReportingCompliances    OBJECT IDENTIFIER
+    ::= { etsysSrvcLvlReportingConformance 2 }
+
+
+-- -------------------------------------------------------------
+-- Units of Conformance
+-- -------------------------------------------------------------
+
+etsysSrvcLvlSystemGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysSrvcLvlSystemTime,
+        etsysSrvcLvlSystemClockResolution,
+        etsysSrvcLvlMetricCapabilities,
+        etsysSrvcLvlMetricType,
+        etsysSrvcLvlMetricUnit,
+        etsysSrvcLvlMetricDescription
+    }
+    STATUS current
+    DESCRIPTION
+        "The System Group."
+    ::= { etsysSrvcLvlReportingGroups 1 }
+
+etsysSrvcLvlOwnersGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysSrvcLvlOwnersOwner,
+        etsysSrvcLvlOwnersGrantedMetrics,
+        etsysSrvcLvlOwnersQuota,
+        etsysSrvcLvlOwnersIpAddressType,
+        etsysSrvcLvlOwnersIpAddress,
+        etsysSrvcLvlOwnersEmail,
+        etsysSrvcLvlOwnersSMS,
+        etsysSrvcLvlOwnersStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Owners Group."
+    ::= { etsysSrvcLvlReportingGroups 2 }
+
+etsysSrvcLvlHistoryGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysSrvcLvlHistorySequence,
+        etsysSrvcLvlHistoryTimestamp,
+        etsysSrvcLvlHistoryValue
+    }
+    STATUS current
+    DESCRIPTION
+        "The History Group."
+    ::= { etsysSrvcLvlReportingGroups 3 }
+
+etsysSrvcLvlMeasureGroup OBJECT-GROUP
+    OBJECTS { 
+        etsysSrvcLvlNetMeasureName,
+        etsysSrvcLvlNetMeasureMetrics,
+        etsysSrvcLvlNetMeasureBeginTime,
+        etsysSrvcLvlNetMeasureDurationUnit,
+        etsysSrvcLvlNetMeasureDuration,
+        etsysSrvcLvlNetMeasureHistorySize,
+        etsysSrvcLvlNetMeasureFailureMgmtMode,
+        etsysSrvcLvlNetMeasureResultsMgmt,
+        etsysSrvcLvlNetMeasureSrcTypeP,
+        etsysSrvcLvlNetMeasureSrc,
+        etsysSrvcLvlNetMeasureDstTypeP,
+        etsysSrvcLvlNetMeasureDst,
+        etsysSrvcLvlNetMeasureTxMode,
+        etsysSrvcLvlNetMeasureTxPacketRateUnit,
+        etsysSrvcLvlNetMeasureTxPacketRate,
+        etsysSrvcLvlNetMeasureDevtnOrBurstSize,
+        etsysSrvcLvlNetMeasureMedOrIntBurstSize,
+        etsysSrvcLvlNetMeasureLossTimeout,
+        etsysSrvcLvlNetMeasureL3PacketSize,
+        etsysSrvcLvlNetMeasureDataPattern,
+        etsysSrvcLvlNetMeasureMap,
+        etsysSrvcLvlNetMeasureSingletons,
+        etsysSrvcLvlNetMeasureOperState,
+        etsysSrvcLvlAggrMeasureName,
+        etsysSrvcLvlAggrMeasureMetrics,
+        etsysSrvcLvlAggrMeasureBeginTime,
+        etsysSrvcLvlAggrMeasureAggrPeriodUnit,
+        etsysSrvcLvlAggrMeasureAggrPeriod,
+        etsysSrvcLvlAggrMeasureDurationUnit,
+        etsysSrvcLvlAggrMeasureDuration,
+        etsysSrvcLvlAggrMeasureHistorySize,
+        etsysSrvcLvlAggrMeasureStorageType,
+        etsysSrvcLvlAggrMeasureResultsMgmt,
+        etsysSrvcLvlAggrMeasureHistoryOwner,
+        etsysSrvcLvlAggrMeasureHistoryOwnerIndex,
+        etsysSrvcLvlAggrMeasureHistoryMetric,
+        etsysSrvcLvlAggrMeasureAdminState,
+        etsysSrvcLvlAggrMeasureMap,
+        etsysSrvcLvlAggrMeasureStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The Network and Aggregate Measures Group."
+    ::= { etsysSrvcLvlReportingGroups 4 }
+
+
+-- -------------------------------------------------------------
+-- Compliance statements
+-- -------------------------------------------------------------
+
+etsysSrvcLvlReportingCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         etsysSrvcLvlReportingMib."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS { etsysSrvcLvlSystemGroup,
+                           etsysSrvcLvlOwnersGroup,
+                           etsysSrvcLvlHistoryGroup,
+                           etsysSrvcLvlMeasureGroup }
+
+
+    ::= { etsysSrvcLvlReportingCompliances 1 }
+ 
+END 

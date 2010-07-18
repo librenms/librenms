@@ -1,0 +1,1336 @@
+DOT5-PHYS-MIB DEFINITIONS ::= BEGIN
+
+        --  dot5-phys-mib.txt
+        --  Revision: 1.02.00
+        --  Part Number:  2170990
+        --  Date: August 14, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific physical chassis management MIB
+        --  for Token Ring devices.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright (c)1995 Cabletron Systems
+
+--
+IMPORTS
+        TimeTicks, Counter
+                FROM RFC1155-SMI
+        ctDot5PhysMgmt
+                FROM CTRON-MIB-NAMES
+        DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212;
+
+-- Textual convention
+
+-- DisplayString ::= OCTET STRING
+
+
+-- This is a listing of the different chassis physical management nodes--
+
+dot5PhysMgmtRev1                OBJECT IDENTIFIER ::= { ctDot5PhysMgmt 1 }
+  dot5PhysMgmtDevice            OBJECT IDENTIFIER ::= { dot5PhysMgmtRev1 1 }
+  dot5PhysMgmtBoard             OBJECT IDENTIFIER ::= { dot5PhysMgmtRev1 2 }
+  dot5PhysMgmtPort              OBJECT IDENTIFIER ::= { dot5PhysMgmtRev1 3 }
+    dot5PhysMgmtPortCommon      OBJECT IDENTIFIER ::= { dot5PhysMgmtPort 1 }
+    dot5PhysMgmtPortStn         OBJECT IDENTIFIER ::= { dot5PhysMgmtPort 2 }
+    dot5PhysMgmtPortRing        OBJECT IDENTIFIER ::= { dot5PhysMgmtPort 3 }
+    dot5PhysMgmtPortSwitch      OBJECT IDENTIFIER ::= { dot5PhysMgmtPort 4 }
+  dot5PhysMgmtRingSpeedTables   OBJECT IDENTIFIER ::= { dot5PhysMgmtRev1 4 }
+    
+--
+-- ============================================================
+--
+--  A "Token Ring Device" is an intelligent, manageable device
+--  providing at least one token ring interface and hosting an 
+--  SNMP agent addressed via an assignable network address.
+--
+--  The term "manage", and all of its derived forms, are used
+--  to describe the ability of a device to alter the state of
+--  a MIM board and/or the ports residing on a MIM board.
+--
+--  In the managed object descriptions that follow there may be 
+--  references to a board or a port falling within the domain of 
+--  a device.  A device's domain is governed by a set of rules
+--  used to determine whether a MIM board may be managed by a
+--  given device.  FNB connectivity, MIM board media type, and
+--  the availability of alternate MIM board managers are all
+--  used to ascertain whether a given device may manage a given
+--  MIM board.
+--
+--  Write Requests:
+--  Should a MIM board lie within the domain of a managing device, 
+--  that device will be able to administer the write requests for
+--  a given managed object to the respective MIM board and that 
+--  MIM board's ports.  If the MIM board lies outside the domain 
+--  of a managing device, all write requests will fail.
+--
+--  Read Requests:
+--  Should a MIM board lie within the domain of a managing device, 
+--  that device will be able to administer the read requests for
+--  a given managed object to the respective MIM board and that 
+--  MIM board's ports.  If the MIM board lies outside the domain 
+--  of a managing device, some read requests will be honored while
+--  others won't.  Those that won't are clearly defined within
+--  the descriptions of the managed objects themselves.
+--
+-- ============================================================
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for Token Ring Devices
+--
+-- ============================================================
+--
+-- Implementation of this group of objects is mandatory.
+--
+-- ============================================================
+
+dot5PhysMgmtDeviceRingCount             OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns the total number of rings passing through the chassis
+     of which the token ring device is aware.  All of these rings
+     may or may not be administratively or statistically manageable."
+ ::= { dot5PhysMgmtDevice 1 }
+
+dot5PhysMgmtDevicePortCount  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of token ring ports contained within
+     the chassis in which the managing device resides.  This count
+     does not include unpopulated TPIM slots, nor does it include
+     ports residing on MIM boards outside of the domain of the
+     managing device."
+::= { dot5PhysMgmtDevice 2 }
+
+dot5PhysMgmtDevicePortsEnable    OBJECT-TYPE
+SYNTAX      INTEGER {
+            noEnable(1),
+            enable(2)
+            }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token ring 
+     ports residing within the domain of this device to be enabled.  
+     Setting this object to noEnable will have no effect.  When 
+     read this object will always return noEnable."
+ ::= { dot5PhysMgmtDevice 3 }
+
+dot5PhysMgmtDevicePortsOn    OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of administratively enabled token ring
+     ports contained within the chassis in which the managing device
+     resides.  This count does not include ports residing on MIM
+     boards outside of the domain of the managing device."
+::= { dot5PhysMgmtDevice 4}
+
+dot5PhysMgmtDevicePortsOper  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of operational token ring ports
+     contained within the chassis in which the managing device
+     resides. This count does not include ports residing on MIM
+     boards outside of the domain of the managing device."
+::= { dot5PhysMgmtDevice 5 }
+
+dot5PhysMgmtDeviceStnPortCount          OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of token ring station ports contained
+     within the chassis in which the managing device resides. This
+     count does not include ports residing on MIM boards outside of
+     the domain of the managing device."
+::= { dot5PhysMgmtDevice 6 }
+
+dot5PhysMgmtDeviceStnPortsEnable        OBJECT-TYPE
+SYNTAX     INTEGER {
+           noEnable(1),
+           enable(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token 
+     ring station ports residing within the domain of this 
+     device to be enabled.  Setting this object to noEnable 
+     will have no effect.  When read this object will always 
+     return noEnable."
+ ::= { dot5PhysMgmtDevice 7 }
+
+dot5PhysMgmtDeviceStnPortsOn            OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of administratively enabled token
+     ring station ports contained within the chassis in which
+     the managing device resides.  This count does not include
+     ports residing on MIM boards outside of the domain of the
+     managing device."
+::= { dot5PhysMgmtDevice 8 }
+
+dot5PhysMgmtDeviceRingPortCount OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of token ring ring in/ring out
+     ports contained within the chassis in which the managing
+     device resides.  This count does not include unpopulated
+     TPIM slots nor does it include ports residing on MIM boards
+     outside of the domain of the managing device."
+::= { dot5PhysMgmtDevice 9 }
+
+dot5PhysMgmtDeviceRingPortsEnable       OBJECT-TYPE
+SYNTAX     INTEGER {
+           noEnable(1),
+           enable(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token 
+     ring ring in/ring out ports residing within the domain 
+     of this device to be enabled.  Setting this object to 
+     noEnable will have no effect.  When read this object will 
+     always return noEnable."
+ ::= { dot5PhysMgmtDevice 10 }
+
+dot5PhysMgmtDeviceRingPortsOn           OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of administratively enabled token
+     ring ring in/ring out ports contained within the chassis
+     in which this device resides.  This count does not include
+     ports residing on MIM boards outside of the domain of the
+     managing device."
+::= { dot5PhysMgmtDevice 11 }
+
+dot5PhysMgmtDevicePortAssociationChanges        OBJECT-TYPE
+SYNTAX     Counter
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object is incremented every time the port association changes
+     for a token ring port residing on a MIM board contained within the
+     chassis in which the managing device resides.  This count does not
+     include port association changes for ports residing on MIM boards
+     outside of the domain of the managing device."
+ ::= { dot5PhysMgmtDevice 12 }
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for MIMs
+--
+-- ============================================================
+--
+-- Implementation of this table is mandatory.
+--
+-- ============================================================
+
+dot5PhysMgmtBoardTable  OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtBoardEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of 
+     boards physically residing in the chassis in which a token 
+     ring device also resides."
+ ::= { dot5PhysMgmtBoard 1 }
+
+dot5PhysMgmtBoardEntry  OBJECT-TYPE
+SYNTAX     Dot5PhysMgmtBoardEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance
+     of a board physically residing in the chassis in which a token 
+     ring device also resides."
+INDEX      { dot5PhysMgmtBoardId }
+ ::= { dot5PhysMgmtBoardTable 1 }
+ 
+Dot5PhysMgmtBoardEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtBoardId
+                INTEGER,
+      dot5PhysMgmtBoardDomain
+                INTEGER,
+      dot5PhysMgmtBoardName
+                DisplayString,
+      dot5PhysMgmtBoardDesc
+                DisplayString,
+      dot5PhysMgmtBoardDot5PortCount
+                INTEGER,
+      dot5PhysMgmtBoardDot5PortsEnable
+                INTEGER,
+      dot5PhysMgmtBoardDot5PortsOn
+                INTEGER,
+      dot5PhysMgmtBoardDot5PortsOper
+                INTEGER,
+      dot5PhysMgmtBoardDot5StnPortCount
+                INTEGER,
+      dot5PhysMgmtBoardDot5StnPortsEnable
+                INTEGER,
+      dot5PhysMgmtBoardDot5StnPortsOn
+                INTEGER,
+      dot5PhysMgmtBoardDot5RingPortCount
+                INTEGER,
+      dot5PhysMgmtBoardDot5RingPortsEnable
+                INTEGER,
+      dot5PhysMgmtBoardDot5RingPortsOn
+                INTEGER,
+      dot5PhysMgmtBoardMode
+                INTEGER,
+      dot5PhysMgmtBoardSpeed
+                INTEGER,
+      dot5PhysMgmtBoardSpeedFault
+                INTEGER,
+      dot5PhysMgmtBoardSpeedFaultLocation
+                INTEGER,
+      dot5PhysMgmtBoardPortAssociation
+                INTEGER,
+      dot5PhysMgmtBoardPortAssociationChanges
+                Counter
+  }
+
+dot5PhysMgmtBoardId     OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a MIM board for which the information 
+     in  this table pertains."
+ ::= { dot5PhysMgmtBoardEntry 1 }
+
+dot5PhysMgmtBoardDomain OBJECT-TYPE
+SYNTAX     INTEGER {
+           outsideDomain(1),
+           withinDomain(2)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an indication of the manageability of this MIM by
+     the device being addressed.  If the value outsideDomain is
+     returned, then any write requests to this MIM will result 
+     in an SNMP error BadValue being returned.  If the value 
+     withinDomain is returned, then the MIM may be managed via 
+     write requests."
+ ::= { dot5PhysMgmtBoardEntry 2 }
+
+dot5PhysMgmtBoardName   OBJECT-TYPE
+SYNTAX     DisplayString (SIZE(20))
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "The ASCII name assigned to this MIM board.  This name defaults 
+     to 'Board n', where n is a unique integer value from 1 to n 
+     which corelates to the physical chassis slot the board resides 
+     in."
+ ::= { dot5PhysMgmtBoardEntry 3 }
+
+dot5PhysMgmtBoardDesc   OBJECT-TYPE
+SYNTAX     DisplayString (SIZE(6))
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "An ASCII string which describes this type of MIM board.  For 
+     example, an MT8MIM would be described as 'MT8MIM' and a TRRMIM-2A 
+     would be described as 'TRR2A', etc."
+ ::= { dot5PhysMgmtBoardEntry 4 }
+
+dot5PhysMgmtBoardDot5PortCount  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of token ring ports contained on the
+     board.  This count does not include unpopulated TPIM slots.
+     If this MIM falls outside of the domain of the managing device,
+     then this count will be zero."
+::= { dot5PhysMgmtBoardEntry 5}
+
+dot5PhysMgmtBoardDot5PortsEnable    OBJECT-TYPE
+SYNTAX      INTEGER {
+            noEnable(1),
+            enable(2)
+            }
+ACCESS      read-write
+STATUS      mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token ring 
+     ports residing on this MIM board to be enabled, provided this
+     MIM falls within the domain of the device.  If the MIM falls
+     outside of the domain of the device, the SNMP error BadValue
+     will be returned.  Setting this object to noEnable will have 
+     no effect.  When read this object will always return noEnable."
+ ::= { dot5PhysMgmtBoardEntry 6}
+
+dot5PhysMgmtBoardDot5PortsOn    OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of administratively enabled token
+     ring ports residing on this MIM board.  If this MIM falls
+     outside of the domain of the managing device, then this
+     count will be zero."
+::= { dot5PhysMgmtBoardEntry 7}
+
+dot5PhysMgmtBoardDot5PortsOper  OBJECT-TYPE
+SYNTAX      INTEGER
+ACCESS      read-only
+STATUS      mandatory
+DESCRIPTION
+     "Returns the total number of operational token ring ports
+     residing on this MIM board.  If this MIM falls outside of
+     the domain of the managing device, then this count will be
+     zero."
+::= { dot5PhysMgmtBoardEntry 8}
+
+dot5PhysMgmtBoardDot5StnPortCount       OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of token ring station ports contained
+     on the board.  If this MIM falls outside of the domain of the
+     managing device, then this count will be zero."
+::= { dot5PhysMgmtBoardEntry 9 }
+
+dot5PhysMgmtBoardDot5StnPortsEnable     OBJECT-TYPE
+SYNTAX     INTEGER {
+           noEnable(1),
+           enable(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token ring
+     station ports residing on this MIM board to be enabled, provided 
+     this MIM falls within the domain of the device.  If the MIM falls
+     outside of the domain of the device, the SNMP error BadValue will 
+     be returned.  Setting this object to noEnable will have no effect.  
+     When read this object will always return noEnable."
+ ::= { dot5PhysMgmtBoardEntry 10 }
+
+dot5PhysMgmtBoardDot5StnPortsOn         OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of adminstratively enabled token
+     ring station ports residing on this MIM board.  If this MIM
+     falls outside of the domain of the managing device, then
+     this count will be zero."
+::= { dot5PhysMgmtBoardEntry 11 }
+
+dot5PhysMgmtBoardDot5RingPortCount      OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of token ring ring in/ring out
+     ports contained on the board.  This count does not include
+     unpopulated TPIM slots.  If this MIM falls outside of the
+     domain of the managing device, then this count will be zero."
+::= { dot5PhysMgmtBoardEntry 12 }
+
+dot5PhysMgmtBoardDot5RingPortsEnable    OBJECT-TYPE
+SYNTAX     INTEGER {
+           noEnable(1),
+           enable(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Setting this object to enable will cause all the token ring 
+     ring in/ring out ports residing on this MIM board to be enabled, 
+     provided this MIM falls within the domain of the device.  If 
+     the MIM falls outside of the domain of the device, the SNMP 
+     error BadValue will be returned.  Setting this object to noEnable 
+     will have no effect.  When read this object will always return 
+     noEnable."
+ ::= { dot5PhysMgmtBoardEntry 13 }
+
+dot5PhysMgmtBoardDot5RingPortsOn        OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+     "Returns the total number of adminstratively enabled token
+     ring ring in/ring out ports residing on this MIM board.
+     If this MIM falls outside of the domain of the managing
+     device, then this count will be zero."
+::= { dot5PhysMgmtBoardEntry 14 }
+
+dot5PhysMgmtBoardMode           OBJECT-TYPE
+SYNTAX     INTEGER {
+           managementMode(1),
+           autoMode(2),
+           unknown(3)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "This object defines the mode of the board.  In Auto Mode, the
+     board is using its hardware defaults. The default values of the
+     board are all ports enabled, speed selected by the HW jumper on
+     the board, the FNB attempts to attach left and right and not
+     bypassed, ring port phantom current (if applicable) is controlled 
+     via a HW switch, and selectable media (if applicable) is managed
+     also via a HW switch.  In Management Mode, the hardware defaults 
+     may be overridden by network or local management.  If the mode
+     of the board is indeterminate, such as an Ethernet MIM, then the
+     value unknown is returned.  A write to this object will place the
+     board into either management or auto mode, provided this MIM falls 
+     within the domain of the device.  If the MIM falls outside of the 
+     domain of the device, the SNMP error BadValue will be returned. A 
+     write request with the value unknown also returns the SNMP error 
+     BadValue."
+ ::= { dot5PhysMgmtBoardEntry 15 }
+
+dot5PhysMgmtBoardSpeed          OBJECT-TYPE
+SYNTAX     INTEGER {
+           unknown(1),
+           fourMegaBits(4),
+           tenMegaBits(10),
+           sixteenMegaBits(16),
+           hundredMegaBits(100)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "This object sets the data speed of the board.  On devices with 
+     a MAC interface, on MIM boards in which the data speed cannot
+     be set, or on MIMs which reside outside of the domain of the
+     managing device, this object is read-only, and will return the 
+     SNMP error BadValue on a write request."
+ ::= { dot5PhysMgmtBoardEntry 16 }
+
+dot5PhysMgmtBoardSpeedFault             OBJECT-TYPE
+SYNTAX     INTEGER {
+           noFaultDetected(1),
+           faultDetected(2),
+           notSupported(3)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports a ring speed fault on a MIM board, if applicable.
+     If the MIM cannot detect speed faults, such as an Ethernet MIM, then
+     the value notSupported is returned.."
+ ::= { dot5PhysMgmtBoardEntry 17 }
+
+dot5PhysMgmtBoardSpeedFaultLocation     OBJECT-TYPE
+SYNTAX     INTEGER {
+           notApplicable(1),
+           fnb(2),
+           ringIn(3),
+           ringOut(4)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object indicates the last ring speed fault detection circuit(s)
+     to detect the fault, if there was one.  On MIM boards which cannot
+     detect speed faults, such as an Ethernet MIM, the value notApplicable 
+     is returned."
+ ::= { dot5PhysMgmtBoardEntry 18 }
+
+dot5PhysMgmtBoardPortAssociation        OBJECT-TYPE
+SYNTAX          INTEGER ( 0..255 )
+ACCESS          read-write
+STATUS          mandatory
+DESCRIPTION
+        "This object, when written, would associate all of the ports on the
+        board with the selected ring, provided this option is available for
+        this MIM and this MIM lies within the domain of the managing device.
+        If this option is not available, or should the MIM lie outside of the
+        domain of the managing device, any write requests will result in the
+        SNMP error BadValue being returned. When read, this object will return
+        either a value indicating which ring all the ports on the board are
+        associated with or notAvailable if this function is not supported. If
+        the MIM lies outside of the domain of the managing device, all read
+        requests will return notAvailable.
+                    0    - MIM does not support function
+                  1..200 - Fnb ring 1 to Fnb ring 200
+                201..254 - AUX ring 1 to AUX ring 54
+                   255   - All ports are not on the same ring"
+::= { dot5PhysMgmtBoardEntry 19 }
+
+dot5PhysMgmtBoardPortAssociationChanges  OBJECT-TYPE
+SYNTAX     Counter
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object is incremented every time the port association changes
+     for a token ring port residing on this MIM board.  If this MIM falls
+     outside of the domain of the managing device, then this count will
+     remain zero."
+ ::= { dot5PhysMgmtBoardEntry 20 }
+
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for All Token Ring Ports
+--
+-- ============================================================
+--
+-- Implementation of this table is mandatory.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+dot5PhysMgmtPortCommonTable     OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtPortCommonEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of token 
+     ring ports physically residing on a MIM board resident in a chassis 
+     with this device."
+ ::= { dot5PhysMgmtPortCommon 1 }
+
+dot5PhysMgmtPortCommonEntry     OBJECT-TYPE
+SYNTAX     Dot5PhysMgmtPortCommonEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance of a
+     token ring port physically residing on a MIM board resident in a 
+     chassis with this device."
+INDEX      { dot5PhysMgmtPortCommonBoardId, dot5PhysMgmtPortCommonPortId }
+ ::= { dot5PhysMgmtPortCommonTable 1 }
+
+Dot5PhysMgmtPortCommonEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtPortCommonPortId
+                INTEGER,
+      dot5PhysMgmtPortCommonBoardId
+                INTEGER,
+      dot5PhysMgmtPortCommonPortName
+                DisplayString,
+      dot5PhysMgmtPortCommonPortAdminState
+                INTEGER,
+      dot5PhysMgmtPortCommonPortOperState
+                INTEGER,
+      dot5PhysMgmtPortCommonPortType
+                OBJECT IDENTIFIER,
+      dot5PhysMgmtPortCommonSpeedFaultDetect
+                INTEGER,
+      dot5PhysMgmtPortCommonRingOutEnable
+                INTEGER,
+      dot5PhysMgmtPortCommonPortAssociation
+                INTEGER,
+      dot5PhysMgmtPortCommonMauCompId
+                INTEGER
+  }
+
+dot5PhysMgmtPortCommonPortId            OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a token ring port for which the information 
+     in this table pertains."
+ ::= { dot5PhysMgmtPortCommonEntry 1 }
+
+dot5PhysMgmtPortCommonBoardId           OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a MIM board to which the token ring port 
+     belongs for which the information in this table pertains."
+ ::= { dot5PhysMgmtPortCommonEntry 2 }
+
+dot5PhysMgmtPortCommonPortName          OBJECT-TYPE
+SYNTAX     DisplayString (SIZE(20))
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Sets an ASCII name for this token ring port, provided the MIM
+     on which this port is resident falls within the domain of the
+     device.  If the MIM falls outside of the domain of the device, 
+     the SNMP error BadValue will be returned.  The default name 
+     for this object is 'Board b, Port p', where b and p are unique 
+     integers 1 through n.  When read, this object will return the
+     ASCII name which is assigned to this port."
+ ::= { dot5PhysMgmtPortCommonEntry 3 }
+
+dot5PhysMgmtPortCommonPortAdminState    OBJECT-TYPE
+SYNTAX     INTEGER {
+           disable(1),
+           enable(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "Setting this object to enable or disable will cause this token 
+     ring port to be enabled or disabled, respectively, provided the 
+     MIM on which this port is resident falls within the domain of the 
+     device.  If the MIM falls outside of the domain of the device, the 
+     SNMP error BadValue will be returned.  When read this object will 
+     always return the last administrative request made."
+ ::= { dot5PhysMgmtPortCommonEntry 4 }
+
+dot5PhysMgmtPortCommonPortOperState     OBJECT-TYPE
+SYNTAX     INTEGER {
+           notOperational(1),
+           operational(2)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns the operational state of this token ring port."
+ ::= { dot5PhysMgmtPortCommonEntry 5 }
+
+dot5PhysMgmtPortCommonPortType          OBJECT-TYPE
+SYNTAX     OBJECT IDENTIFIER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Uniquely defines the token ring station or ring port type.  An 
+     authoritative identification for a token ring station or ring 
+     port type.  By convention, this value is allocated within the 
+     SMI enterprises subtree (1.3.6.1.4.1), and provides an easy and 
+     unambiguous means to determine the type of a token ring station 
+     or ring port."
+ ::= { dot5PhysMgmtPortCommonEntry 6 }
+
+dot5PhysMgmtPortCommonSpeedFaultDetect   OBJECT-TYPE
+SYNTAX     INTEGER {
+           notDetectable(1),
+           noFaultDetected(2),
+           faultDetected(3)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object indicates whether a speed fault has been detected at
+     this token ring port. If the HW is incapable of detecting a speed 
+     fault at the port, the value notDetectable is returned."
+ ::= { dot5PhysMgmtPortCommonEntry 7 }
+
+dot5PhysMgmtPortCommonRingOutEnable      OBJECT-TYPE
+SYNTAX     INTEGER {
+           notAvailable(1),
+           disable(2),
+           enable(3)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "This object, when written, permits the port to function as either
+     a ring out port or a station port, if available and if the MIM
+     board on which this station port is resident lies within the domain 
+     of the device.  If this selection is not supported by this port, or
+     if the MIM falls outside of the domain of the device, the SNMP error 
+     BadValue will be returned.  When read, this object will return the 
+     state of the port with respect to this mode of operation.  The default 
+     state of this object, if available, is disabled; otherwise it is 
+     notAvailable."
+ ::= { dot5PhysMgmtPortCommonEntry 8 }
+
+dot5PhysMgmtPortCommonPortAssociation     OBJECT-TYPE
+SYNTAX     INTEGER( 0..254 )
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "This object, when written, would associate the port with the
+     selected ring, provided this option is available for this port and
+     and the MIM the port resides on lies within the domain of the
+     managing device.  If this option is not available, or should the
+     MIM on which the port resides lie outside of the domain of the
+     managing device, any write requests will result in the SNMP error
+     BadValue being returned.  When read, this object will return either
+     a value indicating which ring the port is associated with or
+     notAvailable if this function is not supported.  If the MIM on
+     which the port resides lies outside of the domain of the managing
+     device, all read requests will return notAvailable.
+            0    - MIM does not support function
+          1..200 - Fnb ring 1 to Fnb ring 200
+        201..254 - AUX ring 1 to AUX ring 54"
+ ::= { dot5PhysMgmtPortCommonEntry 9 }
+
+dot5PhysMgmtPortCommonMauCompId    OBJECT-TYPE
+SYNTAX   INTEGER
+ACCESS   read-only
+STATUS   mandatory
+DESCRIPTION
+    "This object returns the component ID for the cptMau component
+     for which this port is associated."
+::= { dot5PhysMgmtPortCommonEntry 10 }
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for Token Ring Station Ports
+--
+-- ============================================================
+--
+-- Implementation of this table is mandatory.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+dot5PhysMgmtPortStnTable        OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtPortStnEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of 
+     token ring station ports residing on a MIM board resident in 
+     a chassis with this device."
+ ::= { dot5PhysMgmtPortStn 1 }
+
+dot5PhysMgmtPortStnEntry        OBJECT-TYPE
+SYNTAX     Dot5PhysMgmtPortStnEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance 
+     of a token ring station port residing on a MIM board resident 
+     in a chassis with this device."
+INDEX      { dot5PhysMgmtPortStnBoardId, dot5PhysMgmtPortStnPortId }
+ ::= { dot5PhysMgmtPortStnTable 1 }
+
+Dot5PhysMgmtPortStnEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtPortStnPortId
+                INTEGER,
+      dot5PhysMgmtPortStnBoardId
+                INTEGER,
+      dot5PhysMgmtPortStnPortLinkState
+                INTEGER,
+      dot5PhysMgmtPortStnPortLinkStateTime
+                TimeTicks,
+      dot5PhysMgmtPortStnInsertionTrapEnable
+                INTEGER
+  }
+
+dot5PhysMgmtPortStnPortId               OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a token ring station port for which the 
+     information in this table pertains."
+ ::= { dot5PhysMgmtPortStnEntry 1 }
+
+dot5PhysMgmtPortStnBoardId              OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a MIM board to which the token ring station 
+     port belongs for which the information in this table pertains."
+ ::= { dot5PhysMgmtPortStnEntry 2 }
+
+dot5PhysMgmtPortStnPortLinkState        OBJECT-TYPE
+SYNTAX     INTEGER {
+           noLink(1),
+           link(2)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports the link status of a token ring station port.  
+     The link status indicates the port is detecting a good phantom current."
+ ::= { dot5PhysMgmtPortStnEntry 3 }
+
+dot5PhysMgmtPortStnPortLinkStateTime    OBJECT-TYPE
+SYNTAX     TimeTicks
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports the amount of time in TimeTicks since the token
+     ring station port's link state last changed."
+ ::= { dot5PhysMgmtPortStnEntry 4 }
+
+dot5PhysMgmtPortStnInsertionTrapEnable  OBJECT-TYPE
+SYNTAX     INTEGER {
+           disabled(1),
+           enabled(2)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "A write of enabled or disabled to this object permits or inhibits
+     the sending of the port inserted and port deinserted traps when 
+     phantom current is asserted or removed, respectively, on this 
+     station port, provided the MIM on which this port is resident falls 
+     within the domain of the device.  If the MIM falls outside of the 
+     domain of the device, the SNMP error BadValue will be returned.  When
+     read this object will repond with the last write request made.  The 
+     default state of this object is disabled."
+ ::= { dot5PhysMgmtPortStnEntry 5 }
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for Token Ring Ring Ports
+--
+-- ============================================================
+--
+-- Implementation of this table is mandatory.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+dot5PhysMgmtPortRingTable       OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtPortRingEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of
+     token ring ring ports residing on a MIM board resident in a
+     chassis with this device."
+ ::= { dot5PhysMgmtPortRing 1 }
+
+dot5PhysMgmtPortRingEntry       OBJECT-TYPE
+SYNTAX     Dot5PhysMgmtPortRingEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance
+     of a token ring ring port residing on a MIM board resident in
+     a chassis with this device."
+INDEX      { dot5PhysMgmtPortRingBoardId, dot5PhysMgmtPortRingPortId}
+ ::= { dot5PhysMgmtPortRingTable 1 }
+
+Dot5PhysMgmtPortRingEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtPortRingPortId
+                INTEGER,
+      dot5PhysMgmtPortRingBoardId
+                INTEGER,
+      dot5PhysMgmtPortRingPortClass
+                INTEGER,
+      dot5PhysMgmtPortRingPortMediaSelect
+                INTEGER,
+      dot5PhysMgmtPortRingFaultStatus
+                INTEGER,
+      dot5PhysMgmtPortRingFaultStateTime
+                TimeTicks,
+      dot5PhysMgmtPortRingPhantomCurrent
+                INTEGER,
+      dot5PhysMgmtPortRingPortType
+                INTEGER
+  }
+
+dot5PhysMgmtPortRingPortId      OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a token ring ring port for which the 
+     information in this table pertains."
+ ::= { dot5PhysMgmtPortRingEntry 1 }
+
+dot5PhysMgmtPortRingBoardId     OBJECT-TYPE
+SYNTAX     INTEGER
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "Returns an index to a MIM board to which the token ring ring 
+     port belongs for which the information in this table pertains."
+ ::= { dot5PhysMgmtPortRingEntry 2 }
+
+dot5PhysMgmtPortRingPortClass   OBJECT-TYPE
+SYNTAX     INTEGER {
+           noAutowrap(1),
+           autowrap(2),
+           selectable(3)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object returns a code indicating whether the token ring ring 
+     port is capable of either autowrapping or not, or whether the media 
+     type is selectable (implies autowrappability)."
+ ::= { dot5PhysMgmtPortRingEntry 3 }
+
+dot5PhysMgmtPortRingPortMediaSelect     OBJECT-TYPE
+SYNTAX     INTEGER {
+           noSelection(1),
+           stp(2),
+           fiber(3)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "When written, this object allows for the selection of the media type
+     for this token ring ring ring port, provided the MIM on which this 
+     port is resident falls within the domain of the device.  If the MIM 
+     falls outside of the domain of the device, the SNMP error BadValue 
+     will be returned.  If the ring port is not selectable and an attempt 
+     is made to change the media type, a BadValue error will be returned.  
+     When read, this object will return the last selection made unless it 
+     is unselectable, in which case noSelection is returned."
+ ::= { dot5PhysMgmtPortRingEntry 4 }
+
+dot5PhysMgmtPortRingFaultStatus OBJECT-TYPE
+SYNTAX     INTEGER {
+           notSupported(1),
+           noFaultDetected(2),
+           faultDetected(3)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports the media fault status of a token ring ring port 
+     capable of auto-wrapping.  If auto-wrapping is not available, notSupported 
+     will be returned."
+ ::= { dot5PhysMgmtPortRingEntry 5 }
+
+dot5PhysMgmtPortRingFaultStateTime      OBJECT-TYPE
+SYNTAX     TimeTicks
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports the amount of time in TimeTicks since the token
+     ring ring port fault state last changed."
+ ::= { dot5PhysMgmtPortRingEntry 6 }
+
+dot5PhysMgmtPortRingPhantomCurrent      OBJECT-TYPE
+SYNTAX     INTEGER {
+           noPhantomAvailable(1),
+           activatePhantom(2),
+           deactivatePhantom(3)
+           }
+ACCESS     read-write
+STATUS     mandatory
+DESCRIPTION
+    "When written, this object activates or deactivates the MIM board's 
+     phantom current for this ring port, if applicable and provided the 
+     MIM on which this port is resident falls within the domain of the 
+     device.  If the port does not support phantom drive, or if the MIM 
+     falls outside of the domain of the device, the SNMP error BadValue 
+     will be returned.  If successfully written, this selection may be 
+     different than the HW switch setting.  When read, this object reports 
+     the state of the ring port's phantom drive status, whether enabled,
+     disabled, or not supported."
+ ::= { dot5PhysMgmtPortRingEntry 7 }
+
+dot5PhysMgmtPortRingPortType            OBJECT-TYPE
+SYNTAX     INTEGER {
+           ringIn(1),
+           ringOut(2)
+           }
+ACCESS     read-only
+STATUS     mandatory
+DESCRIPTION
+    "This object reports the ring port type."
+ ::= { dot5PhysMgmtPortRingEntry 8 }
+
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for Token Ring Port Switching
+--
+-- ============================================================
+--
+-- Implementation of this table is mandatory.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+-- Currently there are no defined objects
+
+
+--
+
+--
+-- ============================================================
+--
+-- Managed Objects in Support of Dot5 Physical Management for Token Ring
+--
+-- ============================================================
+--
+-- Implementation of this table is optional.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+dot5PhysMgmtDeviceRingSpeedTable        OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtDeviceRingSpeedEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of 
+     rings physically residing in the chassis in which a token 
+     ring device also resides."
+ ::= { dot5PhysMgmtRingSpeedTables 1 }
+
+dot5PhysMgmtDeviceRingSpeedEntry        OBJECT-TYPE
+SYNTAX    Dot5PhysMgmtDeviceRingSpeedEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance of a
+     ring physically residing in the chassis in which a token ring device
+     also resides."
+INDEX     { dot5PhysMgmtDeviceRingSpeedRing }
+ ::= { dot5PhysMgmtDeviceRingSpeedTable 1 }
+
+Dot5PhysMgmtDeviceRingSpeedEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtDeviceRingSpeedRing
+                INTEGER,
+      dot5PhysMgmtDeviceRingSpeed
+                INTEGER
+}
+ 
+dot5PhysMgmtDeviceRingSpeedRing         OBJECT-TYPE
+SYNTAX  INTEGER (1..200)
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+    "Returns an index to a FNB ring on a device board for which the
+     information in this table pertains.
+     Valid numeric range:
+        1 - 200  Fnb rings 1 - 200"
+ ::= { dot5PhysMgmtDeviceRingSpeedEntry 1 }
+
+dot5PhysMgmtDeviceRingSpeed           OBJECT-TYPE
+SYNTAX     INTEGER {
+           unknown(1),
+           fourMegaBits(4),
+           tenMegaBits(10),
+           sixteenMegaBits(16),
+           hundredMegaBits(100)
+           }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+    "This object sets the data speed of the ring. All MIM ports
+     physically attached to the ring will be set to the indicated
+     speed"
+ ::= { dot5PhysMgmtDeviceRingSpeedEntry 2 }
+
+-- ============================================================
+--
+-- Implementation of this table is optional.
+--
+-- If the MIM on which a port may reside falls outside of the
+-- domain of the managing device, then no managed objects will
+-- exist for the port.
+--
+-- ============================================================
+
+dot5PhysMgmtBoardAuxRingSpeedTable      OBJECT-TYPE
+SYNTAX     SEQUENCE OF Dot5PhysMgmtBoardAuxRingSpeedEntry
+ACCESS     not-accessible
+STATUS     mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a collection of 
+     boards physically residing in the chassis in which a token 
+     ring device also resides."
+ ::= { dot5PhysMgmtRingSpeedTables 2 }
+
+dot5PhysMgmtBoardAuxRingSpeedEntry      OBJECT-TYPE
+SYNTAX    Dot5PhysMgmtBoardAuxRingSpeedEntry
+ACCESS    not-accessible
+STATUS    mandatory
+DESCRIPTION
+    "A list of managed objects which pertains to a single instance of a
+     board physically residing in the chassis in which a token ring device
+     also resides."
+INDEX     { dot5PhysMgmtBoardAuxRingSpeedBoardId, dot5PhysMgmtBoardAuxRingSpeedAuxRing }
+ ::= { dot5PhysMgmtBoardAuxRingSpeedTable 1 }
+
+Dot5PhysMgmtBoardAuxRingSpeedEntry ::=
+  SEQUENCE {
+      dot5PhysMgmtBoardAuxRingSpeedBoardId
+                INTEGER,
+      dot5PhysMgmtBoardAuxRingSpeedAuxRing
+                INTEGER,
+      dot5PhysMgmtBoardAuxRingSpeed
+                INTEGER
+}
+ 
+dot5PhysMgmtBoardAuxRingSpeedBoardId    OBJECT-TYPE
+SYNTAX  INTEGER
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+    "Returns an index to a MIM board for which the information in this
+     table pertains."
+ ::= { dot5PhysMgmtBoardAuxRingSpeedEntry 1 }
+
+dot5PhysMgmtBoardAuxRingSpeedAuxRing    OBJECT-TYPE
+SYNTAX  INTEGER (201..254)
+ACCESS  read-only
+STATUS  mandatory
+DESCRIPTION
+    "Returns an index to an auxillary ring on a MIM board for which
+     the information in this table pertains.
+     Valid numeric range:
+        201 - 254  Auxillary rings 1 - 54"
+ ::= { dot5PhysMgmtBoardAuxRingSpeedEntry 2 }
+
+dot5PhysMgmtBoardAuxRingSpeed           OBJECT-TYPE
+SYNTAX     INTEGER {
+           unknown(1),
+           fourMegaBits(4),
+           tenMegaBits(10),
+           sixteenMegaBits(16),
+           hundredMegaBits(100)
+           }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+    "This object sets the data speed of the auxillary ring.  On devices
+     without an auxillary ring, or on MIMs which reside outside of the
+     domain of the managing device, this object does not exist."
+ ::= { dot5PhysMgmtBoardAuxRingSpeedEntry 3 }
+
+
+--
+-- Revision History
+--
+-- Rev 0.00.01
+-- Date: October 23, 1993
+--
+--  Initial working document.
+--
+-- Rev 0.00.02
+-- Date: October 27, 1993
+--
+--  a) Changed branch where MIB lives in enterprise MIB to
+--     ctDot5PhysMgmt        OBJECT IDENTIFIER ::= { ctPhysical 6 }
+--     dot5PhysMgmtRev1      OBJECT IDENTIFIER ::= { ctDot5PhysMgmt 1 }
+--
+--  b) Modified PortCount objects such that total port counts and ring port
+--     counts do not include the count of empty TPIM slots.
+--
+-- Rev 0.00.03
+-- Date: October 29, 1993
+--
+--  Added descriptive text which explains what a "token ring device" is
+--  within the context of this MIB, and how such a device is expected to
+--  respond to read and write requests destined for MIMs and ports which
+--  lie outside of the domain of the token ring device.  Also, the des-
+--  criptive text accompanying many of the managed objects defined in this
+--  MIB has been refined to more accurately what is being managed and what
+--  should be expected as a response from the object when acted upon.
+--
+-- Rev 0.00.04
+-- Date: November 8, 1993
+--
+--  Added object dot5PhysMgmtBoardDomain at { dot5PhysMgmtBoardEntry 2 }.
+--  This bumped down all following board objects by one.
+--
+-- Rev 0.00.05
+-- Date: January 26, 1994
+--
+--  a) This MIB now defines the appropriate response for several of the
+--     managed objects depending on whether the board or port lies within
+--     the domain of the managing device or not.
+--  b) The Device managed objects which have been descriptively modified:
+--     dot5PhysMgmtDevicePortCount         { dot5PhysMgmtDevice 2 }
+--     dot5PhysMgmtDevicePortsOn           { dot5PhysMgmtDevice 4 }
+--     dot5PhysMgmtDevicePortsOper         { dot5PhysMgmtDevice 5 }
+--     dot5PhysMgmtDeviceStnPortCount      { dot5PhysMgmtDevice 6 }
+--     dot5PhysMgmtDeviceStnPortsOn        { dot5PhysMgmtDevice 8 }
+--     dot5PhysMgmtDeviceRingPortCount     { dot5PhysMgmtDevice 9 }
+--     dot5PhysMgmtDeviceRingPortsOn       { dot5PhysMgmtDevice 11 }
+--  c) The Board managed objects which have been descriptively modified:
+--     dot5PhysMgmtBoardDot5PortCount      { dot5PhysMgmtBoardEntry 5}
+--     dot5PhysMgmtBoardDot5PortsOn        { dot5PhysMgmtBoardEntry 7}
+--     dot5PhysMgmtBoardDot5PortsOper      { dot5PhysMgmtBoardEntry 8}
+--     dot5PhysMgmtBoardDot5StnPortCount   { dot5PhysMgmtBoardEntry 9}
+--     dot5PhysMgmtBoardDot5StnPortsOn     { dot5PhysMgmtBoardEntry 11}
+--     dot5PhysMgmtBoardDot5RingPortCount  { dot5PhysMgmtBoardEntry 12}
+--     dot5PhysMgmtBoardDot5RingPortsOn    { dot5PhysMgmtBoardEntry 14}
+--  d) The Common, Station and Ring Port groups descriptive text has been
+--     modified to reflect that should a MIM on which a port may reside 
+--     falls outside of the domain of the managing device, then no managed
+--     objects will exist for the port.
+--  e) The syntax of the object dot5PhysMgmtBoardSpeed has been modified to
+--     return the value 1 if the speed of the board is indeterminate.
+--
+-- Rev 0.00.06
+-- Date: March 29, 1994
+--
+--  a) Added MIB Objects:
+--     dot5PhysMgmtDevicePortAssociationChanges    { dot5PhysMgmtDevice 12 }.
+--     dot5PhysMgmtBoardPortAssociation            { dot5PhysMgmtBoardEntry 19 }.
+--     dot5PhysMgmtBoardPortAssociationChanges     { dot5PhysMgmtBoardEntry 20 }.
+--     dot5PhysMgmtPortCommonPortAssociation       { dot5PhysMgmtPortCommonEntry 9 }.
+--     dot5PhysMgmtPortCommonMauCompId             { dot5PhysMgmtPortCommonEntry 10 }.
+--
+-- Rev 1.00.01
+-- Date: July 8, 1994
+--
+--  a) Added MIB Object dot5PhysMgmtPortRingPortType.
+--
+-- Rev 1.00.02
+-- Date: July 20, 1994
+--
+--  a) Added MIB Objects dot5PhysMgmtDeviceRingSpeedTable and
+--     dot5PhysMgmtBoardAuxRingSpeedTable.
+--
+
+END

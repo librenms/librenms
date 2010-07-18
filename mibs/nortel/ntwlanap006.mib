@@ -1,0 +1,1783 @@
+NORTEL-WLAN-AP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, NOTIFICATION-TYPE,
+    Counter32
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, PhysAddress, RowStatus, MacAddress,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex, InterfaceIndex, ifPhysAddress
+        FROM IF-MIB
+    wlan2200
+        FROM SYNOPTICS-ROOT-MIB;
+    
+
+nortelWlanApMib MODULE-IDENTITY
+       LAST-UPDATED    "200404120000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "Nortel Wireless LAN AP MIB
+
+            Copyright 2003-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+       REVISION "200307160000Z" -- 16 July 2003
+       DESCRIPTION "v001:  Conversion to SMIv2"
+       REVISION "200309110000Z" -- 11 September 2003
+       DESCRIPTION "v005:  Added ntWlanDot11TrapTable.
+                           Added ntWlanApMuAssocTrap.
+                           Added ntWlanApMuDisAssocTrap."
+       REVISION "200404120000Z" -- 12 April 2003
+       DESCRIPTION "v005: Updates for AP version 1.3.:
+           - Added ntWlanApDot1xAuthenticationFail, ntWlanApMuWEPAuthFail, and
+             ntWlanApMuWPAAuthFail NOTIFICATION-TYPEs.
+           - Added ntWlanApMuAssocTrapEnabled and ntWlanApMuDisAssocTrapEnabled
+             NOTIFICATION-TYPEs.
+           - Added ntWlanApLID, ntWlanApRateSupport, ntWlanApSecurity,
+             ntWlanApQoS, ntWlanApVlan, ntWlanApStats groups.
+           - Added NtWlanApDataRate, NtWlanApWEPKey TEXTUAL-CONVENTIONS.
+           - Added ntWlanSwNNDataFileVer.
+           - Changed enumerations of ntWlanTransferType to ftpDownload(1),
+             tftpDownload(2), ftpUpload(3), and tftpUpload(4).
+           - Added ntWlanFileTransferStatus.
+           - Added ntWlanDot11dWorldModeEnabled and ntWlanDot11ClosedSystem.
+           - Added ntWlanDot118021xBcastKeyRefresh,
+             ntWlanDot118021xSessKeyRefresh, and ntWlanDot118021xReAuthRefresh.
+           - Added ntWlanDot11SecondaryAuthServer, ntWlanDot11SecondaryAuthPort,
+             ntWlanDot11SecondaryAuthKey, ntWlanDot11SecondaryAuthRetransmit,
+             and ntWlanDot11SecondaryAuthTimeout."
+       ::= { wlan2200 1 }
+
+
+-- Nortel AP OBJECT IDs Groups
+
+ntWlanApSys             OBJECT IDENTIFIER ::= { nortelWlanApMib 1 }
+ntWlanApLineMgnt        OBJECT IDENTIFIER ::= { nortelWlanApMib 2 }
+ntWlanApPortMgnt        OBJECT IDENTIFIER ::= { nortelWlanApMib 3 }
+ntWlanApFileTransferMgt OBJECT IDENTIFIER ::= { nortelWlanApMib 4 }
+ntWlanApResetMgt        OBJECT IDENTIFIER ::= { nortelWlanApMib 5 }
+ntWlanApIpMgt           OBJECT IDENTIFIER ::= { nortelWlanApMib 6 }
+ntWlanApDot11           OBJECT IDENTIFIER ::= { nortelWlanApMib 7 }
+ntWlanApTraps           OBJECT IDENTIFIER ::= { nortelWlanApMib 8 }
+ntWlanApLID             OBJECT IDENTIFIER ::= { nortelWlanApMib 9 }
+ntWlanApRateSupport     OBJECT IDENTIFIER ::= { nortelWlanApMib 10 }
+ntWlanApSecurity        OBJECT IDENTIFIER ::= { nortelWlanApMib 11 }
+ntWlanApQoS             OBJECT IDENTIFIER ::= { nortelWlanApMib 12 }
+ntWlanApVlan            OBJECT IDENTIFIER ::= { nortelWlanApMib 13 }
+ntWlanApStats           OBJECT IDENTIFIER ::= { nortelWlanApMib 14 }
+
+-- ****************************************************************************
+--  Textual Conventions
+-- ****************************************************************************
+
+NtWlanApDataRate ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "A data rate, measured in increments of 500Kb/s from 1 Mb/s
+                 to 63.5 Mb/s.  For example, a value of 2 means a data rate
+                 of 1 Mb/s, while a value of 5 means a data rate of 2.5 Mb/s."
+    SYNTAX       Integer32 (2..127)
+
+NtWlanApWEPKey ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION "A WEP key.  Valid sizes are 5, 13, and 16 octets,
+                 corresponding to WEP key lengths of 64, 128, and 152
+                 bits, respectively.  A length of 0 is also allowed, so
+                 that retrieval of objects containing a valid key value
+                 can return an empty string so as to avoid key disclosure."
+    SYNTAX       OCTET STRING (SIZE(0|5|13|16))
+
+-- ****************************************************************************
+--  END Textual Conventions
+-- ****************************************************************************
+
+-- ****************************************************************************
+--  ntWlanApSys - Standard Mib elements
+-- ****************************************************************************
+ntWlanSwHardwareVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Hardware version of the main board."
+        ::= { ntWlanApSys 1 }
+
+ntWlanSwBootRomVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Boot ROM code version of the main board."
+        ::= { ntWlanApSys 2 }
+
+ntWlanSwOpCodeVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Operation code version of the main board."
+        ::= { ntWlanApSys 3 }
+
+ntWlanSwCountryCode OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(2))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Country code of the AP.
+                       AL-ALBANIA,             DZ-ALGERIA,
+                       AR-ARGENTINA,           AM-ARMENIA,
+                       AU-AUSTRALIA,           AT-AUSTRIA,
+                       AZ-AZERBAIJAN,          BH-BAHRAIN,
+                       BY-BELARUS,             BE-BELGIUM,
+                       BZ-BELIZE,              BO-BOLVIA,
+                       BR-BRAZIL,              BN-BRUNEI_DARUSSALAM,
+                       BG-BULGARIA,            CA-CANADA,
+                       CL-CHILE,               CN-CHINA,
+                       CO-COLOMBIA,            CR-COSTA_RICA,
+                       HR-CROATIA,             CY-CYPRUS,
+                       CZ-CZECH_REPUBLIC,      DK-DENMARK,
+                       DO-DOMINICAN_REPUBLIC,  EC-ECUADOR,
+                       EG-EGYPT,               EE-ESTONIA,
+                       FI-FINLAND,             FR-FRANCE,
+                       GE-GEORGIA,             DE-GERMANY,
+                       GR-GREECE,              GT-GUATEMALA,
+                       HK-HONG_KONG,           HU-HUNGARY,
+                       IS-ICELAND,             IN-INDIA,
+                       ID-INDONESIA,           IR-IRAN,
+                       IE-IRELAND,             IL-ISRAEL,
+                       IT-ITALY,               JP-JAPAN,
+                       JO-JORDAN,              KZ-KAZAKHSTAN,
+                       KP-NORTH_KOREA,         KR-KOREA_REPUBLIC,
+                       KW-KUWAIT,              LV-LATVIA,
+                       LB-LEBANON,             LI-LIECHTENSTEIN,
+                       LT-LITHUANIA,           LU-LUXEMBOURG,
+                       MO-MACAU,               MK-MACEDONIA,
+                       MY-MALAYSIA,            MX-MEXICO,
+                       MC-MONACO,              MA-MOROCCO,
+                       NL-NETHERLANDS,         NZ-NEW_ZEALAND,
+                       NO-NORWAY,              OM-OMAN,
+                       PK-PAKISTAN,            PA-PANAMA,
+                       PE-PERU,                PH-PHILIPPINES,
+                       PL-POLAND,              PT-PORTUGAL,
+                       PR-PUERTO_RICO,         QA-QATAR,
+                       RO-ROMANIA,             RU-RUSSIA,
+                       SA-SAUDI_ARABIA,        SG-SINGAPORE,
+                       SK-SLOVAK_REPUBLIC,     SI-SLOVENIA,
+                       ZA-SOUTH_AFRICA,        ES-SPAIN,
+                       SE-SWEDEN,              CH-SWITZERLAND,
+                       SY-SYRIA,               TW-TAIWAN,
+                       TH-THAILAND,            TR-TURKEY,
+                       UA-UKRAINE,             AE-UNITED_ARAB_EMIRATES,
+                       GB-UNITED_KINGDOM,      US-UNITED_STATES,
+                       UY-URUGUAY,             VE-VENEZUELA,
+                       VN-VIETNAM"
+        ::= { ntWlanApSys 4 }
+        
+ntWlanSwNNDataFileVer OBJECT-TYPE 
+        SYNTAX      DisplayString (SIZE(0..20)) 
+        MAX-ACCESS  read-only 
+        STATUS      current 
+        DESCRIPTION "Nortel Networks Customization Data File Version." 
+        ::= { ntWlanApSys 5 } 
+
+-- ****************************************************************************
+--  enterpriseApLine  AP Line elements
+-- ****************************************************************************
+ntWlanLineTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each RS-232 line in this system"
+        ::= { ntWlanApLineMgnt 1 }
+
+ntWlanLineEntry OBJECT-TYPE
+        SYNTAX      NtWlanLineEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one RS232 line of the Access
+                     Point."
+        INDEX       { ntWlanLineIndex }
+        ::= { ntWlanLineTable 1 }
+
+NtWlanLineEntry ::= SEQUENCE
+{
+    ntWlanLineIndex                Integer32,
+    ntWlanLineDataBits             Integer32,
+    ntWlanLineParity               INTEGER,
+    ntWlanLineSpeed                Integer32,
+    ntWlanLineStopBits             Integer32
+}
+
+ntWlanLineIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as RS-232 index."
+        ::= { ntWlanLineEntry 1 }
+
+ntWlanLineDataBits OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as number of data bits for the RS232
+                     interface."
+        ::= { ntWlanLineEntry 2 }
+
+
+ntWlanLineParity OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        none(99),
+                        odd(1),
+                        even(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as parity of the RS232 interface."
+        ::= { ntWlanLineEntry 3 }
+
+ntWlanLineSpeed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as the speed of the RS-232 interface."
+        ::= { ntWlanLineEntry 4 }
+
+ntWlanLineStopBits OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as the number of stop bits for the RS-232
+                     interface."
+        ::= { ntWlanLineEntry 5 }
+
+
+-- ****************************************************************************
+--  ntWlanApPortMgnt - Port Mib elements
+-- ****************************************************************************
+ntWlanPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each switch port (including expansion
+                     slot) in this system. This table also contains information
+                     about each trunk (similar to Cisco's EtherChannel)."
+        ::= { ntWlanApPortMgnt 1 }
+
+ntWlanPortEntry OBJECT-TYPE
+        SYNTAX      NtWlanPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one switch port of the switch."
+        INDEX       { ntWlanPortIndex }
+        ::= { ntWlanPortTable 1 }
+
+NtWlanPortEntry ::= SEQUENCE
+{
+    ntWlanPortIndex                InterfaceIndex,
+    ntWlanPortName                 DisplayString,
+    ntWlanPortType                 INTEGER,
+    ntWlanPortSpeedDpxCfg          INTEGER,
+    ntWlanPortFlowCtrlCfg          INTEGER,
+    ntWlanPortCapabilities         INTEGER,
+    ntWlanPortAutonegotiation      INTEGER,
+    ntWlanPortSpeedDpxStatus       INTEGER,
+    ntWlanPortFlowCtrlStatus       INTEGER
+}
+
+ntWlanPortIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { ntWlanPortEntry 1 }
+
+ntWlanPortName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the port name. This is same as 
+                     ifAlias in the IF-MIB (RFC2863 or later)."
+        ::= { ntWlanPortEntry 2 }
+
+ntWlanPortType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        other(1),
+                        hundredBaseTX(2),
+                        hundredBaseFX(3),
+                        thousandBaseSX(4),
+                        thousandBaseLX(5),
+                        thousandBaseT(6),
+                        thousandBaseGBIC(7),
+                        thousandBaseMiniGBIC(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the port type."
+        ::= { ntWlanPortEntry 3 }
+
+ntWlanPortSpeedDpxCfg OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        reserved(1),
+                        halfDuplex10(2),
+                        fullDuplex10(3),
+                        halfDuplex100(4),
+                        fullDuplex100(5),
+                        halfDuplex1000(6),
+                        fullDuplex1000(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Set the port speed and duplex mode as follows:
+                         halfDuplex10(2)    - 10Mbps and half duplex mode
+                         fullDuplex10(3)    - 10Mbps and full duplex mode
+                         halfDuplex100(4)   - 100Mbps and half duplex mode
+                         fullDuplex100(5)   - 100Mbps and full duplex mode
+                         halfDuplex1000(6)  - 1000Mbps and half duplex mode
+                         fullDuplex1000(7)  - 1000Mbps and full duplex mode
+                     hundredBaseTX port can be set as
+                         halfDuplex10(2)
+                         fullDuplex10(3)
+                         halfDuplex100(4)
+                         fullDuplex100(5)
+                     hundredBaseFX port can be set as
+                         halfDuplex100(4)
+                         fullDuplex100(5)
+                     thousandBaseSX port can be set as
+                         halfDuplex1000(6)
+                         fullDuplex1000(7)
+                     The actual operating speed and duplex of the port
+                     is given by portSpeedDpxStatus."
+        DEFVAL      { halfDuplex10 }
+        ::= { ntWlanPortEntry 4 }
+
+ntWlanPortFlowCtrlCfg OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2),
+                        backPressure(3),
+                        dot3xFlowControl(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "(1) Flow control mechanism is enabled.
+                         If the port type is hundredBaseTX or thousandBaseSX:
+                         When the port is operating in halfDuplex mode, the
+                         port uses backPressure flow control mechanism. When
+                         the port is operating in fullDuplex mode, the port
+                         uses IEEE 802.3x flow control mechanism.
+                         If the port type is hundredBaseFX:
+                         When the port is operating in halfDuplex mode, the
+                         port uses backPressure flow control mechanism. When
+                         the port is operating in fullDuplex mode, Flow
+                         control mechanism will not function.
+                     (2) Flow control mechanism is disabled.
+                     (3) Flow control mechanism is backPressure.
+                         when the port is in fullDuplex mode.This flow control
+                         mechanism will not function.
+                     (4) Flow control mechanism is IEEE 802.3x flow control.
+                         when the port is in halfDuplex mode.This flow control
+                         mechanism will not function.
+                     hundredBaseTX and thousandBaseSX port can be set as:
+                         enabled(1),
+                         disabled(2),
+                         backPressure(3),
+                         dot3xFlowControl(4).
+                     hundredBaseFX port can be set as:
+                         enabled(1),
+                         disabled(2),
+                         backPressure(3).
+                     The actual flow control mechanism is used given by
+                     portFlowCtrlStatus."
+        DEFVAL      { enabled }
+        ::= { ntWlanPortEntry 5 }
+
+ntWlanPortCapabilities OBJECT-TYPE
+-- INTEGER should be bits
+        SYNTAX      INTEGER
+                    {
+                        portCap10half(99),
+                        portCap10full(1),
+                        portCap100half(2),
+                        portCap100full(3),
+                        portCap1000half(4),
+                        portCap1000full(5),
+                        reserved6(6),
+                        reserved7(7),
+                        reserved8(8),
+                        reserved9(9),
+                        reserved10(10),
+                        reserved11(11),
+                        reserved12(12),
+                        reserved13(13),
+                        portCapSym(14),
+                        portCapFlowCtrl(15)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Port capabilities."
+        ::= { ntWlanPortEntry 6 }
+
+ntWlanPortAutonegotiation OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Whether autonegotiation is enabled."
+        ::= { ntWlanPortEntry 7 }
+                        
+ntWlanPortSpeedDpxStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        error(1),
+                        halfDuplex10(2),
+                        fullDuplex10(3),
+                        halfDuplex100(4),
+                        fullDuplex100(5),
+                        halfDuplex1000(6),
+                        fullDuplex1000(7)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operating speed and duplex mode of the
+                     switched port. If this index is a trunk,
+                     the speed is the speed of its individual members.
+                     If this index is a trunk and the result
+                     is inconsistent among its member ports, this value is
+                     error(1)."
+        ::= { ntWlanPortEntry 8 }
+
+ntWlanPortFlowCtrlStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        error(1),
+                        backPressure(2),
+                        dot3xFlowControl(3),
+                        none(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "(2) BackPressure flow control machanism is used.
+                     (3) IEEE 802.3 flow control machanism is used.
+                     (4) Flow control mechanism is disabled.
+                     If this index is a trunk and the result
+                     is inconsistent among its member ports, this value is
+                     error(1)."
+        ::= { ntWlanPortEntry 9 }
+
+-- ****************************************************************************
+--  ntWlanApTftpMgt - File Transfer Mib elements
+-- ****************************************************************************
+
+ntWlanTransferStart  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  go(1),
+                  nogo(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Set to go(1) to start a transfer."
+    ::= { ntWlanApFileTransferMgt 1 }
+
+ntWlanTransferType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  ftpDownload(1),
+                  tftpDownload(2),
+                  ftpUpload(3),
+                  tftpUpload(4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Type of file to transfer."
+    ::= { ntWlanApFileTransferMgt 2 }
+
+ntWlanFileType  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  firmware(1),
+                  config(2),
+                  nortelConfig(3)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Type of file to transfer."
+    ::= { ntWlanApFileTransferMgt 3 }
+
+ntWlanSrcFile  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The source file name for TFTP transfer when a
+        transfer is next requested via this MIB.  This value is set to
+        the zero length string when no file name has been specified."
+    ::= { ntWlanApFileTransferMgt 4 }
+
+ntWlanDestFile  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The destination file name for TFTP transfer when a
+        transfer is next requested via this MIB.  This value is set to
+        the zero length string when no file name has been specified."
+    ::= { ntWlanApFileTransferMgt 5 }
+
+ntWlanFileServer  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP address of the TFTP server for transfer
+        when a download is next requested via this MIB.
+        This value is set to `0.0.0.0' when no IP address has been
+        specified."
+    ::= { ntWlanApFileTransferMgt 6 }
+
+ntWlanUserName  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The username specified for an FTP Transfer."
+    ::= { ntWlanApFileTransferMgt 7 }
+
+ntWlanPassword  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The password specified for an FTP Transfer."
+    ::= { ntWlanApFileTransferMgt 8 }
+
+
+ntWlanFileTransferStatus  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                            none(1),
+                            inProgress(2),
+                            success(3),
+                            fail(4),
+                            invalidSource(5),
+                            invalidDestination(6),
+                            outOfMemory(7),
+                            outOfSpace(8),
+                            fileNotFound(9)
+               }
+
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of the current FTP Transfer process."
+    ::= { ntWlanApFileTransferMgt 9 }
+
+-- ****************************************************************************
+--  ntWlanApResetMgt - Reset Mib elements
+-- ****************************************************************************
+
+ntWlanRestartOpCodeFile OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Name of op-code file for start-up."
+        ::= { ntWlanApResetMgt 1 }
+
+ntWlanRestartControl  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    running(1),
+                    warmBoot(2),
+                    coldBoot(3)
+              }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this object to warmBoot(2) causes the device to
+        restart the application software with current configuration
+        parameters saved in non-volatile memory.  Setting this
+        object to coldBoot(3) causes the device to reinitialize
+        configuration parameters in non-volatile memory to default
+        values and restart the application software.  When the device
+        is running normally, this variable has a value of
+        running(1)."
+    ::= { ntWlanApResetMgt 2 }
+
+
+-- ****************************************************************************
+--  ntWlanApIpMgnt - Ip Mib elements
+-- ****************************************************************************
+
+ntWlanNetConfigIPAddress  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP address of this Net interface.  The default value
+        for this object is 0.0.0.0.  If either the netConfigIPAddress
+        or netConfigSubnetMask are 0.0.0.0, then when the device
+        boots, it may use DHCP to try to figure out what these
+        values should be. If DHCP fails, before the device
+        can talk on the network, this value must be configured
+        (e.g., through a terminal attached to the device)."
+    ::= { ntWlanApIpMgt 1 }
+
+ntWlanNetConfigSubnetMask  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The subnet mask of this Net interface.  The default value
+        for this object is 0.0.0.0.  If either the netConfigIPAddress
+        or netConfigSubnetMask are 0.0.0.0, then when the device
+        boots, it may use DHCP to try to figure out what these
+        values should be. If DHCP fails, before the device
+        can talk on the network, this value must be configured
+        (e.g., through a terminal attached to the device)."
+    ::= { ntWlanApIpMgt 2 }
+
+ntWlanNetDefaultGateway  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of the default gateway.  If this value is
+        undefined or unknown, it shall have the value 0.0.0.0."
+    ::= { ntWlanApIpMgt 3 }
+
+ntWlanIpHttpState OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   enabled(1),
+                   disabled(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Whether HTTP is enabled."
+    ::= { ntWlanApIpMgt 4 }
+
+ntWlanIpHttpPort OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The port number for HTTP."
+    ::= { ntWlanApIpMgt 5 }
+
+
+-- **********************************************************************
+-- * End of ntWlanDot11OperationTable TABLE
+-- **********************************************************************
+
+-- PHY Attributes
+
+    ntWlanDot11Phy                OBJECT IDENTIFIER ::= { ntWlanApDot11 4 }
+
+-- **********************************************************************
+-- * ntWlanDot11PhyOperationEntry TABLE
+-- **********************************************************************
+ntWlanDot11PhyOperationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NtWlanDot11PhyOperationEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "Table of descriptive and status information about
+                 configuration of each radio of the AP."
+    ::= { ntWlanDot11Phy 1 }
+
+ntWlanDot11PhyOperationEntry OBJECT-TYPE
+    SYNTAX      NtWlanDot11PhyOperationEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table, containing information
+                 about configuration in one radio of the AP."
+    INDEX       { ntWlanDot11Index }
+    ::= { ntWlanDot11PhyOperationTable 1 }
+
+NtWlanDot11PhyOperationEntry ::= SEQUENCE
+{
+    ntWlanDot11Index                        Integer32,
+    ntWlanDot11TurboModeEnabled             INTEGER,
+    ntWlanDot11PreambleLength               INTEGER,
+    ntWlanDot11dWorldModeEnabled            TruthValue,
+    ntWlanDot11ClosedSystem                 TruthValue
+}
+
+ntWlanDot11Index OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION "Radio index of the AP."
+    ::= { ntWlanDot11PhyOperationEntry 1 }
+
+
+ntWlanDot11TurboModeEnabled OBJECT-TYPE
+    SYNTAX INTEGER {
+               none(99),
+               on(1),
+               off(2)
+           }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This attribute, when true, shall indicate that the nortel's 
+        propietory turbo mode option is enabled. The default value of
+        this attribute shall be false."
+    ::= { ntWlanDot11PhyOperationEntry 3 }
+
+
+ntWlanDot11PreambleLength OBJECT-TYPE
+    SYNTAX INTEGER {
+                twelveSymbols(99),
+                short(1),
+                long(2)
+            }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute determines whether or not a short or a long
+        preamble is used to delineate 802.11 frames."
+    ::= { ntWlanDot11PhyOperationEntry 4 }
+
+
+ntWlanDot11dWorldModeEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute determines whether 802.11d world mode is
+        enabled for this radio."
+    ::= { ntWlanDot11PhyOperationEntry 5 }
+
+
+ntWlanDot11ClosedSystem OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute determines whether the radio operates as a
+         closed system.  When configured as a closed system, the
+         SSID is not included when broadcasting periodic beacon
+         frames."
+    ::= { ntWlanDot11PhyOperationEntry 6 }
+
+-- **********************************************************************
+-- * End of ntWlanDot11PhyOperationEntry TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * ntWlanDot11AuthenticationEntry TABLE
+-- **********************************************************************
+ntWlanDot11AuthenticationEntry OBJECT IDENTIFIER ::= { ntWlanApDot11 5 }
+
+ntWlanDot118021xSupport OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute, when true(1), indicates that the Enterprise
+        Access Point supports the 802.1x authentication algorithm."
+    ::= { ntWlanDot11AuthenticationEntry 1 }
+
+ntWlanDot118021xRequired OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This attribute, when true(1), indicates that the Enterprise
+        Access Point requires successful 802.1x authentication              
+        for any clients accessing the network."
+    ::= { ntWlanDot11AuthenticationEntry 2 }
+
+ntWlanDot118021xBcastKeyRefresh OBJECT-TYPE
+    SYNTAX Integer32 (0..1440)
+    UNITS "Minutes"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The broadcast key refresh rate."
+    ::= { ntWlanDot11AuthenticationEntry 3 }
+
+ntWlanDot118021xSessKeyRefresh OBJECT-TYPE
+    SYNTAX Integer32 (0..1440)
+    UNITS "Minutes"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The session key refresh rate."
+    ::= { ntWlanDot11AuthenticationEntry 4 }
+
+ntWlanDot118021xReAuthRefresh OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The re-authentication refresh rate."
+    ::= { ntWlanDot11AuthenticationEntry 5 }
+
+
+-- **********************************************************************
+-- * End of ntWlanDot11Authentication TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * ntWlanDot11AuthenticationServer TABLE
+-- **********************************************************************
+
+ntWlanDot11AuthenticationServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanDot11AuthenticationServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each authentication server."
+        ::= { ntWlanApDot11 6 }
+
+ntWlanDot11AuthenticationServerEntry OBJECT-TYPE
+        SYNTAX      NtWlanDot11AuthenticationServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one radio of the AP."
+        INDEX       { ntWlanDot11ServerIndex }
+        ::= { ntWlanDot11AuthenticationServerTable 1 }
+
+NtWlanDot11AuthenticationServerEntry ::= SEQUENCE
+{
+    ntWlanDot11ServerIndex                      Integer32,
+    ntWlanDot11AuthenticationServer             IpAddress,
+    ntWlanDot11AuthenticationPort               INTEGER,
+    ntWlanDot11AuthenticationKey                DisplayString,
+    ntWlanDot11AuthenticationRetransmit         INTEGER,
+    ntWlanDot11AuthenticationTimeout            INTEGER,
+    ntWlanDot11SecondaryAuthServer              IpAddress,
+    ntWlanDot11SecondaryAuthPort                INTEGER,
+    ntWlanDot11SecondaryAuthKey                 DisplayString,
+    ntWlanDot11SecondaryAuthRetransmit          INTEGER,
+    ntWlanDot11SecondaryAuthTimeout             INTEGER
+}
+
+ntWlanDot11ServerIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Radio index of the AP."
+        ::= { ntWlanDot11AuthenticationServerEntry 1 }
+
+ntWlanDot11AuthenticationServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the IP address of the 
+            authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 2 }
+
+ntWlanDot11AuthenticationPort OBJECT-TYPE
+        SYNTAX INTEGER (1024..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the UDP Port used by the primary
+            authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 3 }
+
+ntWlanDot11AuthenticationKey OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..20))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the shared key used by the 
+            authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 4 }
+
+ntWlanDot11AuthenticationRetransmit OBJECT-TYPE
+        SYNTAX INTEGER (1..30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the retransmit timer length used by the 
+            authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 5 }
+
+ntWlanDot11AuthenticationTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..60)
+        UNITS "Seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the Timeout value(sec) used by the 
+            authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 6 }
+
+ntWlanDot11SecondaryAuthServer OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the IP address of the 
+            secondary authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 7 }
+
+ntWlanDot11SecondaryAuthPort OBJECT-TYPE
+        SYNTAX INTEGER (1024..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the UDP Port used by the primary
+            secondary authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 8 }
+
+ntWlanDot11SecondaryAuthKey OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..20))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the shared key used by the 
+            secondary authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 9 }
+
+ntWlanDot11SecondaryAuthRetransmit OBJECT-TYPE
+        SYNTAX INTEGER (1..30)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the retransmit timer length used by the 
+            secondary authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 10 }
+
+ntWlanDot11SecondaryAuthTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..60)
+        UNITS "Seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the Timeout value(sec) used by the 
+            secondary authentication server."
+        ::= { ntWlanDot11AuthenticationServerEntry 11 }
+
+
+-- **********************************************************************
+-- * End of ntWlanDot11AuthenticationServer TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * ntWlanDot11FilteringTable TABLE
+-- **********************************************************************
+
+ntWlanDot11FilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanDot11FilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information about
+                     each configured MAC Address Filtering Entry."
+        ::= { ntWlanApDot11 7 }
+
+ntWlanDot11FilterEntry OBJECT-TYPE
+        SYNTAX      NtWlanDot11FilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one radio of the AP."
+        INDEX       { ntWlanDot11FilterIndex }
+        ::= { ntWlanDot11FilterTable 1 }
+
+NtWlanDot11FilterEntry ::= SEQUENCE
+{
+    ntWlanDot11FilterIndex                        Integer32,
+    ntWlanDot11FilterAddress                      PhysAddress,
+    ntWlanDot11FilterStatus                       INTEGER
+}
+
+ntWlanDot11FilterIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Filter index."
+        ::= { ntWlanDot11FilterEntry 1 }
+
+
+ntWlanDot11FilterAddress OBJECT-TYPE
+        SYNTAX PhysAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of the 
+            filter entry."
+        ::= { ntWlanDot11FilterEntry 2 }
+
+ntWlanDot11FilterStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                allowed(30),
+                denied(31)
+            }
+
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This values indicates the Status of the filter entry.
+             Ifallowed, the client is allowed access to the network.
+             If disallowed, the no frames will be forwarded to the 
+             network from the client."
+
+        ::= { ntWlanDot11FilterEntry 3 }
+
+-- **********************************************************************
+-- * End of ntWlanDot11FilteringTable TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * ntWlanDot11TrapTable TABLE
+-- **********************************************************************
+ntWlanDot11TrapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanDot11TrapEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Table of status information for Association and
+        Disassociation Trap"
+        ::= { ntWlanApDot11 9 }
+ 
+ntWlanDot11TrapEntry OBJECT-TYPE
+        SYNTAX      NtWlanDot11TrapEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     for the association and disassociation trap."
+        INDEX       { ntWlanDot11InterfaceIndex }
+        ::= { ntWlanDot11TrapTable 1 }
+
+NtWlanDot11TrapEntry ::= SEQUENCE
+{
+    ntWlanDot11InterfaceIndex                 Integer32,
+    ntWlanDot11AssociationStationAddress      PhysAddress,
+    ntWlanDot11DisassociationStationAddress   PhysAddress,
+    ntWlanDot11AssociationMU                  INTEGER
+}
+
+ntWlanDot11InterfaceIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION "Interface index."
+        ::= { ntWlanDot11TrapEntry 1 }
+
+ntWlanDot11AssociationStationAddress OBJECT-TYPE
+        SYNTAX PhysAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of the Mobile Unit 
+             associating with this Access Point."
+        ::= { ntWlanDot11TrapEntry 2 } 
+        
+ntWlanDot11DisassociationStationAddress OBJECT-TYPE
+        SYNTAX PhysAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the MAC address of the Mobile Unit 
+             no longer associated with this Access Point."
+        ::= { ntWlanDot11TrapEntry 3 }    
+                   
+ntWlanDot11AssociationMU OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This values indicates the number of Mobile Units associated
+            on the Interface"
+        ::= { ntWlanDot11TrapEntry 4 }  
+
+
+-- **********************************************************************
+-- * End of ntWlanDot11TrapTable TABLE
+-- **********************************************************************
+
+-- **********************************************************************
+-- * Notification Definitions
+-- **********************************************************************
+
+ntWlanApTraps0     OBJECT IDENTIFIER ::= { ntWlanApTraps 0 }
+
+ntWlanApDot1xAuthenticationFail   NOTIFICATION-TYPE
+    OBJECTS {
+        ifPhysAddress, 
+        ntWlanDot11AssociationStationAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "Indicates that a Mobile Unit failed 802.1x authentication.
+         - ifPhysAddress is the MAC address of the Access Point
+           sending this trap message.
+         - ntWlanDot11AssociationStationAddress is the MAC address
+           of the Mobile Unit."
+    ::=  { ntWlanApTraps0 101 }
+
+ntWlanApMuAssocTrap   NOTIFICATION-TYPE
+    OBJECTS {
+        ifPhysAddress, 
+        ntWlanDot11AssociationStationAddress, 
+        ntWlanDot11AssociationMU
+    }
+    STATUS current
+    DESCRIPTION
+        "Indicates that there is a Mobile Unit associating
+         with this Access Point.
+         - ifPhysAddress is the MAC address of the Access Point
+           sending this trap message.
+         - ntWlanDot11AssociationStationAddress is the MAC address of the 
+           Mobile Unit.
+           Note: If two or more Mobile Units associate with the
+           Access Point at the same time, ntWlanDot11AssociationStationAddress 
+           belongs to the last Mobile Unit.
+         - ntWlanDot11AssociationMU is the number of Mobile Units currently
+           associating with this Access Point."
+    ::=  { ntWlanApTraps0 111 }
+
+ntWlanApMuDisAssocTrap NOTIFICATION-TYPE
+    OBJECTS {
+        ifPhysAddress, 
+        ntWlanDot11DisassociationStationAddress, 
+        ntWlanDot11AssociationMU
+    }
+    STATUS current
+    DESCRIPTION
+        "Indicates that there is one Mobile Unit no longer
+         associating with this Access Point anymore.
+         - ifPhysAddress is the MAC address of the Access Point
+           sending this trap message.
+         - ntWlanDot11DisassociationStationAddress is the MAC address of the 
+           Mobile Unit.
+           Note: If two or more Mobile Units un-associate with
+           the Access Point at the same time, 
+           ntWlanDot11DisassociationStationAddress belongs to the last 
+           Mobile Unit.
+         - ntWlanDot11AssociationMU is the number of Mobile Units currently
+           associating with this Access Point."
+    ::= { ntWlanApTraps0 112 }
+
+ntWlanApMuWEPAuthFail NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex, 
+        ntWlanDot11AssociationStationAddress 
+    }
+    STATUS current
+    DESCRIPTION
+        "Indicates that WEP authentication of a Mobile Unit failed.
+         - ifIndex identifies the radio to which the MU attempted to connect.
+         - ntWlanDot11AssociationStationAddress is the MAC address of the 
+           Mobile Unit that attempted to connect."
+    ::= { ntWlanApTraps0 113 }
+
+ntWlanApMuWPAAuthFail NOTIFICATION-TYPE
+    OBJECTS {
+        ifIndex, 
+        ntWlanDot11AssociationStationAddress 
+    }
+    STATUS current
+    DESCRIPTION
+        "Indicates that WPA authentication of a Mobile Unit failed.
+         - ifIndex identifies the radio to which the MU attempted to connect.
+         - ntWlanDot11AssociationStationAddress is the MAC address of the 
+           Mobile Unit that attempted to connect."
+    ::= { ntWlanApTraps0 114 }
+
+-- **********************************************************************
+-- * End of Notifications section
+-- **********************************************************************
+
+-- **********************************************************************
+-- * Notification Control Objects
+-- **********************************************************************
+
+ntWlanApMuAssocTrapEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object controls whether ntWlanApMuAssocTrap
+                     notifications will be generated when an MU
+                     associates with the AP.  If this object is true(1),
+                     then the notification will be generated.  If it is
+                     false, the notification will not be generated."
+        ::= { ntWlanApTraps 1 }
+
+ntWlanApMuDisAssocTrapEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object controls whether ntWlanApMuDisAssocTrap
+                     notifications will be generated when an MU
+                     disassociates from the AP.  If this object is true(1),
+                     then the notification will be generated.  If it is
+                     false, the notification will not be generated."
+        ::= { ntWlanApTraps 2 }
+
+-- **********************************************************************
+-- * End of Notification Control Objects
+-- **********************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApLID - Objects for ethernet/IP(ping) link integrity detection
+-- ****************************************************************************
+
+ntWlanApLIDCheckEtherLinkEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether checks for ethernet link integrity are
+                     enabled."
+        ::= { ntWlanApLID 1 }
+
+ntWlanApLIDCheckIPLinkEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether checks for IP link integrity are
+                     enabled."
+        ::= { ntWlanApLID 2 }
+
+ntWlanApLIDCheckIpLinkAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The IP address to ping to check IP link integrity."
+        ::= { ntWlanApLID 3 }
+
+-- ****************************************************************************
+--  End of ntWlanApLID group
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApRateSupport - Objects for controlling basic and supported rates
+-- ****************************************************************************
+
+ntWlanApRateSupportTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApRateSupportEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure which hardware-supported rates are
+                     actively supported, and which are basic rates required
+                     for an MU to connect to an AP.  Entries must exist in
+                     this table for every hardware-supported rate for each
+                     appropriate ifIndex value."
+        ::= { ntWlanApRateSupport 1 }
+
+ntWlanApRateSupportEntry OBJECT-TYPE
+        SYNTAX      NtWlanApRateSupportEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApRateSupportTable."
+        INDEX       { ntWlanApRateSupportIfIndex, ntWlanApRateSupportSpeed }
+        ::= { ntWlanApRateSupportTable 1 }
+
+NtWlanApRateSupportEntry ::= SEQUENCE
+{
+    ntWlanApRateSupportIfIndex              InterfaceIndex,
+    ntWlanApRateSupportSpeed                NtWlanApDataRate,
+    ntWlanApRateSupportLevel                INTEGER
+}
+
+ntWlanApRateSupportIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value of the radio."
+        ::= { ntWlanApRateSupportEntry 1 }
+
+ntWlanApRateSupportSpeed OBJECT-TYPE
+        SYNTAX      NtWlanApDataRate
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A supported data rate."
+        ::= { ntWlanApRateSupportEntry 2 }
+
+ntWlanApRateSupportLevel OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(0),
+                        supported(1),
+                        supportedBasic(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether a specific rate is currently
+                     supported, and if so, whether it is a basic rate.
+
+                        off - indicates that this rate is not currently
+                            supported.
+
+                        supported - indicates that this rate is currently
+                            supported, but is not required to be supported
+                            by an MU in order to connect to this radio.
+
+                        supportedBasic - indicates that this rate is currently
+                            supported as a basic rate, and an MU must also
+                            support this rate in order to connect to this
+                            radio."
+        ::= { ntWlanApRateSupportEntry 3 }
+
+-- ****************************************************************************
+--  End of ntWlanApRateSupport group
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApSecurity - Objects for controlling WEP and WPA security
+-- ****************************************************************************
+
+ntWlanApSecurityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure WEP and WPA security parameters.
+                     Entries are per-radio."
+        ::= { ntWlanApSecurity 1 }
+
+ntWlanApSecurityEntry OBJECT-TYPE
+        SYNTAX      NtWlanApSecurityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApSecurityTable."
+        INDEX       { ntWlanApSecurityIfIndex }
+        ::= { ntWlanApSecurityTable 1 }
+
+NtWlanApSecurityEntry ::= SEQUENCE
+{
+    ntWlanApSecurityIfIndex              InterfaceIndex,
+    ntWlanApSecurityEnabled              TruthValue,
+    ntWlanApSecurityWEPAuthType          INTEGER,
+    ntWlanApSecurityWEPKeyLength         INTEGER,
+    ntWlanApSecurityWEPActiveKey         Integer32,
+    ntWlanApSecurityWEPKey1              NtWlanApWEPKey,
+    ntWlanApSecurityWEPKey2              NtWlanApWEPKey,
+    ntWlanApSecurityWEPKey3              NtWlanApWEPKey,
+    ntWlanApSecurityWEPKey4              NtWlanApWEPKey,
+    ntWlanApSecurityWPASupport           INTEGER,
+    ntWlanApSecurityWPAMode              INTEGER,
+    ntWlanApSecurityWPAPreSharedKey      OCTET STRING,
+    ntWlanApSecurityWPAMcastCypherMode   INTEGER
+}
+
+ntWlanApSecurityIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value of the radio."
+        ::= { ntWlanApSecurityEntry 1 }
+
+ntWlanApSecurityEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether security is enabled for a radio."
+        ::= { ntWlanApSecurityEntry 2 }
+
+ntWlanApSecurityWEPAuthType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        openSystem(0),
+                        sharedKey(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The WEP authentication type."
+        ::= { ntWlanApSecurityEntry 3 }
+
+ntWlanApSecurityWEPKeyLength OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        wepKey64(0),
+                        wepKey128(1),
+                        wepKey152(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates the WEP key length being used."
+        ::= { ntWlanApSecurityEntry 4 }
+
+ntWlanApSecurityWEPActiveKey OBJECT-TYPE
+        SYNTAX      Integer32 (1..4)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates which WEP key is currently in use."
+        ::= { ntWlanApSecurityEntry 5 }
+
+ntWlanApSecurityWEPKey1 OBJECT-TYPE
+        SYNTAX      NtWlanApWEPKey
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The first WEP key.  Retrieval of this object will
+                     always return an empty string."
+        ::= { ntWlanApSecurityEntry 6 }
+
+ntWlanApSecurityWEPKey2 OBJECT-TYPE
+        SYNTAX      NtWlanApWEPKey
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The second WEP key.  Retrieval of this object will
+                     always return an empty string."
+        ::= { ntWlanApSecurityEntry 7 }
+
+ntWlanApSecurityWEPKey3 OBJECT-TYPE
+        SYNTAX      NtWlanApWEPKey
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The third WEP key.  Retrieval of this object will
+                     always return an empty string."
+        ::= { ntWlanApSecurityEntry 8 }
+
+ntWlanApSecurityWEPKey4 OBJECT-TYPE
+        SYNTAX      NtWlanApWEPKey
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The fourth WEP key.  Retrieval of this object will
+                     always return an empty string."
+        ::= { ntWlanApSecurityEntry 9 }
+
+ntWlanApSecurityWPASupport OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        supported(1),
+                        required(2),
+                        wepOnly(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether WPA security is supported."
+        ::= { ntWlanApSecurityEntry 10 }
+
+ntWlanApSecurityWPAMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        dynamic(0),
+                        preSharedKey(1)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The WPA mode."
+        ::= { ntWlanApSecurityEntry 11 }
+
+ntWlanApSecurityWPAPreSharedKey OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(63))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The WPA pre-shared key."
+        ::= { ntWlanApSecurityEntry 12 }
+
+ntWlanApSecurityWPAMcastCypherMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        wep(0),
+                        tkip(1),
+                        aes(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The multicast cypher mode."
+        ::= { ntWlanApSecurityEntry 13 }
+
+-- ****************************************************************************
+--  End of ntWlanApSecurity group
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApQoS - Objects for controlling QoS
+-- ****************************************************************************
+
+ntWlanApQoSMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        off(0),
+                        etherSrc(1),
+                        etherDst(2),
+                        ethertype(3),
+                        directPriorityMap(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the QoS mode being used.
+
+                        off - indicates QoS features are disabled.
+
+                        etherSrc - indicates that the ethernet source MAC
+                            address of received packets is mapped to an
+                            egress queue.
+
+                        etherDst - indicates that the ethernet destination
+                            MAC address of received packets is mapped to an
+                            egress queue.
+
+                        etherType - indicates that the ethernet type of
+                            of received packets is mapped to an egress
+                            queue.
+
+                        directPriorityMap - indicates that the priority
+                            value of received packets is used to map directly
+                            to an egress queue."
+        ::= { ntWlanApQoS 1 }
+
+ntWlanApQoSEtherTypeToQueueTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApQoSEtherTypeToQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure mappings from ethernet type
+                     to queue number."
+        ::= { ntWlanApQoS 2 }
+
+ntWlanApQoSEtherTypeToQueueEntry OBJECT-TYPE
+        SYNTAX      NtWlanApQoSEtherTypeToQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApQoSTable."
+        INDEX       { ntWlanApQoSEtherTypeToQueueIndex }
+        ::= { ntWlanApQoSEtherTypeToQueueTable 1 }
+
+NtWlanApQoSEtherTypeToQueueEntry ::= SEQUENCE
+{
+    ntWlanApQoSEtherTypeToQueueIndex           Integer32,
+    ntWlanApQoSEtherTypeToQueueNumber          Integer32,
+    ntWlanApQoSEtherTypeToQueueRowStatus       RowStatus
+}
+
+ntWlanApQoSEtherTypeToQueueIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An ethernet type, to be mapped to a queue."
+        ::= { ntWlanApQoSEtherTypeToQueueEntry 1 }
+
+ntWlanApQoSEtherTypeToQueueNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The queue number to which the ether type is mapped."
+        ::= { ntWlanApQoSEtherTypeToQueueEntry 2 }
+
+ntWlanApQoSEtherTypeToQueueRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to create and destroy entries in
+                     this table."
+        ::= { ntWlanApQoSEtherTypeToQueueEntry 3 }
+
+
+ntWlanApQoSMACToQueueTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApQoSMACToQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure mappings from ethernet MAC address
+                     to queue number."
+        ::= { ntWlanApQoS 3 }
+
+ntWlanApQoSMACToQueueEntry OBJECT-TYPE
+        SYNTAX      NtWlanApQoSMACToQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApQoSTable."
+        INDEX       { ntWlanApQoSMACToQueueAddress }
+        ::= { ntWlanApQoSMACToQueueTable 1 }
+
+NtWlanApQoSMACToQueueEntry ::= SEQUENCE
+{
+    ntWlanApQoSMACToQueueAddress         MacAddress,
+    ntWlanApQoSMACToQueueNumber          Integer32,
+    ntWlanApQoSMACToQueueRowStatus       RowStatus
+}
+
+ntWlanApQoSMACToQueueAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An ethernet MAC address, to be mapped to a queue."
+        ::= { ntWlanApQoSMACToQueueEntry 1 }
+
+ntWlanApQoSMACToQueueNumber OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The queue number to which the MAC address is mapped."
+        ::= { ntWlanApQoSMACToQueueEntry 2 }
+
+ntWlanApQoSMACToQueueRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to create and destroy entries in
+                     this table."
+        ::= { ntWlanApQoSMACToQueueEntry 3 }
+
+-- ****************************************************************************
+--  End of ntWlanApQoS group
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApVlan - Objects for controlling Vlan
+-- ****************************************************************************
+
+ntWlanApVlanEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether Vlan support is enabled."
+        ::= { ntWlanApVlan 1 }
+
+
+ntWlanApVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table to configure the default VID per-radio."
+        ::= { ntWlanApVlan 2 }
+
+ntWlanApVlanEntry OBJECT-TYPE
+        SYNTAX      NtWlanApVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApVlanTable."
+        INDEX       { ntWlanApVlanIfIndex }
+        ::= { ntWlanApVlanTable 1 }
+
+NtWlanApVlanEntry ::= SEQUENCE
+{
+    ntWlanApVlanIfIndex      InterfaceIndex,
+    ntWlanApVlanDefaultVid   Integer32
+}
+
+ntWlanApVlanIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifIndex value of the radio."
+        ::= { ntWlanApVlanEntry 1 }
+
+ntWlanApVlanDefaultVid OBJECT-TYPE
+        SYNTAX      Integer32 (0..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The default VID of the radio."
+        ::= { ntWlanApVlanEntry 2 }
+
+
+ntWlanApVlanMUMACToVidTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApVlanMUMACToVidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table containing mappings from Mobile Unit MAC
+                     addresses to VLAN ID values."
+        ::= { ntWlanApVlan 3 }
+
+ntWlanApVlanMUMACToVidEntry OBJECT-TYPE
+        SYNTAX      NtWlanApVlanMUMACToVidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApVlanMUMACToVidTable."
+        INDEX       { ntWlanApVlanMUMACToVidAddress }
+        ::= { ntWlanApVlanMUMACToVidTable 1 }
+
+NtWlanApVlanMUMACToVidEntry ::= SEQUENCE
+{
+    ntWlanApVlanMUMACToVidAddress         MacAddress,
+    ntWlanApVlanMUMACToVidNumber          Integer32
+}
+
+ntWlanApVlanMUMACToVidAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ethernet MAC address of a Mobile Unit."
+        ::= { ntWlanApVlanMUMACToVidEntry 1 }
+
+ntWlanApVlanMUMACToVidNumber OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The VID to which this Mobile Unit's MAC is mapped."
+        ::= { ntWlanApVlanMUMACToVidEntry 2 }
+
+-- ****************************************************************************
+--  End of ntWlanApVlan group
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--  ntWlanApStats - Objects for controlling Statistics
+-- ****************************************************************************
+
+ntWlanApMUStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NtWlanApMUStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of per-Mobile Unit statistics."
+        ::= { ntWlanApStats 1 }
+
+ntWlanApMUStatsEntry OBJECT-TYPE
+        SYNTAX      NtWlanApMUStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the ntWlanApMUStatsTable."
+        INDEX       { ntWlanApMUStatsMUAddress }
+        ::= { ntWlanApMUStatsTable 1 }
+
+NtWlanApMUStatsEntry ::= SEQUENCE
+{
+    ntWlanApMUStatsMUAddress    MacAddress,
+    ntWlanApMUStatsPacketsIn    Counter32,
+    ntWlanApMUStatsPacketsOut   Counter32,
+    ntWlanApMUStatsOctetsIn     Counter32,
+    ntWlanApMUStatsOctetsOut    Counter32
+}
+
+ntWlanApMUStatsMUAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ethernet MAC address of the Mobile Unit."
+        ::= { ntWlanApMUStatsEntry 1 }
+
+ntWlanApMUStatsPacketsIn OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A count of the packets received from this MU."
+        ::= { ntWlanApMUStatsEntry 2 }
+
+ntWlanApMUStatsPacketsOut OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A count of the packets sent to this MU."
+        ::= { ntWlanApMUStatsEntry 3 }
+
+ntWlanApMUStatsOctetsIn OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A count of the octets received from this MU."
+        ::= { ntWlanApMUStatsEntry 4 }
+
+ntWlanApMUStatsOctetsOut OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A count of the octets sent to this MU."
+        ::= { ntWlanApMUStatsEntry 5 }
+
+-- ****************************************************************************
+--  End of ntWlanApQoS group
+-- ****************************************************************************
+
+END
+

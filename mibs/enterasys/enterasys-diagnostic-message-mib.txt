@@ -1,0 +1,332 @@
+ENTERASYS-DIAGNOSTIC-MESSAGE-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-diagnostic-message-mib.txt
+--
+--  Part Number:
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' diagnostic message retrieval and monitoring OIDs.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright January, 2002-2003 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32
+        FROM SNMPv2-SMI
+    DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysDiagnosticMessageMIB MODULE-IDENTITY
+    LAST-UPDATED "200304252048Z"  -- Fri Apr 25 20:48 GMT 2003
+    ORGANIZATION "Enterasys Networks"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under the Enterasys enterprise OID pertaining to the
+         retrieval of diagnostic messages."
+
+    REVISION "200301102117Z"  -- Fri Jan 10 21:17 GMT 2003
+    DESCRIPTION
+         "Added a textual convention to provide a display hint for
+          the etsysDiagnosticMessageDetailsText object."
+
+    REVISION "200206071428Z"  -- Fri Jun  7 14:28 GMT 2002
+    DESCRIPTION
+         "Added Enterasys copyright notice and corrected some text."
+
+    REVISION "200112031951Z"  -- Mon Dec  3 19:51 GMT 2001
+    DESCRIPTION
+         "Removed the import of BITS from SNMPv2-SMI."
+
+    REVISION "200108080000Z"
+    DESCRIPTION
+         "The initial version of this MIB module."
+
+    ::= { etsysModules 13 }
+
+LongAdminString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1024a"
+    STATUS        current
+    DESCRIPTION
+        "A size extended version of an SnmpAdminString as defined
+         in RFC2571.
+        "
+    REFERENCE
+        "RFC2571 (An Architecture for Describing SNMP Management
+         Frameworks)"
+    SYNTAX  OCTET STRING (SIZE (0..1024))
+
+
+-- -------------------------------------------------------------
+-- etsysDiagnosticMessageMIB  groupings
+-- -------------------------------------------------------------
+
+etsysDiagnosticMessage           OBJECT IDENTIFIER
+                            ::= { etsysDiagnosticMessageMIB 1 }
+
+etsysDiagnosticMessageDetails    OBJECT IDENTIFIER
+                            ::= { etsysDiagnosticMessageMIB 2 }
+
+-- -------------------------------------------------------------
+-- etsysDiagnosticMessages  group
+-- -------------------------------------------------------------
+
+etsysDiagnosticMessageCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of messages logged on this entity since
+         the beginning of time.  This value must be persistent.
+         There should be no facility to clear this value."
+    ::= { etsysDiagnosticMessage 1 }
+
+etsysDiagnosticMessageChanges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of changes to the message log since the
+         last reboot.  Changes should include, clearing the
+         message log, deleting a message, and the logging of
+         new messages."
+    ::= { etsysDiagnosticMessage 2 }
+
+etsysDiagnosticMessageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysDiagnosticMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists a summary of the diagnostic messages
+         stored on the managed entity."
+    ::= { etsysDiagnosticMessage 3 }
+
+etsysDiagnosticMessageEntry OBJECT-TYPE
+    SYNTAX      EtsysDiagnosticMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing a particular diagnostic message.
+         Every message that is stored in non-volatile memory
+         is required to appear in this table."
+    INDEX { etsysDiagnosticMessageIndex }
+    ::= { etsysDiagnosticMessageTable 1 }
+
+EtsysDiagnosticMessageEntry ::= SEQUENCE {
+    etsysDiagnosticMessageIndex       Unsigned32,
+    etsysDiagnosticMessageTime        DateAndTime,
+    etsysDiagnosticMessageType        SnmpAdminString,
+    etsysDiagnosticMessageSummary     SnmpAdminString,
+    etsysDiagnosticMessageFWRevision  SnmpAdminString,
+    etsysDiagnosticMessageStatus      BITS
+}
+
+etsysDiagnosticMessageIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique arbitrary identifier for this message.  For
+         stateless message log implementations it may be valid
+         only while etsysDiagnosticMessageChanges remains unchanged."
+    ::= { etsysDiagnosticMessageEntry 1 }
+
+etsysDiagnosticMessageTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time and date that this message was stored."
+    ::= { etsysDiagnosticMessageEntry 2 }
+
+etsysDiagnosticMessageType OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A description of the type of message shown in this entry."
+    ::= { etsysDiagnosticMessageEntry 3 }
+
+etsysDiagnosticMessageSummary OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A brief summary of the diagnostic message."
+    ::= { etsysDiagnosticMessageEntry 4 }
+
+etsysDiagnosticMessageFWRevision OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The string representing the version of firmware running
+         on the the managed entity at the time the message was stored."
+    ::= { etsysDiagnosticMessageEntry 5 }
+
+etsysDiagnosticMessageStatus OBJECT-TYPE
+    SYNTAX      BITS {
+        etsysDiagnosticMessageBadChecksum(0)
+                              -- Message checksum failed during
+                              -- retrieval.  May indicate corruption.
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A list of attributes associated with this message.  Generally
+         these attributes would be considered exceptional, but could
+         potentially be extended to indicate any number of conditions."
+    ::= { etsysDiagnosticMessageEntry 6 }
+
+-- -------------------------------------------------------------
+-- etsysDiagnosticMessageDetails  group
+-- -------------------------------------------------------------
+
+-- -------------------------------------------------------------
+-- The etsysDiagnosticMessageDetailsTable allows the complete
+-- message to be retrieved from the managed entity via SNMP.
+-- -------------------------------------------------------------
+
+etsysDiagnosticMessageDetailsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EtsysDiagnosticMessageDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the complete diagnostic messages
+         for entries in the etsysDiagnosticMessageSummaryTable.
+         This allows a message of virtually unlimited length
+         to be accessible via SNMP."
+    ::= { etsysDiagnosticMessageDetails 1 }
+
+etsysDiagnosticMessageDetailsEntry OBJECT-TYPE
+    SYNTAX      EtsysDiagnosticMessageDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry describing a particular fragment of a message."
+    INDEX { etsysDiagnosticMessageIndex,
+            etsysDiagnosticMessageDetailsIndex }
+    ::= { etsysDiagnosticMessageDetailsTable 1 }
+
+EtsysDiagnosticMessageDetailsEntry ::= SEQUENCE {
+    etsysDiagnosticMessageDetailsIndex     Unsigned32,
+    etsysDiagnosticMessageDetailsText      LongAdminString,
+    etsysDiagnosticMessageDetailsStatus    BITS
+}
+
+etsysDiagnosticMessageDetailsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique arbitrary identifier for this message fragment.
+         Ideally this index should have the values 1 - n, where
+         'n' is the number of message fragments.  It, at a minimum,
+         must be chosen such that the lexicographical ordering will
+         allow the fragments to be assembled in the proper order."
+    ::= { etsysDiagnosticMessageDetailsEntry 1 }
+
+etsysDiagnosticMessageDetailsText OBJECT-TYPE
+    SYNTAX      LongAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The text that makes up a fragment of a message."
+    ::= { etsysDiagnosticMessageDetailsEntry 2 }
+
+etsysDiagnosticMessageDetailsStatus OBJECT-TYPE
+    SYNTAX      BITS {
+        etsysDiagnosticMessageLastSegment(0)
+                              -- This is the last segment for this
+                              -- message index.
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A list of attributes associated with this message segment."
+    ::= { etsysDiagnosticMessageDetailsEntry 3 }
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+
+etsysDiagnosticMessageConformance OBJECT IDENTIFIER
+                                  ::= { etsysDiagnosticMessageMIB 3 }
+
+etsysDiagnosticMessageGroups      OBJECT IDENTIFIER
+                                  ::= { etsysDiagnosticMessageConformance 1 }
+
+etsysDiagnosticMessageCompliances OBJECT IDENTIFIER
+                                  ::= { etsysDiagnosticMessageConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+etsysDiagnosticMessageGroup OBJECT-GROUP
+    OBJECTS {
+        etsysDiagnosticMessageCount,
+        etsysDiagnosticMessageChanges,
+        etsysDiagnosticMessageTime,
+        etsysDiagnosticMessageType,
+        etsysDiagnosticMessageSummary,
+        etsysDiagnosticMessageFWRevision,
+        etsysDiagnosticMessageStatus,
+        etsysDiagnosticMessageDetailsText,
+        etsysDiagnosticMessageDetailsStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The basic etsysDiagnosticMessage group."
+    ::= { etsysDiagnosticMessageGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+etsysDiagnosticMessageCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for managed entities that
+         support diagnostic message logs."
+    MODULE
+        MANDATORY-GROUPS { etsysDiagnosticMessageGroup }
+
+    ::= { etsysDiagnosticMessageCompliances 1 }
+
+END

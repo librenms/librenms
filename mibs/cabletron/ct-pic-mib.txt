@@ -1,0 +1,876 @@
+CT-PIC-MIB DEFINITIONS ::= BEGIN
+        --  ct-pic-mib
+        --  Revision: 1.02.05
+        --  Part Number: 2170997
+        --  Date:  March 16, 2000
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for part
+        --  of the naming tree below:
+        --
+        --              cabletron { enterprises 52 }
+        --
+        --  This module will be extended, as additional sub-sections
+        --  of this naming tree are defined.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright March 2000 Cabletron Systems
+
+-- PICs come in multiple types.  In general they define information which is
+-- maintained by manufacturing and is updated whenever the  module is updated.
+-- The other use for PICs is to hold other interesting information such as
+-- MAC addresses etc.  In order to support this dual function this MIB
+-- consists of 2 different tables.  The first ctPicTable calls out the
+-- information that is defined by manufacturing which defines the particular
+-- module the PIC resides on.  The second table ctPicTagTable defines the
+-- other entries that may or maynot be  defined for the given module.  The
+-- second table functions based on TAG id to define the location of the object
+-- within the PIC and a TAG type field that defines the type of information
+-- found in that field.
+
+        IMPORTS
+                Gauge           FROM RFC1155-SMI
+                OBJECT-TYPE     FROM RFC-1212
+                DisplayString   FROM RFC1213-MIB
+                ctPIC           FROM CTRON-MIB-NAMES;
+
+-- DisplayString ::= OCTET STRING
+
+-- ctPIC MODULE-IDENTITY
+--    LAST-UPDATED "000316184621Z"
+--    ORGANIZATION "Cabletron Systems, Inc"
+--    CONTACT-INFO
+--    "Cabletron Systems, Inc.
+--     35 Industrial Way, P.O. Box 5005
+--     Rochester, NH 03867-0505
+--     (603) 332-9400
+--     support@cabletron.com
+--     http://www.ctron.com"
+--
+--    DESCRIPTION
+--            "This mib module defines a portion of the SNMP enterprise
+--             MIBs under Cabletron enterprise OID pertaining to
+--             the Product Information Chip (PIC)."
+--
+--    REVISION    "000316184621Z"
+--    DESCRIPTION "Added enumerations newbridge(5) and enTeraSys(6) to the
+--                 ctPicOEMVendorId leaf.  Added a commented out MODULE-IDENTITY 
+--                 block to allow for better tracking of revisions."
+--         ::= { ctSystem 9 }
+
+
+pic     OBJECT IDENTIFIER ::= { ctPIC 1 }
+
+ctPicNumberEntries      OBJECT-TYPE
+        SYNTAX  Gauge
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the number of PIC modules defined by this MIB."
+        ::= { pic 1 }
+
+ctPicTable              OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPicEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table that describes the contents of all PIC modules
+                accessible by this module."
+        ::= { pic 2 }
+
+ctPicEntry              OBJECT-TYPE
+        SYNTAX  CtPicEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Description of a specific instance of a PIC module."
+        INDEX   { ctPicSlot, ctPicIndex }
+        ::= { ctPicTable 1 }
+
+CtPicEntry              ::= SEQUENCE {
+        ctPicSlot
+                INTEGER,
+        ctPicIndex
+                INTEGER,
+        ctPicLocation
+                OBJECT IDENTIFIER,
+        ctPicStatus
+                INTEGER,
+        ctPicVersion
+                DisplayString,
+        ctPicModuleType
+                OBJECT IDENTIFIER,
+        ctPicMfgPN
+                DisplayString,
+        ctPicMfgSN
+                DisplayString,
+        ctPicMfgPartNumb
+                DisplayString,
+        ctPicMfgSerialNumb
+                DisplayString,
+        ctPicMfgReworkLocation
+                DisplayString,
+        ctPicMfgMfgLocation
+                DisplayString,
+        ctPicMfgDateCode
+                DisplayString,
+        ctPicMfgRevisionCode
+                DisplayString,
+        ctPicTLPN
+                DisplayString,
+        ctPicTLSN
+                DisplayString,
+        ctPicTLPartNumb
+                DisplayString,
+        ctPicTLSerialNumb
+                DisplayString,
+        ctPicTLReworkLocation
+                DisplayString,
+        ctPicTLMfgLocation
+                DisplayString,
+        ctPicTLDateCode
+                DisplayString,
+        ctPicTLRevisionCode
+                DisplayString,
+        ctPicPcbRevision
+                DisplayString,
+        ctPicMacAddr
+                OCTET STRING,
+        ctPicNumbRsvdAddrs
+                INTEGER,
+        ctPicBoardRevision
+                DisplayString,
+        ctPicModuleTypeString
+                DisplayString,
+        ctPicDCDCconverterType
+                DisplayString,
+        ctPicDCDCconvInputPower
+                DisplayString,
+        ctPicSMB1promVersion
+                DisplayString,
+        ctPicAtmMacAddr
+                OCTET STRING,
+        ctPicOEMVendorId
+                INTEGER,
+        ctPicOEMVendorName
+                DisplayString,
+        ctPicMfg97SN
+                DisplayString,
+        ctPicMfg97DateCode
+                DisplayString,
+        ctPicMfg97RevisionCode
+                DisplayString,
+        ctPicTL97SN
+                DisplayString,
+        ctPicTL97DateCode
+                DisplayString,
+        ctPicTL97RevisionCode
+                DisplayString,
+        ctPicOEMTLSN
+                DisplayString
+        }
+
+ctPicSlot  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specific slot which the module that realizes this PIC
+                resides.  If the PIC is associated with the chassis
+                and not a specific module then this value will be 0."
+        ::= { ctPicEntry 1 }
+
+ctPicIndex              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Uniquely identifies the instance of a PIC in a particular
+                 slot."
+        ::= { ctPicEntry 2 }
+
+ctPicLocation           OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines location of the PIC chip.  This takes on any of
+                the encoding values defined below for backplane, module,
+                daughter board, brim."
+        ::= { ctPicEntry 3 }
+
+ctPicStatus             OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        present(2),
+                        notPresent(3),
+                        checkSum(4),
+                        error(5),
+                        limited(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Provides the status of the specific PIC chip.  the values
+                are defined as follows:
+                        other(1) - firmware can not determine status
+                        present(2) - PIC seems to be functional
+                        notPresent(3) - PIC not found but expected
+                        checkSum(4) - A check sum error occured
+                        error(5) - An undefined error condition exists.
+                        limited(6) - A limited PIC implementation only
+                                type code information is present."
+        ::= { ctPicEntry 4 }
+
+ctPicVersion            OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Reflects the version of the PIC implementation that this
+                PIC conforms to.  This has the format x.yy . If non-existent,
+                this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 5 }
+
+ctPicModuleType OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the standard module type value as defined in
+                ctron-oids."
+        ::= { ctPicEntry 6 }
+
+ctPicMfgPN      OBJECT-TYPE
+        SYNTAX  DisplayString   (SIZE(9))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the manufacturing level part number of the module
+                associated with this PIC.  This information is encoded as
+                follows:
+                        7 Characters    Part Number
+                        2 Characters    Rework Location.
+                If any field of this object is non-existent, it will be set
+                to all blanks(ascii 32)."
+        ::= { ctPicEntry 7 }
+
+ctPicMfgSN      OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the manufacturing level serial number of the module
+                associated with this PIC.  This information is encoded as
+                follows:
+                        3 bytes - Date code (year/week)
+                        4 bytes - Serial number
+                        2 bytes - Manufacture location
+                        3 bytes - Board level revision
+                If any field of this object is non-existent, it will be 
+                set to all blanks(ascii 32)."
+        ::= { ctPicEntry 8 }
+
+ctPicMfgPartNumb        OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(7))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object presents the part number portion of the
+                ctPicMfgPN object.  This object contains the same information
+                however in a more human readable format.  If non-existent,
+                this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 9 }
+
+ctPicMfgSerialNumb      OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(4))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object presents the serial number portion of the
+                ctPicMfgSN object.  This object contains the same information
+                however in a more human readable format.  If non-existent,
+                this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 10 }
+
+ctPicMfgReworkLocation  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 2 character code that defines the location this
+                module was last reworked. This object contains the same
+                information as presented in ctPicMfgPN object however
+                in a more human readable format.  If non-existent, this
+                object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 11 }
+
+ctPicMfgMfgLocation  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The two character code that defines the location
+                this module was manufactured at. This object contains the same
+                information as presented in ctPicMfgSN object however
+                in a more human readable format.  If non-existent, this object 
+                will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 12 }
+
+ctPicMfgDateCode OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 3 byte date code field when this module was last
+                reworked.  This is in year/week format. This object
+                contains the same information as presented in ctPicMfgSN
+                object however in a more human readable format.  If 
+                non-existent, this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 13 }
+
+ctPicMfgRevisionCode  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 3 character board level revision code field of this
+                module.  This object contains the same information as
+                presented in ctPicMfgSN object however in a more human
+                readable format.  If non-existent, this object will be set
+                to all blanks (ascii 32)."
+        ::= { ctPicEntry 14 }
+
+ctPicTLPN               OBJECT-TYPE
+        SYNTAX  DisplayString   (SIZE(9))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the top level part number of the module associated
+                with this PIC.  This information is encoded as follows:
+                        7 Characters    Part Number
+                        2 Characters    Rework Location.
+                If any field of this object is non-existent, it will be set
+                to all blanks(ascii 32)."
+        ::= { ctPicEntry 15 }
+
+ctPicTLSN       OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the top level serial number of the module
+                associated with this PIC.  This information is encoded
+                as follows:
+                        3 bytes - Date code (year/week)
+                        4 bytes - Serial number
+                        2 bytes - Manufacture location
+                        3 bytes - Top level revision
+                If any field of this object is non-existent, it will be 
+                set to all blanks(ascii 32)."
+        ::= { ctPicEntry 16 }
+
+ctPicTLPartNumb OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(7))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object presents the part number portion of the
+                ctPicTLPN object.  This object contains the same information
+                however in a more human readable format.  If non-existent,
+                this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 17 }
+
+ctPicTLSerialNumb       OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(4))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This object presents the serial number portion of the
+                ctPicTLSN object.  This object contains the same information
+                however in a more human readable format.  If non-existent,
+                this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 18 }
+
+ctPicTLReworkLocation  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 2 character code that defines the location this
+                module was last reworked. This object contains the same
+                information as presented in ctPicTLPN object however
+                in a more human readable format.  If non-existent, this
+                object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 19 }
+
+ctPicTLMfgLocation  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The two character code that defines the location
+                this module was manufactured at. This object contains the same
+                information as presented in ctPicTLSN object however
+                in a more human readable format.  If non-existent, this object 
+                will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 20 }
+
+ctPicTLDateCode OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 3 byte date code field when this module was last
+                reworked.  This is in year/week format. This object
+                contains the same information as presented in ctPicTLSN
+                object however in a more human readable format.  If 
+                non-existent, this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 21 }
+
+ctPicTLRevisionCode  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 3 character top level revision code field of this module.
+                This object contains the same information as presented in
+                ctPicTLSN object however in a more human readable format.
+                If non-existent, this object will be set to all blanks
+                (ascii 32)."
+        ::= { ctPicEntry 22 }
+
+ctPicPcbRevision        OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(8))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the Cabletron revision of the art work for this
+                module. If non-existent, this object will be set to all
+                blanks(ascii 32)."
+        ::= { ctPicEntry 23 }
+
+ctPicMacAddr    OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE(0..6))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The base MAC address(ethernet format)assigned to the module.
+                If this field is not used then it should have a value of a
+                zero length string. If non-existent, this object will be set
+                to all blanks(ascii 32)."
+        ::= { ctPicEntry 24 }
+
+ctPicNumbRsvdAddrs  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of reserved MAC addresses starting at the
+                address as defined in ctPicMacAddr.  If no MAC addresses
+                are reserved this object should have a value of 0."
+        ::= { ctPicEntry 25 }
+
+ctPicBoardRevision      OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the Cabletron board level revision level code for
+                this module.  If non-existent, this object will be set to
+                blanks (ascii 32)."
+        ::= { ctPicEntry 26 }
+
+ctPicModuleTypeString   OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(16))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the module associated with this PIC in a 
+                human readable format.  If non-existent, this object 
+                will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 27 }
+
+ctPicDCDCconverterType  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the voltage of the installed DCDC Converter 
+                input and output lines.  
+                If the Module does not contain a DCDC Converter
+                this object will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 28 }
+
+ctPicDCDCconvInputPower OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(3))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the maximum allowed input power 
+                for the DCDC input line.
+                If the Module does not contain a DCDC Converter
+                this object will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 29 }
+
+ctPicSMB1promVersion    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(8))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the current version of the SMB1 prom. 
+                If the Module does not contain an SMB1 prom
+                this object will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 30 }
+
+ctPicAtmMacAddr       OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE(0..20))
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+              "The Atm MAC address(atm format)assigned to the chassis.
+              If this field is not used then it should have a value of a
+              zero length string. If non-existent, this object will be set
+              to all blanks(ascii 32)."
+      ::= { ctPicEntry 31 }
+
+ctPicOEMVendorId  OBJECT-TYPE
+        SYNTAX  INTEGER {
+          cabletron(1),
+          nEC(2),
+          dEC(3),
+          cPQ(4),
+          newbridge(5),
+          enTeraSys(6)
+          }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the OEM vendor for a product.
+                If the Module does not program this value
+                this object will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 32 }
+
+ctPicOEMVendorName      OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(40))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "ASCII name of the OEM vendor for the product.
+                If the Module does not program this value
+                this object will be set to blanks (ascii 32)."
+        ::= { ctPicEntry 33 }
+
+
+ctPicMfg97SN    OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the manufacturing level serial number of the module
+                associated with this PIC.  This information is encoded as
+                follows:
+                        4 bytes - Date code (year/week)
+                        4 bytes - Serial number
+                        2 bytes - Manufacture location
+                        2 bytes - Board level revision
+                If any field of this object is non-existent, it will be 
+                set to all blanks(ascii 32)."
+        ::= { ctPicEntry 34 }
+
+ctPicMfg97DateCode OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE(4))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 4 byte date code field when this module was last
+                reworked.  This is in year/week format. This object
+                contains the same information as presented in ctPicMfg97SN
+                object however in a more human readable format.  If 
+                non-existent, this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 35 }
+
+ctPicMfg97RevisionCode  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 2 character board level revision code field of this
+                module.  This object contains the same information as
+                presented in ctPicMfg97SN object however in a more human
+                readable format.  If non-existent, this object will be set
+                to all blanks (ascii 32)."
+        ::= { ctPicEntry 36 }
+
+ctPicTL97SN     OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes the top level serial number of the module
+                associated with this PIC.  This information is encoded
+                as follows:
+                        4 bytes - Date code (year/week)
+                        4 bytes - Serial number
+                        2 bytes - Manufacture location
+                        2 bytes - Top level revision
+                If any field of this object is non-existent, it will be 
+                set to all blanks(ascii 32)."
+        ::= { ctPicEntry 37 }
+
+ctPicTL97DateCode OBJECT-TYPE 
+        SYNTAX  DisplayString (SIZE(4))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 4 byte date code field when this module was last
+                reworked.  This is in year/week format. This object
+                contains the same information as presented in ctPicTL97SN
+                object however in a more human readable format.  If 
+                non-existent, this object will be set to all blanks(ascii 32)."
+        ::= { ctPicEntry 38 }
+
+ctPicTL97RevisionCode  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The 2 character top level revision code field of this module.
+                This object contains the same information as presented in
+                ctPicTL97SN object however in a more human readable format.
+                If non-existent, this object will be set to all blanks
+                (ascii 32)."
+        ::= { ctPicEntry 39 }
+
+ctPicOEMTLSN OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(20))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Describes the top level serial number of the module as specified
+                by the OEM for this device.  If non-existent, this object will be
+                set to all blanks (ascii 32)."
+        ::= { ctPicEntry 40 }
+
+
+ctPicECOTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPicECOEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each module that contains a PIC may have several
+                ECOs performed on it.  The ctPicECOTable reflects
+                a history of the last 5 ECOs that have been performed
+                on this module."
+        ::= { pic 3 }
+
+ctPicECOEntry   OBJECT-TYPE
+        SYNTAX  CtPicECOEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes a particular PIC ECO entry."
+        INDEX { ctPicECOSlot, ctPicECOIndex, ctPicECOID }
+        ::= { ctPicECOTable 1 }
+
+CtPicECOEntry   ::= SEQUENCE {
+        ctPicECOSlot
+                INTEGER,
+        ctPicECOIndex
+                INTEGER,
+        ctPicECOID
+                INTEGER,
+        ctPicECONumber
+                DisplayString
+        }
+
+ctPicECOSlot  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specific slot which the module that realizes this PIC
+                resides.  If the PIC is associated with the chassis
+                and not a specific module then this value will be 0.
+                This refers to the same slot as identified by ctPicSlot
+                in ctPicTable."
+        ::= { ctPicECOEntry 1 }
+
+ctPicECOIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The specific PIC instance that this ECO entry pertains to.
+                This refers to the same instance as identified by ctPicIndex
+                in ctPicTable."
+        ::= { ctPicECOEntry 2 }
+
+ctPicECOID  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Uniquely defines the ECO entry that is being described
+                by this conceptual row."
+        ::= { ctPicECOEntry 3 }
+
+ctPicECONumber  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines Cabletron's ECO number that describes the revision of
+                the hardware.  This object is organized as follows:
+                        6 Characters    ECO Number
+                        2 Characters    Rework Location
+                        4 Characters    Date Code"
+        ::= { ctPicECOEntry 4 }
+
+
+ctPicDiagTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPicDiagEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each module that contains a PIC may have several
+                Diags performed on it.  The ctPicDiagTable reflects
+                a history of the last 8 Diags that have been performed
+                on this module.
+
+                Important:  This table only contains entries diagnostic
+                entries that are defined.  Therefore it is possible for
+                this table to be empty 'does not respond to a GET or
+                GET-NEXT' if there are no diagnostic errors present."
+        ::= { pic 5 }
+
+ctPicDiagEntry  OBJECT-TYPE
+        SYNTAX  CtPicDiagEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes a particular PIC Diag entry."
+        INDEX { ctPicDiagSlot, ctPicDiagIndex, ctPicDiagID }
+        ::= { ctPicDiagTable 1 }
+
+CtPicDiagEntry  ::= SEQUENCE {
+        ctPicDiagSlot
+                INTEGER,
+        ctPicDiagIndex
+                INTEGER,
+        ctPicDiagID
+                INTEGER,
+        ctPicDiagResults
+                DisplayString
+        }
+
+ctPicDiagSlot  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specific slot which the module that realizes this PIC
+                resides.  If the PIC is associated with the chassis
+                and not a specific module then this value will be 0.
+                This refers to the same slot as identified by ctPicSlot
+                in ctPicTable."
+        ::= { ctPicDiagEntry 1 }
+
+ctPicDiagIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The specific PIC instance that this Diag entry pertains to.
+                This refers to the same instance as identified by ctPicIndex
+                in ctPicTable."
+        ::= { ctPicDiagEntry 2 }
+
+ctPicDiagID  OBJECT-TYPE
+        SYNTAX  INTEGER (1..8)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Uniquely defines the Diag entry that is being described
+                by this conceptual row."
+        ::= { ctPicDiagEntry 3 }
+
+ctPicDiagResults        OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(64))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines Cabletron's Diag results code."
+        ::= { ctPicDiagEntry 4 }
+
+-- The following is the control group for the PIC.
+-- Currently only one object is defined for this group.
+
+ctPicControlTable       OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtPicControlEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A table allowing management control of PIC 
+                 functionality. "
+        ::= { pic 8 }
+
+ctPicControlEntry       OBJECT-TYPE
+        SYNTAX  CtPicControlEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes a particular PIC Control Table entry."
+        INDEX { ctPicSlot, ctPicIndex }
+        ::= { ctPicControlTable 1 }
+
+CtPicControlEntry               ::= SEQUENCE {
+        ctPicRefresh
+                INTEGER
+        }
+ 
+ctPicRefresh   OBJECT-TYPE
+        SYNTAX  INTEGER   {
+                          reFresh(1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Setting this value causes the PIC Driver to clear
+                 cached memory and to reread the PIC chip.  This
+                 functionality removes the need for manufacturing 
+                 to power cycle a board to ensure proper PIC 
+                 programming.  Reading this object always returns
+                 a zero (0)."
+        ::= { ctPicControlEntry 1 }
+
+
+ctPicLocationID OBJECT IDENTIFIER ::= { pic 4 }
+ctPicLocationModule OBJECT IDENTIFIER ::= { ctPicLocationID 1 }
+ctPicBrim       OBJECT IDENTIFIER ::= { ctPicLocationID 2 }
+ctPicChassis    OBJECT IDENTIFIER ::= { ctPicLocationID 3 }
+ctPicDaughter   OBJECT IDENTIFIER ::= { ctPicLocationID 4 }
+ctPicBackPlane  OBJECT IDENTIFIER ::= { ctPicLocationID 5 }
+
+END

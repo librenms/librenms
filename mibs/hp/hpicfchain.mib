@@ -1,0 +1,357 @@
+       HP-ICF-CHAIN DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY,
+           NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, TruthValue, TimeStamp
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, hpicfCommon, hpicfCommonTrapsPrefix
+               FROM HP-ICF-OID;
+
+       hpicfChainMib MODULE-IDENTITY
+            LAST-UPDATED "200011032216Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module describes management of the
+                    Distributed Management Chain for devices in the
+                    HP AdvanceStack product line."
+
+            REVISION     "200011032216Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9703060333Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added NOTIFICATION-GROUP information."
+            REVISION     "9609100208Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB."
+            REVISION    "9402250000Z"  -- February 25, 1994
+            DESCRIPTION
+                    "Initial version of this MIB module."
+            ::= { hpicfObjectModules 2 }
+
+
+
+       hpicfChain      OBJECT IDENTIFIER ::= { hpicfCommon 1 }
+
+       -- This MIB models a chain of "boxes" attached to an HP 
+       -- Distributed Management Chain.  Each box may have one or 
+       -- more manageable entities in it, and may contain one or more
+       -- SNMP agents, which may each be acting as an SNMP proxy for
+       -- one or more of the other boxes on the Distributed 
+       -- Management Chain that do not have agents.
+       --
+       -- All of the agents on the chain will know about the 
+       -- hpicfChainTable.  The hpicfChainViewTable will contain 
+       -- entries for those boxes on the chain for which the agent 
+       -- can act as a proxy.
+
+       hpicfChainMaxMembers OBJECT-TYPE 
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The maximum number of devices that can be 
+                   supported on the Distributed Management Chain from
+                   this agent."
+           ::= { hpicfChain 1 }
+
+       hpicfChainCurMembers OBJECT-TYPE
+           SYNTAX     Integer32 (1..16)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of devices currently on the 
+                   Distributed Management Chain connected to this 
+                   agent."
+           ::= { hpicfChain 2 }
+
+       hpicfChainLastChange OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The value of sysUpTime on this agent the last 
+                   time a device was added to or removed from the 
+                   Distributed Management Chain connected to this 
+                   agent."
+           ::= { hpicfChain 3 }
+
+       hpicfChainChanges OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A count of the number of times devices have been 
+                   added to or removed from the Distributed 
+                   Management Chain connected to this agent."
+           ::= { hpicfChain 4 }
+
+       hpicfChainTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfChainEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of boxes currently connected to the same 
+                   Distributed Management Chain as this agent."
+           ::= { hpicfChain 5 }
+
+       hpicfChainEntry OBJECT-TYPE
+           SYNTAX     HpicfChainEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the table describing a single box on 
+                   the Distributed Management Chain connected to this
+                   device."
+           INDEX      { hpicfChainId }
+           ::= { hpicfChainTable 1 }
+
+       HpicfChainEntry ::= 
+           SEQUENCE {
+               hpicfChainId                    OCTET STRING,
+               hpicfChainObjectId              OBJECT IDENTIFIER,
+               hpicfChainTimestamp             TimeStamp,
+               hpicfChainHasAgent              TruthValue,
+               hpicfChainThisBox               TruthValue,
+               hpicfChainLocation              Integer32
+           }
+
+       hpicfChainId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (6))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "An identifier which uniquely identifies this 
+                   particular box.  In practice, this will be a box
+                   serial number or MAC address."
+           ::= { hpicfChainEntry 1 }
+
+       hpicfChainObjectId OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The authoritative identification of the box which
+                   provides an easy and unambiguous means for 
+                   determining the type of box."
+           ::= { hpicfChainEntry 2 }
+
+       hpicfChainTimestamp OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The value of the agent's sysUpTime at which this 
+                   box was last initialized.  If the box has not been
+                   initialized since the last reinitialization of the
+                   agent, then this object has a zero value."
+           ::= { hpicfChainEntry 3 }
+
+       hpicfChainHasAgent OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object will contain the value 'true' if this
+                   box contains at least one network management agent
+                   capable of responding to SNMP requests, and will 
+                   contain the value 'false' otherwise."
+           ::= { hpicfChainEntry 4 }
+
+       hpicfChainThisBox OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object will contain the value 'true' if this
+                   entry in the chain table corresponds to the box 
+                   which contains the agent which is responding to
+                   this SNMP request, and will contain the value
+                   'false' otherwise."
+           ::= { hpicfChainEntry 5 }
+
+       hpicfChainLocation OBJECT-TYPE
+           SYNTAX     Integer32 (0..255)
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This byte is settable by a management station and
+                   is not interpreted by the agent.  The intent is
+                   that a management station can use it to assign an
+                   ordering to boxes on the chain that can later be
+                   used when displaying the chain."
+           ::= { hpicfChainEntry 6 }
+
+       hpicfChainViewTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfChainViewEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This table contains one entry for each box on the
+                   Distributed Management Chain for which this agent 
+                   is able to act as a proxy."
+           ::= { hpicfChain 6 }
+
+       hpicfChainViewEntry OBJECT-TYPE
+           SYNTAX     HpicfChainViewEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpicfChainViewTable containing
+                   information about how to proxy to a single box."
+           INDEX      { hpicfChainViewId }
+           ::= { hpicfChainViewTable 1 }
+
+       HpicfChainViewEntry ::=
+           SEQUENCE {
+               hpicfChainViewId                OCTET STRING,
+               hpicfChainViewName              DisplayString
+           }
+
+       hpicfChainViewId OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (6))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "An identifier which uniquely identifies this 
+                   particular box.  In practice, this will be a box
+                   serial number or MAC address."
+           ::= { hpicfChainViewEntry 1 }
+
+       hpicfChainViewName OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..15))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The local name of this box.  This is used by the
+                   proxy agent for the box to determine which box on
+                   the Distributed Management Chain is being 
+                   addressed.  If an agent does not use this method 
+                   to distinguish proxy destinations, it should 
+                   return a zero length octet string for this object.
+
+                   For SNMPv1, the destination box is specified by
+                   appending this name to the proxy agent's community
+                   name.  For example, if this agent has a community
+                   with a community name of 'public', and the value
+                   of this object is 'repeater1', the community 
+                   'public/repeater1' will specify that the agent
+                   should proxy to the public community of the
+                   'repeater1' box.
+
+                   The default value for this object for box-level 
+                   repeaters is an ASCII hex representation of the 
+                   low-order three bytes of the device MAC address."
+           ::= { hpicfChainViewEntry 2 }
+
+
+       -- Chain MIB notifications
+
+       hpicfChainAddition NOTIFICATION-TYPE
+           OBJECTS    { hpicfChainId  }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS NOTIFICATION IS DEPRECATED *********
+
+                   An hpicfChainAddition trap indicates that a new node
+                   has been added to the Distributed Management Chain
+                   connected to this agent.  The hpicfChainId returned
+                   is the identifier for the new node.
+
+                   Replaced by Cold Start"
+           ::= { hpicfCommonTrapsPrefix  1 }
+
+       hpicfChainRemoval NOTIFICATION-TYPE
+           OBJECTS    { hpicfChainId }
+           STATUS     current
+           DESCRIPTION
+                   "An hpicfChainRemoval trap indicates that a node has
+                   been removed from the Distributed Management Chain
+                   connected to this agent.  The hpicfChainId returned
+                   is the identifier for the node that was removed."
+           ::=  { hpicfCommonTrapsPrefix 2 }
+
+
+       -- conformance information
+
+       hpicfChainConformance
+           OBJECT IDENTIFIER ::= { hpicfChainMib 1 }
+
+       hpicfChainCompliances
+           OBJECT IDENTIFIER ::= { hpicfChainConformance 1 }
+       hpicfChainGroups
+           OBJECT IDENTIFIER ::= { hpicfChainConformance 2 }
+
+
+       -- compliance statements
+
+       hpicfChainingCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "The compliance statement for HP ICF devices with
+                   a Distributed Management Chain connection."
+           MODULE
+               MANDATORY-GROUPS { hpicfChainingGroup,
+                                  hpicfChainTrapGroup }
+           ::= { hpicfChainCompliances 1 }
+
+       hpicfChainingCompliance2 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for HP ICF devices with
+                   a Distributed Management Chain connection."
+           MODULE
+               MANDATORY-GROUPS { hpicfChainingGroup,
+                                  hpicfChainNotifyGroup }
+           ::= { hpicfChainCompliances 2 }
+
+
+       -- units of conformance
+
+       hpicfChainingGroup OBJECT-GROUP
+           OBJECTS    { hpicfChainMaxMembers, hpicfChainCurMembers,
+                        hpicfChainLastChange, hpicfChainChanges,
+                        hpicfChainId, hpicfChainObjectId,
+                        hpicfChainTimestamp, hpicfChainHasAgent,
+                        hpicfChainThisBox, hpicfChainLocation,
+                        hpicfChainViewId, hpicfChainViewName }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing devices on the
+                   HP Distributed Management Bus."
+           ::= { hpicfChainGroups 1 }
+
+       hpicfChainTrapGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfChainAddition,
+                           hpicfChainRemoval }
+           STATUS        obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of notifications used to indicate a
+                   changes in membership on a Distributed Management
+                   Chain."
+           ::= { hpicfChainGroups 2 }
+
+       hpicfChainNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfChainRemoval }
+           STATUS        current
+           DESCRIPTION
+                   "A collection of notifications used to indicate a
+                   changes in membership on a Distributed Management
+                   Chain."
+           ::= { hpicfChainGroups 3 }
+
+
+       END
+

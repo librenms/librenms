@@ -1,0 +1,962 @@
+CTRON-MIB-NAMES DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cabletron
+            FROM CTRON-OIDS;
+
+mibs OBJECT IDENTIFIER ::= { cabletron 4 }
+
+-- MODULE-IDENTITY
+--  Organization
+--    Enterasys Networks
+--  ContactInfo
+--   "Postal:  Enterasys Networks
+--             50 Minuteman Rd.
+--             Andover, MA 01810-1008
+--             USA
+--    Phone:   +1 978 684 1000
+--    E-mail:  support@enterasys.com
+--    WWW:     http://www.enterasys.com"
+--  Description
+--    ctron-mib-names.txt
+--    Revision:
+--    Part Number: 
+--    Date:  March 6, 2006
+--    
+--    REVISION     "200603061501Z"  - Mon Mar  6 15:01 UTC 2006
+--    DESCRIPTION  "Added the ctFastPathProtectedPortMib OID."
+--   
+--    REVISION     "200601161932Z"  - Mon Jan 16 19:32 UTC 2006
+--    DESCRIPTION  "Added the ctDhcpServerExpMib OID."
+--
+--    REVISION     "200503251526Z"  - Fri Mar 25 15:26 GMT 2005
+--    DESCRIPTION  "Added the ctEntityStateTC and ctEntityStateMib OIDs."
+--   
+--    REVISION     "200503051336Z"  - Sat Mar  5 13:36 GMT 2005
+--    DESCRIPTION  "Added the ctronTrapeze OID."
+--    
+--    REVISION     "200410281452Z"  - Thu Oct 28 14:52 GMT 2004
+--    DESCRIPTION  "Added the ctronWslMIB OID."
+--    
+--    REVISION     "200403251446Z"  - Thu Mar 25 14:46 GMT 2004
+--    DESCRIPTION  "Added the ctronAP3000 OID."
+--    
+--    REVISION     "200312122049Z"  - Fri Dec 12 20:49 GMT 2003
+--    DESCRIPTION  "Added the ctronV2H and v2h124-24MIB OIDs."
+--    
+--    This module provides authoritative definitions for part
+--    of the naming tree below:
+--    
+--    cabletron { enterprises 52 }
+--    
+--    This module will be extended, as additional sub-sections
+--    of this naming tree are defined.
+--    
+--    Enterasys Networks reserves the right to make changes in 
+--    specification and other information contained in this document 
+--    without prior notice.  The reader should consult Enterasys Networks
+--    to determine whether any such changes have been made.
+--    
+--    In no event shall Enterasys Networks be liable for any incidental, 
+--    indirect, special, or consequential damages whatsoever (including 
+--    but not limited to lost profits) arising out of or related to this
+--    document or the information contained in it, even if Enterasys
+--    Networks has been advised of, known, or should have known, the 
+--    possibility of such damages.
+--     
+--    Enterasys grants vendors, end-users, and other interested parties
+--    a non-exclusive license to use this Specification in connection
+--    with the management of Enterasys or Cabletron products.
+--    
+--    Copyright February 1999 Cabletron Systems
+--    Copyright March (2000-2006) Enterasys Networks
+--    
+--    The assigned enterprise MIB tree for Cabletron System
+
+ctron OBJECT IDENTIFIER ::= { mibs 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctPhysical OBJECT IDENTIFIER ::= { ctron 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+repeaterRev4 OBJECT IDENTIFIER ::= { ctPhysical 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+chassis OBJECT IDENTIFIER ::= { ctPhysical 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The MMAC chassis MIB MIB.
+
+ctPhysRptrMim OBJECT IDENTIFIER ::= { ctPhysical 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctPhysModule OBJECT IDENTIFIER ::= { ctPhysical 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctPModuleETWMIM OBJECT IDENTIFIER ::= { ctPhysModule 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctDevice OBJECT IDENTIFIER ::= { ctPhysical 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctDot5PhysMgmt OBJECT IDENTIFIER ::= { ctPhysical 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctps OBJECT IDENTIFIER ::= { ctPhysical 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctenv OBJECT IDENTIFIER ::= { ctPhysical 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctChassis2 OBJECT IDENTIFIER ::= { ctPhysical 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Used for the second revision of the chassis MIB as
+--    used in MMAC+ based devices.
+
+ctUPS OBJECT IDENTIFIER ::= { ctPhysical 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Used for Cabletron's uninteruptable power supply MIB.
+
+ctTRStnAssign OBJECT IDENTIFIER ::= { ctPhysical 11 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Token Ring Station Assignment MIB.
+
+ctResource OBJECT IDENTIFIER ::= { ctPhysical 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The system resource MIB which reports what's installed
+--    and what's available for use.
+
+ctIFRemap OBJECT IDENTIFIER ::= { ctPhysical 13 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    MIB Allows mapping of an interface onto other interfaces.
+
+ctIFRemap2 OBJECT IDENTIFIER ::= { ctPhysical 14 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    MIB Allows mapping of an interface onto other interfaces.
+--    This MIB will replace the inital ctIFRemap in future 
+--    releases.
+
+ctOrpHSIM OBJECT IDENTIFIER ::= { ctPhysical 15 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--     MIB used by the host platform to perform management of Orp type 
+--     HSIMs.
+
+ctPortMap  OBJECT IDENTIFIER ::= { ctPhysical 16 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--     This mib provides information about a  repeated ports  
+--     operational mode and capability. 
+
+ctHSIMPhysMib  OBJECT IDENTIFIER ::= { ctPhysical 17 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--     This mib provides information about the physical
+--     operation of an HSIM.
+
+ctCMM  OBJECT IDENTIFIER ::= { ctPhysical 18 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--     This branch provides information about the physical
+--     operation of CMM which is a Cabletron Modem Module
+--     on the AuSable product line (might branch out).
+
+
+ctDataLink OBJECT IDENTIFIER ::= { ctron 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+dot5 OBJECT IDENTIFIER ::= { ctDataLink 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctsmtmib OBJECT IDENTIFIER ::= { ctDataLink 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctBridge OBJECT IDENTIFIER ::= { ctDataLink 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctEthernet OBJECT IDENTIFIER ::= { ctDataLink 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctCSMACD OBJECT IDENTIFIER ::= { ctEthernet 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctEthernetCtlParameters OBJECT IDENTIFIER ::= { ctEthernet 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--   The ctEthernetCtlParameters MIB is used to manage
+--   Cabletron interfaces that comply to IEEE Draft
+--   P802.3z/D4.1, IEEE Std 802.3x-1997 and IEEE Std
+--   802.3y-1997.  This MIB supercedes the ctFastEthernet MIB.
+ 
+ctFDDI OBJECT IDENTIFIER ::= { ctDataLink 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctFDDIFnb OBJECT IDENTIFIER ::= { ctFDDI 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctFDDIStats OBJECT IDENTIFIER ::= { ctFDDI 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for all FDDI statisics values.
+
+ctTokenRing OBJECT IDENTIFIER ::= { ctDataLink 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctTokenRingFnb OBJECT IDENTIFIER ::= { ctTokenRing 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctronWan OBJECT IDENTIFIER ::= { ctDataLink 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctWan OBJECT IDENTIFIER ::= { ctronWan 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctRemoteAccess OBJECT IDENTIFIER ::= { ctronWan 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctWanServices OBJECT IDENTIFIER ::= { ctronWan 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Cabletron WAN Applications
+
+ctDLSW OBJECT IDENTIFIER ::= { ctDataLink 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Cabletron data link switching MIB.
+
+ctFastEthernet OBJECT IDENTIFIER ::= { ctDataLink 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The cabletron fast ethernet 100Base T MIB.
+
+ctATM OBJECT IDENTIFIER ::= { ctDataLink 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    A branch for all Cabletron ATM MIBs.
+
+ctATMConfig OBJECT IDENTIFIER ::= { ctATM 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    ATM port redundancy and PVC/SVC config.
+
+ctSwitch OBJECT IDENTIFIER ::= { ctDataLink 11 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    A branch for all Cabletron Switch MIBs
+
+ctsfSwitch OBJECT IDENTIFIER ::= { ctSwitch 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    A branch for all Cabletron Secure Fast Switch MIBs
+
+ctSFCS OBJECT IDENTIFIER ::= { ctsfSwitch 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Cabletron's Secure Fast Cell Switching MIB
+
+ctFPS OBJECT IDENTIFIER ::= { ctSwitch 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The FPS configuration information and statistics MIB 
+
+ctINB OBJECT IDENTIFIER ::= { ctDataLink 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    A branch for all Cabletron INB MIBs
+
+ctINBinfo OBJECT IDENTIFIER ::= { ctINB 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The INB configuration information and statistics MIB 
+
+ctINBinfo2 OBJECT IDENTIFIER ::= { ctINB 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The INB MIB for SSX
+
+ctBroadcast OBJECT IDENTIFIER ::= { ctDataLink 13 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Broadcast information and configuration MIB.
+
+ctPriorityExt OBJECT IDENTIFIER ::= { ctDataLink 14 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The ctPriorityExt Mib used to control priority packet
+--    forwarding.
+
+ctFPSServices OBJECT IDENTIFIER ::= { ctDataLink 15 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    FPS Services mib
+ 
+ctVlanExt OBJECT IDENTIFIER ::= { ctDataLink 16 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    ctVlanExt MIB
+
+ctronVVD OBJECT IDENTIFIER ::= { ctDataLink 18 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Cabletron Voice Video and Data MIB
+
+ctVVD OBJECT IDENTIFIER ::= { ctronVVD 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Voice Video and Data branch
+
+ctVoiceOverIP OBJECT IDENTIFIER ::= { ctVVD 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Voice over IP mibs
+  
+ctCDP OBJECT IDENTIFIER ::= { ctDataLink 19 }
+--OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+ctSmartTrunkBranch OBJECT IDENTIFIER ::= { ctDataLink 20 }
+--OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+ctronVpnMonMIB OBJECT IDENTIFIER ::= { ctDataLink 21 }
+--OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+ctNetwork OBJECT IDENTIFIER ::= { ctron 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+nwDiagnostics OBJECT IDENTIFIER ::= { ctNetwork 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+
+ctTranslation OBJECT IDENTIFIER ::= { ctNetwork 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    A MIB to provide control over IP fragmentation 
+--    between the various media types.
+
+ctIGMPBranch OBJECT IDENTIFIER ::= { ctNetwork 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctDirectory OBJECT IDENTIFIER ::= { ctNetwork 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctAliasMib OBJECT IDENTIFIER ::= { ctNetwork 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+
+ctApplication OBJECT IDENTIFIER ::= { ctron 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctNetManagement OBJECT IDENTIFIER ::= { ctApplication 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctCATV OBJECT IDENTIFIER ::= { ctApplication 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctCM OBJECT IDENTIFIER ::= { ctCATV 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctHETS OBJECT IDENTIFIER ::= { ctCATV 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctWebView OBJECT IDENTIFIER ::= { ctApplication 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctSystem OBJECT IDENTIFIER ::= { ctron 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctPoMIB OBJECT IDENTIFIER ::= { ctSystem 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctErrLog OBJECT IDENTIFIER ::= { ctSystem 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctBackplaneProto OBJECT IDENTIFIER ::= { ctSystem 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctUPowerSupply OBJECT IDENTIFIER ::= { ctSystem 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctFpRedundancy OBJECT IDENTIFIER ::= { ctSystem 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctTrapTable OBJECT IDENTIFIER ::= { ctSystem 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctDownLoad OBJECT IDENTIFIER ::= { ctSystem 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctPIC OBJECT IDENTIFIER ::= { ctSystem 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctFlash OBJECT IDENTIFIER ::= { ctSystem 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctLFAP OBJECT IDENTIFIER ::= { ctSystem 11 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctTxQArb OBJECT IDENTIFIER ::= { ctSystem 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This MIB provides configuration for the priority in
+--    which transmit queues are serviced for Cabletron
+--    devices that support multiple transmit queues.
+
+ctDcm OBJECT IDENTIFIER ::= { ctron 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctTrapLog OBJECT IDENTIFIER ::= { ctron 44 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctronExp OBJECT IDENTIFIER ::= { mibs 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is for all non-accepted Cabletron
+--    Proprietary MIBs.
+
+ctronDLM OBJECT IDENTIFIER ::= { ctronExp 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+-- ctronSFPS OBJECT IDENTIFIER ::= { ctronExp 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    This MIB has been moved to ctSFPS { ctDataLink 17 }
+
+
+-- ctronSwitch OBJECT IDENTIFIER ::= { ctronExp 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    This MIB branch has been approved and moved to ctSwitch
+--    { ctDataLink 11 }
+
+ctLicense OBJECT IDENTIFIER ::= { ctronExp 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The experimental application download license MIB.
+
+ctX25 OBJECT IDENTIFIER ::= { ctronExp 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The experimental branch for WAN X.25 MIB.
+
+ctFault OBJECT IDENTIFIER ::= { ctronExp 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The experimental branch for the fault MIB.
+
+ctGateway OBJECT IDENTIFIER ::= { ctronExp 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The SPMA gateway agent.
+
+ctronHost OBJECT IDENTIFIER ::= { ctronExp 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The SPMA host MIB.
+
+ctronRunTimeDiag OBJECT IDENTIFIER ::= { ctronExp 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is the experimental branch for run time
+--    diagnostic development.
+
+ctProfiler OBJECT IDENTIFIER ::= { ctronExp 11 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is the experimental branch for the profiler MIB.
+--    This will be used until we get a good feeling for what
+--    needs to be in the profiler.
+
+ctVLANMib OBJECT IDENTIFIER ::= { ctronExp 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is the experimental MIB branch for virtual LAN.
+
+-- ctronFlashFS OBJECT IDENTIFIER ::= { ctronExp 13 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    This is used for experimental MIB for the flash file system.
+--
+--    This MIB has been approved as an official Cabletron MIB.
+
+ctDistMgt OBJECT IDENTIFIER ::= { ctronExp 14 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for experimental distributed management
+--    objects.
+
+ctRmonDebug OBJECT IDENTIFIER ::= { ctronExp 15 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    RMON Debug MIB
+
+-- ctLoadShare OBJECT IDENTIFIER ::= { ctronExp 16 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    This branch is used for the experimental load sharing MIB.
+--
+--    This MIB has been accepted and is now a group under the ctBridge MIB.
+--    {ctBridge 10}
+
+ctNetSim OBJECT IDENTIFIER ::= { ctronExp 17 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Spectrum Network Simulation MIB
+
+--ctFPSServices OBJECT IDENTIFIER ::= { ctronExp 18 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    FPS Services mib 
+--
+--    This MIB has been accepted and is now off the ctDataLink 15.
+ 
+--ctPriorityExt OBJECT IDENTIFIER ::= { ctronExp 19 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    ctPriorityExt MIB
+--
+--    This MIB has been accepted and is now off the ctDataLink 14.
+
+--ctVlanExt OBJECT IDENTIFIER ::= { ctronExp 20 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    ctVlanExt MIB
+--
+--  This MIB has been accepted and is now off the ctDataLink 15.
+
+--ctDefaults OBJECT IDENTIFIER ::= { ctronExp 21 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This MIB is used to clear the device.
+-- This MIB has been accepted and is now off the internal directory.
+
+ctMemory OBJECT IDENTIFIER ::= { ctronExp 22 }
+-- OBJECT-IDENTITY
+-- Status
+--   optional
+-- Descr
+--   This MIB used for the implementation of memory management functionality.
+
+ctEngTest OBJECT IDENTIFIER ::= { ctronExp 23 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+flowPolicyPolling OBJECT IDENTIFIER ::= { ctronExp 24 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+--catnet OBJECT IDENTIFIER ::= { ctronExp 25 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--     This mib has been moved to Application 3.
+
+-- monLfap OBJECT IDENTIFIER ::= { ctronExp 26 }
+-- OBJECT-IDENTITY
+--  Status
+--    deprecated
+--  Descr
+--    This mib has been moved to ctSystem 11.
+
+ctDemandAccess OBJECT IDENTIFIER ::= { ctronExp 27 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+
+ctHWDebug  OBJECT IDENTIFIER ::= { ctronExp 28 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This mib is for specific hardware debug
+--    it will be filled in as needed. Currently
+--   (12/98) the only item under here is isp info.
+
+ctFWDebug  OBJECT IDENTIFIER ::= { ctronExp 29 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This mib is for specific firmware debug
+--    it will be filled in as needed. 
+
+ctEntityStateTC  OBJECT IDENTIFIER ::= { ctronExp 30 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for the draft entityStateTc Module.
+
+ctEntityStateMib  OBJECT IDENTIFIER ::= { ctronExp 31 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for the draft entityStateMIB Module.
+
+ctDhcpServerExpMib  OBJECT IDENTIFIER ::= { ctronExp 32 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party DHCP server MIB.
+
+ctFastPathProtectedPortMib  OBJECT IDENTIFIER ::= { ctronExp 33 }
+-- OBJECT-IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is an OID registration for a third party protected port MIB.
+
+ctronExtn OBJECT IDENTIFIER ::= { mibs 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctronChassis OBJECT IDENTIFIER ::= { ctronExtn 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctronRmon OBJECT IDENTIFIER ::= { ctronExtn 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctronMib2 OBJECT IDENTIFIER ::= { ctronExtn 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctActions OBJECT IDENTIFIER ::= { ctronExtn 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    Definitions of the event actions MIB.  This is an
+--    extension to RMON alarms and events.
+
+ctAtmfLanEmulation OBJECT IDENTIFIER ::= { ctronExtn 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    MIB for managing configuration data for ATM Emulated LANs.
+
+ctLeClient OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+
+ctElan OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+
+ctLes OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+
+ctBus OBJECT IDENTIFIER ::= { ctAtmfLanEmulation 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+
+ctMidManager OBJECT IDENTIFIER ::= { mibs 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for all MID level manager MIBs.
+
+ctGateWay OBJECT IDENTIFIER ::= { ctMidManager 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is used for the SPMA Gateway agent.
+
+ctronV2H OBJECT IDENTIFIER ::= { mibs 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the V2H.
+
+v2h124-24MIB OBJECT IDENTIFIER ::= { ctronV2H 30 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This is the V2H MIB.
+
+ctronAP3000 OBJECT IDENTIFIER ::= { mibs 13 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the AP3000.
+
+ctronWslMIB OBJECT IDENTIFIER ::= { mibs 14 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the Wsl MIB.
+
+ctronTrapeze OBJECT IDENTIFIER ::= { mibs 15 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    This branch is used for the Trapeze MIBs.
+
+ctronInternal OBJECT IDENTIFIER ::= { mibs 100 }
+-- OBJECT IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This is the internal directory.
+
+ctDefaults OBJECT IDENTIFIER ::= { ctronInternal 1 }
+-- OBJECT IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This branch is for the defaults mib.
+
+ctEnet OBJECT IDENTIFIER ::= { ctronInternal 2 }
+-- OBJECT IDENTITY
+--  Status
+--    optional
+--  Descr
+--    This branch is for the Enet mib.
+
+END

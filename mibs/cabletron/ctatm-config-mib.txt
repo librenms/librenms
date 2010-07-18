@@ -1,0 +1,1688 @@
+CTATM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+--  Ctron ATM Config MIB
+--  Revision: 01.04.03
+--  Date: September 5, 1998
+--  Part Number:
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for part
+--  of the naming tree below:
+--
+--  cabletron { enterprises 52 }
+--
+--  This module will be extended, as additional sub-sections
+--  of this naming tree are defined.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright May 98 Cabletron Systems
+
+IMPORTS
+
+        OBJECT-TYPE
+              FROM SNMPv2-SMI
+
+        ctATMConfig
+              FROM CTRON-MIB-NAMES
+
+        ifIndex, DisplayString
+              FROM RFC1213-MIB
+        
+        lecIndex, leArpMacAddress
+              FROM LAN-EMULATION-CLIENT-MIB
+
+        AtmTrafficDescrParamIndex
+              FROM ATM-TC-MIB
+
+        atmVclVpi, atmVclVci, atmTrafficDescrParamIndex
+              FROM ATM-MIB;
+
+
+
+-- DisplayString ::= OCTET STRING
+AtmAddress ::= OCTET STRING (SIZE(20))
+
+--
+--=======================================================================
+-- ctAtmConfig Groups
+
+ctATMBaseConfig          OBJECT IDENTIFIER ::= { ctATMConfig 1 }
+ctATMPhysicalRedundancy  OBJECT IDENTIFIER ::= { ctATMConfig 2 }
+ctATMPhysicalRedundancyInterface OBJECT IDENTIFIER ::= { 
+                                     ctATMPhysicalRedundancy 1 }
+ctATMIlmi                OBJECT IDENTIFIER ::= { ctATMConfig 3 }
+ctATMSignalConfig        OBJECT IDENTIFIER ::= { ctATMConfig 4 }
+ctATMLANEServices        OBJECT IDENTIFIER ::= { ctATMConfig 5 }
+ctATMLANEInfoExtGroup    OBJECT IDENTIFIER ::= { ctATMConfig 6 }
+ctATMTrafficManagementGroup     OBJECT IDENTIFIER ::= { ctATMConfig 7 }
+
+--
+--=======================================================================
+
+ctATMPvcIfDef    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-write
+     STATUS          deprecated 
+     DESCRIPTION
+         "This object is the MIB-II interface on which the next
+          Permanent Virtual Circuit (PVC) will be created. 
+ 
+          It is an error to  set an interface number which is not
+          an ATM interface (physical or virtual).
+ 
+          This object is persistent. However, during reinitialization of
+          the device if it is found that the interface no longer
+          supports ATM, then a new MIB-II interface will be created for
+          the next PVC. The special value of 0 causes a new MIB-II
+          interface to be created for the next PVC."
+     ::= { ctATMBaseConfig 1 }
+
+--
+--=====================================================================
+ctATMLecIfDef    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-write
+     STATUS          obsolete
+     DESCRIPTION
+         "This object is the physical interface on which _all_ LAN
+          Emulation Clients (LECs) will be created.
+ 
+          It is an error to  set an interface number which does not
+          support ATM.
+ 
+          This object is persistent. However, during reinitialization of
+          the device if it is found that the interface no longer
+          supports ATM, then the first ATM interface for the device will
+          be used as the value for this object."
+     ::= { ctATMBaseConfig 2 }
+
+--
+--=====================================================================
+
+ctATMDefApplicationTable   OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtATMDefApplicationEntry
+     MAX-ACCESS          not-accessible
+     STATUS          obsolete
+     DESCRIPTION
+         "A list of Default Application objects for this interface."
+     ::= { ctATMBaseConfig 3 }
+     
+ctATMDefApplicationEntry     OBJECT-TYPE
+     SYNTAX          CtATMDefApplicationEntry
+     MAX-ACCESS          not-accessible
+     STATUS          obsolete
+     DESCRIPTION
+         "An entry containing objects pertaining to the default 
+          application on a physical interface."
+     INDEX           { ifIndex }
+     ::= { ctATMDefApplicationTable 1 }
+
+CtATMDefApplicationEntry ::=
+     SEQUENCE {
+                ctATMDefApplicationIfIndex
+                     INTEGER,
+                ctATMDefApplication
+                     INTEGER
+               }
+
+ctATMDefApplicationIfIndex    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-only
+     STATUS          obsolete
+     DESCRIPTION
+         "Returns an index for the physical interface to which the
+          information in this table pertains. It is equal to the MIB-II
+          ifIndex."
+     ::= { ctATMDefApplicationEntry 1 }
+
+ctATMDefApplication OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             lane04(1),
+                             lane(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          obsolete
+     DESCRIPTION
+         "The default application to be run on this physical ATM 
+          interface.
+
+          Selecting lane04 will cause the application known as FORE LAN
+          Emulation 0.4 to be the default application on this interface
+          using the spans signalling stack. This will also cause ILMI to
+          be disabled. i.e., a read on ctATMSignalType will return
+          spans; and a read on ctATMIlmiStatus will return disable.
+
+          It is an error to set ctATMSignalType to a value other than
+          spans when this object is set to lane04. It is an error
+          to set ctATMIlmiStatus to a value other than disable when this
+          object is set to spans.
+
+          Selecting lane will cause the application known as ATM Forum
+          LAN emulation version 2.0 to be the default application on this
+          physical interface. If an attempt to be operational using LANE 
+          2.0 is unsuccessful because of a bad-version error, then ATM Forum
+          LANE 1.0 will be the default application. Selecting this also
+          enables ILMI in autoconfigure mode. i.e., a read on
+          ctATMIlmiStatus will return the value enableAutoConfigure).
+
+          It is an error to set ctATMSignalType to the value spans when
+          this object is set to lane.
+
+          This object is persistent."
+     DEFVAL  { lane } 
+     ::= { ctATMDefApplicationEntry 2 }
+
+
+--
+--=====================================================================
+ctATMFramerStatusTable     OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtATMFramerStatusEntry
+     MAX-ACCESS          not-accessible
+     STATUS          obsolete
+     DESCRIPTION
+         "A list of framer status objects for this interface."
+     ::= { ctATMBaseConfig 4 }
+
+ctATMFramerStatusEntry     OBJECT-TYPE
+     SYNTAX          CtATMFramerStatusEntry
+     MAX-ACCESS          not-accessible
+     STATUS          obsolete
+     DESCRIPTION
+         "An entry containing objects pertaining to status of the framer
+          on a physical interface."
+     INDEX           { ifIndex }
+     ::= { ctATMFramerStatusTable 1 }
+
+CtATMFramerStatusEntry ::=
+     SEQUENCE {
+                ctATMFramerStatusIfIndex
+                     INTEGER,
+                ctATMFramerStatus
+                     INTEGER
+               }
+
+ctATMFramerStatusIfIndex    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-only
+     STATUS          obsolete
+     DESCRIPTION
+         "Returns an index for the physical interface to which the
+          information in this table pertains. It is equal to the MIB-II
+          ifIndex."
+     ::= { ctATMFramerStatusEntry 1 }
+
+ctATMFramerStatus OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             on(1),
+                             off(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          obsolete
+     DESCRIPTION
+         "Setting this object to on will activate the Framer MIBs as
+          specified by either RFC-1595 or RFC-1407 depending on whether
+          the interface uses SONET framing or DS3 framing respectively.
+          i.e., setting it to on will permit gathering of framer
+          statistics at the expense of processing time. However it might
+          be a valuable debugging aid to turn on the framer MIB.
+ 
+          Setting this object to off will not activate the respective
+          framer MIBS. Thus saving processing time.
+ 
+          It is emphasised that collection of statistics for the framer
+          is resource (processor, memory) intensive.
+ 
+          This object is persistent."
+     DEFVAL  { off } 
+     ::= { ctATMFramerStatusEntry 2 }
+
+--
+--=====================================================================
+-- This table defines the association of a "MAC address, LEC Index" pair
+-- with a particular VPI, VCI, ATM address and ELAN name. Several pieces
+-- of information available in this table could conceivably be obtained
+-- by querying other "standard" MIBs. However, at this point in time,
+-- some of those MIBs are not yet standards and/or are in a state of flux.
+-- It is felt that defining such a table could serve the interim needs.
+-- This has the added benefit of efficiency.
+
+ctATMLecArpMacTable     OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CtATMLecArpMacEntry
+     MAX-ACCESS         not-accessible
+     STATUS         current
+     DESCRIPTION
+         "A list of LEC-Index, MAC-address, associated with a particular
+          VPI, VCI and ATM-address objects on this device."
+     ::= { ctATMBaseConfig 5 }
+
+ctATMLecArpMacEntry          OBJECT-TYPE
+     SYNTAX          CtATMLecArpMacEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry containing objects pertaining to LEC Index,
+          MAC-address, associated with a particular VPI, VCI and
+          and ATM-address on this device."
+     INDEX           {  lecIndex, leArpMacAddress }
+     ::= { ctATMLecArpMacTable 1 }
+
+CtATMLecArpMacEntry ::=
+     SEQUENCE {
+                   ctATMLecArpMacLecIndex
+                        INTEGER,
+                   ctATMLecArpMacAddress
+                        OCTET STRING,
+                   ctATMLecArpMacElanName
+                        DisplayString,
+                   ctATMLecArpMacVpi
+                        INTEGER,
+                   ctATMLecArpMacVci
+                        INTEGER,
+                   ctATMLecArpMacATMAddress
+                        DisplayString
+              }
+
+ctATMLecArpMacLecIndex   OBJECT-TYPE
+     SYNTAX              INTEGER (1..2147483647)
+     MAX-ACCESS              read-only
+     STATUS              obsolete
+     DESCRIPTION
+       "The lecIndex of the LEC which has learned the MAC-address
+        given by ctATMLecArpMacAddress."
+     ::= { ctATMLecArpMacEntry 1 }
+
+ctATMLecArpMacAddress    OBJECT-TYPE
+     SYNTAX              OCTET STRING (SIZE(6))
+     MAX-ACCESS              read-only
+     STATUS              obsolete
+     DESCRIPTION
+        "The MAC-address which is learned by this LEC."
+     ::= { ctATMLecArpMacEntry 2 }
+
+ctATMLecArpMacElanName   OBJECT-TYPE
+     SYNTAX              DisplayString 
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "The name of the ELAN which is joined by this LEC."
+     ::= { ctATMLecArpMacEntry 3 }
+
+ctATMLecArpMacVpi        OBJECT-TYPE
+     SYNTAX              INTEGER (1..4095)
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "The data-direct VPI over which traffic destined for the
+        MAC-address ctATMLecArpMacAddress is sent."
+     ::= { ctATMLecArpMacEntry 4 }
+
+ctATMLecArpMacVci        OBJECT-TYPE
+     SYNTAX              INTEGER (1..65535)
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "The data-direct VCI over which traffic destined for the
+        MAC-address ctATMLecArpMacAddress is sent."
+     ::= { ctATMLecArpMacEntry 5 }
+
+ctATMLecArpMacATMAddress OBJECT-TYPE
+     SYNTAX              DisplayString (SIZE(32))
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "The ATM-address of the destination end-station which is the
+        logical destination of the MAC-address ctATMLecArpMacAddress.
+
+        The ATM address is returned in a form suitable for printing.
+        The format (separators etc.) is implementation dependent.
+        However, it is recommended that the same format be used
+        consistently by all agents that return similar information."
+     ::= { ctATMLecArpMacEntry 6 }
+
+--
+--=====================================================================
+-- ATM Bandwidth Allocation Mode Object Definitions
+
+-- This table provides the ability to enable and disable Bandwidth
+-- Allocation Mode on a physical ATM interface.  If this mode is enabled
+-- the network administrator can assign the maximum bandwidth a PVC
+-- can use.
+
+ctATMPvcBwAllocTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF CtATMPvcBwAllocEntry
+        MAX-ACCESS       not-accessible
+        STATUS       current
+        DESCRIPTION
+                "A list of PvcBwAllocEntries for this physical interface."
+        ::= { ctATMBaseConfig 6 }
+
+ctATMPvcBwAllocEntry OBJECT-TYPE
+        SYNTAX       CtATMPvcBwAllocEntry
+        MAX-ACCESS       not-accessible
+        STATUS       current
+        DESCRIPTION
+                "An entry containing objects pertaining to Bandwidth 
+                 Allocation."
+        INDEX   { ifIndex }
+        ::= { ctATMPvcBwAllocTable 1 }
+
+CtATMPvcBwAllocEntry ::=
+        SEQUENCE {
+                ctATMPvcBwAllocPhysIface    INTEGER,
+                ctATMPvcBwAllocStatus       INTEGER,
+                ctATMPvcBwAllocBandwidth    INTEGER
+         }
+
+ctATMPvcBwAllocPhysIface    OBJECT-TYPE
+        SYNTAX              INTEGER (1..512)
+        MAX-ACCESS              read-only
+        STATUS              obsolete
+        DESCRIPTION
+                "Returns an index for the physical interface to which the
+                 information in this table pertains. It is equal to the
+                 MIB-II ifIndex."
+        ::= { ctATMPvcBwAllocEntry 1 }
+
+ctATMPvcBwAllocStatus  OBJECT-TYPE
+        SYNTAX         INTEGER 
+                             {
+                             on(1),
+                             off(2),
+                             notSupported(3)
+                             }
+        MAX-ACCESS         read-write
+        STATUS         current
+        DESCRIPTION
+         "The values on and off can be written to this object. Selecting
+          on will enable bandwidth allocation mode on this interface. When
+          this mode is enabled all LECs and PVCs currently configured on 
+          this interface will be deleted, UNI and ILMI will be disabled, and
+          this module will reboot.
+
+          Selecing off will disable bandwidth allocation mode on this
+          interface.  When this mode is disabled all PVCs currently 
+          configured on this interface will be deleted, UNI and ILMI will 
+          revert to their former status, and this module will reboot.
+
+          If bandwidth allocation mode is not supported by this module the
+          value notSupported will be returned by this object.  This value
+          can not be set by the network administrator.
+
+          This object is persistent."
+        ::= { ctATMPvcBwAllocEntry 2 }
+
+ctATMPvcBwAllocBandwidth    OBJECT-TYPE
+        SYNTAX              INTEGER (1..2147483647)
+        MAX-ACCESS              read-only
+        STATUS              obsolete
+        DESCRIPTION
+                "Returns the amount of bandwidth in use on this ATM
+                 interface in bits per second." 
+        ::= { ctATMPvcBwAllocEntry 3 }
+
+
+--
+--=====================================================================
+-- ATM Discovery Elan Object Definitions
+
+-- This table provides the elan names, statuses, and modes for the
+-- Discovery Elan process. The elan name is looked up in the LEC mib 
+-- when the device is initialized. If the status for a particular elan
+-- is (Enabled) and the discovery elan table for that interface is 
+-- configured as (Master), this interface will attempt to set up an 
+-- SVC. This allows the network administrator to manually configure
+-- the topology of elans in the ATM cloud.
+
+ctATMDiscoveryElanTable   OBJECT-TYPE
+        SYNTAX            SEQUENCE OF CtATMDiscoveryElanEntry
+        MAX-ACCESS            not-accessible
+        STATUS            current
+        DESCRIPTION
+                "A list of DiscoveryElanEntries for this physical interface."
+        ::= { ctATMBaseConfig 7 }
+
+ctATMDiscoveryElanEntry  OBJECT-TYPE
+        SYNTAX           CtATMDiscoveryElanEntry
+        MAX-ACCESS           not-accessible
+        STATUS           current
+        DESCRIPTION
+                "An entry containing objects pertaining to discovering elans."
+        INDEX   { ifIndex, ctATMDiscoveryElanIndex }
+        ::= { ctATMDiscoveryElanTable 1 }
+
+CtATMDiscoveryElanEntry ::=
+        SEQUENCE {
+                ctATMDiscoveryElanIndex
+                        INTEGER,
+                ctATMDiscoveryElanName
+                        DisplayString,
+                ctATMDiscoveryElanMode
+                        INTEGER,
+                ctATMDiscoveryElanStatus
+                        INTEGER,
+                ctATMDiscoveryElanPhysIface
+                        INTEGER
+         }
+
+ctATMDiscoveryElanIndex  OBJECT-TYPE
+        SYNTAX           INTEGER (1..16)
+        MAX-ACCESS           read-only
+        STATUS           current
+        DESCRIPTION
+                "There are a fixed number of elans (1 - MAX_ELANS) per
+                 physical interface to initiate the discovery process on.
+                 This is the index for these elans. This is NOT related 
+                 to the LEC Index."
+        ::= { ctATMDiscoveryElanEntry 1 }
+
+ctATMDiscoveryElanName  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(32))
+        MAX-ACCESS          read-write
+        STATUS          current
+        DESCRIPTION
+                "The device will try to discover, on this named elan, any 
+                 other devices out in the atm cloud that it should set up an 
+                 svc with. This allows flexibility in the number and location 
+                 of other switches this particular physical interface should 
+                 know about and talk with."
+        ::= { ctATMDiscoveryElanEntry 2 }
+
+ctATMDiscoveryElanMode  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                ctATMDiscoveryElanMaster (1),
+                                ctATMDiscoveryElanSlave  (2)
+                                }
+        MAX-ACCESS          read-write
+        STATUS          current
+        DESCRIPTION
+                "Master indicates other elans may discover this elan whereas
+                 slave elans may only discover other elans."
+        ::= { ctATMDiscoveryElanEntry 3 }
+
+ctATMDiscoveryElanStatus  OBJECT-TYPE
+        SYNTAX            INTEGER {
+                                  ctATMDiscoveryElanEnabled  (1),
+                                  ctATmDiscoveryElanDisabled (2)
+                                  }
+        MAX-ACCESS            read-write
+        STATUS            current
+        DESCRIPTION             
+                "Enabled indicates this elan should be used in the 
+                 discovery process whereas disabled elans are not." 
+        ::= { ctATMDiscoveryElanEntry 4 }
+
+ctATMDiscoveryElanPhysIface  OBJECT-TYPE
+        SYNTAX               INTEGER (1..512)
+        MAX-ACCESS               read-only
+        STATUS               obsolete
+        DESCRIPTION
+                "The physical interface number on which to initiate the 
+                 discovery processes."
+        ::= { ctATMDiscoveryElanEntry 5 }
+
+--
+--=====================================================================
+-- ATM Interface Virtual Channel Link (VCL) Object Definitions
+
+-- This group provides additional information to the atmVclTable
+-- described in RFC 1695.
+
+ctATMVclTable       OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CtATMVclEntry
+    MAX-ACCESS          not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of physical interface number, VPI, VCI, associated
+         with a virtual ifIndex, application port, ATM Address, and 
+         Encapsulation type on this device."
+    ::= { ctATMBaseConfig 8 }
+
+ctATMVclEntry       OBJECT-TYPE
+     SYNTAX         CtATMVclEntry
+     MAX-ACCESS         not-accessible
+     STATUS         current
+     DESCRIPTION
+         "An entry containing objects pertaining to physical interface
+          number, VPI, VCI, associated with a particular virtual ifIndex,
+          application port, ATM Address, and Encapsulation type on this 
+          device."
+     INDEX        { ifIndex, atmVclVpi, atmVclVci }     
+     ::= { ctATMVclTable 1 }
+
+CtATMVclEntry ::=
+     SEQUENCE {
+                   ctATMVclIfIndex
+                        INTEGER,
+                   ctATMVclVpi
+                        INTEGER,
+                   ctATMVclVci
+                        INTEGER,
+                   ctATMVclVirtualIfIndex
+                        INTEGER,
+                   ctATMVclApplicationPort
+                        INTEGER,
+                   ctATMVclATMAddress
+                        AtmAddress,
+                   ctATMVclEncapsulationType
+                        INTEGER
+              }
+
+ctATMVclIfIndex          OBJECT-TYPE
+     SYNTAX              INTEGER (1..512)
+     MAX-ACCESS              read-only
+     STATUS              obsolete
+     DESCRIPTION
+       "Returns an index for the physical interface to which the information
+        in this table pertains.  It is equal to the MIB-II ifIndex."
+     ::= { ctATMVclEntry  1 }
+
+ctATMVclVpi              OBJECT-TYPE
+     SYNTAX              INTEGER (1..4095)
+     MAX-ACCESS              read-only
+     STATUS              obsolete
+     DESCRIPTION
+       "The VPI value of the VCL."
+     ::= { ctATMVclEntry  2 }
+
+ctATMVclVci              OBJECT-TYPE
+     SYNTAX              INTEGER (1..65535)
+     MAX-ACCESS              read-only
+     STATUS              obsolete
+     DESCRIPTION
+       "The VCI value of the VCL."
+     ::= { ctATMVclEntry  3 }
+
+ctATMVclVirtualIfIndex   OBJECT-TYPE
+     SYNTAX              INTEGER (1..512)
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "Returns an index for the virtual interface to which the information
+        in this table pertains.  It is equal to the MIB-II ifIndex."
+     ::= { ctATMVclEntry  4 }
+
+ctATMVclApplicationPort  OBJECT-TYPE
+     SYNTAX              INTEGER (1..512)
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "Returns an index for the application port to which the
+        information in this table pertains."
+     ::= { ctATMVclEntry  5 }
+
+ctATMVclATMAddress OBJECT-TYPE
+     SYNTAX              AtmAddress
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "The ATM-address of the channel entry defined by ctATMVclEntry.
+
+        The ATM address is returned in a form suitable for printing.
+        The format (separators etc.) is implementation dependent.
+        However, it is recommended that the same format be used
+        consistently by all agents that return similar information."
+     ::= { ctATMVclEntry 6 }
+
+ctATMVclEncapsulationType OBJECT-TYPE
+     SYNTAX              INTEGER {
+                                 vcMultiplexRoutedProtocol      (1),
+                                 vcMultiplexBridgedProtocol8023 (2),
+                                 vcMultiplexBridgedProtocol8025 (3),
+                                 vcMultiplexBridgedProtocol8026 (4),
+                                 vcMultiplexLANemulation8023    (5),
+                                 vcMultiplexLANemulation8025    (6),
+                                 llcEncapsulation               (7),
+                                 multiprotocolFrameRelaySscs    (8),
+                                 other                          (9),
+                                 unknown                       (10),
+                                 ilmi                          (11),
+                                 uni                           (12),
+                                 lanEmulationData              (13),
+                                 lanEmulationControl           (14),
+                                 atmVcSvcApp                   (15),
+                                 multiProtocolOverATMData          (16),
+                                 multiProtocolOverATMControl   (17)
+                                 }
+     MAX-ACCESS              read-only
+     STATUS              current
+     DESCRIPTION
+       "An instance of this object only exists when the local VCL
+        end-point is also the VCC end-point, and AAL5 is in use.
+        The type of data encapsulation used over the AAL5 SSCS layer.
+        The definitions reference RFC 1483 Multiprotocol Encapsulation
+        over ATM AAL5 and to the ATM Forum LAN Emulation specification,
+        and additional definitions previously categorized as 'other'.
+        This object mirrors the atmVccAal5EncapsType described in 
+        RFC1695, up to the 'unknown' value.  'LANemulation' protocols
+        were branched into two categories 'Data' and 'Control', and
+        ILMI, UNI, and 'atm_vc_svc_app' were added as 
+        expansions from 'other'."
+     ::= { ctATMVclEntry 7 }
+
+--
+--=====================================================================
+-- ATM Physical Port Redundancy Object Definitions
+
+-- ATM Physical Port Redundancy offers a method of managing redundant
+-- physical ports on a particular physical ATM interface.  The interface
+-- portion of redundancy is instanced with indices that match the MIB-II
+-- ifIndex.  This capability will only be available for ATM MIB-II 
+-- interfaces that correspond to a physical entity that has hardware to supply 
+-- the redundant port feature.  It will not be available for virtual interfaces
+-- or for physical interfaces that do not have hardware that can be used 
+-- in a redundant fashion.  Because of this, the tables will be sparsely 
+-- populated to show ONLY the physical ATM interfaces that can supply such a 
+-- feature The port portion of redundancy is instanced with indices 
+-- that start at one and then increment by one for each physical port on 
+-- that physical interface that can be involved in the redundancy. The 
+-- redundant port numbers cannot be sparse (i.e., they have to be contiguous).
+
+-- Physical port redundancy as a whole is an optional implementation.
+-- However, if any group concerning redundancy is implemented, all
+-- of the groups involved in the redundancy implementation must be
+-- provided.
+
+-- All objects provided as part of the Redundancy table return the value 
+-- of the last request made unless mentioned otherwise.
+
+-- This section defines the redundancy objects under the Interface part of
+-- physical port redundancy.
+
+ctATMPhyRedundTable  OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtATMPhyRedundEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of redundancy objects for this physical interface."
+     ::= { ctATMPhysicalRedundancyInterface 1 }
+
+ctATMPhyRedundEntry  OBJECT-TYPE
+     SYNTAX          CtATMPhyRedundEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry containing objects pertaining to ATM physical
+          redundancy for a physical interface."
+     INDEX           { ifIndex }
+     ::= { ctATMPhyRedundTable 1 }
+
+CtATMPhyRedundEntry ::=
+     SEQUENCE {
+                ctATMPhyRedundIfIndex
+                     INTEGER,
+                ctATMPhyRedundPrimaryPort
+                     INTEGER,
+                ctATMPhyRedundActivePort
+                     INTEGER,
+                ctATMPhyRedundStatus
+                     INTEGER,
+                ctATMPhyRedundActivation
+                     INTEGER,
+                ctATMPhyRedundPrimaryRevert
+                     INTEGER,
+                ctATMPhyRedundPerformTest
+                     INTEGER,
+                ctATMPhyRedundTestTOD
+                     DisplayString,
+                ctATMPhyRedundTestResult
+                     INTEGER,
+                ctATMPhyRedundReset
+                     INTEGER
+               }
+
+ctATMPhyRedundIfIndex    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-only
+     STATUS          obsolete
+     DESCRIPTION
+         "Returns an index for the physical interface to which the
+          information in this table pertains.  It is equal to the MIB-II
+          ifIndex."
+     ::= { ctATMPhyRedundEntry 1 }
+
+ctATMPhyRedundPrimaryPort   OBJECT-TYPE
+     SYNTAX          INTEGER (1..16)
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "The physical port number to be used as the primary port.  The primary
+          port is the default port to become active and the port of priority,
+          i.e. regardless of the status of the current active port, if the
+          primary can be used (and Redundancy is set up to activate it when it
+          becomes available--see ctATMPhyRedundPrimaryRevert), it will be.
+
+          The write will NOT take effect immediately.  It will wait until
+          the NEXT time that the redundancy algorithm determines that the
+          primary port should be used.
+
+          This object is persistent. i.e., it will retain its value between
+          powerdowns."
+     DEFVAL { 1 }
+     ::= { ctATMPhyRedundEntry 2 }
+
+ctATMPhyRedundActivePort    OBJECT-TYPE
+     SYNTAX          INTEGER (1..16)
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "The physical port number to be used as the active port.  The
+          primary port defaults as the active port if this object is not set.
+
+          Rules:
+
+          - This object can always be set when ctATMPhyRedundStatus (q.v.) is
+          set to disable(2).
+
+          - It cannot be set when ctATMPhyRedundStatus is set to enable(1),
+          ctATMPhyRedundPrimaryRevert (q.v.) is set to automatic(1), and the
+          primary port is deemed good (and therefore usable) by redundancy.
+          Under these conditions, it is meaningless to attempt to manually set
+          the Active Port, as Redundancy would simply reset the active port to
+          the primary again immediately after the set takes place.
+
+          - If the primary port has failed, or ctATMPhyRedundPrimaryRevert is
+          set to manual(2), then this object can be set; however, the behaviour
+          of redundancy as a result of the set will depend on the status of
+          ctATMPhyRedundActivation (q.v.) and whether or not the port being set
+          active is good.  If RedundActivation is enabled, the set may be
+          countermanded immediately if at any time the port being set is found
+          to be bad (and therefore not usable by Redundancy) and another (good)
+          redundant port is available.  If RedundActivation is set to manual(2),
+          then the set will take place, regardless of the status of the port
+          being set.  Naturally, if the primary port is restored, the behaviour
+          of Redundancy will depend on whether RedundPrimaryRevert is automatic;
+          if it is, the active port will immediately switch over; otherwise it
+          will remain as-is.
+
+          There is a precisely defined relationship between
+          ctATMPhyRedundActivePort, ctATMPhyRedundStatus,
+          ctATMPhyRedundPrimaryRevert, and ctATMPhyRedundActivation.  If
+          RedundStatus is disabled, then PrimaryRevert and RedundActivation have
+          no functional meaning and ActivePort becomes the only means by which
+          the redundant ports can be switched.  Likewise, if RedundStatus is
+          enabled and PrimaryRevert is automatic, a set of the ActivePort has no
+          functional meaning for as long as the primary port is deemed usable by
+          redundancy.  If RedundStatus is enabled but PrimaryRevert is
+          manual, the active port will only be changed through ActivePort or
+          the exercise of RedundActivation.  The line of precedence, therefore,
+          fully depends upon the status of Redundancy; if RedundStatus is
+          disabled, then precedence lies with ActivePort by virtue of the fact
+          that there are no other competing methods to switch the active port
+          among the redundant ports.  If RedundStatus is enabled, however,
+          PrimaryRevert (an active switching method) and RedundActivation (a
+          passive switching method) have precedence over ActivePort; if
+          PrimaryRevert is set to automatic, then the active port is immediately
+          switched to the primary as soon as it's deemed usable by Redundancy;
+          likewise, if RedundActivation is set to automatic, the currently
+          active port will be switched immediately in the event of port failure.
+          Clearly, then, ActivePort cannot guarantee a set for as long as any
+          automatic part of Redundancy is enabled.
+
+          This object is persistent."
+     DEFVAL { 1 }
+     ::= { ctATMPhyRedundEntry 3 }
+
+ctATMPhyRedundStatus    OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             enable(1),
+                             disable(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to enable, then redundancy for this
+          interface is enabled.
+
+          If this object is set to disable, redundancy is disabled. If
+          redundancy is disabled, then automatic switching to backup ports
+          will not be available.
+
+          Periodic testing of ports is independent of ctATMPhyRedundStatus
+          and is controlled by ctATMPhyRedundPerformTest.
+
+          See ctATMPhyRedundActivePort for a description of the relationships
+          between this object, ctATMPhyRedundActivePort,
+          ctATMPhyRedundActivation, and ctATMPhyRedundPrimaryRevert.
+
+          This object is persistent."
+     DEFVAL  { disable }
+     ::= { ctATMPhyRedundEntry 4 }
+
+ctATMPhyRedundActivation OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             automatic(1),
+                             manual(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to automatic, a backup port will
+          automatically be activated upon failure of the active port. 
+
+          If this object is set to manual, it will require the manual
+          setting of ctATMPhyRedundActivePort to activate a port upon
+          failure of the currently active port.
+
+          See ctATMPhyRedundActivePort for a description of the relationships
+          between this object, ctATMPhyRedundStatus, ctATMPhyRedundActivePort,
+          and ctATMPhyRedundPrimaryRevert.
+
+          This object is persistent."
+     DEFVAL  { automatic }
+     ::= { ctATMPhyRedundEntry 5 }
+
+ctATMPhyRedundPrimaryRevert  OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             automatic(1),
+                             manual(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to automatic, the primary port will
+          automatically  be activated upon identifying it to be valid
+          at any time.
+
+          If this object is set to manual, then the currently active
+          port will not change despite identifying the primary port to
+          be valid.
+
+          See ctATMPhyRedundActivePort for a description of the relationships
+          between this object, ctATMPhyRedundStatus, ctATMPhyRedundActivePort,
+          and ctATMPhyRedundActivation.
+
+          This object is persistent."
+     DEFVAL { automatic }
+     ::= { ctATMPhyRedundEntry 6 }
+
+ctATMPhyRedundPerformTest   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             enable(1),
+                             disable(2),
+                             immediate(3)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to enable, then the automatic test
+          (at the time given by ctATMPhyRedundTestTOD) is enabled.
+          The test is periodic with a period of 24 hours.
+
+          If this object is set to disable, then the automatic test
+          is disabled. However, one can still test the ports by setting
+          this object to immediate.
+
+          If this object is set to immediate it will cause a test for
+          validity of each redundant port for this interface to be
+          performed immediately.
+
+          The result of the test shall be available by reading the object
+          ctATMPhyRedundTestResult.
+
+          This object is persistent. However, the special value immediate
+          is not persistent."
+     DEFVAL  { enable }
+     ::= { ctATMPhyRedundEntry 7 }
+
+ctATMPhyRedundTestTOD       OBJECT-TYPE
+     SYNTAX          DisplayString (SIZE(9))
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "Setting this object will set the time of day at which each
+          redundant port of this interface will be tested for validity.
+          The value is a null terminated string in either hh:mm:ss or
+          hh.mm.ss or hh:mm.ss or hh.mm:ss format (24 hour format).
+          The seconds(ss) and minutes(mm) components are optional and
+          default to 00.
+
+          The value of this object will be used only if
+          ctATMPhyRedundPerformTest is set to enable.
+
+          This object is persistent."
+     -- DEFVAL  { "01:00:00" }
+     ::= { ctATMPhyRedundEntry 8 }
+
+ctATMPhyRedundTestResult OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             manualAllPortsGood(100),
+                             manualPrimaryBadOthersGood(101),
+                             manualPrimaryGoodOthersBad(102),
+                             manualPrimaryBadOthersBad(103),
+                             automaticAllPortsGood(200),
+                             automaticPrimaryBadOthersGood(201),
+                             automaticPrimaryGoodOthersBad(202),
+                             automaticPrimaryBadOthersBad(203)
+                             }
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "This object returns the status of the last test performed on
+          all the ports. If the test was performed as a result of
+          ctATMPhyRedundPerformTest.immediate, then the value of this
+          object is of the form 1xx. If the test was performed as a
+          result of setting ctATMPhyRedundTestTOD, then the result is of
+          the form 2xx. The meaning of xx is the same in both cases and
+          is explained below:
+
+             00  All ports involved in redundancy are good.
+             01  Primary port (as identified by ctATMPhyRedundPrimaryPort)
+                 is bad, but all other non-primary ports are good.
+             02  Primary port is good, but one or more non-primary ports
+                 are bad.
+             03  Primary port and one or more non-primary ports are bad.
+
+          Any other value for this object may be interpreted to mean
+          that no test has been performed on the ports involved in
+          redundancy since system startup.
+
+          This object is NOT persistent."
+     ::= { ctATMPhyRedundEntry 9 }
+
+ctATMPhyRedundReset    OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             reset(1)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to reset, the state of redundancy on
+          this interface will be reset to factory defaults.
+
+          When read this object will always return 1."
+     ::= { ctATMPhyRedundEntry 10 }
+
+--
+--=====================================================================
+
+ctATMIlmiTable     OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtATMIlmiEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of ILMI objects for this physical ATM interface."
+     ::= { ctATMIlmi 1 }
+
+ctATMIlmiEntry     OBJECT-TYPE
+     SYNTAX          CtATMIlmiEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry containing objects pertaining to ILMI for this
+          physical ATM interface."
+     INDEX           { ifIndex }
+     ::= { ctATMIlmiTable 1 }
+
+CtATMIlmiEntry ::=
+     SEQUENCE {
+                ctATMIlmiIfIndex
+                     INTEGER,
+                ctATMIlmiStatus
+                     INTEGER,
+                ctATMIlmiAtmAddress
+                     AtmAddress,
+                ctATMIlmiState
+                     INTEGER,
+                ctATMIlmiRestart
+                     INTEGER
+              }
+
+ctATMIlmiIfIndex    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-only
+     STATUS          obsolete
+     DESCRIPTION
+         "Returns an index for the physical interface to which the
+          information in this table pertains.  It is equal to the MIB-II
+          interface number for this interface."
+     ::= { ctATMIlmiEntry 1 }
+
+ctATMIlmiStatus OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             enableAutoConfigure(1),
+                             enable(2),
+                             disable(3)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to enableAutoConfigure, then ILMI on
+          this interface will attempt to automatically configure the
+          version of UNI to use on this interface. After the auto
+          configure process has completed, the version of UNI this interface
+          is running can be obtained by reading the ctATMSignalType
+          object.
+
+          If this object is set to enable, the ILMI for this
+          interface is enabled.
+
+          If enabled (with or without auto-configure), ILMI on this
+          interface will attempt address registration.
+
+          If this object is set to disable, auto-configure and address
+          registration are both disabled. The signalling to use on this
+          interface is then dictated by the value of ctATMSignalType.
+          If disabled, the ILMI channel (0/16) will not be created.
+
+          It is an error to set a value other than disable to this
+          object when ctATMDefApplication is set to lane04.
+
+          It is an error to write to ctATMSignalType when this object is
+          set to enableAutoConfigure.
+
+          This object is persistent, i.e, it will retain its value
+          between powerdowns."
+     DEFVAL  { enableAutoConfigure }
+     ::= { ctATMIlmiEntry 2 }
+
+ctATMIlmiAtmAddress    OBJECT-TYPE
+     SYNTAX          AtmAddress
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "This object is used as the ATM address of this interface
+          if ILMI on this interface is disabled  i.e, the value of
+          IlmiStatus is set to disable.
+
+          If ILMI address registration is successful (ctATMIlmiState is
+          up) then a read on this object will return the ATM Address in
+          use at this interface.
+
+          It is an error to write to this object when the value of
+          ctATMIlmiStatus is other than disable.
+
+          This object is persistent. However, enabling ILMI after writing
+          to this object will cause ILMI to ignore the persistent value."
+     ::= { ctATMIlmiEntry 3 }
+
+ctATMIlmiState OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             unknown(1),
+                             up(2),
+                             addressRegistration(3),
+                             autoconfigure(4),
+                             down(5),
+                             estabConnectivity(6),
+                             noLink(7),
+                             obtainLECS(8)
+                             }
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "This object describes the current state of ILMI on this
+          interface.
+
+          The meaning of the various values returned is as follows:
+            unknown             -ILMI is in the process of becoming
+                                 operational.
+            up                  -ILMI is operational and is doing keep
+                                 alives.
+            addressRegistration -ILMI is attempting address registration.
+            autoconfigure       -ILMI is attempting to automatically
+                                 configure UNI version, provided
+                                 ctATMIlmiStatus is enableAutoConfigure.
+            down                -ILMI is down either because it is
+                                 disabled or failed to become
+                                 operational.
+            estabConnectivity   -ILMI is waiting to hear an answer
+                                 from the other side.
+            noLink              -ILMI has not been told that it's physical
+                                 interface has link integrity.
+            obtainLECS          -ILMI is requesting the LECS registration table
+                                 from the switch."
+     ::= { ctATMIlmiEntry 4 }
+
+ctATMIlmiRestart OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             restart(1)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "Setting this object to restart will restart ILMI on this
+          interface.
+
+          Reading this object always returns a 1."
+     ::= { ctATMIlmiEntry 5 }
+
+--
+--=====================================================================
+
+ctATMSignalTable     OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CtATMSignalEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of signaling object for this interface."
+     ::= { ctATMSignalConfig 1 }
+
+ctATMSignalEntry     OBJECT-TYPE
+     SYNTAX          CtATMSignalEntry
+     MAX-ACCESS          not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry containing objects pertaining to ATM signaling
+          on a physical interface."
+     INDEX           { ifIndex }
+     ::= { ctATMSignalTable 1 }
+
+CtATMSignalEntry ::=
+     SEQUENCE {
+                ctATMSignalIfIndex
+                     INTEGER,
+                ctATMSignalStatus
+                     INTEGER,
+                ctATMSignalType
+                     INTEGER,
+                ctATMSignalQ93Status
+                     INTEGER,
+                ctATMSignalQsaalStatus
+                     INTEGER,
+                ctATMSignalRestart
+                     INTEGER
+              }
+
+ctATMSignalIfIndex    OBJECT-TYPE
+     SYNTAX          INTEGER (1..512)
+     MAX-ACCESS          read-only
+     STATUS          obsolete
+     DESCRIPTION
+         "Returns an index for the physical interface to which the
+          information in this table pertains.  It is equal to ifIndex."
+     ::= { ctATMSignalEntry 1 }
+
+ctATMSignalStatus OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             enable(1),
+                             disable(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "If this object is set to enable, the signalling for this
+          interface is enabled. If this object is set to disable,
+          signalling is disabled. When read, this object returns the
+          state of the object based on the last request made.
+
+          This object is persistent."
+     DEFVAL  { enable }
+     ::= { ctATMSignalEntry 2 }
+
+ctATMSignalType OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             unknown(1),
+                             spans(2),
+                             uni30(3),
+                             uni31(4),
+                             uni40(5)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "The type of signalling to be used on this interface.
+
+          Setting this object to spans will cause the FORE SPANS
+          protocol to be used for signalling on this interface.
+
+          Setting this object to any other value will cause the
+          appropriate version of ATM FORUM UNI to be used for
+          signalling on this interface.
+
+          A read on this object will return the signalling stack in use
+          at this interface.
+
+          When read, the special value of unknown indicates that ILMI is
+          in the process of autoconfiguring and the value of UNI on this
+          interface is yet unknown. A subsequent read sometime later will
+          yield the correct value.
+
+          When read, any value other than spans (and unknown) indicates
+          the version of signalling stack in use at this interface. This
+          value is obtained either as a result of a prior write to this
+          object or ILMI autoconfigure.
+
+          It is an error to set this object to any value other than
+          spans when ctATMDefApplication is lane04.
+
+          It is an error to write to this object when ctATMIlmiStatus is
+          set to enableAutoConfigure or enable.
+
+          It is an error to write the special value unknown.
+
+          This object is persistent. But, the special value unknown is
+          not persistent."
+     ::= { ctATMSignalEntry 3 }
+
+ctATMSignalQ93Status OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             up(1),
+                             down(2)
+                             }
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "If ctATMSignalType is other than spans, then the value
+          of this object is the state of the layer 3 signalling stack
+          on this interface."
+     ::= { ctATMSignalEntry 4 }
+
+ctATMSignalQsaalStatus OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             up(1),
+                             down(2)
+                             }
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "If ctATMSignalType is other than spans, then the value
+          of this object is the state of the layer-2 signalling stack
+          (Q.SAAL) on this interface. "
+     ::= { ctATMSignalEntry 5 }
+
+ctATMSignalRestart OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             restart(1)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "Setting this object to restart will restart signalling on this
+          interface.  Reading this object always returns a 1."
+     ::= { ctATMSignalEntry 6 }
+
+--
+--=====================================================================
+-- This group is an extension to the ATM Forum's LAN Emulation MIB.
+-- It will allow for extra configuration information to be read and set.
+-- 
+
+ctATMLANEInfoExtStatusTable       OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CtATMLANEInfoExtStatusEntry
+    MAX-ACCESS          not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Defines extentions to the lecConfigTable and the lecStatusTable
+        in the ATM Forum's LANE MIB."
+    ::= { ctATMLANEInfoExtGroup 1 }
+
+ctATMLANEInfoExtStatusEntry       OBJECT-TYPE
+     SYNTAX        CtATMLANEInfoExtStatusEntry 
+     MAX-ACCESS         not-accessible
+     STATUS         current
+     DESCRIPTION
+         "An entry containing objects describing information about an 
+          LEC (LAN Emulation Client).  It is instanced by lecIndex which
+          is the same as what is defined in the ATM Forum's LAN Emulation
+          MIB."
+     INDEX           { lecIndex }
+     ::= { ctATMLANEInfoExtStatusTable 1 }
+
+CtATMLANEInfoExtStatusEntry ::=
+     SEQUENCE {
+                   ctATMLANEInfoExtStatusUpTime
+                        INTEGER,
+                   ctATMLANEInfoExtStatus
+                        INTEGER,
+                   ctATMLANEInfoExtStatusSendTopo
+                        INTEGER,
+                   ctATMLANEInfoExtStatusTimeLeft
+                        DisplayString,
+                   ctATMLANEInfoExtStatusNumQueues
+                        INTEGER,
+                   ctATMLANEInfoExtStatusMaxNumQueues
+                        INTEGER
+              }
+
+ctATMLANEInfoExtStatusUpTime OBJECT-TYPE
+     SYNTAX          INTEGER (1..2147483647) 
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "The amount of time in milliseconds since the LEC has reached the
+          operational state. It will read 0 if the LEC is not operational."
+     ::= { ctATMLANEInfoExtStatusEntry  1 }
+
+ctATMLANEInfoExtStatus OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             lecactive(1),
+                             lecnotInService(2),
+                             lecnoLink(3),
+                             lecnoATMaddrnoUNI(4),
+                             lecnoATMaddr(5),
+                             lecnoUNI(6),
+                             lecmemError(7)
+                             }
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "LEC_active         - The LEC is actually trying to become or is 
+                               operational.
+                               See lecInterfaceState in the ATM Forum's LAN
+                               Emulation MIB to see which state the LEC is in.
+          LEC_notInService   - The LEC is not trying to become operational 
+                               because the MIB read so.
+          LEC_noLink         - The LEC is not trying to become operational 
+                               because the physical interface does not have
+                               link.
+          LEC_noATMaddrnoUNI - The LEC is not trying to become operational 
+                               because there isn't an ATM address and UNI is
+                               not operational. 
+          LEC_noATMaddr      - The LEC is not trying to become operational
+                               because there isn't an ATM address. 
+          LEC_noUNI          - The LEC is not trying to become operational
+                               because UNI is not operational. 
+          LEC_memError       - The LEC is not trying to become operational
+                               because it was not able to allocate memory in
+                               order to do so."
+     ::= { ctATMLANEInfoExtStatusEntry  2 }
+
+ctATMLANEInfoExtStatusSendTopo OBJECT-TYPE
+     SYNTAX          INTEGER {
+                             on(1),
+                             off(2)
+                             }
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "This configuration value is used to define whether or not this LEC
+          should send a LE_TOPOLOGY_CHANGE message when the situation presents
+          itself."
+     DEFVAL  { on } 
+     ::= { ctATMLANEInfoExtStatusEntry  3 }
+
+ctATMLANEInfoExtStatusTimeLeft OBJECT-TYPE
+     SYNTAX          DisplayString  (SIZE(32))
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "A string used to describe the amount of time left in a certain
+          LEC state before the LEC will try again in that state. This will
+          read NULL if the LEC is operational."
+     ::= { ctATMLANEInfoExtStatusEntry  4 }
+
+ctATMLANEInfoExtStatusNumQueues OBJECT-TYPE
+     SYNTAX          INTEGER (1..32)
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "This configuration value is used to define the number of traffic
+          descriptors used by this LEC to implement Traffic Mangement.
+          It's value ranges from 1 to ctATMLANEInfoExtStatusMaxNumQueues."
+     DEFVAL  { 1 } 
+     ::= { ctATMLANEInfoExtStatusEntry  5 }
+
+ctATMLANEInfoExtStatusMaxNumQueues OBJECT-TYPE
+     SYNTAX          INTEGER  (1..32)
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "Defines the maximum number that ctATMLANEInfoExtNumQueues can be
+          set to."
+     ::= { ctATMLANEInfoExtStatusEntry  6 }
+
+--
+--=====================================================================
+-- Defines a table that will describe the traffic descriptors that an
+-- LAN Emulation Client will use when supporting Traffic Management.
+
+ctATMLANEInfoExtTMTable       OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CtATMLANEInfoExtTMEntry
+    MAX-ACCESS          not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Defines a list, of length ctATMLANEInfoExtStatusNumQueues, of traffic
+         descriptor indexes matching atmTrafficDescrParamIndex in the
+         atmTrafficDescrParamTable defined in the RFC 1695."
+    ::= { ctATMLANEInfoExtGroup 2 }
+
+ctATMLANEInfoExtTMEntry       OBJECT-TYPE
+     SYNTAX        CtATMLANEInfoExtTMEntry 
+     MAX-ACCESS         not-accessible
+     STATUS         current
+     DESCRIPTION
+         "An entry containing OBJECTS describing information about
+          an LEC's (LAN Emulation Client) Traffic Management parameters.
+          It is instanced by lecIndex, which is the same as what is defined
+          in the ATM Forum's LAN Emulation MIB, and by a list index which
+          ranges from 1 to ctATMLANEInfoExtStatusNumQueues."
+     INDEX           { lecIndex, ctATMLANEInfoExtTMIndex }
+     ::= { ctATMLANEInfoExtTMTable 1 }
+
+CtATMLANEInfoExtTMEntry ::=
+     SEQUENCE {
+                   ctATMLANEInfoExtTMIndex 
+                        INTEGER,
+                   ctATMLANEInfoExtTMTrafficDescrIndex
+                        AtmTrafficDescrParamIndex
+              }
+
+ctATMLANEInfoExtTMIndex OBJECT-TYPE
+     SYNTAX          INTEGER
+     MAX-ACCESS          read-only
+     STATUS          current
+     DESCRIPTION
+         "Defines the list index and will range from 1 to 
+          ctATMLANEInfoExtStatusNumQueues."
+     ::= { ctATMLANEInfoExtTMEntry  1 }
+
+ctATMLANEInfoExtTMTrafficDescrIndex OBJECT-TYPE
+     SYNTAX          AtmTrafficDescrParamIndex 
+     MAX-ACCESS          read-write
+     STATUS          current
+     DESCRIPTION
+         "Defines a traffic descriptor index that matches the index 
+          atmTrafficDescrParamIndex in the atmTrafficDescrParamTable 
+          defined in the RFC 1695.
+
+          NOTE: This table will always be at least of length 1. 
+          In this case it will define the traffic descriptor that will
+          be used for every data SVC for this LAN Emulation Client.
+
+          NOTE: When this is set it will cause the LAN Emulation Client
+          to restart it's state machine, thus loosing operational status
+          temporarily, thus loosing LAN connectivity temporarily."
+     ::= { ctATMLANEInfoExtTMEntry  2 }
+
+
+--
+--=====================================================================
+-- ATM Traffic Descriptor Name Table
+-- This table is an extension to the ATM Traffic Descriptor table
+-- described in RFC 1695.  In the atmTrafficDescrParamTable in
+-- RFC 1695 a network manager can create a traffic descriptor and 
+-- assign traffic parameters and traffic class.  A virtual link will use 
+-- the traffic parameters and traffic class of the traffic descriptor whose 
+-- index it points to.  The ATM Traffic Descriptor Name Table defined 
+-- here will match a name for a traffic descriptor to a traffic descriptor
+-- index.  This index will correspond to a traffic descriptor described
+-- in the ATM Traffic Descriptor Table in RFC 1695.
+
+-- A row in this table will be created when a row is added to the 
+-- atmTrafficDescrParamTable defined in RFC 1695 and will exist until
+-- the row in the atmTrafficDescrParamTable has been destroyed.  
+-- After a row has been created in the atmTrafficDescrParamTable the
+-- value of the ctATMTrafficDescrName object associated with that traffic
+-- descriptor will default to "unknown" with the ctATMTrafficDescrParamIndex
+-- appended to it.  For example, if a row is created in the 
+-- atmTrafficDescrParamTable with an index of 5, a row will be created
+-- in this table with an index of 5, and the object ctATMTrafficDescrName
+-- will default to "unknown5".
+
+
+ctATMTrafficDescrNameTable       OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CtATMTrafficDescrNameEntry
+    MAX-ACCESS          not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An association between a string describing a traffic 
+         descriptor and a traffic descriptor index into the 
+         atmTrafficDescrParamTable in RFC 1695."
+    ::= { ctATMTrafficManagementGroup 1 }
+
+ctATMTrafficDescrNameEntry       OBJECT-TYPE
+     SYNTAX         CtATMTrafficDescrNameEntry
+     MAX-ACCESS         not-accessible
+     STATUS         current
+     DESCRIPTION
+         "An entry containing objects associating a string describing 
+          a traffic descriptor on this device and a traffic descriptor 
+          index into the atmTrafficDescrParamTable in RFC 1695."
+     INDEX    { atmTrafficDescrParamIndex }
+     ::= { ctATMTrafficDescrNameTable 1 }
+
+CtATMTrafficDescrNameEntry ::=
+     SEQUENCE {
+                   ctATMTrafficDescrName
+                        DisplayString
+              }
+
+ctATMTrafficDescrName    OBJECT-TYPE
+     SYNTAX              DisplayString (SIZE(32))
+     MAX-ACCESS              read-write
+     STATUS              current
+     DESCRIPTION
+       "The name of the traffic descriptor."
+     ::= { ctATMTrafficDescrNameEntry 1 }
+
+
+--
+--=====================================================================
+-- ATM Traffic Service Categories Supported Table
+
+-- This table will define the traffic service categories that are
+-- supported.
+
+ctATMTrafficServiceCategoriesSupportedTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF CtATMTrafficServiceCategoriesSupportedEntry
+        MAX-ACCESS       not-accessible
+        STATUS       current
+        DESCRIPTION
+          "A table related to traffic management service categories supported."
+        ::= { ctATMTrafficManagementGroup 2 }
+
+ctATMTrafficServiceCategoriesSupportedEntry OBJECT-TYPE
+        SYNTAX       CtATMTrafficServiceCategoriesSupportedEntry
+        MAX-ACCESS       not-accessible
+        STATUS       current
+        DESCRIPTION
+          "A table entry containing information related to the traffic 
+           management service categories that are supported for a certain
+           physical interface."
+        INDEX   { ifIndex }
+        ::= { ctATMTrafficServiceCategoriesSupportedTable 1 }
+
+CtATMTrafficServiceCategoriesSupportedEntry ::=
+        SEQUENCE {
+                ctATMTrafficServiceCategoriesSupportedBitMask     BITS,
+                ctATMTrafficManagementAllocBandwidth    INTEGER
+         }
+
+ctATMTrafficServiceCategoriesSupportedBitMask  OBJECT-TYPE
+        SYNTAX         BITS {
+                                other(0),
+                                pvcBandwidthAllocation(1),
+                                cbr(2),
+                                vbrnrt(3),
+                                ubr(4),
+                                abr(5),
+                                vbrrt(6)
+                            }
+        MAX-ACCESS         read-only
+        STATUS         current
+        DESCRIPTION
+            "This indicates the traffic service categories supported by this
+             physical interface.
+
+             other(0)                                   Undefined, or service category unknown
+             PVC Bandwidth Allocation(1)    Proprietary bandwidth allocation
+                                                                                        on PVCs only - to set in this
+                                                                                        mode please use ctATMPvcBwAllocStatus
+             CBR(2)                                     Constant Bit Rate
+             VBR-nrt(3)                                 Variable Bit Rate - non real time
+             UBR(4)                                             Unspecified Bit Rate  
+             ABR(5)                                             Avalilable Bit Rate
+             VBR-rt(6)                                  Variable Bit Rate - real time "
+
+                ::= { ctATMTrafficServiceCategoriesSupportedEntry 1 }
+
+ctATMTrafficManagementAllocBandwidth    OBJECT-TYPE
+        SYNTAX              INTEGER (1..2147483647)
+        MAX-ACCESS              read-only
+        STATUS              current
+        DESCRIPTION
+            "Returns the amount of bandwidth in use on this ATM
+             interface in bits per second. Value only valid when
+             running more than just UBR traffic." 
+        ::= { ctATMTrafficServiceCategoriesSupportedEntry 2 }
+
+--
+--=====================================================================
+
+-- Trap Description
+--    ATMRedundActivePortFailed
+--
+--    Specific Trap Type Code - 12000
+--
+-- This trap will be generated when the active port, on a physical ATM
+-- interface that has redundancy enabled, has failed (become "quiet").
+-- The interesting information will include:
+--        ctATMPhyRedundIfIndex
+--
+-- Trap Description
+--    ATMRedundPortActivated
+--
+--    Specific Trap Type Code - 12001
+--
+-- This trap indicates that a new port has been activated on a physical ATM
+-- interface that has redundancy enabled.  This does not indicate that this
+-- port is usable, but that it is being tested as a possible replacement.
+-- The interesting information will include:
+--        ctATMPhyRedundIfIndex
+--
+-- Trap Description
+--    ATMRedundPortFailedTest
+--
+--    Specific Trap Type Code - 12002
+--
+-- This trap will be generated when the PhyRedundTestTOD or the
+-- PhyRedundPerformTest.immediate has tested a port and determined
+-- that it is not usable.  It is suggested that the port be fixed prior
+-- to it being needed.
+-- The interesting information will include:
+--        ctATMPhyRedundIfIndex
+--
+-- Trap Description
+--    ATMRedundPrimaryPortSkipped
+--
+--    Specific Trap Type Code - 12003
+--
+-- This trap will be generated when redundancy finds that the primary
+-- port as designated be PhyRedundPrimaryPort is usable but cannot be
+-- used because PhyRedundPrimaryRevert is set to manual. This trap
+-- is generated only when redundancy is enabled (PhyRedundStatus is
+-- enable).
+-- The interesting information will include:
+--        ctATMPhyRedundIfIndex
+
+END

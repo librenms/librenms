@@ -1,0 +1,545 @@
+ENTERASYS-SSH-SERVER-MIB DEFINITIONS ::= BEGIN
+
+--  enterasys-ssh-server-mib.txt
+--
+--  Part Number: <TBD>
+--
+--
+
+--  This module provides authoritative definitions for Enterasys 
+--  Networks' Secure Shell (SSH) Server MIB.
+
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in this
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested
+--  parties a non-exclusive license to use this Specification in 
+--  connection with the management of Enterasys Networks products.
+
+--  Copyright June, 2002 Enterasys Networks, Inc.
+
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF   
+    etsysModules
+        FROM ENTERASYS-MIB-NAMES;
+
+etsysSshServerMIB MODULE-IDENTITY
+    LAST-UPDATED "200302191903Z"  -- Wed Feb 19 19:03 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal: Enterasys Networks
+                 35 Industrial Way, P.O. Box 5005
+                 Rochester, NH 03867-0505
+                 USA
+         Phone:  +1 603 332 9400
+         E-mail: support@enterasys.com
+         WWW:    http://www.enterasys.com"
+
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks' enterprise OID pertaining to 
+         Secure Shell (SSH) system management functionality,
+         specifically for embedded systems.  This is a subset of the
+         objects that would be required for a full-featured, host-
+         based implementation.
+
+         It provides configuration controls for Enterasys Networks'
+         Secure Shell system management -- a feature that enhances 
+         system security by authenticating and encrypting the remote
+         system management function."
+
+    REVISION "200302191903Z"  -- Wed Feb 19 19:03 GMT 2003
+    DESCRIPTION
+        "The status of all of the objects in this MIB module were
+         changed to deprecated."
+
+    REVISION "200211141541Z"  -- Thu Nov 14 15:41 GMT 2002
+    DESCRIPTION
+        "Added dsa512 and rsa512 enumerations to the
+         etsysSshOperKeyType and etsysSshAdminKeyType objects."
+
+    REVISION "200209271748Z"  -- Fri Sep 27 17:48 GMT 2002
+    DESCRIPTION
+        "Added a completedPending enumeration to the
+         etsysSshGenerateHostKeys object, and a none enumeration
+         to the etsysSshOperKeyType object."
+
+    REVISION "200209182041Z"  -- Wed Sep 18 20:41 GMT 2002
+    DESCRIPTION
+        "The initial version of this MIB module."
+
+    ::= { etsysModules 26 }
+
+
+etsysSshObjects
+        OBJECT IDENTIFIER ::= { etsysSshServerMIB 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- Branches of the Enterasys Secure Shell MIB
+-- ---------------------------------------------------------- --
+
+etsysSshGeneralBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 1 }
+etsysSshNetworkBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 2 }
+etsysSshCryptoBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 3 }
+etsysSshLoginBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 4 }
+etsysSshServerKeyBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 5 }
+etsysSshAuthBranch
+        OBJECT IDENTIFIER ::= { etsysSshObjects 6 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server Configuration Scalars
+-- ---------------------------------------------------------- --
+  
+etsysSshEnabled   OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Controls the operation of the Secure Shell server task 
+         on the embedded system. When enabled, the SSH server 
+         will accept connection requests and create a secure
+         transport layer on which to transmit system configuration
+         data."
+    DEFVAL { false }
+    ::= { etsysSshGeneralBranch 1 }
+
+etsysSshEventLogFilter OBJECT-TYPE
+    SYNTAX        INTEGER { none (1), information (2), 
+                            warning (3), error (4) }                     
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the filter for event log messages. Valid 
+         values are information, warning, and error.
+
+         The values are defined as follows:
+
+         none (1)            Pass no messages.  This is effectively
+                             a disable condition for Event Logging.
+
+         information (2)     Pass Informational Level, Warning Level 
+                             and Error Level messages.
+
+         warning (3)         Pass Warning Level and Error Level
+                             messages.
+
+         error (4)           Pass Error Level messages only."
+    DEFVAL { error }
+    ::= { etsysSshGeneralBranch 2 }
+
+etsysSshMaxConnections OBJECT-TYPE
+    SYNTAX        INTEGER (1..255)
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the maximum number of simultaneous connections
+         that the target system supports.  This is an
+         implementation restriction."
+    DEFVAL { 5 }
+    ::= { etsysSshGeneralBranch 3 }
+
+etsysSshNumConnections OBJECT-TYPE
+    SYNTAX        INTEGER (0..255)
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the maximum number of simultaneous connections
+         that the server will currently allow. This value must be 
+         less than or equal to etsysSshMaxConnections."
+    DEFVAL { 5 }
+    ::= { etsysSshGeneralBranch 4 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Network Configuration Scalars
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Crypto Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysSshCiphers   OBJECT-TYPE
+    SYNTAX        INTEGER { anyStdCipher (1), anyCipher (2),
+                     des (3), tripleDes (4), blowfish (5),
+                     arcFour (6), twofish (7), cast128 (8),
+                     aes (9) }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the ciphers to use for encrypting the session. 
+         Current enumerated types, DES, 3DES, Blowfish, Arcfour, 
+         Twofish, and CAST128 are supported. Special values to 
+         this option are any, anystd, that allows only standard 
+         (see below) ciphers, and anycipher that allows either any 
+         available cipher or excludes non-encrypting cipher mode 
+         none but allows all others. anystdcipher is the same as 
+         above, but includes only those ciphers mentioned in the 
+         IETF-SecSH-draft (excluding 'none')."
+    DEFVAL { anyStdCipher }
+    ::= { etsysSshCryptoBranch 1 }
+
+etsysSshMACs      OBJECT-TYPE
+    SYNTAX        INTEGER { anyStdMac (1), anyMac (2), 
+                     hmacSha1 (3), hmacSha1Dash96 (4), hmacMd5 (5),
+                     hmacMd5Dash96 (6), hmacRipemd160 (7), 
+                     hmacRipemd160Dash96 (8) }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the MAC (Message Authentication Code) algorithm 
+         to use for data integrity verification. Currently enumerated 
+         types, hmacSha1, hmacSha1Dash96, hmacMd5, hmacMd5Dash96, 
+         hmacRipemd160, and hmacRipemd160Dash96 are supported, of
+         which hmacSha1, hmacSha1Dash96, hmacMd5, and hmacMd5Dash96 are
+         included in all distributions. Special values to this option
+         are anyStdMac, that allows only standard (see below) MACs,
+         and anyMac that allows either any available MAC or excludes 
+         none but allows all others. AnyStdMac is the same as above, 
+         but includes only those MACs mentioned in the IETF-SecSH-draft
+         (excluding none). "
+    DEFVAL { anyStdMac }
+    ::= { etsysSshCryptoBranch 2 }
+
+etsysSshRekeyIntervalSeconds OBJECT-TYPE
+    SYNTAX        INTEGER (0..65535)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the number of seconds after which the key 
+         exchange is done again. A value of 0 (zero) turns re-key 
+         requests off. This does not prevent the client from 
+         requesting re-keys. Note that not all clients support 
+         this function."
+    DEFVAL { 0 }
+    ::= { etsysSshCryptoBranch 3 }
+
+etsysSshRandomSeed OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..80))
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies optional additional entropy information that
+         will be merged with the seed for the random number 
+         generator."
+    ::= { etsysSshCryptoBranch 4 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell User Login Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysSshLoginGraceTime OBJECT-TYPE
+    SYNTAX        INTEGER (1..3600)
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "The server disconnects after this many seconds if the user 
+         has not successfully been authenticated and logged in. The 
+         range limit is from 1 second to 1 hour."
+    DEFVAL { 60 }
+    ::= { etsysSshLoginBranch 1 }
+
+etsysSshIdleTimeout OBJECT-TYPE
+    SYNTAX        INTEGER (0..65535)
+    UNITS         "minutes"
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the maximum number of minutes before a user is
+         disconnected due to lack of activity.
+
+         A value of zero means that there is no idle timeout."
+    DEFVAL { 10 }
+    ::= { etsysSshLoginBranch 2 }
+
+etsysSshBannerMessage OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Banner message that is displayed at the client before 
+         the login."
+    DEFVAL { "" }
+    ::= { etsysSshLoginBranch 3 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Server Key Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysSshGenerateHostKeys OBJECT-TYPE
+    SYNTAX        INTEGER { notInitiated (1),
+                            completed (2), 
+                            failed (3),
+                            generate (4),
+                            completedPending (5)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Causes the host to generate a new private/public host 
+         key pair, using the cipher algorithm currently selected
+         in etsysSshAdminKeyType.  Note that this can be compute
+         intensive on many platforms.
+
+         The meaning of the values are as follows:
+
+         notInitiated (1) On a write, this is a no-operation,
+                          on a read, it indicates that no key
+                          material generation operation has
+                          ever been initiated, at least since
+                          the last reset to factory defaults
+                          initialization of the managed entity.
+                          No key material exists.
+
+         completed (2)    On a write, this is a no-operation,
+                          on a read, this indicates that a key
+                          pair has been successfully generated.
+
+         failed (3)       On a write, this is a no-operation,
+                          on a read, it indicates that the key
+                          generation operation has failed.                 
+
+         generate (4)     On a write, this causes the managed
+                          entity to generate a new key pair,
+                          on a read, it indicates that the
+                          managed entity is still working on
+                          creating the new keys. 
+
+         completedPending (5)
+                          On a write, this is a no-operation,
+                          on a read, this indicates that a key
+                          pair has been successfully generated
+                          but its use is pending due to another
+                          required operation, such as a reboot."
+
+    ::= { etsysSshServerKeyBranch 1 }
+
+etsysSshPublicHostKey OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE(0..512))
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "The host's public key, of type etsysSshOperKeyType."
+    ::= { etsysSshServerKeyBranch 2 }
+
+etsysSshAdminKeyType OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      dsa768  (1),
+                      rsa768  (2),
+                      dsa1024 (3),
+                      rsa1024 (4),
+                      dsa2048 (5), 
+                      rsa2048 (6),
+                      dsa3072 (7),
+                      rsa3072 (8),
+                      dsa512  (9),
+                      rsa512  (10)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Determines the type of the key pair to be (re)created
+         on the next key (re)creation operation.  The 
+         etsysSshOperKeyType object returns the type of
+         key that is currently being used by the SSH server."
+    DEFVAL { rsa1024 }
+    ::= { etsysSshServerKeyBranch 3 }
+
+etsysSshOperKeyType OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      dsa768  (1),
+                      rsa768  (2),
+                      dsa1024 (3),
+                      rsa1024 (4),
+                      dsa2048 (5), 
+                      rsa2048 (6),
+                      dsa3072 (7),
+                      rsa3072 (8),
+                      dsa512  (9),
+                      rsa512  (10),
+                      none    (99)
+                  }
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "Indicates the type of the key pair currently in
+         effect on the managed entity.  The value of the 
+         etsysSshAdminKeyType object is copied to the
+         etsysSshOperKeyType object upon successful completion
+         of the (re)creation of a key pair.  A value of none
+         indicates that due to the failure of the initial key
+         pair generation there is no active key pair."
+    DEFVAL { rsa1024 }
+    ::= { etsysSshServerKeyBranch 4 }
+
+-- ---------------------------------------------------------- --
+-- The Secure Shell Authentication Configuration Scalars
+-- ---------------------------------------------------------- --
+
+etsysSshPasswordGuesses OBJECT-TYPE
+    SYNTAX        INTEGER  (1..100)
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Specifies the number of tries that the user has when 
+         attempting to authenticate using password authentication."    
+    DEFVAL { 3 }
+    ::= { etsysSshAuthBranch 1 }
+
+etsysSshAllowedAuthentications OBJECT-TYPE
+    SYNTAX        INTEGER { allAuth (1),
+                            password (2),
+                            publickey (3)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "This specifies the authentications methods that are 
+         allowed. This is an enumerated list currently consisting 
+         of the following types: password, publickey. Each specifies 
+         an authentication method. 
+
+         With RequiredAuthentications, the administrator can 
+         force users to complete several authentications before 
+         they are considered authenticated."
+    DEFVAL { password }
+    ::= { etsysSshAuthBranch 2 }
+
+etsysSshRequiredAuthentications OBJECT-TYPE
+    SYNTAX        INTEGER { noAuth (1),
+                            password (2), 
+                            publickey (3)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        deprecated
+    DESCRIPTION
+        "Related to AllowedAuthentications, this is used to 
+         specify what authentication methods the users must 
+         complete before continuing. If this value is left 
+         zero, it does not mean that no authentications are 
+         required. It means that the client can authenticate 
+         itself with any of the authentications given in 
+         AllowedAuthentications. This parameter has no default. 
+
+         Note: This parameter has to be a subset for 
+         AllowedAuthentications. Otherwise, the server denies 
+         connection every time."
+    ::= { etsysSshAuthBranch 3 }
+
+-- ---------------------------------------------------------- --
+-- Enterasys Secure Shell (SSH) MIB - Conformance Information
+-- ---------------------------------------------------------- --
+
+etsysSshConformance
+    OBJECT IDENTIFIER ::= { etsysSshServerMIB 2 }
+
+etsysSshGroups      
+    OBJECT IDENTIFIER ::= { etsysSshConformance 1 }
+
+etsysSshCompliances
+    OBJECT IDENTIFIER ::= { etsysSshConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+etsysSshBaseGroup OBJECT-GROUP
+    OBJECTS {
+           etsysSshEnabled,
+           etsysSshMaxConnections,
+           etsysSshNumConnections,
+           etsysSshCiphers,
+           etsysSshMACs,
+           etsysSshRekeyIntervalSeconds,
+           etsysSshRandomSeed,
+           etsysSshGenerateHostKeys,
+           etsysSshPublicHostKey,
+           etsysSshAdminKeyType,
+           etsysSshOperKeyType,
+           etsysSshAllowedAuthentications,
+           etsysSshRequiredAuthentications
+        }
+    STATUS deprecated
+    DESCRIPTION
+        "A collection of objects providing basic SSH server 
+         configuration on a managed entity."
+    ::= { etsysSshGroups 1 }
+
+etsysSshAdvancedGroup OBJECT-GROUP
+    OBJECTS  {
+             etsysSshBannerMessage,
+             etsysSshLoginGraceTime,
+             etsysSshIdleTimeout,
+             etsysSshPasswordGuesses
+             }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects providing advanced feature support
+         for configuration of the SSH server on the managed entity."
+    ::= { etsysSshGroups 2 }  
+
+etsysSshEventLogGroup OBJECT-GROUP
+    OBJECTS  {
+           etsysSshEventLogFilter
+           }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of objects to manage SSH event logs on 
+         the managed entity.  Conditionally mandatory for all
+         managed entities that implement the event log feature."
+    ::= { etsysSshGroups 3 }   
+  
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+etsysSshCompliance MODULE-COMPLIANCE
+    STATUS    deprecated
+    DESCRIPTION
+        "The compliance statement for devices that support the
+         Enterasys Secure Shell (SSH) MIB."
+    MODULE -- this module
+    GROUP    etsysSshBaseGroup
+    DESCRIPTION
+        "Mandatory for all implementations."
+
+    GROUP     etsysSshAdvancedGroup
+    DESCRIPTION
+        "Conditionally mandatory for implementations including
+         the advanced parameters."
+    
+    GROUP     etsysSshEventLogGroup
+    DESCRIPTION
+        "Conditionally mandatory for implementations including SSH 
+         event logging."
+    
+::= { etsysSshCompliances 1 }
+
+END

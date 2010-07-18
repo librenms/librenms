@@ -1,0 +1,232 @@
+CT-PRIORITY-QUEUING DEFINITIONS ::= BEGIN
+
+-- ct-priority-queuing-mib.txt
+-- Revision: 00.00.02
+-- Part Number:
+-- Date: "200309231809Z"  - Tue Sep 23 18:09 GMT 2003
+
+-- Cabletron Systems, Inc.
+-- 35 Industrial Way, P.O. Box 5005
+-- Rochester, NH 03867-5005
+-- (603) 332-9400
+-- support@ctron.com
+
+-- This module provides definitions for the 802.1p
+-- priority queuing MIB.
+-- All managed objects are defined in 802.1p DRAFT D15
+
+-- This module will be extended, as required.
+--
+
+-- Cabletron Systems reserves the right to make changes in
+-- specification and other information contained in this document
+-- without prior notice.  The reader should consult Cabletron Systems
+-- to determine whether any such changes have been made.
+--
+-- In no event shall Cabletron Systems be liable for any incidental,
+-- indirect, special, or consequential damages whatsoever (including
+-- but not limited to lost profits) arising out of or related to this
+-- document or the information contained in it, even if Cabletron
+-- Systems has been advised of, known, or should have known, the
+-- possibility of such damages.
+--
+-- Cabletron grants vendors, end-users, and other interested parties
+-- a non-exclusive license to use this Specification in connection
+-- with the management of Cabletron products.
+
+-- Copyright February 1999 Cabletron Systems
+
+-- 02-24-98 RJH changed "numOfTrafficClasses" to read-only from read-write
+-- 09-23-03 GBP changed the status of all objects to obsolete
+
+IMPORTS
+
+      OBJECT-TYPE
+                FROM RFC-1212
+     enterprises
+                FROM RFC1155-SMI;
+
+
+cabletron                   OBJECT IDENTIFIER ::= { enterprises 52 }
+mibs                        OBJECT IDENTIFIER ::= { cabletron 4 }
+ctronExp                    OBJECT IDENTIFIER ::= { mibs 2 }
+ctVLANMib                   OBJECT IDENTIFIER ::= { ctronExp 12 }
+ctVLANMgr                   OBJECT IDENTIFIER ::= { ctVLANMib 1 }
+ctPriority                  OBJECT IDENTIFIER ::= { ctVLANMgr 4 }
+ctBasePriority           OBJECT IDENTIFIER ::= { ctPriority 2 } 
+ctUserDefPriority        OBJECT IDENTIFIER ::= { ctBasePriority 1 }
+ctRegenPriority          OBJECT IDENTIFIER ::= { ctBasePriority 2 } 
+ctTrafPriority           OBJECT IDENTIFIER ::= { ctBasePriority 3 }
+
+--
+-- The dot1qUserDefPriority group manages priorities of bridged packets. It
+-- uses the information found in the packet tag of an 802.1Q formatted
+-- packet.
+
+ctUserDefTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtUserDefEntry 
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+                "A table that contains Default User Priority."
+        ::= { ctUserDefPriority 1 }
+
+ctUserDefEntry  OBJECT-TYPE
+        SYNTAX  CtUserDefEntry  
+        ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+        "A list of default user priority for all ports."
+
+        INDEX   { ctUserDefPriorityIndex }
+        ::= { ctUserDefTable 1}
+
+CtUserDefEntry ::=
+        SEQUENCE {
+                   ctUserDefPriorityIndex        INTEGER,
+                   ctUserDefPriorityValue        INTEGER,
+                   ctUserDefNumTrafficClass      INTEGER
+                  }
+
+ctUserDefPriorityIndex     OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS        read-only 
+        STATUS        obsolete  
+      DESCRIPTION
+        "Description of a specific instance for the default user
+         priority table. The object identifier contains the port number."
+        ::= { ctUserDefEntry 1 }
+
+ctUserDefPriorityValue OBJECT-TYPE
+        SYNTAX          INTEGER (1..7)
+        ACCESS  read-write
+        STATUS          obsolete
+        DESCRIPTION
+        "The current state of the Default User Priority parameter
+         for a specific port."
+        ::= { ctUserDefEntry 2 }
+
+ctUserDefNumTrafficClass   OBJECT-TYPE
+    SYNTAX      INTEGER (1..8)
+    ACCESS      read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The number of Traffic Classes in the range 1 through 8
+         that are supported on each port."
+    ::= { ctUserDefEntry 3 }
+
+
+-- The regenerationTable is used to modify the incoming packet
+-- priority to a new value.
+
+ctRegenerationTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF CtRegenerationEntry
+        ACCESS          not-accessible
+        STATUS          obsolete
+    DESCRIPTION
+        "A table that contains the Regenerated Priority."
+      ::= { ctRegenPriority 1 }
+
+
+ctRegenerationEntry OBJECT-TYPE
+    SYNTAX        CtRegenerationEntry   
+    ACCESS              not-accessible
+    STATUS              obsolete
+    DESCRIPTION
+        "A list of regenerated priority for each bridge port."
+    INDEX   { ctRegenerationIndex, ctRegenerationId }
+    ::= { ctRegenerationTable 1 }
+
+CtRegenerationEntry ::= 
+        SEQUENCE {
+                   ctRegenerationIndex          INTEGER,
+                   ctRegenerationId             INTEGER,                
+                   ctRegenerationValue          INTEGER         
+                 }
+
+ctRegenerationIndex     OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          obsolete
+        DESCRIPTION
+        "Description of a specific instance of the CtRegeneration
+         table.  The object identifier contains port."
+    ::= { ctRegenerationEntry 1 }
+
+ctRegenerationId                OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          obsolete
+        DESCRIPTION
+        "Description of a specific instance of the CtRegeneration
+         table.  The object identifier contains the priority that 
+         is referenced."
+    ::= { ctRegenerationEntry 2 }
+
+ctRegenerationValue OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    ACCESS      read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Value of the regenerated priority."
+    ::= { ctRegenerationEntry 3 }
+
+
+-- The TrafficClassTable maps the number of transmit queues available
+-- to an appropriate traffic class. If the device does not support all
+-- 7 transmit queues, this table is used to map the desired traffic
+-- priority with the appropriate transmit queue
+
+ctTrafClassTable        OBJECT-TYPE
+    SYNTAX              SEQUENCE OF CtTrafClassEntry 
+    ACCESS              not-accessible
+    STATUS              obsolete
+    DESCRIPTION
+        "A table that lists the queue number for each Traffic Classes."
+    ::= {  ctTrafPriority 1 }
+
+ctTrafClassEntry                OBJECT-TYPE
+    SYNTAX              CtTrafClassEntry 
+    ACCESS              not-accessible
+    STATUS              obsolete
+    DESCRIPTION
+        "A list of available queue for each Traffic Classes on each port."
+    INDEX  { ctTrafClassIndex, ctTrafClassId }
+    ::= { ctTrafClassTable 1 }
+
+CtTrafClassEntry ::=
+       SEQUENCE {
+                  ctTrafClassIndex        INTEGER,
+                  ctTrafClassId           INTEGER,
+                  ctTrafClassValue        INTEGER
+
+                }
+ctTrafClassIndex                OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          obsolete
+        DESCRIPTION
+        "Description of a specific instance of the Traffic Classes
+         table.  The object identifier contains the port number."
+        ::= { ctTrafClassEntry 1 }
+
+ctTrafClassId         OBJECT-TYPE
+        SYNTAX          INTEGER 
+        ACCESS          read-only
+        STATUS          obsolete
+        DESCRIPTION
+        "Description of a specific instance of the Traffic Classes
+         table.  The object identifier contains the priority that
+         is referenced."
+        ::= { ctTrafClassEntry 2 }
+
+ctTrafClassValue                OBJECT-TYPE
+    SYNTAX              INTEGER 
+    ACCESS              read-write
+    STATUS              obsolete
+    DESCRIPTION
+        "The queue number of Traffic Classes in the range of 0 to the number  
+         of Traffic Classes supported on this product."
+    ::= { ctTrafClassEntry 3 }
+
+END

@@ -1,0 +1,312 @@
+ROUTER-OIDS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ctNetwork, ctronExp
+            FROM CTRON-MIB-NAMES
+    networkType
+            FROM CTRON-OIDS;
+
+ntProtoSuites OBJECT IDENTIFIER ::= { networkType 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpRouter OBJECT IDENTIFIER ::= { ntProtoSuites 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxRouter OBJECT IDENTIFIER ::= { ntProtoSuites 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVRouter OBJECT IDENTIFIER ::= { ntProtoSuites 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtRouter OBJECT IDENTIFIER ::= { ntProtoSuites 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Apple table router.
+
+ntAppnRouter OBJECT IDENTIFIER ::= { ntProtoSuites 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The APPN router.
+
+ntIpRip OBJECT IDENTIFIER ::= { ntIpRouter 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpOspf OBJECT IDENTIFIER ::= { ntIpRouter 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpFib OBJECT IDENTIFIER ::= { ntIpRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpArp OBJECT IDENTIFIER ::= { ntIpRouter 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpAc1 OBJECT IDENTIFIER ::= { ntIpRouter 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpFwdEng OBJECT IDENTIFIER ::= { ntIpRouter 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpPortRedirect OBJECT IDENTIFIER ::= { ntIpRouter 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpEventLog OBJECT IDENTIFIER ::= { ntIpRouter 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpAddressTable OBJECT IDENTIFIER ::= { ntIpRouter 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxRip OBJECT IDENTIFIER ::= { ntIpxRouter 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxSap OBJECT IDENTIFIER ::= { ntIpxRouter 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxFib OBJECT IDENTIFIER ::= { ntIpxRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxAc1 OBJECT IDENTIFIER ::= { ntIpxRouter 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxFwdEng OBJECT IDENTIFIER ::= { ntIpxRouter 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxPortRedirect OBJECT IDENTIFIER ::= { ntIpxRouter 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxEventLog OBJECT IDENTIFIER ::= { ntIpxRouter 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxAddressTable OBJECT IDENTIFIER ::= { ntIpxRouter 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxEcho OBJECT IDENTIFIER ::= { ntIpxRouter 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxBroadcast OBJECT IDENTIFIER ::= { ntIpxRouter 11 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntIpxNetbios OBJECT IDENTIFIER ::= { ntIpxRouter 12 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVLevel1 OBJECT IDENTIFIER ::= { ntDecIVRouter 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVLevel2 OBJECT IDENTIFIER ::= { ntDecIVRouter 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVFib OBJECT IDENTIFIER ::= { ntDecIVRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVAcl OBJECT IDENTIFIER ::= { ntDecIVRouter 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVFwdEng OBJECT IDENTIFIER ::= { ntDecIVRouter 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVPportRedirect OBJECT IDENTIFIER ::= { ntDecIVRouter 7 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVEventLog OBJECT IDENTIFIER ::= { ntDecIVRouter 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntDecIVAddressTable OBJECT IDENTIFIER ::= { ntDecIVRouter 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtRtgProt OBJECT IDENTIFIER ::= { ntAtRouter 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtFib OBJECT IDENTIFIER ::= { ntAtRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtArp OBJECT IDENTIFIER ::= { ntAtRouter 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtAcl OBJECT IDENTIFIER ::= { ntAtRouter 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtFwdEng OBJECT IDENTIFIER ::= { ntAtRouter 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtEventLog OBJECT IDENTIFIER ::= { ntAtRouter 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAtAddressTable OBJECT IDENTIFIER ::= { ntAtRouter 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAppnFwdEng OBJECT IDENTIFIER ::= { ntAppnRouter 6 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAppnEventLog OBJECT IDENTIFIER ::= { ntAppnRouter 8 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAppnExtensionTable OBJECT IDENTIFIER ::= { ntAppnRouter 9 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ntAppnIsr OBJECT IDENTIFIER ::= { ntAppnRouter 10 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctRouter OBJECT IDENTIFIER ::= { ctNetwork 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctHighLevelView OBJECT IDENTIFIER ::= { ctRouter 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctProtoSuites OBJECT IDENTIFIER ::= { ctRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctApplicationView OBJECT IDENTIFIER ::= { ctHighLevelView 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctIpRouter OBJECT IDENTIFIER ::= { ctProtoSuites 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctIpxRouter OBJECT IDENTIFIER ::= { ctProtoSuites 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctDecIVRouter OBJECT IDENTIFIER ::= { ctProtoSuites 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+ctAtRouter OBJECT IDENTIFIER ::= { ctProtoSuites 4 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Apple Talk router MIB base.
+
+ctAppnRouter OBJECT IDENTIFIER ::= { ctProtoSuites 5 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+--  Descr
+--    The Appn router MIB base.
+
+ctronRouterExp OBJECT IDENTIFIER ::= { ctronExp 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+nwRouter OBJECT IDENTIFIER ::= { ctronRouterExp 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+nwRtrMibs OBJECT IDENTIFIER ::= { nwRouter 1 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+nwRtrHighLevelView OBJECT IDENTIFIER ::= { nwRouter 2 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+nwRtrProtoSuites OBJECT IDENTIFIER ::= { nwRouter 3 }
+-- OBJECT-IDENTITY
+--  Status
+--    mandatory
+
+END

@@ -1,0 +1,317 @@
+SYSTEM-RESOURCE-MIB DEFINITIONS ::= BEGIN
+
+--  system-resource-mib.txt
+--  Revision: 1.01.00
+--  Part Number: 
+--  Date: March 9, 1998
+
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific IP Routing Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright March 1998 Cabletron Systems
+--
+
+-- This is the system resource MIB.  The purpose of this MIB is to
+-- report on current system resources and utilizations, this may include
+-- both physical as well as logical resources.  Examples of physical
+-- resources is memory.  Logical resources may be execution environment
+-- such as threads etc.
+
+        IMPORTS
+                OBJECT-TYPE     FROM RFC-1212
+                ctResource      FROM CTRON-MIB-NAMES
+                TimeTicks       FROM RFC1155-SMI;
+
+--      Groups in the system Resource MIB
+
+        sysResourceInstalled    OBJECT IDENTIFIER ::= { ctResource 1 }
+        sysResourceSwitch       OBJECT IDENTIFIER ::= { ctResource 2 }
+
+--      The sysResourceInstalled group
+--      This group provides information about installed hardware.
+--      Implementation of this group is mandatory
+
+        sysResourceCpuTable     OBJECT-TYPE
+            SYNTAX      SEQUENCE OF SysResourceCpuEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table defines the CPus present within the system."
+            ::= { sysResourceInstalled 1 }
+
+        sysResourceCpuEntry     OBJECT-TYPE
+            SYNTAX      SysResourceCpuEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Defines a particular CPU entry."
+            INDEX { sysResSlotID, sysResCpuIndex }
+            ::= { sysResourceCpuTable 1 }
+
+        SysResourceCpuEntry     ::= SEQUENCE {
+                sysResSlotID
+                        INTEGER,
+                sysResCpuIndex
+                        INTEGER,
+                sysResCpuType
+                        OBJECT IDENTIFIER,
+                sysResCpuSpeed
+                        INTEGER,
+                sysResCpuID
+                        INTEGER,
+                sysResInstalledLocalMemory
+                        INTEGER,
+                sysResUsedLocalMemory
+                        INTEGER
+                }
+
+        sysResSlotID            OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The slot for which this CPU information pertains."
+            ::= { sysResourceCpuEntry 1 }
+
+        sysResCpuIndex          OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "An identifier for the CPU on a per slot basis."
+            ::= { sysResourceCpuEntry 2 }
+
+        sysResCpuType           OBJECT-TYPE
+            SYNTAX      OBJECT IDENTIFIER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The processor (CPU) type."
+            ::= { sysResourceCpuEntry 3 }
+
+        sysResCpuSpeed          OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The speed of the processor in mega-hertz."
+            ::= { sysResourceCpuEntry 4 }
+
+        sysResCpuID             OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "A system wide unique identifier for each CPU."
+            ::= { sysResourceCpuEntry 5 }
+
+        sysResInstalledLocalMemory      OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "Total installed local memory 'DRAM' used for code and
+                data.  This is reported in mega-bytes."
+            ::= { sysResourceCpuEntry 6 }
+
+        sysResUsedLocalMemory   OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The current amount of  local memory 'DRAM' that is
+                currently being used for code and data.  This is reported
+                in bytes."
+            ::= { sysResourceCpuEntry 7 }
+
+
+
+        sysResourceTable        OBJECT-TYPE
+            SYNTAX      SEQUENCE OF SysResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "This table describes total installed system resources."
+            ::= { sysResourceInstalled 2 }
+
+        sysResourceEntry        OBJECT-TYPE
+            SYNTAX      SysResourceEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                "Describes a particular installed set of system
+                resources."
+            INDEX { sysResSlotID, sysResCpuIndex }
+            ::= { sysResourceTable 1 }
+
+        SysResourceEntry        ::= SEQUENCE {
+                sysResInstalledNvram
+                        INTEGER,
+                sysResInstalledFlash
+                        INTEGER,
+                sysResInstalledSharedMemory
+                        INTEGER,
+                sysResUsedNvram
+                        INTEGER,
+                sysResUsedFlash
+                        INTEGER,
+                sysResUsedSharedMemory
+                        INTEGER
+                }
+
+        sysResInstalledNvram    OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The total installed non-volatile memory 'NVRAM'.  This
+                is reported in K-bytes."
+            ::= { sysResourceEntry 1 }
+--          .1.2.1.1
+
+        sysResInstalledFlash    OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The total installed flash memory.  This is reported in
+                K-bytes."
+            ::= { sysResourceEntry 2 }
+
+        sysResInstalledSharedMemory     OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The total amount of shared memory that is installed.  This
+                is reported in K-bytes."
+            ::= { sysResourceEntry 3 }
+
+        sysResUsedNvram         OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The current amount of  non-volatile memory 'NVRAM' that
+                is currently being used for data.  This is reported in
+                bytes."
+            ::= { sysResourceEntry 4 }
+
+        sysResUsedFlash OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The current amount of flash memory that is
+                currently being used for code and data.  This is reported
+                in bytes."
+            ::= { sysResourceEntry 5 }
+
+        sysResUsedSharedMemory  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The current amount of shared memory that is currently
+                being used for data.  This is reported in bytes."
+            ::= { sysResourceEntry 6 }
+
+--      sysResourceSwitch group
+
+--      This group is only implemented on those devices where 
+--      control over frame transfer to the CPU is allowed.
+--      Also present in this group is CPU Switch load objects.
+
+sysResManagementCpuResource     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none(1),         
+        limited(2),
+        full(3)
+    }
+    ACCESS read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The desired amount of CPU bandwith reserved for management
+        purposes. For example, in the default state (1), the device
+        will devote all CPU bandwith to switching if necessary therefore
+        possibly dropping management frames. If limited (2) is selected,
+        management of the device may appear slow while under maximum
+        switching capabilities although management will still be possible
+        which may result in dropped frames. If full (3) is selected,
+        management of the device is always possible and acts as if there is
+        no switching load on the device, which may result in dropped frames."
+    DEFVAL { none }
+    ::= { sysResourceSwitch 1 }
+
+switchLoad      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The returned value represents the current switch load 
+        based upon a percentage of maximum switching capacity 
+        where maximum switching capacity is 100%."
+    ::= { sysResourceSwitch 2 }
+
+peakSwitchload  OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The peak load which has occured on this switch. The value 
+        returned represents The peak percentage of switch load based
+        upon a percentage of maximum switch load which is 100%."
+    ::= { sysResourceSwitch 3 }
+
+peakSwitchLoadTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "The time at which the peak switch load occured. The value
+        returned will represent system up time at which the peak occured."
+    ::= { sysResourceSwitch 4 }
+
+peakSwitchClear         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        clear(1),
+        noClear(2)
+        }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This object is used to clear the values found in peakSwitchload
+        and peakSwitchLoadTime.
+
+        When set with a value of clear(1) the values will be cleared.
+        When read, a value of noClear(2) will be returned.  A set of noClear(2)
+        will have no effect."
+    DEFVAL { noClear }
+    ::= { sysResourceSwitch 5 }
+
+END

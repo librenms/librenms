@@ -1,0 +1,984 @@
+CTIF-EXT-MIB DEFINITIONS ::= BEGIN
+
+--  ctif-ext-mib  Cabletron's extension to the MIB-II
+--  Revision: 1.06.03
+--  Part Number:  2170559
+
+--  LAST-UPDATED "200302241529Z"   - Mon Feb 24 15:29 GMT 2003
+--  ORGANIZATION "Enterasys Networks"
+--  CONTACT-INFO
+--      "Postal:  Enterasys Networks
+--                35 Industrial Way, P.O. Box 5005
+--                Rochester, NH 03867-0505
+--                USA
+--       Phone:   +1 603 332 9400
+--       E-mail:  support@enterasys.com
+--       WWW:     http://www.enterasys.com"
+
+--  This module provides authoritative definitions for part
+--  of the naming tree below:
+--
+--              cabletron { enterprises 52 }
+--
+--  This module will be extended, as additional sub-sections
+--  of this naming tree are defined.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright 1995-2003 Enterasys Networks, Inc.
+
+IMPORTS
+      ctronMib2       FROM CTRON-MIB-NAMES
+      ifIndex         FROM IF-MIB 
+      Counter         FROM RFC1155-SMI
+      DisplayString   FROM RFC1213-MIB
+      OBJECT-TYPE     FROM RFC-1212;
+
+        --  Textual convention
+
+        --  DisplayString   ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax are declared as having:
+        --
+        --  SIZE (0..255)
+
+-- This MIB defines Cabletron extensions to MIB-II.  Groups within this MIB
+-- refer to the group that the objects pertain to within MIB-II.
+
+-- Groups within this MIB are
+
+commonDev               OBJECT IDENTIFIER ::= { ctronMib2 1 }
+ctIf                    OBJECT IDENTIFIER ::= { ctronMib2 2 }
+ctIfPort                OBJECT IDENTIFIER ::= { ctronMib2 3 }
+ctIfCp                  OBJECT IDENTIFIER ::= { ctronMib2 4 }
+ctSNMP                  OBJECT IDENTIFIER ::= { ctronMib2 5 }
+ctSonet                 OBJECT IDENTIFIER ::= { ctronMib2 6 }
+ctVirtual               OBJECT IDENTIFIER ::= { ctronMib2 7 }
+ctStats                 OBJECT IDENTIFIER ::= { ctronMib2 8 }       
+ctFramerConfig          OBJECT IDENTIFIER ::= { ctronMib2 9 }
+ctIfHC                  OBJECT IDENTIFIER ::= { ctronMib2 10 }
+
+--  The commonDevice group this group is an extension to the system
+--  group of MIB2.  It contains similar information to that defined
+--  within the system group of MIB-II.
+
+--  Implementation of this group is optional for all Cabletron
+--  devices.
+
+comDeviceTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(6|8))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The current time of day, in 24 hour format, as
+        measured by the device.  The representation shall
+        use the standard HHMMSS format."
+    ::= { commonDev 1 }
+
+comDeviceDate  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(8))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The current date, as measured by the device.  The
+        representation shall use the standard MMDDYYYY 
+        format."
+    ::= { commonDev 2 }
+
+comDeviceBoardMap  OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Contains a bit encoded representation of slots that contain MIM
+        boards.  If a bit is one then that slot is occupied by a board."
+    ::= { commonDev 3 }
+
+
+-- ctIf group implementation of this group is optional
+
+-- the ctIf group contains information about the type of interface ie
+-- the type of BRIM etc.  This information is not available
+-- in the interface group of MIB-II.
+
+ctIfTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines an extension to the interface table."
+    ::= { ctIf 1 }
+
+ctIfEntry       OBJECT-TYPE
+    SYNTAX      CtIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines each conceptual row within the ctIfTable"
+    INDEX { ctIfNumber }
+    ::= { ctIfTable 1 }
+
+CtIfEntry       ::=
+    SEQUENCE {
+        ctIfNumber
+            INTEGER,
+        ctIfPortCnt
+            INTEGER,
+        ctIfConnectionType
+            OBJECT IDENTIFIER,
+        ctIfLAA
+            OCTET STRING,
+        ctIfDuplex
+            INTEGER,
+        ctIfCapability
+            INTEGER,
+        ctIfRedundancy
+            INTEGER     
+    }
+
+ctIfNumber      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the interface that is being described.  This is the
+        same as ifIndex."
+    ::= { ctIfEntry 1 }
+
+ctIfPortCnt     OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the number of ports on the interface that is being
+        described."
+    ::= { ctIfEntry 2 }
+
+ctIfConnectionType  OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the specific type of the interface connection (BRIM, etc).
+        This is defined within ctron-oids.  This differs from the nature of
+        the interface as defined by ifType as found in MIB-II."
+    ::= { ctIfEntry 3 }
+
+ctIfLAA         OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (6))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "This object is used by a device (with a Token Ring 
+                interface) to set a Locally Administered Address (LAA) 
+                for it's MAC hardware address.  When set, this LAA will
+                override the default Universally Administered Address or 
+                burned in address of the interface. 
+
+                For devices that do not support LAA: 
+
+                        - a read will return all zeros.
+
+                        - any write attempt will return BADVALUE.
+
+                For devices that support LAA:
+
+                        - valid values are 4000 0000 0000 to 4000 7fff ffff, 
+                          and 0000 0000 0000 (a value of all zeros, causes
+                          interface to use the burned in address).
+
+                        - a set (write) with an invalid value, returns BADVALUE.
+
+                        - after a write, new values will only become active
+                          after the Token Ring interface has been closed and
+                          then opened again.
+
+                        - a read of ctIfLAA will always return same value as
+                          ifPhysAddress, except in the case where;
+
+                                o ctIfLAA has been set, but interface has
+                                  not yet been closed and reopened, in
+                                  this case the last set value is returned.
+
+                Note that a read of ifPhysAddress will always return the
+                physical address currently being used by the interface."
+        ::= { ctIfEntry 4 }
+
+ctIfDuplex      OBJECT-TYPE
+        SYNTAX INTEGER {
+                        other(1),
+                        standard(2),
+                        full(3)
+                }       
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the duplex mode that the interface is set to
+                operate in.
+
+                For devices that do not support this capability: 
+
+                        - a read will return standard(2).
+
+                        - any write attempt will return BADVALUE.
+
+                        - fast ethernet devices will report other(1)."
+        ::= { ctIfEntry 5 }
+
+ctIfCapability  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                standard(2),
+                fullDuplex(3),
+                fastEthernet(4),
+                ethernetBased(5)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines the cabability of the underlying hardware in
+                supporting full duplex.  This object will have a value
+                of fullDuplex(3) if all hardware is capable of supporting
+                full duplex operation."
+
+        ::= { ctIfEntry 6 }
+
+ctIfRedundancy  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                redundant (1),
+                not-redundant (2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines whether or not an interface supports redundancy."
+
+        ::= { ctIfEntry 7 }
+
+
+-- ctIfPort group implementation of this group is optional
+ 
+-- The ctIfPort group contains information about the type of port on the
+-- interface ie the type of EPIM, TPIM etc.  This information is not
+-- available in the interface group of MIB-II.
+ 
+ctIfPortTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtIfPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines an extension to the interface table."
+    ::= { ctIfPort 1 }
+ 
+ctIfPortEntry       OBJECT-TYPE
+    SYNTAX      CtIfPortEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines each conceptual row within the ctIfPortTable"
+    INDEX { ctIfPortIfNumber, ctIfPortPortNumber }
+    ::= { ctIfPortTable 1 }
+ 
+CtIfPortEntry       ::=
+    SEQUENCE {
+        ctIfPortPortNumber
+            INTEGER,
+        ctIfPortIfNumber
+            INTEGER,
+        ctIfPortType
+            OBJECT IDENTIFIER,
+        ctIfPortLinkStatus
+            INTEGER,
+        ctIfPortTrapStatus
+            INTEGER
+    }
+
+ctIfPortPortNumber      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the port that is being described."
+    ::= { ctIfPortEntry 1 }
+ 
+ctIfPortIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the interface that the port being described is on."
+    ::= { ctIfPortEntry 2 }
+
+ctIfPortType    OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the specific type of the port (EPIM, TPIM).
+         This is defined within ctron-oids."
+    ::= { ctIfPortEntry 3 }
+ 
+ctIfPortLinkStatus      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notLinked(1), 
+                    linked(2),   
+                    notApplicable(3)
+                }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the status of the port connection."
+    ::= { ctIfPortEntry 4 }
+
+ctIfPortTrapStatus      OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     disabled(1),
+                     enabled(2)  -- default
+                 }
+     ACCESS      read-write
+     STATUS      mandatory
+     DESCRIPTION
+     "Defines the trap forwarding status of the port.  A value of (1) 
+     indicates that a trap WILL NOT be sent if the port goes down and
+     a value of (2) which is the default value, indicates that a trap
+     WILL be sent if the port goes down."
+     ::= { ctIfPortEntry 5 }
+
+
+-- ctIfCp group implementation of this group is optional
+
+-- the ctIfCp group contains information about the com port configuration
+-- on the MMAC Management Modules (e.g., EMME, TRMM), and on the MMAC-Plus
+-- Environmental Module
+
+
+ctCpTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtCpEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines a Com Port Table."
+    ::= { ctIfCp 1 }
+
+ctCpEntry       OBJECT-TYPE
+    SYNTAX      CtCpEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines each conceptual row within the ctCPTable"
+    INDEX { ctComPort }
+    ::= { ctCpTable 1 }
+
+CtCpEntry       ::=
+    SEQUENCE {
+        ctComPort
+            INTEGER,
+        ctCpFunction
+            INTEGER,
+        ctIfNum
+            INTEGER,
+        ctCpAdminStatus
+            INTEGER
+    }
+
+ctComPort       OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This is the index into the Com Port Table and defines the Com Port 
+        that is being described.  com1 = 1, com2 = 2"  
+    ::= { ctCpEntry 1 }
+
+ctCpFunction    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    lm(1),              -- Local Management (default)
+                    ups(2),             -- UPS
+                    slip(3),            -- SLIP
+                    ppp(4)              -- PPP
+                }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Defines the Com Port Function supported by that Com Port."
+    ::= { ctCpEntry 2 }
+
+ctIfNum         OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines the interface that is being described.  This is the
+        same as ifIndex.  This is only valid if ctCpFunction is SLIP or PPP,
+        otherwise, 0"
+    ::= { ctCpEntry 3 }
+
+ctCpAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(1),
+                    enabled(2)          -- default
+                }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The administrative state of the Com Port."
+    ::= { ctCpEntry 4 }
+
+
+--      The SNMP group.  Implementation of this group is mandatory when
+--      the SNMPv2 protocol is present within the device.
+
+enableSNMPv1    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2) }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "This object allows control over the SNMPv1 protocol.  If set to
+        a value of disable(1) then the SNMPv1 protocol will not be accepted
+        by the device."
+::= { ctSNMP 1 }
+
+enableSNMPv2    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2) }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "This object allows control over the SNMPv2 protocol.  If set to
+        a value of disable(1) then the SNMPv2 protocol will not be accepted
+        by the device."
+::= { ctSNMP 2 }
+
+enableSNMPv1Counter64    OBJECT-TYPE
+SYNTAX  INTEGER {
+        disable(1),
+        enable(2) }
+ACCESS  read-write
+STATUS  mandatory
+DESCRIPTION
+        "This object allows control over the SNMPv1 protocol agent.  If 
+        set to a value of enable(2) then the SNMPv1 agent will return 
+        Counter64 objects using SNMPv2 syntax. If set to a value of disable(1) 
+        then the SNMPv1 agent will return any Counter64 objects as Counter32."
+::= { ctSNMP 3 }
+
+--        ctIfNumber            {ctIfEntry 1}
+--        ctIfPortPortNumber    {ctIfPortEntry 1}
+
+
+-- The ctSonet group is an optional group. IT contains information
+-- pertaining to the optical connectivity speed.
+
+ctSonetTable        OBJECT-TYPE
+SYNTAX   SEQUENCE OF CtSonetEntry
+ACCESS   not-accessible
+STATUS   deprecated 
+DESCRIPTION
+        "This table defines the Sonet table."
+::= { ctSonet 1 }
+
+ctSonetEntry        OBJECT-TYPE
+SYNTAX   CtSonetEntry
+ACCESS   not-accessible
+STATUS   deprecated
+DESCRIPTION
+        "This defines each conceptual row within the ctSonetTable."
+INDEX   { ctSonetIfIndex }
+::= { ctSonetTable 1 }
+
+CtSonetEntry        ::=
+SEQUENCE { ctSonetIfIndex
+               INTEGER,
+           ctSonetMediumType
+               INTEGER }
+
+ctSonetIfIndex      OBJECT-TYPE
+SYNTAX   INTEGER
+ACCESS   read-only
+STATUS   deprecated
+DESCRIPTION
+        "This defines the interface being described. It is the same as
+        IfIndex."
+::= { ctSonetEntry 1 }
+
+ctSonetMediumType   OBJECT-TYPE
+SYNTAX   INTEGER {
+         sonet(1),
+         sdh(2) 
+         }
+ACCESS   read-write
+STATUS   deprecated
+DESCRIPTION
+         "This variable identifies whether a SONET or a SDH
+         signal is used across this interface."
+::= { ctSonetEntry 2 }
+
+
+-- ctVirtual group implementation is optional
+
+-- The ctVirtual group contains information on managing virtual interfaces
+-- and ports.
+
+ctVirtualIfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtVirtualIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table defines a Virtual IF Table."
+    ::= { ctVirtual 1 }
+
+ctVirtualIfEntry  OBJECT-TYPE
+    SYNTAX      CtVirtualIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This defines each conceptual row within the ctVirtualIfTable"
+    INDEX { ctVirtualIfIndex }
+    ::= { ctVirtualIfTable 1 }
+
+CtVirtualIfEntry     ::= SEQUENCE {
+        ctVirtualIfIndex
+            INTEGER,
+        ctVirtualIfPhysicalInterface
+            INTEGER,
+        ctVirtualIfType
+            OBJECT IDENTIFIER,
+        ctVirtualIfNumPorts
+            INTEGER
+    }
+
+ctVirtualIfIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Returns the virtual If Index."
+    ::= { ctVirtualIfEntry 1 }
+
+ctVirtualIfPhysicalInterface    OBJECT-TYPE
+     SYNTAX       INTEGER
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+          "This value displays the physical interface that owns
+          the virtual interface. This is the IfIndex from MIB-II."
+     ::= { ctVirtualIfEntry 2 }
+
+ctVirtualIfType    OBJECT-TYPE
+     SYNTAX       OBJECT IDENTIFIER
+     ACCESS       read-only
+     STATUS       mandatory
+     DESCRIPTION
+          "This value displays the physical interface type." 
+     ::= { ctVirtualIfEntry 3 }
+
+ctVirtualIfNumPorts    OBJECT-TYPE
+     SYNTAX      INTEGER
+     ACCESS      read-only
+     STATUS      mandatory
+     DESCRIPTION
+          "This value displays the number of virtual ports."
+     ::= { ctVirtualIfEntry 4 }
+
+ctVirtualIfPortTable  OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CtVirtualIfPortEntry
+     ACCESS     not-accessible
+     STATUS     mandatory
+     DESCRIPTION
+         "This table defines the Virtual Port types."
+     ::= { ctVirtual 2 }
+
+ctVirtualIfPortEntry  OBJECT-TYPE
+     SYNTAX     CtVirtualIfPortEntry 
+     ACCESS     not-accessible
+     STATUS     mandatory
+     DESCRIPTION
+         "This defines each conceptual row within the ctVirtualIfPortTable."
+     INDEX { ctVirtualIfPortIfIndex, ctVirtualIfPortNumber }
+    ::= { ctVirtualIfPortTable 1 }
+
+CtVirtualIfPortEntry     ::= SEQUENCE {
+         ctVirtualIfPortIfIndex
+             INTEGER,
+         ctVirtualIfPortNumber
+             INTEGER,
+         ctVirtualIfPortType
+             INTEGER,
+         ctVirtualIfPortVPI
+             INTEGER,
+         ctVirtualIfPortVCI
+             INTEGER 
+         }
+
+ctVirtualIfPortIfIndex   OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "Returns the virtual If Index."
+    ::= { ctVirtualIfPortEntry 1 }
+
+ctVirtualIfPortNumber  OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "The application port number of the port being described."
+    ::= { ctVirtualIfPortEntry 2 }
+
+ctVirtualIfPortType    OBJECT-TYPE
+    SYNTAX     INTEGER {
+         portVirtualTypeSvc (1),
+         portVirtualTypePvcLlc (2),
+         portVirtualTypePvcVcmux (3)
+         }       
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "This defines the port type from ctron-oids."
+    ::= { ctVirtualIfPortEntry 3 }
+
+ctVirtualIfPortVPI    OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "This returns the Virtual Path Identifier value."
+    ::= { ctVirtualIfPortEntry 4 }
+
+ctVirtualIfPortVCI     OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+        "This returns the Virtual Channel Identifier value."
+    ::= { ctVirtualIfPortEntry 5 }
+
+
+-- The ctStats group is an optional group. It contains information
+-- pertaining to the ability to pass Token Ring MAC frames to the HOST
+-- to collect stats on an interface.
+
+ctStatsTable        OBJECT-TYPE
+SYNTAX   SEQUENCE OF CtStatsEntry
+ACCESS   not-accessible
+STATUS   mandatory
+DESCRIPTION
+        "This table defines the Stats table."
+::= { ctStats 1 }
+
+ctStatsEntry        OBJECT-TYPE
+SYNTAX   CtStatsEntry
+ACCESS   not-accessible
+STATUS   mandatory
+DESCRIPTION
+        "This defines each StatsTable."
+INDEX   { ctStatsIfIndex }
+::= { ctStatsTable 1 }
+
+CtStatsEntry        ::=
+SEQUENCE { ctStatsIfIndex
+               INTEGER,
+           ctStatsIfEnable
+               INTEGER }
+
+ctStatsIfIndex      OBJECT-TYPE
+SYNTAX   INTEGER
+ACCESS   read-only
+STATUS   mandatory
+DESCRIPTION
+        "This defines the interface being described. It is the same as
+        IfIndex."
+::= { ctStatsEntry 1 }
+
+ctStatsIfEnable      OBJECT-TYPE
+SYNTAX   INTEGER {
+                        enable(1),
+                        disable(2)
+}
+ACCESS   read-write
+STATUS   mandatory
+DESCRIPTION
+        "This allows the interface to pass Token Ring MAC frames to the
+HOST for processing.
+          When disabled, stats will not be gathered on the interface.
+          Default is Enabled.
+         For devices that do not support this capability
+         any write attempt will return BADVALUE."
+::= { ctStatsEntry 2 }
+
+
+-- ctIfHC group implementation of this group is optional
+
+-- the ctIfHC group contains 64 bit equivalent counter support on high
+-- capacity ethernet interfaces.  This information is not available
+-- in the interface group of MIB-II.
+
+ctIfHCStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF CtIfHCStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table defines an extension to the interface table.
+
+                This table consists of interface counters grouped together.
+                For each counter type in the table their is a 32 bit counter
+                and a 32 bit overflow counter.  This effectively provides a
+                method for counting up to 64 bits."
+        ::= { ctIfHC 1 }
+
+ctIfHCStatsEntry OBJECT-TYPE
+        SYNTAX  CtIfHCStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This defines each conceptual row within the ctIfHCStatsTable.
+                 Entries in this table will exist for High Capacity Interfaces."
+        INDEX { ifIndex }
+        ::= { ctIfHCStatsTable 1 }
+
+CtIfHCStatsEntry ::=
+    SEQUENCE {
+            ctIfInOctets                  Counter,
+            ctIfInOctetsOverflows         Counter,
+            ctIfInUcastPkts               Counter,
+            ctIfInUcastPktsOverflows      Counter,
+            ctIfInMulticastPkts           Counter,
+            ctIfInMulticastPktsOverflows  Counter,
+            ctIfInBroadcastPkts           Counter,
+            ctIfInBroadcastPktsOverflows  Counter,
+            ctIfOutOctets                 Counter,
+            ctIfOutOctetsOverflows        Counter,
+            ctIfOutUcastPkts              Counter,
+            ctIfOutUcastPktsOverflows     Counter,
+            ctIfOutMulticastPkts          Counter,
+            ctIfOutMulticastPktsOverflows Counter,
+            ctIfOutBroadcastPkts          Counter,
+            ctIfOutBroadcastPktsOverflows Counter
+    }
+
+ctIfInOctets    OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The total number of octets received on the interface,
+            including framing characters."
+    ::= { ctIfHCStatsEntry 1 }
+
+ctIfInOctetsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfInOctets
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 2 }
+                    
+ctIfInUcastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were not addressed to a multicast
+            or broadcast address at this sub-layer."
+    ::= { ctIfHCStatsEntry 3 }
+
+ctIfInUcastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfInUcastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 4 }
+
+ctIfInMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a multicast
+            address at this sub-layer.  For a MAC layer protocol, this
+            includes both Group and Functional addresses."
+    ::= { ctIfHCStatsEntry 5 }
+
+ctIfInMulticastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfInMulticastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 6 }
+
+ctIfInBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of packets, delivered by this sub-layer to a
+            higher (sub-)layer, which were addressed to a broadcast
+            address at this sub-layer."
+    ::= { ctIfHCStatsEntry 7 }
+
+ctIfInBroadcastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfInBroadcastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 8 }
+
+ctIfOutOctets OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The total number of octets transmitted out of the
+            interface, including framing characters."
+    ::= { ctIfHCStatsEntry 9 }
+
+ctIfOutOctetsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfOutOctets
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 10 }
+
+ctIfOutUcastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were not addressed to a
+            multicast or broadcast address at this sub-layer, including
+            those that were discarded or not sent."
+    ::= { ctIfHCStatsEntry 11 }
+
+ctIfOutUcastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfOutUcastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 12 }
+
+ctIfOutMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            multicast address at this sub-layer, including those that
+            were discarded or not sent.  For a MAC layer protocol, this
+            includes both Group and Functional addresses."  
+    ::= { ctIfHCStatsEntry 13 }
+
+ctIfOutMulticastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfOutMulticastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 14 }
+
+ctIfOutBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The total number of packets that higher-level protocols
+            requested be transmitted, and which were addressed to a
+            broadcast address at this sub-layer, including those that
+            were discarded or not sent."  
+    ::= { ctIfHCStatsEntry 15 } 
+
+ctIfOutBroadcastPktsOverflows OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+            "The number of times the associated ctIfOutBroadcastPkts
+            counter has overflowed."
+    ::= { ctIfHCStatsEntry 16 }
+
+
+-- Trap Description
+--  InterfacePortInsertion 
+
+-- Specfic Trap Type Code - 0x1A0
+
+--      This trap  will be generated when it is detected that an
+-- interface port has been inserted.
+-- The interesting information will include:
+
+--        ctIfNumber            {ctIfEntry 1}
+--        ctIfPortPortNumber    {ctIfPortEntry 1}
+--        ctIfPortType          {ctIfPortEntry 3}
+
+-- Trap Description
+--  InterfacePortRemoval 
+
+-- Specfic Trap Type Code - 0x1A1
+
+--      This trap  will be generated when it is detected that an
+-- interface port has been removed.
+-- The interesting information will include:
+
+--        ctIfNumber            {ctIfEntry 1}
+--        ctIfPortPortNumber    {ctIfPortEntry 1}
+
+-- Trap Description
+--  InterfacePortLinkUp 
+
+-- Specfic Trap Type Code - 0x1A2
+
+--      This trap will be generated when it is determined that
+-- a port on a strictly bridging interface (not a "repeater") has 
+-- been connected to a LAN. This is only appropriate
+-- for ports that support the concept of a link state.
+-- The interesting information will include:
+
+--        ctIfNumber            {ctIfEntry 1}
+--        ctIfPortPortNumber    {ctIfPortEntry 1}
+
+-- Trap Description
+--  InterfacePortLinkDown 
+
+-- Specfic Trap Type Code - 0x1A3
+
+--      This trap will be generated when a previously attached
+-- bridging port has been disconnected from a LAN. This is only
+-- appropriate for ports that support the concept of a link state.
+-- The interesting information will include:
+
+END
