@@ -1,0 +1,419 @@
+-- extracted from rfc1389.txt
+-- at Mon Nov 15 17:11:57 1999
+
+   RFC1389-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+           Counter, TimeTicks, IpAddress
+                   FROM RFC1155-SMI
+           mib-2
+                   FROM RFC1213-MIB
+           OBJECT-TYPE
+                   FROM RFC-1212;
+
+   --  RIP-2 Management Information Base
+
+     rip2 OBJECT IDENTIFIER ::= { mib-2 23 }
+
+   -- the RouteTag type represents the contents of the
+   -- Route Tag field in the packet header or route entry.
+
+   RouteTag ::= OCTET STRING (SIZE (2))
+
+   -- the Validation type is used for the variable that deletes
+   -- an entry from a table, and ALWAYS takes at least these values:
+
+   Validation ::= INTEGER { valid (1), invalid (2) }
+
+
+   --      The RIP-2 Globals Group.
+   --      Implementation of this group is mandatory for systems that
+   --           implement RIP-2.
+
+   -- These counters are intended to facilitate debugging quickly
+   -- changing routes or failing neighbors
+
+   rip2GlobalGroup OBJECT IDENTIFIER ::= { rip2 1 }
+
+
+       rip2GlobalRouteChanges OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of changes made to the IP Route Da-
+              tabase by RIP."
+          ::= { rip2GlobalGroup 1 }
+
+
+       rip2GlobalQueries OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of responses sent  to  RIP  queries
+              from other systems."
+          ::= { rip2GlobalGroup 2 }
+
+
+   --  RIP Interfaces Groups
+   --  Implementation of these Groups is mandatory for systems that
+   --       implement RIP-2.
+
+   -- Since RIP versions 1 and 2 do not deal with addressless links,
+   -- it is assumed that RIP "interfaces" are subnets within a
+   -- routing domain.
+   -- The RIP Interface Status Table.
+
+       rip2IfStatTable OBJECT-TYPE
+           SYNTAX   SEQUENCE OF Rip2IfStatEntry
+           ACCESS   not-accessible
+           STATUS   mandatory
+           DESCRIPTION
+              "A  list  of  subnets  which  require  separate
+              status monitoring in RIP."
+          ::= { rip2 2 }
+
+      rip2IfStatEntry OBJECT-TYPE
+          SYNTAX   Rip2IfStatEntry
+          ACCESS   not-accessible
+          STATUS   mandatory
+          DESCRIPTION
+             "A Single Routing Domain in a single Subnet."
+         INDEX { rip2IfStatAddress }
+         ::= { rip2IfStatTable 1 }
+
+
+       Rip2IfStatEntry ::=
+           SEQUENCE {
+               rip2IfStatAddress
+                   IpAddress,
+               rip2IfStatRcvBadPackets
+                   Counter,
+               rip2IfStatRcvBadRoutes
+                   Counter,
+               rip2IfStatSentUpdates
+                   Counter,
+               rip2IfStatStatus
+                   Validation
+       }
+
+       rip2IfStatAddress OBJECT-TYPE
+           SYNTAX   IpAddress
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The IP Address of this system on the indicated
+              subnet."
+          ::= { rip2IfStatEntry 1 }
+
+
+       rip2IfStatRcvBadPackets OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of RIP response packets received by
+              the  RIP  process  which were subsequently dis-
+              carded for any reason (e.g. a version 0 packet,
+              or an unknown command type)."
+          ::= { rip2IfStatEntry 2 }
+
+
+       rip2IfStatRcvBadRoutes OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of routes, in  valid  RIP  packets,
+              which were ignored for any reason (e.g. unknown
+              address family, or invalid metric)."
+          ::= { rip2IfStatEntry 3 }
+
+
+       rip2IfStatSentUpdates OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of triggered RIP  updates  actually
+              sent  on  this interface.  This explicitly does
+              NOT include full updates  sent  containing  new
+              information."
+          ::= { rip2IfStatEntry 4 }
+
+       rip2IfStatStatus OBJECT-TYPE
+           SYNTAX   Validation
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "Writing invalid has  the  effect  of  deleting
+              this interface."
+          DEFVAL { valid }
+          ::= { rip2IfStatEntry 5 }
+
+
+   -- The RIP Interface Configuration Table.
+
+
+       rip2IfConfTable OBJECT-TYPE
+           SYNTAX   SEQUENCE OF Rip2IfConfEntry
+           ACCESS   not-accessible
+           STATUS   mandatory
+           DESCRIPTION
+              "A list of subnets which require separate  con-
+              figuration in RIP."
+          ::= { rip2 3 }
+
+      rip2IfConfEntry OBJECT-TYPE
+          SYNTAX   Rip2IfConfEntry
+          ACCESS   not-accessible
+          STATUS   mandatory
+          DESCRIPTION
+             "A Single Routing Domain in a single Subnet."
+         INDEX { rip2IfConfAddress }
+         ::= { rip2IfConfTable 1 }
+
+
+       Rip2IfConfEntry ::=
+           SEQUENCE {
+               rip2IfConfAddress
+                   IpAddress,
+               rip2IfConfDomain
+                   RouteTag,
+               rip2IfConfAuthType
+                   INTEGER,
+               rip2IfConfAuthKey
+                   OCTET STRING (SIZE(0..16)),
+               rip2IfConfSend
+                   INTEGER,
+               rip2IfConfReceive
+                   INTEGER,
+               rip2IfConfDefaultMetric
+                   INTEGER,
+               rip2IfConfStatus
+                   Validation
+       }
+
+       rip2IfConfAddress OBJECT-TYPE
+           SYNTAX   IpAddress
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The IP Address of this system on the indicated
+              subnet."
+          ::= { rip2IfConfEntry 1 }
+
+
+       rip2IfConfDomain OBJECT-TYPE
+           SYNTAX   RouteTag
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "Value inserted into the Routing  Domain  field
+              of all RIP packets sent on this interface."
+          DEFVAL { '0000'h }
+          ::= { rip2IfConfEntry 2 }
+
+
+       rip2IfConfAuthType OBJECT-TYPE
+           SYNTAX   INTEGER {
+                       noAuthentication (1),
+                       simplePassword (2)
+                    }
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "The type of Authentication used on this inter-
+              face."
+          DEFVAL { noAuthentication }
+          ::= { rip2IfConfEntry 3 }
+
+
+       rip2IfConfAuthKey OBJECT-TYPE
+           SYNTAX   OCTET STRING (SIZE(0..16))
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "The value to be used as the Authentication Key
+              whenever    the   corresponding   instance   of
+              rip2IfConfAuthType has  the  value  simplePass-
+              word.   A modification of the corresponding in-
+              stance of rip2IfConfAuthType  does  not  modify
+              the rip2IfConfAuthKey value.
+
+              If a string shorter than 16 octets is supplied,
+              it  will be left-justified and padded to 16 oc-
+              tets, on the right, with nulls (0x00).
+
+              Reading this object always results in an  OCTET
+              STRING  of  length zero; authentication may not
+              be bypassed by reading the MIB object."
+          DEFVAL { ''h }
+          ::= { rip2IfConfEntry 4 }
+
+
+       rip2IfConfSend OBJECT-TYPE
+           SYNTAX   INTEGER {
+                       doNotSend (1),
+                       ripVersion1 (2),
+                       rip1Compatible (3),
+                       ripVersion2 (4)
+                    }
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "What  the  router  sends  on  this  interface.
+              ripVersion1 implies sending RIP updates compli-
+              ant  with  RFC  1058.   rip1Compatible  implies
+              broadcasting RIP-2 updates using RFC 1058 route
+              subsumption rules.  ripVersion2 implies  multi-
+              casting RIP-2 updates."
+          DEFVAL { rip1Compatible }
+          ::= { rip2IfConfEntry 5 }
+
+
+       rip2IfConfReceive OBJECT-TYPE
+           SYNTAX   INTEGER {
+                       rip1 (1),
+                       rip2 (2),
+                       rip1OrRip2 (3)
+                    }
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "This indicates which version  of  RIP  updates
+              are   to  be  accepted.   Note  that  rip2  and
+              rip1OrRip2 implies reception of multicast pack-
+              ets."
+          DEFVAL { rip1OrRip2 }
+          ::= { rip2IfConfEntry 6 }
+
+
+       rip2IfConfDefaultMetric OBJECT-TYPE
+           SYNTAX   INTEGER ( 0..15 )
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "This variable indicates what metric is  to  be
+              used  as  a  default  route in RIP updates ori-
+              ginated on this interface.  A value of zero in-
+              dicates  that  no  default route should be ori-
+              ginated; in this  case,  a  default  route  via
+              another router may be propagated."
+          ::= { rip2IfConfEntry 7 }
+
+       rip2IfConfStatus OBJECT-TYPE
+           SYNTAX   Validation
+           ACCESS   read-write
+           STATUS   mandatory
+           DESCRIPTION
+              "Writing invalid has  the  effect  of  deleting
+              this interface."
+          DEFVAL { valid }
+          ::= { rip2IfConfEntry 8 }
+
+
+   --  Peer Table
+
+   --      The RIP Peer Group
+   --      Implementation of this Group is Optional
+
+   --      This group provides information about active peer
+   --      relationships intended to assist in debugging.
+
+       rip2PeerTable OBJECT-TYPE
+           SYNTAX   SEQUENCE OF Rip2PeerEntry
+           ACCESS   not-accessible
+           STATUS   mandatory
+           DESCRIPTION
+              "A list of RIP Peers."
+          ::= { rip2 4 }
+
+      rip2PeerEntry OBJECT-TYPE
+          SYNTAX   Rip2PeerEntry
+          ACCESS   not-accessible
+          STATUS   mandatory
+          DESCRIPTION
+             "Information regarding a single routing peer."
+         INDEX { rip2PeerAddress, rip2PeerDomain }
+         ::= { rip2PeerTable 1 }
+
+
+       Rip2PeerEntry ::=
+           SEQUENCE {
+               rip2PeerAddress
+                   IpAddress,
+               rip2PeerDomain
+                   RouteTag,
+               rip2PeerLastUpdate
+                   TimeTicks,
+               rip2PeerVersion
+                   INTEGER,
+               rip2PeerRcvBadPackets
+                   Counter,
+               rip2PeerRcvBadRoutes
+                   Counter
+               }
+
+
+       rip2PeerAddress OBJECT-TYPE
+           SYNTAX   IpAddress
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The IP Address of the Peer System."
+          ::= { rip2PeerEntry 1 }
+
+
+       rip2PeerDomain OBJECT-TYPE
+           SYNTAX   RouteTag
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The value in the Routing Domain field  in  RIP
+              packets received from the peer."
+          ::= { rip2PeerEntry 2 }
+
+
+       rip2PeerLastUpdate OBJECT-TYPE
+           SYNTAX   TimeTicks
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The value of sysUpTime when  the  most  recent
+              RIP update was received from this system."
+          ::= { rip2PeerEntry 3 }
+
+
+       rip2PeerVersion OBJECT-TYPE
+           SYNTAX   INTEGER ( 0..255 )
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The RIP version number in the  header  of  the
+              last RIP packet received."
+          ::= { rip2PeerEntry 4 }
+
+
+       rip2PeerRcvBadPackets OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of RIP response packets  from  this
+              peer discarded as invalid."
+          ::= { rip2PeerEntry 5 }
+
+
+       rip2PeerRcvBadRoutes OBJECT-TYPE
+           SYNTAX   Counter
+           ACCESS   read-only
+           STATUS   mandatory
+           DESCRIPTION
+              "The number of routes from this peer that  were
+              ignored because the entry format was invalid."
+          ::= { rip2PeerEntry 6 }
+
+
+   END

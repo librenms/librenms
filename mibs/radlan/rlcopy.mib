@@ -1,0 +1,566 @@
+RADLAN-COPY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    rnd                                     FROM RADLAN-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,Counter32, TimeTicks,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI
+    DisplayString                           FROM SNMPv2-TC-v1
+    TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC;
+
+ rlCopy   MODULE-IDENTITY
+          LAST-UPDATED "200602020000Z"
+          ORGANIZATION "Radlan Computer Communications Ltd."
+          CONTACT-INFO
+                  "radlan.com"
+          DESCRIPTION
+                  "The private MIB module definition for file copy in Radlan devices."
+          REVISION "200602020000Z"
+          DESCRIPTION
+                  "Added objects rlCopyMessagesTable and rlCopyMessagesTableRemoveEntries."
+          REVISION "200309220000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { rnd 87 }
+
+RlCopyApplicationType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies management application"
+    SYNTAX  INTEGER {
+        mcli(1),
+        cli(2),
+        ewb(3),
+        nms(4),
+        initerm(5),
+        serial(6)
+}
+
+RlCopyLocationType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "Specifies file location"
+    SYNTAX  INTEGER {
+        local(1),
+        anotherUnit(2),
+        tftp(3),
+        xmodem(4),
+        scp(5),
+        serial(6)
+}
+
+RlCopyFileType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The File type"
+    SYNTAX  INTEGER {
+        other(1),
+        runningConfig(2),
+        startupConfig(3),
+        backupConfig(4),
+        runningMibConfig(5),
+        startupMibConfig(6),
+        backupMibConfig(7),
+        image(8),
+        boot(9),
+        null(10)
+}
+
+rlCopyMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Copy support version. The current version is 1."
+    ::= {rlCopy 1 }
+
+rlCopyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The (conceptual) table listing only one entry at a time
+          with parameters needed for configuration
+          of the file copy action."
+    ::= {rlCopy 2 }
+
+rlCopyEntry  OBJECT-TYPE
+    SYNTAX RlCopyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the CopyTable."
+    INDEX {rlCopyIndex }
+    ::= {rlCopyTable  1 }
+
+RlCopyEntry ::= SEQUENCE {
+    rlCopyIndex                         INTEGER,
+    rlCopyApplicationId                 RlCopyApplicationType,
+    rlCopySourceLocation                RlCopyLocationType,
+    rlCopySourceIpAddress               IpAddress,
+    rlCopySourceUnitNumber              INTEGER,
+    rlCopySourceFileName                DisplayString,
+    rlCopySourceFileType                RlCopyFileType,
+    rlCopyDestinationLocation           RlCopyLocationType,
+    rlCopyDestinationIpAddress          IpAddress,
+    rlCopyDestinationUnitNumber         INTEGER,
+    rlCopyDestinationFileName           DisplayString,
+    rlCopyDestinationFileType           RlCopyFileType,
+    rlCopyUpTime                        TimeTicks,
+    rlCopyOperationState                INTEGER,
+    rlCopyBytesTransferred              INTEGER,
+    rlCopyInBackground                  INTEGER,
+    rlCopyRowStatus                     RowStatus,
+    rlCopyHistoryIndex                  INTEGER
+}
+
+rlCopyIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The row index in the table."
+    ::=  { rlCopyEntry 1 }
+
+rlCopyApplicationId OBJECT-TYPE
+    SYNTAX RlCopyApplicationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The applicatione activated this comand"
+    ::=  { rlCopyEntry 2}
+
+rlCopySourceLocation OBJECT-TYPE
+    SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source File Location"
+    ::=  { rlCopyEntry 3 }
+
+rlCopySourceIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Ip address of the source remote host"
+    ::=  { rlCopyEntry  4 }
+
+rlCopySourceUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the source unit"
+    ::=  { rlCopyEntry  5 }
+
+rlCopySourceFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the source file."
+    ::=  { rlCopyEntry 6 }
+
+rlCopySourceFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the source file."
+    ::=  { rlCopyEntry 7 }
+
+rlCopyDestinationLocation OBJECT-TYPE
+   SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination File Location"
+    ::=  { rlCopyEntry 8 }
+
+rlCopyDestinationIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Ip address of the destination remote host"
+    ::=  { rlCopyEntry  9 }
+
+rlCopyDestinationUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the destination unit,
+         value 257 means all units"
+    ::=  { rlCopyEntry  10 }
+
+rlCopyDestinationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the destination file."
+    ::=  { rlCopyEntry 11 }
+
+rlCopyDestinationFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the destination file."
+    ::=  { rlCopyEntry 12 }
+
+rlCopyUpTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time elapsed since this entry was created."
+    ::= { rlCopyEntry 13 }
+
+rlCopyOperationState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uploadInProgress(1),
+        downloadInProgress(2),
+        copyFailed(3),
+        copyTimedout(4),
+        copyFinished(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the copy operation."
+    ::=  { rlCopyEntry 14 }
+
+rlCopyBytesTransferred OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of bytes that were transferred by the copy operation."
+    ::=  { rlCopyEntry 15 }
+
+rlCopyInBackground OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When enabled the copy operation is done in the background."
+    DEFVAL { disable }
+    ::=  { rlCopyEntry 16 }
+
+rlCopyRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "It is used to insert or delete an entry"
+    ::= { rlCopyEntry 17 }
+
+-- Robi 9/5/2003
+rlCopyHistoryIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The index of the entry corresponding to this one in the
+         rlCopyHistoryTable (equals rlCopyHistoryHistoryIndex).
+         A value of 0 indicates that no history entry should be kept
+         for this copy operation."
+    DEFVAL { 0 }
+    ::= { rlCopyEntry 18 }
+
+rlCopyFreeHistoryIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Gives the next free index in the rlCopyHistoryTable (i.e., the next
+        available value for rlCopyHistoryHistoryIndex)"
+    ::= { rlCopy 3 }
+
+
+rlCopyHistoryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The (conceptual) table listing only one entry at a time
+          with parameters needed for configuration
+          of the file copy action."
+    ::= {rlCopy 4 }
+
+rlCopyHistoryEntry  OBJECT-TYPE
+    SYNTAX RlCopyHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the rlCopyHistoryTable."
+    INDEX {rlCopyHistoryHistoryIndex }
+    ::= {rlCopyHistoryTable  1 }
+
+RlCopyHistoryEntry ::= SEQUENCE {
+    rlCopyHistoryHistoryIndex                  INTEGER,
+    rlCopyHistoryApplicationId                 RlCopyApplicationType,
+    rlCopyHistorySourceLocation                RlCopyLocationType,
+    rlCopyHistorySourceIpAddress               IpAddress,
+    rlCopyHistorySourceUnitNumber              INTEGER,
+    rlCopyHistorySourceFileName                DisplayString,
+    rlCopyHistorySourceFileType                RlCopyFileType,
+    rlCopyHistoryDestinationLocation           RlCopyLocationType,
+    rlCopyHistoryDestinationIpAddress          IpAddress,
+    rlCopyHistoryDestinationUnitNumber         INTEGER,
+    rlCopyHistoryDestinationFileName           DisplayString,
+    rlCopyHistoryDestinationFileType           RlCopyFileType,
+    rlCopyHistoryUpTime                        TimeTicks,
+    rlCopyHistoryOperationState                INTEGER,
+    rlCopyHistoryBytesTransferred              INTEGER,
+    rlCopyHistoryInBackground                  INTEGER,
+    rlCopyHistoryRowStatus                     RowStatus,
+    rlCopyHistoryErrorMessage                  DisplayString
+}
+
+rlCopyHistoryHistoryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The row index in the table."
+    ::=  { rlCopyHistoryEntry 1 }
+
+rlCopyHistoryApplicationId OBJECT-TYPE
+    SYNTAX RlCopyApplicationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The application that activated this comand"
+    ::=  { rlCopyHistoryEntry 2}
+
+rlCopyHistorySourceLocation OBJECT-TYPE
+    SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Source File Location"
+    ::=  { rlCopyHistoryEntry 3 }
+
+rlCopyHistorySourceIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address of the source remote host"
+    ::=  { rlCopyHistoryEntry  4 }
+
+rlCopyHistorySourceUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the source unit"
+    ::=  { rlCopyHistoryEntry  5 }
+
+rlCopyHistorySourceFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the source file."
+    ::=  { rlCopyHistoryEntry 6 }
+
+rlCopyHistorySourceFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the source file."
+    ::=  { rlCopyHistoryEntry 7 }
+
+rlCopyHistoryDestinationLocation OBJECT-TYPE
+   SYNTAX RlCopyLocationType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destination File Location"
+    ::=  { rlCopyHistoryEntry 8 }
+
+rlCopyHistoryDestinationIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The IP address of the destination remote host"
+    ::=  { rlCopyHistoryEntry  9 }
+
+rlCopyHistoryDestinationUnitNumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The unit number of the destination unit"
+    ::=  { rlCopyHistoryEntry  10 }
+
+rlCopyHistoryDestinationFileName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The name of the destination file."
+    ::=  { rlCopyHistoryEntry 11 }
+
+rlCopyHistoryDestinationFileType OBJECT-TYPE
+    SYNTAX RlCopyFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The type of the destination file."
+    ::=  { rlCopyHistoryEntry 12 }
+
+rlCopyHistoryUpTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time elapsed since this entry was created."
+    ::= { rlCopyHistoryEntry 13 }
+
+rlCopyHistoryOperationState OBJECT-TYPE
+    SYNTAX INTEGER {
+        uploadInProgress(1),
+        downloadInProgress(2),
+        copyFailed(3),
+        copyTimedout(4),
+        copyFinished(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of the copy operation."
+    ::=  { rlCopyHistoryEntry 14 }
+
+rlCopyHistoryBytesTransferred OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of bytes that were transferred by the copy operation."
+    ::=  { rlCopyHistoryEntry 15 }
+
+rlCopyHistoryInBackground OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When enabled the copy operation is done in the background."
+    DEFVAL { disable }
+    ::=  { rlCopyHistoryEntry 16 }
+
+rlCopyHistoryRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "It is used delete an entry. No other operations are permitted since
+         the history table is populated and updated through the copy table only."
+    ::= { rlCopyHistoryEntry 17 }
+
+rlCopyHistoryErrorMessage OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Error message as a result of failed copy action."
+    ::=  { rlCopyHistoryEntry 18 }
+
+
+---         File Copy auditing control (SysLog)
+
+rlCopyAuditingEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls whether SysLog messages
+         should be issued on file copy events"
+    DEFVAL { true }
+    ::= { rlCopy 5 }
+
+rlCopyMessagesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlCopyMessagesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " The table listing the messages issued during a COPY operation."
+    ::= {rlCopy 6 }
+
+rlCopyMessagesEntry  OBJECT-TYPE
+    SYNTAX RlCopyMessagesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        " An entry (conceptual row) in the rlCopyMessagesTable."
+    INDEX {rlCopyMessagesCopyIndex, rlCopyMessagesMessageIndex }
+    ::= {rlCopyMessagesTable  1 }
+
+RlCopyMessagesEntry ::= SEQUENCE {
+    rlCopyMessagesCopyIndex      INTEGER,
+    rlCopyMessagesMessageIndex   INTEGER,
+    rlCopyMessagesMessageText    DisplayString,
+    rlCopyMessagesStatus         RowStatus
+}
+
+rlCopyMessagesCopyIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the copy operation whose messages are displayed."
+    ::=  { rlCopyMessagesEntry 1 }
+
+rlCopyMessagesMessageIndex OBJECT-TYPE
+    SYNTAX INTEGER(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the displayed message."
+    ::=  { rlCopyMessagesEntry 2 }
+
+rlCopyMessagesMessageText OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..80))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The text of the message occurred in the copy operation."
+    ::=  { rlCopyMessagesEntry 3 }
+
+rlCopyMessagesStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only destroy is supported."
+    ::=  { rlCopyMessagesEntry 4 }
+
+
+rlCopyMessagesTableRemoveEntries  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this object with value n will remove all entries associated
+         with copy operation represented by the value n from the rlCopyMessagesTable,
+         i.e. all the entries with rlCopyMessagesCopyIndex = n."
+    ::= { rlCopy 7 }
+
+
+
+END
+
+

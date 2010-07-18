@@ -1,0 +1,68 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: TRIGGER module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-TRIGGER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+trigger MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	TRIGGER module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 53 }
+
+-- The trigger group. This group contains information pertinent to triggers in the router.
+-- The last trigger activated on the router.
+triggerLastTriggerActivated OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The trigger number of the most recent trigger activated on this router. This is
+            also the variable sent in the trigger trap below. If no triggers have been activated
+            yet since the last restart of this router, this variable will read as 0."
+    ::= { trigger 1 }
+
+triggerTrap		OBJECT IDENTIFIER ::= { trigger 0 }
+triggerActiveTrap NOTIFICATION-TYPE
+    OBJECTS   	{ triggerLastTriggerActivated }
+    STATUS     	current
+    DESCRIPTION
+                "A trigger trap is generated a trigger is activated. The number of the trigger
+                activated is given by the variable triggerLastTriggerActivated."
+    ::= { triggerTrap 1 }
+END

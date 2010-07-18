@@ -114,6 +114,11 @@ $config['os']['powerconnect']['ifname'] = 1;
 $config['os']['powerconnect']['type']   = "network";
 $config['os']['powerconnect']['icon']   = "dell";
 
+$config['os']['radlan']['text']         = "Radlan";
+$config['os']['radlan']['ifname']       = 1;
+$config['os']['radlan']['type']         = "network";
+
+
 $config['os']['powervault']['text']     = "Dell PowerVault";
 $config['os']['powervault']['icon']     = "dell";
 
@@ -183,6 +188,7 @@ $config['os']['ies']['icon']            = "zyxel";
 
 $config['os']['allied']['text']         = "AlliedWare";
 $config['os']['allied']['type']         = "network";
+$config['os']['allied']['ifname']	= 1;
 
 $config['os']['mgeups']['text']         = "MGE UPS";
 $config['os']['mgeups']['group']        = "ups";
@@ -295,6 +301,7 @@ if(!$config['mibdir'])
 {
   $config['mibdir'] =  $config['install_dir']."/mibs/";
 }
+$config['mib_dir'] = $config['mibdir'];
 
 if(isset($config['enable_nagios']) && $config['enable_nagios']) {
   $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);

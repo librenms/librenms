@@ -1,0 +1,182 @@
+   INET-ADDRESS-MIB DEFINITIONS ::= BEGIN
+
+
+   IMPORTS
+     MODULE-IDENTITY, mib-2 FROM SNMPv2-SMI
+     TEXTUAL-CONVENTION     FROM SNMPv2-TC;
+
+
+   inetAddressMIB MODULE-IDENTITY
+     LAST-UPDATED "200006080000Z"
+     ORGANIZATION
+         "IETF Operations and Management Area"
+     CONTACT-INFO
+         "Mike Daniele
+          Compaq Computer Corporation
+          110 Spit Brook Rd
+          Nashua, NH  03062, USA
+
+          Phone: +1 603 884-1423
+          EMail: daniele@zk3.dec.com
+
+          Brian Haberman
+          Nortel Networks
+          4039 Emperor Blvd., Suite 200
+          Durham, NC  27703, USA
+
+          Phone: +1 919 992-4439
+          EMail: haberman@nortelnetworks.com
+
+          Shawn A. Routhier
+          Wind River Systems, Inc.
+          1 Tara Blvd, Suite 403
+          Nashua, NH  03062, USA
+
+          Phone: +1 603 897-2000
+          EMail: sar@epilogue.com
+
+          Juergen Schoenwaelder
+          TU Braunschweig
+          Bueltenweg 74/75
+          38106 Braunschweig, Germany
+
+          Phone: +49 531 391-3289
+          EMail: schoenw@ibr.cs.tu-bs.de
+
+          Send comments to mibs@ops.ietf.org."
+
+   DESCRIPTION
+     "This MIB module defines textual conventions for
+      representing Internet addresses. An Internet
+      address can be an IPv4 address, an IPv6 address
+      or a DNS domain name."
+
+   REVISION     "200006080000Z"
+   DESCRIPTION
+       "Initial version, published as RFC 2851."
+   ::= { mib-2 76 }
+
+   InetAddressType ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+         "A value that represents a type of Internet address.
+
+          unknown(0)  An unknown address type. This value MUST
+                      be used if the value of the corresponding
+                      InetAddress object is a zero-length string.
+                      It may also be used to indicate an IP address
+                      which is not in one of the formats defined
+                      below.
+
+          ipv4(1)     An IPv4 address as defined by the
+                      InetAddressIPv4 textual convention.
+
+          ipv6(2)     An IPv6 address as defined by the
+                      InetAddressIPv6 textual convention.
+
+          dns(16)     A DNS domain name as defined by the
+                      InetAddressDNS textual convention.
+
+          Each definition of a concrete InetAddressType value must be
+          accompanied by a definition of a textual convention for use
+          with that InetAddressType.
+
+          The InetAddressType textual convention SHOULD NOT be subtyped
+          in object type definitions to support future extensions. It
+          MAY be subtyped in compliance statements in order to require
+          only a subset of these address types for a compliant
+          implementation."
+     SYNTAX      INTEGER {
+                     unknown(0),
+                     ipv4(1),    -- these named numbers are aligned
+                     ipv6(2),    -- with AddressFamilyNumbers from
+                     dns(16)     -- IANA-ADDRESS-FAMILY-NUMBERS-MIB
+                 }
+
+   InetAddress ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+         "Denotes a generic Internet address.
+
+          An InetAddress value is always interpreted within the
+          context of an InetAddressType value. The InetAddressType
+          object which defines the context must be registered
+          immediately before the object which uses the InetAddress
+          textual convention. In other words, the object identifiers
+          for the InetAddressType object and the InetAddress object
+          MUST have the same length and the last sub-identifier of
+          the InetAddressType object MUST be 1 less than the last
+          sub-identifier of the InetAddress object.
+
+          When this textual convention is used as the syntax of an
+          index object, there may be issues with the limit of 128
+          sub-identifiers specified in SMIv2, STD 58. In this case,
+          the OBJECT-TYPE declaration MUST include a 'SIZE' clause
+          to limit the number of potential instance sub-identifiers."
+     SYNTAX      OCTET STRING (SIZE (0..255))
+
+   InetAddressIPv4 ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "1d.1d.1d.1d"
+     STATUS       current
+     DESCRIPTION
+         "Represents an IPv4 network address:
+
+            octets   contents         encoding
+             1-4     IP address       network-byte order
+
+          The corresponding InetAddressType value is ipv4(1)."
+     SYNTAX       OCTET STRING (SIZE (4))
+
+   InetAddressIPv6 ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x%4d"
+     STATUS       current
+     DESCRIPTION
+         "Represents an IPv6 network address:
+
+            octets   contents         encoding
+             1-16    IPv6 address     network-byte order
+            17-20    scope identifier network-byte order
+
+          The corresponding InetAddressType value is ipv6(2).
+
+          The scope identifier (bytes 17-20) MUST NOT be present
+          for global IPv6 addresses. For non-global IPv6 addresses
+          (e.g. link-local or site-local addresses), the scope
+          identifier MUST always be present. It contains a link
+          identifier for link-local and a site identifier for
+          site-local IPv6 addresses.
+
+          The scope identifier MUST disambiguate identical address
+          values. For link-local addresses, the scope identifier will
+          typically be the interface index (ifIndex as defined in the
+          IF-MIB, RFC 2233) of the interface on which the address is
+          configured.
+
+          The scope identifier may contain the special value 0
+          which refers to the default scope. The default scope
+          may be used in cases where the valid scope identifier
+          is not known (e.g., a management application needs to
+          write a site-local InetAddressIPv6 address without
+          knowing the site identifier value). The default scope
+          SHOULD NOT be used as an easy way out in cases where
+          the scope identifier for a non-global IPv6 is known."
+     SYNTAX       OCTET STRING (SIZE (16|20))
+
+   InetAddressDNS ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "255a"
+     STATUS       current
+     DESCRIPTION
+         "Represents a DNS domain name. The name SHOULD be
+          fully qualified whenever possible.
+
+          The corresponding InetAddressType is dns(16).
+
+          The DESCRIPTION clause of InetAddress objects that
+          may have InetAddressDNS values must fully describe
+          how (and when) such names are to be resolved to IP
+          addresses."
+     SYNTAX       OCTET STRING (SIZE (1..255))
+
+   END
+
+
