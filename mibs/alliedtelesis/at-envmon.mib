@@ -1,0 +1,626 @@
+-- ============================================================================
+-- AT-ENVMON.MIB, Allied Telesis enterprise MIB: Environment Monitoring
+--
+-- Copied from ATR-ENVMON.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    enterprises
+        FROM SNMPv2-SMI
+
+    TruthValue,
+	TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+
+	sysinfo
+		FROM AT-SYSINFO-MIB
+;
+
+envMon MODULE-IDENTITY
+    LAST-UPDATED "200603070000Z"
+    ORGANIZATION "Allied Telesis, Inc"
+    CONTACT-INFO
+        "http://www.alliedtelesis.com"
+    DESCRIPTION
+        "The AT Environment Monitoring MIB for managing and
+        reporting data relating to voltage rails, fan speeds,
+        temperature sensors and power supply units."
+
+    REVISION "200603070000Z"
+    DESCRIPTION
+	"Initial Revision"
+  ::= { sysinfo 10 }
+
+-- Textual Conventions
+
+EnvMonPsbSensorType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Indicates the type of a Power Supply Bay Device sensor."
+    SYNTAX       INTEGER { 
+			psbSensorTypeInvalid	(0), 
+			fanSpeedDiscrete		(1), 
+			temperatureDiscrete		(2), 
+			voltageDiscrete			(3) }
+
+--  This section of the MIB contains new generic environment monitoring
+--  data. It relates to temperature, fanspeed, voltage and power supply
+--  bay device monitors.
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Fan Table
+-- ---------------------------------------------------------- --
+
+    envMonFanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of fans installed in the device that have their
+             fan speeds monitored by environment monitoring hardware."
+    ::= { envMon 1 }
+
+    envMonFanEntry OBJECT-TYPE
+        SYNTAX      EnvMonFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The description, current speed, lower threshold speed and
+             current status of a fan."
+        INDEX { envMonFanBoardIndex, envMonFanIndex }
+    ::= { envMonFanTable 1 }
+
+    EnvMonFanEntry ::=
+        SEQUENCE {
+            envMonFanBoardIndex
+                Unsigned32,
+            envMonFanIndex
+                Unsigned32,
+            envMonFanDescription
+                DisplayStringUnsized,
+            envMonFanCurrentSpeed
+                Unsigned32,
+            envMonFanLowerThreshold
+                Unsigned32,
+            envMonFanAlarm
+                TruthValue
+            }
+
+    envMonFanBoardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The index of the board hosting this fan in the board table."
+    ::= { envMonFanEntry 1 }
+
+    envMonFanIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The numeric identifier of this fan within the context of its host board."
+    ::= { envMonFanEntry 2 }
+
+    envMonFanDescription OBJECT-TYPE
+        SYNTAX      DisplayStringUnsized (SIZE (0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text description of this fan."
+    ::= { envMonFanEntry 3 }
+
+    envMonFanCurrentSpeed OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current speed of this fan in revolutions per
+             minute."
+    ::= { envMonFanEntry 4 }
+
+    envMonFanLowerThreshold OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The minimum acceptable speed of the fan (in revolutions
+             per minute)."
+    ::= { envMonFanEntry 5 }
+
+    envMonFanAlarm OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An indication of whether this fan is currently in an
+             alarm condition. A value of TRUE indicates that its
+             current speed is too low, FALSE indicates that the
+             current speed is acceptable."
+    ::= { envMonFanEntry 6 }
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Voltage Table
+-- ---------------------------------------------------------- --
+
+    envMonVoltageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonVoltageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of voltage rails in the device that are
+             monitored by environment monitoring hardware."
+    ::= { envMon 2 }
+
+    envMonVoltageEntry OBJECT-TYPE
+        SYNTAX      EnvMonVoltageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The description, current value, upper & lower threshold
+             settings and current status of a voltage rail."
+        INDEX { envMonVoltageBoardIndex, envMonVoltageIndex }
+    ::= { envMonVoltageTable 1 }
+
+    EnvMonVoltageEntry ::=
+        SEQUENCE {
+            envMonVoltageBoardIndex
+                Unsigned32,
+            envMonVoltageIndex
+                Unsigned32,
+            envMonVoltageDescription
+                DisplayStringUnsized,
+            envMonVoltageCurrent
+                INTEGER,
+            envMonVoltageUpperThreshold
+                INTEGER,
+            envMonVoltageLowerThreshold
+                INTEGER,
+            envMonVoltageAlarm
+                TruthValue
+            }
+
+    envMonVoltageBoardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The index of the board hosting this voltage sensor in the board table."
+    ::= { envMonVoltageEntry 1 }
+
+    envMonVoltageIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The numeric identifier of this voltage rail within the context of its host board."
+    ::= { envMonVoltageEntry 2 }
+
+    envMonVoltageDescription OBJECT-TYPE
+        SYNTAX      DisplayStringUnsized (SIZE (0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text description of this voltage rail."
+    ::= { envMonVoltageEntry 3 }
+
+    envMonVoltageCurrent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current reading of this voltage rail in millivolts."
+    ::= { envMonVoltageEntry 4 }
+
+    envMonVoltageUpperThreshold OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The maximum acceptable reading of this voltage rail in millivolts."
+    ::= { envMonVoltageEntry 5 }
+
+    envMonVoltageLowerThreshold OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The minimum acceptable reading of this voltage rail in millivolts."
+    ::= { envMonVoltageEntry 6 }
+
+    envMonVoltageAlarm OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An indication of whether this voltage rail is currently
+             in an alarm condition. A value of TRUE indicates that
+             its current reading is outside its threshold range,
+             FALSE indicates that the current reading is acceptable."
+    ::= { envMonVoltageEntry 7 }
+
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Temperature Table
+-- ---------------------------------------------------------- --
+
+    envMonTemperatureTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonTemperatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of temperature sensors in the device that are
+             monitored by environment monitoring hardware."
+    ::= { envMon 3 }
+
+    envMonTemperatureEntry OBJECT-TYPE
+        SYNTAX      EnvMonTemperatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The description, current value, upper threshold setting
+             and current status of a temperature sensor."
+        INDEX { envMonTemperatureBoardIndex, envMonTemperatureIndex }
+    ::= { envMonTemperatureTable 1 }
+
+    EnvMonTemperatureEntry ::=
+        SEQUENCE {
+            envMonTemperatureBoardIndex
+                Unsigned32,
+            envMonTemperatureIndex
+                Unsigned32,
+            envMonTemperatureDescription
+                DisplayStringUnsized,
+            envMonTemperatureCurrent
+                INTEGER,
+            envMonTemperatureUpperThreshold
+                INTEGER,
+            envMonTemperatureAlarm
+                TruthValue
+            }
+
+    envMonTemperatureBoardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The index of the board hosting this temperature sensor in the board table."
+    ::= { envMonTemperatureEntry 1 }
+
+    envMonTemperatureIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The numeric identifier of this temperature sensor within the context of its host board."
+    ::= { envMonTemperatureEntry 2 }
+
+    envMonTemperatureDescription OBJECT-TYPE
+        SYNTAX      DisplayStringUnsized (SIZE (0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text description of this temperature sensor."
+    ::= { envMonTemperatureEntry 3 }
+
+    envMonTemperatureCurrent OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current reading of this temperature sensor in tenths of a degree Celcius."
+    ::= { envMonTemperatureEntry 4 }
+
+    envMonTemperatureUpperThreshold OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The maximum acceptable reading of this temperature
+             sensor in tenths of a degree Celcius."
+    ::= { envMonTemperatureEntry 5 }
+
+    envMonTemperatureAlarm OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An indication of whether this temperature sensor is
+             currently in an alarm condition. A value of TRUE indicates
+             that its current reading is outside its threshold range,
+             FALSE indicates that the current reading is acceptable."
+    ::= { envMonTemperatureEntry 6 }
+
+
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring Power Supply Bay Device Table
+-- ---------------------------------------------------------- --
+
+    envMonPsbObjects            OBJECT IDENTIFIER ::= { envMon 4 }
+
+    envMonPsbTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonPsbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table showing power supply bays in the system and info
+             on any devices that are present."
+    ::= { envMonPsbObjects 1 }
+
+    envMonPsbEntry OBJECT-TYPE
+        SYNTAX      EnvMonPsbEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The description and current status of a power supply
+             bay device."
+        INDEX { envMonPsbHostBoardIndex, envMonPsbHostSlotIndex }
+    ::= { envMonPsbTable 1 }
+
+    EnvMonPsbEntry ::=
+        SEQUENCE {
+            envMonPsbHostBoardIndex
+                Unsigned32,
+            envMonPsbHostSlotIndex
+                Unsigned32,
+            envMonPsbHeldBoardIndex
+                Unsigned32,
+            envMonPsbHeldBoardId
+                OBJECT IDENTIFIER,
+            envMonPsbDescription
+                DisplayStringUnsized
+            }
+
+    envMonPsbHostBoardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The index of the board hosting this PSB in the board table."
+    ::= { envMonPsbEntry 1 }
+
+    envMonPsbHostSlotIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The index of this PSB slot within the context of its host board.
+                 This index is fixed for each slot, on each type of board."
+    ::= { envMonPsbEntry 2 }
+
+    envMonPsbHeldBoardIndex OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of a board installed in this power supply bay.
+            This value corresponds to envMonPsbSensorBoardIndex for
+            each sensor on this board. A value of 0 indicates that a
+            board is is either not present or not supported."
+    ::= { envMonPsbEntry 3 }
+
+    envMonPsbHeldBoardId OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The type of board installed in this power supply bay. The
+            values of this object are taken from the pprXxx object IDs
+            under the boards sub-tree in the parent MIB. A value of 0
+            indicates that a board is is either not present or not
+            supported."
+    ::= { envMonPsbEntry 4 }
+
+    envMonPsbDescription OBJECT-TYPE
+        SYNTAX      DisplayStringUnsized (SIZE (0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text description of this power supply bay."
+    ::= { envMonPsbEntry 5 }
+
+    envMonPsbSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EnvMonPsbSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of environment monitoring sensors on installed
+             power supply bay devices."
+    ::= { envMonPsbObjects 2 }
+
+    envMonPsbSensorEntry OBJECT-TYPE
+        SYNTAX      EnvMonPsbSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The description and current status of a power supply
+             bay device."
+        INDEX { envMonPsbSensorBoardIndex, envMonPsbSensorIndex }
+    ::= { envMonPsbSensorTable 1 }
+
+    EnvMonPsbSensorEntry ::=
+        SEQUENCE {
+            envMonPsbSensorBoardIndex
+                Unsigned32,
+            envMonPsbSensorIndex
+                Unsigned32,
+            envMonPsbSensorType
+                EnvMonPsbSensorType,
+            envMonPsbSensorDescription
+                DisplayStringUnsized,
+            envMonPsbSensorAlarm
+                TruthValue
+            }
+
+    envMonPsbSensorBoardIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of the board hosting this sensor in the board table."
+    ::= { envMonPsbSensorEntry 1 }
+
+    envMonPsbSensorIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of this power supply bay environmental sensor, within the
+             context of its host board."
+    ::= { envMonPsbSensorEntry 2 }
+
+    envMonPsbSensorType OBJECT-TYPE
+        SYNTAX EnvMonPsbSensorType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the type of environmental variable this sensor detects."
+    ::= { envMonPsbSensorEntry 3 }
+
+    envMonPsbSensorDescription OBJECT-TYPE
+        SYNTAX      DisplayStringUnsized (SIZE (0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The text description of this power supply bay environmental sensor."
+    ::= { envMonPsbSensorEntry 4 }
+
+    envMonPsbSensorAlarm OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An indication of whether this environmental sensor is currently
+             in an alarm condition. A value of TRUE indicates that
+             the device is in a failure condition, FALSE indicates
+             that the device is functioning normally."
+    ::= { envMonPsbSensorEntry 5 }
+                    
+                      
+-- ---------------------------------------------------------- --
+-- The Environment Monitoring SNMP Trap Objects
+-- ---------------------------------------------------------- --
+
+    envMonTraps    OBJECT IDENTIFIER ::= { envMon 5 }
+
+    envMonFanAlarmSetEvent NOTIFICATION-TYPE
+        OBJECTS { envMonFanBoardIndex,
+                  envMonFanIndex,
+                  envMonFanDescription,
+                  envMonFanLowerThreshold,
+                  envMonFanCurrentSpeed }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when the monitored speed of a fan
+                 drops below its lower threshold."
+    ::= { envMonTraps 1 }
+
+    envMonFanAlarmClearedEvent NOTIFICATION-TYPE
+        OBJECTS { envMonFanBoardIndex,
+                  envMonFanIndex,
+                  envMonFanDescription,
+                  envMonFanLowerThreshold,
+                  envMonFanCurrentSpeed }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when the monitored speed of a fan
+                 returns to an acceptable value, the fan
+                 having previously been in an alarm condition."
+    ::= { envMonTraps 2 }
+
+    envMonVoltAlarmSetEvent NOTIFICATION-TYPE
+        OBJECTS { envMonVoltageBoardIndex,
+                  envMonVoltageIndex,
+                  envMonVoltageDescription,
+                  envMonVoltageUpperThreshold,
+                  envMonVoltageLowerThreshold,
+                  envMonVoltageCurrent }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when the voltage of a monitored
+                 voltage rail, goes out of tolerance by
+                 either dropping below its lower threshold,
+                 or exceeding its upper threshold."
+    ::= { envMonTraps 3 }
+
+    envMonVoltAlarmClearedEvent NOTIFICATION-TYPE
+        OBJECTS { envMonVoltageBoardIndex,
+                  envMonVoltageIndex,
+                  envMonVoltageDescription,
+                  envMonVoltageUpperThreshold,
+                  envMonVoltageLowerThreshold,
+                  envMonVoltageCurrent }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when the voltage of a monitored
+                 voltage rail returns to an acceptable value,
+                 having previously been in an alarm condition."
+    ::= { envMonTraps 4 }
+
+    envMonTempAlarmSetEvent NOTIFICATION-TYPE
+        OBJECTS { envMonTemperatureBoardIndex,
+                  envMonTemperatureIndex,
+                  envMonTemperatureDescription,
+                  envMonTemperatureUpperThreshold,
+                  envMonTemperatureCurrent }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a monitored temperature
+                 exceeds its upper threshold."
+    ::= { envMonTraps 5 }
+
+    envMonTempAlarmClearedEvent NOTIFICATION-TYPE
+        OBJECTS { envMonTemperatureBoardIndex,
+                  envMonTemperatureIndex,
+                  envMonTemperatureDescription,
+                  envMonTemperatureUpperThreshold,
+                  envMonTemperatureCurrent }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a monitored temperature
+                 returns to an acceptable value, having
+                 previously been in an alarm condition."
+    ::= { envMonTraps 6 }
+
+    envMonPsbAlarmSetEvent NOTIFICATION-TYPE
+        OBJECTS { envMonPsbSensorBoardIndex,
+                  envMonPsbSensorIndex,
+                  envMonPsbSensorType,
+                  envMonPsbSensorDescription }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a monitored parameter of
+                 a power supply bay device goes out of
+                 tolerance."
+    ::= { envMonTraps 7 }
+
+    envMonPsbAlarmClearedEvent NOTIFICATION-TYPE
+        OBJECTS { envMonPsbSensorBoardIndex,
+                  envMonPsbSensorIndex,
+                  envMonPsbSensorType,
+                  envMonPsbSensorDescription }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a monitored parameter of
+                 a power supply bay device returns to an
+                 acceptable value, having previously been
+                 in an alarm condition."
+    ::= { envMonTraps 8 }
+                                            
+END

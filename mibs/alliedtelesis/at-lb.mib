@@ -1,0 +1,650 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: Load Balance module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-LB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+lb	MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	LB module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 104 }
+									  
+-- The loadbalance group. This group contains the current configuration and status 
+-- of the routers' load balancing operation.
+-- The variables in this sub-tree are only valid in releases which support
+-- load balancing. The first release with load balancing code is 2.5.1, Dec/2002.
+
+-- lbShowGlobalTable 
+lbShowGlobalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowGlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "General configuration and status of all of the virtual balancers 
+             configured on the router."
+	::= { lb 1 }
+     
+lbShowGlobalEntry OBJECT-TYPE
+    SYNTAX      LbShowGlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the global table."
+    INDEX   { lbGlobalIndex }
+    ::= { lbShowGlobalTable 1 }
+    
+LbShowGlobalEntry ::=
+    SEQUENCE {
+        lbGlobalIndex
+        	INTEGER,
+        lbAffinityTimeOut
+        	INTEGER,
+        lbOrphanTimeOut
+        	INTEGER,
+        lbCriticalRst
+        	INTEGER,
+        lbTotalResources
+        	INTEGER,
+        lbTotalResPools
+        	INTEGER,
+        lbTotalVirtBals
+        	INTEGER,
+        lbCurrentConnections
+        	INTEGER
+    }     
+ 
+lbGlobalIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the global table."
+    ::= { lbShowGlobalEntry 1 } 
+     
+lbAffinityTimeOut OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The length of time in seconds that a resource can be associated to a source
+             IP address or Cookie after the connection has been closed."
+    ::= { lbShowGlobalEntry 2 }
+    
+lbOrphanTimeOut OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The length of time in seconds that a connection can exist without having any
+             data traversing it, before being declared an orphan and closed by the router."
+    ::= { lbShowGlobalEntry 3 }
+    
+lbCriticalRst OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ratio of total messages received from a resource that can be TCP RST 
+             messages represented as a percentage."
+    ::= { lbShowGlobalEntry 4 }
+    
+lbTotalResources OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of resources configured on the router."
+    ::= { lbShowGlobalEntry 5 }
+    
+lbTotalResPools OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of resource pools configured on the router."
+    ::= { lbShowGlobalEntry 6 }
+    
+lbTotalVirtBals OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of virtual balancers configured on the router."
+    ::= { lbShowGlobalEntry 7 } 
+    
+lbCurrentConnections OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Displays the current total number of connections to all resources in 
+             every resource pool on the router."
+    ::= { lbShowGlobalEntry 8 }
+
+                            
+-- The lbShowRes table
+lbShowResTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowResEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list about the general information about for a given resource."
+    ::= { lb 2 }
+
+lbShowResEntry OBJECT-TYPE
+    SYNTAX      LbShowResEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the resource table."
+    INDEX   { lbResIndex }
+    ::= { lbShowResTable 1 }
+    
+LbShowResEntry ::=
+    SEQUENCE {
+        lbResIndex
+        	INTEGER,
+        lbResource
+        	DisplayString,
+        lbResIp
+        	IpAddress,
+        lbResPort
+        	INTEGER,
+        lbResState
+           	DisplayString,
+        lbResWeight
+        	INTEGER,
+        lbResTotalConnections
+        	INTEGER,    
+        lbResCurrentConnections
+        	INTEGER
+    }
+
+lbResIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the resource table."
+    ::= { lbShowResEntry 1 }
+
+lbResource OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource."
+    ::= { lbShowResEntry 2 } 
+    
+lbResIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address that a virtual balancer uses to accesses the resource."
+    ::= { lbShowResEntry 3 }
+
+lbResPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The port that the service that the resource offer is accessed on."
+    ::= { lbShowResEntry 4 }  
+    
+lbResState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the resource, either UP, DOWN, or CLOSING."
+    ::= { lbShowResEntry 5 }                                
+
+lbResWeight OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The weight that the virtual balancer will apply to the resource when selecting 
+             resources to try a connection to from a resource pool using either the 
+             WEIGHTEDLEASTCONNECT or WEIGHTEDLOTTERY selection algorithms."
+    ::= { lbShowResEntry 6 }  
+    
+lbResTotalConnections OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of successful connections that have been made to 
+             this resource while it has been in the UP state."
+    ::= { lbShowResEntry 7 }  
+    
+lbResCurrentConnections OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of connections currently made to the resource."
+    ::= { lbShowResEntry 8 }  
+    
+-- The lbShowResPool table
+lbShowResPoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowResPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list about the general information about for a given 
+             resource pool."
+    ::= { lb 3 }
+
+lbShowResPoolEntry OBJECT-TYPE
+    SYNTAX      LbShowResPoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the resource pool table."
+    INDEX   { lbResPoolIndex, lbResPoolResourceIndex }
+    ::= { lbShowResPoolTable 1 }
+    
+LbShowResPoolEntry ::=
+    SEQUENCE {
+        lbResPoolIndex
+        	INTEGER,
+        lbResPoolResourceIndex
+        	INTEGER,
+        lbResPool
+        	DisplayString,
+        lbResPoolSelectionAlg
+        	DisplayString,
+        lbResPoolFailOnLast
+        	DisplayString,
+        lbResPoolTotalConnections
+           	DisplayString,
+        lbResPoolResources
+        	DisplayString        
+    }
+
+lbResPoolIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the resource pool table."
+    ::= { lbShowResPoolEntry 1 }
+                         
+lbResPoolResourceIndex OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+        	"The index for the resource table."
+	::= { lbShowResPoolEntry 2 }                                    
+                         
+lbResPool OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource pool."
+    ::= { lbShowResPoolEntry 3 } 
+    
+lbResPoolSelectionAlg OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The selection algorithm that ius employed by this resource pool when 
+             a resource has been selected for a connection. The options are ROUNDROBIN,
+             WEIGHTEDLEASTCONNECT, WEIGHTEDLOTTERY and FASTESTRESPONSE."
+    ::= { lbShowResPoolEntry 4 }
+
+lbResPoolFailOnLast OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether or not the resource pool will fail a resource if it is 
+             the last resource in the resource pool."
+    ::= { lbShowResPoolEntry 5 }  
+    
+lbResPoolTotalConnections OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of successful connections that have been made to the 
+             resources in the resource pool over the lifetime of the resource pool."
+    ::= { lbShowResPoolEntry 6 } 
+    
+lbResPoolResources OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource that is currently allocated 
+             to the resource pool."
+    ::= { lbShowResPoolEntry 7 }                                 
+
+-- The lbShowVirtBal table
+lbShowVirtBalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowVirtBalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list about the general information about for a given 
+             virtual balancer."
+    ::= { lb 4 }
+
+lbShowVirtBalEntry OBJECT-TYPE
+    SYNTAX      LbShowVirtBalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the virtual balancer table."
+    INDEX   { lbVirtBalIndex }
+    ::= { lbShowVirtBalTable 1 }
+    
+LbShowVirtBalEntry ::=
+    SEQUENCE {
+        lbVirtBalIndex
+        	INTEGER,
+        lbVirtBal
+        	DisplayString,
+        lbVirtBalPublicIp
+        	IpAddress,
+        lbVirtBalPublicPort
+        	INTEGER,      
+        lbVirtBalState
+        	DisplayString,
+        lbVirtBalResPool
+        	DisplayString,            	
+        lbVirtBalType
+        	DisplayString,
+        lbVirtBalTotalConnections
+           	INTEGER,
+        lbVirtBalAffinity
+        	DisplayString,            
+        lbVirtBalHttpErrorCode
+        	DisplayString
+    }
+
+lbVirtBalIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the virtual balancer table."
+    ::= { lbShowVirtBalEntry 1 }
+
+lbVirtBal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the virtual balancer."
+    ::= { lbShowVirtBalEntry 2 } 
+    
+lbVirtBalPublicIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address on which the virtual balancer will receive requests for 
+             the service provided by the resource pool associated with it."
+    ::= { lbShowVirtBalEntry 3 }
+
+lbVirtBalPublicPort OBJECT-TYPE
+    SYNTAX      INTEGER  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The port on which the virtual balancer will receive requests for 
+             the service provided by the resource pool associated with it."
+    ::= { lbShowVirtBalEntry 4 }
+    
+lbVirtBalState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the virtual balancer, can either be UP, 
+             CLOSING, or DOWN."
+    ::= { lbShowVirtBalEntry 5 }
+
+lbVirtBalResPool OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource pool that is associated with the 
+             virtual balancer."
+    ::= { lbShowVirtBalEntry 6 }
+
+lbVirtBalType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of load balancer that this virtual balancer currently is, 
+             can be either TCP, HTTP, or ROUTE."
+    ::= { lbShowVirtBalEntry 7 }
+    
+lbVirtBalTotalConnections OBJECT-TYPE
+    SYNTAX      INTEGER  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of stateful connections currently running through
+             this virtual balancer."
+    ::= { lbShowVirtBalEntry 8 }                                
+    
+lbVirtBalAffinity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether or not entries will be made in a virtual balancers'
+             affinity table for each stateful connection to a resource in its' resource 
+             pool (TCP and ROUTE type) or for cookies received from clients (HTTP type)."
+    ::= { lbShowVirtBalEntry 9 }
+    
+lbVirtBalHttpErrorCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A list of the HTTP server error status code added."
+    ::= { lbShowVirtBalEntry 10 }
+    
+-- The lbShowAff table
+lbShowAffTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowAffEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of affinity tables for all configured virtual balancers on the router."
+    ::= { lb 5 }
+
+lbShowAffEntry OBJECT-TYPE
+    SYNTAX      LbShowAffEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the affinity table."
+    INDEX   { lbAffIndex }
+    ::= { lbShowAffTable 1 } 
+    
+LbShowAffEntry ::=
+    SEQUENCE {
+        lbAffIndex
+        	INTEGER,
+        lbAffVirtBal
+        	DisplayString,
+        lbAffClientIp
+        	IpAddress,
+        lbAffCookie
+        	DisplayString,
+        lbAffResource
+        	DisplayString,
+        lbAffExpiry
+        	INTEGER
+    }
+
+lbAffIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the affinity table."
+    ::= { lbShowAffEntry 1 }
+
+lbAffVirtBal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the virtual balancer whose affinity table is being displayed."
+    ::= { lbShowAffEntry 2 } 
+    
+lbAffClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address that has affinity to the given resource."
+    ::= { lbShowAffEntry 3 }
+
+lbAffCookie OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The cookie that has affinity to the given resource."
+    ::= { lbShowAffEntry 4 }  
+    
+lbAffResource OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource that the Client IP/Cookie has an affinity for."
+    ::= { lbShowAffEntry 5 }
+
+lbAffExpiry OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of seconds left before this entry expires, and is removed 
+             from the affinity table."
+    ::= { lbShowAffEntry 6 } 
+    
+-- The lbShowCon table
+lbShowConTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LbShowConEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list about all of the TCP connections currently open to a given virtual balancer."
+    ::= { lb 6 }
+
+lbShowConEntry OBJECT-TYPE
+    SYNTAX      LbShowConEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the connections table."
+    INDEX   { lbConIndex }
+    ::= { lbShowConTable 1 }
+    
+LbShowConEntry ::=
+    SEQUENCE {
+        lbConIndex
+        	INTEGER,
+        lbConVirtBal
+        	DisplayString,
+        lbConClientIp
+        	IpAddress,
+        lbConPort
+           	INTEGER,
+        lbConResource
+        	DisplayString
+    }
+
+lbConIndex OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the connections table."
+    ::= { lbShowConEntry 1 }
+
+lbConVirtBal OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the virtual balancer the listed connections are to."
+    ::= { lbShowConEntry 2 } 
+    
+lbConClientIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address of that originated the connection."
+    ::= { lbShowConEntry 3 }
+
+lbConPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The port on the originating system that represents the other end of the connection."
+    ::= { lbShowConEntry 4 }  
+    
+lbConResource OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the resource that the connection has been made to."
+    ::= { lbShowConEntry 5 }
+
+END
