@@ -26,8 +26,11 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 	$descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB");
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
         $current = $entry['entSensorValue'];
+
+        if($entry['entSensorScale'] == "milli") { $divisor = "1000"; } else { $divisor = "1"; }        
+        
 	
-        discover_temperature($valid_temp, $device, $oid, $index, "cisco-entity-sensor", $descr, "1", NULL, NULL, $current);
+        discover_temperature($valid_temp, $device, $oid, $index, "cisco-entity-sensor", $descr, $divisor, NULL, NULL, $current);
       }
     }
   }

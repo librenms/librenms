@@ -52,8 +52,14 @@ echo("<div style='clear: both;'>");
 
 print_optionbar_start();
 
-echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/'>Graphs</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/arp/'>ARP Table</a>$pagp");
+echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/'>Graphs</a> | ");
+
+if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$interface['interface_id']."'"),0)) 
+{
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/interface/".$interface['interface_id']."/adsl/'>ADSL</a> | ");
+}
+
+echo ("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/arp/'>ARP Table</a>$pagp");
 
 
 
