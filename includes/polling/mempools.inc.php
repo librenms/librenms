@@ -52,6 +52,8 @@ while($mempool = mysql_fetch_array($mempool_data)) {
 
 }
 
+unset($mempool_cache);
+
 echo("\n");
 
 ?>
