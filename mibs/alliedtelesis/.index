@@ -24,10 +24,12 @@ SWITCH-CHASSIS-MIB swchasis.mib
 AT-TRIGGER-MIB at-trigger.mib
 AT-FIREWALL-MIB at-firewall.mib
 AT-SETUP-MIB at-setup.mib
+AtiL2-MIB atiL2.mib
 AT-XEM-MIB at-xem.mib
 AT-LOADER-MIB at-loader.mib
 AT-SWITCH-MIB at-switch.mib
 AT-PING-MIB at-ping.mib
+ATI-8324SX-MIB 8324sx.mib
 AT-INSTALL-MIB at-install.mib
 AT-LB-MIB at-lb.mib
 AT-DS3-MIB at-ds3.mib
