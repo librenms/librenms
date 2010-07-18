@@ -1,10 +1,6 @@
 -- ============================================================================
--- AT-SMI.MIB, Allied Telesis enterprise Structure of Management Information
---
--- Extracted from ATROUTER.MIB of pre 2.9.1 release 
--- Upgraded to SMIv2 compliance
---
--- June 2006, Stan Xiang
+-- AT-SMI.MIB, Allied Telesis enterprise 
+-- Structure of Management Information
 --
 -- Copyright (c) 2006 by Allied Telesis, Inc.
 -- All rights reserved.
@@ -24,12 +20,16 @@ IMPORTS
 ;
 
 alliedTelesis MODULE-IDENTITY
-	LAST-UPDATED "200606140000Z"
+	LAST-UPDATED "200802280000Z"
 	ORGANIZATION "Allied Telesis, Inc."
 	CONTACT-INFO
 		"  http://www.alliedtelesis.com"
 	DESCRIPTION
 		"The Structure of Management Information for Allied Telesis enterprise."
+	REVISION      "200802280000Z"
+	DESCRIPTION
+		"Standardized the file head."
+
 	REVISION      "200606140000Z"
 	DESCRIPTION
 		"Initial version of this MIB module."

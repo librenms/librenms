@@ -1,10 +1,5 @@
 -- ============================================================================
--- AT-SYSINFO.MIB, Allied Telesis enterprise MIB: system information
---
--- Extracted from ATROUTER.MIB of pre 2.9.1 release
---
--- June 2006, Stan Xiang
--- Upgraded to SMIv2 compliance
+-- AT-SYSINFO.MIB, Allied Telesis enterprise 
 --
 -- Copyright (c) 2006 by Allied Telesis, Inc.
 -- All rights reserved.
@@ -14,6 +9,7 @@
 AT-SYSINFO-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+	MODULE-IDENTITY,
     OBJECT-TYPE,
     NOTIFICATION-TYPE
         FROM SNMPv2-SMI
@@ -24,15 +20,18 @@ IMPORTS
 	atRouter,
 	DisplayStringUnsized
 		FROM AT-SMI-MIB
+	
+	InterfaceIndex
+		FROM IF-MIB
 ;
 
 sysinfo MODULE-IDENTITY
-	LAST-UPDATED "200606140000Z"
+	LAST-UPDATED "200802260000Z"
 	ORGANIZATION "Allied Telesis, Inc."
 	CONTACT-INFO
 		"  http://www.alliedtelesis.com"
 	DESCRIPTION
-		"ubtree beneath which system inforamtion ids are assigned.
+		"Subtree beneath which system inforamtion ids are assigned.
 		 It contains generic system information, as follows:
 		 { sysinfo 1 } fanAndPs
 		 { sysinfo 2 } restartGroup
@@ -40,7 +39,17 @@ sysinfo MODULE-IDENTITY
 		 { sysinfo 4 } sysTemperature
 		 { sysinfo 5 } atrContactDetails
 		 { sysinfo 6 } bbrNvs
-		 { sysinfo 9 } hostId "
+		 { sysinfo 9 } hostId 
+		 { sysinfo 10 } envMon
+		 { sysinfo 11 } xem
+		 { sysinfo 12 } awpEnvMon
+		 { sysinfo 13 } awpStack
+		 { sysinfo 14 } atPortInfo"
+		 
+	 REVISION      "200802260000Z"
+
+	 DESCRIPTION
+		"Changed top DESCRIPTION section."
 
 	REVISION      "200606140000Z"
 	DESCRIPTION
@@ -449,7 +458,7 @@ restart OBJECT-TYPE
                 restartWarm(1),
                 restartCold(2)
             }
-    MAX-ACCESS  write-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
             "A router/switch restart request.
@@ -909,5 +918,76 @@ hostId OBJECT-TYPE
     DESCRIPTION
             "Host Identifier of this device"
 	::= { sysinfo 9 }    	   	
-   	 
+
+
+atPortInfo OBJECT IDENTIFIER::= { sysinfo 14 }
+
+atPortInfoTransceiverTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AtPortInfoTransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of information about the transceiver of a interface."
+    ::= { atPortInfo 1 }
+
+atPortInfoTransceiverEntry OBJECT-TYPE
+    SYNTAX  AtPortInfoTransceiverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The description, the transceiver type of a interface."
+    INDEX   { atPortInfoTransceiverifIndex }
+    ::= { atPortInfoTransceiverTable 1 }
+
+AtPortInfoTransceiverEntry ::=
+    SEQUENCE {
+        atPortInfoTransceiverifIndex
+            InterfaceIndex,
+        atPortInfoTransceiverType
+            INTEGER
+    }
+atPortInfoTransceiverifIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex for the interface represented
+             by this entry of the interfaces table."
+    ::= { atPortInfoTransceiverEntry 1 }
+
+atPortInfoTransceiverType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                rj45(1),
+                sfp-px(2),
+                sfp-bx10(3),
+                sfp-fx(4),
+                sfp-100base-lx(5),
+                sfp-t(6),
+                sfp-cx(7),
+                sfp-zx-cwdm(8),
+                sfp-lx(9),
+                sfp-sx(10),
+                sfp-oc3-lr(11),
+                sfp-oc3-ir(12),
+                sfp-oc3-mm(13),
+                xfp-srsw(14),
+                xfp-lrlw(15),
+                xfp-erew(16),
+                xfp-sr(17),
+                xfp-lr(18),
+                xfp-er(19),
+                xfp-lrm(20),
+                xfp-sw(21),
+                xfp-lw(22),
+                xfp-ew(23),
+                unknown(24),
+                empty(25)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object indicates the type of transceiver on a interface."
+    ::= { atPortInfoTransceiverEntry 2 }
+
+
 END
