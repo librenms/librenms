@@ -48,7 +48,15 @@
 
       $adsl_oids = array('AtucCurrSnrMgn','AtucCurrAtn','AtucCurrOutputPwr','AtucCurrAttainableRate','AtucChanCurrTxRate','AturCurrSnrMgn','AturCurrAtn','AturCurrOutputPwr','AturCurrAttainableRate','AturChanCurrTxRate','AtucPerfLofs','AtucPerfLoss','AtucPerfLprs','AtucPerfESs','AtucPerfInits','AturPerfLofs','AturPerfLoss','AturPerfLprs','AturPerfESs','AtucChanCorrectedBlks','AtucChanUncorrectBlks','AturChanCorrectedBlks','AturChanUncorrectBlks');
 
-      $adsl_db_oids = array('adslLineCoding','adslLineType','adslAtucInvVendorID','adslAtucInvVersionNumber','adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr','adslAtucCurrAttainableRate','adslAturInvSerialNumber','adslAturInvVendorID','adslAturInvVersionNumber');
+      $adsl_db_oids = array('adslLineCoding','adslLineType','adslAtucInvVendorID','adslAtucInvVersionNumber','adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr',
+                            'adslAtucCurrAttainableRate','adslAturInvSerialNumber','adslAturInvVendorID','adslAturInvVersionNumber', 'adslAtucChanCurrTxRate', 
+                            'adslAturChanCurrTxRate', 'adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr', 'adslAturCurrAttainableRate');
+
+      $adsl_tenth_oids = array('adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr','adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr');
+
+      foreach($adsl_tenth_oids as $oid) {
+        $this_port[$oid] = $this_port[$oid] / 10;
+      }
  
       if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'"),0) == "0") { mysql_query("INSERT INTO `ports_adsl` (`interface_id`) VALUES ('".$port['interface_id']."')"); }
       $mysql_update = "UPDATE `ports_adsl` SET `port_adsl_updated` = NOW()";

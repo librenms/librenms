@@ -32,7 +32,9 @@
 
   if($config['enable_ports_etherlike']) { echo("dot3Stats "); $array = snmp_cache_oid("dot3StatsEntry", $device, $array, "EtherLike-MIB"); }
   if($config['enable_ports_adsl'])      { 
-    echo("adsl "); $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.2.1", $device, $array, "ADSL-LINE-MIB"); 
+    echo("adsl "); 
+    $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.1.1", $device, $array, "ADSL-LINE-MIB");
+    $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.2.1", $device, $array, "ADSL-LINE-MIB"); 
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.3.1", $device, $array, "ADSL-LINE-MIB");
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.4.1", $device, $array, "ADSL-LINE-MIB");
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.5.1", $device, $array, "ADSL-LINE-MIB");
