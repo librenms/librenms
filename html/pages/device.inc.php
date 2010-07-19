@@ -236,6 +236,6 @@ echo("</div>
 ");
 }
 
-} else { include("includes/error-no-perm-dev.inc.php"); }
+} else { include("includes/error-no-perm.inc.php"); }
 ?>
 

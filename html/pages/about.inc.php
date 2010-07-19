@@ -39,10 +39,7 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     $stat_diskio = mysql_result(mysql_query("SELECT COUNT(*) FROM `ucd_diskio`"),0);
     $stat_processors = mysql_result(mysql_query("SELECT COUNT(*) FROM `processors`"),0);
     $stat_memory = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools`"),0);
-    $stat_temp = mysql_result(mysql_query("SELECT COUNT(*) FROM `temperature`"),0);
-    $stat_fanspeeds = mysql_result(mysql_query("SELECT COUNT(*) FROM `fanspeed`"),0);
-    $stat_volt = mysql_result(mysql_query("SELECT COUNT(*) FROM `voltage`"),0);
-    $stat_amp = mysql_result(mysql_query("SELECT COUNT(*) FROM `current`"),0);
+    $stat_sensors = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors`"),0);
     $stat_hz = mysql_result(mysql_query("SELECT COUNT(*) FROM `frequency`"),0);
     $stat_humid = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE sensor_class='humidity'"),0);
     $stat_toner = mysql_result(mysql_query("SELECT COUNT(*) FROM `toner`"),0);
@@ -95,24 +92,14 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     <td><img src='images/icons/eventlog.png' class='optionicon'> <b>Eventlog Entries</b></td><td align=right>$stat_events</td>
 </tr>
 <tr>
-    <td ><img src='images/icons/temperatures.png' class='optionicon'> <b>Temperatures</b></td><td align=right>$stat_temp</td>
-    <td><img src='images/icons/fanspeeds.png' class='optionicon'> <b>Fanspeeds</b></td><td align=right>$stat_fanspeeds</td>
-</tr>
-<tr>
-    <td ><img src='images/icons/voltages.png' class='optionicon'> <b>Voltage</b></td><td align=right>$stat_volt</td>
-    <td><img src='images/icons/current.png' class='optionicon'> <b>Current</b></td><td align=right>$stat_amp</td>
+    <td ><img src='images/icons/sensors.png' class='optionicon'> <b>Sensors</b></td><td align=right>$stat_sensors</td>
+    <td ><img src='images/icons/humidity.png' class='optionicon'> <b>Humidity</b></td><td align=right>$stat_humid</td>
 </tr>
 
 <tr>
     <td ><img src='images/icons/frequencies.png' class='optionicon'> <b>Frequency</b></td><td align=right>$stat_hz</td>
     <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner</td>
 </tr>
-
-<tr>
-    <td ><img src='images/icons/humidity.png' class='optionicon'> <b>Humidity</b></td><td align=right>$stat_humid</td>
-    <td><!--<img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner--></td>
-</tr>
-
 
 </table>
 ");
