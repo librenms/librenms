@@ -8,7 +8,7 @@ echo("</pre>");
 
 } else {
 
-echo "<div class='errorbox'>Insufficient permissions to view this page.</div>";
+  include("includes/error-no-perm.inc.php");
 
 }
 
