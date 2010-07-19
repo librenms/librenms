@@ -2,8 +2,6 @@
 
 if($_GET['id']) {$_GET['id'] = mres($_GET['id']); } 
 
-print_r($_GET);
-
 if($_GET['section'] == "interface" && is_numeric($_GET['opta']) && interfacepermitted($_GET['opta'])) {
   echo("device!");
   $check_device = get_device_id_by_interface_id($_GET['opta']);
