@@ -109,6 +109,7 @@ function print_graph_popup($graph_array)
 }
 
 
+
 function permissions_cache($user_id) {
   $permissions = array();
   $query = mysql_query("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'");
