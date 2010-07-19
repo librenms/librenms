@@ -2,7 +2,7 @@
 
 if(!$os) {
 
-  if(strstr($sysDescr, "KONICA MINOLTA magicolor")) { $os = "konica"; }
+  if(strstr($sysDescr, "KONICA MINOLTA ")) { $os = "konica"; }
 
 }
 
