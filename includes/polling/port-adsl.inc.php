@@ -1,5 +1,45 @@
 <?php
 
+#### Example snmpwalk with units
+#### "Interval" oids have been filtered out
+# adslLineCoding.1 = dmt
+# adslLineType.1 = fastOrInterleaved
+# adslLineSpecific.1 = zeroDotZero
+# adslLineConfProfile.1 = "qwer"
+# adslAtucInvSerialNumber.1 = "IES-1000 AAM1008-61"
+# adslAtucInvVendorID.1 = "4"
+# adslAtucInvVersionNumber.1 = "0"
+# adslAtucCurrSnrMgn.1 = 150 tenth dB
+# adslAtucCurrAtn.1 = 20 tenth dB
+# adslAtucCurrStatus.1 = "00 00 "
+# adslAtucCurrOutputPwr.1 = 100 tenth dBm
+# adslAtucCurrAttainableRate.1 = 10272000 bps
+# adslAturInvVendorID.1 = "0"
+# adslAturInvVersionNumber.1 = "0"
+# adslAturCurrSnrMgn.1 = 210 tenth dB
+# adslAturCurrAtn.1 = 20 tenth dB
+# adslAturCurrStatus.1 = "00 00 "
+# adslAturCurrOutputPwr.1 = 0 tenth dBm
+# adslAturCurrAttainableRate.1 = 1056000 bps
+# adslAtucChanInterleaveDelay.1 = 6 milli-seconds
+# adslAtucChanCurrTxRate.1 = 8064000 bps
+# adslAtucChanPrevTxRate.1 = 0 bps
+# adslAturChanInterleaveDelay.1 = 9 milli-seconds
+# adslAturChanCurrTxRate.1 = 512000 bps
+# adslAturChanPrevTxRate.1 = 0 bps
+# adslAtucPerfLofs.1 = 0
+# adslAtucPerfLoss.1 = 0
+# adslAtucPerfLols.1 = 0
+# adslAtucPerfLprs.1 = 0
+# adslAtucPerfESs.1 = 0
+# adslAtucPerfInits.1 = 1
+# adslAtucPerfValidIntervals.1 = 0
+# adslAtucPerfInvalidIntervals.1 = 0
+# adslAturPerfLoss.1 = 0 seconds
+# adslAturPerfESs.1 = 0 seconds
+# adslAturPerfValidIntervals.1 = 0
+# adslAturPerfInvalidIntervals.1 = 0
+
     if($array[$device[device_id]][$port[ifIndex]]['adslLineCoding']) { // Check to make sure Port data is cached.
 
       $this_port = &$array[$device[device_id]][$port[ifIndex]];
@@ -33,18 +73,6 @@
       $rrd_create .= " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797";
       $rrd_create .= " RRA:MIN:0.5:1:600 RRA:MIN:0.5:6:700 RRA:MIN:0.5:24:775 RRA:MIN:0.5:288:797 ";
       $rrd_create .= " RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797 ";
-
-	#ADSL-LINE-MIB::adslLineCoding.11 = INTEGER: dmt(2)
-	#ADSL-LINE-MIB::adslLineType.11 = INTEGER: fastOnly(2)
-	#ADSL-LINE-MIB::adslAtucInvVendorID.11 = STRING: "GSPN"
-	#ADSL-LINE-MIB::adslAtucInvVersionNumber.11 = STRING: "8"
-	#ADSL-LINE-MIB::adslAtucCurrSnrMgn.11 = Gauge32: 90 tenth dB
-	#ADSL-LINE-MIB::adslAtucCurrAtn.11 = Gauge32: 125 tenth dB
-	#ADSL-LINE-MIB::adslAtucCurrOutputPwr.11 = Gauge32: 185 tenth dBm
-	#ADSL-LINE-MIB::adslAtucCurrAttainableRate.11 = Gauge32: 9792000 bps
-	#ADSL-LINE-MIB::adslAturInvSerialNumber.11 = ""
-	#ADSL-LINE-MIB::adslAturInvVendorID.11 = STRING: "STMI"
-	#ADSL-LINE-MIB::adslAturInvVersionNumber.11 = STRING: "0"
 
       $adsl_oids = array('AtucCurrSnrMgn','AtucCurrAtn','AtucCurrOutputPwr','AtucCurrAttainableRate','AtucChanCurrTxRate','AturCurrSnrMgn','AturCurrAtn','AturCurrOutputPwr','AturCurrAttainableRate','AturChanCurrTxRate','AtucPerfLofs','AtucPerfLoss','AtucPerfLprs','AtucPerfESs','AtucPerfInits','AturPerfLofs','AturPerfLoss','AturPerfLprs','AturPerfESs','AtucChanCorrectedBlks','AtucChanUncorrectBlks','AturChanCorrectedBlks','AturChanUncorrectBlks');
 

@@ -12,23 +12,25 @@ echo("Observium Poller v".$config['version']."\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 
-if ($options['h'] == "odd") {
-  $where = "AND MOD(device_id,2) = 1";  $doing = $options['h'];
-} elseif ($options['h'] == "even") {
-  $where = "AND MOD(device_id,2) = 0";  $doing = $options['h'];
-} elseif ($options['h'] == "all") {
-  $where = " ";  $doing = "all";
-} elseif ($options['h']) {
+if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
+elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
+elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
+elseif ($options['h']) {
   if (is_numeric($options['h']))
   {
-    $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+    $where = "AND `device_id` = '".$options['h']."'";  
+    $doing = $options['h'];
   }
   else
   {
-    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";  $doing = "Host ".$options['h'];
+    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";  
+    $doing = $options['h'];
   }
-} elseif ($options['i'] && isset($options['n'])) {
-  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
+}
+
+if ($options['i'] && isset($options['n'])) {
+  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  
+  $doing = $options['n'] ."/".$options['i'];
 }
 
 if (!$where) {
@@ -248,25 +250,30 @@ while ($device = mysql_fetch_array($device_query))
     echo("\n");
   } 
 
-  if ($poll_update) {
-    $poll_update_query  = "UPDATE `devices` SET ";
-    $poll_update_query .= $poll_update;
-    $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-    if($debug) {echo("Updating " . $device['hostname'] . " - $poll_update_query \n");}
-    $poll_update_result = mysql_query($poll_update_query);
-    if(mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
-  } else {
-    echo("No Changes to " . $device['hostname'] . "\n");
-  }
+  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+  $poll_update .= $poll_separator . "`last_polled_timetaken` = '$device_time'";
+  echo("$device_end - $device_start; $device_time $device_run");
+  echo("Polled in $device_time seconds\n");
+
+
+  $poll_update_query  = "UPDATE `devices` SET ";
+  $poll_update_query .= $poll_update;
+  $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
+  if($debug) {echo("Updating " . $device['hostname'] . " - $poll_update_query \n");}
+  $poll_update_result = mysql_query($poll_update_query);
+  if(mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
   
   unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
-
-  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
-  echo("Polled in $device_time seconds\n");
+  unset($cache); // Clear cache (unify all things here?)
 
 }   
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
+
+if($polled_devices) {
+  mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`) 
+                               VALUES ('poll', '$doing', '$poller_start', '$poller_time', '$polled_devices')");
+}
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");

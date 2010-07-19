@@ -15,23 +15,25 @@ echo("Observium v".$config['version']." Discovery\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 
-if ($options['h'] == "odd") {
-  $where = "AND MOD(device_id,2) = 1";  $doing = $options['h'];
-} elseif ($options['h'] == "even") {
-  $where = "AND MOD(device_id,2) = 0";  $doing = $options['h'];
-} elseif ($options['h'] == "all") {
-  $where = " ";  $doing = "all";
-} elseif($options['h']) {
+if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
+elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
+elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
+elseif ($options['h']) {
   if (is_numeric($options['h']))
   {
-    $where = "AND `device_id` = '".$options['h']."'";  $doing = "Host ".$options['h'];
+    $where = "AND `device_id` = '".$options['h']."'";
+    $doing = $options['h'];
   }
   else
   {
-    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";  $doing = "Host ".$options['h'];
+    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";
+    $doing = $options['h'];
   }
-} elseif ($options['i'] && isset($options['n'])) {
-  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  $doing = "Proc ".$options['n'] ."/".$options['i'];
+}
+
+if ($options['i'] && isset($options['n'])) {
+  $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
+  $doing = $options['n'] ."/".$options['i'];
 }
 
 if(!$where) {
@@ -92,6 +94,9 @@ $devices_discovered = 0;
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query))
 {
+
+  $device_start = utime();  // Start counting device poll time
+
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
   if($device['os'] != strtolower($device['os'])) {
     mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
@@ -144,18 +149,30 @@ while ($device = mysql_fetch_array($device_query))
     }
   }
 
+  $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
+
   $update_query  = "UPDATE `devices` SET ";
   $update_query .= " `last_discovered` = NOW(), `type` = '" . $device['type'] . "'";
+  $update_query .= ", `last_discovered_timetaken` = '$device_time'";
   $update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
   $update_result = mysql_query($update_query);
 
+  echo("Discovered in $device_time seconds\n");
+  unset($cache); // Clear cache (unify all things here?)
   echo("\n"); $devices_discovered++;
 }
 
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-echo("$devices_discovered devices discovered in $proctime secs\n");
+if($devices_discovered) {
+  mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
+                               VALUES ('discover', '$doing', '$start', '$proctime', '$devices_discovered')");
+}
 
+$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices discovered in $proctime secs";
+if ($debug) echo("$string\n");
+
+shell_exec("echo '".$string."' >> ".$config['logfile']);
 
 ?>
