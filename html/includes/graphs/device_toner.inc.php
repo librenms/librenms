@@ -13,7 +13,7 @@ while($toner = mysql_fetch_array($sql))
   switch ($iter)
   {
     case "1":
-      $colour= "CC0000"; 
+      $colour= "000000"; 
       break; 
     case "2":
       $colour= "008C00"; 
@@ -32,7 +32,7 @@ while($toner = mysql_fetch_array($sql))
       break; 
     case "7": 
     default:
-      $colour= "FF0084"; 
+      $colour= "FF0000"; 
       unset($iter);
       break;
   }
