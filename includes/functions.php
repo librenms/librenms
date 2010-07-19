@@ -89,6 +89,17 @@ function device_array($device_id)
   return $device;
 }
 
+function get_device_id_by_interface_id($interface_id) {
+  if(is_numeric($interface_id)) {
+    $device_id = mysql_result(mysql_query("SELECT `device_id` FROM `ports` WHERE `interface_id` = '".$interface_id."'"),0);
+  }
+  if(is_numeric($device_id)){ 
+    return $device_id;
+  } else {
+    return FALSE;
+  }
+}
+
 function getHostOS($device)
 {
   global $config;
