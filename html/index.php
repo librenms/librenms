@@ -4,8 +4,8 @@
   ini_set('allow_url_fopen', 0);
   ini_set('display_errors', 0);
 
-#$debug=1;
-if($debug) {
+if(strpos($_SERVER['REQUEST_URI'], "debug")) {
+  $debug = "1";
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
   ini_set('log_errors', 1);
