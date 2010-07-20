@@ -33,7 +33,7 @@
    } else { $sort = "in"; }
 
 
-   echo("<div style='margin: 5px 0px 0px 3px'>
+   echo("<div style='margin: 0px 0px 0px 0px'>
           <div style=' margin:0px; float: left;';>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Day</span><br />
@@ -71,7 +71,7 @@
              </div>
         </div>
         <div style='float: left;'>
-          <img src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=$from&to=now&width=750&height=245' />
+          <img src='".$config['base_url']."/graph.php?port=".$interface['interface_id']."&type=mac_acc_total&sort=$sort&stat=$stat&from=$from&to=now&width=745&height=300' />
         </div>
         <div style=' margin:0px; float: left;';>
              <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
@@ -147,20 +147,20 @@
 
   if(!$asn) { $asn = "No Session"; }
 
-  echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 223px; max-width:223px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e5e5e5;'>
+  echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 221px; max-width:221px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e5e5e5;'>
      ".$addy['ipv4_address']." - ".$asn."
          <a href='#' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>".$name." - ".$addy['ipv4_address']." - ".$asn."</div>\
     <img src=\'graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=450&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
-         <img src='graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=215&height=45'></a>
+         <img src='graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=213&height=45'></a>
 
          <span style='font-size: 10px;'>".$name."</span>
         </div>");
 
    } else {
 
-   echo("<div style='background-color: $row_colour; padding: 8px;'>");
+   echo("<div style='background-color: $row_colour; padding: 0px;'>");
 
    echo("
      <table>
@@ -197,7 +197,6 @@
   echo("</div>");
   $i++;
  }
-
 }
 
 }
