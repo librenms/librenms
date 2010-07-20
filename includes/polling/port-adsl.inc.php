@@ -40,7 +40,7 @@
 # adslAturPerfValidIntervals.1 = 0
 # adslAturPerfInvalidIntervals.1 = 0
 
-    if($array[$device[device_id]][$port[ifIndex]]['adslLineCoding']) { // Check to make sure Port data is cached.
+    if(isset($array[$device[device_id]][$port[ifIndex]]['adslLineCoding'])) { // Check to make sure Port data is cached.
 
       $this_port = &$array[$device[device_id]][$port[ifIndex]];
 
