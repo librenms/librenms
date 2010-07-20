@@ -110,7 +110,6 @@ $config['os']['extremeware']['type']    = "network";
 $config['os']['extremeware']['ifname']  = 1;
 $config['os']['extremeware']['icon']    = "extreme";
 
-
 $config['os']['xos']['text']    	= "Extreme XOS";
 $config['os']['xos']['type']    	= "network";
 $config['os']['xos']['ifname']  	= 1;
@@ -119,6 +118,7 @@ $config['os']['xos']['icon']            = "extreme";
 
 $config['os']['ftos']['text']		= "Force10 FTOS";
 $config['os']['ftos']['type']		= "network";
+$config['os']['ftos']['icon']		= "force10";
 
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
