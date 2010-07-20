@@ -1,0 +1,581 @@
+-- *****************************************************************
+-- FORCE10-SYSTEM-COMPONENT-MIB
+--
+--
+-- Copyright (c) 2003-2005 by Force10 Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+
+FORCE10-SYSTEM-COMPONENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE,Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+		DisplayString
+			FROM RFC1213-MIB
+        f10Mgmt
+            FROM FORCE10-SMI
+        F10CamPartitionType
+            FROM FORCE10-TC
+        ;
+ 
+f10SysComponentMib   MODULE-IDENTITY
+        LAST-UPDATED    "200510050000Z"
+        ORGANIZATION    "Force10 Networks, Inc."
+        CONTACT-INFO
+            "Force10 Networks, Inc
+            1440 McCarthy Blvd
+            Milpitas, CA 95035
+            (408) 571-3500
+            support@force10networks.com
+            http://www.force10networks.com"
+        DESCRIPTION
+            "Force10 System component MIB.
+            Force10 System component allow user to view the SW information 
+            of a component in the system. 
+
+            Currently, the available component information that are avaibale 
+            are
+		1)  CAM Entries on linecard
+                  - Overall system CAM usage table
+		  - L2 Ingress or Egress CAM Usage 
+		  - L3 Ingress or Egress CAM Usage 
+
+            "
+        ::= { f10Mgmt 7 }   
+
+
+f10SysComponentObjects  OBJECT IDENTIFIER ::= { f10SysComponentMib 1 }
+f10CamEntries           OBJECT IDENTIFIER ::= { f10SysComponentObjects 1 } 
+f10SysComponentTrap     OBJECT IDENTIFIER ::= { f10SysComponentObjects 2 } 
+
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+
+camUsageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CamUsageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of general CAM usages table."
+    ::= { f10CamEntries 1 }
+
+camUsageEntry OBJECT-TYPE
+    SYNTAX CamUsageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of CAM usage table.  
+         The table show the different partition of CAM
+	"
+
+    INDEX { camUsageSlot, camUsagePipeNum, camUsagePartId }
+    ::= { camUsageTable 1 }
+
+
+CamUsageEntry ::= SEQUENCE {
+
+    camUsageSlot 		Integer32,
+    camUsagePipeNum 		Integer32,
+    camUsagePartId 		F10CamPartitionType,
+    camUsagePartDesc            DisplayString, 
+    camUsageTotal 		Integer32,
+    camUsageUsed 		Integer32
+
+    }
+
+camUsageSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The slot number of linecard where the CAM is located
+        "
+    ::= { camUsageEntry 1 }
+
+camUsagePipeNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The port pipe number on the linecard where the CAM is located
+        "
+    ::= { camUsageEntry 2 }
+
+camUsagePartId OBJECT-TYPE
+    SYNTAX F10CamPartitionType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The partition id of the CAM on the line card.
+        "
+    ::= { camUsageEntry 3 }
+
+camUsagePartDesc     OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "The description of the CAM partition id."
+    ::= { camUsageEntry 4 }
+
+camUsageTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to this CAM partition
+        "
+    ::= { camUsageEntry 5 }
+
+camUsageUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured  to this CAM partition
+        "
+    ::= { camUsageEntry 6 }
+
+
+-- End of General CAM Usage Entry
+
+
+camUsageL2Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CamUsageL2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 2 or switch layer CAM usages table."
+    ::= { f10CamEntries 2 }
+
+camUsageL2Entry OBJECT-TYPE
+    SYNTAX CamUsageL2Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 2 (switch layer ) CAM usage table.  
+         The table show the different partition of CAM and if the cam
+         is used in the Ingress or Egress.  
+	"
+
+    INDEX { camUsageL2Slot, camUsageL2PipeId }
+    ::= { camUsageL2Table 1 }
+
+CamUsageL2Entry ::= SEQUENCE {
+
+    camUsageL2Slot 		Integer32,
+    camUsageL2PipeId 		Integer32,
+    camUsageL2IngAclTotal 	Integer32,
+    camUsageL2IngAclUsed 	Integer32,
+    camUsageL2IngFibTotal 	Integer32,
+    camUsageL2IngFibUsed 	Integer32,
+    camUsageL2EgrAclTotal 	Integer32,
+    camUsageL2EgrAclUsed 	Integer32
+
+    }
+
+camUsageL2Slot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The slot number of linecard where the CAM is located
+        "
+    ::= { camUsageL2Entry 1 }
+
+camUsageL2PipeId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The port pipe number on the linecard where the CAM is located
+        "
+    ::= { camUsageL2Entry 2 }
+
+camUsageL2IngAclTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 2 ingress ACL
+        "
+    ::= { camUsageL2Entry 3 }
+
+camUsageL2IngAclUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 2 ingress ACL
+        "
+    ::= { camUsageL2Entry 4 }
+
+camUsageL2IngFibTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 2 ingress FIB
+        "
+    ::= { camUsageL2Entry 7 }
+
+camUsageL2IngFibUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 2 ingress FIB
+        "
+    ::= { camUsageL2Entry 8 }
+
+camUsageL2EgrAclTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 2 Egress ACL
+        "
+    ::= { camUsageL2Entry 9 }
+
+camUsageL2EgrAclUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 2 Egress Acl 
+        "
+    ::= { camUsageL2Entry 10 }
+
+
+-- End of camUsageL2Entry
+
+
+camUsageL3Table OBJECT-TYPE
+    SYNTAX SEQUENCE OF CamUsageL3Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 3 or router layer CAM usages table."
+    ::= { f10CamEntries 3 }
+
+camUsageL3Entry OBJECT-TYPE
+    SYNTAX CamUsageL3Entry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 3 (router layer ) CAM usage table.
+         The table show the different partition of CAM and if the cam
+         is used in the Ingress or Egress.
+        "
+    INDEX { camUsageL3Slot, camUsageL3PipeId }
+    ::= { camUsageL3Table 1 }
+
+CamUsageL3Entry ::= SEQUENCE {
+
+    camUsageL3Slot 		Integer32,
+    camUsageL3PipeId 		Integer32,
+    camUsageL3IngFibTotal 	Integer32,
+    camUsageL3IngFibUsed 	Integer32,
+    camUsageL3IngSysFlowTotal 	Integer32,
+    camUsageL3IngSysFlowUsed 	Integer32,
+    camUsageL3IngTrcListTotal 	Integer32,
+    camUsageL3IngTrcListUsed 	Integer32,
+    camUsageL3IngMcastFibTotal 	Integer32,
+    camUsageL3IngMcastFibUsed 	Integer32,
+    camUsageL3IngQosTotal 	Integer32,
+    camUsageL3IngQosUsed 	Integer32,
+    camUsageL3IngPbrTotal 	Integer32,
+    camUsageL3IngPbrUsed 	Integer32,
+    camUsageL3IngAclTotal 	Integer32,
+    camUsageL3IngAclUsed 	Integer32,
+    camUsageL3EgrAclTotal 	Integer32,
+    camUsageL3EgrAclUsed 	Integer32
+
+    }
+
+camUsageL3Slot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The slot number of linecard where the CAM is located
+        "
+    ::= { camUsageL3Entry 1 }
+
+camUsageL3PipeId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The port pipe number on the linecard where the CAM is located
+        "
+    ::= { camUsageL3Entry 2 }
+
+camUsageL3IngFibTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress FIB
+        "
+    ::= { camUsageL3Entry 3 }
+
+camUsageL3IngFibUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress FIB
+        "
+    ::= { camUsageL3Entry 4 }
+
+camUsageL3IngSysFlowTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress system flow
+        "
+    ::= { camUsageL3Entry 5 }
+
+camUsageL3IngSysFlowUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress system flow
+        "
+    ::= { camUsageL3Entry 6 }
+
+camUsageL3IngTrcListTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress trace list
+        "
+    ::= { camUsageL3Entry 7 }
+
+camUsageL3IngTrcListUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress trace list
+        "
+    ::= { camUsageL3Entry 8 }
+
+camUsageL3IngMcastFibTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress multicast FIB
+        "
+    ::= { camUsageL3Entry 9 }
+
+camUsageL3IngMcastFibUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress multicast FIB
+        "
+    ::= { camUsageL3Entry 10 }
+
+camUsageL3IngQosTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress QOS 
+        "
+    ::= { camUsageL3Entry 11 }
+
+camUsageL3IngQosUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress QOS
+        "
+    ::= { camUsageL3Entry 12 }
+
+
+camUsageL3IngPbrTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress PBR 
+        "
+    ::= { camUsageL3Entry 13 }
+
+camUsageL3IngPbrUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress QOS
+        "
+    ::= { camUsageL3Entry 14 }
+
+camUsageL3IngAclTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 ingress ACL 
+        "
+    ::= { camUsageL3Entry 15 }
+
+camUsageL3IngAclUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 ingress ACL
+        "
+    ::= { camUsageL3Entry 16 }
+
+camUsageL3EgrAclTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 egress ACL 
+        "
+    ::= { camUsageL3Entry 17 }
+
+camUsageL3EgrAclUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used or configured in layer 3 egress ACL
+        "
+    ::= { camUsageL3Entry 18 }
+
+    --
+    -- ## Alarm Group or Traps
+    --
+
+    sysCompAlarmMibNotifications     OBJECT IDENTIFIER ::= { f10SysComponentTrap 0 }
+    sysCompAlarmVariable             OBJECT IDENTIFIER ::= { f10SysComponentTrap 1 }
+
+    --
+    -- TRAP VarBind Data
+    --
+
+    sysCompAlarmLevel OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "the message warning level"
+        ::= { sysCompAlarmVariable 1 }
+
+
+    sysCompAlarmVarString OBJECT-TYPE
+        SYNTAX       OCTET STRING
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "An generic string value in the TRAP object"
+        ::= { sysCompAlarmVariable 2 }
+
+
+    sysCompSlotId OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated LineCard in the TRAP object"
+        ::= { sysCompAlarmVariable 3 }
+
+    sysCompPortPipe OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated port pipe in the TRAP object"
+        ::= { sysCompAlarmVariable 4 }
+
+    sysCompCamPartId OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            "The associated CAM partion name in the TRAP object"
+        ::= { sysCompAlarmVariable 5 }
+
+    --
+    -- TRAPS
+    --
+   
+    camUsageThresholdExceed  NOTIFICATION-TYPE
+        OBJECTS              {   sysCompAlarmLevel,
+                                 sysCompAlarmVarString,
+								 sysCompSlotId,
+								 sysCompPortPipe,
+								 sysCompCamPartId
+                             }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when the
+             cam usage for a partition is exceeded."
+        ::= { sysCompAlarmMibNotifications 1 }
+
+    camIsFull  NOTIFICATION-TYPE
+        OBJECTS              {   sysCompAlarmLevel,
+                                 sysCompAlarmVarString,
+								 sysCompSlotId,
+								 sysCompPortPipe,
+								 sysCompCamPartId
+                             }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when the
+             cam is fully used."
+        ::= { sysCompAlarmMibNotifications 2 }
+
+END

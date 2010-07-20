@@ -155,15 +155,15 @@ while ($device = mysql_fetch_array($device_query))
       $poll_separator = ", ";
     } 
 
-    if (is_file($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php")) 
+    if (is_file($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php")) 
     {
       /// OS Specific
-      include($config['install_dir'] . "/includes/polling/device-".$device['os'].".inc.php");
+      include($config['install_dir'] . "/includes/polling/os/".$device['os'].".inc.php");
     }
-    elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php")) 
+    elseif ($device['os_group'] && is_file($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php")) 
     {
       /// OS Group Specific
-      include($config['install_dir'] . "/includes/polling/device-".$device['os_group'].".inc.php");
+      include($config['install_dir'] . "/includes/polling/os/".$device['os_group'].".inc.php");
     }
     else
     {
@@ -183,7 +183,7 @@ while ($device = mysql_fetch_array($device_query))
     include("includes/polling/processors.inc.php");
     include("includes/polling/mempools.inc.php");
     include("includes/polling/storage.inc.php");
-    include("includes/polling/device-netstats.inc.php");
+    include("includes/polling/netstats.inc.php");
     include("includes/polling/ipSystemStats.inc.php");
     include("includes/polling/ports.inc.php");
     include("includes/polling/cisco-mac-accounting.inc.php");

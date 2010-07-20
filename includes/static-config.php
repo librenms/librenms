@@ -117,6 +117,8 @@ $config['os']['xos']['ifname']  	= 1;
 $config['os']['xos']['group']           = "extremeware";
 $config['os']['xos']['icon']            = "extreme";
 
+$config['os']['ftos']['text']		= "Force10 FTOS";
+$config['os']['ftos']['type']		= "network";
 
 $config['os']['powerconnect']['text']   = "Dell PowerConnect";
 $config['os']['powerconnect']['ifname'] = 1;
