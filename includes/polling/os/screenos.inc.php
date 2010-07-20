@@ -6,9 +6,9 @@ $version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "Juniper
 echo("$version\n");
 list($hardware,$version,$serial,$features) = explode("||", $version);
 
-$cpurrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-cpu.rrd";
-$memrrd   = $rrd_dir . "/" . $device['hostname'] . "/netscreen-memory.rrd";
-$sessrrd  = $rrd_dir . "/" . $device['hostname'] . "/netscreen-sessions.rrd";
+$cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/screenos-cpu.rrd";
+$memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/screenos-memory.rrd";
+$sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/screenos-sessions.rrd";
 
 $cpu_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $cpu_cmd .= " .1.3.6.1.4.1.3224.16.1.1.0 .1.3.6.1.4.1.3224.16.1.3.0";
@@ -19,7 +19,6 @@ $mem_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device
 $mem_cmd .= " .1.3.6.1.4.1.3224.16.2.1.0 .1.3.6.1.4.1.3224.16.2.2.0 .1.3.6.1.4.1.3224.16.2.3.0";
 $mem_data = shell_exec($mem_cmd);
 list ($memalloc, $memfree, $memfrag) = explode("\n", $mem_data);
-
 
 $sess_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'];
 $sess_cmd .= " .1.3.6.1.4.1.3224.16.3.2.0 .1.3.6.1.4.1.3224.16.3.3.0 .1.3.6.1.4.1.3224.16.3.4.0";
