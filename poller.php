@@ -277,6 +277,6 @@ if($polled_devices) {
 
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
-shell_exec("echo '".$string."' >> ".$config['install_dir']."/observium.log"); # FIXME EWW
+shell_exec("echo '".$string."' >> ".$config['log_file']); # FIXME EWW
 
 ?>

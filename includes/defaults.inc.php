@@ -6,7 +6,7 @@ $config['temp_dir']      = "/tmp";
 $config['install_dir']   = "/opt/observium";
 $config['html_dir']      = $config['install_dir'] . "/html";
 $config['rrd_dir']       = $config['install_dir'] . "/rrd";
-$config['observium_log'] = $config['install_dir'] . "/observium.log";
+$config['log_file']      = $config['install_dir'] . "/observium.log";
 
 ### Location of executables
 

@@ -173,6 +173,6 @@ if($devices_discovered) {
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
-shell_exec("echo '".$string."' >> ".$config['logfile']);
+shell_exec("echo '".$string."' >> ".$config['log_file']);
 
 ?>
