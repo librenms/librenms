@@ -280,7 +280,6 @@ $config['os']['konica']['group'] 	   = "printer";
 $config['os']['konica']['text']  	   = "Konica-Minolta Printer";
 $config['os']['konica']['overgraph'][]     = "device_toner";
 $config['os']['konica']['overtext']        = "Toner";
-$config['os']['konica']['ifname']	   = 1;
 $config['os']['konica']['type']            = "printer";
 
 $config['os']['kyocera']['group'] 	   = "printer";
