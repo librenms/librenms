@@ -46,6 +46,6 @@ if (is_numeric($cpu_usage))
   rrdtool_update($cpurrd, " N:$cpu_usage");
 }
 
-include("hr-mib.inc.php");
+include("includes/polling/hr-mib.inc.php");
 
 ?>

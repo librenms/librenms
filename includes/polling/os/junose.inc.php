@@ -26,8 +26,8 @@ $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junose-cpu.rrd";
 #$cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
 #$cpu_usage = trim(shell_exec($cpu_cmd));
 
-include("hr-mib.inc.php");
-include("junose-atm-vp.inc.php");
+include("includes/polling/hr-mib.inc.php");
+include("includes/polling/junose-atm-vp.inc.php");
 
 
 
