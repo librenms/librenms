@@ -20,7 +20,7 @@
 
    ### Detect processor type? : I.E.  x86 Family 15 Model 2 Stepping 7
 
-include("ucd-mib.inc.php");
-include("hr-mib.inc.php");
+include("includes/polling/ucd-mib.inc.php");
+include("includes/polling/hr-mib.inc.php");
 
 ?>

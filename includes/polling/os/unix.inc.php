@@ -48,5 +48,5 @@
 
 echo("$version - $hardware - $features ");
 
-include("ucd-mib.inc.php");
-include("hr-mib.inc.php");
+include("includes/polling/ucd-mib.inc.php");
+include("includes/polling/hr-mib.inc.php");
