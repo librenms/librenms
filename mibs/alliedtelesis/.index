@@ -50,6 +50,5 @@ AT-PRI-MIB at-pri.mib
 AT-RESOURCE-MIB at-resource.mib
 AT-SYSINFO-MIB at-sysinfo.mib
 AT-PVSTPM-MIB at-pvstpm.mib
-SWITCH-VLAN-MIB swvlan.zip
 ALLIEDTELESYN-MIB atrouter.mib
 AT-FILEv2-MIB at-filev2.mib

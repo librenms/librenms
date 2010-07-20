@@ -1,0 +1,791 @@
+ 
+SWITCH-CHASSIS-MIB
+DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress, RowStatus, TimeStamp
+        FROM SNMPv2-TC
+    switchChassis
+        FROM TELESYN-ATI-TC;
+ 
+switchChassisMib MODULE-IDENTITY
+    LAST-UPDATED "9704292000Z"
+	ORGANIZATION ""
+	CONTACT-INFO ""
+	DESCRIPTION  
+		"The MIB module for SWITCH chassis entity."
+	REVISION "9704292000Z"
+	DESCRIPTION
+		"Changed the status of the objects in ipParams group to
+		obsolete. The objects in this group are defined elsewhere or
+		not applicable."
+	REVISION "9701142000Z"
+	DESCRIPTION
+		"Redefined the TFTP objects in TftpGroup for executing a file
+		transfer between the chassis and the TFTP server.
+		
+		Deprecated the Console objects."
+	REVISION "9612192200Z"
+	DESCRIPTION
+		"Initial Release."
+    ::= { switchChassis 1 }
+HostNameOrIpAddr ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+            "The DNS, NIS (or equivalent name), or the ip address (in 
+            dotted quad notation) of the host."
+    SYNTAX    DisplayString 
+HwIdentifier ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "2d.2d"
+    STATUS  current
+    DESCRIPTION
+			"The hardware identifier consists of 2 16 bit values, called
+			major and minor.  The first 2 octets contain the major number;
+			the second 2 octets  contain the minor number."
+    SYNTAX  OCTET STRING (SIZE(4)) 
+SwVersionId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "2d.2d.2d"
+    STATUS  current
+    DESCRIPTION
+            "The software version id consists of 3 16 bit values. 
+            The first 2 octets contain the major number; the octets 3, 4
+            contain the minor number, octets 5,6 contain a release number."
+    SYNTAX  OCTET STRING (SIZE(6)) 
+chassisParams     	OBJECT IDENTIFIER ::= { switchChassisMib  1 }
+ipParams         	OBJECT IDENTIFIER ::= { switchChassisMib  3 }
+sysConfigParams	 	OBJECT IDENTIFIER ::= { switchChassisMib  4 }
+snmpParams       	OBJECT IDENTIFIER ::= { switchChassisMib  6 }
+consoleParams    	OBJECT IDENTIFIER ::= { switchChassisMib  7 }
+logParams        	OBJECT IDENTIFIER ::= { switchChassisMib  8 }
+bootParams        	OBJECT IDENTIFIER ::= { switchChassisMib  9 }
+chassisSerialNumber  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (8))
+            MAX-ACCESS    read-only
+            STATUS    current
+            DESCRIPTION
+                "The serial number of the chassis."
+            ::= { chassisParams 1 }
+ 
+chassisHwId  OBJECT-TYPE
+            SYNTAX  HwIdentifier
+            MAX-ACCESS    read-only
+            STATUS    current
+            DESCRIPTION
+				 "A version number for the motherboard - first 16 bits
+				 is the major number, second 16 bits is the minor number."
+            ::= { chassisParams 2 }
+chassisOSVersion  OBJECT-TYPE
+            SYNTAX    DisplayString(SIZE(0..16))
+            MAX-ACCESS    read-only
+            STATUS    current
+            DESCRIPTION
+                " Software version of the operating system kernel."
+            ::= { chassisParams 3 }
+ 
+chassisFwVersion  OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(0..16))
+            MAX-ACCESS  read-only
+            STATUS    current
+            DESCRIPTION
+                "The chassis firmware version. "
+            ::= { chassisParams 4 }
+ 
+chassisLastChanges     OBJECT-TYPE
+         SYNTAX   Counter32
+	     MAX-ACCESS   read-only
+         STATUS      current
+         DESCRIPTION 
+             "Counts the number of times the system config file has
+             been written to flash since last reboot."
+         ::= { chassisParams 5 }
+chassisBaseMacAddress  OBJECT-TYPE
+            SYNTAX	  MacAddress
+            MAX-ACCESS  read-only
+            STATUS    current
+            DESCRIPTION
+                "This object is the 6-byte 'base' MAC address for this chassis."
+            ::= { chassisParams 6 }
+ 
+chassisFanStatus  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        normal(1),
+                        slowOrStopped(2)
+                    }
+            MAX-ACCESS  read-only
+            STATUS    current
+            DESCRIPTION
+                "The operational status of fan. 'slowOrStopped'
+                indicates the fan rpm is lower than a minimum required
+                value."
+            ::= { chassisParams 7 }
+ 
+chassisBoardSerialNumber  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE (8))
+            MAX-ACCESS    read-only
+            STATUS    current
+            DESCRIPTION
+                "The serial number of the mother board."
+            ::= { chassisParams 8 }
+ 
+ 
+ 
+ 
+ipAddr OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The IP address that the device will use after a
+              restart.  The device's active IP address can be
+              determined by examining the appropriate instance
+              of the ipAdEntAddr attribute of the MIB-II IP
+              address table."
+    ::= { ipParams 1 }   
+ 
+ 
+ipNetMask OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The subnet mask that the device will use after
+              a restart.  The device's active subnet mask can
+              be determined by examining the appropriate
+              instance of the ipAdEntNetMask attribute of the
+              MIB-II IP address table."
+    ::= { ipParams 2 }   
+ 
+ipBcastForm OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  allOnes(1),
+                  allZeros(2)
+              }
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The type of IP broadcast address that the
+              device will use after a restart:  the Internet
+              standard all-ones broadcast address or the non-
+              standard all zeros broadcast address.  The
+              device's active broadcast address type can be
+              determined by examining the appropriate instance
+              of the ipAdEntBcastAddr attribute of the MIB-II
+              IP address table."
+    ::= { ipParams 3 }   
+ 
+ipEncap OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  ethernet(1),
+                  ieee8022(2)
+              }
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The type of IP datagram encapsulation that the
+              device will use after a restart:  Ethernet or
+              IEEE802.2.  The active type of IP datagram
+              encapsulation  can be determined by examining
+              the appropriate instance of the ifType attribute
+              of the MIB-II interfaces table entry for the
+              device's Ethernet interface.  If the value of
+              that instance of ifType is ethernet-csmacd(6),
+              then the active type of IP datagram
+              encapsulation is Ethernet; if the value of that
+              instance of ifType is iso88023-csmacd(7), then
+              the active type of IP datagram encapsulation is
+              IEEE802.2."
+    ::= { ipParams 4 }   
+ 
+ipDefaultGateway OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The default gateway IP address that the device
+              will use after a restart.  The device's
+              operational default gateway IP address can be
+              determined by examining the value of the
+              ipRouteNextHop.0.0.0.0 attribute of the MIB-II
+              IP routing table."
+    ::= { ipParams 5 }   
+ 
+ipDomainName OBJECT-TYPE
+    SYNTAX    DisplayString (SIZE(0..63))
+    MAX-ACCESS    read-write
+    STATUS    obsolete
+    DESCRIPTION
+              "The device's domain name."
+    ::= { ipParams 6 }   
+bootFlag OBJECT-TYPE
+    SYNTAX     INTEGER {
+        bootSystem(0),    
+        skipPost(1),      
+    	runMonitor(2),    
+        useBackupBoot(4), 
+        loopPost(8),      
+        bootLoader(16),   
+        bootNetwork(32),  
+        bootDiag(48),     
+        networkEth0(64),  
+        networkEth1(128),  
+        networkCom0(192)  
+    }
+    MAX-ACCESS    read-write
+    STATUS    deprecated
+    DESCRIPTION
+	" Boot flags to define the startup parameters"
+    ::= { sysConfigParams 1 }
+dramSize OBJECT-TYPE
+    SYNTAX    Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+         "DRAM size in bytes"
+    ::= { sysConfigParams 2 }
+ 
+cpuVer OBJECT-TYPE
+    SYNTAX    HwIdentifier 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	" Hardware identifier of the processor."
+    ::= { sysConfigParams 3 }
+ 
+iscVer OBJECT-TYPE
+    SYNTAX    HwIdentifier 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	" Hardware identifier of the Galileo chip."
+    ::= { sysConfigParams 4 }
+ 
+pigVer OBJECT-TYPE
+    SYNTAX    HwIdentifier 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	"Hardware identifier of the PIG chip."
+    ::= { sysConfigParams 5 }
+ 
+postVer OBJECT-TYPE
+    SYNTAX    SwVersionId 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	"Software version of the POST diagnostic."
+    ::= { sysConfigParams 6 }
+ 
+isdVer OBJECT-TYPE
+    SYNTAX    SwVersionId 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	" Software version of the ISD diagnostic."
+    ::= { sysConfigParams 7 }
+ 
+bootVer OBJECT-TYPE
+    SYNTAX    SwVersionId 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	"Software version of the boot prom."
+    ::= { sysConfigParams 8 }
+ 
+qmuMemSize OBJECT-TYPE
+    SYNTAX    Unsigned32 
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+	"QME memory size"
+    ::= { sysConfigParams 9 }
+segBusTable OBJECT-TYPE   
+    SYNTAX    SEQUENCE OF SegBusEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "A table of attributes associated with segBus."
+    ::= { sysConfigParams 10 }
+segBusEntry OBJECT-TYPE
+    SYNTAX    SegBusEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "A list of attributes associated with a segBus."
+    INDEX	{ segBusIndex  }
+    ::= { segBusTable 1 }
+SegBusEntry ::= SEQUENCE {
+    segBusIndex         INTEGER,
+    segBusPmiuId        HwIdentifier,
+    segBusQmuId         HwIdentifier
+}
+segBusIndex  OBJECT-TYPE
+    SYNTAX    INTEGER (1..10)
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+        "SegBus number"
+    ::= { segBusEntry 1 }
+ 
+segBusPmiuId  OBJECT-TYPE
+    SYNTAX    HwIdentifier
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"Hardware identifier of the Port Manager Interface Unit (PMIU)
+		chip "
+    ::= { segBusEntry 2 }
+ 
+segBusQmuId  OBJECT-TYPE
+    SYNTAX    HwIdentifier
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+        "Hardware identifier of the Queue Management Unit (QMU) chip "
+    ::= { segBusEntry 3 }
+ 
+ 
+snmpIpTrapRcvrTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF SnmpIpTrapRcvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "A list of entries containing information about
+              network management stations with Ip addresses
+              that are to receive traps generated by this
+              device over UDP."
+ 
+    ::= { snmpParams 1 }
+ 
+snmpIpTrapRcvrEntry OBJECT-TYPE
+    SYNTAX    SnmpIpTrapRcvrEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "An entry containing information about a single
+              network management station with an Ip address
+              that is to receive traps generated by this
+              device over UDP."
+    INDEX     { snmpIpTrapRcvrIpAddress }
+    ::= { snmpIpTrapRcvrTable 1 }
+ 
+SnmpIpTrapRcvrEntry ::=
+    SEQUENCE {
+        snmpIpTrapRcvrIpAddress	IpAddress,
+        snmpIpTrapRcvrPort      INTEGER,
+        snmpIpTrapRcvrCommunity	DisplayString,
+        snmpIpTrapRcvrStatus	RowStatus
+    }
+ 
+snmpIpTrapRcvrIpAddress OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "The Ip address of this trap receiver."
+    ::= { snmpIpTrapRcvrEntry 1 }
+ 
+snmpIpTrapRcvrPort OBJECT-TYPE
+    SYNTAX    INTEGER (0..65535)
+    MAX-ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+              "The UDP port number for the Trap receiver."
+    ::= { snmpIpTrapRcvrEntry 2 }
+ 
+snmpIpTrapRcvrCommunity OBJECT-TYPE
+    SYNTAX    DisplayString (SIZE(1..64))
+    MAX-ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+              "The community string to be specified in traps
+              sent to this ip trap receiver."
+    DEFVAL  { "public" }
+    ::= { snmpIpTrapRcvrEntry 3 }
+ 
+snmpIpTrapRcvrStatus OBJECT-TYPE
+    SYNTAX    RowStatus
+    MAX-ACCESS    read-create
+    STATUS    current
+    DESCRIPTION
+              "This object is used to create or delete entries in the
+              snmpIpTrapRcvrTable."
+    ::= { snmpIpTrapRcvrEntry 4 }
+snmpUnAuthIpAddr OBJECT-TYPE
+    SYNTAX    IpAddress
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The IP address of the last management station
+              that attempted to access this agent with an
+              invalid community string.  This object is used
+              as a variable binding in an Authentication
+              Failure Trap-PDU."
+    ::= { snmpParams 2 }
+ 
+snmpUnAuthCommunity OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..20))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The community string specified by the most
+              recent unauthenticated attempt to access this
+              agent.  This object is used as a variable
+              binding in an Authentication Failure Trap-PDU."
+    ::= { snmpParams 3 }
+ 
+consolePortSpeed OBJECT-TYPE   
+    SYNTAX    Unsigned32
+    MAX-ACCESS    read-write
+    STATUS    deprecated
+    DESCRIPTION
+              "The speed of the console port in bits per second."
+    ::= { consoleParams 1 }
+ 
+consolePortDataBits OBJECT-TYPE
+    SYNTAX    INTEGER (7..8)
+    MAX-ACCESS    read-write
+    STATUS    deprecated
+    DESCRIPTION
+              "The console port's number of data bits."
+    ::= { consoleParams 2 }
+ 
+consolePortStopBits OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  one(1),
+                  two(2),
+                  onePointFive(3)
+              }
+    MAX-ACCESS    read-write
+    STATUS    deprecated
+    DESCRIPTION
+              "The console port's number of stop bits."
+    ::= { consoleParams 3 }
+ 
+consolePortParity OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  none(1),
+                  odd(2),
+                  even(3),
+                  mark(4),
+                  space(5)
+              }
+    MAX-ACCESS    read-write
+    STATUS    deprecated
+    DESCRIPTION
+              "The console port's parity setting."
+    ::= { consoleParams 4 }
+ 
+ 
+ 
+eventLogEnable OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  enabled(1),
+                  disabled(2)
+              }
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+              "The value of this object indicates whether or
+              not system event logging is currently enabled.
+              Changes to this object take effect immediately."
+    ::= { logParams 1 }
+ 
+eventLogSize OBJECT-TYPE
+    SYNTAX    Unsigned32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The maximum number of entries retrievable from
+              the system event log.  If the value of this
+              object is greater than the value of the
+              eventLogCount object, then only eventLogCount
+ 
+              entries have been logged and can be retrieved."
+    ::= { logParams 2 }
+ 
+eventLogCount OBJECT-TYPE
+    SYNTAX    Unsigned32
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The total number of events logged to the system
+              event log.  If the value of this object exceeds
+              the value of the eventLogSize object, only the
+              most recent eventLogSize entries can be retrieved.
+ 
+              Setting the value of this object to zero clears
+              the device's system event log."
+    ::= { logParams 3 }
+ 
+ 
+eventLogTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF EventLogEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "A list of system event log entries."
+    ::= { logParams 4 }
+ 
+eventLogEntry OBJECT-TYPE
+    SYNTAX    EventLogEntry
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "A single system event log entry."
+    INDEX     { eventLogIndex }
+    ::= { eventLogTable 1 }
+ 
+EventLogEntry ::=
+    SEQUENCE {
+        eventLogIndex
+            INTEGER,
+        eventLogTime
+            DisplayString,
+        eventLogDescr
+            DisplayString,
+        eventLogDetail
+            DisplayString,
+        eventLogRawEntry
+            OCTET STRING
+    }
+ 
+eventLogIndex OBJECT-TYPE
+    SYNTAX    INTEGER (1..2147483647)
+    MAX-ACCESS    not-accessible
+    STATUS    current
+    DESCRIPTION
+              "A unique value for each entry in the event log.
+              Its value is between 1 and the minimum of the
+              value of the eventLogSize and eventLogCount
+              objects.  The oldest event in the log
+              corresponds to index 1."
+    ::= { eventLogEntry 1 }
+ 
+eventLogTime OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The time (according to the system clock) in
+              human-readable form at which this system event
+              log entry was logged."
+    ::= { eventLogEntry 2 }
+ 
+eventLogDescr OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "A human-readable string describing the event
+              represented by this system event log entry."
+    ::= { eventLogEntry 3 }
+ 
+eventLogDetail OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "A human-readable string providing more detailed
+              information about the event respresented by this
+              system event log entry."
+    ::= { eventLogEntry 4 }
+ 
+eventLogRawEntry OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+              "The first 255 octets of raw, unformatted system event 
+              log entry as it appears internally."
+    ::= { eventLogEntry 5 }
+ 
+deviceReset OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  noOp(1),
+                  reset(2)
+              }
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"The value of this object returned in response to an SNMP Get
+		or Get-Next request is always noOp(1).  Changing the value of
+		this object to reset(2) will cause the device to be reset."
+    ::= { bootParams 1 }
+ 
+tftpGroup      OBJECT IDENTIFIER ::= { bootParams 4 }
+tftpServerName OBJECT-TYPE
+    SYNTAX    HostNameOrIpAddr
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"The name of the TFTP server from which to read or write the
+		device's configuration files or from which to read a firmware
+		image.
+		
+		The value of this object can be a fully- or partially-qualified
+		domain name system (dns) name, or it can be an ip address in
+		the familiar 'dotted-quad' notation.
+		
+		If the value of this object is a fully- or partially-qualified
+		dns name, the device will attempt to use the Domain Name System
+		to convert the name to an ip address before initiating a
+		transaction with this TFTP server.
+		
+		This object may be set only if tftpAdminStatus has the value 
+		'configure'."
+    ::= { tftpGroup 1 }
+tftpUserName OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..63))
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "The user name that makes the TFTP request.
+		
+		This object may be set only if tftpAdminStatus has the value 
+		'configure'."
+    ::= { tftpGroup 2 }
+ 
+ 
+tftpRemoteFileName OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..63))
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"The file name of the file on the remote TFTP server.
+		
+		This object may be set only if tftpAdminStatus has the value 
+		'configure'."
+    ::= { tftpGroup 3 }
+ 
+tftpLocalFileName OBJECT-TYPE
+    SYNTAX    OCTET STRING (SIZE(0..63))
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"The local file name of the file which is copied to or from the
+		remote server.  If this string is a 0 length string, then the
+		value of tftpRemoteFileName shall also be used as the local file
+		name.
+		
+		This object may be set only if tftpAdminStatus has the value 
+		'configure'."		
+    ::= { tftpGroup 4 }
+tftpOperation OBJECT-TYPE
+    SYNTAX    INTEGER {
+                  putFile(1),
+                  getFile(2),
+                  getFirmware(3)
+              }
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+		"When tftpOperation has the value putFile(1) when
+		tftpAdminStatus is set to 'execute',   the device attempts to
+		copy the file identified by tftpLocalFileName to the file
+		tfptRemoteFileName.
+		
+		When tftpOperation has the value getFile(2) when
+		tftpAdminStatus is set to 'execute', the device attempts to
+		copy the file identified by tftpRemoteFileName on the remote
+		tftp server to the file identified by tftpLocalFileName.
+		
+		When tftpOperation has the value getFirmware(3) when
+		tftpAdminStatus is set to 'execute', the device attempts to
+		replace its firmware image with the file identified by
+		tftpRemoteFileName.  This firmware file will be used the next
+		time the system is reset.
+		When tftpOperation has the value putConfig(1) when
+		tftpAdminStatus is set to 'execute',   the device attempts to
+		copy the file identified by tftpLocalFileName to the file
+		tfptRemoteFileName.
+		
+		When tftpOperation has the value getConfig(2) when
+		tftpAdminStatus is set to 'execute', the device attempts to
+		copy the file identified by tftpRemoteFileName on the remote
+		tftp server to the file identified by tftpLocalFileName.
+		"
+    ::= { tftpGroup 5 }
+ 
+tftpAdminState OBJECT-TYPE
+    SYNTAX    INTEGER {
+                 configure(1),
+                 execute(2)
+              }
+    MAX-ACCESS    read-write
+    STATUS    current
+    DESCRIPTION
+        "This object is used to initiate a file transfer using the TFTP
+		protocol between the local system and a remote TFTP server
+		identified by tftpServerAddr.  The file name on the remote
+		server is identified by tftpRemoteFileName and the local file
+		name is identified by tftpLocalFileName. The tftp operation is
+		identified by the valu of tftpOperation.
+		
+		The objects tftpServerName, tftpUserName, tftpLocalFileName,
+		tftpRemoteFileName, and tftpOperation may only be set when
+		tftpAdminState has the value 'configure'.
+		
+		When tftpAdminState is set to 'execute', the operation identified
+		by tftpOperation shall be started and the state of the operation
+		is reflected in tftpOperationState.  Setting this attribute to
+		'execute' when tftpOperationState is not 'inactive' has no effect
+		on the operational state. 
+		
+		Under normal operation tftpAdminState should only be set to
+		'configure' if tftpOperationState is not 'executing'. If
+		tftpOperationState is 'executing' then the system may attempt to
+		abort the current opertion and change the operation state to
+		'inactive' or not permitting the set to occur by returning the
+		snmp error 'inconsistentValue'."
+    ::= { tftpGroup 6 }
+    
+tftpOperationState OBJECT-TYPE
+    SYNTAX    INTEGER {
+                 inactive(1),
+                 executing(2),
+                 succeeded(3),
+                 localFileProblem(4),
+                 unknownHost(5),
+                 timedOut(6),
+                 remoteFileProblem(7),
+                 otherFailure(8)
+              }
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"The value 'executing' reflects a transition of tftpAdminState
+		from 'configure' to 'execute'.  In the 'executing' state, the
+		TFTP operation identified by the value of tftpOperation shall
+		begin with the values for the objects tftpServerName,
+		tftpUserName, tftpRemoteFileName, and tftpLocalFileName.
+		
+		When the TFTP operation has completed successfully, the value
+		of tftpOperation shall be set to 'succeeded'.  If the operation
+		failed, the value shall be set to one of 'localFileProblem',
+		'unknownHost', 'timedOut', 'remoteFileProblem', or 
+		'otherFailure'.
+		
+		Any state transition shall result in setting the
+		tftpOperationStateChange object."
+    
+    ::= { tftpGroup 7 }
+    
+tftpOperationStateChange OBJECT-TYPE
+    SYNTAX    TimeStamp
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"This is the value of sysUpTime when the value of
+		tftpOperationState changes."
+    ::= { tftpGroup 8 }
+tftpErrorMessage OBJECT-TYPE
+    SYNTAX    DisplayString(SIZE(0..127))
+    MAX-ACCESS    read-only
+    STATUS    current
+    DESCRIPTION
+		"An error message giving a brief description of the error if
+		the tftpOperation did not succeed."
+    ::= { tftpGroup 9 }
+END
