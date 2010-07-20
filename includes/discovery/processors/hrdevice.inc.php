@@ -2,7 +2,7 @@
 
 global $valid_processor;
 
-if ($device['os_group'] == "unix" || $device['os'] == "windows")
+if ($device['os_group'] == "unix" || $device['os'] == "windows" || $device['os'] == "routeros")
   {
   echo("hrDevice ");
   $hrDevice_oids = array('hrDevice','hrProcessorLoad');  
@@ -16,16 +16,17 @@ if ($device['os_group'] == "unix" || $device['os'] == "windows")
       $usage_oid = ".1.3.6.1.2.1.25.3.3.1.2." . $index;
       $usage = $entry['hrProcessorLoad'];
 
-      $descr = $entry['hrDeviceDescr'];
+      #### What is this for? I have forgotten. What has : in its hrDeviceDescr?
+      #### Set description to that found in hrDeviceDescr, first part only if containing a :
+      $descr_array = explode(":",$entry['hrDeviceDescr']);
+      if($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
 
-	$descr_array = explode(":",$entry['hrDeviceDescr']);
+      ### Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
+      if($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor";}
 
-	if($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
-
-	$descr = str_replace("CPU ", "", $descr);
+      $descr = str_replace("CPU ", "", $descr);
       $descr = str_replace("(TM)", "", $descr);
       $descr = str_replace("(R)", "", $descr);
-
 
       $old_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("hrProcessor-" . $index . ".rrd");
       $new_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-hr-" . $index . ".rrd");
@@ -35,7 +36,7 @@ if ($device['os_group'] == "unix" || $device['os'] == "windows")
         rename($old_rrd,$new_rrd);
         echo("Moved RRD ");
       }
-      if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" && $descr != "An electronic chip that makes the computer work.") 
+      if(isset($descr) && $descr != "An electronic chip that makes the computer work.") 
       {
         discover_processor($valid_processor, $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
       }
