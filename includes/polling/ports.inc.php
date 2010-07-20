@@ -32,7 +32,7 @@
 
   if($config['enable_ports_etherlike']) { echo("dot3Stats "); $array = snmp_cache_oid("dot3StatsEntry", $device, $array, "EtherLike-MIB"); }
   if($config['enable_ports_adsl'])      { 
-    echo("adsl "); 
+    echo("ADSL ");
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.1.1", $device, $array, "ADSL-LINE-MIB");
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.2.1", $device, $array, "ADSL-LINE-MIB"); 
     $array = snmp_cache_oid(".1.3.6.1.2.1.10.94.1.1.3.1", $device, $array, "ADSL-LINE-MIB");
@@ -94,6 +94,9 @@
       $update .= "`poll_time` = '".$polled."'";
       $update .= ", `poll_prev` = '".$port['poll_time']."'";
       $update .= ", `poll_period` = '".$polled_period."'";
+
+      #echo("\n32bit - In: ".$this_port['ifInOctets']." Out: ".$this_port['ifOutOctets']);
+      #echo("\n64bit - In: ".$this_port['ifHCInOctets']." Out: ".$this_port['ifHCOutOctets']."\n");
 
       /// Copy ifHC[In|Out]Octets values to non-HC if they exist
       if($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {

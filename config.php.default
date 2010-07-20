@@ -12,7 +12,7 @@ $config['db_name'] = "observium";
 $config['install_dir'] 	= "/opt/observium";
 $config['html_dir']	= $config['install_dir'] . "/html";
 $config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
-$config['observer_log'] = $config['install_dir'] . "/observium.log";
+$config['log_file']     = $config['install_dir'] . "/observium.log";
 
 ###
 $config['base_url']	= "http://obeservium.company.com";
