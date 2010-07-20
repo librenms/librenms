@@ -95,6 +95,9 @@ $config['os']['screenos']['type']	= "firewall";
 $config['os']['routeros']['text']	= "Mikrotik RouterOS";
 $config['os']['routeros']['type']	= "network";
 $config['os']['routeros']['nobulk']	= 1;
+$config['os']['routeros']['overgraph'][]  = "device_bits";
+$config['os']['routeros']['overtext']     = "Traffic";
+
 
 $config['os']['junose']['text']		= "Juniper JunOSe";
 $config['os']['junose']['type']		= "network";

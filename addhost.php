@@ -15,7 +15,7 @@ if($argv[1]) {
   	$port = 161;
 
   if (!$snmpver) $snmpver = "v2c";
-  if (!$community) $community = $config['community'];
+  if (!$community) $community = $config['snmp']['community'][0];
 
   list($hostshort) 	= explode(".", $host);
   if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
