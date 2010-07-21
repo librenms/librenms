@@ -115,18 +115,19 @@ $config['overview_show_sysDescr'] = true;
 
 ### Poller/Discovery Modules
 
-$config['enable_port_Xbcmc']    	= 1; # Enable ifXEntry broadcast/multicast
-$config['port_descr_parser']		= "includes/port-descr-parser.inc.php"; # Parse port descriptions into fields
 $config['enable_bgp']           	= 1; # Enable BGP session collection and display
 $config['enable_syslog']        	= 0; # Enable Syslog
 $config['enable_billing']       	= 0; # Enable Billing
 $config['enable_inventory']     	= 1; # Enable Inventory
-$config['enable_etherlike']     	= 1; # Enable Etherlike
-$config['enable_port_Xbcmc']    	= 1; # Enable ifXEntry broadcast/multicast
 $config['enable_pseudowires']   	= 1; # Enable Pseudowires
-$config['enable_ports_junoseatmvp'] 	= 0; # Enable JunOSe ATM VC Discovery/Poller
-$config['enable_ports_etherlike'] 	= 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_printers']  		= 0;  # Enable Printer support
+
+### Ports extension modules
+
+$config['port_descr_parser']            = "includes/port-descr-parser.inc.php"; # Parse port descriptions into fields
+$config['enable_ports_Xbcmc']           = 1; # Enable ifXEntry broadcast/multicast
+$config['enable_ports_etherlike']       = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
+$config['enable_ports_junoseatmvp']     = 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_adsl']            = 1; # Enable ADSL-LINE-MIB
 
 ### External Integration
