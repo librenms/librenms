@@ -32,7 +32,6 @@ if(mysql_affected_rows()) {
     if($debug) { echo("$rrd "); }
 
     if (!is_file($rrd)) {
-
       rrdtool_create ($rrd, "--step 300 \
       DS:read:DERIVE:600:0:125000000000 \
       DS:written:DERIVE:600:0:125000000000 \
