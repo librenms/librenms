@@ -206,7 +206,7 @@
       $ret = rrdtool_update("$rrdfile", $if_rrd_update);
 
 
-      if($config['enable_port_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
+      if($config['enable_ports_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
         if(!is_file($ifx_rrd)) { shell_exec($ifx_rrd_cmd); }
         $ifx_rrd_update = "$polled:$ifHCInBroadcastPkts:$ifHCOutBroadcastPkts:$ifHCInMulticastPkts:$ifHCOutMulticastPkts";
         $ret = rrdtool_update($ifx_rrd, $ifx_rrd_update);

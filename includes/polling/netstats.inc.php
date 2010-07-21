@@ -4,6 +4,8 @@ if($device[os] != "Snom") {
 
   echo("Polling device network statistics...\n");
 
+  #### These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
+
   $oids['ip'] = array ('ipForwDatagrams','ipInDelivers','ipInReceives','ipOutRequests','ipInDiscards','ipOutDiscards','ipOutNoRoutes',
                  'ipReasmReqds','ipReasmOKs','ipReasmFails','ipFragOKs','ipFragFails','ipFragCreates', 'ipInUnknownProtos',
                  'ipInHdrErrors', 'ipInAddrErrors');
@@ -16,6 +18,8 @@ if($device[os] != "Snom") {
   $oids['tcp_collect'] = $oids['tcp'];
   $oids['tcp_collect'][] = 'tcpHCInSegs';
   $oids['tcp_collect'][] = 'tcpHCOutSegs';
+
+  #### Below have more oids, and are in trees by themselves, so we can snmpwalk_cache_oid them
 
   $oids['icmp'] =   array('icmpInMsgs','icmpOutMsgs','icmpInErrors','icmpOutErrors','icmpInEchos','icmpOutEchos','icmpInEchoReps',
                  'icmpOutEchoReps','icmpInDestUnreachs','icmpOutDestUnreachs','icmpInParmProbs','icmpInTimeExcds',
