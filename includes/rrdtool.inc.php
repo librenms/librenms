@@ -7,7 +7,14 @@ function rrdtool_update($rrdfile, $rrdupdate)
 
 function rrdtool_create($rrdfile, $rrdupdate)
 {
-  return rrdtool("create", $rrdfile, $rrdupdate);
+  global $config; global $debug;
+
+  $command = $config['rrdtool'] . " create $rrdfile $rrdupdate";
+
+  if ($debug || TRUE) { echo($command."\n"); }
+
+  return shell_exec($command);
+
 }
 
 function rrdtool_fetch($rrdfile, $rrdupdate)
@@ -40,7 +47,7 @@ function rrdtool($command, $file, $options)
     $command .= " --daemon " . $config['rrdcached'];
   }
 
-  if ($debug) { echo($command."\n"); }
+  if ($debug || TRUE) { echo($command."\n"); }
   return shell_exec($command);
 }
 
