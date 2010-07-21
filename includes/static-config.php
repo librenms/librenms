@@ -86,6 +86,11 @@ $config['os']['catos']['text']		= "Cisco CatOS";
 $config['os']['catos']['ifname']	= 1;
 $config['os']['catos']['type']		= "network";
 
+$config['os']['vrp']['group'] 		= "vrp";
+$config['os']['vrp']['text']  		= "Huawei VRP";
+$config['os']['vrp']['type']  		= "network";
+$config['os']['vrp']['icon']  		= "huawei";
+
 $config['os']['junos']['text']		= "Juniper JunOS";
 $config['os']['junos']['type']		= "network";
 
