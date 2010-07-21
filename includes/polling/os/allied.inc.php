@@ -47,6 +47,6 @@ $version = str_replace("\"","", $version);
 $features = str_replace("\"","", $features);
 $hardware = str_replace("\"","", $hardware);
 
-include("hr-mib.inc.php");
+include("includes/polling/hr-mib.inc.php");
 
 ?>
