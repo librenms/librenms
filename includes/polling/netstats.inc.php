@@ -8,6 +8,15 @@ if($device[os] != "Snom") {
                  'ipReasmReqds','ipReasmOKs','ipReasmFails','ipFragOKs','ipFragFails','ipFragCreates', 'ipInUnknownProtos',
                  'ipInHdrErrors', 'ipInAddrErrors');
 
+  $oids['tcp'] = array ('tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab',
+    'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts');
+
+  $oids['udp'] = array ('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');
+
+  $oids['tcp_collect'] = $oids['tcp'];
+  $oids['tcp_collect'][] = 'tcpHCInSegs';
+  $oids['tcp_collect'][] = 'tcpHCOutSegs';
+
   $oids['icmp'] =   array('icmpInMsgs','icmpOutMsgs','icmpInErrors','icmpOutErrors','icmpInEchos','icmpOutEchos','icmpInEchoReps',
                  'icmpOutEchoReps','icmpInDestUnreachs','icmpOutDestUnreachs','icmpInParmProbs','icmpInTimeExcds',
                  'icmpInSrcQuenchs','icmpInRedirects','icmpInTimestamps','icmpInTimestampReps','icmpInAddrMasks',
@@ -19,23 +28,7 @@ if($device[os] != "Snom") {
    'snmpInGetRequests','snmpInGetNexts','snmpInSetRequests','snmpInGetResponses','snmpInTraps','snmpOutTooBigs','snmpOutNoSuchNames',
    'snmpOutBadValues','snmpOutGenErrs','snmpOutGetRequests','snmpOutGetNexts','snmpOutSetRequests','snmpOutGetResponses','snmpOutTraps','snmpSilentDrops','snmpProxyDrops');
 
-  $oids['tcp'] = array ('tcpActiveOpens', 'tcpPassiveOpens', 'tcpAttemptFails', 'tcpEstabResets', 'tcpCurrEstab', 
-    'tcpInSegs', 'tcpOutSegs', 'tcpRetransSegs', 'tcpInErrs', 'tcpOutRsts');
-
-  $oids['tcp_collect'] = $oids['tcp'];
-  $oids['tcp_collect'][] = 'tcpHCInSegs';
-  $oids['tcp_collect'][] = 'tcpHCOutSegs';
-
-  $oids['udp'] = array ('udpInDatagrams','udpOutDatagrams','udpInErrors','udpNoPorts');
-
   $protos = array('ip','icmp', 'snmp', 'udp', 'tcp');
-
-#  /// Copy ifHC[In|Out]Octets values to non-HC if they exist
-#  if($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {
-#     echo("HC ");
-#     $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
-#     $this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
-#  }
 
   foreach($protos as $proto) {
     unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
@@ -51,24 +44,27 @@ if($device[os] != "Snom") {
       $snmpstring .= " $oid.0"; 
     }
     if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
-    #$snmpdata_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IP-MIB:SNMPv2-MIB:UDP-MIB:TCP-MIB:IP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " $snmpstring";
-    #$snmpdata     = trim(shell_exec($snmpdata_cmd));
-    $data = snmp_get_multi($device ,$snmpstring);
 
-#    print_r($data);
+    if($proto == "ip" || $proto == "tcp" || $proto == "udp")
+    {
+      $data = snmp_get_multi($device ,$snmpstring);
+    } else {
+      $data_array = snmpwalk_cache_oid($proto, $device, array());
+    }
     
     $rrdupdate = "N";
 
     foreach($oids[$proto] as $oid){
-      if(is_numeric($data[0][$oid])) { $value = $data[0][$oid]; } else { $value = "0"; } 
+      if(is_numeric($data[0][$oid])) 
+      { 
+        $value = $data[0][$oid]; 
+      } elseif(is_numeric($data_array[$device['device_id']][0][$oid])) {
+         $value = $data_array[$device['device_id']][0][$oid];
+      } else { 
+        $value = "0"; 
+      }
       $rrdupdate .= ":$value";
     }
-
-#    $rrdupdate = "N";
-#    foreach(explode("\n", $snmpdata) as $data) {
-#      if(strstr($data, "No") || strstr($data, "d") || strstr($data, "s")) { $data = "0"; }
-#      $rrdupdate .= ":$data";
-#    }
 
     unset($snmpstring);
     rrdtool_update($rrdfile, $rrdupdate);
