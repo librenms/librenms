@@ -1,0 +1,497 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-SEP-STATS-MIB.my: Cisco VPN3000 Series SEP Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002, 2003 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-SEP-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32
+         FROM SNMPv2-SMI
+      RowStatus, DisplayString
+         FROM SNMPv2-TC
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alStatsSep, alSepGroup
+         FROM ALTIGA-MIB
+      alSepMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaSepStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200303270000Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Cisco VPN 3000 Series SEP Statistics MIB models counters
+          and objects that are of management interest for the SEP 
+          hardware.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            MIB:        Management Information Base
+
+            RSA:        Rivest, Shamir, and Adelman
+
+            SEP:        Scalable Encryption Processor
+
+         "
+        REVISION "200303270000Z"
+        DESCRIPTION
+                 "Added new enum value to alSepModuleStatsType
+                  and alSepModuleStatsState."
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alSepMibModule 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+-- per SEP statistics 
+
+alSepModuleStatsTable      OBJECT-TYPE
+   SYNTAX         SEQUENCE OF AlSepModuleStatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "List of SEPs modules found."
+   ::= { alStatsSep 2 }
+
+alSepModuleStatsEntry   OBJECT-TYPE
+   SYNTAX         AlSepModuleStatsEntry
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "An entry in the alSepModuleStatsTable."
+   INDEX       { alSepModuleStatsSlotNum }
+   ::= { alSepModuleStatsTable 1 }
+
+AlSepModuleStatsEntry ::= SEQUENCE {
+   alSepModuleStatsRowStatus              RowStatus,
+   alSepModuleStatsSlotNum                INTEGER,
+   alSepModuleStatsType                   INTEGER,
+   alSepModuleStatsState                  INTEGER,
+   alSepModuleStatsDspCodeVersion         DisplayString,
+   alSepModuleStatsHashOutboundPackets    Counter32,
+   alSepModuleStatsHashOutboundOctets     Counter32,
+   alSepModuleStatsHashInboundPackets     Counter32,
+   alSepModuleStatsHashInboundOctets      Counter32,
+   alSepModuleStatsEncPackets             Counter32,
+   alSepModuleStatsEncOctets              Counter32,
+   alSepModuleStatsDecPackets             Counter32,
+   alSepModuleStatsDecOctets              Counter32,
+   alSepModuleStatsHashEncPackets         Counter32,
+   alSepModuleStatsHashDecPackets         Counter32,
+   alSepModuleStatsCryptoTransformsTotal  Counter32,
+   alSepModuleStatsPacketDrops            Counter32,
+   alSepModuleStatsRandRequests           Counter32,
+   alSepModuleStatsRandReplens            Counter32,
+   alSepModuleStatsRandBytesAvail         Integer32,
+   alSepModuleStatsRandCacheEmpty         Counter32,
+   alSepModuleStatsDHKeysGenerated        Counter32,
+   alSepModuleStatsDHDerivedSecretKeys    Counter32,
+   alSepModuleStatsRSASignings            Counter32,
+   alSepModuleStatsRSAVerifications       Counter32,
+   alSepModuleStatsRSAEncPackets          Counter32,
+   alSepModuleStatsRSAEncOctets           Counter32,
+   alSepModuleStatsRSADecPackets          Counter32,
+   alSepModuleStatsRSADecOctets           Counter32,
+   alSepModuleStatsDSAKeysGenerated       Counter32,
+   alSepModuleStatsDSASignings            Counter32,
+   alSepModuleStatsDSAVerifications       Counter32,
+   alSepModuleStatsRSAKeysGenerated       Counter32
+}
+
+alSepModuleStatsRowStatus  OBJECT-TYPE
+   SYNTAX         RowStatus
+   MAX-ACCESS     read-create
+   STATUS         current
+   DESCRIPTION
+      "The status of this row."
+   ::= { alSepModuleStatsEntry 1 }
+
+alSepModuleStatsSlotNum    OBJECT-TYPE
+   SYNTAX         INTEGER(1..4)
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+      "The physical slot this SEP is connected to."
+   ::= { alSepModuleStatsEntry 2 }
+
+
+alSepModuleStatsType    OBJECT-TYPE
+   SYNTAX INTEGER {
+                     cryptSet(1),
+                     cryptIc(2),
+                     bcm582x(3)
+                  }
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "Indicates the type of HW engine used to perform the
+       cryptographic transforms.
+       cryptSet: First generation of Hardware Cryptographic Processor.
+       cryptIc: Cryptographic Integrated Circuit.
+       bcm582x: BroadCom 582x series Hardware Cryptographic Products.
+      "
+   ::= { alSepModuleStatsEntry 3 }
+
+alSepModuleStatsState      OBJECT-TYPE
+   SYNTAX INTEGER {
+                     sepNotFound(1),
+                     sepFound(2),
+                     sepDiagFailure(3),
+                     sepNotOperational(4),
+                     sepLoading(5),
+                     sepInitializing(6),
+                     sepOperational(7),
+                     sepDisabled(8)
+                  }
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The functional state of this SEP.
+      sepNotFound: SEP is not found.
+      sepFound: SEP is found.
+      sepDiagFailure: SEP dialog fail.
+      sepNotOperational: SEP is not operational.
+      sepLoading: SEP is loading data.
+      sepInitializing: SEP is initializing.
+      sepOperational: SEP is operational.
+      sepDisabled: SEP is disabled.
+      "
+   ::= { alSepModuleStatsEntry 4 }
+
+alSepModuleStatsDspCodeVersion   OBJECT-TYPE
+   SYNTAX         DisplayString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The version of DSP microcode running on this SEP."
+   ::= { alSepModuleStatsEntry 5 }
+
+alSepModuleStatsHashOutboundPackets OBJECT-TYPE
+   SYNTAX            Counter32
+   MAX-ACCESS        read-only
+   STATUS            current
+   DESCRIPTION
+      "The number of outbound authentication-only packets processed
+       by this SEP."
+   ::= { alSepModuleStatsEntry 6 }
+
+alSepModuleStatsHashOutboundOctets     OBJECT-TYPE
+   SYNTAX            Counter32
+   MAX-ACCESS        read-only
+   STATUS            current
+   DESCRIPTION
+      "The number of outbound octets authenticated by this SEP."
+   ::= { alSepModuleStatsEntry 7 }
+
+alSepModuleStatsHashInboundPackets  OBJECT-TYPE
+   SYNTAX            Counter32
+   MAX-ACCESS        read-only
+   STATUS            current
+   DESCRIPTION
+      "The number of inbound authentication-only packets processed
+       by this SEP."
+   ::= { alSepModuleStatsEntry 8 }
+
+alSepModuleStatsHashInboundOctets   OBJECT-TYPE
+   SYNTAX            Counter32
+   MAX-ACCESS        read-only
+   STATUS            current
+   DESCRIPTION
+      "The number of inbound octets authenticated by this SEP."
+   ::= { alSepModuleStatsEntry 9 }
+
+alSepModuleStatsEncPackets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of outbound encryption-only packets processed by
+       this SEP."
+   ::= { alSepModuleStatsEntry 10 }
+
+alSepModuleStatsEncOctets     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of outbound octets encrypted by this SEP."
+   ::= { alSepModuleStatsEntry 11 }
+
+alSepModuleStatsDecPackets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of inbound decryption-only packets processed by
+       this SEP."
+   ::= { alSepModuleStatsEntry 12 }
+
+alSepModuleStatsDecOctets     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of inbound octets decrypted by this SEP."
+   ::= { alSepModuleStatsEntry 13 }
+
+alSepModuleStatsHashEncPackets   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of combined outbound hash/encrypt packets processed
+       by this SEP."
+   ::= { alSepModuleStatsEntry 14 }
+
+alSepModuleStatsHashDecPackets   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of combined inbound hash/decrypt packets processed
+       by this SEP."
+   ::= { alSepModuleStatsEntry 15 }
+
+alSepModuleStatsCryptoTransformsTotal  OBJECT-TYPE
+   SYNTAX            Counter32
+   MAX-ACCESS        read-only
+   STATUS            current
+   DESCRIPTION
+      "The total number of hash, encryption, decryption,
+       hash/encrypt, and hash/decrypt transforms
+       performed by this SEP."
+   ::= { alSepModuleStatsEntry 16 }
+
+alSepModuleStatsPacketDrops      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of packets intended for SEP processing,
+       dropped due to the SEP ring being full."
+   ::= { alSepModuleStatsEntry 17 }
+
+alSepModuleStatsRandRequests     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of random # requests made to the SEP."
+   ::= { alSepModuleStatsEntry 18 }
+
+alSepModuleStatsRandReplens      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of random # requests fulfilled by the SEP."
+   ::= { alSepModuleStatsEntry 19 }
+
+alSepModuleStatsRandBytesAvail   OBJECT-TYPE
+   SYNTAX         Integer32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of random bytes currently cached on the Host."
+   ::= { alSepModuleStatsEntry 20 }
+
+alSepModuleStatsRandCacheEmpty   OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a random # request came in and
+       we had no SEP generated random #'s available on the host."
+   ::= { alSepModuleStatsEntry 21 }
+
+alSepModuleStatsDHKeysGenerated  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a new Diffie Hellman key pair has been
+       generated by a SEP."
+   ::= { alSepModuleStatsEntry 22 }
+
+alSepModuleStatsDHDerivedSecretKeys  OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a SEP has derived the Diffie Hellman
+       secret key."
+   ::= { alSepModuleStatsEntry 23 }
+
+alSepModuleStatsRSASignings      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times an RSA Digital Signature has been
+       generated by a SEP."
+   ::= { alSepModuleStatsEntry 24 }
+
+alSepModuleStatsRSAVerifications OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times an RSA Digital Signature has been
+       verified by a SEP."
+   ::= { alSepModuleStatsEntry 25 }
+
+alSepModuleStatsRSAEncPackets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of packets RSA-encrypted by this SEP."
+   ::= { alSepModuleStatsEntry 26 }
+
+alSepModuleStatsRSAEncOctets     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of octets RSA-encrypted by this SEP."
+   ::= { alSepModuleStatsEntry 27 }
+
+alSepModuleStatsRSADecPackets OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of packets RSA-decrypted by this SEP."
+   ::= { alSepModuleStatsEntry 28 }
+
+alSepModuleStatsRSADecOctets     OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+          "The number of octets RSA-decrypted by this SEP."
+   ::= { alSepModuleStatsEntry 29 }
+
+alSepModuleStatsDSAKeysGenerated OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a new DSA Key pair has been
+       generated by a SEP."
+   ::= { alSepModuleStatsEntry 30 }
+
+alSepModuleStatsDSASignings      OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a DSA Digital Signature has been
+       generated by a SEP."
+   ::= { alSepModuleStatsEntry 31 }
+
+alSepModuleStatsDSAVerifications OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a DSA Digital Signature has been
+       verified by a SEP."
+   ::= { alSepModuleStatsEntry 32 }
+
+alSepModuleStatsRSAKeysGenerated OBJECT-TYPE
+   SYNTAX         Counter32
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+      "The number of times a new RSA Key pair has been
+       generated by a SEP."
+   ::= { alSepModuleStatsEntry 33 }
+
+altigaSepStatsMibConformance OBJECT IDENTIFIER 
+   ::= { altigaSepStatsMibModule 1 }
+
+altigaSepStatsMibCompliances OBJECT IDENTIFIER 
+   ::= { altigaSepStatsMibConformance 1 }
+
+altigaSepStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga SEP Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaSepStatsGroup
+   }
+   ::= { altigaSepStatsMibCompliances 1 }
+
+altigaSepStatsGroup OBJECT-GROUP
+   OBJECTS
+   {
+      alSepModuleStatsRowStatus,
+      alSepModuleStatsType,
+      alSepModuleStatsState,           
+      alSepModuleStatsDspCodeVersion,     
+      alSepModuleStatsHashOutboundPackets,    
+      alSepModuleStatsHashOutboundOctets,    
+      alSepModuleStatsHashInboundPackets,     
+      alSepModuleStatsHashInboundOctets,     
+      alSepModuleStatsEncPackets,      
+      alSepModuleStatsEncOctets,       
+      alSepModuleStatsDecPackets,      
+      alSepModuleStatsDecOctets,       
+      alSepModuleStatsHashEncPackets,  
+      alSepModuleStatsHashDecPackets,  
+      alSepModuleStatsCryptoTransformsTotal, 
+      alSepModuleStatsPacketDrops,     
+      alSepModuleStatsRandRequests,    
+      alSepModuleStatsRandReplens,     
+      alSepModuleStatsRandBytesAvail,  
+      alSepModuleStatsRandCacheEmpty,
+      alSepModuleStatsDHKeysGenerated,
+      alSepModuleStatsDHDerivedSecretKeys,
+      alSepModuleStatsRSASignings,
+      alSepModuleStatsRSAVerifications,
+      alSepModuleStatsRSAEncPackets,
+      alSepModuleStatsRSAEncOctets,
+      alSepModuleStatsRSADecPackets,
+      alSepModuleStatsRSADecOctets,
+      alSepModuleStatsDSAKeysGenerated,
+      alSepModuleStatsDSASignings,
+      alSepModuleStatsDSAVerifications,
+      alSepModuleStatsRSAKeysGenerated
+   }  
+   STATUS   current
+   DESCRIPTION
+      "The objects for the SEP Module statistics."
+   ::= { alSepGroup 2 }
+
+END
+
+
+

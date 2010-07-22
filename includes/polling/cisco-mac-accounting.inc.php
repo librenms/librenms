@@ -7,7 +7,7 @@ $cip_array = array();
 foreach ($cip_oids as $oid) 
 { 
   echo("$oid "); 
-  $cip_array = snmp_cache_cip($oid, $device, $cip_array, "CISCO-IP-STAT-MIB"); 
+  $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, "CISCO-IP-STAT-MIB"); 
 }
 
 $polled = time();

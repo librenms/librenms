@@ -136,7 +136,9 @@ $config['os']['powerconnect']['icon']   = "dell";
 $config['os']['radlan']['text']         = "Radlan";
 $config['os']['radlan']['ifname']       = 1;
 $config['os']['radlan']['type']         = "network";
-
+$config['os']['radlan']['overgraph'][0]  = "device_cpu";
+$config['os']['radlan']['overgraph'][1]  = "device_bits";
+$config['os']['radlan']['overtext']     = "CPU & Traffic";
 
 $config['os']['powervault']['text']     = "Dell PowerVault";
 $config['os']['powervault']['icon']     = "dell";
@@ -146,6 +148,8 @@ $config['os']['drac']['icon']           = "dell";
 
 $config['os']['bcm963']['text']		= "Broadcom BCM963xxx";
 $config['os']['bcm963']['icon']		= "broadcom";
+$config['os']['bcm963']['overgraph'][]  = "device_bits";
+$config['os']['bcm963']['overtext']     = "Traffic";
 
 $config['os']['netopia']['text']        = "Motorola Netopia";
 $config['os']['netopia']['type']        = "network";

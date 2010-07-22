@@ -8,9 +8,7 @@ if(($device['os'] == "ios" || $device['os_group'] == "ios") && $cemp_count == "0
 
   echo("OLD-CISCO-MEMORY-POOL: ");
 
-  $cmp_oids = array('ciscoMemoryPool');
-
-  foreach ($cmp_oids as $oid) { $cmp_array = snmp_cache_oid($oid, $device, array(), "CISCO-MEMORY-POOL-MIB"); }
+  $cmp_array = snmpwalk_cache_oid($device, 'ciscoMemoryPool', NULL, "CISCO-MEMORY-POOL-MIB");
 
   if(is_array($cmp_array)) {
     foreach($cmp_array[$device[device_id]] as $index => $cmp) {

@@ -1,0 +1,239 @@
+-- *------------------------------------------------------------------
+-- * ALTIGA-SDI-ACE-STATS-MIB.my:  SDI ACE Server Statistics MIB.
+-- *
+-- * Altiga Networks was acquired by Cisco Systems on March 29, 2000
+-- *
+-- * Copyright (c) 2002 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+ALTIGA-SDI-ACE-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, Counter32, Gauge32
+         FROM SNMPv2-SMI
+      OBJECT-GROUP, MODULE-COMPLIANCE
+         FROM SNMPv2-CONF
+      alACEServerStats, alACEServerGroup
+         FROM ALTIGA-MIB
+      alACEServerMibModule
+         FROM ALTIGA-GLOBAL-REG;
+
+   altigaACEStatsMibModule MODULE-IDENTITY
+      LAST-UPDATED   "200209051300Z"
+      ORGANIZATION   "Cisco Systems, Inc."
+      CONTACT-INFO
+         "Cisco Systems
+          170 W Tasman Drive
+          San Jose, CA  95134
+          USA
+
+          Tel: +1 800 553-NETS
+          E-mail: cs-cvpn3000@cisco.com"
+
+      DESCRIPTION
+         "The Altiga SDI ACE Server Statistics MIB models counters and objects that are
+          of management interest for SDI ACE Server.
+         
+          Acronyms
+          The following acronyms are used in this document:
+
+            ACE:        Access Control Encryption
+
+            MIB:        Management Information Base
+
+            PIN:        Personal Identification Number
+
+            SDI:        Security Dynamics Technologies, Inc
+         
+         "
+
+        REVISION "200209051300Z"
+        DESCRIPTION
+                "Added module compliance."
+
+        REVISION "200207100000Z"
+        DESCRIPTION
+                "Updated with new header"
+
+      ::= { alACEServerMibModule 1 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+alCfgACEGlobal  OBJECT IDENTIFIER ::= { alACEServerStats 1 }
+
+alACEServerTable                OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF AlACEServerEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+               "The list of authentication servers."
+        ::= { alACEServerStats 2 }
+
+alACEServerEntry                OBJECT-TYPE
+        SYNTAX                  AlACEServerEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+               "An entry in the alAuthServerTable."
+        INDEX           { alACEPrimaryIndex, alACEServerIndex }
+        ::= { alACEServerTable 1 }
+
+AlACEServerEntry ::= SEQUENCE {
+        alACEPrimaryIndex               Integer32,
+        alACEServerIndex                Integer32,
+        alACEServerPriority             Integer32,
+        alACEServerAddress              IpAddress,
+        alACEServerPort                 Integer32,
+        alACEServerRetries              Counter32,
+        alACEServerTimeout              Counter32,
+        alACEServerGroupId              Gauge32,
+        alACEServerAuthSuccesses        Counter32,
+        alACEServerAuthFailures         Counter32,
+        alACEServerBadCodeSent          Counter32,
+        alACEServerBadPinSent           Counter32
+      }
+
+
+alACEPrimaryIndex               OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "The index of the configured primary server"
+        ::= { alACEServerEntry 1 }
+
+alACEServerIndex                OBJECT-TYPE
+        SYNTAX                  Integer32 (0..10)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "The index of this server into the server list"
+        ::= { alACEServerEntry 2 }
+
+alACEServerPriority     OBJECT-TYPE
+        SYNTAX                  Integer32 (0..10)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "The priority as computed by loadbalancing"
+        ::= { alACEServerEntry 3 }
+
+
+alACEServerAddress              OBJECT-TYPE
+        SYNTAX                  IpAddress
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+               "Resolved address from the ACE Server."
+        ::= { alACEServerEntry 4 }
+
+alACEServerPort                 OBJECT-TYPE
+        SYNTAX                  Integer32 (0..65535)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Port over ride for this entry"
+        ::= { alACEServerEntry 5 }
+
+alACEServerRetries              OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Number of retries for this server."
+        ::= { alACEServerEntry 6 }
+
+alACEServerTimeout              OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Timeout, in seconds to access this server."
+        ::= { alACEServerEntry 7 }
+
+alACEServerGroupId              OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "The group that this authentication server entry belongs to."
+        ::= { alACEServerEntry 8 }
+
+
+alACEServerAuthSuccesses        OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "number of auth successes."
+        ::= { alACEServerEntry 9 }
+
+alACEServerAuthFailures         OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "number of failures for this server."
+        ::= { alACEServerEntry 10 }
+
+alACEServerBadCodeSent          OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "number of Bad Code sent to  this server."
+        ::= { alACEServerEntry 11 }
+
+alACEServerBadPinSent           OBJECT-TYPE
+        SYNTAX                  Counter32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "number of Bad Pin sent to this server."
+        ::= { alACEServerEntry 12 }
+
+altigaACEStatsMibConformance OBJECT IDENTIFIER ::= { altigaACEStatsMibModule 1 }
+altigaACEStatsMibCompliances OBJECT IDENTIFIER ::= { altigaACEStatsMibConformance 1 }
+
+altigaACEStatsMibCompliance MODULE-COMPLIANCE
+   STATUS         current
+   DESCRIPTION
+      "The compliance statement for agents which 
+       implement the Altiga ACE Server Statistics MIB."
+   MODULE
+   MANDATORY-GROUPS { 
+      altigaACEServerGroup
+   }
+   ::= { altigaACEStatsMibCompliances 1 }
+
+altigaACEServerGroup OBJECT-GROUP
+        OBJECTS
+        {
+        alACEPrimaryIndex,
+        alACEServerIndex,
+        alACEServerPriority,
+        alACEServerAddress,
+        alACEServerPort,
+        alACEServerRetries,
+        alACEServerTimeout,
+        alACEServerGroupId,
+        alACEServerAuthSuccesses,
+        alACEServerAuthFailures,
+        alACEServerBadCodeSent,
+        alACEServerBadPinSent
+        }
+        STATUS  current
+        DESCRIPTION
+               "The objects for ACE-STATS."
+        ::= { alACEServerGroup 1 }
+
+END
+
+
+
+
+
