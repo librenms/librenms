@@ -2,18 +2,13 @@
 
   echo("Q-BRIDGE-MIB VLANs : ");
 
-  $vlanversion_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " ";
-  $vlanversion_cmd .= $device['hostname'].":".$device['port'] . " Q-BRIDGE-MIB::dot1qVlanVersionNumber.0";
-  $vlanversion = trim(`$vlanversion_cmd 2>/dev/null`);  
+  $vlanversion = snmp_get($device, "dot1qVlanVersionNumber.0", "-Oqv", "Q-BRIDGE-MIB");
 
   if($vlanversion == 'version1') {
 
     echo("VLAN $vlanversion ");
 
-    $vlans_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -m Q-BRIDGE-MIB -O qn -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-    $vlans_cmd .= "dot1qVlanFdbId";
-
-    $vlans  = trim(`$vlans_cmd | grep -v o`);
+    $vlans = snmp_walk($device, "dot1qVlanFdbId", $options = "-Oqn", $mib = "Q-BRIDGE-MIB");
 
     foreach(explode("\n", $vlans) as $vlan_oid) {
 

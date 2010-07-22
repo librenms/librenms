@@ -11,7 +11,7 @@ function rrdtool_create($rrdfile, $rrdupdate)
 
   $command = $config['rrdtool'] . " create $rrdfile $rrdupdate";
 
-  if ($debug || TRUE) { echo($command."\n"); }
+  if ($debug) { echo($command."\n"); }
 
   return shell_exec($command);
 
@@ -47,7 +47,7 @@ function rrdtool($command, $file, $options)
     $command .= " --daemon " . $config['rrdcached'];
   }
 
-  if ($debug || TRUE) { echo($command."\n"); }
+  if ($debug) { echo($command."\n"); }
   return shell_exec($command);
 }
 

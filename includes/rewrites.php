@@ -115,6 +115,26 @@ $rewrite_junose_hardware = array(
   'juniSsx1440' => 'SSX-1440',
 );
 
+$rewrite_ftos_hardware = array (
+'.1.3.6.1.4.1.6027.1.1.1'=> 'E1200',
+'.1.3.6.1.4.1.6027.1.1.2'=> 'E600',
+'.1.3.6.1.4.1.6027.1.1.3'=> 'E300',
+'.1.3.6.1.4.1.6027.1.1.4'=> 'E610',
+'.1.3.6.1.4.1.6027.1.1.5'=> 'E1200i',
+'.1.3.6.1.4.1.6027.1.2.1'=> 'C300',
+'.1.3.6.1.4.1.6027.1.2.2'=> 'C150',
+'.1.3.6.1.4.1.6027.1.3.1'=> 'S50',
+'.1.3.6.1.4.1.6027.1.3.2'=> 'S50E',
+'.1.3.6.1.4.1.6027.1.3.3'=> 'S50V',
+'.1.3.6.1.4.1.6027.1.3.4'=> 'S25P-AC',
+'.1.3.6.1.4.1.6027.1.3.5'=> 'S2410CP',
+'.1.3.6.1.4.1.6027.1.3.6'=> 'S2410P',
+'.1.3.6.1.4.1.6027.1.3.7'=> 'S50N-AC',
+'.1.3.6.1.4.1.6027.1.3.8'=> 'S50N-DC',
+'.1.3.6.1.4.1.6027.1.3.9'=> 'S25P-DC',
+'.1.3.6.1.4.1.6027.1.3.9'=> 'S25V',
+'.1.3.6.1.4.1.6027.1.3.9'=> 'S25N'
+);
 
 $rewrite_extreme_hardware = array (
 '.1.3.6.1.4.1.1916.2.26' => 'Alpine 3802',
@@ -748,6 +768,13 @@ function rewrite_extreme_hardware ($hardware)
   global $rewrite_extreme_hardware;
   #$hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
   $hardware = $rewrite_extreme_hardware[$hardware];
+  return ($hardware);
+}
+
+function rewrite_ftos_hardware ($hardware)
+{
+  global $rewrite_ftos_hardware;
+  $hardware = $rewrite_ftos_hardware[$hardware];
   return ($hardware);
 }
 

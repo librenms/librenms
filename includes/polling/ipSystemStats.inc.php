@@ -49,7 +49,7 @@
 
   echo("Polling IP-MIB ipSystemStats ");
 
-  $ipSystemStats = snmpwalk_cache_oid("ipSystemStats", $device, $ipSystemStats, "IP-MIB");
+  $ipSystemStats = snmpwalk_cache_oid($device, "ipSystemStats", NULL, "IP-MIB");
   $ipSystemStats = $ipSystemStats[$device[device_id]];
 
  if($ipSystemStats) {

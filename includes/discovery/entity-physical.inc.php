@@ -7,8 +7,7 @@
  if($config['enable_inventory']) {
 
   $entity_array = array();
-  $entity_array = snmpwalk_cache_oid("entPhysicalEntry", $device, $entity_array, "ENTITY-MIB");
-  #$entity_array = snmpwalk_cache_oid("entSensorValues", $device, $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+  $entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", $entity_array, "ENTITY-MIB");
 
   if(!$entity_array[$device['device_id']]) { $entity_array[$device['device_id']] = array(); }
 

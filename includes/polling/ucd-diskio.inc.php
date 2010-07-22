@@ -8,7 +8,7 @@ if(mysql_affected_rows()) {
 
 
   $diskio_cache = array();
-  $diskio_cache = snmpwalk_cache_oid("diskIOEntry", $device, $diskio_cache);
+  $diskio_cache = snmpwalk_cache_oid($device, "diskIOEntry", $diskio_cache);
 
   $diskio_cache = $diskio_cache[$device['device_id']];
 

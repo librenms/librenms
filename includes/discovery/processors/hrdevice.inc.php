@@ -5,8 +5,8 @@ global $valid_processor;
 if ($device['os_group'] == "unix" || $device['os'] == "windows" || $device['os'] == "routeros")
   {
   echo("hrDevice ");
-  $hrDevice_oids = array('hrDevice','hrProcessorLoad');  
-  foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmp_cache_oid($oid, $device, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
+  $hrDevice_oids = array('hrDevice','hrProcessorLoad'); 
+  foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
   foreach($hrDevice_array[$device['device_id']] as $index => $entry)
   {
     if ($entry['hrDeviceType'] == "hrDeviceProcessor") 

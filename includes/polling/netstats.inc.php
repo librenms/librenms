@@ -51,9 +51,9 @@ if($device[os] != "Snom") {
 
     if($proto == "ip" || $proto == "tcp" || $proto == "udp")
     {
-      $data = snmp_get_multi($device ,$snmpstring);
+      $data = snmp_get_multi($device, $snmpstring);
     } else {
-      $data_array = snmpwalk_cache_oid($proto, $device, array());
+      $data_array = snmpwalk_cache_oid($device, $proto, array());
     }
     
     $rrdupdate = "N";

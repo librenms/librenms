@@ -37,7 +37,7 @@
   $cpu  = `$cpu_cmd`;
   list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $UsageUser, $UsageSystem) = explode("\n", $cpu);
 
-  $ss = snmpwalk_cache_oid("systemStats", $device, array());
+  $ss = snmpwalk_cache_oid($device, "systemStats", array());
   $ss = $ss[$device['device_id']][0];
 
   ## Create CPU RRD if it doesn't already exist
