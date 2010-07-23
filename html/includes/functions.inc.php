@@ -53,6 +53,15 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
 
   $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
   $contents = "<div class=list-large>".$device['hostname'] . " - $descr</div>";
+
+  $contents .= "<div>";
+  if($device['os']) { $contents .= $config['os'][$device['os']]['text']; }
+  if($device['version']) { $contents .= " ".$device['version']; }
+  if($device['features']) { $contents .= " (".$device['features'].")"; }
+  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
+  $contents .= "</div>";
+
+
   if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
   foreach ($graphs as $graph)
   {
