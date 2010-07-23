@@ -13,50 +13,50 @@ $config['os']['default']['over'][1]['graph'] 	= "device_memory";
 $config['os']['default']['over'][1]['text']	= "Memory Usage";
 
 $os = "generic";
-$config['os'][$os]['text']        = "Generic Device";
+$config['os'][$os]['text']      	= "Generic Device";
 
 $os = "linux";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "Linux";
-$config['os'][$os]['ifXmcbc']	= 1;
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "Linux";
+$config['os'][$os]['ifXmcbc']		= 1;
 
 $os = "freebsd";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "FreeBSD";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "FreeBSD";
 
 $os = "openbsd";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "OpenBSD";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "OpenBSD";
 
 $os = "netbsd";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "NetBSD";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "NetBSD";
 
 $os = "dragonfly";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "DragonflyBSD";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "DragonflyBSD";
 
 $os = "netware";
-$config['os'][$os]['text']  	= "Novell Netware";
-$config['os'][$os]['icon']  	= "novell";
+$config['os'][$os]['text']  		= "Novell Netware";
+$config['os'][$os]['icon']  		= "novell";
 
 $os = "monowall";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "m0n0wall";
-$config['os'][$os]['type']  	= "firewall";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "m0n0wall";
+$config['os'][$os]['type']  		= "firewall";
 
 $os = "solaris";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "Sun Solaris";
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "Sun Solaris";
 
 $os = "adva";
-$config['os'][$os]['group'] 	= "unix";
-$config['os'][$os]['text']  	= "Adva";
-$config['os'][$os]['ifalias']	= 1;
+$config['os'][$os]['group'] 		= "unix";
+$config['os'][$os]['text']  		= "Adva";
+$config['os'][$os]['ifalias']		= 1;
 
 $os = "opensolaris";
-$config['os'][$os]['group']	= "unix";
-$config['os'][$os]['text']	= "Sun OpenSolaris";
+$config['os'][$os]['group']		= "unix";
+$config['os'][$os]['text']		= "Sun OpenSolaris";
 
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
@@ -71,23 +71,23 @@ $config['os'][$os]['over'][2]['graph']	= "device_memory";
 $config['os'][$os]['over'][2]['text']	= "Memory Usage";
 
 $os = "cat1900";
-$config['os'][$os]['group']	= "cat1900";
-$config['os'][$os]['text']	= "Cisco Catalyst 1900";
-$config['os'][$os]['type']        = "network";
-$config['os'][$os]['icon']        = "catos";
+$config['os'][$os]['group']		= "cat1900";
+$config['os'][$os]['text']		= "Cisco Catalyst 1900";
+$config['os'][$os]['type']        	= "network";
+$config['os'][$os]['icon']        	= "catos";
 
 $os = "iosxe";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS-XE";
 $config['os'][$os]['type']		= "network";
-$config['os'][$os]['ifXmcbc']       = 1;
+$config['os'][$os]['ifXmcbc']       	= 1;
 $config['os'][$os]['icon']		= "ios";
 
 $os = "iosxr";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS-XR";
 $config['os'][$os]['type']		= "network";
-$config['os'][$os]['ifXmcbc']       = 1;
+$config['os'][$os]['ifXmcbc']       	= 1;
 $config['os'][$os]['icon']		= "ios";
 
 $os = "asa";
@@ -201,6 +201,11 @@ $os = "netopia";
 $config['os'][$os]['text']        	= "Motorola Netopia";
 $config['os'][$os]['type']        	= "network";
 
+$os = "tranzeo";
+$config['os'][$os]['text']              = "Tranzeo";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $os = "dlink";
 $config['os'][$os]['text']          	= "D-Link Switch";
 $config['os'][$os]['type']          	= "network";
@@ -220,27 +225,27 @@ $config['os'][$os]['text']  		= "AXIS Network Document Server";
 $config['os'][$os]['icon']  		= "axis";
 
 $os = "gamatronicups";
-$config['os'][$os]['text']  = "Gamatronic UPS Stack";
-$config['os'][$os]['type']  = "power";
+$config['os'][$os]['text']  		= "Gamatronic UPS Stack";
+$config['os'][$os]['type']  		= "power";
 
 $os = "airport";
-$config['os'][$os]['type'] 	= "network";
-$config['os'][$os]['text']  	= "Apple AirPort";
-$config['os'][$os]['icon']  	= "apple";
+$config['os'][$os]['type'] 		= "network";
+$config['os'][$os]['text']  		= "Apple AirPort";
+$config['os'][$os]['icon']  		= "apple";
 
 $os = "windows";
-$config['os'][$os]['text']        = "Microsoft Windows";
-$config['os'][$os]['ifname']	= 1;
+$config['os'][$os]['text']        	= "Microsoft Windows";
+$config['os'][$os]['ifname']		= 1;
 
 $os = "procurve";
-$config['os'][$os]['text']       = "HP ProCurve";
-$config['os'][$os]['type']       = "network";
-$config['os'][$os]['icon']       = "hp";
+$config['os'][$os]['text']       	= "HP ProCurve";
+$config['os'][$os]['type']       	= "network";
+$config['os'][$os]['icon']       	= "hp";
 
 $os = "speedtouch";
-$config['os'][$os]['text']     = "Thomson Speedtouch";
-$config['os'][$os]['ifname']	= 1;
-$config['os'][$os]['type']     = "network";
+$config['os'][$os]['text']     		= "Thomson Speedtouch";
+$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['type']     		= "network";
 
 $os = "sonicwal";
 $config['os'][$os]['text']     		= "SonicWALL";

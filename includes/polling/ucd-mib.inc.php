@@ -32,11 +32,6 @@
   #UCD-SNMP-MIB::ssRawSwapIn.0 = Counter32: 602002
   #UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
 
-  $cpu_cmd  = $config['snmpget'] . " -M ".$config['mibdir']." -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-  $cpu_cmd .= " $oid_ssCpuRawUser $oid_ssCpuRawSystem $oid_ssCpuRawNice $oid_ssCpuRawIdle $oid_ssCpuUser $oid_ssCpuSystem";
-  $cpu  = `$cpu_cmd`;
-  list ($cpuUser, $cpuSystem, $cpuNice, $cpuIdle, $UsageUser, $UsageSystem) = explode("\n", $cpu);
-
   $ss = snmpwalk_cache_oid($device, "systemStats", array());
   $ss = $ss[$device['device_id']][0];
 
