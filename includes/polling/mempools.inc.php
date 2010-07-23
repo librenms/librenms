@@ -28,7 +28,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
      RRA:MAX:0.5:288:797");
   }
 
-  $file = $config['install_dir']."/includes/polling/mempools-".$mempool['mempool_type'].".inc.php";
+  $file = $config['install_dir']."/includes/polling/mempools/".$mempool['mempool_type'].".inc.php";
   if(is_file($file)) {
     include($file);
   } else {
