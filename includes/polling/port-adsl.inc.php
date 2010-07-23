@@ -101,7 +101,9 @@
       $rrdupdate = "N";
       foreach($adsl_oids as $oid) {
         $oid = "adsl".$oid;
-        $data = str_replace("\"", "", $this_port[$oid]) + 0;
+        $data = str_replace("\"", "", $this_port[$oid]);
+        ## Set data to be "unknown" if it's garbled, unexistant or zero
+        if(!is_numeric($data) || $data == "0") { $data = "-1"; }
         $rrdupdate .= ":$data";
       }
 
