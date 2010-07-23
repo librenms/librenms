@@ -12,54 +12,43 @@ echo("Doing Force10 FTOS ");
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitSerialNumber.1 = STRING: DL2E9250002
 #F10-S-SERIES-CHASSIS-MIB::chStackUnitUpTime.1 = Timeticks: (262804700) 30 days, 10:00:47.00
 
+## Stats for C-Series
+
+#F10-C-SERIES-CHASSIS-MIB::chType.0 = INTEGER: c300(7)
+#F10-C-SERIES-CHASSIS-MIB::chChassisMode.0 = INTEGER: cseries1(4)
+#F10-C-SERIES-CHASSIS-MIB::chSwVersion.0 = STRING: 8.2.1.2
+#F10-C-SERIES-CHASSIS-MIB::chMacAddr.0 = STRING: 0:1:e8:3b:ea:b5
+#F10-C-SERIES-CHASSIS-MIB::chSerialNumber.0 = STRING: TY000000491
+#F10-C-SERIES-CHASSIS-MIB::chPartNum.0 = STRING: 7520029900
+#F10-C-SERIES-CHASSIS-MIB::chProductRev.0 = STRING: 04
+#F10-C-SERIES-CHASSIS-MIB::chVendorId.0 = STRING: 04
+#F10-C-SERIES-CHASSIS-MIB::chDateCode.0 = STRING: "01182007"
+#F10-C-SERIES-CHASSIS-MIB::chCountryCode.0 = STRING: "01"
+
+## Stats for E-Series
+
+#F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.1.1 = STRING: 7.6.1.2
+#F10-CHASSIS-MIB::chSysSwRuntimeImgVersion.8.1 = STRING: 7.6.1.2
+
 $sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
 $hardware = rewrite_ftos_hardware($sysObjectID);
 
+if(strstr($sysObjectID, ".1.3.6.1.4.1.6027.1.3.")) 
+{
+  echo("S-Series ");
+  $version = snmp_get($device, "chStackUnitCodeVersion.1", "-Oqvn", "F10-S-SERIES-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos");
+} elseif(strstr($sysObjectID, ".1.3.6.1.4.1.6027.1.2.")) 
+{
+  echo("C-Series ");
+  $version = snmp_get($device, "chSwVersion.0", "-Oqvn", "F10-C-SERIES-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos");
+} else 
+{
+  echo("E-Series ");
+  $version = snmp_get($device, "chSysSwRuntimeImgVersion.1.1", "-Oqvn", "F10-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos");
+}
 
-
-
-#$hardware = snmp_get($device, "atiswitchProductType.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
-#$version  = snmp_get($device, "atiswitchSwVersion.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
-#$software = snmp_get($device, "atiswitchSw.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
-
-#if($software && $version)
-#  $version = $software . " " . $version;
-
-# sysDescr.0 = STRING: "Allied Telesis AT-8624T/2M version 2.9.1-13 11-Dec-2007"
-# sysDescr.0 = STRING: "Allied Telesyn Ethernet Switch AT-8012M"
-# sysDescr.0 = STRING: "ATI AT-8000S" <------------------------------------- RADLAN ********
-# sysDescr.0 = STRING: "Allied Telesyn AT-8624T/2M version 2.8.1-02 05-Sep-2006"
-# sysDescr.0 = STRING: "AT-8126XL, AT-S21 version 1.4.2"
-
-# AtiL2-MIB::atiL2SwProduct.0 = STRING: "AT-8326GB"
-# AtiL2-MIB::atiL2SwVersion.0 = STRING: "AT-S41 v1.1.6 "
-
-#if(!$hardware && !$version && !$features) {
-#  $hardware = snmp_get($device, "atiL2SwProduct.0", "-OsvQU", "+AtiL2-MIB", "+".$config['mib_dir']."/alliedtelesis");
-#  $version = snmp_get($device, "atiL2SwVersion.0", "-OsvQU", "+AtiL2-MIB", "+".$config['mib_dir']."/alliedtelesis");
-#}
-
-#Allied Telesyn AT-8948 version 2.7.4-02 22-Aug-2005
-
-#list($a,$b,$c,$d,$e,$f) = explode(" ", $sysDescr);
-#if(!$hardware && !$version && !$features) {
-#  if($a == "Allied" && $d == "version") {
-#    $version = $e;
-#    $features = $f;
-#    $hardware = $c;
-#  }
-#}#
-
-#if ($a == "Allied" && $d == "Switch") {
-#  $hardware = $e;
-#}
-
-
-
-#$version = str_replace("\"","", $version);
-#$features = str_replace("\"","", $features);
-#$hardware = str_replace("\"","", $hardware);
-
-include("includes/polling/hr-mib.inc.php");
+$version = str_replace("\"","", $version);
+$features = str_replace("\"","", $features);
+$hardware = str_replace("\"","", $hardware);
 
 ?>
