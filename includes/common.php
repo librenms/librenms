@@ -9,7 +9,7 @@ function device_by_id_cache($device_id)
   {
     $device = $device_cache[$device_id];
   } else {
-    $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
+    $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'"));
     $device_cache[$device_id] = $device;
   }
   return $device;

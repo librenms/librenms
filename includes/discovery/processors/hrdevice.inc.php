@@ -6,6 +6,7 @@ if ($device['os_group'] == "unix" || $device['os'] == "windows" || $device['os']
   {
   echo("hrDevice ");
   $hrDevice_oids = array('hrDevice','hrProcessorLoad'); 
+  unset($hrDevice_array);
   foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
   foreach($hrDevice_array[$device['device_id']] as $index => $entry)
   {
@@ -40,9 +41,13 @@ if ($device['os_group'] == "unix" || $device['os'] == "windows" || $device['os']
       {
         discover_processor($valid_processor, $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
       }
+      unset($old_rrd,$new_rrd,$descr,$entry,$usage_oid,$index,$usage,$hrDeviceIndex,$descr_array);
     }
+    unset($entry);
   }
+  unset($hrDevice_oids, $hrDevice_array, $oid);
 } 
+
 ## End hrDevice Processors
 
 ?>

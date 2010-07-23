@@ -1,8 +1,8 @@
 <?php
 
-    if($array[$device[device_id]][$port[ifIndex]] && $port['ifType'] == "ethernetCsmacd") { // Check to make sure Port data is cached.
+    if($port_stats[$device[device_id]][$port[ifIndex]] && $port['ifType'] == "ethernetCsmacd") { // Check to make sure Port data is cached.
 
-      $this_port = &$array[$device[device_id]][$port[ifIndex]];
+      $this_port = &$port_stats[$device[device_id]][$port[ifIndex]];
 
       $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("etherlike-".$port['ifIndex'].".rrd");
 
