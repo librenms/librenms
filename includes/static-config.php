@@ -7,308 +7,389 @@ $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
-$config['os']['default']['overgraph'][]	= "device_cpu";
-$config['os']['default']['overgraph'][] = "device_memory";
-$config['os']['default']['overtext']	= "CPU &amp; Memory Usage";
-
-$config['os']['linux']['group'] 	= "unix";
-$config['os']['linux']['text']  	= "Linux";
-$config['os']['linux']['ifXmcbc']	= 1;
-
-$config['os']['freebsd']['group'] 	= "unix";
-$config['os']['freebsd']['text']  	= "FreeBSD";
-
-$config['os']['openbsd']['group'] 	= "unix";
-$config['os']['openbsd']['text']  	= "OpenBSD";
-
-$config['os']['netbsd']['group'] 	= "unix";
-$config['os']['netbsd']['text']  	= "NetBSD";
-
-$config['os']['dragonfly']['group'] 	= "unix";
-$config['os']['dragonfly']['text']  	= "DragonflyBSD";
-
-$config['os']['netware']['text']  	= "Novell Netware";
-$config['os']['netware']['icon']  	= "novell";
-
-$config['os']['monowall']['group'] 	= "unix";
-$config['os']['monowall']['text']  	= "m0n0wall";
-$config['os']['monowall']['type']  	= "firewall";
-
-$config['os']['solaris']['group'] 	= "unix";
-$config['os']['solaris']['text']  	= "Sun Solaris";
-
-$config['os']['adva']['group'] 		= "unix";
-$config['os']['adva']['text']  		= "Adva";
-$config['os']['adva']['ifalias']	= 1;
-
-$config['os']['opensolaris']['group']	= "unix";
-$config['os']['opensolaris']['text']	= "Sun OpenSolaris";
-
-$config['os']['ios']['group']		= "ios";
-$config['os']['ios']['text']		= "Cisco IOS";
-$config['os']['ios']['type']		= "network";
-$config['os']['ios']['ifXmcbc']         = 1;
-
-$config['os']['cat1900']['group']	= "cat1900";
-$config['os']['cat1900']['text']	= "Cisco Catalyst 1900";
-$config['os']['cat1900']['type']        = "network";
-$config['os']['cat1900']['icon']        = "catos";
-
-$config['os']['iosxe']['group']		= "ios";
-$config['os']['iosxe']['text']		= "Cisco IOS-XE";
-$config['os']['iosxe']['type']		= "network";
-$config['os']['iosxe']['ifXmcbc']       = 1;
-$config['os']['iosxe']['icon']		= "ios";
-
-$config['os']['iosxr']['group']		= "ios";
-$config['os']['iosxr']['text']		= "Cisco IOS-XR";
-$config['os']['iosxr']['type']		= "network";
-$config['os']['iosxr']['ifXmcbc']       = 1;
-$config['os']['iosxr']['icon']		= "ios";
-
-$config['os']['asa']['group']		= "ios";
-$config['os']['asa']['text']		= "Cisco ASA";
-$config['os']['asa']['ifname']		= 1;
-$config['os']['asa']['type']		= "firewall";
-$config['os']['asa']['icon']		= "ios";
-
-$config['os']['pix']['group'] 		= "ios";
-$config['os']['pix']['text']		= "Cisco PIX-OS";
-$config['os']['pix']['ifname']		= 1;
-$config['os']['pix']['type']		= "firewall";
-
-$config['os']['nxos']['group'] 		= "ios";
-$config['os']['nxos']['text']  		= "Cisco NX-OS";
-$config['os']['nxos']['type']  		= "network";
-
-$config['os']['catos']['group']		= "ios";
-$config['os']['catos']['text']		= "Cisco CatOS";
-$config['os']['catos']['ifname']	= 1;
-$config['os']['catos']['type']		= "network";
-
-$config['os']['vrp']['group'] 		= "vrp";
-$config['os']['vrp']['text']  		= "Huawei VRP";
-$config['os']['vrp']['type']  		= "network";
-$config['os']['vrp']['icon']  		= "huawei";
-
-$config['os']['junos']['text']		= "Juniper JunOS";
-$config['os']['junos']['type']		= "network";
-
-$config['os']['screenos']['text']	= "Juniper ScreenOS";
-$config['os']['screenos']['type']	= "firewall";
-
-$config['os']['routeros']['text']	= "Mikrotik RouterOS";
-$config['os']['routeros']['type']	= "network";
-$config['os']['routeros']['nobulk']	= 1;
-$config['os']['routeros']['overgraph'][]  = "device_bits";
-$config['os']['routeros']['overtext']     = "Traffic";
-
-
-$config['os']['junose']['text']		= "Juniper JunOSe";
-$config['os']['junose']['type']		= "network";
-$config['os']['junose']['icon']		= "junos";
-
-$config['os']['generic']['text']        = "Generic Device";
-
-$config['os']['ironware']['text']       = "Brocade IronWare";
-$config['os']['ironware']['type']       = "network";
-
-$config['os']['extremeware']['text']    = "Extremeware";
-$config['os']['extremeware']['type']    = "network";
-$config['os']['extremeware']['ifname']  = 1;
-$config['os']['extremeware']['icon']    = "extreme";
-
-$config['os']['xos']['text']    	= "Extreme XOS";
-$config['os']['xos']['type']    	= "network";
-$config['os']['xos']['ifname']  	= 1;
-$config['os']['xos']['group']           = "extremeware";
-$config['os']['xos']['icon']            = "extreme";
-
-$config['os']['ftos']['text']		= "Force10 FTOS";
-$config['os']['ftos']['type']		= "network";
-$config['os']['ftos']['icon']		= "force10";
-
-$config['os']['powerconnect']['text']   = "Dell PowerConnect";
-$config['os']['powerconnect']['ifname'] = 1;
-$config['os']['powerconnect']['type']   = "network";
-$config['os']['powerconnect']['icon']   = "dell";
-
-$config['os']['radlan']['text']         = "Radlan";
-$config['os']['radlan']['ifname']       = 1;
-$config['os']['radlan']['type']         = "network";
-$config['os']['radlan']['overgraph'][0]  = "device_cpu";
-$config['os']['radlan']['overgraph'][1]  = "device_bits";
-$config['os']['radlan']['overtext']     = "CPU & Traffic";
-
-$config['os']['powervault']['text']     = "Dell PowerVault";
-$config['os']['powervault']['icon']     = "dell";
-
-$config['os']['drac']['text']           = "Dell DRAC";
-$config['os']['drac']['icon']           = "dell";
-
-$config['os']['bcm963']['text']		= "Broadcom BCM963xxx";
-$config['os']['bcm963']['icon']		= "broadcom";
-$config['os']['bcm963']['overgraph'][]  = "device_bits";
-$config['os']['bcm963']['overtext']     = "Traffic";
-
-$config['os']['netopia']['text']        = "Motorola Netopia";
-$config['os']['netopia']['type']        = "network";
-
-$config['os']['dlink']['text']          = "D-Link Switch";
-$config['os']['dlink']['type']          = "network";
-$config['os']['dlink']['icon']          = "dlink";
-
-$config['os']['dlinkap']['text']        = "D-Link Access Point";
-$config['os']['dlinkap']['type']        = "network";
-$config['os']['dlinkap']['icon']        = "dlink";
-
-$config['os']['axiscam']['text']        = "AXIS Network Camera";
-$config['os']['axiscam']['icon']        = "axis";
-
-$config['os']['axisdocserver']['text']  = "AXIS Network Document Server";
-$config['os']['axisdocserver']['icon']  = "axis";
-
-$config['os']['gamatronicups']['text']  = "Gamatronic UPS Stack";
-$config['os']['gamatronicups']['type']  = "power";
-
-$config['os']['airport']['type'] 	= "network";
-$config['os']['airport']['text']  	= "Apple AirPort";
-$config['os']['airport']['icon']  	= "apple";
-
-$config['os']['windows']['text']        = "Microsoft Windows";
-$config['os']['windows']['ifname']	= 1;
-
-$config['os']['procurve']['text']       = "HP ProCurve";
-$config['os']['procurve']['type']       = "network";
-$config['os']['procurve']['icon']       = "hp";
-
-$config['os']['speedtouch']['text']     = "Thomson Speedtouch";
-$config['os']['speedtouch']['ifname']	= 1;
-$config['os']['speedtouch']['type']     = "network";
-
-$config['os']['sonicwal']['text']     	= "SonicWALL";
-$config['os']['sonicwal']['type']     	= "firewall";
-$config['os']['sonicwal']['overgraph'][]  = "device_bits";
-$config['os']['sonicwal']['overtext']     = "Traffic";
-
-$config['os']['zywall']['text']     	= "ZyXEL ZyWALL";
-$config['os']['zywall']['type']     	= "firewall";
-$config['os']['zywall']['overgraph'][]  = "device_bits";
-$config['os']['zywall']['overtext']     = "Traffic";
-$config['os']['zywall']['icon']         = "zyxel";
-
-$config['os']['prestige']['text']     	= "ZyXEL Prestige";
-$config['os']['prestige']['type']     	= "network";
-$config['os']['prestige']['icon']       = "zyxel";
-
-$config['os']['zyxeles']['text']     	= "ZyXEL Ethernet Switch";
-$config['os']['zyxeles']['type']     	= "network";
-$config['os']['zyxeles']['icon']        = "zyxel";
-
-$config['os']['ies']['text']     	= "ZyXEL IES DSLAM";
-$config['os']['ies']['type']     	= "network";
-$config['os']['ies']['icon']            = "zyxel";
-
-$config['os']['allied']['text']         = "AlliedWare";
-$config['os']['allied']['type']         = "network";
-$config['os']['allied']['ifname']	= 1;
-
-$config['os']['mgeups']['text']         = "MGE UPS";
-$config['os']['mgeups']['group']        = "ups";
-$config['os']['mgeups']['overgraph'][]	= "device_current";
-$config['os']['mgeups']['overtext']	= "Current";
-$config['os']['mgeups']['type']		= "power";
-$config['os']['mgeups']['icon']		= "mge";
-
-$config['os']['mgepdu']['text']         = "MGE PDU";
-$config['os']['mgepdu']['type']		= "power";
-$config['os']['mgepdu']['icon']		= "mge";
-
-$config['os']['apc']['text']            = "APC Management Module";
-$config['os']['apc']['overgraph'][]	= "device_current";
-$config['os']['apc']['overtext']	= "Current";
-$config['os']['apc']['type']		= "power";
-
-$config['os']['areca']['text']          = "Areca RAID Subsystem";
-$config['os']['areca']['overgraph'][]	= "";
-$config['os']['areca']['overtext']	= "";
-
-$config['os']['netmanplus']['text']        = "NetMan Plus";
-$config['os']['netmanplus']['group']	   = "ups";
-$config['os']['netmanplus']['nobulk']	   = 1;
-$config['os']['netmanplus']['overgraph'][] = "device_current";
-$config['os']['netmanplus']['overtext']    = "Current";
-$config['os']['netmanplus']['type']	   = "power";
-
-$config['os']['akcp']['text']              = "AKCP SensorProbe";
-$config['os']['akcp']['overgraph'][]	   = "device_temperatures";
-$config['os']['akcp']['overtext']          = "Temperature";
-$config['os']['akcp']['type']              = "environment";
-
-$config['os']['minkelsrms']['text']        = "Minkels RMS";
-$config['os']['minkelsrms']['overgraph'][] = "device_temperatures";
-$config['os']['minkelsrms']['overtext']    = "Temperature";
-$config['os']['minkelsrms']['type']        = "environment";
-
-$config['os']['papouch-tme']['text']       = "Papouch TME";
-$config['os']['papouch-tme']['overgraph'][] = "device_temperatures";
-$config['os']['papouch-tme']['overtext']   = "Temperature";
-$config['os']['papouch-tme']['type']       = "environment";
-
-$config['os']['dell-laser']['group'] 	   = "printer";
-$config['os']['dell-laser']['text']  	   = "Dell Laser";
-$config['os']['dell-laser']['overgraph'][] = "device_toner";
-$config['os']['dell-laser']['overtext']    = "Toner";
-$config['os']['dell-laser']['ifname']	   = 1;
-$config['os']['dell-laser']['type']        = "printer";
-$config['os']['dell-laser']['icon']        = "dell";
-
-$config['os']['xerox']['group'] 	   = "printer";
-$config['os']['xerox']['text']  	   = "Xerox Printer";
-$config['os']['xerox']['overgraph'][]      = "device_toner";
-$config['os']['xerox']['overtext']         = "Toner";
-$config['os']['xerox']['ifname']	   = 1;
-$config['os']['xerox']['type']             = "printer";
-
-$config['os']['jetdirect']['group'] 	   = "printer";
-$config['os']['jetdirect']['text']  	   = "HP Printer";
-$config['os']['jetdirect']['overgraph'][]  = "device_toner";
-$config['os']['jetdirect']['overtext']     = "Toner";
-$config['os']['jetdirect']['ifname']	   = 1;
-$config['os']['jetdirect']['type']         = "printer";
-$config['os']['jetdirect']['icon']         = "hp";
-
-$config['os']['ricoh']['group'] 	   = "printer";
-$config['os']['ricoh']['text']  	   = "Ricoh Printer";
-$config['os']['ricoh']['overgraph'][]      = "device_toner";
-$config['os']['ricoh']['overtext']         = "Toner";
-$config['os']['ricoh']['type']             = "printer";
-
-$config['os']['brother']['group'] 	   = "printer";
-$config['os']['brother']['text']  	   = "Brother Printer";
-$config['os']['brother']['overgraph'][]    = "device_toner";
-$config['os']['brother']['overtext']       = "Toner";
-$config['os']['brother']['type']           = "printer";
-
-$config['os']['konica']['group'] 	   = "printer";
-$config['os']['konica']['text']  	   = "Konica-Minolta Printer";
-$config['os']['konica']['overgraph'][]     = "device_toner";
-$config['os']['konica']['overtext']        = "Toner";
-$config['os']['konica']['type']            = "printer";
-
-$config['os']['kyocera']['group'] 	   = "printer";
-$config['os']['kyocera']['text']  	   = "Kyocera Mita Printer";
-$config['os']['kyocera']['overgraph'][]    = "device_toner";
-$config['os']['kyocera']['overtext']       = "Toner";
-$config['os']['kyocera']['ifname']	   = 1;
-$config['os']['kyocera']['type']           = "printer";
-
-$config['os']['3com']['text']              = "3Com";
-$config['os']['3com']['overgraph'][]       = "";
-$config['os']['3com']['overtext']          = "";
-$config['os']['3com']['type']              = "network";
-
-$device_types = array('server','network','firewall','workstation','printer','power', 'environment');
+$config['os']['default']['over'][0]['graph']	= "device_cpu";
+$config['os']['default']['over'][0]['text']	= "Processor Usage";
+$config['os']['default']['over'][1]['graph'] 	= "device_memory";
+$config['os']['default']['over'][1]['text']	= "Memory Usage";
+
+$os = "generic";
+$config['os'][$os]['text']        = "Generic Device";
+
+$os = "linux";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "Linux";
+$config['os'][$os]['ifXmcbc']	= 1;
+
+$os = "freebsd";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "FreeBSD";
+
+$os = "openbsd";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "OpenBSD";
+
+$os = "netbsd";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "NetBSD";
+
+$os = "dragonfly";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "DragonflyBSD";
+
+$os = "netware";
+$config['os'][$os]['text']  	= "Novell Netware";
+$config['os'][$os]['icon']  	= "novell";
+
+$os = "monowall";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "m0n0wall";
+$config['os'][$os]['type']  	= "firewall";
+
+$os = "solaris";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "Sun Solaris";
+
+$os = "adva";
+$config['os'][$os]['group'] 	= "unix";
+$config['os'][$os]['text']  	= "Adva";
+$config['os'][$os]['ifalias']	= 1;
+
+$os = "opensolaris";
+$config['os'][$os]['group']	= "unix";
+$config['os'][$os]['text']	= "Sun OpenSolaris";
+
+$os = "ios";
+$config['os'][$os]['group']		= "ios";
+$config['os'][$os]['text']		= "Cisco IOS";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['ifXmcbc']		= 1;
+$config['os'][$os]['over'][0]['graph']	= "device_bits";
+$config['os'][$os]['over'][0]['text']	= "Device Traffic";
+$config['os'][$os]['over'][1]['graph']	= "device_cpu";
+$config['os'][$os]['over'][1]['text']	= "CPU Usage";
+$config['os'][$os]['over'][2]['graph']	= "device_memory";
+$config['os'][$os]['over'][2]['text']	= "Memory Usage";
+
+$os = "cat1900";
+$config['os'][$os]['group']	= "cat1900";
+$config['os'][$os]['text']	= "Cisco Catalyst 1900";
+$config['os'][$os]['type']        = "network";
+$config['os'][$os]['icon']        = "catos";
+
+$os = "iosxe";
+$config['os'][$os]['group']		= "ios";
+$config['os'][$os]['text']		= "Cisco IOS-XE";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['ifXmcbc']       = 1;
+$config['os'][$os]['icon']		= "ios";
+
+$os = "iosxr";
+$config['os'][$os]['group']		= "ios";
+$config['os'][$os]['text']		= "Cisco IOS-XR";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['ifXmcbc']       = 1;
+$config['os'][$os]['icon']		= "ios";
+
+$os = "asa";
+$config['os'][$os]['group']		= "ios";
+$config['os'][$os]['text']		= "Cisco ASA";
+$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['type']		= "firewall";
+$config['os'][$os]['icon']		= "ios";
+
+$os = "pix";
+$config['os'][$os]['group'] 		= "ios";
+$config['os'][$os]['text']		= "Cisco PIX-OS";
+$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['type']		= "firewall";
+
+$os = "nxos";
+$config['os'][$os]['group'] 		= "ios";
+$config['os'][$os]['text']  		= "Cisco NX-OS";
+$config['os'][$os]['type']  		= "network";
+
+$os = "catos";
+$config['os'][$os]['group']		= "ios";
+$config['os'][$os]['text']		= "Cisco CatOS";
+$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['type']		= "network";
+
+$os = "vrp";
+$config['os'][$os]['group'] 		= "vrp";
+$config['os'][$os]['text']  		= "Huawei VRP";
+$config['os'][$os]['type']  		= "network";
+$config['os'][$os]['icon']  		= "huawei";
+
+$os = "junos";
+$config['os'][$os]['text']		= "Juniper JunOS";
+$config['os'][$os]['type']		= "network";
+
+$os = "screenos";
+$config['os'][$os]['text']		= "Juniper ScreenOS";
+$config['os'][$os]['type']		= "firewall";
+
+$os = "routeros";
+$config['os'][$os]['text']		= "Mikrotik RouterOS";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['nobulk']		= 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_cpu";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_memory";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
+$os = "junose";
+$config['os'][$os]['text']		= "Juniper JunOSe";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['icon']		= "junos";
+
+$os = "ironware";
+$config['os'][$os]['text']       	= "Brocade IronWare";
+$config['os'][$os]['type']       	= "network";
+
+$os = "extremeware";
+$config['os'][$os]['text']    		= "Extremeware";
+$config['os'][$os]['type']    		= "network";
+$config['os'][$os]['ifname']  		= 1;
+$config['os'][$os]['icon']    		= "extreme";
+
+$os = "xos";
+$config['os'][$os]['text']    		= "Extreme XOS";
+$config['os'][$os]['type']    		= "network";
+$config['os'][$os]['ifname']  		= 1;
+$config['os'][$os]['group']		= "extremeware";
+$config['os'][$os]['icon']		= "extreme";
+
+$os = "ftos";
+$config['os'][$os]['text']		= "Force10 FTOS";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['icon']		= "force10";
+
+$os = "powerconnect";
+$config['os'][$os]['text']   		= "Dell PowerConnect";
+$config['os'][$os]['ifname'] 		= 1;
+$config['os'][$os]['type']   		= "network";
+$config['os'][$os]['icon']   		= "dell";
+
+$os = "radlan";
+$config['os'][$os]['text']         	= "Radlan";
+$config['os'][$os]['ifname']       	= 1;
+$config['os'][$os]['type']         	= "network";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_cpu";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+#$config['os'][$os]['over'][2]['graph']   = "device_memory";
+#$config['os'][$os]['over'][2]['text']    = "Memory Usage";
+
+$os = "powervault";
+$config['os'][$os]['text']     		= "Dell PowerVault";
+$config['os'][$os]['icon']     		= "dell";
+
+$os = "drac";
+$config['os'][$os]['text']           	= "Dell DRAC";
+$config['os'][$os]['icon']           	= "dell";
+
+$os = "bcm963";
+$config['os'][$os]['text']		= "Broadcom BCM963xxx";
+$config['os'][$os]['icon']		= "broadcom";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
+$os = "netopia";
+$config['os'][$os]['text']        	= "Motorola Netopia";
+$config['os'][$os]['type']        	= "network";
+
+$os = "dlink";
+$config['os'][$os]['text']          	= "D-Link Switch";
+$config['os'][$os]['type']          	= "network";
+$config['os'][$os]['icon']          	= "dlink";
+
+$os = "dlinkap";
+$config['os'][$os]['text']        	= "D-Link Access Point";
+$config['os'][$os]['type']        	= "network";
+$config['os'][$os]['icon']        	= "dlink";
+
+$os = "axiscam";
+$config['os'][$os]['text']        	= "AXIS Network Camera";
+$config['os'][$os]['icon']        	= "axis";
+
+$os = "axisdocserver";
+$config['os'][$os]['text']  		= "AXIS Network Document Server";
+$config['os'][$os]['icon']  		= "axis";
+
+$os = "gamatronicups";
+$config['os'][$os]['text']  = "Gamatronic UPS Stack";
+$config['os'][$os]['type']  = "power";
+
+$os = "airport";
+$config['os'][$os]['type'] 	= "network";
+$config['os'][$os]['text']  	= "Apple AirPort";
+$config['os'][$os]['icon']  	= "apple";
+
+$os = "windows";
+$config['os'][$os]['text']        = "Microsoft Windows";
+$config['os'][$os]['ifname']	= 1;
+
+$os = "procurve";
+$config['os'][$os]['text']       = "HP ProCurve";
+$config['os'][$os]['type']       = "network";
+$config['os'][$os]['icon']       = "hp";
+
+$os = "speedtouch";
+$config['os'][$os]['text']     = "Thomson Speedtouch";
+$config['os'][$os]['ifname']	= 1;
+$config['os'][$os]['type']     = "network";
+
+$os = "sonicwal";
+$config['os'][$os]['text']     		= "SonicWALL";
+$config['os'][$os]['type']     		= "firewall";
+$config['os'][$os]['over'][0]['graph'] 	= "device_bits";
+$config['os'][$os]['over'][0]['text']  	= "Traffic";
+
+$os = "zywall";
+$config['os'][$os]['text']		= "ZyXEL ZyWALL";
+$config['os'][$os]['type']		= "firewall";
+$config['os'][$os]['over'][0]['graph']	= "device_bits";
+$config['os'][$os]['over'][0]['text']	= "Traffic";
+$config['os'][$os]['icon']         	= "zyxel";
+
+$os = "prestige";
+$config['os'][$os]['text']     		= "ZyXEL Prestige";
+$config['os'][$os]['type']     		= "network";
+$config['os'][$os]['icon']       	= "zyxel";
+
+$os = "zyxeles";
+$config['os'][$os]['text']     		= "ZyXEL Ethernet Switch";
+$config['os'][$os]['type']     		= "network";
+$config['os'][$os]['icon']        	= "zyxel";
+
+$os = "ies";
+$config['os'][$os]['text']     		= "ZyXEL IES DSLAM";
+$config['os'][$os]['type']     		= "network";
+$config['os'][$os]['icon']            	= "zyxel";
+
+$os = "allied";
+$config['os'][$os]['text']         	= "AlliedWare";
+$config['os'][$os]['type']         	= "network";
+$config['os'][$os]['ifname']		= 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+
+$os = "mgeups";
+$config['os'][$os]['text']         	= "MGE UPS";
+$config['os'][$os]['group']        	= "ups";
+$config['os'][$os]['type']		= "power";
+$config['os'][$os]['icon']		= "mge";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
+$os = "mgepdu";
+$config['os'][$os]['text']         	= "MGE PDU";
+$config['os'][$os]['type']		= "power";
+$config['os'][$os]['icon']		= "mge";
+
+$os = "apc";
+$config['os'][$os]['text']            	= "APC Management Module";
+$config['os'][$os]['type']		= "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
+$os = "areca";
+$config['os'][$os]['text']          	= "Areca RAID Subsystem";
+$config['os'][$os]['over'][0]['graph']  = "";
+$config['os'][$os]['over'][0]['text']   = "";
+
+$os = "netmanplus";
+$config['os'][$os]['text']        	= "NetMan Plus";
+$config['os'][$os]['group']	   	= "ups";
+$config['os'][$os]['nobulk']	   	= 1;
+$config['os'][$os]['type']	   	= "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
+
+$os = "akcp";
+$config['os'][$os]['text']              = "AKCP SensorProbe";
+$config['os'][$os]['type']              = "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['text']   = "Temperatures";
+
+$os = "minkelsrms";
+$config['os'][$os]['text']        	= "Minkels RMS";
+$config['os'][$os]['type']        	= "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['text']   = "Temperatures";
+
+$os = "papouch-tme";
+$config['os'][$os]['text']       	= "Papouch TME";
+$config['os'][$os]['type']       	= "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['text']   = "Temperatures";
+
+$os = "dell-laser";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Dell Laser";
+$config['os'][$os]['ifname']	   	= 1;
+$config['os'][$os]['type']        	= "printer";
+$config['os'][$os]['icon']        	= "dell";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "xerox";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Xerox Printer";
+$config['os'][$os]['ifname']	   	= 1;
+$config['os'][$os]['type']             	= "printer";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "jetdirect";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "HP Printer";
+$config['os'][$os]['ifname']	   	= 1;
+$config['os'][$os]['type']         	= "printer";
+$config['os'][$os]['icon']         	= "hp";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "richoh";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Ricoh Printer";
+$config['os'][$os]['type']		= "printer";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "brother";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Brother Printer";
+$config['os'][$os]['type']           	= "printer";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "konica";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Konica-Minolta Printer";
+$config['os'][$os]['type']            	= "printer";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "kyocera";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Kyocera Mita Printer";
+$config['os'][$os]['over'][0]['graph'] 	= "device_toner";
+$config['os'][$os]['over'][0]['text']  	= "Toner";
+$config['os'][$os]['ifname']	   	= 1;
+$config['os'][$os]['type']           	= "printer";
+
+$os = "3com";
+$config['os'][$os]['text']              = "3Com";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Traffic";
+$config['os'][$os]['type']              = "network";
+
+$device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
 ##############################
 # No changes below this line #

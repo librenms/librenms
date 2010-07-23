@@ -35,20 +35,17 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   $class = devclass($device);
   if (!$text) { $text = $device['hostname']; }
   
-  if (isset($config['os'][$device['os']]['overgraph']))
+  if (isset($config['os'][$device['os']]['over']))
   {
-    $graphs = $config['os'][$device['os']]['overgraph'];
-    $descr = $config['os'][$device['os']]['overtext'];
+    $graphs = $config['os'][$device['os']]['over'];
   }
-  elseif (isset($config['os'][$device['os_group']]['overgraph']))
+  elseif (isset($config['os'][$device['os_group']]['over']))
   {
-    $graphs = $config['os'][$device['os_group']]['overgraph'];
-    $descr = $config['os'][$device['os_group']]['overtext'];
+    $graphs = $config['os'][$device['os_group']]['over'];
   } 
   else
   {
-    $graphs = $config['os']['default']['overgraph']; 
-    $descr = $config['os']['default']['overtext'];
+    $graphs = $config['os']['default']['over']; 
   }
 
   $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
@@ -63,9 +60,15 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
 
 
   if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
-  foreach ($graphs as $graph)
+  foreach ($graphs as $entry)
   {
-    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=400&amp;height=120&amp;type=$graph" . '"><br />';
+    $graph     = $entry['graph'];
+    $graphhead = $entry['text']; 
+    $contents .= '<div style="width: 708px">';
+    $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
+    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= '</div>';
   }
   $text = htmlentities($text);
   $link = overlib_link($url, $text, $contents, $class);
