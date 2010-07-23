@@ -249,6 +249,7 @@ while ($device = mysql_fetch_array($device_query))
     $poll_separator = ", ";
     $polled_devices++;
     echo("\n");
+
   } 
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
@@ -279,5 +280,9 @@ if($polled_devices) {
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices polled in $poller_time secs";
 if ($debug) echo("$string\n");
 shell_exec("echo '".$string."' >> ".$config['log_file']); # FIXME EWW
+
+unset($config); ### Remove this for testing
+
+#print_r(get_defined_vars());
 
 ?>

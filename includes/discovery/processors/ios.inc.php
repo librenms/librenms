@@ -14,10 +14,10 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
     {
       $entPhysicalIndex = $entry['cpmCPUTotalPhysicalIndex'];
 
-      if($entry['cpmCPUTotal5minRev']) {
+      if(isset($entry['cpmCPUTotal5minRev'])) {
 	$usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.8." . $index;
 	$usage = $entry['cpmCPUTotal5minRev'];
-      } elseif($entry['cpmCPUTotal5min']) {
+      } elseif(isset($entry['cpmCPUTotal5min'])) {
 	$usage_oid = ".1.3.6.1.4.1.9.9.109.1.1.1.1.5." . $index;
 	$usage = $entry['cpmCPUTotal5min'];
       }

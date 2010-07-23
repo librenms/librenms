@@ -28,57 +28,57 @@
   $ifmib_oids = array('ifEntry', 'ifXEntry');
 
   echo("Caching Oids: ");
-  foreach ($ifmib_oids as $oid)      { echo("$oid "); $array = snmpwalk_cache_oid($device, $oid, $array, "IF-MIB");}
+  foreach ($ifmib_oids as $oid)      { echo("$oid "); $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "IF-MIB");}
 
-  if($config['enable_ports_etherlike']) { echo("dot3Stats "); $array = snmpwalk_cache_oid($device, "dot3StatsEntry", $array, "EtherLike-MIB"); }
+  if($config['enable_ports_etherlike']) { echo("dot3Stats "); $port_stats = snmpwalk_cache_oid($device, "dot3StatsEntry", $port_stats, "EtherLike-MIB"); }
 
   if($config['enable_ports_adsl']) {
     $device['adsl_count'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifType` = 'adsl'"),0);
   }
   if($device['adsl_count'] > "0")      { 
     echo("ADSL ");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.1.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.2.1", $array, "ADSL-LINE-MIB"); 
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.3.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.4.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.5.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.2", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.3", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.4", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.5", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.6", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.7", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.8", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.1", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.2", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.3", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.4", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.5", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.6", $array, "ADSL-LINE-MIB");
-    $array = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.7", $array, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.1.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.2.1", $port_stats, "ADSL-LINE-MIB"); 
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.3.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.4.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.5.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.2", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.3", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.4", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.5", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.6", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.7", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.6.1.8", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.1", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.2", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.3", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.4", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.5", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.6", $port_stats, "ADSL-LINE-MIB");
+    $port_stats = snmpwalk_cache_oid($device, ".1.3.6.1.2.1.10.94.1.1.7.1.7", $port_stats, "ADSL-LINE-MIB");
   }
 
   echo("\n");
 
-  #foreach ($etherlike_oids as $oid) { $array = snmpwalk_cache_oid($device, $oid, $array, "EtherLike-MIB"); }
-  #foreach ($cisco_oids as $oid)     { $array = snmpwalk_cache_oid($device, $oid, $array, "OLD-CISCO-INTERFACES-MIB"); }
-  #foreach ($pagp_oids as $oid)      { $array = snmpwalk_cache_oid($device, $oid, $array, "CISCO-PAGP-MIB"); }
+  #foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
+  #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
+  #foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
 
   if($device['os_group'] == "ios") {
-    $array = snmp_cache_portIfIndex ($device, $array);
-    $array = snmp_cache_portName ($device, $array);
+    $port_stats = snmp_cache_portIfIndex ($device, $port_stats);
+    $port_stats = snmp_cache_portName ($device, $port_stats);
     $data_oids[] = "portName";
-    #$array = snmpwalk_cache_oid($device, "vmVlan", $array, "CISCO-VLAN-MEMBERSHIP-MIB");
-    #$array = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $array, "CISCO-VTP-MIB");
-    #$array = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $array, "CISCO-VTP-MIB");
+    #$port_stats = snmpwalk_cache_oid($device, "vmVlan", $port_stats, "CISCO-VLAN-MEMBERSHIP-MIB");
+    #$port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
+    #$port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
   }
 
   $polled = time();
 
   /// End Building SNMP Cache Array
 
-  if($debug) { print_r($array); }
+  if($debug) { print_r($port_stats); }
 
   /// New interface detection
   ///// TO DO
@@ -89,9 +89,9 @@
   while ($port = mysql_fetch_array($port_query)) {
     
     echo(" --> " . $port['ifDescr'] . " ");   
-    if($array[$device['device_id']][$port['ifIndex']] && $port['ignore'] == "0") { // Check to make sure Port data is cached.
+    if($port_stats[$device['device_id']][$port['ifIndex']] && $port['ignore'] == "0") { // Check to make sure Port data is cached.
 
-      $this_port = &$array[$device['device_id']][$port['ifIndex']];
+      $this_port = &$port_stats[$device['device_id']][$port['ifIndex']];
 
       $polled_period = $polled - $port['poll_time'];
 
@@ -258,7 +258,16 @@
     } else {
       echo("Port Ignored.");
     }
+
     echo("\n");
+
+    #### Clear Per-Port Variables Here
+    unset($this_port);
+
   }
+
+  #### Clear Variables Here
+  unset($port_stats);
+
 
 ?>

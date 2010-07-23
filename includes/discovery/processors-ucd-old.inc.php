@@ -7,8 +7,8 @@ if($device['os_group'] == "unix" && $count == "0")
   echo("UCD Old: ");
 
   $system = snmp_get($device, "ssCpuSystem.0", "-OvQ", "UCD-SNMP-MIB");
-  $user = snmp_get($device, "ssCpuUser.0", "-OvQ", "UCD-SNMP-MIB");
-  $idle = snmp_get($device, "ssCpuIdle.0", "-OvQ", "UCD-SNMP-MIB");
+  $user =   snmp_get($device, "ssCpuUser.0", "-OvQ", "UCD-SNMP-MIB");
+  $idle =   snmp_get($device, "ssCpuIdle.0", "-OvQ", "UCD-SNMP-MIB");
 
   $percent = $system + $user + $idle;
 

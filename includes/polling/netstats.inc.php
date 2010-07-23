@@ -6,6 +6,8 @@ if($device[os] != "Snom") {
 
   #### These are at the start of large trees that we don't want to walk the entirety of, so we snmpget_multi them
 
+  $oids = array();
+
   $oids['ip'] = array ('ipForwDatagrams','ipInDelivers','ipInReceives','ipOutRequests','ipInDiscards','ipOutDiscards','ipOutNoRoutes',
                  'ipReasmReqds','ipReasmOKs','ipReasmFails','ipFragOKs','ipFragFails','ipFragCreates', 'ipInUnknownProtos',
                  'ipInHdrErrors', 'ipInAddrErrors');
@@ -72,8 +74,9 @@ if($device[os] != "Snom") {
 
     unset($snmpstring);
     rrdtool_update($rrdfile, $rrdupdate);
-  }
 
+  }
+  unset($oids, $data, $data_array, $oid, $protos);
 }
 
 ?>
