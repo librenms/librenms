@@ -43,6 +43,8 @@ RewriteRule ^device/([0-9]+) ?page=device&id=$1
 
 RewriteRule ^([a-z|0-9\-]+)/$ ?page=$1
 
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4&optd=$5&opte=$6
+RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4&optd=$5
 RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3&optc=$4
 RewriteRule ^([a-z|0-9]+)/(.+)/(.+)/$ ?page=$1&opta=$2&optb=$3
 RewriteRule ^([a-z|0-9]+)/(.+)/$ ?page=$1&opta=$2

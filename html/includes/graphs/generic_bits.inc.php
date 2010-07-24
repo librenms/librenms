@@ -3,7 +3,7 @@
 /// Draw generic bits graph
 /// args: rra_in, rra_out, rrd_filename, bg, legend, from, to, width, height, inverse
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 

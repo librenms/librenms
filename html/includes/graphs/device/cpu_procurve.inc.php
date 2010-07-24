@@ -13,8 +13,9 @@ $scale_max = "100";
 
 $nototal = 1;
 
-include("common.inc.php");
-$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/powerconnect-cpu.rrd";
+include("includes/graphs/common.inc.php");
+
+$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-cpu.rrd";
 
 $rrd_options .= " DEF:load=$database:LOAD:AVERAGE";
 $rrd_options .= " DEF:load_max=$database:LOAD:MAX";

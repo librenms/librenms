@@ -19,7 +19,7 @@ while($fan = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "fanspeed";
+  $graph_type = "sensor_fanspeed";
 
 // start fanspeed graphs
 

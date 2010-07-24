@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_temperature";
+
 unset($temp_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
@@ -17,11 +19,11 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $temp_perc = $temp['sensor_current'] / $temp['sensor_limit'] * 100;
     $temp_colour = percent_colour($temp_perc);
-    $temp_day    = "graph.php?id=" . $temp['sensor_id'] . "&type=temperature&from=$day&to=$now&width=300&height=100";
-    $temp_week   = "graph.php?id=" . $temp['sensor_id'] . "&type=temperature&from=$week&to=$now&width=300&height=100";
-    $temp_month  = "graph.php?id=" . $temp['sensor_id'] . "&type=temperature&from=$month&to=$now&width=300&height=100";
-    $temp_year  = "graph.php?id=" . $temp['sensor_id'] . "&type=temperature&from=$year&to=$now&width=300&height=100";
-    $temp_minigraph = "<img src='graph.php?id=" . $temp['sensor_id'] . "&type=temperature&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $temp_day    = "graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $temp_week   = "graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $temp_month  = "graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $temp_year  = "graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $temp_minigraph = "<img src='graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $temp_link  = "<a href='/device/".$device['device_id']."/health/temperatures/' onmouseover=\"return ";
     $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['sensor_descr'];

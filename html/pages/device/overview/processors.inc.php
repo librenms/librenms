@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "processor_usage";
+
 if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
@@ -13,10 +15,10 @@ if(mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = '
     $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$proc['processor_descr'];
-    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
+    $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
-    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=processor&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     ## REPLACE THIS SHITTY CODE. IT IS ALSO ELSEWHERE.
 

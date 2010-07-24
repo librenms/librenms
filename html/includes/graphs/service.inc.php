@@ -3,7 +3,7 @@
 $scale_min = "0";
 $scale_max = "1";
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
   $iter = "1";
 

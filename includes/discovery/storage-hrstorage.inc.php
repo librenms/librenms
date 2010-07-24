@@ -7,8 +7,9 @@ if(is_array($storage_array)) {
   foreach($storage_array[$device[device_id]] as $index => $storage) 
   {
     foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $deny = 1; if ($debug) echo("$bi == $descr \n"); } }
-    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE) { $deny = 1; if ($debug) echo("$descr, $bi \n"); } }
-    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr)) { $deny = 1; if ($debug) echo("$bi, $descr \n"); } }
+    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi)) { $deny = 1; if ($debug) echo("$descr, $bi \n"); } }
+    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr) !== FALSE) { $deny = 1; if ($debug) echo("$bi, $descr \n"); } }
+
     $fstype = $storage['hrStorageType'];
     $descr = $storage['hrStorageDescr'];
     $size = $storage['hrStorageSize'] * $storage['hrStorageAllocationUnits'];

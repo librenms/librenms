@@ -1,6 +1,6 @@
 <?php
 
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
 
   $unit_text = str_pad(truncate($unit_text,10),10);
   $rrd_options .= " COMMENT:'$unit_text              Cur      Max'";

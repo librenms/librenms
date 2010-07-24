@@ -19,7 +19,7 @@ while($volt = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "voltage";
+  $graph_type = "sensor_voltage";
 
 // start voltage graphs
 

@@ -19,7 +19,7 @@ while($temp = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "temperature";
+  $graph_type = "sensor_temperature";
 
 // start temperature graphs
 

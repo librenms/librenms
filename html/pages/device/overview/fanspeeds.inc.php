@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_fanspeed";
+
 unset($fan_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
@@ -15,11 +17,11 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $fan_day    = "graph.php?id=" . $fan['sensor_id'] . "&type=fanspeed&from=$day&to=$now&width=300&height=100";
-    $fan_week   = "graph.php?id=" . $fan['sensor_id'] . "&type=fanspeed&from=$week&to=$now&width=300&height=100";
-    $fan_month  = "graph.php?id=" . $fan['sensor_id'] . "&type=fanspeed&from=$month&to=$now&width=300&height=100";
-    $fan_year  = "graph.php?id=" . $fan['sensor_id'] . "&type=fanspeed&from=$year&to=$now&width=300&height=100";
-    $fan_minigraph = "<img src='graph.php?id=" . $fan['sensor_id'] . "&type=fanspeed&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $fan_day    = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $fan_week   = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $fan_month  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $fan_year  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $fan_minigraph = "<img src='graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $fan_link  = "<a href='/device/".$device['device_id']."/health/fanspeeds/' onmouseover=\"return ";
     $fan_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$fan['sensor_descr'];

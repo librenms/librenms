@@ -1,7 +1,6 @@
 <?php
 
 $device = device_by_id_cache($id);
-
 $query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'");
 
 $i=0;
@@ -32,7 +31,7 @@ $scale_max = "100";
 $nototal = 1;
 
 if ($rrd_list) {
-  include ("generic_multi_line.inc.php");
+  include ("includes/graphs/generic_multi_line.inc.php");
 }
 
 ?>

@@ -1,8 +1,8 @@
 <?php
 
 global $valid_temp;
-  
-if ($device['os'] == "ios" || $device['os_group'] == "ios") 
+
+if (!isset($cisco_entity_temp) && $device['os'] == "ios" || $device['os_group'] == "ios") 
 {
   echo("Cisco ");
   $oids = snmp_walk($device, ".1.3.6.1.4.1.9.9.13.1.3.1.2", "-Osqn", "CISCO-ENVMON-MIB");

@@ -19,7 +19,7 @@ while($freq = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "frequency";
+  $graph_type = "sensor_frequency";
 
 // start frequency graphs
 

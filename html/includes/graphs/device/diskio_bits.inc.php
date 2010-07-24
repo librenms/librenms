@@ -30,6 +30,6 @@ $nototal = 1;
 $rra_in  = "read";
 $rra_out = "written";
 
-include ("generic_multi_bits_separated.inc.php");
+include ("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>

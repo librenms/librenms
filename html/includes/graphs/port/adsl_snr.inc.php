@@ -15,11 +15,11 @@ $port = mysql_fetch_array($query);
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AturCurrAtn";
+$rrd_list[0]['rra'] = "AturCurrSnrMgn";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AtucCurrAtn";
+$rrd_list[1]['rra'] = "AtucCurrSnrMgn";
 
 $unit_text = "dB";
 
@@ -32,7 +32,7 @@ $scale_min = "0";
 $nototal = 1;
 
 if ($rrd_list) {
-  include ("generic_multi_line.inc.php");
+  include ("includes/graphs/generic_multi_line.inc.php");
 }
 
 ?>

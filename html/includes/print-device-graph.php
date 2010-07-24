@@ -27,12 +27,17 @@
   $yearly_url      = "graph.php?device=" . $device['device_id'] . "&type=$graph_type&from=".$config['year']."&to=".$config['now']."&width=400&height=150";
   $yearly_url     .= $args; 
 
-  echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
-        <img src='$daily_traffic' border=0></a> ");
+  $graph_args      = $device['device_id'] . "/" . $graph_type . "/";
+
+  echo("<a href='".$config['base_url']."/graphs/" . $graph_args . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
+        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a> ");
+
   echo("<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$weekly_traffic' border=0></a> ");
+
   echo("<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$monthly_traffic' border=0></a> ");
+
   echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$yearly_traffic' border=0></a>");
 

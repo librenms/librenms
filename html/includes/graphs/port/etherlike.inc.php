@@ -29,7 +29,7 @@ $colours   = "mixed";
 $nototal   = 1;
 $unit_text = "Errors";
 
-include ("generic_multi_simplex_seperated.inc.php");
+include ("includes/graphs/generic_multi_simplex_seperated.inc.php");
 
 
 
