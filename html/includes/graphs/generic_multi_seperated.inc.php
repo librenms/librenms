@@ -1,6 +1,6 @@
 <?php
 
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
 
   $units_descr = substr(str_pad($units_descr, 18),0,18);
 

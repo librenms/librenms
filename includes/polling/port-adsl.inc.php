@@ -103,7 +103,7 @@
         $oid = "adsl".$oid;
         $data = str_replace("\"", "", $this_port[$oid]);
         ## Set data to be "unknown" if it's garbled, unexistant or zero
-        if(!is_numeric($data) || $data == "0") { $data = "-1"; }
+        if(!is_numeric($data)) { $data = "0"; }
         $rrdupdate .= ":$data";
       }
 

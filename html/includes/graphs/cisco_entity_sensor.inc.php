@@ -11,7 +11,7 @@ case 'amperes':
   break;
 }
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 $rrd_filename = $config['rrd_dir'] . "/" . $sensor['hostname'] . "/" . safename("ces-" . $sensor['entPhysicalIndex'] . ".rrd");
 

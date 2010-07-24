@@ -3,7 +3,7 @@
 /// Draws aggregate bits graph from multiple RRDs
 /// Variables : colour_[line|area]_[in|out], rrd_filenames
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 $i=0;
 foreach($rrd_filenames as $rrd_filename) {

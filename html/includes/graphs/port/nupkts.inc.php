@@ -38,7 +38,7 @@ if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($po
 
   $nototal = 1;
 
-  include ("generic_multi_seperated.inc.php");
+  include ("includes/graphs/generic_multi_seperated.inc.php");
 
 }
 elseif(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
@@ -60,7 +60,7 @@ elseif(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($po
 
   $graph_max = 1;
 
-  include("generic_duplex.inc.php");
+  include("includes/graphs/generic_duplex.inc.php");
 
 }
 

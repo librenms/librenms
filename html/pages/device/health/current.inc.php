@@ -19,7 +19,7 @@ while($current = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "current";
+  $graph_type = "sensor_current";
 
 // start current graphs
 

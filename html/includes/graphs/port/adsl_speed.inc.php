@@ -15,13 +15,14 @@ $port = mysql_fetch_array($query);
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = "Downstream";
-$rrd_list[0]['rra'] = "AturCurrOutputPwr";
+$rrd_list[0]['rra'] = "AturChanCurrTxRate";
 
 $rrd_list[1]['filename'] = $rrd_filename;
 $rrd_list[1]['descr'] = "Upstream";
-$rrd_list[1]['rra'] = "AtucCurrOutputPwr";
+$rrd_list[1]['rra'] = "AtucChanCurrTxRate";
 
-$unit_text = "dBm";
+
+$unit_text = "Bits/sec";
 
 $units='';
 $total_units='';
@@ -32,7 +33,7 @@ $scale_min = "0";
 $nototal = 1;
 
 if ($rrd_list) {
-  include ("generic_multi_line.inc.php");
+  include ("includes/graphs/generic_multi_line.inc.php");
 }
 
 ?>

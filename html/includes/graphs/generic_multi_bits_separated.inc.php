@@ -1,6 +1,6 @@
 <?php
 
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
 
   $i = 0;
   $rrd_options .= " COMMENT:'                               In\: Current     Maximum      '";

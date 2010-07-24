@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_current";
+
 unset($current_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
@@ -15,11 +17,11 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $current_day    = "graph.php?id=" . $current['sensor_id'] . "&type=current&from=$day&to=$now&width=300&height=100";
-    $current_week   = "graph.php?id=" . $current['sensor_id'] . "&type=current&from=$week&to=$now&width=300&height=100";
-    $current_month  = "graph.php?id=" . $current['sensor_id'] . "&type=current&from=$month&to=$now&width=300&height=100";
-    $current_year  = "graph.php?id=" . $current['sensor_id'] . "&type=current&from=$year&to=$now&width=300&height=100";
-    $current_minigraph = "<img src='graph.php?id=" . $current['sensor_id'] . "&type=current&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $current_day    = "graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $current_week   = "graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $current_month  = "graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $current_year  = "graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $current_minigraph = "<img src='graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $current_link  = "<a href='/device/".$device['device_id']."/health/current/' onmouseover=\"return ";
     $current_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$current['sensor_descr'];

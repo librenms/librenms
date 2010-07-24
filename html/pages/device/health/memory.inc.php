@@ -1,4 +1,6 @@
 <?php
+
+$graph_type = "mempool_usage";
  
   echo("<div style='margin-top: 5px; padding: 0px;'>");
   echo("<table width=100% cellpadding=6 cellspacing=0>");
@@ -12,10 +14,10 @@
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url   = "/device/".$device['device_id']."/health/memory/";
-    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=mempool&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$month&to=$now&width=400&height=125\'>";
+    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
     $mempool_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     $total = formatStorage($mempool['mempool_total']);
@@ -41,17 +43,17 @@
  
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
  
-  $daily_graph   = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$day&to=$now&width=400&height=150";
+  $daily_graph   = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
  
-  $weekly_graph  = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$week&to=$now&width=400&height=150";
+  $weekly_graph  = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
  
-  $monthly_graph = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$month&to=$now&width=400&height=150";
+  $monthly_graph = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
  
-  $yearly_graph  = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$year&to=$now&width=400&height=150";
+  $yearly_graph  = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
  
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");

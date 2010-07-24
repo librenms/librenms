@@ -2,7 +2,7 @@
 
 function graph_multi_bits ($args) {
 
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
   $i = 1;
   $options .= " COMMENT:'                               In\: Current     Maximum      '";
   if(!$args['nototal']) {$options .= " COMMENT:'Total      '";}

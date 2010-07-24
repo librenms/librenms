@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "mempool_usage";
+
 if(mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</p>");
@@ -13,10 +15,10 @@ if(mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url   = "/device/".$device['device_id']."/health/memory/";
-    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=mempool&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=mempool&from=$month&to=$now&width=400&height=125\'>";
+    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
     $mempool_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     $total = formatStorage($mempool['mempool_total']);

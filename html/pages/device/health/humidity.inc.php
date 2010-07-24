@@ -19,7 +19,7 @@ while($humidity = mysql_fetch_array($query)) {
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
-  $graph_type = "humidity";
+  $graph_type = "sensor_humidity";
 
 // start humidity graphs
 

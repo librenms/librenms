@@ -8,6 +8,8 @@ if($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 
+$graph_type = "humidity";
+
 echo('<table cellspacing="0" cellpadding="6" width="100%">');
 
 echo('<tr class=tablehead>
@@ -26,7 +28,7 @@ while($humidity = mysql_fetch_array($query))
 {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  $weekly_humidity  = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
+  $weekly_humidity  = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
   $humidity_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_humidity\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $humidity['sensor_descr'] . "</a>";
 
@@ -37,12 +39,12 @@ while($humidity = mysql_fetch_array($query))
 
   if($humidity['sensor_current'] >= $humidity['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
    
-  $humidity_day    = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
-  $humidity_week   = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
-  $humidity_month  = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
-  $humidity_year   = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
+  $humidity_day    = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
+  $humidity_week   = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
+  $humidity_month  = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
+  $humidity_year   = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
 
-  $humidity_minigraph = "<img src='graph.php?id=" . $humidity['sensor_id'] . "&amp;type=humidity&amp;from=$day&amp;to=$now&amp;width=100&amp;height=20'";
+  $humidity_minigraph = "<img src='graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=100&amp;height=20'";
   $humidity_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$humidity['hostname']." - ".$humidity['sensor_descr'];
   $humidity_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$humidity_day\'><img src=\'$humidity_week\'><img src=\'$humidity_month\'><img src=\'$humidity_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
@@ -60,17 +62,17 @@ while($humidity = mysql_fetch_array($query))
 
   echo("<tr bgcolor='$row_colour'><td colspan=7>");
 
-  $daily_graph   = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$day&to=$now&width=400&height=150";
+  $daily_graph   = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
 
-  $weekly_graph  = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$week&to=$now&width=400&height=150";
+  $weekly_graph  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
 
-  $monthly_graph = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$month&to=$now&width=400&height=150";
+  $monthly_graph = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
 
-  $yearly_graph  = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$year&to=$now&width=400&height=150";
+  $yearly_graph  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
 
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");

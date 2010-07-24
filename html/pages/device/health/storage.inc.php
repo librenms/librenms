@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "storage_usage";
+
 $sql = "SELECT * FROM `storage` WHERE device_id = '" . ($_GET['id']) . "' ORDER BY storage_descr";
 $query = mysql_query($sql);
 
@@ -29,7 +31,7 @@ while($drive = mysql_fetch_array($query)) {
     $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=400&height=125\'>";
+    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
     $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
 
     if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
@@ -42,8 +44,6 @@ while($drive = mysql_fetch_array($query)) {
           <a href='$fs_url' $fs_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a>
           </td><td>" . $free . "</td><td></td></tr>");
 
-
-  $graph_type = "storage";
 
 // start temperature graphs
 

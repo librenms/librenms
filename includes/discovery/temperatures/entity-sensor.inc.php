@@ -29,8 +29,13 @@ if(is_array($oids[$device['device_id']]))
       $descr = str_replace("sensor", "", $descr);
         
       if($entry['entPhySensorScale'] == "milli") { $divisor = "1000"; } else { $divisor = "1"; }        
-      
-      discover_temperature($valid_temp, $device, $oid, $index, "entity-sensor", $descr, $divisor, NULL, NULL, $current);
+
+     
+      if(mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = 'temperature' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0") 
+      ## Check to make sure we've not already seen this sensor via cisco's entity sensor mib
+      {
+        discover_temperature($valid_temp, $device, $oid, $index, "entity-sensor", $descr, $divisor, NULL, NULL, $current);
+      }
     }
   }
 }

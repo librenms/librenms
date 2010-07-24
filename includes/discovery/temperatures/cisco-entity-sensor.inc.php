@@ -1,6 +1,8 @@
 <?php
 
 global $valid_temp;
+
+unset($cisco_entity_temp);
   
 if ($device['os'] == "ios" || $device['os_group'] == "ios") 
 {
@@ -28,9 +30,10 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         $current = $entry['entSensorValue'];
 
         if($entry['entSensorScale'] == "milli") { $divisor = "1000"; } else { $divisor = "1"; }        
-        
 	
         discover_temperature($valid_temp, $device, $oid, $index, "cisco-entity-sensor", $descr, $divisor, NULL, NULL, $current);
+
+        $cisco_entity_temp = 1;
       }
     }
   }

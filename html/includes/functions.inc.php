@@ -49,17 +49,20 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   }
 
   $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
-  $contents = "<div class=list-large>".$device['hostname'] . " - $descr</div>";
+  $contents = "<div class=list-large>".$device['hostname'];
+  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
+  $contents .= "</div>";
+
 
   $contents .= "<div>";
   if($device['os']) { $contents .= $config['os'][$device['os']]['text']; }
   if($device['version']) { $contents .= " ".$device['version']; }
   if($device['features']) { $contents .= " (".$device['features'].")"; }
-  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
+#  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
 
 
-  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
+#  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
   foreach ($graphs as $entry)
   {
     $graph     = $entry['graph'];
@@ -204,6 +207,8 @@ function generate_if_link($args, $text = NULL)
   $args = ifNameDescr($args);
   if(!$text) { $text = fixIfName($args['label']); }
   if(!$args['graph_type']) { $args['graph_type'] = 'port_bits'; }
+
+  
   $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
   if(!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
 
@@ -238,7 +243,7 @@ function generate_if_link($args, $text = NULL)
 function generate_port_thumbnail($args) 
 {
     if(!$args['bg']) { $args['bg'] = "FFFFF"; }
-    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
+    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&subtype=".$args['graph_subtype']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
     $output = generate_if_link($args, $args['content']);
     echo $output;
 }

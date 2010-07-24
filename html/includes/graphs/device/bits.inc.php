@@ -36,6 +36,6 @@ $colour_line_out = "000099";
 $colour_area_in = "CDEB8B";
 $colour_area_out = "C3D9FF";
 
-include ("generic_multi_bits.inc.php");
+include ("includes/graphs/generic_multi_bits.inc.php");
 
 ?>

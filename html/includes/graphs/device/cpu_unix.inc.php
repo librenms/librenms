@@ -34,10 +34,10 @@ $nototal = 1;
 
 if ($rrd_list) {
 
-include ("generic_multi_line.inc.php");
+include ("includes/graphs/generic_multi_line.inc.php");
 
 } else {
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . "ucd_cpu.rrd";
   $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";
   $rrd_options .= " DEF:nice=$rrd_filename:nice:AVERAGE";

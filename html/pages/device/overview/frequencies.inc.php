@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_frequency";
+
 unset($freq_seperator);
 if(mysql_result(mysql_query("SELECT count(freq_id) from frequency WHERE device_id = '" . $device['device_id'] . "'"),0)) {
   $total = mysql_result(mysql_query("SELECT count(freq_id) from frequency WHERE device_id = '" . $device['device_id'] . "'"),0);
@@ -16,11 +18,11 @@ if(mysql_result(mysql_query("SELECT count(freq_id) from frequency WHERE device_i
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $freq_day    = "graph.php?id=" . $freq['freq_id'] . "&type=frequency&from=$day&to=$now&width=300&height=100";
-    $freq_week   = "graph.php?id=" . $freq['freq_id'] . "&type=frequency&from=$week&to=$now&width=300&height=100";
-    $freq_month  = "graph.php?id=" . $freq['freq_id'] . "&type=frequency&from=$month&to=$now&width=300&height=100";
-    $freq_year  = "graph.php?id=" . $freq['freq_id'] . "&type=frequency&from=$year&to=$now&width=300&height=100";
-    $freq_minigraph = "<img src='graph.php?id=" . $freq['freq_id'] . "&type=frequency&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $freq_day    = "graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $freq_week   = "graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $freq_month  = "graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $freq_year  = "graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $freq_minigraph = "<img src='graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $freq_link  = "<a href='/device/".$device['device_id']."/health/frequencies/' onmouseover=\"return ";
     $freq_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$freq['freq_descr'];

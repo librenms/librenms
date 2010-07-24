@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_humidity";
+
 unset($humidity_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
@@ -17,11 +19,11 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $humidity_perc = $humidity['sensor_current'] / $humidity['sensor_limit'] * 100;
     $humidity_colour = percent_colour($humidity_perc);
-    $humidity_day    = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$day&to=$now&width=300&height=100";
-    $humidity_week   = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$week&to=$now&width=300&height=100";
-    $humidity_month  = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$month&to=$now&width=300&height=100";
-    $humidity_year  = "graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$year&to=$now&width=300&height=100";
-    $humidity_minigraph = "<img src='graph.php?id=" . $humidity['sensor_id'] . "&type=humidity&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $humidity_day    = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $humidity_week   = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $humidity_month  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $humidity_year  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $humidity_minigraph = "<img src='graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $humidity_link  = "<a href='/device/".$device['device_id']."/health/humiditys/' onmouseover=\"return ";
     $humidity_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$humidity['sensor_descr'];

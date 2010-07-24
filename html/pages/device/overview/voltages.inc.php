@@ -1,5 +1,7 @@
 <?php
 
+$graph_type = "sensor_voltage";
+
 unset($volt_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
@@ -15,11 +17,11 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $volt_day    = "graph.php?id=" . $volt['sensor_id'] . "&type=voltage&from=$day&to=$now&width=300&height=100";
-    $volt_week   = "graph.php?id=" . $volt['sensor_id'] . "&type=voltage&from=$week&to=$now&width=300&height=100";
-    $volt_month  = "graph.php?id=" . $volt['sensor_id'] . "&type=voltage&from=$month&to=$now&width=300&height=100";
-    $volt_year  = "graph.php?id=" . $volt['sensor_id'] . "&type=voltage&from=$year&to=$now&width=300&height=100";
-    $volt_minigraph = "<img src='graph.php?id=" . $volt['sensor_id'] . "&type=voltage&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $volt_day    = "graph.php?id=" . $volt['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
+    $volt_week   = "graph.php?id=" . $volt['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
+    $volt_month  = "graph.php?id=" . $volt['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
+    $volt_year  = "graph.php?id=" . $volt['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
+    $volt_minigraph = "<img src='graph.php?id=" . $volt['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
     $volt_link  = "<a href='/device/".$device['device_id']."/health/voltages/' onmouseover=\"return ";
     $volt_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$volt['sensor_descr'];

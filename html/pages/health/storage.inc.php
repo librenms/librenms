@@ -1,5 +1,6 @@
 <?php
 
+$graph_type = "storage_usage";
 
 $sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY D.hostname, S.storage_descr";
 
@@ -49,10 +50,10 @@ while($drive = mysql_fetch_array($query)) {
     $free = formatStorage($drive['storage_free']);
     $used = formatStorage($drive['storage_used']);
 
-    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=400&height=125";
+    $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125";
     $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
 
-    $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&type=storage&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
     } elseif($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
@@ -72,17 +73,17 @@ while($drive = mysql_fetch_array($query)) {
 
   echo("<tr bgcolor='$row_colour'><td colspan=5>");
 
-  $daily_graph   = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$day&to=$now&width=400&height=150";
+  $daily_graph   = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
 
-  $weekly_graph  = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$week&to=$now&width=400&height=150";
+  $weekly_graph  = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
 
-  $monthly_graph = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=400&height=150";
+  $monthly_graph = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
 
-  $yearly_graph  = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$year&to=$now&width=400&height=150";
+  $yearly_graph  = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
 
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");
