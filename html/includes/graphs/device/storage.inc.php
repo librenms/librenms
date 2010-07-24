@@ -3,7 +3,7 @@
 $scale_min = "0";
 $scale_max = "100";
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 $device = device_by_id_cache($id);
 

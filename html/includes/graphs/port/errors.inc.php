@@ -28,6 +28,6 @@ $graph_max = 1;
 
 $unit_text = "Errors";
 
-include("generic_duplex.inc.php");
+include("includes/graphs/generic_duplex.inc.php");
 
 ?>

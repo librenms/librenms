@@ -12,6 +12,6 @@ if(is_file($config['rrd_dir'] . "/" . $disk['hostname'] . "/ucd_diskio-" . safen
 $rra_in = "read";
 $rra_out = "written";
 
-include("generic_bits.inc.php");
+include("includes/graphs/generic_bits.inc.php");
 
 ?>

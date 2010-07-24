@@ -16,6 +16,6 @@ if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['
 $rra_in = "INOCTETS";
 $rra_out = "OUTOCTETS";
 
-include("generic_bits.inc.php");
+include("includes/graphs/generic_bits.inc.php");
 
 ?>

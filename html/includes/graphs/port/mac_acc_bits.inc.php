@@ -11,6 +11,6 @@ if(is_file($config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" .
 $rra_in = "IN";
 $rra_out = "OUT";
 
-include("generic_bits.inc.php");
+include("includes/graphs/generic_bits.inc.php");
 
 ?>

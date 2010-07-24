@@ -22,6 +22,6 @@ $colour_area_out_max = "FFEFAA";
 $graph_max = 1;
 $unit_text = "Pkts\ \ \ ";
 
-include("generic_duplex.inc.php");
+include("includes/graphs/generic_duplex.inc.php");
 
 ?>

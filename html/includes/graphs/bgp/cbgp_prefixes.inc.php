@@ -1,6 +1,6 @@
 <?php
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 $scale_min = "0";
 
@@ -19,6 +19,6 @@ $graph_max = 1;
 
 $unit_text = "Prefixes";
 
-include("generic_simplex.inc.php");
+include("includes/graphs/generic_simplex.inc.php");
 
 ?>

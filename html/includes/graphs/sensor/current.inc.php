@@ -2,7 +2,7 @@
 
 $scale_min = "0";
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
   $rrd_options .= " COMMENT:'                                 Last   Max\\n'";
 
