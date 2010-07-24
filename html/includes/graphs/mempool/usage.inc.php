@@ -1,6 +1,6 @@
 <?php
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
   $rrd_options .= " -u 100 -l 0 -E -b 1024 ";
 

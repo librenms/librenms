@@ -6,7 +6,7 @@ $sort      = mres($_GET['sort']);
 
 if(is_numeric($_GET['topn'])) { $topn = $_GET['topn']; } else { $topn = '10'; }
 
-  include("common.inc.php");
+  include("includes/graphs/common.inc.php");
 
   if($stat == "pkts") {
     $units='pps'; $unit = 'p'; $multiplier = '1';

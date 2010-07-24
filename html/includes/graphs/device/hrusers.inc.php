@@ -4,7 +4,7 @@ $device = device_by_id_cache($id);
 
 $scale_min = "0";
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
 $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
 

@@ -1,6 +1,6 @@
 <?php
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";

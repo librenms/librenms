@@ -3,7 +3,7 @@
 $device = device_by_id_cache($id);
 $query = mysql_query("SELECT * FROM `mempools` where `device_id` = '".$id."'");
 
-include("common.inc.php");
+include("includes/graphs/common.inc.php");
 
   $rrd_options .= " -u 100 -l 0 -E -b 1024 ";
 
