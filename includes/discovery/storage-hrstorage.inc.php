@@ -6,15 +6,17 @@ if(is_array($storage_array)) {
   echo("hrStorage : ");
   foreach($storage_array[$device[device_id]] as $index => $storage) 
   {
-    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $deny = 1; if ($debug) echo("$bi == $descr \n"); } }
-    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi)) { $deny = 1; if ($debug) echo("$descr, $bi \n"); } }
-    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr) !== FALSE) { $deny = 1; if ($debug) echo("$bi, $descr \n"); } }
 
     $fstype = $storage['hrStorageType'];
     $descr = $storage['hrStorageDescr'];
     $size = $storage['hrStorageSize'] * $storage['hrStorageAllocationUnits'];
     $used = $storage['hrStorageUsed'] * $storage['hrStorageAllocationUnits'];
     $units = $storage['hrStorageAllocationUnits'];
+
+
+    foreach($config['ignore_mount'] as $bi) { if($bi == $descr) { $deny = 1; if ($debug) echo("$bi == $descr \n"); } }
+    foreach($config['ignore_mount_string'] as $bi) { if(strpos($descr, $bi) !== FALSE)     { $deny = 1; if ($debug) echo("strpos: $descr, $bi \n"); } }
+    foreach($config['ignore_mount_regexp'] as $bi) { if(preg_match($bi, $descr) > "0") { $deny = 1; if ($debug) echo("preg_match $bi, $descr \n"); } }
 
     if (isset($config['ignore_mount_removable']) && $config['ignore_mount_removable'] && $fstype == "hrStorageRemovableDisk") { $deny = 1; if ($debug) echo("skip(removable)\n"); }
     if (isset($config['ignore_mount_network']) && $config['ignore_mount_network'] && $fstype == "hrStorageNetworkDisk") { $deny = 1; if ($debug) echo("skip(network)\n"); }
