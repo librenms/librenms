@@ -117,7 +117,6 @@ $config['overview_show_sysDescr'] = true;
 
 $config['enable_bgp']           	= 1; # Enable BGP session collection and display
 $config['enable_syslog']        	= 0; # Enable Syslog
-$config['enable_billing']       	= 0; # Enable Billing
 $config['enable_inventory']     	= 1; # Enable Inventory
 $config['enable_pseudowires']   	= 1; # Enable Pseudowires
 $config['enable_printers']  		= 0;  # Enable Printer support
@@ -129,6 +128,14 @@ $config['enable_ports_Xbcmc']           = 1; # Enable ifXEntry broadcast/multica
 $config['enable_ports_etherlike']       = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_ports_junoseatmvp']     = 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_adsl']            = 1; # Enable ADSL-LINE-MIB
+
+### Billing System Configuration
+
+$config['enable_billing']               = 0; # Enable Billing
+$config['billing']['customer_autoadd']	= 0; # Enable Auto-add bill per customer
+$config['billing']['circuit_autoadd']	= 0; # Enable Auto-add bill per circuit_id
+$config['billing']['bill_autoadd']	= 0; # Enable Auto-add bill per bill_id
+
 
 ### External Integration
 
