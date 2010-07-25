@@ -20,35 +20,13 @@ while($current = mysql_fetch_array($query)) {
   echo("<tr  bgcolor=$row_colour><td colspan='4'>");
 
   $graph_type = "sensor_current";
+  
+  $graph_array['id'] = $current['sensor_id'];
+  $graph_array['type'] = $graph_type;
 
-// start current graphs
+  include("includes/print-quadgraphs.inc.php");
 
-  $daily_current   = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$day&to=$now&width=400&height=150";
-
-  $weekly_current  = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$week&to=$now&width=400&height=150";
-
-  $monthly_current = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$month&to=$now&width=400&height=150";
-
-  $yearly_current  = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $current['sensor_id'] . "&type=$graph_type&from=$year&to=$now&width=400&height=150";
-
-  echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$daily_current' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$weekly_current' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$monthly_current' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT);\" onmouseout=\"return nd();\">
-        <img src='$yearly_current' border=0></a>");
-
-
-  echo("</td></tr>");
-
-
-  $row++;
+  $i++;
 
 }
 

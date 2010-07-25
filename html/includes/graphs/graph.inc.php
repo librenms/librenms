@@ -18,16 +18,16 @@ if($_GET['debug']) {
     if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
   }
   
-  if($_GET['device']) {
-    $_GET['id'] = $_GET['device'];
-    $device_id = $_GET['device'];
-  } elseif($_GET['if']) {
-    $_GET['id'] = $_GET['if'];
-  } elseif($_GET['port']) {
-    $_GET['id'] = $_GET['port'];
-  } elseif($_GET['peer']) {
-    $_GET['id'] = $_GET['peer'];
-  }
+#  if($_GET['device']) {
+#    $_GET['id'] = $_GET['device'];
+#    $device_id = $_GET['device'];
+#  } elseif($_GET['if']) {
+#    $_GET['id'] = $_GET['if'];
+#  } elseif($_GET['port']) {
+#    $_GET['id'] = $_GET['port'];
+#  } elseif($_GET['peer']) {
+#    $_GET['id'] = $_GET['peer'];
+#  }
 
   preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
 

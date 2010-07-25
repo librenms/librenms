@@ -45,30 +45,12 @@ while($drive = mysql_fetch_array($query)) {
           </td><td>" . $free . "</td><td></td></tr>");
 
 
-// start temperature graphs
-
-  $daily_temp   = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$day&to=$now&width=212&height=100";
-  $daily_url       = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$day&to=$now&width=400&height=150";
-
-  $weekly_temp  = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$week&to=$now&width=212&height=100";
-  $weekly_url      = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$week&to=$now&width=400&height=150";
-
-  $monthly_temp = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$month&to=$now&width=212&height=100";
-  $monthly_url     = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$month&to=$now&width=400&height=150";
-
-  $yearly_temp  = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$year&to=$now&width=212&height=100";
-  $yearly_url  = "graph.php?id=" . $drive['storage_id'] . "&type=$graph_type&from=$year&to=$now&width=400&height=150";
+  $graph_array['id'] = $storage['storage_id'];
+  $graph_array['type'] = $graph_type;
 
   echo("<tr bgcolor='$row_colour'><td colspan=6>");
 
-  echo("<a onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr']."</div><img src=\'$daily_url\'>', LEFT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\">
-        <img src='$daily_temp' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr']."</div><img src=\'$weekly_url\'>', LEFT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\">
-        <img src='$weekly_temp' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr']."</div><img src=\'$monthly_url\'>', LEFT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\">
-        <img src='$monthly_temp' border=0></a> ");
-  echo("<a onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr']."</div><img src=\'$yearly_url\'>', LEFT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\">
-        <img src='$yearly_temp' border=0></a>");
+  include("includes/print-quadgraphs.inc.php");
 
   echo("</td></tr>");
 
