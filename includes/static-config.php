@@ -346,6 +346,14 @@ $config['os'][$os]['icon']        	= "dell";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
 
+$os = "ricoh";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "Ricoh Printer";
+$config['os'][$os]['type']        	= "printer";
+$config['os'][$os]['icon']        	= "ricoh";
+$config['os'][$os]['over'][0]['graph']  = "device_toner";
+$config['os'][$os]['over'][0]['text']   = "Toner";
+
 $os = "xerox";
 $config['os'][$os]['group'] 	   	= "printer";
 $config['os'][$os]['text']  	   	= "Xerox Printer";
