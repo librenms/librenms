@@ -69,8 +69,8 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
     $graphhead = $entry['text']; 
     $contents .= '<div style="width: 708px">';
     $contents .= '<span style="margin-left: 5px; font-size: 12px; font-weight: bold;">'.$graphhead.'</span><br />';
-    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
-    $contents .= '<img src="' . $config['base_url'] . "/graph.php?device=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= '<img src="' . $config['base_url'] . "/graph.php?id=" . $device['device_id'] . "&amp;from=$start&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
+    $contents .= '<img src="' . $config['base_url'] . "/graph.php?id=" . $device['device_id'] . "&amp;from=".$config['week']."&amp;to=$end&amp;width=275&amp;height=100&amp;type=$graph&amp;legend=no" . '" style="margin: 2px;">';
     $contents .= '</div>';
   }
   $text = htmlentities($text);

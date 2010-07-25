@@ -396,6 +396,16 @@ $config['os'][$os]['type']              = "network";
 
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
+$config['graph']['device']['bits']		= "Total Traffic";
+$config['graph']['device']['hrusers']   	= "Users Logged In";
+$config['graph']['device']['temperatures']	= "Temperatures";
+$config['graph']['device']['memory']  		= "Memory Usage";
+$config['graph']['device']['processors']      	= "Processor Usage";
+$config['graph']['device']['cpu']        	= "Processor Usage";
+$config['graph']['device']['storage']        	= "Disk Usage";
+
+
+
 ##############################
 # No changes below this line #
 ##############################
@@ -443,12 +453,15 @@ $week = time() - (7 * 24 * 60 * 60);
 $month = time() - (31 * 24 * 60 * 60);
 $year = time() - (365 * 24 * 60 * 60);
 
-$config['now'] = $now;
-$config['day'] = $day;
-$config['twoday'] = $twoday;
-$config['week'] = $week;
-$config['month'] = $month;
-$config['year'] = $year;
+$config['now']        = time();
+$config['day']        = time() - (24 * 60 * 60);
+$config['twoday']     = time() - (2 * 24 * 60 * 60);
+$config['week']       = time() - (7 * 24 * 60 * 60);
+$config['twoweek']    = time() - (2 * 7 * 24 * 60 * 60);
+$config['month']      = time() - (31 * 24 * 60 * 60);
+$config['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
+$config['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
+$config['year']       = time() - (365 * 24 * 60 * 60);
 
 
 ?>

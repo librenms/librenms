@@ -7,7 +7,7 @@ if($ports['total']) {
   $graph_array['height'] = "100";
   $graph_array['width']  = "490";
   $graph_array['to']     = $now;
-  $graph_array['device'] = $device['device_id'];
+  $graph_array['id'] 	 = $device['device_id'];
   $graph_array['type']   = "device_bits";
   $graph_array['from']   = $day;
   $graph_array['legend'] = "no";
@@ -28,7 +28,10 @@ if($ports['total']) {
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  echo(overlib_link($_SERVER['REQUEST_URI'], $graph, $content, NULL));
+  $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['day'] . "/" . $config['now'] . "/";
+
+
+  echo(overlib_link($link, $graph, $content, NULL));
 
 
   echo('  <div style="height: 5px;"></div>');

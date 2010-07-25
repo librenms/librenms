@@ -18,14 +18,6 @@ while($drive = mysql_fetch_array($query)) {
 
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-#    $total = $drive['storage_size'];
-#    $used  = $drive['storage_used'];
-#    $free  = $drive['storage_free'];
-#    $perc  = round($drive['storage_perc'], 0);
-#    $used = formatStorage($used);
-#    $total = formatStorage($total);
-#    $free = formatStorage($free);
-
     $fs_url   = "/device/".$device['device_id']."/health/diskio/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['diskio_descr'];
@@ -46,21 +38,12 @@ while($drive = mysql_fetch_array($query)) {
 
     echo('<tr bgcolor="'.$row_colour.'"><td colspan=5>');
 
-    $graph_array['height'] = "100";
-    $graph_array['width']  = "215";
-    $graph_array['to']     = $now;
     $graph_array['id']     = $drive['diskio_id'];
     $graph_array['type']   = $graph_type;
 
-    $periods = array('day', 'week', 'month', 'year');
+    include("includes/print-quadgraphs.inc.php");
 
-    foreach($periods as $period) {
-      $graph_array['from']     = $$period;
-      $graph_array_zoom   = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
-      echo(overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
-    }
-
-    echo('</tr></td>');
+    echo("</td></tr>");
 
   }
 
