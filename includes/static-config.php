@@ -154,6 +154,10 @@ $config['os'][$os]['type']    		= "network";
 $config['os'][$os]['ifname']  		= 1;
 $config['os'][$os]['icon']    		= "extreme";
 
+$os = "packetshaper";
+$config['os'][$os]['text']   		= "Blue Coat Packetshaper";
+$config['os'][$os]['type']   		= "network";
+
 $os = "xos";
 $config['os'][$os]['text']    		= "Extreme XOS";
 $config['os'][$os]['type']    		= "network";
@@ -192,7 +196,7 @@ $config['os'][$os]['text']           	= "Dell DRAC";
 $config['os'][$os]['icon']           	= "dell";
 
 $os = "bcm963";
-$config['os'][$os]['text']		= "Broadcom BCM963xxx";
+$config['os'][$os]['text']		= "Broadcom BCM963xx";
 $config['os'][$os]['icon']		= "broadcom";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
@@ -365,6 +369,13 @@ $config['os'][$os]['text']  	   	= "Ricoh Printer";
 $config['os'][$os]['type']		= "printer";
 $config['os'][$os]['over'][0]['graph']  = "device_toner";
 $config['os'][$os]['over'][0]['text']   = "Toner";
+
+$os = "okilan";
+$config['os'][$os]['group'] 	   	= "printer";
+$config['os'][$os]['text']  	   	= "OKI Printer";
+$config['os'][$os]['overgraph'][]       = "device_toner";
+$config['os'][$os]['overtext']          = "Toner";
+$config['os'][$os]['type']              = "printer";
 
 $os = "brother";
 $config['os'][$os]['group'] 	   	= "printer";

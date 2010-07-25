@@ -2,6 +2,6 @@
 
 # AKCP clone
 
-include('includes/polling/device-akcp.inc.php');
+include('includes/polling/os/akcp.inc.php');
 
 ?>
