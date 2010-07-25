@@ -40,3 +40,6 @@ CREATE TABLE IF NOT EXISTS `ports_adsl` (  `interface_id` int(11) NOT NULL,  `po
 ## 0.10.7
 ALTER TABLE `devices` ADD  `last_polled_timetaken` DOUBLE( 5, 2 ) NOT NULL AFTER  `last_polled` , ADD  `last_discovered_timetaken` DOUBLE( 5, 2 ) NOT NULL AFTER  `last_polled_timetaken`;
 CREATE TABLE IF NOT EXISTS `perf_times` (  `type` varchar(8) NOT NULL,  `doing` varchar(64) NOT NULL,  `start` int(11) NOT NULL,  `duration` double(5,2) NOT NULL,  `devices` int(11) NOT NULL,  KEY `type` (`type`)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+## 0.10.7.1
+ALTER TABLE `bills` ADD `bill_autoadded` BOOLEAN NOT NULL DEFAULT '0'
+ALTER TABLE `bill_ports` ADD `bill_port_autoadded` BOOLEAN NOT NULL DEFAULT '0'
