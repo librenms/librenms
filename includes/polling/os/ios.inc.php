@@ -29,7 +29,7 @@
      }
    }
 
-   list($version) = explode("," $version);
+   #list($version) = explode("," $version);
 
 
 
