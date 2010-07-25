@@ -384,6 +384,7 @@ $config['os'][$os]['text']  	   	= "OKI Printer";
 $config['os'][$os]['overgraph'][]       = "device_toner";
 $config['os'][$os]['overtext']          = "Toner";
 $config['os'][$os]['type']              = "printer";
+$config['os'][$os]['icon']              = "oki";
 
 $os = "brother";
 $config['os'][$os]['group'] 	   	= "printer";
