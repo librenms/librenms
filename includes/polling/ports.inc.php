@@ -124,20 +124,18 @@
 
       /// Parse description (usually ifAlias) if config option set
 
-      if(isset($config['port_descr_parser']))
+      if(isset($config['port_descr_parser']) && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
       {
+
         $port_attribs = array('type','descr','circuit','speed','notes');
-        include($config['port_descr_parser']);
+        include($config['install_dir'] . "/" . $config['port_descr_parser']);
 
         foreach ($port_attribs as $attrib) {
           $attrib_key = "port_descr_".$attrib;
-          if($port_ifAlias[$attrib]) 
+          if($port_ifAlias[$attrib] != $port[$attrib_key]) 
           {
-            if($port_ifAlias[$attrib] != $port[$attrib_key]) 
-            {
-              $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
-              log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], 'interface', $port['interface_id']);
-            }
+            $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
+            log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], 'interface', $port['interface_id']);
           }
         }        
       }
