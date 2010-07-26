@@ -15,7 +15,7 @@ $config['rrd_dir'] 	= $config['install_dir'] . "/rrd";
 $config['log_file']     = $config['install_dir'] . "/observium.log";
 
 ###
-$config['base_url']	= "http://obeservium.company.com";
+$config['base_url']	= "http://observium.company.com";
 
 ### Enable the below to use rrdcached. be sure rrd_dir is within the rrdcached dir
 ### and that your web server has permission to talk to rrdcached.
