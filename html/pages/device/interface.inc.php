@@ -3,7 +3,7 @@
 if( !isset($_GET['optb']) ) { $_GET['optb'] = "graphs"; }
 
 $interface_query = mysql_query("select * from ports WHERE interface_id = '".$_GET['opta']."'");
-$interface = mysql_fetch_array($interface_query);
+$interface = mysql_fetch_assoc($interface_query);
 
  $port_details = 1;
 
