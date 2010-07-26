@@ -136,7 +136,6 @@ $config['billing']['customer_autoadd']	= 0; # Enable Auto-add bill per customer
 $config['billing']['circuit_autoadd']	= 0; # Enable Auto-add bill per circuit_id
 $config['billing']['bill_autoadd']	= 0; # Enable Auto-add bill per bill_id
 
-
 ### External Integration
 
 #$config['rancid_configs']       	= '/var/lib/rancid/network/configs/';

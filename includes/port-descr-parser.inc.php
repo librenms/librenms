@@ -14,6 +14,8 @@
   $descr = trim($descr);
 
   if($type && $descr) {
+
+    $type = strtolower($type);
     $port_ifAlias['type']  = $type;
     $port_ifAlias['descr'] = $descr;
     $port_ifAlias['circuit'] = $circuit;
