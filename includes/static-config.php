@@ -364,7 +364,7 @@ $config['os'][$os]['over'][0]['text']   = "Toner";
 
 $os = "jetdirect";
 $config['os'][$os]['group'] 	   	= "printer";
-$config['os'][$os]['text']  	   	= "HP Printer";
+$config['os'][$os]['text']  	   	= "HP Print server";
 $config['os'][$os]['ifname']	   	= 1;
 $config['os'][$os]['type']         	= "printer";
 $config['os'][$os]['icon']         	= "hp";

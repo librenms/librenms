@@ -1,4 +1,17 @@
-<?php print_optionbar_start(62); ?>
+<?php 
+
+if ($_POST['hostname']) { $where = " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
+if ($_POST['os'])       { $where = " AND os = '".mres($_POST['os'])."'"; }
+if ($_POST['version'])  { $where .= " AND version = '".mres($_POST['version'])."'"; }
+if ($_POST['hardware']) { $where .= " AND hardware = '".mres($_POST['hardware'])."'"; }
+if ($_POST['features']) { $where .= " AND features = '".mres($_POST['features'])."'"; }
+if ($_POST['location']) { $where .= " AND location = '".mres($_POST['location'])."'"; }
+if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location = '".mres($_GET['location'])."'"; }
+if ($_GET['type'])      { $where = "AND type = '" .mres($_GET[type]). "'"; }
+if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
+
+print_optionbar_start(62); 
+?>
 <table cellpadding="4" cellspacing="0" class="devicetable" width="100%">
   <form method="post" action="">
     <tr> 
@@ -10,7 +23,7 @@
         <select name='os' id='os'>
           <option value=''>All OSes</option>
           <?php
-            $query = mysql_query("SELECT `os` FROM `devices` GROUP BY `os` ORDER BY `os`");
+            $query = mysql_query("SELECT `os` FROM `devices` WHERE 1 $where GROUP BY `os` ORDER BY `os`");
             while ($data = mysql_fetch_array($query)) 
             {
               if ($data['os'])
@@ -26,7 +39,7 @@
         <select name='version' id='version'>
           <option value=''>All Versions</option>
           <?php
-            $query = mysql_query("SELECT `version` FROM `devices` GROUP BY `version` ORDER BY `version`");
+            $query = mysql_query("SELECT `version` FROM `devices` WHERE 1 $where GROUP BY `version` ORDER BY `version`");
             while ($data = mysql_fetch_array($query)) 
             {
               if ($data['version'])
@@ -43,7 +56,7 @@
         <select name="hardware" id="hardware">
           <option value="">All Platforms</option>
           <?php
-            $query = mysql_query("SELECT `hardware` FROM `devices` GROUP BY `hardware` ORDER BY `hardware`");
+            $query = mysql_query("SELECT `hardware` FROM `devices` WHERE 1 $where GROUP BY `hardware` ORDER BY `hardware`");
             while ($data = mysql_fetch_array($query)) 
             {
               if ($data['hardware'])
@@ -59,7 +72,7 @@
         <select name="features" id="features">
           <option value="">All Featuresets</option>
           <?php
-            $query = mysql_query("SELECT `features` FROM `devices` GROUP BY `features` ORDER BY `features`");
+            $query = mysql_query("SELECT `features` FROM `devices` WHERE 1 $where GROUP BY `features` ORDER BY `features`");
             while ($data = mysql_fetch_array($query)) 
             {
               if ($data['features'])
@@ -76,7 +89,7 @@
         <select name="location" id="location">
           <option value="">All Locations</option>
           <?php
-            $query = mysql_query("SELECT `location` FROM `devices` GROUP BY `location` ORDER BY `location`");
+            $query = mysql_query("SELECT `location` FROM `devices` WHERE 1 $where GROUP BY `location` ORDER BY `location`");
             while ($data = mysql_fetch_array($query)) 
             {
               if ($data['location'])
@@ -97,17 +110,6 @@
 
 <?php
 print_optionbar_end();
-
-
-if ($_POST['hostname']) { $where = " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
-if ($_POST['os'])       { $where = " AND os = '".mres($_POST['os'])."'"; }
-if ($_POST['version'])  { $where .= " AND version = '".mres($_POST['version'])."'"; }
-if ($_POST['hardware']) { $where .= " AND hardware = '".mres($_POST['hardware'])."'"; }
-if ($_POST['features']) { $where .= " AND features = '".mres($_POST['features'])."'"; }
-if ($_POST['location']) { $where .= " AND location = '".mres($_POST['location'])."'"; }
-if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location = '".mres($_GET['location'])."'"; }
-if ($_GET['type'])      { $where = "AND type = '" .mres($_GET[type]). "'"; }
-if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
 
 $sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostname`";
 if ($_GET['status'] == "alerted") { 

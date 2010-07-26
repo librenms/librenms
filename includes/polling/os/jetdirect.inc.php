@@ -17,10 +17,15 @@ if ($hardware == '')
   $hardware = $jetdirect['DESCRIPTION'];
 }
 
+if ($hardware == '')
+{
+  $hardware = $jetdirect['MODEL'];
+}
+
 # Strip off useless brand fields
 $hardware = str_replace('HP ','',$hardware);
 $hardware = str_replace('Hewlett-Packard ','',$hardware);
-$hardware = str_replace(' Series','',$hardware);
+$hardware = str_ireplace(' Series','',$hardware);
 $hardware = ucfirst($hardware);
 
 ?>
