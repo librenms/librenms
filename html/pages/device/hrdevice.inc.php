@@ -11,7 +11,7 @@ if($hrdevice['hrDeviceType'] == "hrDeviceProcessor") {
   $proc_id = mysql_result(mysql_query("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'"),0);
   $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
   $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
-  $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&type=processor&from=$month&to=$now&width=400&height=125\'>";
+  $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&type=processor_usage&from=$month&to=$now&width=400&height=125\'>";
   $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
   echo("<td><a href='$proc_url' $proc_popup>".$hrdevice['hrDeviceDescr']."</a></td>");
 
@@ -19,7 +19,7 @@ if($hrdevice['hrDeviceType'] == "hrDeviceProcessor") {
   $graph_array['width']  = "100";
   $graph_array['to']     = $now;
   $graph_array['id']     = $proc_id;
-  $graph_array['type']   = 'processor';
+  $graph_array['type']   = 'processor_usage';
   $graph_array['from']     = $day;
   $graph_array_zoom   = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
 
