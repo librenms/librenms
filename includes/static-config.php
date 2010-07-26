@@ -440,6 +440,11 @@ $config['version'] = "0.10";
 $config['rrdgraph_def_text'] = str_replace("  ", " ", $config['rrdgraph_def_text']);
 $config['rrd_opts_array'] = explode(" ", trim($config['rrdgraph_def_text']));
 
+if(!isset($config['log_file'])) 
+{
+  $config['log_file']     = $config['install_dir'] . "/observium.log";
+}
+
 if(!$config['mibdir']) 
 {
   $config['mibdir'] =  $config['install_dir']."/mibs/";
