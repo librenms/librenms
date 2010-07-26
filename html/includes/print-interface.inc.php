@@ -11,8 +11,6 @@
 
   $if_id = $interface['interface_id'];
 
-print_r($interface);
-
   $interface = ifLabel($interface);
 
   if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
