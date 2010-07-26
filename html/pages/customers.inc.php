@@ -1,6 +1,6 @@
 <?php
 
-$sql  = "SELECT * FROM `ports` WHERE `port_descr_type` = 'Cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`";
+$sql  = "SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' GROUP BY `port_descr_descr` ORDER BY `port_descr_descr`";
 $cust_query = mysql_query($sql);
 
 echo("<table border=0 cellspacing=0 cellpadding=2 class=devicetable width=100%>");
@@ -23,7 +23,7 @@ while($customer = mysql_fetch_array($cust_query)) {
 
   $i++;
   
-  $port_sql = "SELECT * FROM `ports` WHERE `port_descr_type` = 'Cust' AND `port_descr_descr` = '".$customer['port_descr_descr']."'";
+  $port_sql = "SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = '".$customer['port_descr_descr']."'";
   $port_query = mysql_query($port_sql);
 
   $customer_name = $customer['port_descr_descr'];
@@ -65,10 +65,10 @@ while($customer = mysql_fetch_array($cust_query)) {
   }
 
      echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?cust=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
        </td></tr>");
 
 

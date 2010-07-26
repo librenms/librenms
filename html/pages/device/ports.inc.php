@@ -36,7 +36,7 @@ if($_GET['optc'] == thumbs) {
   $sql  = "select * from ports WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
   $query = mysql_query($sql);
   unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
+  while($interface = mysql_fetch_assoc($query)) {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($interface['ifDescr'])."</div>
     <a href='device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('\
@@ -59,7 +59,7 @@ if($_GET['optc'] == thumbs) {
     echo("<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>");
     $i = "0";
     $interface_query = mysql_query("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = '".$device['device_id']."' AND A.interface_id = P.interface_id AND P.deleted = '0' ORDER BY `ifIndex` ASC");
-    while($interface = mysql_fetch_array($interface_query)) {
+    while($interface = mysql_fetch_assoc($interface_query)) {
       include("includes/print-interface-adsl.inc.php");
       $i++;
     }
@@ -70,7 +70,7 @@ if($_GET['optc'] == thumbs) {
     echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
     $interface_query = mysql_query("select * from ports WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
-    while($interface = mysql_fetch_array($interface_query)) {
+    while($interface = mysql_fetch_assoc($interface_query)) {
       include("includes/print-interface.inc.php");
       $i++; 
     }
