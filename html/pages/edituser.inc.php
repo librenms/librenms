@@ -116,8 +116,8 @@ echo("<table width=100%><tr><td valign=top width=33%>");
                                      "' AND P.bill_id = B.bill_id");
 
   while($bill_perm = mysql_fetch_array($bill_perm_data)) {
-   echo("<table><tr><td><strong>".$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='?page=edituser&action=delifperm&user_id=" .
-    $_GET['user_id'] . "&interface_id=" . $bill_perm['interface_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></td></tr></table>");
+   echo("<table><tr><td><strong>".$bill_perm['bill_name']."</strong></td><td width=50>&nbsp;&nbsp;<a href='?page=edituser&action=delbillperm&user_id=" .
+    $_GET['user_id'] . "&bill_id=" . $bill_perm['bill_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></td></tr></table>");
     $bill_access_list[] = $bill_perm['bill_id'];
 
     $bpermdone = "yes";
