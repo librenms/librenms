@@ -2,7 +2,7 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.interface_id = '".mres($_GET['port'])."' AND I.device_id = D.device_id");
+$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.interface_id = '".mres($_GET['id'])."' AND I.device_id = D.device_id");
 $port = mysql_fetch_array($query);
 
 $oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingleCollisionFrames', 'dot3StatsMultipleCollisionFrames',
