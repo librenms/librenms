@@ -170,6 +170,12 @@ $config['os'][$os]['text']		= "Force10 FTOS";
 $config['os'][$os]['type']		= "network";
 $config['os'][$os]['icon']		= "force10";
 
+$os = "arista_eos";
+$config['os'][$os]['text']              = "Arista EOS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "arista";
+
+
 $os = "powerconnect";
 $config['os'][$os]['text']   		= "Dell PowerConnect";
 $config['os'][$os]['ifname'] 		= 1;
