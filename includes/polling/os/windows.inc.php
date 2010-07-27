@@ -12,6 +12,7 @@
 #sysDescr.0 = STRING: Hardware: AMD64 Family 16 Model 8 Stepping 0 AT/AT COMPATIBLE - Software: Windows Version 6.1 (Build 7600 Multiprocessor Free)
 
    if(strstr($sysDescr, "x86"))     { $hardware = "Generic x86"; }
+   if(strstr($sysDescr, "ia64"))    { $hardware = "Intel Itanium IA64"; }
    if(strstr($sysDescr, "EM64"))    { $hardware = "Intel x64"; }
    if(strstr($sysDescr, "AMD64"))   { $hardware = "AMD x64"; }
    if(strstr($sysDescr, "Intel64")) { $hardware = "Intel x64"; }  
