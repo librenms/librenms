@@ -180,7 +180,7 @@ $config['allow_entity_sensor']['truthvalue'] = 1;
 $config['allow_entity_sensor']['specialEnum'] = 1;
 
 ### Set default alert limits for various sensors and metrics
-
+#FIXME THESE SUCK
 $config['limit']['fan']  = "1000";
 $config['limit']['temp'] = "60";
 
@@ -198,11 +198,6 @@ $config['ignore_mount_regexp'] = array("/on: \/packages/", "/on: \/dev/", "/on: 
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 
-### Poller/Discovery
-
-$config['enable_ports_etherlike']       = 0; # Enable EtherLike-MIB
-$config['enable_ports_junoseatmvp']     = 0; # Enable JunOSe ATM VC Discovery/Poller
-
 ### Syslog Settings
 
 $config['syslog_age']       = "1 month";        ## Entries older than this will be removed
@@ -218,7 +213,7 @@ $config['auth_ldap_version'] = 3; # v2 or v3
 $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### Default warning settings
-
+## FIXME THESE SUCK
 $config['defaults']['temp_limit'] = 60;
 
 ### What should we warn about?

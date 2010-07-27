@@ -23,8 +23,9 @@ if(is_array($storage_array)) {
     if(!$deny && is_numeric($index)) {
       discover_mempool($valid_mempool, $device, $index, "hrstorage", $descr, $units, NULL, NULL);
     }
-    unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd, $storage_array);
+    unset($deny, $fstype, $descr, $size, $used, $units, $storage_rrd, $old_storage_rrd);
   }
+  unset($storage_array);
 }
 
 ?>
