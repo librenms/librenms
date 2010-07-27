@@ -159,7 +159,7 @@ print_optionbar_end();
              <td>$used</td>
              <td><img src='percentage.php?width=350&per=$percent'> $percent%</td>
 						 <td></td>
-						 <td width=60><a href='".$config['base_url']."/bill/1/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+						 <td width=60><a href='".$config['base_url']."/bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
     $i++;
