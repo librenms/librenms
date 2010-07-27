@@ -70,7 +70,8 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   $data = trim(shell_exec($cmd));
   $runtime_stats['snmpwalk']++;
   if($debug) { echo("$data\n"); }
-  if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data) || preg_match("/No more variables left/i", $data)))
+  if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data)))
+  ##  || preg_match("/No more variables left/i", $data)))
   { $data = false; } else { return $data; }
 }
 
