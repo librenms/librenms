@@ -1,5 +1,7 @@
 <?php
 
+if ($config['enable_bgp'])
+{
 ### Discover BGP peers
 
   echo("BGP Sessions : ");
@@ -139,5 +141,6 @@ while ($entry = mysql_fetch_array($query)) {
 unset($peerlist);
 
 echo("\n");
+}
 
 ?>

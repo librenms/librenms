@@ -5,7 +5,10 @@
   $device_alerts = "0"; 
   $device_alert_sql = "WHERE 0";
 
+if (isset($config['enable_bgp']) && $config['enable_bgp'])
+{
   $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'"), 0);
+}
 
   $query_a = mysql_query("SELECT * FROM `devices`");
   while($device = mysql_fetch_array($query_a)) {
@@ -225,7 +228,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
 
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {
+if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp'])) {
 echo('
 <li><a class="menu2four" href="bgp/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP Sessions</a>
         <table><tr><td>
@@ -248,7 +251,7 @@ echo('        <li><hr /></li>
         </td></tr></table>
 </li>
 ');
-}
+} # If level > 5 && BGP enabled
 
 ?>
 
