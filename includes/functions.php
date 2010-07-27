@@ -165,7 +165,7 @@ function formatstorage($rate, $round = '2')
 
 function format_si($rate) 
 {
-  $sizes = Array('', 'K', 'M', 'G', 'T', 'P', 'E');
+  $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $round = Array('0','0','0','2','2','2','2','2','2');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
@@ -174,7 +174,7 @@ function format_si($rate)
 
 function format_bi($size, $round = '2') 
 {
-  $sizes = Array('', 'K', 'M', 'G', 'T', 'P', 'E');
+  $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
   for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
   return round($size, $round).$ext;
