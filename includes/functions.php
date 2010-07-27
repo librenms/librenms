@@ -254,7 +254,7 @@ function delete_port($int_id)
     mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
     mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
-    shell_exec("rm -rf ".$config['rrd_dir']."/".$interface['hostname']."/".$interface['ifIndex'].".rrd");
+    shell_exec("rm -rf ".trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
 }
 
 function delete_device($id) 
@@ -286,7 +286,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `frequency` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
-  shell_exec("rm -rf ".$config['rrd_dir']."/$host");
+  shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
   return $ret . "Removed device $host\n";
 }
 
