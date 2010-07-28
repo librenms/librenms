@@ -42,6 +42,9 @@ if ($device['type'] == 'network')
     }
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients1);
+
+    $graphs['airport_wireless'] = TRUE;
+
   }
 
   if (isset($wificlients2) && $wificlients2 != "")
@@ -59,7 +62,12 @@ if ($device['type'] == 'network')
     }
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients2);
+
+    $graphs['airport_wireless'] = TRUE;
+
   }
+
+  unset($wificlients2, $wificlients1);
 
 }
 
