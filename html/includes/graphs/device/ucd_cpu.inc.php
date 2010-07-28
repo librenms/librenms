@@ -1,42 +1,5 @@
 <?php
 
-$query = mysql_query("SELECT * FROM `hrDevice` where `device_id` = '".mres($_GET['id'])."' AND hrDeviceType = 'hrDeviceProcessor'");
-$device = device_by_id_cache(mres($device_id));
-
-
-$i=0;
-while($proc = mysql_fetch_array($query)) {
-
-  $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("hrProcessor-" . $proc['hrDeviceIndex'] . ".rrd");
-
-  if(is_file($rrd_filename)) {
-
-    $descr = short_hrDeviceDescr($proc['hrDeviceDescr']);
-    $descr = str_replace(":", "\:", $descr);
-
-    $rrd_list[$i]['filename'] = $rrd_filename;
-    $rrd_list[$i]['descr'] = $descr;
-    $rrd_list[$i]['rra'] = "usage";
-    $i++;
-  }
-}
-
-$unit_text = "Load %";
-
-$units='%';
-$total_units='%';
-$colours='mixed';
-
-$scale_min = "0";
-$scale_max = "100";
-
-$nototal = 1;
-
-if ($rrd_list) {
-
-include ("includes/graphs/generic_multi_line.inc.php");
-
-} else {
   include("includes/graphs/common.inc.php");
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . "ucd_cpu.rrd";
   $rrd_options .= " DEF:user=$rrd_filename:user:AVERAGE";
@@ -65,7 +28,5 @@ include ("includes/graphs/generic_multi_line.inc.php");
   $rrd_options .= " GPRINT:idle_perc:LAST:\ \ \ \ \ %5.2lf%%";
   $rrd_options .= " GPRINT:idle_perc:AVERAGE:\ \ \ %5.2lf%%";
   $rrd_options .= " GPRINT:idle_perc:MAX:\ \ \ %5.2lf%%\\\\n";
-
-}
 
 ?>

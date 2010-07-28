@@ -12,6 +12,7 @@ if($_GET['debug']) {
   include("../config.php");
   include("../includes/common.php");
   include("../includes/rewrites.php");
+  include("includes/functions.inc.php");
   include("includes/authenticate.inc.php");
 
   if(!$config['allow_unauth_graphs']) {
@@ -47,9 +48,8 @@ if($_GET['debug']) {
 
   $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
-  $os = gethostosbyid($device_id);
-  if($config['os'][$os]['group']) {$os_group = $config['os'][$os]['group'];}
-
+#  $os = gethostosbyid($device_id);
+#  if($config['os'][$os]['group']) {$os_group = $config['os'][$os]['group'];}
 #  if(is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".$os.".inc.php")) {
 #    /// Type + OS Specific
 #    include($config['install_dir'] . "/html/includes/graphs/".$type."_".$os.".inc.php");
@@ -62,6 +62,7 @@ if($_GET['debug']) {
 #  }
 
 if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
+  include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
   include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
 }
 

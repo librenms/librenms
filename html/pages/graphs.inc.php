@@ -14,6 +14,8 @@ if(is_numeric($_GET['optd'])) { $to = $_GET['optd']; } else { $to = $now; }
 
   if(isset($config['graph'][$type][$subtype])) { $descr = $config['graph'][$type][$subtype]; } else { $descr = $graph_type; }
 
+  $descr = mysql_result(mysql_query("SELECT `graph_descr` FROM `graph_types` WHERE `graph_type` = '".$type."' AND `graph_subtype` = '".$subtype."'"),0);
+
    if(is_file("includes/graphs/".$type."/auth.inc.php")) 
   {
     include("includes/graphs/".$type."/auth.inc.php");

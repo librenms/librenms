@@ -17,8 +17,4 @@ if($loop) {
     $version = $matches[1];
  }
 
-echo("$hardware - $version - $features - $serial\n");
-
-#include("hr-mib.inc.php");
-
 ?>

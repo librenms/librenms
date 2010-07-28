@@ -37,7 +37,7 @@ if($device[os] != "Snom") {
     if(isset($data[0]['udpInDatagrams']) && isset($data[0]['udpOutDatagrams'])) {
       if(!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
       rrdtool_update($rrd_file, $rrdupdate);
-      $graphs['netstats-udp'] = TRUE;
+      $graphs['netstat_udp'] = TRUE;
     }
 }
 unset($oids, $data, $data_array, $oid, $protos, $snmpstring);

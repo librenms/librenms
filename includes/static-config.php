@@ -7,9 +7,9 @@ $config['afi']['ipv4']['vpn']        = "VPNv4";
 $config['afi']['ipv6']['unicast']    = "IPv6";
 $config['afi']['ipv6']['multicast']  = "IPv6 Multicast";
 
-$config['os']['default']['over'][0]['graph']	= "device_cpu";
+$config['os']['default']['over'][0]['graph']	= "device_processors";
 $config['os']['default']['over'][0]['text']	= "Processor Usage";
-$config['os']['default']['over'][1]['graph'] 	= "device_memory";
+$config['os']['default']['over'][1]['graph'] 	= "device_mempools";
 $config['os']['default']['over'][1]['text']	= "Memory Usage";
 
 $os = "generic";
@@ -65,9 +65,9 @@ $config['os'][$os]['type']		= "network";
 $config['os'][$os]['ifXmcbc']		= 1;
 $config['os'][$os]['over'][0]['graph']	= "device_bits";
 $config['os'][$os]['over'][0]['text']	= "Device Traffic";
-$config['os'][$os]['over'][1]['graph']	= "device_cpu";
+$config['os'][$os]['over'][1]['graph']	= "device_processors";
 $config['os'][$os]['over'][1]['text']	= "CPU Usage";
-$config['os'][$os]['over'][2]['graph']	= "device_memory";
+$config['os'][$os]['over'][2]['graph']	= "device_mempools";
 $config['os'][$os]['over'][2]['text']	= "Memory Usage";
 
 $os = "cat1900";
@@ -134,9 +134,9 @@ $config['os'][$os]['type']		= "network";
 $config['os'][$os]['nobulk']		= 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
-$config['os'][$os]['over'][1]['graph']  = "device_cpu";
+$config['os'][$os]['over'][1]['graph']  = "device_processors";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
-$config['os'][$os]['over'][2]['graph']  = "device_memory";
+$config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 $os = "junose";
@@ -188,9 +188,9 @@ $config['os'][$os]['ifname']       	= 1;
 $config['os'][$os]['type']         	= "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
-$config['os'][$os]['over'][1]['graph']  = "device_cpu";
+$config['os'][$os]['over'][1]['graph']  = "device_processors";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
-#$config['os'][$os]['over'][2]['graph']   = "device_memory";
+#$config['os'][$os]['over'][2]['graph']   = "device_mempools";
 #$config['os'][$os]['over'][2]['text']    = "Memory Usage";
 
 $os = "powervault";
@@ -437,6 +437,17 @@ $config['graph']['device']['memory']  		= "Memory Usage";
 $config['graph']['device']['processors']      	= "Processor Usage";
 $config['graph']['device']['cpu']        	= "Processor Usage";
 $config['graph']['device']['storage']        	= "Disk Usage";
+
+$config['graph']['device']['ucd_load']		= "Load Averages";
+$config['graph']['device']['ucd_cpu']           = "Detailed Processor Usage";
+$config['graph']['device']['ucd_mem']           = "Detailed Memory Usage";
+$config['graph']['device']['netstats_tcp']      = "TCP Statistics";
+$config['graph']['device']['netstats_icmp_info'] = "ICMP Informational Statistics";
+$config['graph']['device']['netstats_icmp_stat'] = "ICMP Statistics";
+$config['graph']['device']['netstats_ip']        = "IP Statistics";
+$config['graph']['device']['netstats_ip_frag']   = "IP Fragmentation Statistics";
+$config['graph']['device']['netstats_udp']       = "UDP Statistics";
+$config['graph']['device']['netstats_snmp']      = "SNMP Statistics";
 
 
 

@@ -18,17 +18,10 @@ list(,$version) =  explode("(", $version);
 list($features) = explode("]", $junose_version);
 list(,$features) =  explode("[", $features);
 
-echo("$hardware - $version - $features - $serial\n");
-
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junose-cpu.rrd";
 
 #$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 #$cpu_cmd .= " .1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0";
 #$cpu_usage = trim(shell_exec($cpu_cmd));
-
-include("includes/polling/hr-mib.inc.php");
-include("includes/polling/junose-atm-vp.inc.php");
-
-
 
 ?>

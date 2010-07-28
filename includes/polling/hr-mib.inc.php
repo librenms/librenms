@@ -3,14 +3,14 @@
 /// HOST-RESOURCES-MIB
 //  Generic System Statistics
 
-$hrSystem_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
-
 $oid_list = "hrSystemProcesses.0 hrSystemNumUsers.0";
 $hrSystem  = snmp_get_multi ($device, $oid_list, "-OUQs", "HOST-RESOURCES-MIB");
 
-if(isset($hrSystem[0]['hrSystemProcesses'])) 
+echo("HR Stats:");
+
+if(is_numeric($hrSystem[0]['hrSystemProcesses'])) 
 {
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr-processes.rrd";
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_processes.rrd";
   if (!is_file($rrd_file)) {
     shell_exec($config['rrdtool'] . " create $rrd_file \
     --step 300 \
@@ -24,13 +24,14 @@ if(isset($hrSystem[0]['hrSystemProcesses']))
     RRA:MAX:0.5:24:800 \
     RRA:MAX:0.5:288:800");
   }
-  rrdtool_update($rrd_file,  "N:$hrSystemProcesses");
-  $graphs['hrprocesses'] = TRUE;
+  rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemProcesses']);
+  $graphs['hr_processes'] = TRUE;
+  echo(" Processes");
 }
 
-if(isset($hrSystem[0]['hrSystemNumUsers'])) 
+if(is_numeric($hrSystem[0]['hrSystemNumUsers'])) 
 {
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr-users.rrd";
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_users.rrd";
   if (!is_file($rrd_file)) {
     shell_exec($config['rrdtool'] . " create $rrd_file \
     --step 300 \
@@ -44,9 +45,11 @@ if(isset($hrSystem[0]['hrSystemNumUsers']))
     RRA:MAX:0.5:24:800 \
     RRA:MAX:0.5:288:800");
   }
-  rrdtool_update($rrd_file,  "N:$hrSystemNumUsers");
-  $graphs['hrusers'] = TRUE;
+  rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemNumUsers']);
+  $graphs['hr_users'] = TRUE;
+  echo(" Users");
 }
 
+echo("\n");
 
 ?>

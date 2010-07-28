@@ -46,7 +46,4 @@
         if(strpos($hw, "No") !== FALSE) { unset($hw); } else { $hardware = "Dell " . $hw; }
       }
 
-echo("$version - $hardware - $features ");
-
-include("includes/polling/ucd-mib.inc.php");
-include("includes/polling/hr-mib.inc.php");
+?>

@@ -2,6 +2,28 @@
 
 ## Common Functions
 
+function get_port_by_id($port_id)
+{
+  if(is_numeric($port_id)) {
+    $port = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '".$port_id."'"));
+  }
+  if(is_array($port)){
+    return $port;
+  } else {
+    return FALSE;
+  }
+
+}
+
+function ifclass($ifOperStatus, $ifAdminStatus)
+{
+  $ifclass = "interface-upup";
+  if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
+  if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
+  if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
+  return $ifclass;
+}
+
 function device_by_id_cache($device_id)
 {
   global $device_cache;

@@ -90,9 +90,9 @@
     unset($rrdupdate, $rrd_create);
 
     ## FIXME per-AF?
-
-    $graphs['ipSystemStats'] = TRUE;
-
+    
+    $graphs['ipsystemstats_'.$af] = TRUE;
+    $graphs['ipsystemstats_'.$af.'_frag'] = TRUE;
   }
  }
 

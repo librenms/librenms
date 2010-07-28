@@ -38,7 +38,8 @@ if($device[os] != "Snom") {
     if(isset($data_array[$device['device_id']][0]['snmpInPkts']) && isset($data_array[$device['device_id']][0]['snmpOutPkts'])) {
       if(!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
       rrdtool_update($rrd_file, $rrdupdate);
-      $graphs['netstats-snmp'] = TRUE;
+      $graphs['netstat_snmp'] = TRUE;
+      $graphs['netstat_snmp_pkt'] = TRUE;
     }
 
   unset($oids, $data, $data_array, $oid, $protos);

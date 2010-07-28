@@ -52,6 +52,7 @@
  
   ### This is how we currently collect. We should collect one RRD per stat, for ease of handling differen formats,
   ### and because it is per-host and no big performance hit. See new format below
+  ### FIXME REMOVE
 
   if(is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) 
   {
@@ -78,8 +79,17 @@
         rrdtool_create($filename, " --step 300 DS:value:COUNTER:600:0:U RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
       }
       rrdtool_update($filename, "N:".$value);
+      $graphs['ucd_cpu'] = TRUE;
     }
   }
+
+  ### Set various graphs if we've seen the right OIDs.
+
+  if(is_numeric($ss['ssRawSwapIn'])) { $graphs['ucd_swap_io'] = TRUE; }
+  if(is_numeric($ss['ssIORawSent'])) { $graphs['ucd_io'] = TRUE; }
+  if(is_numeric($ss['ssRawContexts'])) { $graphs['ucd_contexts'] = TRUE; }
+  if(is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
+
 
   ############################################################################################################################################
 
@@ -130,6 +140,7 @@
       rrdtool_create($mem_rrd, $mem_rrd_create);
     }
     rrdtool_update($mem_rrd,  "N:$memTotalSwap:$memAvailSwap:$memTotalReal:$memAvailReal:$memTotalFree:".($memShared+0).":".($memBuffer+0).":".($memCached+0));
+    $graphs['ucd_memory'] = TRUE;
   }
 
   ##########################################################################################################################################################
@@ -164,4 +175,5 @@
       rrdtool_create($load_rrd, $la_load_create);
     }
     rrdtool_update($load_rrd, "N:$load1:$load5:$load10");
+    $graphs['ucd_load'] = "TRUE";
   }
