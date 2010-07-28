@@ -88,6 +88,11 @@
     if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
     rrdtool_update($rrdfile, $rrdupdate);
     unset($rrdupdate, $rrd_create);
+
+    ## FIXME per-AF?
+
+    $graphs['ipSystemStats'] = TRUE;
+
   }
  }
 
