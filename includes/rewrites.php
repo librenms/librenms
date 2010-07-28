@@ -12,7 +12,7 @@ function ifNameDescr($interface, $device = NULL) {
 
 function ifLabel ($interface, $device = NULL) {
   global $config;
-  if(!$device) { $device = device_array($interface['device_id']); }
+  if(!$device) { $device = device_by_id_cache($interface['device_id']); }
   $os = strtolower($device['os']);
 
   if (isset($config['os'][$os]['ifname'])) {

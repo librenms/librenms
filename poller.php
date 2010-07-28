@@ -94,19 +94,33 @@ while ($device = mysql_fetch_array($device_query))
 
   if ($status == "1") 
   { 
+
+    $graphs = array();
+
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
     $snmpdata = str_replace('"','',trim(shell_exec($snmp_cmd)));
     list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
-    $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
-    $snmp_cmd .= " HOST-RESOURCES-MIB::hrSystemUptime.0";
-    $snmpdata = str_replace('"','',trim(shell_exec($snmp_cmd)));
-    list($hrSystemUptime) = explode("\n", $snmpdata);
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
+    $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
+
+    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
+
+    #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
+    $sysUptime = str_replace("(", "", $sysUptime);
+    $sysUptime = str_replace(")", "", $sysUptime);
+    list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
+    list($secs, $microsecs) = explode(".", $secs);
+    $hours = $hours + ($days * 24);
+    $mins = $mins + ($hours * 60);
+    $secs = $secs + ($mins * 60);
+    $uptime = $secs;
+
     if ($hrSystemUptime != "No Such Object available on this agent at this OID" && $hrSystemUptime != "")
     {
+      $agent_uptime = $uptime; ## Move uptime into agent_uptime
       #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
       $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
       $hrSystemUptime = str_replace(")", "", $hrSystemUptime); 
@@ -118,21 +132,12 @@ while ($device = mysql_fetch_array($device_query))
       $uptime = $secs;
       if ($device['os'] == "windows") { $uptime /= 10; }
     }
-    else
-    {
-      #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-      $sysUptime = str_replace("(", "", $sysUptime);
-      $sysUptime = str_replace(")", "", $sysUptime); 
-      list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
-      list($secs, $microsecs) = explode(".", $secs);
-      $hours = $hours + ($days * 24);
-      $mins = $mins + ($hours * 60);
-      $secs = $secs + ($mins * 60);
-      $uptime = $secs;
-    }
 
-    if ($uptime) 
+    if (is_numeric($uptime)) 
     {
+
+      $graphs['uptime'] = TRUE;
+
       if ( $uptime < $device['uptime'] ) {
         notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device['device_id'], 'reboot', $device['uptime']);
@@ -184,6 +189,8 @@ while ($device = mysql_fetch_array($device_query))
     include("includes/polling/mempools.inc.php");
     include("includes/polling/storage.inc.php");
     include("includes/polling/netstats.inc.php");
+    include("includes/polling/hr-mib.inc.php");
+    include("includes/polling/ucd-mib.inc.php");
     include("includes/polling/ipSystemStats.inc.php");
     include("includes/polling/ports.inc.php");
     include("includes/polling/altiga-ssl.inc.php");
@@ -252,11 +259,33 @@ while ($device = mysql_fetch_array($device_query))
 
   } 
 
+  ## FIX ME EVENTLOGGING
+  ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
+  ### If there any don't match, they're added/deleted from the database.
+  ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
+
+  $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
+  while($graph = mysql_fetch_array($query)){
+    if(!isset($graphs[$graph[0]]))
+    {
+      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph[0]."'");      
+    } else {
+      $oldgraphs[$graph[0]] = TRUE;
+    }
+  }
+  foreach($graphs as $graph => $value)
+  {
+    if(!isset($oldgraphs[$graph]))
+    {
+      mysql_query("INSERT INTO `device_graphs` (`device_id`, `graph`) VALUES ('".$device['device_id']."','".$graph."')");
+    }
+  }
+
+
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
   $poll_update .= $poll_separator . "`last_polled_timetaken` = '$device_time'";
   echo("$device_end - $device_start; $device_time $device_run");
   echo("Polled in $device_time seconds\n");
-
 
   $poll_update_query  = "UPDATE `devices` SET ";
   $poll_update_query .= $poll_update;

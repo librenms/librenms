@@ -6,6 +6,4 @@ if(is_numeric($id)) {
 
 $title = generatedevicelink($device);
 
-
-
 ?>

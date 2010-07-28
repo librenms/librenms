@@ -42,11 +42,10 @@ if($device[os] != "Snom") {
     if(isset($data_array[$device['device_id']][0]['icmpInMsgs']) && isset($data_array[$device['device_id']][0]['icmpOutMsgs'])) {
       if(!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
       rrdtool_update($rrd_file, $rrdupdate);
-      $graphs['netstats-icmp'] = TRUE;
-    }
-    
-
-  unset($oids, $data, $data_array, $oid, $protos);
+      $graphs['netstat_icmp'] = TRUE;
+      $graphs['netstat_icmp_info'] = TRUE;
+    }   
+    unset($oids, $data, $data_array, $oid, $protos);
 }
 
 ?>

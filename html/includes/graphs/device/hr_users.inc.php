@@ -6,7 +6,7 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
+$database = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_users.rrd";
 
 $rrd_options .= " DEF:users=$database:users:AVERAGE";
 $rrd_options .= " DEF:users_max=$database:users:MAX";

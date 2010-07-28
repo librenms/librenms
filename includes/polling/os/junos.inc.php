@@ -17,8 +17,6 @@ list($version) = explode("]", $jun_ver);
 list(,$version) =  explode("[", $version);
 $features = "";
 
-echo("$hardware - $version - $features - $serial\n");
-
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/junos-cpu.rrd";
 
 #$cpu_cmd  = $config['snmpget'] . " -m JUNIPER-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
@@ -45,7 +43,5 @@ if (is_numeric($cpu_usage))
   echo "CPU: $cpu_usage%\n";
   rrdtool_update($cpurrd, " N:$cpu_usage");
 }
-
-include("includes/polling/hr-mib.inc.php");
 
 ?>

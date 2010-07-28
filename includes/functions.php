@@ -89,19 +89,6 @@ function device_array($device_id)
   return $device;
 }
 
-function get_port_by_id($port_id) 
-{
-  if(is_numeric($port_id)) {
-    $port = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '".$port_id."'"));
-  }
-  if(is_array($port)){
-    return $port;
-  } else {
-    return FALSE;
-  }
-
-}
-
 function get_device_id_by_interface_id($interface_id) {
   if(is_numeric($interface_id)) {
     $device_id = mysql_result(mysql_query("SELECT `device_id` FROM `ports` WHERE `interface_id` = '".$interface_id."'"),0);
@@ -404,15 +391,6 @@ function isValidInterface($if) {
       if ($nullintf != '1') {
          return 1;
       }  else { return 0; }
-}
-
-function ifclass($ifOperStatus, $ifAdminStatus) 
-{
-  $ifclass = "interface-upup";
-  if ($ifAdminStatus == "down") { $ifclass = "interface-admindown"; }
-  if ($ifAdminStatus == "up" && $ifOperStatus== "down") { $ifclass = "interface-updown"; }
-  if ($ifAdminStatus == "up" && $ifOperStatus== "up") { $ifclass = "interface-upup"; }
-  return $ifclass;
 }
 
 function utime() 

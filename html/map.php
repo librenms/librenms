@@ -1,5 +1,7 @@
 <?php
 
+### FIXME : remove link when port/host is not in the database (things /seen/ but not *discovered*)
+
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");

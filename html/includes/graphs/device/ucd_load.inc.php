@@ -3,7 +3,7 @@
 include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_load.rrd";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ucd_load.rrd";
 
   $rrd_options .= " DEF:1min=$rrd_filename:1min:AVERAGE";
   $rrd_options .= " DEF:5min=$rrd_filename:5min:AVERAGE";
