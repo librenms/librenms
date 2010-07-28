@@ -98,7 +98,7 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
    $rrd_options .= " LINE1:doutbitsb#000099:";
    $rrd_options .= " LINE0.5:nothing#555555:";
   } else {
-   $rrd_options .= " COMMENT:BPS\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
+   $rrd_options .= " COMMENT:bps\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
    $rrd_options .= " AREA:inbits_tot#cdeb8b:ATM\ \ In\ ";
    $rrd_options .= " GPRINT:inbits:LAST:%6.2lf%s";
    $rrd_options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";

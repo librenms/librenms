@@ -14,8 +14,7 @@ $sess_data = shell_exec($sess_cmd);
 list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
 
 if (!is_file($sessrrd)) {
-   `rrdtool create $sessrrd \
-    --step 300 \
+   shell_exec($config['rrdtool'] ." create $sessrrd --step 300 \
      DS:allocate:GAUGE:600:0:3000000 \
      DS:max:GAUGE:600:0:3000000 \
      DS:failed:GAUGE:600:0:1000 \
@@ -26,9 +25,9 @@ if (!is_file($sessrrd)) {
      RRA:MAX:0.5:1:800 \
      RRA:MAX:0.5:6:800 \
      RRA:MAX:0.5:24:800 \
-     RRA:MAX:0.5:288:800`;
+     RRA:MAX:0.5:288:800");
 }
 
-shell_exec($config['rrdtool'] . " update $sessrrd N:$sessalloc:$sessmax:$sessfailed");
+rrdtool_update("$sessrrd", "N:$sessalloc:$sessmax:$sessfailed");
 
 ?>

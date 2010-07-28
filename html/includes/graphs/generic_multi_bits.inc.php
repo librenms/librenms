@@ -31,7 +31,7 @@ if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
    $rrd_options .= " LINE1.25:doutbits#".$colour_line_out.":";
   } else {
    $rrd_options .= " AREA:inbits#".$colour_area_in.":";
-   $rrd_options .= " COMMENT:BPS\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\\\\n";
+   $rrd_options .= " COMMENT:bps\ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Max\\\\n";
    $rrd_options .= " LINE1.25:inbits#".$colour_line_in.":In\ ";
    $rrd_options .= " GPRINT:inbits:LAST:%6.2lf%s";
    $rrd_options .= " GPRINT:inbits:AVERAGE:%6.2lf%s";
