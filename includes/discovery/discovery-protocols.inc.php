@@ -60,12 +60,25 @@ echo(" LLDP-MIB: ");
 unset($lldp_array);
 $lldp_array = snmpwalk_cache_threepart_oid($device, "lldpRemoteSystemsData", array(), "LLDP-MIB");
 $lldp_array = $lldp_array[$device['device_id']];
+$dot1d_array = snmpwalk_cache_oid($device, "dot1dBasePortIfIndex", array(), "BRIDGE-MIB");
+$dot1d_array = $dot1d_array[$device['device_id']];
+
+#print_r($lldp_array);
+#print_r($dot1d_array);
+
 if($lldp_array) {
   $lldp_links = "";
   foreach( array_keys($lldp_array) as $key) { 
     $lldp_if_array = $lldp_array[$key]; 
-    foreach( array_keys($lldp_if_array) as $entry_key) {
-      $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$entry_key."'"));
+    foreach( array_keys($lldp_if_array) as $entry_key) 
+    {    
+      if(is_numeric($dot1d_array[$entry_key]['dot1dBasePortIfIndex']))
+      {
+        $ifIndex = $dot1d_array[$entry_key]['dot1dBasePortIfIndex'];
+      } else {
+        $ifIndex = $entry_key;
+      }     
+      $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"));
       $lldp_instance = $lldp_if_array[$entry_key];
       foreach ( array_keys($lldp_instance) as $entry_instance) {
 	$lldp = $lldp_instance[$entry_instance];
@@ -74,15 +87,13 @@ if($lldp_array) {
 	  $if = $lldp['lldpRemPortDesc'];
 	  $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
 	} else { $remote_interface_id = "0"; }
-
-	if($interface['interface_id'] && $lldp['lldpRemSysDesc'] && $lldp['lldpRemPortDesc']) {
-	  discover_link($interface['interface_id'], 'lldp', $remote_interface_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortDesc'], NULL, $lldp['lldpRemSysDesc']);
+     	if(is_numeric($interface['interface_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId'])) {
+	  discover_link($interface['interface_id'], 'lldp', $remote_interface_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);
 	}
       }
     }     
   }
 }
-
 
 if($debug) { print_r($link_exists); }
 
