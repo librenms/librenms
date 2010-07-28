@@ -22,9 +22,9 @@
     $port_ifAlias['speed'] = $speed;
     $port_ifAlias['notes'] = $notes;
 
-#    if($debug) {
+    if($debug) {
       print_r($port_ifAlias);
-#    }
+    }
 
   }
 

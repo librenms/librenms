@@ -42,7 +42,7 @@ class observiumbot
      $pps_out = format_bi($port['ifOutUcastPkts_rate']);
 
     $irc->message(SMARTIRC_TYPE_CHANNEL, $data->channel, 'id' . $port['interface_id'] . " " . $port['ifAdminStatus'] . "/" . $port['ifOperStatus'] . " " . 
-                  $bps_in. " > BPS > " . $bps_out . " | " . $pps_in. "pps > PPS > " . $pps_out ."pps");
+                  $bps_in. " > bps > " . $bps_out . " | " . $pps_in. "pps > PPS > " . $pps_out ."pps");
 
   }
 }

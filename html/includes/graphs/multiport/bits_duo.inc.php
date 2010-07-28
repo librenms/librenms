@@ -68,7 +68,7 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
    $rrd_options .= " LINE1.25:doutbits_tot#000099:";
    $rrd_options .= " LINE0.5:nothing#555555:";
   } else {
-   $rrd_options .= " COMMENT:BPS\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
+   $rrd_options .= " COMMENT:bps\ \ \ \ \ \ \ \ \ \ \ \ Current\ \ \ Average\ \ \ \ \ \ Min\ \ \ \ \ \ Max\\\\n";
    $rrd_options .= " AREA:inbits_tot#cdeb8b:Peering\ In\ ";
    $rrd_options .= " GPRINT:inbitsb:LAST:%6.2lf%s";
    $rrd_options .= " GPRINT:inbitsb:AVERAGE:%6.2lf%s";
