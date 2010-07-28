@@ -77,10 +77,10 @@
   }
 
   echo("</td><td width=75>");
-  if($interface['ifSpeed'] && $interface['ifAlias'] != "") { echo("<span class=box-desc>".humanspeed($interface['ifSpeed'])."</span>"); }
+  if($interface['ifSpeed']) { echo("<span class=box-desc>".humanspeed($interface['ifSpeed'])."</span>"); }
   echo("<br />");
 
-#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
+  if($interface[ifDuplex] != "unknown") { echo("<span class=box-desc>" . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 
   if($device['os'] == "ios" || $device['os'] == "iosxe") {
     if($interface['ifTrunk']) { 
@@ -92,8 +92,8 @@
       echo("<span style='color: green;'>" . $vrf['vrf_name'] . "</span>");
     }   
   }
-  if($port_adsl['adslLineCoding']) {
 
+  if($port_adsl['adslLineCoding']) {
     echo("</td><td width=150>");
     echo($port_adsl['adslLineCoding']."/".$port_adsl['adslLineType']);
     echo("<br />");
@@ -104,8 +104,6 @@
     echo("Atten:".$port_adsl['adslAtucCurrAtn'] . "dB/". $port_adsl['adslAturCurrAtn'] . "dB");
     echo("<br />");
     echo("SNR:".$port_adsl['adslAtucCurrSnrMgn'] . "dB/". $port_adsl['adslAturCurrSnrMgn']. "dB");
-
-
   } else {
     echo("</td><td width=150>");
     if($interface['ifType'] && $interface['ifType'] != "") { echo("<span class=box-desc>" . fixiftype($interface['ifType']) . "</span>"); } else { echo("-"); } 
