@@ -5,7 +5,7 @@
 
   // Build SNMP Cache Array
   $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
-                     'ifPromiscuousMode','ifConnectorPresent');
+                     'ifPromiscuousMode','ifConnectorPresent','ifDuplex');
   $stat_oids = array('ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInNUcastPkts', 'ifOutNUcastPkts', 
                      'ifHCInMulticastPkts', 'ifHCInBroadcastPkts', 'ifHCOutMulticastPkts', 'ifHCOutBroadcastPkts',
                      'ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets');
@@ -30,7 +30,12 @@
   echo("Caching Oids: ");
   foreach ($ifmib_oids as $oid)      { echo("$oid "); $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "IF-MIB");}
 
-  if($config['enable_ports_etherlike']) { echo("dot3Stats "); $port_stats = snmpwalk_cache_oid($device, "dot3StatsEntry", $port_stats, "EtherLike-MIB"); }
+  if($config['enable_ports_etherlike']) 
+  { 
+    echo("dot3Stats "); $port_stats = snmpwalk_cache_oid($device, "dot3StatsEntry", $port_stats, "EtherLike-MIB"); 
+  } else {
+    echo("dot3StatsDuplexStatus"); $port_stats = snmpwalk_cache_oid($device, "dot3StatsDuplexStatus", $port_stats, "EtherLike-MIB"); 
+  }
 
   if($config['enable_ports_adsl']) {
     $device['adsl_count'] = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifType` = 'adsl'"),0);
@@ -102,19 +107,28 @@
       #echo("\n32bit - In: ".$this_port['ifInOctets']." Out: ".$this_port['ifOutOctets']);
       #echo("\n64bit - In: ".$this_port['ifHCInOctets']." Out: ".$this_port['ifHCOutOctets']."\n");
 
-      /// Copy ifHC[In|Out]Octets values to non-HC if they exist
+      ### Copy ifHC[In|Out]Octets values to non-HC if they exist
       if($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets'])) {
         echo("HC ");
         $this_port['ifInOctets'] = $this_port['ifHCInOctets'];
 	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
       }
 
+      ### Overwrite ifSpeed with ifHighSpeed if it's over 10G
       if(is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
       {
+        echo("HighSpeed ");
         $this_port['ifSpeed'] = $this_port['ifHighSpeed'] * 1000000;
       } 
 
-      /// Update IF-MIB data
+      ### Overwrite ifDuplex with dot3StatsDuplexStatus if it exists
+      if(isset($this_port['dot3StatsDuplexStatus']))
+      {
+        echo("dot3Duplex ");
+        $this_port['ifDuplex'] = $this_port['dot3StatsDuplexStatus'];
+      }
+
+      ### Update IF-MIB data
       foreach ($data_oids as $oid)      { 
         if ( $port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
           $update .= ", `$oid` = NULL";
