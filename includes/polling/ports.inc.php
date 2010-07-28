@@ -109,6 +109,11 @@
 	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
       }
 
+      if(is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
+      {
+        $this_port['ifSpeed'] = $this_port['ifHighSpeed'] * 1000000;
+      } 
+
       /// Update IF-MIB data
       foreach ($data_oids as $oid)      { 
         if ( $port[$oid] != $this_port[$oid] && !isset($this_port[$oid])) {
