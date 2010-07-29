@@ -12,12 +12,13 @@ while($volt = mysql_fetch_array($query)) {
   if(!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
-          <td width=350>" . $volt['sensor_descr'] . "</td>
-          <td>" . $volt['sensor_current'] . "V</td>
-          <td>" . $volt['sensor_limit_low'] . 'V - ' . $volt['sensor_limit'] . "V</td>
-          <td>" . $volt['sensor_notes'] . "</td>
+          <td width=450>" . $volt['sensor_descr'] . "</td>
+          <td>" . $volt['sensor_type'] . "</td>
+          <td width=50>" . $volt['sensor_current'] . "V</td>
+          <td width=75>" . $volt['sensor_limit_low'] . 'V - ' . $volt['sensor_limit'] . "V</td>
+          <td width=200>" . $volt['sensor_notes'] . "</td>
         </tr>\n");
-  echo("<tr  bgcolor=$row_colour><td colspan='4'>");
+  echo("<tr  bgcolor=$row_colour><td colspan='5'>");
 
   $graph_type = "sensor_voltage";
 

@@ -3,11 +3,12 @@
 include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
-$rrd_options .= " -l 0 -E ";
+if($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
 
+$rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '$id' ORDER BY sensor_index");
-$rrd_options .= " COMMENT:'                          Cur     Min    Max\\n'";
+$rrd_options .= " COMMENT:'".str_pad('',$descr_len)."    Cur     Min    Max\\n'";
 while($temperature = mysql_fetch_array($sql)) 
 {
   switch ($iter)
@@ -37,7 +38,7 @@ while($temperature = mysql_fetch_array($sql))
       break;
   }
   
-  $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], 22),0,22);
+  $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], $descr_len),0,$descr_len);
   $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
   $rrd_options .= " DEF:temp" . $temperature['sensor_id'] . "=$rrd_file:temp:AVERAGE ";
   $rrd_options .= " LINE1:temp" . $temperature['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',$temperature['sensor_descr_fixed'])) . "'";
