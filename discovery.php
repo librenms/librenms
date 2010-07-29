@@ -69,11 +69,16 @@ if (file_exists('.svn'))
 
   if ($dbu_rev+0 > $db_rev)
   {
+    echo "SVN revision changed.\n";
     if($db_rev+0 < "1000") {
-      echo("SVN revision changed.\nRunning pre-revision 1000 SQL update script...\n");
+      echo("Running pre-revision 1000 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1000.sql");
     }
-    echo("SVN revision changed.\nRunning development SQL update script from r$db_rev to r" . trim($dbu_rev) . "...\n");
+    if($db_rev+0 < "1435") {
+      echo("Running pre-revision 1435 SQL update script...\n");
+      shell_exec("scripts/update-sql.php database-update-pre1435.sql");
+    }
+    echo("Running development SQL update script to update from r$db_rev to r" . trim($dbu_rev) . "...\n");
     shell_exec("scripts/update-sql.php database-update.sql");
     if ($db_rev == 0)
     {
