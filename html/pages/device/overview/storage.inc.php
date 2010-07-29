@@ -37,7 +37,7 @@ if(mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_
     $free = formatStorage($drive['storage_free']);
     $used = formatStorage($drive['storage_used']);
 
-    $fs_url   = "/device/".$device['device_id']."/health/storage/";
+    $fs_url   = $config['base_url'] . "/device/".$device['device_id']."/health/storage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
     $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";

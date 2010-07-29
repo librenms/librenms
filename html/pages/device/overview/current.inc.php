@@ -23,7 +23,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $current_year  = "graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
     $current_minigraph = "<img src='graph.php?id=" . $current['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $current_link  = "<a href='/device/".$device['device_id']."/health/current/' onmouseover=\"return ";
+    $current_link  = "<a href='device/".$device['device_id']."/health/current/' onmouseover=\"return ";
     $current_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$current['sensor_descr'];
     $current_link .= "</div><div style=\'width: 750px\'><img src=\'$current_day\'><img src=\'$current_week\'><img src=\'$current_month\'><img src=\'$current_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 

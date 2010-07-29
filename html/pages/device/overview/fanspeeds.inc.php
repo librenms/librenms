@@ -23,7 +23,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $fan_year  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
     $fan_minigraph = "<img src='graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $fan_link  = "<a href='/device/".$device['device_id']."/health/fanspeeds/' onmouseover=\"return ";
+    $fan_link  = "<a href='device/".$device['device_id']."/health/fanspeeds/' onmouseover=\"return ";
     $fan_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$fan['sensor_descr'];
     $fan_link .= "</div><div style=\'width: 750px\'><img src=\'$fan_day\'><img src=\'$fan_week\'><img src=\'$fan_month\'><img src=\'$fan_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
