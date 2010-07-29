@@ -44,13 +44,14 @@ $devices_polled = 0;
 
   echo("includes/discovery/".$type.".php \n");
 
-$debug = 1;
+#$debug = 1;
 
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = '1' $where ORDER BY device_id ASC");
 while ($device = mysql_fetch_array($device_query)) {
 
   echo($device['hostname'] . "(".$device['sysName']."|".$device['device_id'].")\n");
+  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo "(".$device['os_group'].")";}
 
   include("includes/discovery/".$type);
 

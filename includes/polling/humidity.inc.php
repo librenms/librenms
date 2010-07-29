@@ -14,7 +14,6 @@ while($humidity = mysql_fetch_array($hum_data)) {
   if ($humidity['sensor_divisor'])    { $hum = $hum / $humidity['sensor_divisor']; }
   if ($humidity['sensor_multiplier']) { $hum = $hum / $humidity['sensor_multiplier']; }
 
-
   $humrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("humidity-" . $humidity['sensor_descr'] . ".rrd");
 
   if (!is_file($humrrd)) {

@@ -11,10 +11,10 @@ while($voltage = mysql_fetch_array($volt_data)) {
   if ($voltage['sensor_divisor'])    { $volt = $volt / $voltage['sensor_divisor']; }
   if ($voltage['sensor_multiplier']) { $volt = $volt * $voltage['sensor_multiplier']; }
 
-  $voltrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
+  $rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
 
-  if (!is_file($voltrrd)) {
-    `rrdtool create $voltrrd \
+  if (!is_file($rrd_file)) {
+    `rrdtool create $rrd_file \
      --step 300 \
      DS:volt:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
@@ -25,7 +25,7 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   echo($volt . " V\n");
 
-  rrdtool_update($voltrrd,"N:$volt");
+  rrdtool_update($rrd_file,"N:$volt");
 
   if($voltage['sensor_current'] > $voltage['sensor_limit_low'] && $volt <= $voltage['sensor_limit_low']) 
   {

@@ -48,7 +48,7 @@ function check_valid_sensors($device, $class, $valid) {
       if(!$valid[$class][$type][$index])
       {
         echo("-");
-        mysql_query("DELETE FROM `sensors` WHERE sensor_class='humidity' AND sensor_id = '" . $test['sensor_id'] . "'");
+        mysql_query("DELETE FROM `sensors` WHERE sensor_class='".$class."' AND sensor_id = '" . $test['sensor_id'] . "'");
         log_event("Sensor Deleted: ".$test['sensor_class']." ".$test['sensor_type']." ". $test['sensor_index']." ".$test['sensor_descr'], $device['device_id'], 'sensor', $sensor_id);
       }
       unset($oid); unset($type);

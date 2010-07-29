@@ -11,7 +11,6 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
   if ($fanspeed['sensor_divisor'])    { $fan = $fan / $fanspeed['sensor_divisor']; }
   if ($fanspeed['sensor_multiplier']) { $fan = $fan * $fanspeed['sensor_multiplier']; }
 
-
   $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");
 
   if (!is_file($fanrrd)) {
