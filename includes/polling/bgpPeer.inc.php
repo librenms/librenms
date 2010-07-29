@@ -33,7 +33,7 @@ if ($device['os'] == "junos")
   {
     echo "\nCaching Oids...";
     ## FIX ME - needs moved to function
-    $peer_cmd  = $config['snmpwalk'] . " -M ".$config['mibdir'] . " -m BGP4-V2-MIB-JUNIPER -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+    $peer_cmd  = $config['snmpwalk'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6";
     foreach (explode("\n",trim(`$peer_cmd`)) as $oid)
     {
@@ -42,7 +42,7 @@ if ($device['os'] == "junos")
       $junos_v6[implode('.',array_slice($peer_id,35))] = implode('.',array_slice($peer_id,18));
     }
   }
-  ## FIX ME - move to fucntion (and clean up, wtf?)
+  ## FIX ME - move to function (and clean up, wtf?)
   $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . ":".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip]; # Should be jnxBgpM2CfgPeerAdminStatus but doesn't seem to be implemented?
