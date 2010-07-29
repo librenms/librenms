@@ -133,6 +133,11 @@ $os = "junos";
 $config['os'][$os]['text']		= "Juniper JunOS";
 $config['os'][$os]['type']		= "network";
 
+$os = "jwos";
+$config['os'][$os]['text']		= "Juniper JWOS";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['icon']  		= "junos";
+
 $os = "screenos";
 $config['os'][$os]['text']		= "Juniper ScreenOS";
 $config['os'][$os]['type']		= "firewall";
