@@ -29,7 +29,8 @@ include("includes/graphs/common.inc.php");
 #  $rrd_options .= " AREA:temp#bbd392";
 #  $rrd_options .= " AREA:tempwarm#FFCCCC";
 #  $rrd_options .= " AREA:tempcold#CCCCFF";
-  $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['sensor_descr_fixed'])))."'"; # Ugly hack :(
+#  $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['sensor_descr_fixed'])))."'"; # Ugly hack :(
+  $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',$temperature['sensor_descr_fixed']))."'"; # Ugly hack :(
   $rrd_options .= " LINE1:tempwarm#660000";
   $rrd_options .= " GPRINT:temp:LAST:%3.0lfC";
   $rrd_options .= " GPRINT:temp:MIN:%3.0lfC";
