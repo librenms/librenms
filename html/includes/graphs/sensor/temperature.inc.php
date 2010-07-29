@@ -5,13 +5,13 @@ $scale_max = "40";
 
 include("includes/graphs/common.inc.php");
 
-  $rrd_options .= " COMMENT:'                                 Last   Min   Max\\n'";
+  $rrd_options .= " COMMENT:'                          Cur     Min    Max\\n'";
 
   $temperature = mysql_fetch_array(mysql_query("SELECT * FROM sensors where sensor_id = '".mres($_GET['id'])."'"));
 
   $hostname = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '" . $temperature['device_id'] . "'"),0);
 
-  $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], 28),0,28);
+  $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], 22),0,22);
 
   $rrd_filename  = $config['rrd_dir'] . "/".$hostname."/" . safename("temp-" . $temperature['sensor_descr'] . ".rrd");
 
@@ -32,8 +32,8 @@ include("includes/graphs/common.inc.php");
 #  $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',quotemeta($temperature['sensor_descr_fixed'])))."'"; # Ugly hack :(
   $rrd_options .= " LINE1:temp#cc0000:'" . str_replace(':','\:',str_replace('\*','*',$temperature['sensor_descr_fixed']))."'"; # Ugly hack :(
   $rrd_options .= " LINE1:tempwarm#660000";
-  $rrd_options .= " GPRINT:temp:LAST:%3.0lfC";
-  $rrd_options .= " GPRINT:temp:MIN:%3.0lfC";
-  $rrd_options .= " GPRINT:temp:MAX:%3.0lfC\\\\l";
+  $rrd_options .= " GPRINT:temp:LAST:%4.1lfC";
+  $rrd_options .= " GPRINT:temp:MIN:%4.1lfC";
+  $rrd_options .= " GPRINT:temp:MAX:%4.1lfC\\\\l";
 
 ?>
