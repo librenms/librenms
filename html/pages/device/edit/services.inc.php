@@ -8,6 +8,13 @@ if($_POST['addsrv']) {
   }
 }
 
+if($_POST['delsrv']) {
+  if($_SESSION['userlevel'] == '10') {
+    include("includes/service-delete.inc.php");
+  }
+}
+
+
 if ($handle = opendir($config['install_dir'] . "/includes/services/")) {
     while (false !== ($file = readdir($handle))) {
         if ($file != "." && $file != ".." && !strstr($file, ".")) {
@@ -47,7 +54,7 @@ echo("
         Type
       </td>
       <td>
-        <select name='type'>
+        <select name='service'>
           $existform
         </select>
       </td>
