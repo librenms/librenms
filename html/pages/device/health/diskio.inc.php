@@ -18,7 +18,7 @@ while($drive = mysql_fetch_array($query)) {
 
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    $fs_url   = "/device/".$device['device_id']."/health/diskio/";
+    $fs_url   = "device/".$device['device_id']."/health/diskio/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['diskio_descr'];
     $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['diskio_id'] . "&type=diskio_ops&from=$month&to=$now&width=400&height=125\'>";

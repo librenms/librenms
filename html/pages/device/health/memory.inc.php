@@ -9,12 +9,10 @@ $graph_type = "mempool_usage";
   while($mempool = mysql_fetch_array($mempools)) {
     if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
  
-    $proc_url   = "?page=device/".$device['device_id']."/health/memory/";
- 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
-    $mempool_url   = "/device/".$device['device_id']."/health/memory/";
-    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mempool_url   = "device/".$device['device_id']."/health/memory/";
+    $mini_url = "graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
     $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
