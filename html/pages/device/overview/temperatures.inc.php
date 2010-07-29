@@ -25,7 +25,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $temp_year  = "graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
     $temp_minigraph = "<img src='graph.php?id=" . $temp['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $temp_link  = "<a href='/device/".$device['device_id']."/health/temperatures/' onmouseover=\"return ";
+    $temp_link  = "<a href='device/".$device['device_id']."/health/temperatures/' onmouseover=\"return ";
     $temp_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$temp['sensor_descr'];
     $temp_link .= "</div><div style=\'width: 750px\'><img src=\'$temp_day\'><img src=\'$temp_week\'><img src=\'$temp_month\'><img src=\'$temp_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 

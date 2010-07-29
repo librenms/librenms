@@ -24,7 +24,7 @@ if(mysql_result(mysql_query("SELECT count(freq_id) from frequency WHERE device_i
     $freq_year  = "graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
     $freq_minigraph = "<img src='graph.php?id=" . $freq['freq_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $freq_link  = "<a href='/device/".$device['device_id']."/health/frequencies/' onmouseover=\"return ";
+    $freq_link  = "<a href='device/".$device['device_id']."/health/frequencies/' onmouseover=\"return ";
     $freq_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$freq['freq_descr'];
     $freq_link .= "</div><div style=\'width: 750px\'><img src=\'$freq_day\'><img src=\'$freq_week\'><img src=\'$freq_month\'><img src=\'$freq_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
