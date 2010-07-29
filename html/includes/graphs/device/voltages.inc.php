@@ -5,10 +5,12 @@ $device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
+if($_GET['width'] > "300") { $descr_len = "38"; } else { $descr_len = "18"; }
+$rrd_options .= " COMMENT:'".str_pad('',$descr_len)."     Cur      Min     Max\\n'";
+
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '$id'");
-$rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
-while($voltage = mysql_fetch_array($sql)) 
+while($sensor = mysql_fetch_array($sql)) 
 {
   switch ($iter)
   {
@@ -37,17 +39,18 @@ while($voltage = mysql_fetch_array($sql))
       break;
   }
 
-  $hostname = gethostbyid($voltage['device_id']);
   
-  $descr = substr(str_pad($voltage['sensor_descr'], 15),0,15);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
-  $volt_id = $voltage['sensor_id'];
+  $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], $descr_len),0,$descr_len);
+  $sensor['sensor_descr_fixed'] = str_replace(':','\:',str_replace('\*','*',$sensor['sensor_descr_fixed']));
 
-  $rrd_options .= " DEF:volt$volt_id=$rrd_filename:volt:AVERAGE";
-  $rrd_options .= " LINE1:volt$volt_id#".$colour.":'" . $descr . "'";
-  $rrd_options .= " GPRINT:volt$volt_id:AVERAGE:%5.2lfV";
-  $rrd_options .= " GPRINT:volt$volt_id:MIN:%5.2lfV";
-  $rrd_options .= " GPRINT:volt$volt_id:MAX:%5.2lfV\\\\l";
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/volt-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
+  $sensor_id = $sensor['sensor_id'];
+
+  $rrd_options .= " DEF:s$sensor_id=$rrd_filename:volt:AVERAGE";
+  $rrd_options .= " LINE1:s$sensor_id#".$colour.":'" . $sensor['sensor_descr_fixed'] . "'";
+  $rrd_options .= " GPRINT:s$sensor_id:AVERAGE:%5.2lfV";
+  $rrd_options .= " GPRINT:s$sensor_id:MIN:%5.2lfV";
+  $rrd_options .= " GPRINT:s$sensor_id:MAX:%5.2lfV\\\\l";
 
   $iter++;
 }

@@ -33,11 +33,19 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
       if($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index))
       {
         $entPhysicalIndex = $index;
-	$entPhysicalIndex_measured = $entry['entSensorMeasuredEntity']; 
-	$descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB");
+	$descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
+        if(is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
+          $measured_descr = snmp_get($device, "entPhysicalName.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");
+          $descr = $measured_descr . " - " . $descr;
+        }
+
+        ### Bit dirty also, clean later
+	$descr = str_replace("Temp: ", "", $descr);
+        $descr = str_replace("temperature ", "", $descr);
+        $descr = str_replace("Temperature ", "", $descr);
+
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
         $current = $entry['entSensorValue'];
-
         $type = $entitysensor[$entry['entSensorType']];
 
         #echo("$index : ".$entry['entSensorScale']."|");
@@ -51,7 +59,6 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         if($entry['entSensorScale'] == "giga")  { $divisor = "1"; $multiplier = "1000000000";  }
 
 	$current = $current * $multiplier / $divisor;
-
         discover_sensor($valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $temperature);
 
         $cisco_entity_temperature = 1;
