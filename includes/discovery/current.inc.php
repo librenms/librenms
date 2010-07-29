@@ -1,12 +1,4 @@
 <?php
-$id = $device['device_id'];
-$hostname = $device['hostname'];
-$community = $device['community'];
-$snmpver = $device['snmpver'];
-$port = $device['port'];
-
-$valid_current = array();
-
 echo("Current : ");
 
 ## APC
@@ -47,8 +39,7 @@ if ($device['os'] == "apc")
       {
         $descr     = "Output";
       }
-
-      echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+      echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
     }
   }
 
@@ -68,7 +59,8 @@ if ($device['os'] == "apc")
       $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", ""); # No / $precision here! Nice, APC!
       $descr     = "Output Feed";
 
-      echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+      echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, NULL, $warnlimit, $limit, $current);
+
   }
 }
 
@@ -96,7 +88,9 @@ if ($device['os'] == "mgeups")
     $warnlimit  = NULL;
     $lowlimit   = 0;
     $limit      = NULL;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+    $lowwarnlimit = NULL;
+    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
+
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -118,7 +112,8 @@ if ($device['os'] == "mgeups")
     $warnlimit  = NULL;
     $lowlimit   = 0;
     $limit      = NULL;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+    $lowwarnlimit = NULL;
+    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current);
   }
 }
 
@@ -141,11 +136,10 @@ if ($device['os'] == "netmanplus")
       $current_oid  = "1.3.6.1.2.1.33.1.2.6.$current_id";
       $precision = 10;
       $current = snmp_get($device, $current_oid, "-O vq") / $precision;
-      #$current  = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $current_oid")) / $precision;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
       $type = "netmanplus";
       $index = 500+$current_id;
-      discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
+      echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -160,7 +154,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = $i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -174,7 +168,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 100+$i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -188,7 +182,7 @@ if ($device['os'] == "netmanplus")
     $type       = "netmanplus";
     $precision  = 1;
     $index      = 200+$i;
-    echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, NULL, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
@@ -207,8 +201,7 @@ if ($device['os'] == "gamatronicups") {
                        $warnlimit = NULL;
                        $limit = NULL;
 
-                       echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
-
+                       echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
                }
 
 
@@ -224,32 +217,15 @@ if ($device['os'] == "gamatronicups") {
                        $lowlimit = 0;
                        $warnlimit = NULL;
                        $limit = NULL;
-
-                       echo discover_current($valid_current,$device, $current_oid, $index, $type, $descr, $precision, $lowlimit, $warnlimit, $limit, $current);
+                       echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current);
                }
 
 }
 
+if($debug) { print_r($valid['current']); }
 
-## Delete removed sensors
+check_valid_sensors($device, 'current', $valid_sensor);
 
-if($debug) { print_r($valid_current); }
-
-$sql = "SELECT * FROM current WHERE device_id = '".$device['device_id']."'";
-if ($query = mysql_query($sql))
-{
-  while ($test_current = mysql_fetch_array($query))
-  {
-    $index = $test_current['current_index'];
-    $type = $test_current['current_type'];
-    if($debug) { echo("$type -> $index\n"); }
-    if(!$valid_current[$type][$index]) {
-      echo("-");
-      mysql_query("DELETE FROM `current` WHERE current_id = '" . $test_current['current_id'] . "'");
-    }
-  }
-}
-
-unset($valid_current); echo("\n");
+echo("\n");
 
 ?>

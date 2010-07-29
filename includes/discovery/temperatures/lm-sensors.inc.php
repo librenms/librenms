@@ -1,6 +1,6 @@
 <?php
 
-global $valid_temp;
+global $valid_sensor;
 
 if ($device['os'] == "linux")
 {
@@ -15,14 +15,14 @@ if ($device['os'] == "linux")
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
-      $temp_id = $split_oid[count($split_oid)-1];
-      $temp_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temp_id";
-      $temp = snmp_get($device, $temp_oid, "-Ovq") / 1000;
-      $descr = str_ireplace("temp-", "", $descr);
+      $temperature_id = $split_oid[count($split_oid)-1];
+      $temperature_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temperature_id";
+      $temperature = snmp_get($device, $temperature_oid, "-Ovq") / 1000;
+      $descr = str_ireplace("temperature-", "", $descr);
       $descr = trim($descr);
-      if($temp != "0" && $temp <= "1000")
+      if($temperature != "0" && $temperature <= "1000")
       {
-        discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "lmsensors", $descr, "1000", NULL, NULL, $temp);
+        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'lmsensors', $descr, '1000', '1', NULL, NULL, NULL, NULL, $temperature);
       }
     }
   }

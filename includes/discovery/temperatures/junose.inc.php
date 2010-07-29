@@ -1,7 +1,7 @@
 <?php
 
-global $valid_temp;
-  
+global $valid_sensor;
+
 ## JunOSe Temperatures
 
 if ($device['os'] == "junose")
@@ -20,8 +20,7 @@ if ($device['os'] == "junose")
         $descr = str_replace("temperature sensor on", "", trim($descr));
         $oid = ".1.3.6.1.4.1.4874.2.2.2.1.9.4.1.3.".$index;
         $current = $entry['juniSystemTempValue'];
-        discover_temperature($valid_temp, $device, $oid, $index, "junose", $descr, "1", NULL, NULL, $current);
-        $temp_exists[] = $device['device_id'] . " $oid";
+        discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'junose', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
       }
     }
   }

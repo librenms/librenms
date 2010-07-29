@@ -1,19 +1,19 @@
 <?php
 
-global $valid_temp;
-  
+global $valid_sensor;
+
 if ($device['os'] == "papouch-tme") 
 {
   echo("Papouch TME ");
 
   $descr = snmp_get($device, "SNMPv2-SMI::enterprises.18248.1.1.3.0", "-Oqv");
-  $temp  = snmp_get($device, "SNMPv2-SMI::enterprises.18248.1.1.1.0", "-Oqv") / 10;
+  $temperature  = snmp_get($device, "SNMPv2-SMI::enterprises.18248.1.1.1.0", "-Oqv") / 10;
 
-  if ($descr != "" && $temp != "0")
+  if ($descr != "" && $is_numeric($temperature) && $temperature > "0")
   {
-    $temp_oid = ".1.3.6.1.4.1.18248.1.1.1.0";
+    $temperature_oid = ".1.3.6.1.4.1.18248.1.1.1.0";
     $descr = trim(str_replace("\"", "", $descr));
-    discover_temperature($valid_temp, $device, $temp_oid, "1", "ironware", $descr, "10", NULL, NULL, $temp);
+    discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, "1", 'papouch-tme', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
   }
 }
 

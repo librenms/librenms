@@ -1,6 +1,6 @@
 <?php
 
-global $valid_temp;
+global $valid_sensor;
 
 if ($device['os'] == "akcp" || $device['os'] == "minkelsrms")
 {
@@ -17,22 +17,22 @@ if ($device['os'] == "akcp" || $device['os'] == "minkelsrms")
       if ($status == 2) # 2 = normal, 0 = not connected
       {
         $split_oid = explode('.',$oid);
-        $temp_id = $split_oid[count($split_oid)-1];
-        $descr_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.1.$temp_id";
-        $temp_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.3.$temp_id";
-        $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.7.$temp_id";
-        $limit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.8.$temp_id";
-        # .9 = low warn limit
-        $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.10.$temp_id";
+        $temperature_id          = $split_oid[count($split_oid)-1];
+        $descr_oid        = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.1.$temperature_id";
+        $temperature_oid         = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.3.$temperature_id";
+        $warnlimit_oid    = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.7.$temperature_id";
+        $limit_oid        = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.8.$temperature_id";
+        $lowwarnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.9.$temperature_id";
+        $lowlimit_oid     = ".1.3.6.1.4.1.3854.1.2.2.1.16.1.10.$temperature_id";
 
-        $descr = trim(snmp_get($device, $descr_oid, "-Oqv", ""),'"');
-        $temp = snmp_get($device, $temp_oid, "-Oqv", "");
-        $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
-        $limit = snmp_get($device, $limit_oid, "-Oqv", "");
-        $lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "");
+        $descr        = trim(snmp_get($device, $descr_oid, "-Oqv", ""),'"');
+        $temperature         = snmp_get($device, $temperature_oid, "-Oqv", "");
+        $lowwarnlimit = snmp_get($device, $lowwarnlimit_oid, "-Oqv", "");
+        $warnlimit    = snmp_get($device, $warnlimit_oid, "-Oqv", "");
+        $limit        = snmp_get($device, $limit_oid, "-Oqv", "");
+        $lowlimit     = snmp_get($device, $lowlimit_oid, "-Oqv", "");
 
-        # FIXME no warnlimit in table/discover function yet...
-        discover_temperature($valid_temp, $device, $temp_oid, $temp_id, "akcp", $descr, 1, $lowlimit, $limit, $temp);
+        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'akcp', $descr, '1', '1', $lowlimit, $low_warn_limit, $warnlimit, $limit, $temperature);
       }
     }
   }

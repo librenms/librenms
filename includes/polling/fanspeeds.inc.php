@@ -8,7 +8,9 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
 
   $fan = snmp_get($device, $fanspeed['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  if ($fanspeed['sensor_precision']) { $fan = $fan / $fanspeed['sensor_precision']; }
+  if ($fanspeed['sensor_divisor'])    { $fan = $fan / $fanspeed['sensor_divisor']; }
+  if ($fanspeed['sensor_multiplier']) { $fan = $fan * $fanspeed['sensor_multiplier']; }
+
 
   $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");
 

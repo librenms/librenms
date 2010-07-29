@@ -1,6 +1,6 @@
 <?php
 
-global $valid_fan;
+global $valid_sensor;
 
 ## LMSensors Fanspeeds
 if ($device['os'] == "linux") 
@@ -9,8 +9,6 @@ if ($device['os'] == "linux")
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("LM-SENSORS ");
-  $precision = 1;
-  $type = 'lmsensors';
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -23,7 +21,7 @@ if ($device['os'] == "linux")
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB");
       $descr = trim(str_ireplace("fan-", "", $descr));
       if($current > '0' && $current < '500') {
-        discover_fan($valid_fan,$device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+        discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
       }
     }
   }

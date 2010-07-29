@@ -1,6 +1,6 @@
 <?php
 
-global $valid_humidity;
+global $valid_sensor;
 
 if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms')
 {
@@ -17,22 +17,22 @@ if ($device['os'] == 'akcp' || $device['os'] == 'minkelsrms')
       if ($status == 2) # 2 = normal, 0 = not connected
       {
         $split_oid = explode('.',$oid);
-        $humidity_id = $split_oid[count($split_oid)-1];
-        $descr_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.1.$humidity_id";
-        $humidity_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.3.$humidity_id";
-        $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.7.$humidity_id";
-        $limit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.8.$humidity_id";
-        $warnlowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.9.$humidity_id";
-        $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.10.$humidity_id";
+        $index = $split_oid[count($split_oid)-1];
+        $descr_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.1.$index";
+        $oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.3.$index";
+        $warnlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.7.$index";
+        $limit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.8.$index";
+        $warnlowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.9.$index";
+        $lowlimit_oid = ".1.3.6.1.4.1.3854.1.2.2.1.17.1.10.$index";
         
         $descr = trim(snmp_get($device, $descr_oid, "-Oqv", ""),'"');
-        $humidity = snmp_get($device, $humidity_oid, "-Oqv", "");
+        $humidity = snmp_get($device, $oid, "-Oqv", "");
         $warnlimit = snmp_get($device, $warnlimit_oid, "-Oqv", "");
         $limit = snmp_get($device, $limit_oid, "-Oqv", "");
         $lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "");
         $warnlowlimit = snmp_get($device, $warnlowlimit_oid, "-Oqv", "");
       
-        discover_humidity($valid_humidity, $device, $humidity_oid, $humidity_id, "akcp", $descr, 1, $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
+        discover_sensor($valid_sensor, 'humidity', $device, $oid, $index, 'akcp', $descr, '1', '1', $lowlimit, $warnlowlimit, $limit, $warnlimit, $humidity);
       }
     }
   }

@@ -1,41 +1,60 @@
 <?php
-
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
-  
   if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
   if(!$low_limit)
   {
     $low_limit = $config['limit']['current'];
-  }
-  
+  } 
   if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
-    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
-    $query .= " VALUES ('" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
+    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_divisor`, `sensor_multiplier`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
+    $query .= " VALUES ('" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$divisor', '$multiplier', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
     mysql_query($query);
     if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
     echo("+");
+    $sensor_id = mysql_result(mysql_query("SELECT `sensor_id` FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0);
+    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." ". mres($current)."C", $device['device_id'], 'sensor', $sensor_id);
   }
   else
   {
     $sensor_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
-    if($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $precision == $sensor_entry['sensor_precision'])
+    if($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'])
     {
       echo(".");
     }
     else
     {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
+      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
+      log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." ". mres($current)."C", $device['device_id'], 'sensor', $sensor_id);
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }
   }
-
-  $valid[$type][$index] = 1;
+  $valid[$class][$type][$index] = 1;
   return $return;
 }
+
+function check_valid_sensors($device, $class, $valid) {
+  $sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='".$class."' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
+  if ($query = mysql_query($sql))
+  {
+    while ($test = mysql_fetch_array($query))
+    {
+      $index = $test['sensor_index'];
+      $type = $test['sensor_type'];
+      if($debug) { echo($index . " -> " . $type . "\n"); }
+      if(!$valid[$class][$type][$index])
+      {
+        echo("-");
+        mysql_query("DELETE FROM `sensors` WHERE sensor_class='humidity' AND sensor_id = '" . $test['sensor_id'] . "'");
+      }
+      unset($oid); unset($type);
+    }
+  }
+}
+
 
 function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
 {
@@ -172,204 +191,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
 
     $valid[$type][$index] = 1;
   }
-}
-
-function discover_temperature(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current)
-{
-  global $config, $debug; 
-  if($debug) { echo("$oid, $index, $type, $descr, $precision, $current\n"); }
-
-  if (mysql_result(mysql_query("SELECT COUNT(sensor_id) FROM `sensors` WHERE sensor_class='temperature' AND sensor_type = '$type' AND sensor_index = '$index' AND device_id = '".$device['device_id']."'"),0) == '0')
-  {
-    $query  = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_type`,`sensor_index`,`sensor_oid`, `sensor_descr`, `sensor_limit`, `sensor_current`, `sensor_precision`)";
-    $query .= " values ('temperature','".$device['device_id']."', '$type','$index','$oid', '$descr','" . ($high_limit ? $high_limit : $config['defaults']['sensor_limit']) . "', '$current', '$precision')";
-    mysql_query($query);
-    echo("+");
-  }
-  else
-  {
-    $entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='temperature' AND device_id = '".$device['device_id']."' AND `sensor_type` = '$type' AND `sensor_index` = '$index'"));
-    echo(mysql_error());
-    if($oid == $entry['sensor_oid'] && $descr == $entry['sensor_descr'] && $precision == $entry['sensor_precision'])
-    {
-      echo(".");
-    }
-    else
-    {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'temperature' AND`sensor_id` = '".$entry['sensor_id']."'");
-      echo("U");
-    }
-  }
-  $valid[$type][$index] = 1;
-  return $return;
-}
-
-function discover_fan(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
-{
-  global $config, $debug;
-  
-  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
-  
-  if(!$low_limit)
-  {
-    $low_limit = $config['limit']['fan'];
-  }
-
-  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='fanspeed' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
-  {
-    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_current`) ";
-    $query .= " VALUES ('fanspeed','".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$low_limit', '$current')";
-    mysql_query($query);
-    echo("+");
-  }
-  else
-  {
-    $fan_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='fanspeed' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
-    if($oid == $fan_entry['sensor_oid'] && $descr == $fan_entry['sensor_descr'] && $precision == $fan_entry['sensor_precision'])
-    {
-      echo(".");
-    }
-    else
-    {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class` = 'fanspeed' AND `device_id` = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
-      echo("U");
-    }
-  }
-  $valid[$type][$index] = 1;
-  return $return;
-}
-
-function discover_volt(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
-{
-  global $config, $debug;
-  
-  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
-  if(!$low_limit)
-  {
-    $low_limit = $config['limit']['volt'];
-  }
-  
-  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='voltage' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
-  {
-
-    if(!$high_limit && isset($current)) { $high_limit = round($current * 1.05, 2); }
-    if(!$low_limit && isset($current))  { $low_limit = round($current * 0.95, 2); }
-
-    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_low`, `sensor_current`) ";
-    $query .= " VALUES ('voltage','".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
-    mysql_query($query);
-    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
-    echo("+");
-  }
-  else
-  {
-
-    $volt_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='voltage' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
-
-    if(!isset($current) && isset($volt_entry['current'])) { $current = $volt_entry['current']; }
-
-
-    if(!$high_limit && !$volt_entry['sensor_limit'] && $current)  { $high_limit = round($current * 1.05, 2); } elseif (!$high_limit && $volt_entry['sensor_limit']) { $high_limit = $volt_entry['sensor_limit']; }
-    if(!$low_limit && !$volt_entry['sensor_limit_low'] && $current)   { $low_limit = round($current * 0.95, 2); } elseif (!$low_limit && $volt_entry['sensor_limit_low']) { $low_limit = $volt_entry['sensor_limit_low']; }
-
-    if($oid == $volt_entry['sensor_oid'] && $descr == $volt_entry['sensor_descr'] && $precision == $volt_entry['sensor_precision'] && $volt_entry['sensor_limit'] == $high_limit && $volt_entry['sensor_limit_low'] == $low_limit)
-    {
-      echo(".");
-    }
-    else
-    {
-      $sql = "UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision', `sensor_limit_low` = '$low_limit', `sensor_limit` = '$high_limit' WHERE `sensor_class` = 'voltage' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index'";
-      $query = mysql_query($sql);
-      echo("U");
-      if($debug) { echo("$sql ". mysql_affected_rows() . " updated"); }
-    }
-  }
-
-  $valid[$type][$index] = 1;
-  return $return;
-}
-
-function discover_freq(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $high_limit = NULL, $current = NULL)
-{
-  global $config, $debug;
-  
-  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
-  if(!$low_limit)
-  {
-    $low_limit = $config['limit']['freq'];
-  }
-  
-  if (mysql_result(mysql_query("SELECT count(freq_id) FROM `frequency` WHERE device_id = '".$device['device_id']."' AND freq_type = '$type' AND `freq_index` = '$index'"),0) == '0')
-  {
-
-    if(!$high_limit && isset($current)) { $high_limit = round($current * 1.05, 0); }
-    if(!$low_limit && isset($current))  { $low_limit = round($current * 0.95, 0); }
-
-    $query = "INSERT INTO frequency (`device_id`, `freq_oid`, `freq_index`, `freq_type`, `freq_descr`, `freq_precision`, `freq_limit`, `freq_limit_low`, `freq_current`) ";
-    $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$low_limit', '$current')";
-    mysql_query($query);
-    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
-    echo("+");
-  }
-  else
-  {
-    $freq_entry = mysql_fetch_array(mysql_query("SELECT * FROM `frequency` WHERE device_id = '".$device['device_id']."' AND freq_type = '$type' AND `freq_index` = '$index'"));
-    if($oid == $freq_entry['freq_oid'] && $descr == $freq_entry['freq_descr'] && $precision == $freq_entry['freq_precision'])
-    {
-      echo(".");
-    }
-    else
-    {
-      mysql_query("UPDATE frequency SET `freq_descr` = '$descr', `freq_oid` = '$oid', `freq_precision` = '$precision' WHERE `device_id` = '" . $device['device_id'] . "' AND freq_type = '$type' AND `freq_index` = '$index' ");
-      echo("U");
-      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
-    }
-  }
-
-  $valid[$type][$index] = 1;
-  return $return;
-}
-
-function discover_humidity(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
-{
-  return discover_sensor($valid, 'humidity', $device, $oid, $index, $type, $descr, $precision, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current);
-}
-
-function discover_current(&$valid, $device, $oid, $index, $type, $descr, $precision = 1, $low_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
-{
-  global $config, $debug;
-  
-  if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
-  if(!$low_limit)
-  {
-    $low_limit = $config['limit']['current'];
-  }
-  
-  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='current' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
-  {
-    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_precision`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_current`) ";
-    $query .= " VALUES ('current', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$precision', '$high_limit', '$warn_limit', '$low_limit', '$current')";
-    mysql_query($query);
-    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
-    echo("+");
-  }
-  else
-  {
-    $current_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='current' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
-    if($oid == $current_entry['sensor_oid'] && $descr == $current_entry['sensor_descr'] && $precision == $current_entry['sensor_precision'])
-    {
-      echo(".");
-    }
-    else
-    {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_precision` = '$precision' WHERE `sensor_class`='current' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
-      echo("U");
-      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
-    }
-  }
-
-  $valid[$type][$index] = 1;
-  return $return;
 }
 
 function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity = NULL, $current = NULL)

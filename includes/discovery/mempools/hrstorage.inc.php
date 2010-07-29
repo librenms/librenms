@@ -1,5 +1,7 @@
 <?php
 
+global $valid_mempool;
+
 $storage_array = snmpwalk_cache_oid($device, "hrStorageEntry", NULL, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES");
 
 if(is_array($storage_array)) {

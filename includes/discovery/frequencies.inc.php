@@ -1,12 +1,4 @@
 <?php
-$id = $device['device_id'];
-$hostname = $device['hostname'];
-$community = $device['community'];
-$snmpver = $device['snmpver'];
-$port = $device['port'];
-
-$valid_freq = array();
-
 echo("Frequencies : ");
 
 ## MGE UPS Frequencies
@@ -28,9 +20,9 @@ if ($device['os'] == "mgeups")
     }
     $current   /= 10;
     $type       = "mge-ups";
-    $precision  = 10;
+    $divisor  = 10;
     $index      = $i;
-    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -47,9 +39,9 @@ if ($device['os'] == "mgeups")
     }
     $current   /= 10;
     $type       = "mge-ups";
-    $precision  = 10;
+    $divisor  = 10;
     $index      = 100+$i;
-    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
@@ -67,26 +59,26 @@ if ($device['os'] == "netmanplus")
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
     $type       = "netmanplus";
-    $precision  = 10;
+    $divisor  = 10;
     $index      = '3.2.0.'.$i;
-    echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $freq_oid   = "1.3.6.1.2.1.33.1.4.2.0";
   $descr      = "Output";
   $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
   $type       = "netmanplus";
-  $precision  = 10;
+  $divisor  = 10;
   $index      = '4.2.0';
-  echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 
   $freq_oid   = "1.3.6.1.2.1.33.1.5.1.0";
   $descr      = "Bypass";
   $current    = snmp_get($device, $freq_oid, "-Oqv") / 10;
   $type       = "netmanplus";
-  $precision  = 10;
+  $divisor  = 10;
   $index      = '5.1.0';
-  echo discover_freq($valid_freq, $device, $freq_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+  echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
 }
 
 ## APC
@@ -95,7 +87,7 @@ if ($device['os'] == "apc")
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("APC In ");
-  $precision = 1;
+  $divisor = 1;
   $type = "apc";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -107,14 +99,14 @@ if ($device['os'] == "apc")
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4." . $index;
       $descr = "Input Feed " . chr(64+$index);
-      discover_freq($valid_freq,$device, $oid, "3.2.1.4.$index", $type, $descr, $precision, NULL, NULL, $current);
+      discover_sensor($valid_sensor, 'freq', $device, $oid, "3.2.1.4.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.4.2.1.4", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo(" APC Out ");
-  $precision = 1;
+  $divisor = 1;
   $type = "apc";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -126,7 +118,7 @@ if ($device['os'] == "apc")
       $index = $split_oid[count($split_oid)-3];
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.4.2.1.4." . $index;
       $descr = "Output Feed"; if (count(explode("\n", $oids)) > 1) { $descr .= " $index"; }
-      discover_freq($valid_freq,$device, $oid, "4.2.1.4.$index", $type, $descr, $precision, NULL, NULL, $current);
+      discover_sensor($valid_sensor, 'freq', $device, $oid, "4.2.1.4.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -136,11 +128,11 @@ if ($device['os'] == "apc")
   {
     echo(" APC In ");
     list($oid,$current) = explode(" ",$oids);
-    $precision = 1;
+    $divisor = 1;
     $type = "apc";
     $index = "3.2.4.0";
     $descr = "Input";
-    discover_freq($valid_freq, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    discover_sensor($valid_sensor, 'freq', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.4.2.2.0", "-OsqnU", "");
@@ -149,33 +141,18 @@ if ($device['os'] == "apc")
   {
     echo(" APC Out ");
     list($oid,$current) = explode(" ",$oids);
-    $precision = 1;
+    $divisor = 1;
     $type = "apc";
     $index = "4.2.2.0";
     $descr = "Output";
-    discover_freq($valid_freq, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    discover_sensor($valid_sensor, 'freq', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
-## Delete removed sensors
 
-if($debug) { print_r($valid_freq); }
+if($debug) { print_r($valid['freq']); }
 
-$sql = "SELECT * FROM frequency WHERE device_id = '".$device['device_id']."'";
-if ($query = mysql_query($sql))
-{
-  while ($test_freq = mysql_fetch_array($query))
-  {
-    $index = $test_freq['freq_index'];
-    $type = $test_freq['freq_type'];
-    if($debug) { echo("$type -> $index\n"); }
-    if(!$valid_freq[$type][$index]) {
-      echo("-");
-      mysql_query("DELETE FROM `frequency` WHERE freq_id = '" . $test_freq['freq_id'] . "'");
-    }
-  }
-}
+check_valid_sensors($device, 'freq', $valid_sensor);
 
-unset($fan_exists); echo("\n");
-
+echo("\n");
 ?>
