@@ -1,11 +1,4 @@
 <?php
-$id = $device['device_id'];
-$hostname = $device['hostname'];
-$community = $device['community'];
-$snmpver = $device['snmpver'];
-$port = $device['port'];
-
-$valid_volt = array();
 
 echo("Voltages : ");
 
@@ -15,7 +8,7 @@ if ($device['os'] == "linux")
   $oids = snmp_walk($device, "lmVoltSensorsDevice", "-OsqnU", "LM-SENSORS-MIB");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("LM-SENSORS ");
-  $precision = 1000;
+  $divisor = 1000;
   $type = "lmsensors";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -26,8 +19,8 @@ if ($device['os'] == "linux")
       $split_oid = explode('.',$oid);
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
-      $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $precision;
-      discover_volt($valid_volt,$device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+      $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $divisor;
+      echo discover_sensor($valid_sensor, 'volt', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 }
@@ -38,7 +31,7 @@ if ($device['os'] == "areca")
   $oids = snmp_walk($device, "1.3.6.1.4.1.18928.1.2.2.1.8.1.2", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("Areca ");
-  $precision = 1000;
+  $divisor = 1000;
   $type = "areca";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -49,10 +42,10 @@ if ($device['os'] == "areca")
       $split_oid = explode('.',$oid);
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.18928.1.2.2.1.8.1.3." . $index;
-      $current = snmp_get($device, $oid, "-Oqv", "") / $precision;
+      $current = snmp_get($device, $oid, "-Oqv", "") / $divisor;
       if ($descr != '"Battery Status"' || $current != 0.255) # FIXME not sure if this is supposed to be a voltage, but without BBU it's 225, then ignore.
       {
-        discover_volt($valid_volt,$device, $oid, $index, $type, trim($descr,'"'), $precision, NULL, NULL, $current);
+        echo discover_sensor($valid_sensor, 'volt', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
       }
     }
   }
@@ -64,7 +57,7 @@ if ($device['os'] == "apc")
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.3.1.3", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("APC In ");
-  $precision = 1;
+  $divisor = 1;
   $type = "apc";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -76,14 +69,15 @@ if ($device['os'] == "apc")
       $index = $split_oid[count($split_oid)-3];
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.3.3.1.3." . $index . ".1.1";
       $descr = "Input Feed " . chr(64+$index);
-      discover_volt($valid_volt,$device, $oid, "3.3.1.3.$index", $type, $descr, $precision, NULL, NULL, $current);
+      echo discover_sensor($valid_sensor, 'volt', $device, $oid, "3.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+
     }
   }
 
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.4.3.1.3", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo(" APC Out ");
-  $precision = 1;
+  $divisor = 1;
   $type = "apc";
   foreach(explode("\n", $oids) as $data) 
   {
@@ -95,7 +89,7 @@ if ($device['os'] == "apc")
       $index = $split_oid[count($split_oid)-3];
       $oid  = "1.3.6.1.4.1.318.1.1.8.5.4.3.1.3." . $index . ".1.1";
       $descr = "Output Feed"; if (count(explode("\n", $oids)) > 1) { $descr .= " $index"; }
-      discover_volt($valid_volt,$device, $oid, "4.3.1.3.$index", $type, $descr, $precision, NULL, NULL, $current);
+      echo discover_sensor($valid_sensor, 'volt', $device, $oid, "4.3.1.3.$index", $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
@@ -105,11 +99,11 @@ if ($device['os'] == "apc")
   {
     echo(" APC In ");
     list($oid,$current) = explode(" ",$oids);
-    $precision = 1;
+    $divisor = 1;
     $type = "apc";
     $index = "3.2.1.0";
     $descr = "Input";
-    discover_volt($valid_volt, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.1.4.2.1.0", "-OsqnU", "");
@@ -118,11 +112,11 @@ if ($device['os'] == "apc")
   {
     echo(" APC Out ");
     list($oid,$current) = explode(" ",$oids);
-    $precision = 1;
+    $divisor = 1;
     $type = "apc";
     $index = "4.2.1.0";
     $descr = "Output";
-    discover_volt($valid_volt, $device, $oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
@@ -134,7 +128,7 @@ if ($device['os'] == "linux")
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
   $type = "supermicro";
-  $precision = "1000";
+  $divisor = "1000";
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -152,15 +146,15 @@ if ($device['os'] == "linux")
         $lowlimit_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.6.".$index;
 
         $descr    = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
-        $limit    = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
-	$lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $precision;
+        $current  = snmp_get($device, $volt_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $divisor;
+        $limit    = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $divisor;
+	$lowlimit = snmp_get($device, $lowlimit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB") / $divisor;
         $monitor  = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr    = trim(str_ireplace("Voltage", "", $descr));
 
         if ($monitor == 'true')
         {
-          echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+          echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, $limit, NULL, $current);
         }
       }
     }
@@ -186,9 +180,9 @@ if ($device['os'] == "mgeups")
     }
     $current   /= 10;
     $type       = "mge-ups";
-    $precision  = 10;
+    $divisor  = 10;
     $index      = $i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -205,9 +199,9 @@ if ($device['os'] == "mgeups")
     }
     $current   /= 10;
     $type       = "mge-ups";
-    $precision  = 10;
+    $divisor  = 10;
     $index      = 100+$i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
@@ -228,13 +222,13 @@ if ($device['os'] == "netmanplus")
       $split_oid = explode('.',$oid);
       $volt_id = $split_oid[count($split_oid)-1];
       $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
-      $precision = 10;
-      $volt = snmp_get($device, $volt_oid, "-O vq") / $precision;
-      #$volt = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $precision;
+      $divisor = 10;
+      $volt = snmp_get($device, $volt_oid, "-O vq") / $divisor;
+      #$volt = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $divisor;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "netmanplus";
       $index = 500+$volt_id;
-      discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $volt);
+      echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
   }
 
@@ -247,9 +241,9 @@ if ($device['os'] == "netmanplus")
     $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $volt_oid, "-Oqv");
     $type       = "netmanplus";
-    $precision  = 1;
+    $divisor  = 1;
     $index      = $i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -261,9 +255,9 @@ if ($device['os'] == "netmanplus")
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $volt_oid, "-Oqv");
     $type       = "netmanplus";
-    $precision  = 1;
+    $divisor  = 1;
     $index      = 100+$i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -275,9 +269,9 @@ if ($device['os'] == "netmanplus")
     $descr      = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $volt_oid, "-Oqv");
     $type       = "netmanplus";
-    $precision  = 1;
+    $divisor  = 1;
     $index      = 200+$i;
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, NULL, NULL, $current);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
 
@@ -289,12 +283,11 @@ if ($device['os'] == "gamatronicups")
     $descr = "Input Phase $i";
     $volt = snmp_get($device, $volt_oid, "-Oqv");
     $type = "gamatronicups";
-    $precision = 1;
+    $divisor = 1;
     $index = $i;
     $lowlimit = 0;
     $limit = NULL;
-
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $volt);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
   }
 
   for($i = 1; $i <= 3 ;$i++) 
@@ -303,36 +296,19 @@ if ($device['os'] == "gamatronicups")
     $descr = "Output Phase $i";
     $volt = snmp_get($device, $volt_oid, "-Oqv");
     $type = "gamatronicups";
-    $precision = 1;
+    $divisor = 1;
     $index = 100+$i;
     $lowlimit = 0;
     $limit = NULL;
-
-    echo discover_volt($valid_volt,$device, $volt_oid, $index, $type, $descr, $precision, $lowlimit, $limit, $volt);
+    echo discover_sensor($valid_sensor, 'volt', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
   }
 
 }
 
+if($debug) { print_r($valid['volt']); }
 
-## Delete removed sensors
+check_valid_sensors($device, 'volt', $valid_sensor);
 
-if($debug) { print_r($valid_volt); }
-
-$sql = "SELECT * FROM voltage WHERE device_id = '".$device['device_id']."'";
-if ($query = mysql_query($sql))
-{
-  while ($test_volt = mysql_fetch_array($query))
-  {
-    $index = $test_volt['volt_index'];
-    $type = $test_volt['volt_type'];
-    if($debug) { echo("$type -> $index\n"); }
-    if(!$valid_volt[$type][$index]) {
-      echo("-");
-      mysql_query("DELETE FROM `voltage` WHERE volt_id = '" . $test_volt['volt_id'] . "'");
-    }
-  }
-}
-
-unset($valid_volt); echo("\n");
+echo("\n");
 
 ?>

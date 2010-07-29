@@ -8,10 +8,8 @@ while($voltage = mysql_fetch_array($volt_data)) {
 
   $volt = snmp_get($device, $voltage['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  if ($voltage['sensor_precision']) 
-  {
-    $volt = $volt / $voltage['sensor_precision'];
-  }
+  if ($voltage['sensor_divisor'])    { $volt = $volt / $voltage['sensor_divisor']; }
+  if ($voltage['sensor_multiplier']) { $volt = $volt * $voltage['sensor_multiplier']; }
 
   $voltrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $voltage['sensor_descr'] . ".rrd");
 

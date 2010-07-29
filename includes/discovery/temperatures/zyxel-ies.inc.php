@@ -1,6 +1,6 @@
 <?php
 
-global $valid_temp;
+global $valid_sensor;
 
 if ($device['os'] == 'ies')
 {
@@ -20,9 +20,8 @@ if ($device['os'] == 'ies')
       $descr = trim(snmp_get($device, "accessSwitchSysTempDescr.".$index, "-Oqv", "ZYXEL-AS-MIB"),'"');
       $oid = ".1.3.6.1.4.1.890.1.5.1.1.6.1.2.".$index;
       $current = $entry['accessSwitchSysTempCurValue'];
-      $divisor = 1;
-  
-      discover_temperature($valid_temp, $device, $oid, $index, "entity-sensor", $descr, $divisor, NULL, $entry['accessSwitchSysTempHighThresh'], $current);
+      $divisor = '1';
+      discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'zyxel-ies', $descr, '1', '1', NULL, $entry['accessSwitchSysTempHighThresh'], NULL, NULL, $current); 
     }
   }
 }

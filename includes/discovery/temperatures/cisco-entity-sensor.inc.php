@@ -1,9 +1,7 @@
 <?php
 
-global $valid_temp;
+global $valid_sensor;
 
-unset($cisco_entity_temp);
-  
 if ($device['os'] == "ios" || $device['os_group'] == "ios") 
 {
   echo("CISCO-ENTITY-SENSOR");
@@ -29,11 +27,12 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
         $current = $entry['entSensorValue'];
 
+        ## FIXME this sucks
         if($entry['entSensorScale'] == "milli") { $divisor = "1000"; } else { $divisor = "1"; }        
-	
-        discover_temperature($valid_temp, $device, $oid, $index, "cisco-entity-sensor", $descr, $divisor, NULL, NULL, $current);
 
-        $cisco_entity_temp = 1;
+        discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'cisco-entity-sensor', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
+
+        $cisco_entity_temperature = 1;
       }
     }
   }

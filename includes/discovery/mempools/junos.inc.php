@@ -1,5 +1,7 @@
 <?php
 
+global $valid_mempool;
+
 ## JUNOS mempools
 if($device['os'] == "junos")
 {

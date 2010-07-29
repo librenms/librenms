@@ -1,5 +1,7 @@
 <?php
 
+global $valid_mempool;
+
 ## Ignore this discovery module if we have already discovered things in CISCO-ENHANCED-MEMPOOL-MIB. Dirty duplication.
 
 $cemp_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools` WHERE `device_id` = '".$device['device_id']."' AND `mempool_type` = 'cemp'"),0);

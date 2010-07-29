@@ -1,5 +1,7 @@
 <?php
 
+global $valid_mempool;
+
 if($device['os'] == "ios" || $device['os_group'] == "ios") {
 
   echo("CISCO-ENHANCED-MEMORY-POOL: ");

@@ -1,7 +1,7 @@
 <?php
 
-global $valid_temp;
-  
+global $valid_sensor;
+
 if ($device['os'] == "junos" || $device['os_group'] == "junos")
 {
   echo("JunOS ");
@@ -14,19 +14,18 @@ if ($device['os'] == "junos" || $device['os_group'] == "junos")
     if ($data)
     {
       list($oid) = explode(" ", $data);
-      $temp_oid  = "1.3.6.1.4.1.2636.3.1.13.1.7.$oid";
+      $temperature_oid  = "1.3.6.1.4.1.2636.3.1.13.1.7.$oid";
       $descr_oid = "1.3.6.1.4.1.2636.3.1.13.1.5.$oid";
       $descr = snmp_get($device,$descr_oid,"-Oqv","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
-      $temp = snmp_get($device,$temp_oid,"-Oqv","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
-      if (!strstr($descr, "No") && !strstr($temp, "No") && $descr != "" && $temp != "0")
+      $temperature = snmp_get($device,$temperature_oid,"-Oqv","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
+      if (!strstr($descr, "No") && !strstr($temperature, "No") && $descr != "" && $temperature != "0")
       {
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
-        $descr = str_replace("temp", "", $descr);
+        $descr = str_replace("temperature", "", $descr);
         $descr = str_replace("sensor", "", $descr);
         $descr = trim($descr);
-
-        discover_temperature($valid_temp, $device, $temp_oid, $oid, "junos", $descr, "1", NULL, NULL, $temp);
+        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $oid, 'junos', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
       }
     }
   }

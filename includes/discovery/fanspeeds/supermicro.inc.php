@@ -1,6 +1,6 @@
 <?php
 
-global $valid_fan;
+global $valid_sensor;
 
 ## Supermicro Fanspeeds
 if ($device['os'] == "linux") 
@@ -9,7 +9,6 @@ if ($device['os'] == "linux")
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
-  $type = "supermicro";
   foreach(explode("\n", $oids) as $data) 
   {
     $data = trim($data);
@@ -28,16 +27,15 @@ if ($device['os'] == "linux")
         $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-#        $precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-# This returns an incorrect precision. At least using the raw value... I think. -TL
-        $precision     = 1;
+        #$precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        # This returns an incorrect precision. At least using the raw value... I think. -TL
+        $divisor       = "1";
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr         = str_replace(' Fan Speed','',$descr);
-        $descr         = str_replace(' Speed','',$descr);
-                
+        $descr         = str_replace(' Speed','',$descr);      
         if ($monitor == 'true')
         {
-          echo discover_fan($valid_fan,$device, $fan_oid, $index, $type, $descr, $precision, $limit, NULL, $current);
+          discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
         }
       }
     }

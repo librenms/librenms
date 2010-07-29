@@ -8,10 +8,9 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
 
   $current = snmp_get($device, $dbcurrent['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  if ($dbcurrent['sensor_precision']) 
-  {
-    $current = $current / $dbcurrent['sensor_precision'];
-  }
+  if ($dbcurrent['sensor_divisor']) { $current = $current / $dbcurrent['sensor_divisor']; }
+  if ($dbcurrent['sensor_multplier']) { $current = $current * $dbcurrent['sensor_multiplier']; }
+
 
   $currentrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("current-" . $dbcurrent['sensor_descr'] . ".rrd");
 
