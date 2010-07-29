@@ -8,9 +8,9 @@ $i = '1';
 $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "'");
 while($proc = mysql_fetch_array($procs)) {
 
-  $proc_url   = $config['base_url']."/device/".$device['device_id']."/health/processors/";
+  $proc_url   = "device/".$device['device_id']."/health/processors/";
 
-  $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+  $mini_url = "graph.php?id=".$proc['processor_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
   $text_descr = $proc['processor_descr'];
 

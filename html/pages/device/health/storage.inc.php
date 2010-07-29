@@ -28,7 +28,7 @@ while($drive = mysql_fetch_array($query)) {
     $total = formatStorage($total);
     $free = formatStorage($free);
 
-    $fs_url   = "?page=device&id=".$device['device_id']."&section=dev-storage";
+    $fs_url   = "device/".$device['device_id']."/health/storage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
     $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
