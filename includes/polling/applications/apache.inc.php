@@ -6,6 +6,7 @@ $apache_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-apache-".
 $apache_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
 $apache_cmd .= " nsExtendOutputFull.6.97.112.97.99.104.101";
 $apache  = `$apache_cmd`;
+echo($apache_cmd);
 list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec, $bytesperreq, $busyworkers, $idleworkers, 
       $score_wait, $score_start, $score_reading, $score_writing, $score_keepalive, $score_dns, $score_closing, $score_logging, $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
 

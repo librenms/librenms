@@ -44,8 +44,7 @@ while($drive = mysql_fetch_array($query)) {
           <a href='$fs_url' $fs_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $left_background, $perc . "%", "ffffff", $right_background)."</a>
           </td><td>" . $free . "</td><td></td></tr>");
 
-
-  $graph_array['id'] = $storage['storage_id'];
+  $graph_array['id'] = $drive['storage_id'];
   $graph_array['type'] = $graph_type;
 
   echo("<tr bgcolor='$row_colour'><td colspan=6>");
