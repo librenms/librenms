@@ -34,8 +34,10 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
       {
         $entPhysicalIndex = $index;
 	$descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
+        if(!$descr) { snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
         if(is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
           $measured_descr = snmp_get($device, "entPhysicalName.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");
+          if(!measured_descr) {  $measured_descr = snmp_get($device, "entPhysicalDescr.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");}
           $descr = $measured_descr . " - " . $descr;
         }
 
