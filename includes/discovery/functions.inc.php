@@ -15,7 +15,7 @@ function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $d
     if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
     echo("+");
     $sensor_id = mysql_result(mysql_query("SELECT `sensor_id` FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0);
-    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." ". mres($current)."C", $device['device_id'], 'sensor', $sensor_id);
+    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', $sensor_id);
   }
   else
   {
@@ -28,7 +28,7 @@ function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $d
     {
       mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
       echo("U");
-      log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." ". mres($current)."C", $device['device_id'], 'sensor', $sensor_id);
+      log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', $sensor_id);
       if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
     }
   }
@@ -49,6 +49,7 @@ function check_valid_sensors($device, $class, $valid) {
       {
         echo("-");
         mysql_query("DELETE FROM `sensors` WHERE sensor_class='humidity' AND sensor_id = '" . $test['sensor_id'] . "'");
+        log_event("Sensor Deleted: ".$test['sensor_class']." ".$test['sensor_type']." ". $test['sensor_index']." ".$test['sensor_descr'], $device['device_id'], 'sensor', $sensor_id);
       }
       unset($oid); unset($type);
     }
