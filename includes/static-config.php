@@ -44,6 +44,10 @@ $os = "monowall";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "m0n0wall";
 $config['os'][$os]['type']  		= "firewall";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processors";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
 
 $os = "solaris";
 $config['os'][$os]['group'] 		= "unix";
