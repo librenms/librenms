@@ -69,50 +69,55 @@ $config['os'][$os]['over'][1]['graph']	= "device_processors";
 $config['os'][$os]['over'][1]['text']	= "CPU Usage";
 $config['os'][$os]['over'][2]['graph']	= "device_mempools";
 $config['os'][$os]['over'][2]['text']	= "Memory Usage";
+$config['os'][$os]['icon']              = "cisco";
+
 
 $os = "cat1900";
 $config['os'][$os]['group']		= "cat1900";
 $config['os'][$os]['text']		= "Cisco Catalyst 1900";
 $config['os'][$os]['type']        	= "network";
-$config['os'][$os]['icon']        	= "catos";
+$config['os'][$os]['icon']        	= "cisco-old";
 
 $os = "iosxe";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS-XE";
 $config['os'][$os]['type']		= "network";
 $config['os'][$os]['ifXmcbc']       	= 1;
-$config['os'][$os]['icon']		= "ios";
+$config['os'][$os]['icon']		= "cisco";
 
 $os = "iosxr";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS-XR";
 $config['os'][$os]['type']		= "network";
 $config['os'][$os]['ifXmcbc']       	= 1;
-$config['os'][$os]['icon']		= "ios";
+$config['os'][$os]['icon']		= "cisco";
 
 $os = "asa";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco ASA";
 $config['os'][$os]['ifname']		= 1;
 $config['os'][$os]['type']		= "firewall";
-$config['os'][$os]['icon']		= "ios";
+$config['os'][$os]['icon']		= "cisco";
 
 $os = "pix";
 $config['os'][$os]['group'] 		= "ios";
 $config['os'][$os]['text']		= "Cisco PIX-OS";
 $config['os'][$os]['ifname']		= 1;
 $config['os'][$os]['type']		= "firewall";
+$config['os'][$os]['icon']              = "cisco";
 
 $os = "nxos";
 $config['os'][$os]['group'] 		= "ios";
 $config['os'][$os]['text']  		= "Cisco NX-OS";
 $config['os'][$os]['type']  		= "network";
+$config['os'][$os]['icon']              = "cisco";
 
 $os = "catos";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco CatOS";
 $config['os'][$os]['ifname']		= 1;
 $config['os'][$os]['type']		= "network";
+$config['os'][$os]['icon']              = "cisco-old";
 
 $os = "vrp";
 $config['os'][$os]['group'] 		= "vrp";
