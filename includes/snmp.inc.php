@@ -15,6 +15,7 @@ function snmp_get_multi ($device, $oids, $options = "-OQUs", $mib = NULL, $mibdi
   if($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oids;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
   $runtime_stats['snmpget']++;
@@ -41,6 +42,7 @@ function snmp_get ($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   if($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
   $runtime_stats['snmpget']++;
@@ -66,6 +68,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   if($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   if($debug) { echo("$cmd\n"); }
   $data = trim(shell_exec($cmd));
   $runtime_stats['snmpwalk']++;
@@ -91,6 +94,7 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   #echo("Caching: $oid\n");
@@ -130,6 +134,7 @@ function snmp_cache_ifIndex($device)
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   $cmd .= " -m IF-MIB ifIndex";  
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -229,6 +234,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
   if($mib) { $cmd .= " -m $mib"; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -257,6 +263,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0) {
   if($mib) { $cmd .= " -m $mib"; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -286,6 +293,7 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$oid;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $device_id = $device['device_id'];
   foreach(explode("\n", $data) as $entry) {
@@ -317,6 +325,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   if($mib) { $cmd .= " -m $mib"; }
   #$cmd .= " -t " . $config['snmp']['timeout'] . " -r " . $config['snmp']['retries'];
   $cmd .= " ".$string;
+  if (!$debug) { $cmd .= " 2>/dev/null"; }
   $data = trim(shell_exec($cmd));
   $x=0;
   $values = explode("\n", $data);
