@@ -2,12 +2,14 @@
 
 echo("Memory : ");
 
-include("mempools/hrstorage.inc.php");
-include("mempools/cemp.inc.php");
-include("mempools/cmp.inc.php");
-include("mempools/junos.inc.php");
-include("mempools/ironware-dyn.inc.php");
-include("mempools/screenos.inc.php");
+include_dir("includes/discovery/mempools");
+
+#include("mempools/hrstorage.inc.php");
+#include("mempools/cemp.inc.php");
+#include("mempools/cmp.inc.php");
+#include("mempools/junos.inc.php");
+#include("mempools/ironware-dyn.inc.php");
+#include("mempools/screenos.inc.php");
 
 ### Remove memory pools which weren't redetected here
 
