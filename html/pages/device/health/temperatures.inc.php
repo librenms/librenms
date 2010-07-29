@@ -13,6 +13,7 @@ while($temp = mysql_fetch_array($query)) {
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
           <td width=350>" . $temp['sensor_descr'] . "</td>
+          <td width=350>" . $temp['sensor_type'] . "</td>
           <td>" . print_temperature($temp['sensor_current'], $temp['sensor_limit']) . " &deg;C</td>
           <td>" . $temp['sensor_limit'] . " &deg;C</td>
           <td>" . $temp['sensor_notes'] . "</td>

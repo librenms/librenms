@@ -19,21 +19,32 @@ while($temperature = mysql_fetch_array($temp_data)) {
   if ($temperature['sensor_divisor'])    { $temp = $temp / $temperature['sensor_divisor']; }
   if ($temperature['sensor_multiplier']) { $temp = $temp * $temperature['sensor_multiplier']; }
 
-  $temprrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['sensor_descr'] . ".rrd");
+  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['sensor_descr'] . ".rrd");
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
 
-  if (!is_file($temprrd)) {
-    `rrdtool create $temprrd \
+  if(is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
+
+  if (!is_file($rrd_file)) {
+    `rrdtool create $rrd_file \
      --step 300 \
      DS:temp:GAUGE:600:-273:1000 \
-     RRA:AVERAGE:0.5:1:1200 \
-     RRA:MIN:0.5:12:2400 \
-     RRA:MAX:0.5:12:2400 \
-     RRA:AVERAGE:0.5:12:2400`;
+     RRA:AVERAGE:0.5:1:600 \
+     RRA:AVERAGE:0.5:6:700 \
+     RRA:AVERAGE:0.5:24:775 \
+     RRA:AVERAGE:0.5:288:797 \
+     RRA:MAX:0.5:1:600 \
+     RRA:MAX:0.5:6:700 \
+     RRA:MAX:0.5:24:775 \
+     RRA:MAX:0.5:288:797\
+     RRA:MIN:0.5:1:600 \
+     RRA:MIN:0.5:6:700 \
+     RRA:MIN:0.5:24:775 \
+     RRA:MIN:0.5:288:797`;
   }
 
   echo($temp . "C\n");
 
-  rrdtool_update($temprrd,"N:$temp");
+  rrdtool_update($rrd_file,"N:$temp");
 
   if($temperature['sensor_current'] < $temperature['sensor_limit'] && $temp >= $temperature['sensor_limit']) {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }

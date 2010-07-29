@@ -11,7 +11,6 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
   if ($dbcurrent['sensor_divisor']) { $current = $current / $dbcurrent['sensor_divisor']; }
   if ($dbcurrent['sensor_multplier']) { $current = $current * $dbcurrent['sensor_multiplier']; }
 
-
   $currentrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("current-" . $dbcurrent['sensor_descr'] . ".rrd");
 
   if (!is_file($currentrrd)) {

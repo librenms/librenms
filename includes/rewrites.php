@@ -40,36 +40,6 @@ $rewrite_entSensorType = array (
   'truthvalue' => '',
 );
 
-
-function entPhysical_scale($value, $scale) {
-
-  switch ($scale) {
-    case "nano":
-  $value = $value / 1000000000;
-  break;
-    case "micro":
-  $value = $value / 1000000;
-  break;
-    case "milli":
-  $value = $value / 1000;
-  break;
-    case "units":
-  break;
-    case "kilo":
-  $value = $value * 1000;
-  break;
-    case "mega":
-  $value = $value * 1000000;
-  break;
-    case "giga":
-  $value = $value * 1000000000;
-  break;
-  }
-
-  return $value;
-
-}
-
 $translate_ifOperStatus = array(
   "1" => "up",
   "2" => "down",
