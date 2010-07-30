@@ -201,6 +201,7 @@ while ($device = mysql_fetch_array($device_query))
     include("includes/polling/wireless.inc.php");
 
     #include("includes/polling/altiga-ssl.inc.php");
+    include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
     include("includes/polling/cisco-remote-access-monitor.inc.php");
 
     unset( $update ) ;
