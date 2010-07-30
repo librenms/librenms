@@ -267,7 +267,8 @@ $config['os'][$os]['type']       	= "network";
 $config['os'][$os]['icon']       	= "hp";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
-
+$config['os'][$os]['over'][0]['graph']  = "device_processors";
+$config['os'][$os]['over'][0]['text']   = "CPU Usage";
 
 $os = "speedtouch";
 $config['os'][$os]['text']     		= "Thomson Speedtouch";
