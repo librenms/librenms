@@ -12,6 +12,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
   $oids = snmpwalk_cache_multi_oid($device, "entSensorScale", $oids, "CISCO-ENTITY-SENSOR-MIB");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorValue", $oids, "CISCO-ENTITY-SENSOR-MIB");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorMeasuredEntity", $oids, "CISCO-ENTITY-SENSOR-MIB");
+  $oids = snmpwalk_cache_multi_oid($device, "entSensorPrecision", $oids, "CISCO-ENTITY-SENSOR-MIB");
 
   if($debug) { print_r($oids); } 
 
@@ -59,6 +60,8 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         if($entry['entSensorScale'] == "kilo")  { $divisor = "1"; $multiplier = "1000";  }
         if($entry['entSensorScale'] == "mega")  { $divisor = "1"; $multiplier = "1000000";  }
         if($entry['entSensorScale'] == "giga")  { $divisor = "1"; $multiplier = "1000000000";  }
+        if(is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entSensorPrecision'], "0"); }
+        $current = $current * $multiplier / $divisor;
 
 	$current = $current * $multiplier / $divisor;
         discover_sensor($valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $temperature);
