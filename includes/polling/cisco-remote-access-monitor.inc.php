@@ -74,7 +74,7 @@ if($device['os_group'] == "ios") {
     $rrd_update .= ":".$data['crasL2LNumSessions'];
     $rrd_update .= ":".$data['crasLBNumSessions'];
     $rrd_update .= ":".$data['crasSVCNumSessions'];
-    $rrd_update .= ":".$data['crasWebvpnSessions'];
+    $rrd_update .= ":".$data['crasWebvpnNumSessions'];
 
     rrdtool_update($rrd_filename, $rrd_update);
 
