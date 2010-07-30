@@ -41,7 +41,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     {
       if($device)
       {
-        $sql = "SELECT * from ports AS I, links AS L WHERE I.device_id = ".$device['device_id']." AND L.local_interface_id = I.interface_id";
+        $sql = "SELECT * from ports AS I, links AS L WHERE I.device_id = ".$device['device_id']." AND L.local_interface_id = I.interface_id ORDER BY L.remote_hostname";
         $links = mysql_query($sql);
 
         if (mysql_num_rows($links))
@@ -57,8 +57,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
           $i = 0; $done = 0;
           while (isset($linkdone) && $i < count($linkdone))
           {
-            $thislink = "$remote_interface_id $local_interface_id";
-            if ($linkdone[$i] == $thislink) { $done = 1; }
+            if ($linkdone[$i] == "$remote_interface_id $local_interface_id") { $done = 1; }
             $i++;
           }
 
@@ -68,7 +67,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             if($link['ifSpeed'] >= "10000000000") 
             {
-              $info = "color=lightred style=\"setlinewidth(8)\"";
+              $info = "color=red3 style=\"setlinewidth(6)\"";
             } elseif ($link['ifSpeed'] >= "1000000000") {
               $info = "color=lightblue style=\"setlinewidth(4)\"";
             } elseif ($link['ifSpeed'] >= "100000000") {
@@ -88,8 +87,6 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dst = $link['remote_hostname'];
             }
 
-
-
             $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
             if($remote_interface_id) {
               $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
@@ -107,7 +104,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
-            if($dst_host == $device['device_id']) {
+            if($dst_host == $device['device_id'] || $where == '') {
               $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
             } else {
               $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
@@ -140,7 +137,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
       $_GET['format'] = 'png';
   }
 
-  $img = shell_exec("echo \"".addslashes($map)."\" | dot -T".$_GET['format']."");
+  $maptool = 'unflatten -f -l 5 |dot';
+  
+  if ($where == '') { $maptool = 'neato -Gpack'; }
+
+  $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
   if($_GET['format'] == "png") {
     header("Content-type: image/".$_GET['format']);
   } elseif ($_GET['format'] == "svg") {
