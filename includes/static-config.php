@@ -252,6 +252,10 @@ $os = "gamatronicups";
 $config['os'][$os]['text']  		= "Gamatronic UPS Stack";
 $config['os'][$os]['type']  		= "power";
 
+$os = "deltaups";
+$config['os'][$os]['text']  		= "Delta UPS";
+$config['os'][$os]['type']  		= "power";
+
 $os = "airport";
 $config['os'][$os]['type'] 		= "network";
 $config['os'][$os]['text']  		= "Apple AirPort";

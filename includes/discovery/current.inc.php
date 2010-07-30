@@ -120,9 +120,9 @@ if ($device['os'] == "mgeups")
 }
 
 ## Riello UPS
-if ($device['os'] == "netmanplus") 
+if ($device['os'] == "netmanplus" || $device['os'] == 'deltaups') 
 {
-  echo("NetMan Plus ");
+  echo("RFC1628 ");
   
   $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.6", "-Osqn", "UPS-MIB");
   if ($debug) { echo($oids."\n"); }
@@ -139,7 +139,7 @@ if ($device['os'] == "netmanplus")
       $precision = 10;
       $current = snmp_get($device, $current_oid, "-O vq") / $precision;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
-      $type = "netmanplus";
+      $type = "rfc1628";
       $index = 500+$current_id;
       echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', NULL, NULL, NULL, NULL, $current);
     }
@@ -153,7 +153,7 @@ if ($device['os'] == "netmanplus")
     $current_oid   = ".1.3.6.1.2.1.33.1.4.4.1.3.$i";
     $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "netmanplus";
+    $type       = "rfc1628";
     $precision  = 1;
     $index      = $i;
     echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
@@ -167,7 +167,7 @@ if ($device['os'] == "netmanplus")
     $current_oid   = "1.3.6.1.2.1.33.1.3.3.1.4.$i";
     $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "netmanplus";
+    $type       = "rfc1628";
     $precision  = 1;
     $index      = 100+$i;
     echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
@@ -181,7 +181,7 @@ if ($device['os'] == "netmanplus")
     $current_oid   = "1.3.6.1.2.1.33.1.5.3.1.3.$i";
     $descr      = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
     $current    = snmp_get($device, $current_oid, "-Oqv");
-    $type       = "netmanplus";
+    $type       = "rfc1628";
     $precision  = 1;
     $index      = 200+$i;
     echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
