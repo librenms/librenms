@@ -49,19 +49,53 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
         <ul>
         <li><a href="devices/"><img src="images/16/server.png" border="0" align="absmiddle" /> All Devices</a></li>
         <li><hr width="140" /></li>
-        <li><a href="devices/server/"><img src="images/16/server.png" border="0" align="absmiddle" /> Servers</a></li>
-        <li><a href="devices/network/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Network</a></li>
-        <li><a href="devices/firewall/"><img src="images/16/shield.png" border="0" align="absmiddle" /> Firewalls</a></li>
+
 <?php
+
+$i = 0;
+$config['device_types'][$i]['text'] = 'Servers';
+$config['device_types'][$i]['type'] = 'server';
+$config['device_types'][$i]['icon'] = 'server.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Network';
+$config['device_types'][$i]['type'] = 'network';
+$config['device_types'][$i]['icon'] = 'network.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Firewalls';
+$config['device_types'][$i]['type'] = 'firewall';
+$config['device_types'][$i]['icon'] = 'firewall.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Power';
+$config['device_types'][$i]['type'] = 'power';
+$config['device_types'][$i]['icon'] = 'power.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Environment';
+$config['device_types'][$i]['type'] = 'environment';
+$config['device_types'][$i]['icon'] = 'environment.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Servers';
+$config['device_types'][$i]['type'] = 'server';
+$config['device_types'][$i]['icon'] = 'server.png';
+
 if (isset($config['enable_printers']) && $config['enable_printers'])
 {
-?>
-        <li><a href="devices/printer/"><img src="images/16/printer.png" border="0" align="absmiddle" /> Printers</a></li>
-<?php
+  $i++;
+  $config['device_types'][$i]['text'] = 'Printers';
+  $config['device_types'][$i]['type'] = 'printer';
+  $config['device_types'][$i]['icon'] = 'printer.png';
 }
+
+foreach ($config['device_types'] as $devtype)
+{
+  echo '        <li><a href="devices/' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>';
+}
+
 ?>
-        <li><a href="devices/power/"><img src="images/icons/power.png" border="0" align="absmiddle" /> Power</a></li>
-        <li><a href="devices/environment/"><img src="images/icons/environment.png" border="0" align="absmiddle" /> Environment</a></li>
         <li><hr width="140" /></li>
         <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo $device_alerts ?>)</a></li>
 <?php
