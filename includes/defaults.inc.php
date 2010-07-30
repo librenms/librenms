@@ -214,7 +214,6 @@ $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### Default warning settings
 ## FIXME THESE SUCK
-$config['defaults']['temp_limit'] = 60;
 
 ### What should we warn about?
 $config['warn']['ifdown'] = false;
