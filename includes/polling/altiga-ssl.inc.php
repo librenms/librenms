@@ -36,7 +36,7 @@ if($device['os'] == "asa" || $device['os'] == "pix") {
     $rrdupdate .= ":$value";
   }
 
-  if($data_array[$device['device_id']][0]['alSslStatsTotalSessions'])
+  if($data_array[$device['device_id']][0]['alSslStatsTotalSessions'] || is_file($rrdfile))
   {
     rrdtool_update($rrdfile, $rrdupdate);
   }
