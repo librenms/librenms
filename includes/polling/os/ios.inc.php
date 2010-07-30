@@ -14,7 +14,6 @@
 
    if($data[1]['entPhysicalContainedIn'] == "0")
    {
-     echo("woo");
      if(isset($data[1]['entPhysicalSoftwareRev']) && $data[1]['entPhysicalSoftwareRev'] != "")
      {
        $version = $data[1]['entPhysicalSoftwareRev'];

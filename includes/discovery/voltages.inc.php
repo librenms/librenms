@@ -205,10 +205,10 @@ if ($device['os'] == "mgeups")
   }
 }
 
-## Riello UPS Voltages
-if ($device['os'] == "netmanplus") 
+## RFC1628 UPS Voltages
+if ($device['os'] == "netmanplus" || $device['os'] == "deltaups") 
 {
-  echo("NetMan Plus ");
+  echo("RFC1628 ");
   
   $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.5", "-Osqn", "UPS-MIB");
   if ($debug) { echo($oids."\n"); }
@@ -226,8 +226,8 @@ if ($device['os'] == "netmanplus")
       $volt = snmp_get($device, $volt_oid, "-O vq") / $divisor;
       #$volt = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $divisor;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
-      $type = "netmanplus";
-      $index = 500+$volt_id;
+      $type = "rfc1628";
+      $index = "1.2.5.".$volt_id;
       echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
   }
@@ -237,12 +237,12 @@ if ($device['os'] == "netmanplus")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $volt_oid   = ".1.3.6.1.2.1.33.1.4.4.1.2.$i";
-    $descr      = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $volt_oid, "-Oqv");
-    $type       = "netmanplus";
-    $divisor  = 1;
-    $index      = $i;
+    $volt_oid = ".1.3.6.1.2.1.33.1.4.4.1.2.$i";
+    $descr    = "Output"; if ($numPhase > 1) $descr .= " Phase $i";
+    $type     = "rfc1628";
+    $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
+    $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
+    $index    = $i;
     echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
@@ -251,12 +251,12 @@ if ($device['os'] == "netmanplus")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $volt_oid   = "1.3.6.1.2.1.33.1.3.3.1.3.$i";
-    $descr      = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $volt_oid, "-Oqv");
-    $type       = "netmanplus";
-    $divisor  = 1;
-    $index      = 100+$i;
+    $volt_oid = "1.3.6.1.2.1.33.1.3.3.1.3.$i";
+    $descr    = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
+    $type     = "rfc1628";
+    $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
+    $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
+    $index    = 100+$i;
     echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
@@ -265,12 +265,12 @@ if ($device['os'] == "netmanplus")
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
   {
-    $volt_oid   = "1.3.6.1.2.1.33.1.5.3.1.2.$i";
-    $descr      = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
-    $current    = snmp_get($device, $volt_oid, "-Oqv");
-    $type       = "netmanplus";
-    $divisor  = 1;
-    $index      = 200+$i;
+    $volt_oid = "1.3.6.1.2.1.33.1.5.3.1.2.$i";
+    $descr    = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
+    $type     = "rfc1628";
+    $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
+    $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
+    $index    = 200+$i;
     echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
