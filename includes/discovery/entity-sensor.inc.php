@@ -36,7 +36,7 @@ if(is_array($oids[$device['device_id']]))
       $descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
       if(!$descr) { snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
 
-      $valid = TRUE
+      $valid = TRUE;
 
       $type = $entitysensor[$entry['entPhySensorType']];
 
@@ -53,10 +53,11 @@ if(is_array($oids[$device['device_id']]))
       if($entry['entPhySensorScale'] == "kilo")  { $divisor = "1"; $multiplier = "1000";  }
       if($entry['entPhySensorScale'] == "mega")  { $divisor = "1"; $multiplier = "1000000";  }
       if($entry['entPhySensorScale'] == "giga")  { $divisor = "1"; $multiplier = "1000000000";  }
+
       if(is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > "0") { $multiplier = $multiplier . str_pad('', $entry['entPhySensorPrecision'], "0"); }
       $current = $current * $multiplier / $divisor;
 
-      if($type == "temperature") { if($current > "200"){ $valid = FALISE; } }
+      if($type == "temperature") { if($current > "200"){ $valid = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
 
 
       if($valid && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0") 
