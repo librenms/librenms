@@ -106,7 +106,7 @@ while ($device = mysql_fetch_array($device_query))
 
     $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
 
-    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
+    #echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
 
     #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
     $sysUptime = str_replace("(", "", $sysUptime);
