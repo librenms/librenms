@@ -11,7 +11,7 @@ $yesterday = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_SUB(CURD
 $tomorrow = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_ADD(CURDATE(), INTERVAL 1 DAY)"), 0));
 $last_month = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"), 0));
 
-$now = $today . date(His);
+$rightnow = $today . date(His);
 $before = $yesterday . date(His);
 $lastmonth = $last_month . date(His);
 
@@ -143,14 +143,14 @@ $bi = $bi . "$type'>";
 
 $lastmonth = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))"), 0);
 $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
-$now = date(U);
+$rightnow = date(U);
 
 $di =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-$di = $di . "&from=" . $yesterday .  "&to=" . $now . "&x=715&y=250";
+$di = $di . "&from=" . $yesterday .  "&to=" . $rightnow . "&x=715&y=250";
 $di = $di . "$type'>";
 
 $mi =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-$mi = $mi . "&from=" . $lastmonth .  "&to=" . $now . "&x=715&y=250";
+$mi = $mi . "&from=" . $lastmonth .  "&to=" . $rightnow . "&x=715&y=250";
 $mi = $mi . "$type'>";
 
 if($null) {
@@ -180,7 +180,7 @@ echo("
 
  if ($_GET[all]) { 
 	$ai =       "<img src=\"billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-	$ai = $ai . "&from=0&to=" . $now;
+	$ai = $ai . "&from=0&to=" . $rightnow;
 	$ai = $ai . "&x=715&y=250";
 	$ai = $ai . "&count=60\">";
 	echo("<h3>Entire Data View</h3>$ai"); 
