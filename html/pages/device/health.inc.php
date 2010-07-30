@@ -10,7 +10,7 @@ $humidity = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_
 $fans = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'"), 0);
 $volts = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"), 0);
 $current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'"), 0);
-$freqs = mysql_result(mysql_query("select count(*) from frequency WHERE device_id = '" . $device['device_id'] . "'"), 0);
+$freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='freq' AND device_id = '" . $device['device_id'] . "'"), 0);
 
 $datas[] = 'overview';
 if ($processor) { $datas[] = 'processors'; }
