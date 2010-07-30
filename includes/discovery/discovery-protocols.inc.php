@@ -84,8 +84,8 @@ if($lldp_array) {
 	$lldp = $lldp_instance[$entry_instance];
 	$remote_device_id = @mysql_result(mysql_query("SELECT `device_id` FROM `devices` WHERE `sysName` = '".$lldp['lldpRemSysName']."' OR `hostname`='".$lldp['lldpRemSysName']."'"), 0);
 	if($remote_device_id) {
-	  $if = $lldp['lldpRemPortDesc'];
-	  $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if') AND `device_id` = '".$remote_device_id."'"),0);
+	  $if = $lldp['lldpRemPortDesc']; $id = $lldp['lldpRemPortId'];
+	  $remote_interface_id = @mysql_result(mysql_query("SELECT interface_id FROM `ports` WHERE (`ifDescr` = '$if' OR `ifName`='$if' OR `ifDescr`= '$id' OR `ifName`='$id') AND `device_id` = '".$remote_device_id."'"),0);
 	} else { $remote_interface_id = "0"; }
      	if(is_numeric($interface['interface_id']) && isset($lldp['lldpRemSysName']) && isset($lldp['lldpRemPortId'])) {
 	  discover_link($interface['interface_id'], 'lldp', $remote_interface_id, $lldp['lldpRemSysName'], $lldp['lldpRemPortId'], NULL, $lldp['lldpRemSysDesc']);

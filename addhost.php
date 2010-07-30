@@ -15,14 +15,15 @@ if($argv[1]) {
   	$port = 161;
 
   if (!$snmpver) $snmpver = "v2c";
-  if (!$community) $community = $config['snmp']['community'][0];
+  if ($community) { unset($config['snmp']['community']); $config['snmp']['community'][] = $community; }
 
   list($hostshort) 	= explode(".", $host);
   if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
     if ( isDomainResolves($argv[1])){
       if ( isPingable($argv[1])) {
        if ( isSNMPable($argv[1], $community, $snmpver, $port)) {
-        $snmphost = trim(str_replace("\"", "", shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0")));
+        # FIXME should be a foreach $config['snmp']['community'][0] as $community
+        $snmphost = trim(str_replace("\"", "", shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c ".$config['snmp']['community'][0]." $host:$port sysName.0")));
         if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
           $return = createHost ($host, $community, $snmpver, $port);
 	  if($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
