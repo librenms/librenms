@@ -10,7 +10,7 @@
 
    $data = snmp_get_multi($device, $oids, "-OQUs", "ENTITY-MIB:OLD-CISCO-CHASSIS-MIB");
 
-   print_r($data);
+   #print_r($data);
 
    if($data[1]['entPhysicalContainedIn'] == "0")
    {

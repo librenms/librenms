@@ -35,6 +35,7 @@ if($device['os_group'] == "ios") {
 
   $oid_list = "crasEmailNumSessions.0 crasIPSecNumSessions.0 crasL2LNumSessions.0 crasLBNumSessions.0 crasSVCNumSessions.0 crasWebvpnNumSessions.0";
   $data = snmp_get_multi ($device, $oid_list, "-OUQs", "CISCO-REMOTE-ACCESS-MONITOR-MIB");
+  $data = $data[0];
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cisco-cras.rrd");
 
@@ -60,7 +61,7 @@ if($device['os_group'] == "ios") {
   $rrd_create .= " RRA:MIN:0.5:24:2000";
   $rrd_create .= " RRA:MIN:0.5:288:2000";
 
-  if(is_file($rrd_filename) || $data['crasEmailNumSessions.0'] || $data['crasIPSecNumSessions.0'] || $data['crasL2LNumSessions.0'] || $data['crasLBNumSessions.0'] || $data['crasSVCNumSessions.0'] || $data['crasWebvpnSessions.0'])
+  if(is_file($rrd_filename) || $data['crasEmailNumSessions'] || $data['crasIPSecNumSessions'] || $data['crasL2LNumSessions'] || $data['crasLBNumSessions'] || $data['crasSVCNumSessions'] || $data['crasWebvpnSessions'])
   {
     if(!file_exists($rrd_filename))  
     {
@@ -68,18 +69,19 @@ if($device['os_group'] == "ios") {
     } 
 
     $rrd_update  = "N";
-    $rrd_update .= ":".$data['crasEmailNumSessions.0']+0;
-    $rrd_update .= ":".$data['crasIPSecNumSessions.0']+0;
-    $rrd_update .= ":".$data['crasL2LNumSessions.0']+0;
-    $rrd_update .= ":".$data['crasLBNumSessions.0']+0;
-    $rrd_update .= ":".$data['crasSVCNumSessions.0']+0;
-    $rrd_update .= ":".$data['crasWebvpnSessions.0']+0;
+    $rrd_update .= ":".$data['crasEmailNumSessions'];
+    $rrd_update .= ":".$data['crasIPSecNumSessions'];
+    $rrd_update .= ":".$data['crasL2LNumSessions'];
+    $rrd_update .= ":".$data['crasLBNumSessions'];
+    $rrd_update .= ":".$data['crasSVCNumSessions'];
+    $rrd_update .= ":".$data['crasWebvpnSessions'];
 
     rrdtool_update($rrd_filename, $rrd_update);
 
+    $graphs['cras_sessions'] = TRUE;
+    echo(" CRAS Sessions");
+
   }
-  $graphs['cras_sessions'] = TRUE;
-  echo(" CRAS Sessions");
   unset($data, $$rrd_filename, $rrd_create, $rrd_update);
 }
 
