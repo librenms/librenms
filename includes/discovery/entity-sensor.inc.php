@@ -33,6 +33,11 @@ if(is_array($oids[$device['device_id']]))
       $current = $entry['entPhySensorValue'];
       #ENTITY-SENSOR-MIB::entPhySensorUnitsDisplay.11 = STRING: "C"
 
+      $descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
+      if(!$descr) { snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
+
+      $valid = TRUE
+
       $type = $entitysensor[$entry['entPhySensorType']];
 
       $descr = str_replace("temperature", "", $descr);
@@ -49,12 +54,12 @@ if(is_array($oids[$device['device_id']]))
       if($entry['entPhySensorScale'] == "mega")  { $divisor = "1"; $multiplier = "1000000";  }
       if($entry['entPhySensorScale'] == "giga")  { $divisor = "1"; $multiplier = "1000000000";  }
       if(is_numeric($entry['entPhySensorPrecision']) && $entry['entPhySensorPrecision'] > "0") { $multiplier = $multiplier . str_pad('', $entry['entPhySensorPrecision'], "0"); }
-     
-      #echo("|".$entry['entPhySensorScale']."|".$entry['entPhySensorPrecision']."|".$divisor."|".$multiplier."|");
-
       $current = $current * $multiplier / $divisor;
 
-      if(mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0") 
+      if($type == "temperature") { if($current > "200"){ $valid = FALISE; } }
+
+
+      if($valid && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0") 
       ## Check to make sure we've not already seen this sensor via cisco's entity sensor mib
       {
         discover_sensor($valid_sensor, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $current);
