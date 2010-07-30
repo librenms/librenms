@@ -470,6 +470,46 @@ $config['graph']['device']['netstats_ip_frag']   = "IP Fragmentation Statistics"
 $config['graph']['device']['netstats_udp']       = "UDP Statistics";
 $config['graph']['device']['netstats_snmp']      = "SNMP Statistics";
 
+### Device types
+
+$i = 0;
+$config['device_types'][$i]['text'] = 'Servers';
+$config['device_types'][$i]['type'] = 'server';
+$config['device_types'][$i]['icon'] = 'server.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Network';
+$config['device_types'][$i]['type'] = 'network';
+$config['device_types'][$i]['icon'] = 'network.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Firewalls';
+$config['device_types'][$i]['type'] = 'firewall';
+$config['device_types'][$i]['icon'] = 'firewall.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Power';
+$config['device_types'][$i]['type'] = 'power';
+$config['device_types'][$i]['icon'] = 'power.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Environment';
+$config['device_types'][$i]['type'] = 'environment';
+$config['device_types'][$i]['icon'] = 'environment.png';
+
+$i++;
+$config['device_types'][$i]['text'] = 'Servers';
+$config['device_types'][$i]['type'] = 'server';
+$config['device_types'][$i]['icon'] = 'server.png';
+
+if (isset($config['enable_printers']) && $config['enable_printers'])
+{
+  $i++;
+  $config['device_types'][$i]['text'] = 'Printers';
+  $config['device_types'][$i]['type'] = 'printer';
+  $config['device_types'][$i]['icon'] = 'printer.png';
+}
+
 
 
 ##############################
