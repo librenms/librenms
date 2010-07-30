@@ -2,7 +2,6 @@
 
 $graph_type = "sensor_voltage";
 
-unset($volt_seperator);
 if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"),0)) {
   $rows = round($total / 2,0);
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
