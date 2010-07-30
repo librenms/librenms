@@ -267,10 +267,10 @@ $config['os'][$os]['type']       	= "network";
 $config['os'][$os]['icon']       	= "hp";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
-$config['os'][$os]['over'][0]['graph']  = "device_processors";
-$config['os'][$os]['over'][0]['text']   = "CPU Usage";
-$config['os'][$os]['over'][0]['graph']  = "device_mempools";
-$config['os'][$os]['over'][0]['text']   = "Memory Usage";
+$config['os'][$os]['over'][1]['graph']  = "device_processors";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempools";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
 
 $os = "speedtouch";
