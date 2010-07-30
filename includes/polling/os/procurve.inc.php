@@ -3,6 +3,8 @@
 list($hardware, $features, $version) = explode(",", str_replace(", ", ",", $sysDescr));
 list($version) = explode("(", $version);
 
+
+
 $cpurrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-cpu.rrd";
 $memrrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/procurve-mem.rrd";
 
