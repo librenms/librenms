@@ -804,11 +804,11 @@ ZYXEL-IESCOMMON-MIB DEFINITIONS ::= BEGIN
 			 the maintenance operation should be performed. The target can
 			 be a chassis, a plug-in module, and a port.
 		 	 The value of the object will be:
-		 	 	(Chassis_id * 10000 + slot_id * 100 + port_id)
+		 	 	(Chassisid * 10000 + slotid * 100 + portid)
 		 	  where
-		 	 	chassis_id: 0~3,
-		 	 	slot_id: 1~16,
-		 	 	port_id: 1~24"
+		 	 	chassisid: 0~3,
+		 	 	slotid: 1~16,
+		 	 	portid: 1~24"
         ::= { iesSysMaintenance 2 }
 
 
@@ -1697,9 +1697,9 @@ ZYXEL-IESCOMMON-MIB DEFINITIONS ::= BEGIN
 
         iesMacFilterStatusEnable    OBJECT-TYPE
         SYNTAX  INTEGER {
-				enable_accept(1),
+				enableaccept(1),
 				disable(2),
-				enable_deny(3)
+				enabledeny(3)
 			}
         MAX-ACCESS	read-write
         STATUS	current
@@ -2079,7 +2079,7 @@ ZYXEL-IESCOMMON-MIB DEFINITIONS ::= BEGIN
 
 	iesSwitchMode OBJECT-TYPE
         SYNTAX INTEGER {
-        			daisy_chain(1),
+        			daisychain(1),
         			standalone(2)
         		}
 	MAX-ACCESS	read-write
