@@ -1,3 +1,6 @@
+-- extracted from rfc3812.txt
+-- at Thu Jun 17 06:20:52 2004
+
    MPLS-TE-STD-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -131,7 +134,7 @@
 
    mplsTunnelNotificationMaxRate OBJECT-TYPE
       SYNTAX       Unsigned32
-       MAX-ACCESS   read-write
+      MAX-ACCESS   read-write
       STATUS       current
       DESCRIPTION
            "This variable indicates the maximum number of
@@ -322,7 +325,7 @@
 
    mplsTunnelName OBJECT-TYPE
       SYNTAX        SnmpAdminString
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The canonical name assigned to the tunnel. This name
@@ -340,7 +343,7 @@
 
    mplsTunnelDescr OBJECT-TYPE
       SYNTAX        SnmpAdminString
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "A textual string containing information about the
@@ -355,7 +358,7 @@
 
    mplsTunnelIsIf OBJECT-TYPE
       SYNTAX        TruthValue
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Denotes whether or not this tunnel corresponds to an
@@ -405,7 +408,7 @@
                               transit(2),
                               tail(3),
                               headTail(4) }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This value signifies the role that this tunnel
@@ -424,7 +427,7 @@
 
    mplsTunnelXCPointer OBJECT-TYPE
       SYNTAX        RowPointer
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This variable points to a row in the mplsXCTable.
@@ -448,7 +451,7 @@
                         crldp(3),
                         other(4)
                         }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The signalling protocol, if any, used to setup this
@@ -458,7 +461,7 @@
 
    mplsTunnelSetupPrio OBJECT-TYPE
       SYNTAX        Integer32 (0..7)
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Indicates the setup priority of this tunnel."
@@ -472,7 +475,7 @@
 
    mplsTunnelHoldingPrio OBJECT-TYPE
       SYNTAX        Integer32 (0..7)
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Indicates the holding priority for this tunnel."
@@ -493,7 +496,7 @@
                      isPinned (3),
                      recordRoute(4)
                     }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This bit mask indicates optional session values for
@@ -531,7 +534,7 @@
 
    mplsTunnelLocalProtectInUse  OBJECT-TYPE
       SYNTAX        TruthValue
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Indicates that the local repair mechanism is in use
@@ -540,10 +543,9 @@
       DEFVAL { false }
       ::= { mplsTunnelEntry 16 }
 
-
    mplsTunnelResourcePointer OBJECT-TYPE
       SYNTAX        RowPointer
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This variable represents a pointer to the traffic
@@ -575,7 +577,7 @@
 
    mplsTunnelInstancePriority OBJECT-TYPE
       SYNTAX        Unsigned32
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This value indicates which priority, in descending
@@ -589,12 +591,13 @@
              another. Instances of tunnels containing the same
              mplsTunnelInstancePriority will be used for load
              sharing."
+
       DEFVAL        { 0 }
       ::= { mplsTunnelEntry 19 }
 
    mplsTunnelHopTableIndex OBJECT-TYPE
       SYNTAX        MplsPathIndexOrZero
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Index into the mplsTunnelHopTable entry that
@@ -606,7 +609,7 @@
 
    mplsTunnelPathInUse OBJECT-TYPE
       SYNTAX        MplsPathIndexOrZero
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This value denotes the configured path that was
@@ -648,7 +651,7 @@
 
    mplsTunnelIncludeAnyAffinity OBJECT-TYPE
       SYNTAX        MplsTunnelAffinity
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "A link satisfies the include-any constraint if and
@@ -661,7 +664,7 @@
 
    mplsTunnelIncludeAllAffinity OBJECT-TYPE
       SYNTAX        MplsTunnelAffinity
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "A link satisfies the include-all constraint if and
@@ -674,7 +677,7 @@
 
    mplsTunnelExcludeAnyAffinity OBJECT-TYPE
       SYNTAX        MplsTunnelAffinity
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "A link satisfies the exclude-any constraint if and
@@ -763,7 +766,7 @@
                       -- in some test mode
                       testing(3)
                 }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Indicates the desired operational status of this
@@ -797,7 +800,7 @@
 
    mplsTunnelRowStatus OBJECT-TYPE
       SYNTAX        RowStatus
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This variable is used to create, modify, and/or
@@ -810,7 +813,7 @@
 
    mplsTunnelStorageType OBJECT-TYPE
       SYNTAX        StorageType
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION  "The storage type for this tunnel entry.
                     Conceptual rows having the value 'permanent'
@@ -943,7 +946,7 @@
 
    mplsTunnelHopAddrType OBJECT-TYPE
        SYNTAX        TeHopAddressType
-        MAX-ACCESS    read-create
+       MAX-ACCESS    read-create
        STATUS        current
        DESCRIPTION  "The Hop Address Type of this tunnel hop.
 
@@ -959,7 +962,7 @@
 
    mplsTunnelHopIpAddr OBJECT-TYPE
        SYNTAX        TeHopAddress
-        MAX-ACCESS    read-create
+       MAX-ACCESS    read-create
        STATUS        current
        DESCRIPTION  "The Tunnel Hop Address for this tunnel hop.
 
@@ -975,7 +978,7 @@
 
     mplsTunnelHopIpPrefixLen OBJECT-TYPE
        SYNTAX        InetAddressPrefixLength
-        MAX-ACCESS    read-create
+       MAX-ACCESS    read-create
        STATUS        current
        DESCRIPTION  "If mplsTunnelHopAddrType is set to ipv4(1) or
                      ipv6(2), then this value will contain an
@@ -988,7 +991,7 @@
 
    mplsTunnelHopAsNumber OBJECT-TYPE
       SYNTAX        TeHopAddressAS
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "If mplsTunnelHopAddrType is set to asnumber(3), then
@@ -999,7 +1002,7 @@
 
    mplsTunnelHopAddrUnnum OBJECT-TYPE
       SYNTAX        TeHopAddressUnnum
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "If mplsTunnelHopAddrType is set to unnum(4), then
@@ -1014,7 +1017,7 @@
 
    mplsTunnelHopLspId OBJECT-TYPE
       SYNTAX        MplsLSPID
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "If mplsTunnelHopAddrType is set to lspid(5), then
@@ -1030,7 +1033,7 @@
                          strict(1),
                          loose(2)
                         }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "Denotes whether this tunnel hop is routed in a
@@ -1041,7 +1044,7 @@
 
    mplsTunnelHopInclude OBJECT-TYPE
       SYNTAX        TruthValue
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "If this value is set to true, then this indicates
@@ -1058,7 +1061,7 @@
 
    mplsTunnelHopPathOptionName OBJECT-TYPE
       SYNTAX        SnmpAdminString
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The description of this series of hops as they
@@ -1073,7 +1076,7 @@
                          dynamic(1),    -- CSPF computed
                          explicit(2)    -- strict hop
                      }
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "If this value is set to dynamic, then the user
@@ -1088,7 +1091,7 @@
 
    mplsTunnelHopRowStatus OBJECT-TYPE
       SYNTAX        RowStatus
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This variable is used to create, modify, and/or
@@ -1101,7 +1104,7 @@
 
    mplsTunnelHopStorageType OBJECT-TYPE
       SYNTAX        StorageType
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The storage type for this Hop entry. Conceptual
@@ -1203,7 +1206,7 @@
    mplsTunnelResourceMaxRate OBJECT-TYPE
       SYNTAX        MplsBitRate
       UNITS         "kilobits per second"
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The maximum rate in bits/second.  Note that setting
@@ -1216,7 +1219,7 @@
    mplsTunnelResourceMeanRate OBJECT-TYPE
       SYNTAX        MplsBitRate
       UNITS         "kilobits per second"
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This object is copied into an instance of
@@ -1229,7 +1232,7 @@
    mplsTunnelResourceMaxBurstSize OBJECT-TYPE
       SYNTAX        MplsBurstSize
       UNITS         "bytes"
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The maximum burst size in bytes."
@@ -1238,7 +1241,7 @@
    mplsTunnelResourceMeanBurstSize OBJECT-TYPE
       SYNTAX       MplsBurstSize
       UNITS        "bytes"
-       MAX-ACCESS    read-create
+      MAX-ACCESS   read-create
       STATUS       current
       DESCRIPTION
            "The mean burst size in bytes.  The implementations
@@ -1250,7 +1253,7 @@
    mplsTunnelResourceExBurstSize OBJECT-TYPE
       SYNTAX       MplsBurstSize
       UNITS        "bytes"
-       MAX-ACCESS    read-create
+      MAX-ACCESS   read-create
       STATUS       current
       DESCRIPTION
            "The Excess burst size in bytes.  The implementations
@@ -1266,7 +1269,7 @@
                              frequent(2),
                              veryFrequent(3)
                             }
-       MAX-ACCESS    read-create
+      MAX-ACCESS   read-create
       STATUS       current
       DESCRIPTION
            "The granularity of the availability of committed
@@ -1279,7 +1282,7 @@
 
    mplsTunnelResourceWeight    OBJECT-TYPE
       SYNTAX       Unsigned32(0..255)
-       MAX-ACCESS    read-create
+      MAX-ACCESS   read-create
       STATUS       current
       DESCRIPTION
            "The relative weight for using excess bandwidth above
@@ -1291,7 +1294,7 @@
 
    mplsTunnelResourceRowStatus OBJECT-TYPE
       SYNTAX        RowStatus
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "This variable is used to create, modify, and/or
@@ -1304,7 +1307,7 @@
 
    mplsTunnelResourceStorageType OBJECT-TYPE
       SYNTAX        StorageType
-       MAX-ACCESS    read-create
+      MAX-ACCESS    read-create
       STATUS        current
       DESCRIPTION
            "The storage type for this Hop entry. Conceptual
@@ -1357,7 +1360,6 @@
              the actual route read is consistent by reference to
              the mplsTunnelLastPathChange object."
       ::= { mplsTeObjects 7 }
-
 
    mplsTunnelARHopEntry  OBJECT-TYPE
       SYNTAX        MplsTunnelARHopEntry
@@ -1453,8 +1455,6 @@
       ::= { mplsTunnelARHopEntry 6 }
 
    -- End of mplsTunnelARHopTable
-
-
    -- Tunnel Computed Hop table.
 
    mplsTunnelCHopTable  OBJECT-TYPE
@@ -1646,6 +1646,7 @@
            "An entry in this table is created by the LSR for
              every tunnel.  Its is an extension to
              mplsTunnelEntry."
+
       AUGMENTS { mplsTunnelEntry }
       ::= { mplsTunnelPerfTable 1 }
 
@@ -1863,7 +1864,7 @@
 
    mplsTunnelNotificationEnable OBJECT-TYPE
       SYNTAX        TruthValue
-       MAX-ACCESS   read-write
+      MAX-ACCESS    read-write
       STATUS        current
       DESCRIPTION
            "If this object is true, then it enables the
@@ -1934,8 +1935,6 @@
        ::= { mplsTeNotifications 4 }
 
    -- End of notifications.
-
-
    -- Module compliance.
 
    mplsTeGroups
@@ -2127,6 +2126,7 @@
          MIN-ACCESS  read-only
          DESCRIPTION
              "Write access is not required."
+
          OBJECT      mplsTunnelResourcePointer
          MIN-ACCESS  read-only
          DESCRIPTION
@@ -2223,8 +2223,6 @@
          OBJECT      mplsTunnelHopPathOptionName
          MIN-ACCESS  read-only
          DESCRIPTION "Write access is not required."
-
-
          OBJECT      mplsTunnelHopEntryPathComp
          MIN-ACCESS  read-only
          DESCRIPTION "Write access is not required."
@@ -2273,7 +2271,6 @@
          SYNTAX      RowStatus { active(1) }
          MIN-ACCESS  read-only
          DESCRIPTION "Write access is not required."
-
          OBJECT      mplsTunnelResourceStorageType
          MIN-ACCESS   read-only
          DESCRIPTION "Write access is not required."
@@ -2480,3 +2477,42 @@
       ::= { mplsTeGroups 8 }
 
    END
+
+-- 
+--    Copyright (C) The Internet Society (2004).  This document is subject
+--    to the rights, licenses and restrictions contained in BCP 78, and
+--    except as set forth therein, the authors retain all their rights.
+-- 
+--    This document and the information contained herein are provided on an
+--    "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE
+--    REPRESENTS OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE
+--    INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR
+--    IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+--    THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+--    WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- 
+-- Intellectual Property
+-- 
+--    The IETF takes no position regarding the validity or scope of any
+--    Intellectual Property Rights or other rights that might be claimed
+--    to pertain to the implementation or use of the technology
+--    described in this document or the extent to which any license
+--    under such rights might or might not be available; nor does it
+--    represent that it has made any independent effort to identify any
+--    such rights.  Information on the procedures with respect to
+--    rights in RFC documents can be found in BCP 78 and BCP 79.
+-- 
+--    Copies of IPR disclosures made to the IETF Secretariat and any
+--    assurances of licenses to be made available, or the result of an
+--    attempt made to obtain a general license or permission for the use
+--    of such proprietary rights by implementers or users of this
+--    specification can be obtained from the IETF on-line IPR repository
+--    at http://www.ietf.org/ipr.
+-- 
+--    The IETF invites any interested party to bring to its attention
+--    any copyrights, patents or patent applications, or other
+--    proprietary rights that may cover technology that may be required
+--    to implement this standard.  Please address the information to the
+--    IETF at ietf-ipr@ietf.org.
+-- 
+
