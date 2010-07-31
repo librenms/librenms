@@ -7,7 +7,7 @@ global $valid_sensor;
 if ($device['os'] == "junose")
 {
   echo("JunOSe: ");
-  $oids = snmpwalk_cache_multi_oid($device, "juniSystemTempValue", array(), "Juniper-System-MIB", "+".$config['install_dir']."/mibs/junose");
+  $oids = snmpwalk_cache_multi_oid($device, "juniSystemTempValue", array(), "Juniper-System-MIB", $config['install_dir']."/mibs/junose");
   if(is_array($oids[$device['device_id']])) 
   {
     foreach($oids[$device[device_id]] as $index => $entry) 

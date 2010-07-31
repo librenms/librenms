@@ -6,7 +6,7 @@ global $valid_processor;
 if($device['os'] == "junose")
 {
   echo("JUNOSe : ");
-  $processors_array = snmpwalk_cache_double_oid($device, "juniSystemModule", $processors_array, "Juniper-System-MIB" , "+".$config['install_dir']."/mibs/junose");
+  $processors_array = snmpwalk_cache_double_oid($device, "juniSystemModule", $processors_array, "Juniper-System-MIB" , $config['install_dir']."/mibs/junose");
   if($debug) { print_r($processors_array); }
 
   foreach ($processors_array[$device['device_id']] as $index => $entry) 

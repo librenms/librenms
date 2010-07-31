@@ -39,7 +39,7 @@ if ($config['enable_bgp'])
     if ($device['os'] == "junos")
     {
       ## Juniper BGP4-V2 MIB, ipv6 only for now, because v4 should be covered in BGP4-MIB above
-      $peers_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -M +".$config['install_dir']."/mibs/junos -m BGP4-V2-MIB-JUNIPER -CI -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
+      $peers_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -M ".$config['install_dir']."/mibs/junos -m BGP4-V2-MIB-JUNIPER -CI -Onq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
       $peers_cmd .= "jnxBgpM2PeerRemoteAs.0.ipv6";  # FIXME: is .0 the only possible value here?
       $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", `$peers_cmd`));  
       foreach (explode("\n", $peers) as $peer)  

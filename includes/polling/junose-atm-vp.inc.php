@@ -8,14 +8,14 @@ if(mysql_affected_rows()) {
 
 
   $vp_cache = array();
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInCells", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPackets", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPacketOctets", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPacketErrors", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutCells", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPackets", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPacketOctets", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
-  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPacketErrors", $vp_cache, "Juniper-UNI-ATM-MIB" , "+".$config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInCells", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPackets", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPacketOctets", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPacketErrors", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutCells", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPackets", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPacketOctets", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
+  $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsOutPacketErrors", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
   $vp_cache = $vp_cache[$device[device_id]];
 
   echo("Checking JunOSe ATM vps: ");

@@ -5,8 +5,8 @@
 
 include("includes/graphs/common.inc.php");
 
-$unit_text = str_pad(truncate($unit_text,10),10);
-
+$unit_text = str_pad(truncate($unit_text,18,''),18);
+$line_text = str_pad(truncate($line_text,12,''),12);
 
 $rrd_options .= " DEF:".$rra."=".$rrd_filename.":".$rra.":AVERAGE";
 $rrd_options .= " DEF:".$rra."_max=".$rrd_filename.":".$rra.":MAX";
@@ -28,7 +28,7 @@ if($percentile) {
   $rrd_options .= "      ".$percentile."th %";
 }
 $rrd_options .= "\\n'";
-$rrd_options .= " LINE1.25:".$rra."#".$colour_line.":In\ ";
+$rrd_options .= " LINE1.25:".$rra."#".$colour_line.":'".$line_text."'";
 $rrd_options .= " GPRINT:".$rra.":LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:".$rra.":AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:".$rra."_max:MAX:%6.2lf%s";
