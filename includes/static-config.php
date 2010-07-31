@@ -252,6 +252,10 @@ $os = "gamatronicups";
 $config['os'][$os]['text']  		= "Gamatronic UPS Stack";
 $config['os'][$os]['type']  		= "power";
 
+$os = "powerware";
+$config['os'][$os]['text']  		= "Powerware UPS";
+$config['os'][$os]['type']  		= "power";
+
 $os = "deltaups";
 $config['os'][$os]['text']  		= "Delta UPS";
 $config['os'][$os]['type']  		= "power";

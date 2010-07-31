@@ -1,6 +1,6 @@
 <?php
 
-echo("Temperatures : ");
+echo("Temperatures: ");
 
 include_dir("includes/discovery/temperatures");
 
