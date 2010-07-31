@@ -5,7 +5,7 @@ global $valid_sensor;
 if ($device['os'] == "junos" || $device['os_group'] == "junos")
 {
   echo("JunOS ");
-  $oids = snmp_walk($device,"1.3.6.1.4.1.2636.3.1.13.1.7","-Osqn","JUNIPER-MIB", '+'.$config['install_dir']."/mibs/junos");
+  $oids = snmp_walk($device,"1.3.6.1.4.1.2636.3.1.13.1.7","-Osqn","JUNIPER-MIB", $config['install_dir']."/mibs/junos");
   $oids = trim($oids);
   foreach(explode("\n", $oids) as $data)
   {

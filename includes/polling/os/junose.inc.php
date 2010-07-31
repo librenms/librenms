@@ -6,8 +6,8 @@ if(strpos($sysDescr, "olive")) {
   $hardware = "Olive";
   $serial = "";
 } else {
-  $junose_hardware  = snmp_get($device, "sysObjectID.0", "-Ovqs", "+Juniper-Products-MIB", "+".$config['install_dir']."/mibs/junose");
-  $junose_version   = snmp_get($device, "juniSystemSwVersion.0", "-Ovqs", "+Juniper-System-MIB", "+".$config['install_dir']."/mibs/junose");
+  $junose_hardware  = snmp_get($device, "sysObjectID.0", "-Ovqs", "+Juniper-Products-MIB", $config['install_dir']."/mibs/junose");
+  $junose_version   = snmp_get($device, "juniSystemSwVersion.0", "-Ovqs", "+Juniper-System-MIB", $config['install_dir']."/mibs/junose");
   $junose_serial    = "";
 
   $hardware = "Juniper " . rewrite_junose_hardware($junose_hardware);

@@ -5,25 +5,43 @@
 
 include("includes/graphs/common.inc.php");
 
+if($rrd_filename) { $rrd_filename_out = $rrd_filename; $rrd_filename_in = $rrd_filename; }
+
 if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
-$rrd_options .= " DEF:".$out."octets=".$rrd_filename.":".$rra_out.":AVERAGE";
-$rrd_options .= " DEF:".$in."octets=".$rrd_filename.":".$rra_in.":AVERAGE";
-$rrd_options .= " DEF:".$out."octets_max=".$rrd_filename.":".$rra_out.":MAX";
-$rrd_options .= " DEF:".$in."octets_max=".$rrd_filename.":".$rra_in.":MAX";
+
+if($multiplier) 
+{
+  $rrd_options .= " DEF:p".$out."octets=".$rrd_filename_out.":".$rra_out.":AVERAGE";
+  $rrd_options .= " DEF:p".$in."octets=".$rrd_filename_in.":".$rra_in.":AVERAGE";
+  $rrd_options .= " DEF:p".$out."octets_max=".$rrd_filename_out.":".$rra_out.":MAX";
+  $rrd_options .= " DEF:p".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
+  $rrd_options .= " CDEF:inoctets=pinoctets,$multiplier,*";
+  $rrd_options .= " CDEF:outoctets=poutoctets,$multiplier,*";
+  $rrd_options .= " CDEF:inoctets_max=pinoctets_max,$multiplier,*";
+  $rrd_options .= " CDEF:outoctets_max=poutoctets_max,$multiplier,*";
+} else {
+  $rrd_options .= " DEF:".$out."octets=".$rrd_filename_out.":".$rra_out.":AVERAGE";
+  $rrd_options .= " DEF:".$in."octets=".$rrd_filename_in.":".$rra_in.":AVERAGE";
+  $rrd_options .= " DEF:".$out."octets_max=".$rrd_filename_out.":".$rra_out.":MAX";
+  $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
+}
 
 $rrd_options .= " CDEF:octets=inoctets,outoctets,+";
 $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
-$rrd_options .= " CDEF:inbits=inoctets,8,*";
-$rrd_options .= " CDEF:inbits_max=inoctets_max,8,*";
+$rrd_options .= " CDEF:outbits=outoctets,8,*";
 $rrd_options .= " CDEF:outbits_max=outoctets_max,8,*";
 $rrd_options .= " CDEF:doutoctets_max=outoctets_max,-1,*";
-$rrd_options .= " CDEF:doutbits_max=doutoctets_max,8,*";
-$rrd_options .= " CDEF:outbits=outoctets,8,*";
 $rrd_options .= " CDEF:doutbits=doutoctets,8,*";
+$rrd_options .= " CDEF:doutbits_max=doutoctets_max,8,*";
+
+$rrd_options .= " CDEF:inbits=inoctets,8,*";
+$rrd_options .= " CDEF:inbits_max=inoctets_max,8,*";
+
 $rrd_options .= " VDEF:totin=inoctets,TOTAL";
 $rrd_options .= " VDEF:totout=outoctets,TOTAL";
 $rrd_options .= " VDEF:tot=octets,TOTAL";
+
 $rrd_options .= " VDEF:95thin=inbits,95,PERCENT";
 $rrd_options .= " VDEF:95thout=outbits,95,PERCENT";
 $rrd_options .= " VDEF:d95thout=doutbits,5,PERCENT";
