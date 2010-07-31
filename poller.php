@@ -198,7 +198,7 @@ while ($device = mysql_fetch_array($device_query))
     include("includes/polling/toner.inc.php");
     include("includes/polling/ucd-diskio.inc.php");
     include("includes/polling/applications.inc.php");
-    include("includes/polling/wireless.inc.php");
+    include("includes/polling/aironet_wifi_clients.inc.php");
 
     #include("includes/polling/altiga-ssl.inc.php");
     include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
