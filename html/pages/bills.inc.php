@@ -127,6 +127,10 @@ print_optionbar_end();
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>");
   $i=1;
   while($bill = mysql_fetch_array($query)) {
+   #echo("<pre>");
+   #print_r($permissions);
+   #echo("</pre>");
+   if(bill_permitted($bill['bill_id'])) {
     unset($class);
     $day_data     = getDates($bill['bill_day']);
     $datefrom     = $day_data['0'];
@@ -148,6 +152,14 @@ print_optionbar_end();
        $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);
        $percent = round(($rate_data['total_data'] / ($bill['bill_gb'] * 1024)) * 100,2);
     }
+
+    if ($percent > 100) { $perc = "100"; } else { $perc = $percent; }
+    if($perc > '90') { $left_background='c4323f'; $right_background='C96A73';
+    } elseif($perc > '75') { $left_background='bf5d5b'; $right_background='d39392';
+    } elseif($perc > '50') { $left_background='bf875b'; $right_background='d3ae92';
+    } elseif($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3';
+    } else { $left_background='9abf5b'; $right_background='bbd392'; }
+
     if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     echo("
            <tr bgcolor='$row_colour'>
@@ -157,12 +169,12 @@ print_optionbar_end();
 	     <td>$type</td>
              <td>$allowed</td>
              <td>$used</td>
-             <td><img src='percentage.php?width=350&per=$percent'> $percent%</td>
-						 <td></td>
-						 <td width=60><a href='".$config['base_url']."/bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
+             <td width=370>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</td>
+             <td width=60><a href='".$config['base_url']."/bill/".$bill['bill_id']."/edit/'><img src='images/16/wrench.png' align=absmiddle alt='Edit'> Edit</a></td>
            </tr>
          ");
     $i++;
+   } ### PERMITTED
   }
   echo("</table>");
 }

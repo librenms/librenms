@@ -125,7 +125,8 @@ function print_graph_popup($graph_array)
 
 
 
-function permissions_cache($user_id) {
+function permissions_cache($user_id) 
+{
   $permissions = array();
   $query = mysql_query("SELECT * FROM devices_perms WHERE user_id = '".$user_id."'");
   while($device = mysql_fetch_assoc($query)) {
@@ -135,9 +136,26 @@ function permissions_cache($user_id) {
   while($port = mysql_fetch_assoc($query)) {
     $permissions['port'][$port['interface_id']] = 1;
   }
+  $query = mysql_query("SELECT * FROM bill_perms WHERE user_id = '".$user_id."'");
+  while($bill = mysql_fetch_assoc($query)) {
+    $permissions['bill'][$bill['bill_id']] = 1;
+  }
   return $permissions;
 }
 
+function bill_permitted($bill_id) 
+{
+  global $_SESSION; global $permissions;
+  if ($_SESSION['userlevel'] >= "5") {
+    $allowed = TRUE;
+  } elseif ( $permissions['bill'][$bill_id]) {
+    $allowed = TRUE;
+  } else {
+    $allowed = FALSE;
+  }
+  return $allowed;
+
+}
 function interfacepermitted($interface_id, $device_id = NULL)
 {
   global $_SESSION; global $permissions;

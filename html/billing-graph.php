@@ -11,14 +11,16 @@ if($_GET['debug']) {
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");
+include("includes/functions.inc.php");
 include("includes/authenticate.inc.php");
 if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 require("includes/jpgraph/src/jpgraph.php");
 include("includes/jpgraph/src/jpgraph_line.php");
 include("includes/jpgraph/src/jpgraph_utils.inc.php");
 
-if($_GET['bill_id']){
-        if(testPassword($_GET['bill_id'],$_GET['bill_code']) == "1") {
+if(is_numeric($_GET['bill_id'])){
+        if(bill_permitted($_GET['bill_id']))
+        {
                 $bill_id = $_GET['bill_id'];
         } else {
                 echo("Unauthorised Access Prohibited.");
@@ -76,7 +78,6 @@ $i = '0';
 
 #$start = mysql_result(mysql_query("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp ASC LIMIT 0,1"),0);
 #$end   = mysql_result(mysql_query("SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >=$datefrom AND timestamp <= $dateto ORDER BY timestamp DESC LIMIT 0,1"),0);
-
 $dur = $end - $start; 
 
 $sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY timestamp ASC";
@@ -96,7 +97,7 @@ while($row = mysql_fetch_array($data))
 	#@$data[] = $in_value + $out_value;
 	#@$in_data[] = $in_value;
         #@$out_data[] = $out_value;
-	#@$ticks[] = $timestamp;
+#	@$ticks[] = $timestamp;
 	#@$per_data[] = $rate_95th / 1000;
 	#@$ave_data[] = $rate_average / 1000;
 
@@ -111,7 +112,7 @@ while($row = mysql_fetch_array($data))
 		$out_data[$i] 	= round($iter_out * 8 / $iter_period / $div, 2);
 		$in_data[$i] 	= round($iter_in * 8 / $iter_period / $div, 2);
 		$tot_data[$i]   = $out_data[$i] + $in_data[$i];
-#		$ticks[$i] 	= date('M j g:ia', $timestamp);
+		$ticks[$i] 	= date('M j g:ia', $timestamp);
 		$ticks[$i]	= $timestamp;
 		
           if($dur < 172800) {
@@ -170,10 +171,10 @@ $graph->title->Set("$graph_name");
 $graph->title->SetFont(FF_FONT2,FS_BOLD,10);
 $graph->xaxis->SetFont(FF_FONT1,FS_BOLD);
 
-$graph->xaxis->SetTickLabels($ticks);
+#$graph->xaxis->SetTickLabels($ticks);
 
 if(count($tickPositions) > 24) {
-  $graph->xaxis->SetTextLabelInterval(3);
+  $graph->xaxis->SetTextLabelInterval(6);
 }elseif(count($tickPositions) > 12) {
   $graph->xaxis->SetTextLabelInterval(2);
 }

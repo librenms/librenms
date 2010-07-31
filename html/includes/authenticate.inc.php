@@ -74,6 +74,8 @@ if (isset($_SESSION['username']))
       setcookie("username", $_SESSION['username'], time()+60*60*24*100, "/");
       setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
     }
+    $permissions = permissions_cache($_SESSION['user_id']);
+
   } 
   elseif (isset($_SESSION['username'])) 
   { 
