@@ -751,10 +751,6 @@ jnxWxGrpStatsSysExchangeFailTcpAcclFailedPkts OBJECT-TYPE
       "
     ::= { jnxWxGrpStatsSysExchange 6 }
 
----------------------------------
--- Acceleration Statistics Group 
----------------------------------
-
 jnxWxGrpStatsAccl OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
@@ -872,9 +868,6 @@ jnxWxGrpStatsComp OBJECT-IDENTITY
       "
     ::= { jnxWxGrpStats 3 }
 
--------------------------------------------------------------
--- Compression Statistics for each Application and Remote Wx 
--------------------------------------------------------------
 
 jnxWxGrpStatsCompTable OBJECT-TYPE
     SYNTAX  SEQUENCE OF JnxWxGrpStatsCompEntry
@@ -945,9 +938,6 @@ jnxWxGrpStatsCompCacheMisses OBJECT-TYPE
       "
     ::= { jnxWxGrpStatsCompEntry 4 }
 
------------------------------------------------------------------
--- WAN Performance Statistics for each Application and Remote Wx 
------------------------------------------------------------------
 
 jnxWxGrpStatsWanPerf OBJECT-IDENTITY
     STATUS  current

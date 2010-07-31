@@ -2270,7 +2270,7 @@ ZYXEL-SAM1216 DEFINITIONS ::= BEGIN
 --      STATUS current
 --      DESCRIPTION
 --	"configured transition L0 to L2 rate.
---	 (<=min_l2rate/2 and >= 16 Kbps, For CTLM solution, 0 for system assign; for BCM solution, default:16.)"
+--	 (<=minl2rate/2 and >= 16 Kbps, For CTLM solution, 0 for system assign; for BCM solution, default:16.)"
 --      ::= { adslLineConfEntry 22 }
 
 -- ADSL Port Batch Set
@@ -2551,7 +2551,7 @@ ZYXEL-SAM1216 DEFINITIONS ::= BEGIN
 --      STATUS current
 --      DESCRIPTION
 --	"configured transition L0 to L2 rate.
---	 (<=min_l2rate/2 and >= 16 Kbps, For CTLM solution, 0 for system assign; for BCM solution, default:16.)"
+--	 (<=minl2rate/2 and >= 16 Kbps, For CTLM solution, 0 for system assign; for BCM solution, default:16.)"
 --      ::= { adslPortBatchSet 22 }
 
 -- Line Status
@@ -2800,9 +2800,9 @@ ZYXEL-SAM1216 DEFINITIONS ::= BEGIN
 
         shdslLineConfPboMode OBJECT-TYPE
         SYNTAX 	INTEGER {
-			normal_epl(1),
-			forced_epl(2),
-			forced_no_epl(3)
+			normalepl(1),
+			forcedepl(2),
+			forcednoepl(3)
 		}
         MAX-ACCESS read-write
         STATUS current
@@ -2865,9 +2865,9 @@ ZYXEL-SAM1216 DEFINITIONS ::= BEGIN
 		BIT  5: set alarm profile
 		BIT  6: set pmms mode to be normal
 		BIT  7: set pmms mode to be forced
-		BIT  8: set pbo mode to be normal_epl
-		BIT  9: set pbo mode to be forced_epl
-		BIT 10: set pbo mode to be forced_no_epl
+		BIT  8: set pbo mode to be normalepl
+		BIT  9: set pbo mode to be forcedepl
+		BIT 10: set pbo mode to be forcednoepl
 		BIT 11: set pbo value"
         ::= { shdslPortBatchSet 2 }
 
