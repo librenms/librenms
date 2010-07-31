@@ -1,7 +1,6 @@
 <?php
 
 $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.interface_id = P.interface_id";
-echo("$sql");
 $vp_data = mysql_query($sql);
 
 if(mysql_affected_rows()) {
