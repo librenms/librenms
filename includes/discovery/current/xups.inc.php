@@ -28,7 +28,7 @@ if ($device['os'] == "powerware")
     }
   }
 
-  $oids = trim(snmp_walk($device, "xupsOutputCurrent", "-OsqnU"));
+  $oids = trim(snmp_walk($device, "xupsOutputCurrent", "-OsqnU", "XUPS-MIB"));
   if ($debug) { echo($oids."\n"); }
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)
@@ -42,7 +42,7 @@ if ($device['os'] == "powerware")
     echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
-  $oids = trim(snmp_walk($device, "xupsInputCurrent", "-OsqnU"));
+  $oids = trim(snmp_walk($device, "xupsInputCurrent", "-OsqnU", "XUPS-MIB"));
   if ($debug) { echo($oids."\n"); }
   list($unused,$numPhase) = explode(' ',$oids);
   for($i = 1; $i <= $numPhase;$i++)

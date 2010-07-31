@@ -11,6 +11,9 @@
 # XUPS-MIB::xupsTestBattery.0 = INTEGER: 0
 # XUPS-MIB::xupsTestBatteryStatus.0 = INTEGER: unknown(1)
 # XUPS-MIB::xupsOutputLoad.0 = INTEGER: 19
+# XUPS-MIB::xupsOnBattery
+# XUPS-MIB::xupsLowBattery
+# Powerware also supports a small part of the IETF UPS-MIB (RFC1628)
 
 # gamatronic: unknown
 
