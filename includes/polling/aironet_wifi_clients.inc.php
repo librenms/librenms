@@ -4,12 +4,12 @@ echo "Wireless: ";
 
 if ($device['type'] == 'network')
 {
-  if ($device['os'] == 'airport')
+  if ($device['os'] == 'aironet')
   {
 
-    echo "Checking Airport Wireless clients... ";
+    echo "Checking aironet Wireless clients... ";
 
-    $wificlients1 = snmp_get($device, "wirelessNumber.0", "-OUqnv", "AIRPORT-BASESTATION-3-MIB") +0;
+    $wificlients1 = snmp_get($device, "wirelessNumber.0", "-OUqnv", "aironet-BASESTATION-3-MIB") +0;
 
     echo($wificlients1 . " clients\n");
 
@@ -43,7 +43,7 @@ if ($device['type'] == 'network')
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients1);
 
-    $graphs['airport_wireless'] = TRUE;
+    $graphs['aironet_wifi_clients'] = TRUE;
 
   }
 
@@ -63,7 +63,7 @@ if ($device['type'] == 'network')
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients2);
 
-    $graphs['airport_wireless'] = TRUE;
+    $graphs['aironet_wifi_clients'] = TRUE;
 
   }
 

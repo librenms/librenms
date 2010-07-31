@@ -457,7 +457,11 @@ $device_types = array('server', 'network', 'firewall', 'workstation', 'printer',
 
 ### Graph Types
 
-$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wifi', 'storage');
+$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wireless', 'storage');
+
+$config['graph_types']['device']['aironet_wifi_clients']['section'] = 'wireless';
+$config['graph_types']['device']['aironet_wifi_clients']['order'] = '0';
+$config['graph_types']['device']['aironet_wifi_clients']['descr'] = 'Wireless Clients';
 
 $config['graph_types']['device']['cipsec_flow_bits']['section'] = 'firewall';
 $config['graph_types']['device']['cipsec_flow_bits']['order'] = '0';
