@@ -1,0 +1,312 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+
+-- This file describes the ZyXEL Communications Corporation Enterprise MIB.
+-- It contains ZyXEL products OIDs, and common managed objects.
+
+-- $Log: zyxel.mib $
+-- Revision 1.2  2007/07/20 09:28:18  jacky
+-- Revision 1.1  2006/08/28 05:32:50  kenny
+-- Initial revision
+-- Revision 1.4  2006/06/08 09:18:13  niceguy
+-- Revision 1.3  2006/05/15 03:00:36  niceguy
+-- Revision 1.2  2006/03/07 06:37:09  niceguy
+-- Revision 1.1  2005/11/23 12:47:47  niceguy
+-- Initial revision
+-- Revision 1.2  2005/08/24 09:57:57  niceguy
+-- Revision 1.20  2005/06/17 05:33:47  jackho
+-- Revision 1.19  2005/06/09 07:29:05  jennyhsu
+-- Revision 1.18  2005/05/04 01:15:38  jennyhsu
+-- Revision 1.17  2005/03/07 11:22:32  Admin
+-- change IES1248-71 and IES1248-73 OID
+-- Revision 1.16  2004/06/08 10:13:33  jenny
+--
+-- Revision 1.15  2004/05/20 08:24:00  jennyhsu
+-- Revision 1.14  2004/05/19 10:47:37  jennyhsu
+-- add system OID for new products
+-- Revision 1.13  2004/03/01 07:06:56  jennyhsu
+-- add object alc1124-71
+-- Revision 1.12  2004/02/25 08:41:34  jennyhsu
+-- add vlc1124 and ves1124
+-- Revision 1.11  2003/09/10 00:58:52  jennyhsu
+-- Add product OID for ves1416
+-- Revision 1.10  2003/05/27 08:12:05  jennyhsu
+-- Add object accessSwitchCommonATM
+-- Revision 1.9  2003/05/07 06:46:20  jennyhsu
+-- Remove ves2000
+-- Revision 1.8  2003/03/28 01:36:38  jennyhsu
+-- Add OID for ves1316, vlc1316 and ves2000
+-- Revision 1.7  2003/03/10 02:54:32  jennyhsu
+-- Add ether switch products
+-- Revision 1.6  2002/11/12 07:41:52  jennyhsu
+-- Revision 1.5  2002/09/02 11:48:40  jennyhsu
+-- Revision 1.4  2002/01/10 05:10:37  jennyhsu
+-- Revision 1.3  2001/10/26 02:50:02  jennyhsu
+-- Revision 1.2  2001/10/03 09:03:20  jennyhsu
+-- Revision 1.1  2001/08/25 06:01:16  jennyhsu
+-- Initial revision
+
+    ZYXEL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	enterprises		FROM RFC1155-SMI;
+
+
+
+	zyxel			OBJECT IDENTIFIER ::= { enterprises 890 }
+
+	products		OBJECT IDENTIFIER ::= { zyxel 1 }
+
+	prestige 		OBJECT IDENTIFIER ::= { products 2 }
+	rack			OBJECT IDENTIFIER ::= { products 3 }
+	dslam			OBJECT IDENTIFIER ::= { products 4 }
+	accessSwitch  		OBJECT IDENTIFIER ::= { products 5 }
+	zywall			OBJECT IDENTIFIER ::= { products 6 }
+	atmEncryptor		OBJECT IDENTIFIER ::= { products 7 }
+	serviceGateway  	OBJECT IDENTIFIER ::= { products 8 }
+	wimax		  	OBJECT IDENTIFIER ::= { products 9 }
+
+	-- Prestige products
+
+	prestigeCommon		OBJECT IDENTIFIER ::= { prestige 1 }
+	p200Series		OBJECT IDENTIFIER ::= { prestige 2 }
+	p300Series		OBJECT IDENTIFIER ::= { prestige 3 }
+	p400Series		OBJECT IDENTIFIER ::= { prestige 4 }
+	p500Series		OBJECT IDENTIFIER ::= { prestige 5 }
+	p600Series		OBJECT IDENTIFIER ::= { prestige 6 }
+	p641			OBJECT IDENTIFIER ::= { p600Series 1 }
+	p642			OBJECT IDENTIFIER ::= { p600Series 2 }
+	p643			OBJECT IDENTIFIER ::= { p600Series 3 }
+	p700Series		OBJECT IDENTIFIER ::= { prestige 7 }
+	p794ra			OBJECT IDENTIFIER ::= { p700Series 1 }
+	p794rb			OBJECT IDENTIFIER ::= { p700Series 2 }
+	p800Series		OBJECT IDENTIFIER ::= { prestige 8 }
+	p900Series		OBJECT IDENTIFIER ::= { prestige 9 }
+	p2X00Series		OBJECT IDENTIFIER ::= { prestige 10 }
+
+	-- ISDN TA and Router P200 series
+	p202h			OBJECT IDENTIFIER ::= { p200Series 1 }
+	p202hPlus		OBJECT IDENTIFIER ::= { p200Series 2 }
+
+
+
+	-- IP Sharing Gateway P300 series
+	p304			OBJECT IDENTIFIER ::= { p300Series 1 }
+	p310			OBJECT IDENTIFIER ::= { p300Series 2 }
+	p314			OBJECT IDENTIFIER ::= { p300Series 3 }
+	p314Plus		OBJECT IDENTIFIER ::= { p300Series 4 }
+	p324			OBJECT IDENTIFIER ::= { p300Series 5 }
+	
+	p641			OBJECT IDENTIFIER ::= { p600Series 1 }
+	p642			OBJECT IDENTIFIER ::= { p600Series 2 }
+	p643			OBJECT IDENTIFIER ::= { p600Series 3 }	
+	p645ra1			OBJECT IDENTIFIER ::= { p600Series 4 }	
+	p650r31			OBJECT IDENTIFIER ::= { p600Series 5 }	
+	p650r11			OBJECT IDENTIFIER ::= { p600Series 6 }	
+	p650h11			OBJECT IDENTIFIER ::= { p600Series 7 }	
+	p650hw11		OBJECT IDENTIFIER ::= { p600Series 8 }	
+	p650r13			OBJECT IDENTIFIER ::= { p600Series 9 }	
+	p650me11		OBJECT IDENTIFIER ::= { p600Series 10 }	
+	p650me13		OBJECT IDENTIFIER ::= { p600Series 11 }	
+	p652r11			OBJECT IDENTIFIER ::= { p600Series 12 }	
+	p652r13			OBJECT IDENTIFIER ::= { p600Series 13 }	
+	p650r33			OBJECT IDENTIFIER ::= { p600Series 14 }
+	p650hw31		OBJECT IDENTIFIER ::= { p600Series 15 }	
+	p650hw33		OBJECT IDENTIFIER ::= { p600Series 16 }	
+	p623ra1			OBJECT IDENTIFIER ::= { p600Series 17 }	
+	p650h37			OBJECT IDENTIFIER ::= { p600Series 18 }	
+	p652hw31		OBJECT IDENTIFIER ::= { p600Series 19 }	
+	p652hw33		OBJECT IDENTIFIER ::= { p600Series 20 }	
+	p654ra-a1		OBJECT IDENTIFIER ::= { p600Series 21 }	
+	p650r-e1		OBJECT IDENTIFIER ::= { p600Series 22 }	
+	p650r-e3		OBJECT IDENTIFIER ::= { p600Series 23 }	
+	p650r-e7		OBJECT IDENTIFIER ::= { p600Series 24 }	
+	p650h-e7		OBJECT IDENTIFIER ::= { p600Series 25 }	
+	p652hw37		OBJECT IDENTIFIER ::= { p600Series 26 }	
+	p650h-e1		OBJECT IDENTIFIER ::= { p600Series 27 }	
+	p623r-t1		OBJECT IDENTIFIER ::= { p600Series 28 }	
+	p623r-t3		OBJECT IDENTIFIER ::= { p600Series 29 }	
+	p623r-t7		OBJECT IDENTIFIER ::= { p600Series 30 }	
+	p653hwi-11		OBJECT IDENTIFIER ::= { p600Series 31 }	
+	p653hwi-13		OBJECT IDENTIFIER ::= { p600Series 32 }	
+	p653hwi-17		OBJECT IDENTIFIER ::= { p600Series 33 }	
+	p660hw-61		OBJECT IDENTIFIER ::= { p600Series 34 }	
+	p650r-t3		OBJECT IDENTIFIER ::= { p600Series 35 }	
+	p660hw-63		OBJECT IDENTIFIER ::= { p600Series 36 }	
+	p660hw-67		OBJECT IDENTIFIER ::= { p600Series 37 }	
+	p660w-61		OBJECT IDENTIFIER ::= { p600Series 38 }	
+	p660w-63		OBJECT IDENTIFIER ::= { p600Series 39 }	
+	p660w-67		OBJECT IDENTIFIER ::= { p600Series 40 }	
+	p660r-61		OBJECT IDENTIFIER ::= { p600Series 41 }	
+	p660r-63		OBJECT IDENTIFIER ::= { p600Series 42 }	
+	p660r-67		OBJECT IDENTIFIER ::= { p600Series 43 }	
+	p650r-t1		OBJECT IDENTIFIER ::= { p600Series 44 }	
+	p662w-61		OBJECT IDENTIFIER ::= { p600Series 45 }	
+	p662w-63		OBJECT IDENTIFIER ::= { p600Series 46 }	
+	p662w-67		OBJECT IDENTIFIER ::= { p600Series 47 }	
+	p660h-61		OBJECT IDENTIFIER ::= { p600Series 48 }	
+	p660h-63		OBJECT IDENTIFIER ::= { p600Series 49 }	
+	p660h-67		OBJECT IDENTIFIER ::= { p600Series 50 }	
+	p660r-67C		OBJECT IDENTIFIER ::= { p600Series 51 }	
+	p660r-61C		OBJECT IDENTIFIER ::= { p600Series 52 }	
+	p660hw-13		OBJECT IDENTIFIER ::= { p600Series 53 }	
+	p660ru-t1		OBJECT IDENTIFIER ::= { p600Series 54 }	
+	p660ru-t3		OBJECT IDENTIFIER ::= { p600Series 55 }	
+--	p660ru-t7		OBJECT IDENTIFIER ::= { p600Series 55 }	the same as p660ru-t3
+		
+	p794ra			OBJECT IDENTIFIER ::= { p700Series 1 }
+	p794rb			OBJECT IDENTIFIER ::= { p700Series 2 }	
+	p742			OBJECT IDENTIFIER ::= { p700Series 3 }	
+	p791r			OBJECT IDENTIFIER ::= { p700Series 4 }	
+	p792r			OBJECT IDENTIFIER ::= { p700Series 5 }	
+	
+	p861h			OBJECT IDENTIFIER ::= { p800Series 1 }	
+	p861hw			OBJECT IDENTIFIER ::= { p800Series 2 }
+	
+	-- VoIP p2X00 series
+	p2602hw-61		OBJECT IDENTIFIER ::= { p2X00Series 1 }
+    p2602hw-63		OBJECT IDENTIFIER ::= { p2X00Series 2 }
+    p2602hw-67		OBJECT IDENTIFIER ::= { p2X00Series 3 }
+    p2602hwl-61		OBJECT IDENTIFIER ::= { p2X00Series 4 }
+    p2602hwl-63		OBJECT IDENTIFIER ::= { p2X00Series 5 }
+    p2602hwl-67		OBJECT IDENTIFIER ::= { p2X00Series 6 }	
+    p2002-obm		OBJECT IDENTIFIER ::= { p2X00Series 7 }	
+    p2002l-obm		OBJECT IDENTIFIER ::= { p2X00Series 8 }	
+    p2002l-aol		OBJECT IDENTIFIER ::= { p2X00Series 9 }	
+    p2302r-obm		OBJECT IDENTIFIER ::= { p2X00Series 10 }	
+    p2602r-61		OBJECT IDENTIFIER ::= { p2X00Series 11 }	
+	
+
+
+
+
+	-- Access Switch products
+	accessSwitchCommon	OBJECT IDENTIFIER ::= { accessSwitch 1 }
+	aes100			OBJECT IDENTIFIER ::= { accessSwitch 2 }
+	pes100			OBJECT IDENTIFIER ::= { accessSwitch 3 }
+	ves1012			OBJECT IDENTIFIER ::= { accessSwitch 4 }
+	sesSeries		OBJECT IDENTIFIER ::= { accessSwitch 5 }
+	sesSeriesCommon		OBJECT IDENTIFIER ::= { sesSeries 1 }
+	sam1008			OBJECT IDENTIFIER ::= { sesSeries 2 }
+	ses1024			OBJECT IDENTIFIER ::= { sesSeries 3 }
+	slc1024			OBJECT IDENTIFIER ::= { sesSeries 4 }
+	slc1224-22		OBJECT IDENTIFIER ::= { sesSeries 5 }
+	sam1216-22 		OBJECT IDENTIFIER ::= { sesSeries 6 }
+	ies708-22a-stuc	OBJECT IDENTIFIER ::= { sesSeries 7 }
+	ies708-22a-stur	OBJECT IDENTIFIER ::= { sesSeries 8 }
+	p1600			OBJECT IDENTIFIER ::= { accessSwitch 6 }
+	p1400			OBJECT IDENTIFIER ::= { accessSwitch 7 }
+
+	esSeries		OBJECT IDENTIFIER ::= { accessSwitch 8 }
+	esSeriesCommon		OBJECT IDENTIFIER ::= { esSeries 1 }
+	ees1024af		OBJECT IDENTIFIER ::= { esSeries 2 }
+	es2008			OBJECT IDENTIFIER ::= { esSeries 3 }
+	es2008-gtp		OBJECT IDENTIFIER ::= { esSeries 4 }
+	es2008-sc		OBJECT IDENTIFIER ::= { esSeries 5 }
+	es2008-sc30		OBJECT IDENTIFIER ::= { esSeries 6 }
+	es3024			OBJECT IDENTIFIER ::= { esSeries 7 }
+	es4024			OBJECT IDENTIFIER ::= { esSeries 8 }
+	es2024			OBJECT IDENTIFIER ::= { esSeries 9 }
+	gs3012			OBJECT IDENTIFIER ::= { esSeries 10 }
+	gs3012f			OBJECT IDENTIFIER ::= { esSeries 11 }
+	es3124			OBJECT IDENTIFIER ::= { esSeries 12 }
+	gs4024			OBJECT IDENTIFIER ::= { esSeries 13 }
+	es3124pwr		OBJECT IDENTIFIER ::= { esSeries 14 }
+	gs2024			OBJECT IDENTIFIER ::= { esSeries 15 }
+	es2024a			OBJECT IDENTIFIER ::= { esSeries 16 }
+	es3148			OBJECT IDENTIFIER ::= { esSeries 17 }
+	es2108			OBJECT IDENTIFIER ::= { esSeries 18 }
+	es2108g			OBJECT IDENTIFIER ::= { esSeries 19 }
+	gs4012f			OBJECT IDENTIFIER ::= { esSeries 20 }
+	es2108pwr		OBJECT IDENTIFIER ::= { esSeries 21 }
+	es2108lc		OBJECT IDENTIFIER ::= { esSeries 22 }
+	es2048			OBJECT IDENTIFIER ::= { esSeries 23 }
+	es4124			OBJECT IDENTIFIER ::= { esSeries 24 }
+--	gs3012			OBJECT IDENTIFIER ::= { esSeries 25 }
+	es3124-4f		OBJECT IDENTIFIER ::= { esSeries 26 }
+
+	aes100-1		OBJECT IDENTIFIER ::= { accessSwitch 9 }
+	pes1014			OBJECT IDENTIFIER ::= { accessSwitch 10 }
+
+	aesSeries		OBJECT IDENTIFIER ::= { accessSwitch 11 }
+	aesSeriesCommon		OBJECT IDENTIFIER ::= { aesSeries 1 }
+	aes1024			OBJECT IDENTIFIER ::= { aesSeries 2 }
+	alc1024-61		OBJECT IDENTIFIER ::= { aesSeries 3 }
+	aam1008-63		OBJECT IDENTIFIER ::= { aesSeries 4 }
+	alc1024-63		OBJECT IDENTIFIER ::= { aesSeries 5 }
+	aam1008-61		OBJECT IDENTIFIER ::= { aesSeries 6 }
+	alc1224-71		OBJECT IDENTIFIER ::= { aesSeries 7 }
+	ies1248-71		OBJECT IDENTIFIER ::= { aesSeries 9 }
+	ies1248-73		OBJECT IDENTIFIER ::= { aesSeries 10 }
+	aam1212-51		OBJECT IDENTIFIER ::= { aesSeries 11 }
+	aam1212-53		OBJECT IDENTIFIER ::= { aesSeries 12 }
+	ies1248-51		OBJECT IDENTIFIER ::= { aesSeries 13 }
+	ies1248-53		OBJECT IDENTIFIER ::= { aesSeries 14 }
+	alc1224-51		OBJECT IDENTIFIER ::= { aesSeries 15 }
+	alc1224-53		OBJECT IDENTIFIER ::= { aesSeries 16 }
+
+	vesSeries		OBJECT IDENTIFIER ::= { accessSwitch 12 }
+	vesSeriesCommon		OBJECT IDENTIFIER ::= { vesSeries 1 }
+	ves1008			OBJECT IDENTIFIER ::= { vesSeries 2 }
+--	vmb2024			OBJECT IDENTIFIER ::= { vesSeries 3 }
+	ves1024			OBJECT IDENTIFIER ::= { vesSeries 4 }
+	vlc1012			OBJECT IDENTIFIER ::= { vesSeries 5 }
+	ves1316			OBJECT IDENTIFIER ::= { vesSeries 6 }
+	ves1416			OBJECT IDENTIFIER ::= { vesSeries 7 }
+	vlc1124			OBJECT IDENTIFIER ::= { vesSeries 8 }
+	ves1124			OBJECT IDENTIFIER ::= { vesSeries 9 }
+	ves1616f34		OBJECT IDENTIFIER ::= { vesSeries 10 }
+	ves1616f44		OBJECT IDENTIFIER ::= { vesSeries 11 }
+	ves1624f44		OBJECT IDENTIFIER ::= { vesSeries 12 }
+
+	iesSeries		OBJECT IDENTIFIER ::= { accessSwitch 13 }
+	iesSeriesCommon		OBJECT IDENTIFIER ::= { iesSeries 1 }
+	ies2000			OBJECT IDENTIFIER ::= { iesSeries 2 }
+	ies3000			OBJECT IDENTIFIER ::= { iesSeries 3 }
+	ies5000			OBJECT IDENTIFIER ::= { iesSeries 5 }
+	ies5005			OBJECT IDENTIFIER ::= { iesSeries 7 }
+	ies6000			OBJECT IDENTIFIER ::= { iesSeries 8 }
+
+	accessSwitchCommonATM	OBJECT IDENTIFIER ::= { accessSwitch 14 }
+
+	-- DSLAM products
+	dslamCommon             OBJECT IDENTIFIER ::= { dslam 1 }
+
+
+	-- Service Gateway products
+	serviceGWCommon			OBJECT IDENTIFIER ::= { serviceGateway 1 }
+	vsg1000				OBJECT IDENTIFIER ::= { serviceGateway 2 }
+	vsg1200				OBJECT IDENTIFIER ::= { serviceGateway 3 }
+	vsg1200v2			OBJECT IDENTIFIER ::= { serviceGateway 4 }
+
+	ponSeries		OBJECT IDENTIFIER ::= { accessSwitch 15 }
+	olt1308			OBJECT IDENTIFIER ::= { ponSeries 1 }
+	lt20h			OBJECT IDENTIFIER ::= { ponSeries 2 }
+
+	-- ZyWALL series
+	zywallCommon           	OBJECT IDENTIFIER ::= { zywall 1 }
+	zywall1		      	OBJECT IDENTIFIER ::= { zywall 2 }
+	zywall2		        OBJECT IDENTIFIER ::= { zywall 3 }
+	zywall2w	      	OBJECT IDENTIFIER ::= { zywall 4 }
+	zywall10	       	OBJECT IDENTIFIER ::= { zywall 5 }
+	zywall10ii		OBJECT IDENTIFIER ::= { zywall 6 }
+	zywall10w		OBJECT IDENTIFIER ::= { zywall 7 }
+	zywall50	      	OBJECT IDENTIFIER ::= { zywall 8 }
+	zywall100	      	OBJECT IDENTIFIER ::= { zywall 9 }
+	zywall200	       	OBJECT IDENTIFIER ::= { zywall 10 }
+	zywallidp10           	OBJECT IDENTIFIER ::= { zywall 11 }
+	zywall5           	OBJECT IDENTIFIER ::= { zywall 12 }
+	zywall30w           	OBJECT IDENTIFIER ::= { zywall 13 }
+	zywall35           	OBJECT IDENTIFIER ::= { zywall 14 }
+	zywall70           	OBJECT IDENTIFIER ::= { zywall 15 }
+	zywall1000           	OBJECT IDENTIFIER ::= { zywall 16 }
+	zywallCHT1           	OBJECT IDENTIFIER ::= { zywall 17 }
+	zywallM70           	OBJECT IDENTIFIER ::= { zywall 18 }
+	zywallP1           	OBJECT IDENTIFIER ::= { zywall 19 }
+	zywallP2           	OBJECT IDENTIFIER ::= { zywall 20 }
+	zywallM110         	OBJECT IDENTIFIER ::= { zywall 21 }
+
+	-- ZyWALL ZLD series
+	zywallZLDCommon		OBJECT IDENTIFIER ::= { zywall 22 }
+
+END
