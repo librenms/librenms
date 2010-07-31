@@ -255,6 +255,7 @@ $config['os'][$os]['type']  		= "power";
 $os = "powerware";
 $config['os'][$os]['text']  		= "Powerware UPS";
 $config['os'][$os]['type']  		= "power";
+$config['os'][$os]['icon']  		= "eaton";
 
 $os = "deltaups";
 $config['os'][$os]['text']  		= "Delta UPS";
@@ -280,14 +281,12 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-
 $os = "speedtouch";
 $config['os'][$os]['text']     		= "Thomson Speedtouch";
 $config['os'][$os]['ifname']		= 1;
 $config['os'][$os]['type']     		= "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
-
 
 $os = "sonicwal";
 $config['os'][$os]['text']     		= "SonicWALL";

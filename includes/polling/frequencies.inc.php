@@ -2,18 +2,16 @@
 
 $query = "SELECT * FROM `sensors` WHERE device_id = '" . $device['device_id'] . "' AND `sensor_class` = 'freq'";
 $sensor_data = mysql_query($query);
-while($frequency = mysql_fetch_array($sensor_data)) {
+while($sensor = mysql_fetch_array($sensor_data)) {
 
-  echo("Checking frequency " . $frequency['sensor_descr'] . "... ");
+  echo("Checking frequency " . $sensor['sensor_descr'] . "... ");
 
-  $freq = snmp_get($device, $frequency['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+  $freq = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  if ($frequency['sensor_precision']) 
-  {
-    $freq = $freq / $frequency['sensor_precision'];
-  }
-
-  $rrd_file      = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("freq-" . $frequency['sensor_descr'] . ".rrd");
+  if ($sensor['sensor_divisor'])    { $freq = $freq / $sensor['sensor_divisor']; }
+  if ($sensor['sensor_multiplier']) { $freq = $freq * $sensor['sensor_multiplier']; }
+    
+  $rrd_file      = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("freq-" . $sensor['sensor_descr'] . ".rrd");
 
   if (!is_file($rrd_file)) {
     `rrdtool create $rrd_file \
@@ -29,26 +27,26 @@ while($frequency = mysql_fetch_array($sensor_data)) {
 
   rrdtool_update($rrd_file,"N:$freq");
 
-  if($frequency['sensor_current'] > $frequency['sensor_limit_low'] && $freq <= $frequency['sensor_limit_low']) 
+  if($sensor['sensor_current'] > $sensor['sensor_limit_low'] && $freq <= $sensor['sensor_limit_low']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $frequency['sensor_descr'] . " is " . $freq . "Hz (Limit " . $frequency['sensor_limit'];
+    $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $freq . "Hz (Limit " . $sensor['sensor_limit'];
     $msg .= "Hz) at " . date($config['timestamp_format']);
-    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['sensor_descr'], $msg);
-    echo("Alerting for " . $device['hostname'] . " " . $frequency['sensor_descr'] . "\n");
-    log_event('Frequency ' . $frequency['sensor_descr'] . " under threshold: " . $freq . " Hz (< " . $frequency['sensor_limit_low'] . " Hz)", $device['device_id'] , 'frequency', $frequency['sensor_id']);
+    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
+    log_event('Frequency ' . $sensor['sensor_descr'] . " under threshold: " . $freq . " Hz (< " . $sensor['sensor_limit_low'] . " Hz)", $device['device_id'] , 'frequency', $sensor['sensor_id']);
   }
-  else if($frequency['sensor_current'] < $frequency['sensor_limit'] && $freq >= $frequency['sensor_limit']) 
+  else if($sensor['sensor_current'] < $sensor['sensor_limit'] && $freq >= $sensor['sensor_limit']) 
   {
     if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
-    $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $frequency['sensor_descr'] . " is " . $freq . "Hz (Limit " . $frequency['sensor_limit'];
+    $msg  = "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $freq . "Hz (Limit " . $sensor['sensor_limit'];
     $msg .= "Hz) at " . date($config['timestamp_format']);
-    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $frequency['sensor_descr'], $msg);
-    echo("Alerting for " . $device['hostname'] . " " . $frequency['sensor_descr'] . "\n");
-    log_event('Frequency ' . $frequency['sensor_descr'] . " above threshold: " . $freq . " Hz (> " . $frequency['sensor_limit'] . " Hz)", $device['device_id'], 'frequency', $frequency['sensor_id']);
+    notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
+    log_event('Frequency ' . $sensor['sensor_descr'] . " above threshold: " . $freq . " Hz (> " . $sensor['sensor_limit'] . " Hz)", $device['device_id'], 'frequency', $sensor['sensor_id']);
   }
 
-  mysql_query("UPDATE frequency SET sensor_current = '$freq' WHERE sensor_id = '" . $frequency['sensor_id'] . "'");
+  mysql_query("UPDATE frequency SET sensor_current = '$freq' WHERE sensor_id = '" . $sensor['sensor_id'] . "'");
 }
 
 ?>
