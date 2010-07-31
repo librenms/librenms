@@ -260,6 +260,7 @@ $config['os'][$os]['icon']  		= "eaton";
 $os = "deltaups";
 $config['os'][$os]['text']  		= "Delta UPS";
 $config['os'][$os]['type']  		= "power";
+$config['os'][$os]['icon']  		= "delta";
 
 $os = "airport";
 $config['os'][$os]['type'] 		= "network";
