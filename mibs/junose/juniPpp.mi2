@@ -31,7 +31,7 @@ IMPORTS
         FROM Juniper-TC;
 
 juniPppMIB  MODULE-IDENTITY
-    LAST-UPDATED "200808271120Z"  -- 27-Aug-08 04:50 PM EST
+    LAST-UPDATED "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -40,10 +40,19 @@ juniPppMIB  MODULE-IDENTITY
                 USA
         Tel:    +1 978 589 5800
         Email:  mib@Juniper.net"
-
+    
     DESCRIPTION
         "The Point-to-Point Protocol (PPP) MIB for the Juniper enterprise."
-    -- Revision History
+    -- Revision History  
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+		"Added new multiclass multilink objects. Added new traffic class 
+		mapping for multiclasses."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added new variables for prompting IPCP DNS options and IPCP 
+         lockout options."
+
     REVISION    "200808271120Z"  -- 08-Sep-08 04:50 PM EST  - JUNOSe 10.1
     DESCRIPTION
         "Added new variables for configuring Maximum negotiation attempts
@@ -881,7 +890,9 @@ JuniPppIpConfigEntry ::= SEQUENCE {
     juniPppIpConfigPeerWinsPriority     JuniEnable,
     juniPppIpConfigIpcpNetmask          JuniEnable,
     juniPppIpConfigInitiateIp           JuniEnable,
-    juniPppIpConfigMaxIpcpRenegotiation Integer32}
+    juniPppIpConfigMaxIpcpRenegotiation Integer32,
+    juniPppIpConfigPromptIpcpDnsOption  JuniEnable,
+    juniPppIpConfigIpcpLockout          JuniEnable}
 
 juniPppIpConfigPeerDnsPriority OBJECT-TYPE
     SYNTAX      JuniEnable
@@ -930,6 +941,27 @@ juniPppIpConfigMaxIpcpRenegotiation OBJECT-TYPE
         "Maximum number of allowed ipcp renegotiation attempts from peer."
     DEFVAL    { 30 }
     ::= { juniPppIpConfigEntry 5 }
+
+juniPppIpConfigPromptIpcpDnsOption OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control prompting of IPCP DNS option to remote peer."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 6 }
+
+juniPppIpConfigIpcpLockout OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables IPCP lockout. It determines whether this NCP can be negotiated
+         when the interface is already running a different NCP. On enabling this
+         option, the IPCP negotiation will be blocked after a different NCP
+         service is up and waited for 10 seconds for IPCP initiation from peer."
+    DEFVAL    { disable }
+    ::= { juniPppIpConfigEntry 7 }
 
 -- /////////////////////////////////////////////////////////////////////////////
 --
@@ -1492,7 +1524,9 @@ JuniPppMlPppLinkConfigEntry ::= SEQUENCE {
     juniPppMlPppLinkConfigFragmentSize                 Integer32,
     juniPppMlPppLinkConfigHashLinkSelection            JuniEnable,
     juniPppMlPppLinkConfigAuthentication2              JuniNibbleConfig,
-    juniPppMlPppLinkConfigIgnoreMagicNumberMismatch    JuniEnable }
+    juniPppMlPppLinkConfigIgnoreMagicNumberMismatch    JuniEnable,
+    juniPppMlPppLinkConfigMultilinkMulticlass          JuniEnable,
+    juniPppMlPppLinkConfigMultilinkMaxMultiClasses     INTEGER}
 
 juniPppMlPppLinkConfigIfIndex OBJECT-TYPE
     SYNTAX      InterfaceIndex
@@ -1761,7 +1795,25 @@ juniPppMlPppLinkConfigIgnoreMagicNumberMismatch OBJECT-TYPE
     DEFVAL    { disable }
     ::= { juniPppMlPppLinkConfigEntry 19 }
 
+juniPppMlPppLinkConfigMultilinkMulticlass OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables Multiclass Multilink PPP (MCML). Changing this object has an 
+		effect when the link is next restarted."
+    DEFVAL    {disable}
+    ::= { juniPppMlPppLinkConfigEntry 20 }
 
+juniPppMlPppLinkConfigMultilinkMaxMultiClasses OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MCML classes to be negotiated. Changing this object
+		 has an effect when the link is next restarted."
+    DEFVAL    {0}
+    ::= { juniPppMlPppLinkConfigEntry 21 }
 
 juniPppMlPppNextNetworkIfIndex OBJECT-TYPE
     SYNTAX      JuniNextIfIndex
@@ -1952,6 +2004,94 @@ juniPppMlPppBindRowStatus OBJECT-TYPE
         of creating/destroying an entry in this table."
     ::= { juniPppMlPppLinkBindEntry 3 }
 
+
+--
+-- The MLPPP Multiclass Traffic class Configuration Table
+--
+
+JuniPppMlPppMulticlassTcName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Name of the Traffic class.  The bundle name is a characteristic of a MLPPP
+        Multiclass."
+    SYNTAX OCTET STRING (SIZE(0..64))
+    
+juniPppMlPppMulticlassTraffiClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppMlPppMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Multiclass to traffic class
+         mapping of interfaces present in the system."
+    ::= { juniPppMlPpp 7 }
+ 
+juniPppMlPppMulticlassTrafficClassEntry OBJECT-TYPE
+    SYNTAX      JuniPppMlPppMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP multiclass to traffic class mapping of
+         interfaces.Other characteristics like fragmentation and reassembly
+         for a particular traffic class can be configured."
+    INDEX     { juniPppMlPppMulticlassIfIndex,
+                juniPppMlPppMulticlassIndex }
+    ::= { juniPppMlPppMulticlassTraffiClassTable  1 }
+
+JuniPppMlPppMulticlassTrafficClassEntry ::= SEQUENCE {
+	juniPppMlPppMulticlassIfIndex						InterfaceIndex,
+    juniPppMlPppMulticlassIndex                       INTEGER,
+    juniPppMlPppMulticlassTcName            			JuniPppMlPppMulticlassTcName,
+    juniPppMlPppMulticlassFragmentation               JuniEnable,
+    juniPppMlPppMulticlassReassembly                  JuniEnable }
+
+juniPppMlPppMulticlassIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniPppMlPppMulticlassIfIndex."
+    ::= { juniPppMlPppMulticlassTrafficClassEntry 1 }
+
+juniPppMlPppMulticlassIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The multiclass index of a particular traffic class type. This can be
+		 configured only when MCMP is enabled on the link interface."
+	DEFVAL	{ 15 }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 2 }
+	
+juniPppMlPppMulticlassTcName OBJECT-TYPE
+	SYNTAX		JuniPppMlPppMulticlassTcName
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The traffic class index mapped to the MCMP multiclass index. This can be
+		 configured only when MCMP is enabled on the link interface."
+	::= { juniPppMlPppMulticlassTrafficClassEntry 3 }
+	
+juniPppMlPppMulticlassFragmentation  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable fragmentation for a particular multiclass. This can be
+		 configured only when MCMP is enaled on the link interface."
+	DEFVAL  { disable }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 4 }
+
+juniPppMlPppMulticlassReassembly  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable rassembly for a particular multiclass. This can be
+		 configured only when MCMP is enaled on the link interface."
+	DEFVAL  { disable }
+	::= { juniPppMlPppMulticlassTrafficClassEntry 5 }
 
 -- /////////////////////////////////////////////////////////////////////////////
 --
@@ -3304,7 +3444,7 @@ juniPppCompliance13  MODULE-COMPLIANCE
     ::= { juniPppCompliances 13 }                                  -- JUNOSe 7.3
 
 juniPppCompliance14  MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for entities which implement the Juniper PPP
         MIB."
@@ -3329,6 +3469,66 @@ juniPppCompliance14  MODULE-COMPLIANCE
                 "The network summary group is mandatory only for PPP entities
                 that support multi-link functionality."
     ::= { juniPppCompliances 14 }                                  -- JUNOSe 10.1
+
+juniPppCompliance15  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup6,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup8
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+    ::= { juniPppCompliances 15 }                                  -- JUNOSe 11.0
+
+juniPppCompliance16  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB. This statement was obsoleted when MCMP traffic class mapping was
+		added. New group juniPppMlPppMulticlassTcGroup1 was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup5,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup9
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP		juniPppMlPppMulticlassTcGroup1
+        	DESCRIPTION
+        		"The Multilink multiclass traffic class group is mandatory only 
+				for PPP entities that support multi-link functionality."
+    ::= { juniPppCompliances 16 }                                  -- JUNOSe 11.1
+    
 --
 -- units of conformance
 --
@@ -4190,10 +4390,11 @@ juniPppMlPppGroup8  OBJECT-GROUP
         juniPppMlPppNetworkBundleName,
         juniPppMlPppNetworkRowStatus,
         juniPppMlPppBindRowStatus }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A collection of objects providing multi link PPP management support in
-        a Juniper product."
+        a Juniper product. This was obsoleted when multiclass multilink support
+		was added."
     ::= { juniPppGroups 33 }                                       -- JUNOSe 7.3
 
 juniPppLcpGroup8  OBJECT-GROUP
@@ -4228,7 +4429,7 @@ juniPppLcpGroup8  OBJECT-GROUP
     STATUS      current
     DESCRIPTION
         "A collection of objects providing management of link-layer
-        functionality (LCP) of PPP interfaces in a Juniper product."
+		functionality (LCP) of PPP interfaces in a Juniper product."
     ::= { juniPppGroups 34 }                                       -- JUNOSe 10.1
 
 juniPppIpGroup5  OBJECT-GROUP
@@ -4248,10 +4449,11 @@ juniPppIpGroup5  OBJECT-GROUP
         juniPppIpConfigIpcpNetmask,
         juniPppIpConfigInitiateIp,
         juniPppIpConfigMaxIpcpRenegotiation }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
-        "A collection of objects providing management of IP network control
-        protocol functionality (IPCP) of PPP interfaces in a Juniper product."
+        "A collection of objects providing management of IP network 
+         control protocol functionality (IPCP) of PPP interfaces in a Juniper 
+         product.This group became obsolete when additional objects were added."
     ::= { juniPppGroups 35 }                                       -- JUNOSe 10.1
 
 juniPppIpv6Group2  OBJECT-GROUP
@@ -4272,6 +4474,76 @@ juniPppIpv6Group2  OBJECT-GROUP
         protocol functionality (IPV6CP) of PPP interfaces in a Juniper product."
     ::= { juniPppGroups 36 }                                       -- JUNOSe 10.1
 
+juniPppIpGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpNetworkStatusIpcpRenegoTerminates,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask,
+        juniPppIpConfigInitiateIp,
+        juniPppIpConfigMaxIpcpRenegotiation,
+        juniPppIpConfigPromptIpcpDnsOption,
+        juniPppIpConfigIpcpLockout }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IP network control
+        protocol functionality (IPCP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 37 }                                        --JUNOSe 11.0
+
+juniPppMlPppGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniPppMlPppBundleRowStatus,
+        juniPppMlPppBundleNetworkIfIndex,
+        juniPppMlPppNextLinkIfIndex,
+        juniPppMlPppLinkConfigLowerIfIndex,
+        juniPppMlPppLinkConfigKeepalive,
+        juniPppMlPppLinkConfigAuthentication,
+        juniPppMlPppLinkConfigMaxAuthenRetries,
+        juniPppMlPppLinkConfigRowStatus,
+        juniPppMlPppLinkConfigChapMinChallengeLength,
+        juniPppMlPppLinkConfigChapMaxChallengeLength,
+        juniPppMlPppLinkConfigPassiveMode,
+        juniPppMlPppLinkConfigAuthenticatorVirtualRouter,
+        juniPppMlPppLinkConfigAaaProfile,
+        juniPppMlPppLinkConfigFragmentation,
+        juniPppMlPppLinkConfigReassembly,
+        juniPppMlPppLinkConfigMaxReceiveReconstructedUnit,
+        juniPppMlPppLinkConfigFragmentSize,
+        juniPppMlPppLinkConfigHashLinkSelection,
+        juniPppMlPppLinkConfigAuthentication2,
+        juniPppMlPppLinkConfigIgnoreMagicNumberMismatch,
+        juniPppMlPppNextNetworkIfIndex,
+        juniPppMlPppNetworkConfigLowerIfIndex,
+        juniPppMlPppNetworkBundleName,
+        juniPppMlPppNetworkRowStatus,
+        juniPppMlPppBindRowStatus,
+		juniPppMlPppLinkConfigMultilinkMulticlass,
+    	juniPppMlPppLinkConfigMultilinkMaxMultiClasses }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing multi link PPP management support in
+        a Juniper product."
+    ::= { juniPppGroups 38 }                                       -- JUNOSe 11.1
+    
+juniPppMlPppMulticlassTcGroup1  OBJECT-GROUP
+	OBJECTS {
+	  	juniPppMlPppMulticlassTcName,
+    	juniPppMlPppMulticlassFragmentation,
+    	juniPppMlPppMulticlassReassembly  }
+    STATUS		current
+    DESCRIPTION
+    	" A collection of object providing management of MCMP traffic class
+		mapping functionality of PPP link interfaces in a Juniper product."
+	::= { juniPppGroups 39 }										-- JUNOSe 11.1
 
 END
 

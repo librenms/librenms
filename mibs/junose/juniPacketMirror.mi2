@@ -4,7 +4,7 @@
 -- Juniper Networks Enterprise MIB
 --   Extensions for Packet Mirroring Management
 --
--- Copyright (c) 2005-2006 Juniper Networks, Inc.
+-- Copyright (c) 2005-2009 Juniper Networks, Inc.
 --   All Rights Reserved.
 -- *****************************************************************************
 
@@ -24,7 +24,7 @@ IMPORTS
         FROM Juniper-MIBs;
 
 juniPacketMirrorMIB  MODULE-IDENTITY
-    LAST-UPDATED "200607192057Z"  -- 19-Jul-06 04:57 PM EDT
+    LAST-UPDATED "200910280940Z"  -- 28-Oct-09 03:10 PM EST
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -36,6 +36,9 @@ juniPacketMirrorMIB  MODULE-IDENTITY
     DESCRIPTION
         "The Packet Mirror MIB for the Juniper Networks enterprise."
     -- Revision History                 
+    REVISION    "200910280940Z"  -- 28-Oct-09 03:10 PM EST  - JUNOSe 11.1
+    DESCRIPTION
+        "Added support for additional mirror trigger types."
     REVISION    "200607192057Z"  -- 19-Jul-06 04:57 PM EDT  - JUNOSe 7.3
     DESCRIPTION
         "Added new traps for LAES-2006-014R1 LI specification."                    
@@ -290,7 +293,10 @@ juniPacketMirrorTriggerType OBJECT-TYPE
                     nasPortId(2),
                     username(3),
                     callingStationId(4),
-                    acctSessionId(5) }
+                    acctSessionId(5),
+                    dhcpOption82(6),
+                    agentCircuitId(7),
+                    agentRemoteId(8) }
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION

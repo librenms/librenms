@@ -36,7 +36,7 @@ IMPORTS
         FROM Juniper-POLICY-MIB;
 
 juniAcctngMIB  MODULE-IDENTITY
-    LAST-UPDATED "200504261500Z"  -- 26-Apr-05 10:00 AM EST
+    LAST-UPDATED "200907161500Z"  -- 16-Jul-09 10:0 AM EST
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -49,6 +49,9 @@ juniAcctngMIB  MODULE-IDENTITY
         "The accounting MIB for the Juniper Networks enterprise.  This MIB
         augments with the Virtual Router Accounting MIB specified in RLI618."
     -- Revision History
+    REVISION    "200907161500Z"  -- 16-Jul-09 10:0 AM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added Qos Schema IDs"
     REVISION "200504261500Z"  -- 26-Apr-05 10:00 AM EST     - JUNOSe 7.1
     DESCRIPTION
         "Key revisions include:
@@ -792,6 +795,9 @@ juniAcctngSelectionSchemaPolicy    OBJECT IDENTIFIER
 juniAcctngSelectionSchemaIgmp      OBJECT IDENTIFIER
     ::= { juniAcctngSelectionSchema 6 }
 
+juniAcctngSelectionSchemaQos      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchema 7 }
+
 juniAcctngGreenPackets             OBJECT IDENTIFIER
     ::= { juniAcctngSelectionSchemaPolicy 1 }
 juniAcctngUpperGreenPackets        OBJECT IDENTIFIER
@@ -831,6 +837,63 @@ juniAcctngIgmpLowerIgmpCommand     OBJECT IDENTIFIER
     ::= { juniAcctngSelectionSchemaIgmp 6 }
 juniAcctngIgmpLowerTimeStamp       OBJECT IDENTIFIER
     ::= { juniAcctngSelectionSchemaIgmp 7 }
+
+juniAcctngParentShapingRate         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 1 }
+juniAcctngParentSharedShapRate   OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 2 }
+juniAcctngParentChildWeight          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 3 }
+juniAcctngQueueLength             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 4 }
+juniAcctngForwardedRate          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 5 }
+juniAcctngAggDropRate             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 6 }
+juniAcctngForwardedPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 7 }
+juniAcctngForwardedBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 8 }
+juniAcctngGreenDropPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 9 }
+juniAcctngGreenDropBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 10 }
+juniAcctngYellowDropPackets      OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 11 }
+juniAcctngYellowDropBytes         OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 12 }
+juniAcctngRedDropPackets          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 13 }
+juniAcctngRedDropBytes             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 14 }
+juniAcctngDropProfile                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 15 }
+juniAcctngQueueProfile                OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 16 }
+juniAcctngSchedulerProfile           OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 17 }
+juniAcctngStatisticsProfile             OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 18 }
+juniAcctngShapingMode                OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 19 }
+juniAcctngShapingRate                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 20 }
+juniAcctngBurst                            OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 21 }
+juniAcctngAssuredRate                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 22 }
+juniAcctngWeight                          OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 23 }
+juniAcctngRedEnabled                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 24 }
+juniAcctngSharedShapingMode       OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 25 }
+juniAcctngSharedShapingRate        OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 26 }
+juniAcctngByteAdjType                  OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 27 }
+juniAcctngByteAdjBytes                 OBJECT IDENTIFIER
+    ::= { juniAcctngSelectionSchemaQos 28 }
 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

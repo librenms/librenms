@@ -1454,7 +1454,8 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 spuIdpdCoreDumpIncomplete(56),  -- SPU idpd crash with incomplete core dump
                 spuIdpdCoreDumpComplete(57),    -- SPU idpd crash with complete core dump
                 spuCoreDumpIncomplete(58),      -- SPU kernel crash with incomplete core dump
-                spuIdpdDown(59)                 -- SPU idpd down
+                spuIdpdDown(59),                -- SPU idpd down
+                fruPfeReset(60)                 -- PFE reset
 	}
 	MAX-ACCESS	read-only
 	STATUS		current

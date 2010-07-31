@@ -61,15 +61,17 @@ JUNIPER-JS-UTM-AV-MIB DEFINITIONS ::= BEGIN
         SYNTAX INTEGER {
             unknown-engine         (1),
             kaspersky-lab-engine   (2),
-            juniper-express-engine (3)
+            juniper-express-engine (3),
+            sophos-engine          (4)
         }
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
             "The scan engine type in use. User can use CLI to set the
-             engine type to either full AV (kaspersky-lab-engine) or
-             express AV (juniper-express-engine). If AV is not configured
-             then engine type is not known."
+             engine type to either full AV (kaspersky-lab-engine),
+             express AV (juniper-express-engine) or Sophos AV
+             (sophos-engine). If AV is not configured then engine type
+             is not known."
         ::= { jnxJsAntiVirusEngine 1 }
 
     jnxJsAVCurrentPatternVersionString       OBJECT-TYPE
@@ -84,15 +86,17 @@ JUNIPER-JS-UTM-AV-MIB DEFINITIONS ::= BEGIN
         SYNTAX INTEGER {
             full            (1),
             express         (2),
-            unknown         (3)
+            unknown         (3),
+            sophos          (4)
         }
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
             "The Database type in use. User can use CLI to set the
-             engine type to full AV or express AV. Corresponding 
-             database types are Full for KL Engine and Express for
-             Juniper Express Engine."
+             engine type to full AV, express AV or Sophos AV. 
+             Corresponding database types are Full for KL Engine,
+             Express for Juniper Express Engine and Sophos for Sophos 
+             AV Engine."
         ::= { jnxJsAntiVirusEngine 3 }
 
     -- ***************************************************************

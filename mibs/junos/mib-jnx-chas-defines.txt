@@ -2,7 +2,7 @@
 -- Juniper chassis mib definitions:
 -- OIDs used to identify various platforms and chassis components.
 -- 
--- Copyright (c) 1998-2008, Juniper Networks, Inc.
+-- Copyright (c) 1998-2009, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -1231,6 +1231,7 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
 
   jnxMediaCardSpaceMX960      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    21 }
     jnxMX960MediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX960 1 }
+    jnxMX960MediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX960 2 }
 
   jnxMidplaneMX960         OBJECT IDENTIFIER ::= { jnxBackplane        21 }
 
@@ -1322,7 +1323,7 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
 
   jnxMediaCardSpaceMX480      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    25 }
   jnxMX480MediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX480 1 }
- 
+  jnxMX480MediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX480 2 }
 
   jnxMidplaneMX480         OBJECT IDENTIFIER ::= { jnxBackplane        25 }
 
@@ -1447,9 +1448,9 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
   jnxMX240SlotFan          OBJECT IDENTIFIER ::= { jnxSlotMX240 4  }
   jnxMX240SlotCB           OBJECT IDENTIFIER ::= { jnxSlotMX240 5  }
   jnxMX240SlotFPB          OBJECT IDENTIFIER ::= { jnxSlotMX240 6  }
-
   jnxMediaCardSpaceMX240   OBJECT IDENTIFIER ::= { jnxMediaCardSpace    29 }
   jnxMX240MediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX240 1 }
+  jnxMX240MediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX240 2 }
 
   jnxMidplaneMX240         OBJECT IDENTIFIER ::= { jnxBackplane         29 }
 
@@ -1861,6 +1862,328 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
       jnxEX4500RE            OBJECT IDENTIFIER ::= { jnxEX4500FPC 3 }
 
 --
+--DCF 
+--
+
+   jnxProductLineFXSeries       OBJECT IDENTIFIER ::= { jnxProductLine      45 }
+   jnxProductNameFXSeries       OBJECT IDENTIFIER ::= { jnxProductName      45 }
+   jnxProductModelFXSeries      OBJECT IDENTIFIER ::= { jnxProductModel     45 }
+   jnxProductVariationFXSeries  OBJECT IDENTIFIER ::= { jnxProductVariation 45 }
+   jnxChassisFXChassis          OBJECT IDENTIFIER ::= { jnxChassis          45 }
+   jnxProductFX1600port         OBJECT IDENTIFIER ::= { jnxProductVariationFXSeries 1 }
+   jnxProductFX2160port         OBJECT IDENTIFIER ::= { jnxProductVariationFXSeries 2 }
+
+--
+-- IBM4274M02J02M
+--
+
+  jnxProductLineIBM4274M02J02M      OBJECT IDENTIFIER ::= { jnxProductLine      46 }
+  jnxProductNameIBM4274M02J02M      OBJECT IDENTIFIER ::= { jnxProductName      46 }
+  jnxProductModelIBM4274M02J02M     OBJECT IDENTIFIER ::= { jnxProductModel     46 }
+  jnxProductVariationIBM4274M02J02M OBJECT IDENTIFIER ::= { jnxProductVariation 46 }
+  jnxChassisIBM4274M02J02M          OBJECT IDENTIFIER ::= { jnxChassis          46 }
+
+  jnxSlotIBM4274M02J02M             OBJECT IDENTIFIER ::= { jnxSlot             46 }
+  jnxIBM4274M02J02MSlotFPC          OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 1  }
+  jnxIBM4274M02J02MSlotHM           OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 2  }
+  jnxIBM4274M02J02MSlotPower        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 3  }
+  jnxIBM4274M02J02MSlotFan          OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 4  }
+  jnxIBM4274M02J02MSlotCB           OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 5  }
+  jnxIBM4274M02J02MSlotFPB          OBJECT IDENTIFIER ::= { jnxSlotIBM4274M02J02M 6  }
+  jnxMediaCardSpaceIBM4274M02J02M   OBJECT IDENTIFIER ::= { jnxMediaCardSpace    46 }
+  jnxIBM4274M02J02MMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M02J02M 1 }
+  jnxIBM4274M02J02MMediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M02J02M 2 }
+
+  jnxMidplaneIBM4274M02J02M         OBJECT IDENTIFIER ::= { jnxBackplane         46 }
+     
+--
+-- IBM4274M06J06M
+--
+
+  jnxProductLineIBM4274M06J06M      OBJECT IDENTIFIER ::= { jnxProductLine      47 }
+  jnxProductNameIBM4274M06J06M      OBJECT IDENTIFIER ::= { jnxProductName      47 }
+  jnxProductModelIBM4274M06J06M     OBJECT IDENTIFIER ::= { jnxProductModel     47 }
+  jnxProductVariationIBM4274M06J06M OBJECT IDENTIFIER ::= { jnxProductVariation 47 }
+  jnxChassisIBM4274M06J06M          OBJECT IDENTIFIER ::= { jnxChassis          47 }
+
+  jnxSlotIBM4274M06J06M             OBJECT IDENTIFIER ::= { jnxSlot             47 }
+    jnxIBM4274M06J06MSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 1  }
+    jnxIBM4274M06J06MSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 2  }
+    jnxIBM4274M06J06MSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 3  }
+    jnxIBM4274M06J06MSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 4  }
+    jnxIBM4274M06J06MSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 5  }
+    jnxIBM4274M06J06MSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M06J06M 6  }
+
+  jnxMediaCardSpaceIBM4274M06J06M      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    47 }
+  jnxIBM4274M06J06MMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M06J06M 1 }
+  jnxIBM4274M06J06MMediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M06J06M 2 }
+
+  jnxMidplaneIBM4274M06J06M         OBJECT IDENTIFIER ::= { jnxBackplane        47 }
+
+--
+-- IBM4274M11J11M
+--
+
+  jnxProductLineIBM4274M11J11M      OBJECT IDENTIFIER ::= { jnxProductLine      48 }
+  jnxProductNameIBM4274M11J11M      OBJECT IDENTIFIER ::= { jnxProductName      48 }
+  jnxProductModelIBM4274M11J11M     OBJECT IDENTIFIER ::= { jnxProductModel     48 }
+  jnxProductVariationIBM4274M11J11M OBJECT IDENTIFIER ::= { jnxProductVariation 48 }
+  jnxChassisIBM4274M11J11M          OBJECT IDENTIFIER ::= { jnxChassis          48 }
+
+  jnxSlotIBM4274M11J11M             OBJECT IDENTIFIER ::= { jnxSlot             48 }
+    jnxIBM4274M11J11MSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 1  }
+    jnxIBM4274M11J11MSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 2  }
+    jnxIBM4274M11J11MSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 3  }
+    jnxIBM4274M11J11MSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 4  }
+    jnxIBM4274M11J11MSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 5  }
+    jnxIBM4274M11J11MSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274M11J11M 6  }
+
+  jnxMediaCardSpaceIBM4274M11J11M      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    48 }
+    jnxIBM4274M11J11MMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M11J11M 1 }
+    jnxIBM4274M11J11MMediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274M11J11M 2 }
+
+  jnxMidplaneIBM4274M11J11M         OBJECT IDENTIFIER ::= { jnxBackplane        48 }
+
+ --
+ -- SRX1400
+ --
+       
+   jnxProductLineSRX1400      OBJECT IDENTIFIER ::= { jnxProductLine      49 }
+   jnxProductNameSRX1400      OBJECT IDENTIFIER ::= { jnxProductName      49 }
+   jnxProductModelSRX1400     OBJECT IDENTIFIER ::= { jnxProductModel     49 }
+   jnxProductVariationSRX1400 OBJECT IDENTIFIER ::= { jnxProductVariation 49 }
+   jnxChassisSRX1400          OBJECT IDENTIFIER ::= { jnxChassis          49 }
+  
+   jnxSlotSRX1400             OBJECT IDENTIFIER ::= { jnxSlot             49 }
+     jnxSRX1400SlotFPC        OBJECT IDENTIFIER ::= { jnxSlotSRX1400 1  }
+     jnxSRX1400SlotHM         OBJECT IDENTIFIER ::= { jnxSlotSRX1400 2  }
+     jnxSRX3100SlotPower      OBJECT IDENTIFIER ::= { jnxSlotSRX1400 3  }
+     jnxSRX1400SlotFan        OBJECT IDENTIFIER ::= { jnxSlotSRX1400 4  }
+     jnxSRX1400SlotCB         OBJECT IDENTIFIER ::= { jnxSlotSRX1400 5  }
+     jnxSRX1400SlotFPB        OBJECT IDENTIFIER ::= { jnxSlotSRX1400 6  }
+ 
+   jnxMediaCardSpaceSRX1400   OBJECT IDENTIFIER ::= { jnxMediaCardSpace    49 }
+   jnxSRX1400MediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceSRX1400 1 }
+ 
+   jnxMidplaneSRX1400         OBJECT IDENTIFIER ::= { jnxBackplane        49 }
+
+--
+-- IBM4274S58J58S (A40 OEM)
+--
+
+  jnxProductLineIBM4274S58J58S      OBJECT IDENTIFIER ::= { jnxProductLine      50 }
+  jnxProductNameIBM4274S58J58S      OBJECT IDENTIFIER ::= { jnxProductName      50 }
+  jnxProductModelIBM4274S58J58S     OBJECT IDENTIFIER ::= { jnxProductModel     50 }
+  jnxProductVariationIBM4274S58J58S OBJECT IDENTIFIER ::= { jnxProductVariation 50 }
+  jnxChassisIBM4274S58J58S          OBJECT IDENTIFIER ::= { jnxChassis          50 }
+
+  jnxSlotIBM4274S58J58S             OBJECT IDENTIFIER ::= { jnxSlot             50 }
+    jnxIBM4274S58J58SSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 1  }
+    jnxIBM4274S58J58SSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 2  }
+    jnxIBM4274S58J58SSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 3  }
+    jnxIBM4274S58J58SSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 4  }
+    jnxIBM4274S58J58SSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 5  }
+    jnxIBM4274S58J58SSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S58J58S 6  }
+
+  jnxMediaCardSpaceIBM4274S58J58S      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    50 }
+    jnxIBM4274S58J58SMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274S58J58S 1 }
+
+  jnxMidplaneIBM4274S58J58S         OBJECT IDENTIFIER ::= { jnxBackplane        50 }
+
+--
+-- IBM4274S56J56S (A20 OEM)
+--
+
+  jnxProductLineIBM4274S56J56S      OBJECT IDENTIFIER ::= { jnxProductLine      51 }
+  jnxProductNameIBM4274S56J56S      OBJECT IDENTIFIER ::= { jnxProductName      51 }
+  jnxProductModelIBM4274S56J56S     OBJECT IDENTIFIER ::= { jnxProductModel     51 }
+  jnxProductVariationIBM4274S56J56S OBJECT IDENTIFIER ::= { jnxProductVariation 51 }
+  jnxChassisIBM4274S56J56S          OBJECT IDENTIFIER ::= { jnxChassis          51 }
+
+  jnxSlotIBM4274S56J56S             OBJECT IDENTIFIER ::= { jnxSlot             51 }
+    jnxIBM4274S56J56SSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 1  }
+    jnxIBM4274S56J56SSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 2  }
+    jnxIBM4274S56J56SSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 3  }
+    jnxIBM4274S56J56SSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 4  }
+    jnxIBM4274S56J56SSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 5  }
+    jnxIBM4274S56J56SSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S56J56S 6  }
+
+  jnxMediaCardSpaceIBM4274S56J56S      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    51 }
+  jnxIBM4274S56J56SMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274S56J56S 1 }
+
+  jnxMidplaneIBM4274S56J56S         OBJECT IDENTIFIER ::= { jnxBackplane        51 }
+
+--             
+-- IBM4274S36J36S (A10 OEM)
+--
+
+  jnxProductLineIBM4274S36J36S      OBJECT IDENTIFIER ::= { jnxProductLine      52 }
+  jnxProductNameIBM4274S36J36S      OBJECT IDENTIFIER ::= { jnxProductName      52 }
+  jnxProductModelIBM4274S36J36S     OBJECT IDENTIFIER ::= { jnxProductModel     52 }
+  jnxProductVariationIBM4274S36J36S OBJECT IDENTIFIER ::= { jnxProductVariation 52 }
+  jnxChassisIBM4274S36J36S          OBJECT IDENTIFIER ::= { jnxChassis          52 }
+
+  jnxSlotIBM4274S36J36S             OBJECT IDENTIFIER ::= { jnxSlot             52 }
+    jnxIBM4274S36J36SSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 1  }
+    jnxIBM4274S36J36SSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 2  }
+    jnxIBM4274S36J36SSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 3  }
+    jnxIBM4274S36J36SSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 4  }
+    jnxIBM4274S36J36SSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 5  }
+    jnxIBM4274S36J36SSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S36J36S 6  }
+  
+  jnxMediaCardSpaceIBM4274S36J36S   OBJECT IDENTIFIER ::= { jnxMediaCardSpace    52 }
+  jnxIBM4274S36J36SMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274S36J36S 1 }
+  
+  jnxMidplaneIBM4274S36J36S         OBJECT IDENTIFIER ::= { jnxBackplane        52 }
+
+--
+-- IBM4274S34J34S (A2 OEM)
+--
+
+  jnxProductLineIBM4274S34J34S      OBJECT IDENTIFIER ::= { jnxProductLine      53 }
+  jnxProductNameIBM4274S34J34S      OBJECT IDENTIFIER ::= { jnxProductName      53 }
+  jnxProductModelIBM4274S34J34S     OBJECT IDENTIFIER ::= { jnxProductModel     53 }
+  jnxProductVariationIBM4274S34J34S OBJECT IDENTIFIER ::= { jnxProductVariation 53 }
+  jnxChassisIBM4274S34J34S          OBJECT IDENTIFIER ::= { jnxChassis          53 }
+
+  jnxSlotIBM4274S34J34S             OBJECT IDENTIFIER ::= { jnxSlot             53 }
+    jnxIBM4274S34J34SSlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 1  }
+    jnxIBM4274S34J34SSlotHM         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 2  }
+    jnxIBM4274S34J34SSlotPower      OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 3  }
+    jnxIBM4274S34J34SSlotFan        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 4  }
+    jnxIBM4274S34J34SSlotCB         OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 5  }
+    jnxIBM4274S34J34SSlotFPB        OBJECT IDENTIFIER ::= { jnxSlotIBM4274S34J34S 6  }
+
+  jnxMediaCardSpaceIBM4274S34J34S   OBJECT IDENTIFIER ::= { jnxMediaCardSpace    53 }
+  jnxIBM4274S34J34SMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274S34J34S 1 }
+
+  jnxMidplaneIBM4274S34J34S         OBJECT IDENTIFIER ::= { jnxBackplane        53 }
+
+--
+-- IBM 427348E J48E (EX4200)
+--
+
+  jnxProductLineIBM427348EJ48E      OBJECT IDENTIFIER ::= { jnxProductLine      54 }
+  jnxProductNameIBM427348EJ48E      OBJECT IDENTIFIER ::= { jnxProductName      54 }
+  jnxProductModelIBM427348EJ48E     OBJECT IDENTIFIER ::= { jnxProductModel     54 }
+  jnxProductVariationIBM427348EJ48E OBJECT IDENTIFIER ::= { jnxProductVariation 54 }
+    jnxProductIBM427348EJ48Eport24T    OBJECT IDENTIFIER ::= { jnxProductVariationIBM427348EJ48E 1 }
+    jnxProductIBM427348EJ48Eport24P    OBJECT IDENTIFIER ::= { jnxProductVariationIBM427348EJ48E 2 }
+    jnxProductIBM427348EJ48Eport48T    OBJECT IDENTIFIER ::= { jnxProductVariationIBM427348EJ48E 3 }
+    jnxProductIBM427348EJ48Eport48P    OBJECT IDENTIFIER ::= { jnxProductVariationIBM427348EJ48E 4 }
+    jnxProductIBM427348EJ48Eport24F    OBJECT IDENTIFIER ::= { jnxProductVariationIBM427348EJ48E 5 }
+
+  jnxChassisIBM427348EJ48E          OBJECT IDENTIFIER ::= { jnxChassis          54 }
+    jnxIBM427348EJ48ERE0            OBJECT IDENTIFIER ::= { jnxChassisIBM427348EJ48E 1  }
+    jnxIBM427348EJ48ERE1            OBJECT IDENTIFIER ::= { jnxChassisIBM427348EJ48E 2  }
+  jnxSlotIBM427348EJ48E             OBJECT IDENTIFIER ::= { jnxSlot             54 }
+    jnxIBM427348EJ48ESlotFPC        OBJECT IDENTIFIER ::= { jnxSlotIBM427348EJ48E 1 }
+      jnxIBM427348EJ48ESlotPower    OBJECT IDENTIFIER ::= { jnxIBM427348EJ48ESlotFPC 1 }
+      jnxIBM427348EJ48ESlotFan      OBJECT IDENTIFIER ::= { jnxIBM427348EJ48ESlotFPC 2 }
+
+  jnxMediaCardSpaceIBM427348EJ48E      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    54 }
+    jnxIBM427348EJ48EMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM427348EJ48E 1 }
+
+ jnxModuleIBM427348EJ48E            OBJECT IDENTIFIER ::= { jnxModule    54 }
+    jnxIBM427348EJ48EFPC            OBJECT IDENTIFIER ::= { jnxModuleIBM427348EJ48E 1 }
+      jnxIBM427348EJ48EPower        OBJECT IDENTIFIER ::= { jnxIBM427348EJ48EFPC 1 }
+      jnxIBM427348EJ48EFan          OBJECT IDENTIFIER ::= { jnxIBM427348EJ48EFPC 2 }
+
+--
+-- IBM 4274E08 J08E  (EX8208)
+--
+
+  jnxProductLineIBM4274E08J08E        OBJECT IDENTIFIER ::= { jnxProductLine      55 }
+  jnxProductNameIBM4274E08J08E        OBJECT IDENTIFIER ::= { jnxProductName      55 }
+  jnxProductModelIBM4274E08J08E       OBJECT IDENTIFIER ::= { jnxProductModel     55 }
+  jnxProductVariationIBM4274E08J08E   OBJECT IDENTIFIER ::= { jnxProductVariation 55 }
+  jnxChassisIBM4274E08J08E            OBJECT IDENTIFIER ::= { jnxChassis          55 }
+
+  jnxSlotIBM4274E08J08E               OBJECT IDENTIFIER ::= { jnxSlot             55 }
+    jnxIBM4274E08J08ESlotFPC         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E08J08E   1 }
+                            -- Flexible Port Concentrator
+      jnxIBM4274E08J08ESlot48S       OBJECT IDENTIFIER ::= { jnxIBM4274E08J08ESlotFPC  1 }
+      jnxIBM4274E08J08ESlot48T       OBJECT IDENTIFIER ::= { jnxIBM4274E08J08ESlotFPC  2 }
+      jnxIBM4274E08J08ESlot8XS       OBJECT IDENTIFIER ::= { jnxIBM4274E08J08ESlotFPC  3 }
+    jnxIBM4274E08J08EHM              OBJECT IDENTIFIER ::= { jnxSlotIBM4274E08J08E   3 }
+                            -- Host Module (also called Routing Engine)
+    jnxIBM4274E08J08ESlotPower       OBJECT IDENTIFIER ::= { jnxSlotIBM4274E08J08E   4 }
+    jnxIBM4274E08J08ESlotFan         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E08J08E   5 }
+      jnxIBM4274E08J08ESlotFT        OBJECT IDENTIFIER ::= { jnxIBM4274E08J08ESlotFan  1 }
+    jnxIBM4274E08J08ESlotCBD         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E08J08E   6 }
+                            -- Control Board
+
+  jnxMediaCardSpaceIBM4274E08J08E     OBJECT IDENTIFIER ::= { jnxMediaCardSpace   55 }
+    jnxIBM4274E08J08EMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274E08J08E  1 }
+
+  jnxBackplaneIBM4274E08J08E          OBJECT IDENTIFIER ::= { jnxBackplane        55 }
+
+--
+-- IBM 4274E16 J16E (EX8216)
+--
+
+  jnxProductLineIBM4274E16J16E       OBJECT IDENTIFIER ::= { jnxProductLine      56 }
+  jnxProductNameIBM4274E16J16E       OBJECT IDENTIFIER ::= { jnxProductName      56 }
+  jnxProductModelIBM4274E16J16E      OBJECT IDENTIFIER ::= { jnxProductModel     56 }
+  jnxProductVariationIBM4274E16J16E  OBJECT IDENTIFIER ::= { jnxProductVariation 56 }
+  jnxChassisIBM4274E16J16E           OBJECT IDENTIFIER ::= { jnxChassis          56 }
+
+  jnxSlotIBM4274E16J16E              OBJECT IDENTIFIER ::= { jnxSlot             56 }
+    jnxIBM4274E16J16ESlotFPC         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   1 }
+                            -- Flexible Port Concentrator
+      jnxIBM4274E16J16ESlot48S       OBJECT IDENTIFIER ::= { jnxIBM4274E16J16ESlotFPC   1 }
+      jnxIBM4274E16J16ESlot48T       OBJECT IDENTIFIER ::= { jnxIBM4274E16J16ESlotFPC   2 }
+      jnxIBM4274E16J16ESlot8XS       OBJECT IDENTIFIER ::= { jnxIBM4274E16J16ESlotFPC   3 }
+    jnxIBM4274E16J16ESIB             OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   2 }
+                            -- Swtich Interface Board
+    jnxIBM4274E16J16EHM              OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   3 }
+                            -- Host Module (also called Routing Engine)
+    jnxIBM4274E16J16ESlotPower       OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   4 }
+    jnxIBM4274E16J16ESlotFan         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   5 }
+      jnxIBM4274E16J16ESlotFT        OBJECT IDENTIFIER ::= { jnxIBM4274E16J16ESlotFan   1 }
+      jnxIBM4274E16J16ESlotRFT       OBJECT IDENTIFIER ::= { jnxIBM4274E16J16ESlotFan   2 }
+    jnxIBM4274E16J16ESlotCBD         OBJECT IDENTIFIER ::= { jnxSlotIBM4274E16J16E   6 }
+                            -- Control Board
+
+  jnxMediaCardSpaceIBM4274E16J16E    OBJECT IDENTIFIER ::= { jnxMediaCardSpace   56 }
+    jnxIBM4274E16J16EMediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceIBM4274E16J16E 1 }
+
+  jnxMidplaneIBM4274E16J16E          OBJECT IDENTIFIER ::= { jnxBackplane         56 }
+
+--
+-- MX80
+--
+
+  jnxProductLineMX80      OBJECT IDENTIFIER ::= { jnxProductLine      57 }
+  jnxProductNameMX80      OBJECT IDENTIFIER ::= { jnxProductName      57 }
+  jnxProductModelMX80     OBJECT IDENTIFIER ::= { jnxProductModel     57 }
+  jnxProductVariationMX80 OBJECT IDENTIFIER ::= { jnxProductVariation 57 }
+    jnxProductMX80        OBJECT IDENTIFIER ::= { jnxProductVariationMX80 1 }
+    jnxProductMX80-48T    OBJECT IDENTIFIER ::= { jnxProductVariationMX80 2 }
+  jnxChassisMX80          OBJECT IDENTIFIER ::= { jnxChassis          57 }
+
+  jnxSlotMX80             OBJECT IDENTIFIER ::= { jnxSlot     57 }
+    jnxMX80SlotFPC        OBJECT IDENTIFIER ::= { jnxSlotMX80 1  }
+    jnxMX80SlotCFEB       OBJECT IDENTIFIER ::= { jnxSlotMX80 2  }
+    jnxMX80SlotRE         OBJECT IDENTIFIER ::= { jnxSlotMX80 3  }
+    jnxMX80SlotPower      OBJECT IDENTIFIER ::= { jnxSlotMX80 4  }
+    jnxMX80SlotFan        OBJECT IDENTIFIER ::= { jnxSlotMX80 5  }
+
+  jnxMediaCardSpaceMX80      OBJECT IDENTIFIER ::= { jnxMediaCardSpace    57 }
+    jnxMX80MediaCardSpacePIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX80 1 }
+    jnxMX80MediaCardSpaceMIC OBJECT IDENTIFIER ::= { jnxMediaCardSpaceMX80 2 }
+
+  jnxMidplaneMX80         OBJECT IDENTIFIER ::= { jnxBackplane        57 }
+
+  jnxModuleMX80           OBJECT IDENTIFIER ::= { jnxModule     57 }
+    jnxMX80FPC            OBJECT IDENTIFIER ::= { jnxModuleMX80 1  }
+    jnxMX80CFEB           OBJECT IDENTIFIER ::= { jnxModuleMX80 2  }
+    jnxMX80RE             OBJECT IDENTIFIER ::= { jnxModuleMX80 3  }
+    jnxMX80Power          OBJECT IDENTIFIER ::= { jnxModuleMX80 4  }
+    jnxMX80PowerAC        OBJECT IDENTIFIER ::= { jnxModuleMX80 5  }
+    jnxMX80Fan            OBJECT IDENTIFIER ::= { jnxModuleMX80 6  }
+
+--
 --
 -- PLATFORM INDEPENDENT OIDs
 -- 
@@ -1889,6 +2212,7 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
 
   jnxSubmoduleGeneric OBJECT IDENTIFIER ::= { jnxSubmodule        12 }
     jnxPic            OBJECT IDENTIFIER ::= { jnxSubmoduleGeneric 1  }
+    jnxMic            OBJECT IDENTIFIER ::= { jnxSubmoduleGeneric 2  }
       --
       -- Generic PIC OIDs
       --
@@ -2074,7 +2398,7 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
       jnxPicFIOC4X10GEXFP        OBJECT IDENTIFIER ::= { jnxPic 179 }
       jnxPicMIC20XGESFP          OBJECT IDENTIFIER ::= { jnxPic 180 }
       jnxPicMIC2X10GEXFP         OBJECT IDENTIFIER ::= { jnxPic 181 }
-      jnxPicMIC20XGERJ45         OBJECT IDENTIFIER ::= { jnxPic 182 }
+      jnxPicMIC40XGERJ45         OBJECT IDENTIFIER ::= { jnxPic 182 }
       jnxPicMIC4X10GEXFP         OBJECT IDENTIFIER ::= { jnxPic 183 }
       jnxPicMICLoad              OBJECT IDENTIFIER ::= { jnxPic 184 }
       jnxPicMICH10XGESFP         OBJECT IDENTIFIER ::= { jnxPic 185 }
@@ -2103,4 +2427,44 @@ jnxStatusSource	    OBJECT IDENTIFIER ::= { jnxClassStatus 1 }
       jnxPicEX820048T            OBJECT IDENTIFIER ::= { jnxPic 208 }
       jnxPicEX82008XS            OBJECT IDENTIFIER ::= { jnxPic 209 }    
       jnxPicMIC4X10GESFPPLUS     OBJECT IDENTIFIER ::= { jnxPic 210 }    
+      jnxPicEX4500UplinkSFPPlus4Port OBJECT IDENTIFIER ::= { jnxPic 211 }
+      jnxPicSoho48X10GE          OBJECT IDENTIFIER ::= { jnxPic 212 }
+      jnxPicM2LoopBack           OBJECT IDENTIFIER ::= { jnxPic 213 }
+      jnxPicCtpGluon4xT1E1       OBJECT IDENTIFIER ::= { jnxPic 214 }
+      jnxPicCtpGluon4xSerial     OBJECT IDENTIFIER ::= { jnxPic 215 }
+      jnxPicSng24x10GE           OBJECT IDENTIFIER ::= { jnxPic 216 }
+      jnxPicSng2x100GE           OBJECT IDENTIFIER ::= { jnxPic 217 }
+      jnxPicSngLoad              OBJECT IDENTIFIER ::= { jnxPic 218 }
+      jnxPicSysio6XGERJ456XGESFP OBJECT IDENTIFIER ::= { jnxPic 219 }
+      jnxPicSysio6XGERJ453XGESFP3X10GESFPPlus OBJECT IDENTIFIER ::= { jnxPic 220 }
+      jnxPicDualWideSPCNPC       OBJECT IDENTIFIER ::= { jnxPic 221 }
+      jnxPicDualWideNPCSPC       OBJECT IDENTIFIER ::= { jnxPic 222 }
+      jnxPicTAZ12XGERJ45         OBJECT IDENTIFIER ::= { jnxPic 223 }
+      jnxPicType1MultiServicesFIPS OBJECT IDENTIFIER ::= { jnxPic 224 }
+      jnxPicType2MultiServicesFIPS OBJECT IDENTIFIER ::= { jnxPic 225 }
+      jnxPicType3MultiServicesFIPS OBJECT IDENTIFIER ::= { jnxPic 226 }
+      jnxPicEX4500UplinkXFP4Port OBJECT IDENTIFIER ::= { jnxPic 227 }
+      jnxPicEX4500M2Optical OBJECT IDENTIFIER ::= { jnxPic 228 }
+      jnxPicEX4500M2Legacy OBJECT IDENTIFIER ::= { jnxPic 229 }
+      jnxPicEX820036XS           OBJECT IDENTIFIER ::= { jnxPic 230 }
+      jnxPicEX820040XS           OBJECT IDENTIFIER ::= { jnxPic 231 }
+
+-- 
+-- OIDs 232 and 233 are not defined here as they have been reserved
+-- for future use.
+-- 
+
+      jnxPicType1ASPCPrism       OBJECT IDENTIFIER ::= { jnxPic 234 }
+      jnxPicType2ASPCPrism       OBJECT IDENTIFIER ::= { jnxPic 235 }
+      jnxPicType3ASPCPrism       OBJECT IDENTIFIER ::= { jnxPic 236 }
+      jnxPicSPCPrismx1           OBJECT IDENTIFIER ::= { jnxPic 237 }
+      jnxPicStoli40GE            OBJECT IDENTIFIER ::= { jnxPic 238 }
+      jnxPicHyp1X100GECFP        OBJECT IDENTIFIER ::= { jnxPic 239 }
+      jnxPicHyp1X40GECFP         OBJECT IDENTIFIER ::= { jnxPic 240 }
+      jnxPicHypX100GECXP         OBJECT IDENTIFIER ::= { jnxPic 241 }
+      jnxPicHyp10X10GESFPP       OBJECT IDENTIFIER ::= { jnxPic 242 }
+      jnxPic12x10GE              OBJECT IDENTIFIER ::= { jnxPic 243 }
+      jnxPic1x100GE              OBJECT IDENTIFIER ::= { jnxPic 244 }
+      jnxPicHyp2X40GEQSFP        OBJECT IDENTIFIER ::= { jnxPic 245 }
+
 END

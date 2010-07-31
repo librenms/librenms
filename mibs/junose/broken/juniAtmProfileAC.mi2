@@ -1,0 +1,112 @@
+
+-- *****************************************************************************
+-- Juniper-ATM-1483-Profile-CONF
+--
+-- SNMP Agent Capabilities definitions for the ATM 1483 Profile MIB.
+--
+-- Copyright (c) 2003, 2004 Juniper Networks, Inc.  All rights reserved.
+-- *****************************************************************************
+
+Juniper-ATM-1483-Profile-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniProfileAgents
+        FROM Juniper-Agents;
+
+juniAtm1483ProfileAgent  MODULE-IDENTITY
+    LAST-UPDATED "200407261954Z"  -- 26-Jul-04 03:54 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the ATM 1483 Profile component
+        of the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200407261954Z"  -- 26-Jul-04 03:54 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added Encapsulation Type Lockout objects."
+    REVISION    "200411022107Z"  -- 02-Nov-04 04:07 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added ifALias support to profile entries."
+    REVISION    "200411022107Z"  -- 02-Nov-04 04:07 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "The initial release of this management information module.
+         Added support for OAM admin status and loopback frequency."
+    ::= { juniProfileAgents 6 }
+
+
+-- *****************************************************************************
+-- ATM 1483 Profile JUNOSe SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniAtm1483ProfileAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the ATM 1483 Profile component of the JUNOSe SNMP agent.
+        This version of the ATM 1483 Profile component was supported in Juniper
+        JUNOSe 5.1 and 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM 1483 Profile
+        application in JUNOSe.  These capabilities became obsolete when ifALias
+        support was added to profile entries."
+    SUPPORTS    Juniper-ATM-1483-Profile-MIB
+        INCLUDES  {
+            juniAtm1483ProfileGroup }
+    ::= { juniAtm1483ProfileAgent 1 }
+
+juniAtm1483ProfileAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the ATM 1483 Profile component of the JUNOSe SNMP agent.
+        This version of the ATM 1483 Profile component was supported in Juniper
+        JUNOSe 5.3 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM 1483 Profile
+        application in JUNOSe.  These capabilities became obsolete when OAM support 
+        was added to profile entries."
+    SUPPORTS    Juniper-ATM-1483-Profile-MIB
+        INCLUDES  {
+            juniAtm1483ProfileGroup2 }
+    ::= { juniAtm1483ProfileAgent 2 }
+
+
+juniAtm1483ProfileAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the ATM 1483 Profile component of the JUNOSe SNMP agent.
+        This version of the ATM 1483 Profile component was supported in Juniper
+        JUNOSe 5.1 and 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM 1483 Profile
+        application in JUNOSe.  These capabilities became obsolete when ifALias
+        support was added to profile entries."
+    SUPPORTS    Juniper-ATM-1483-Profile-MIB
+        INCLUDES  {
+            juniAtm1483ProfileGroup3 }
+    ::= { juniAtm1483ProfileAgent 3 }
+
+juniAtm1483ProfileAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the ATM 1483 Profile component of the JUNOSe SNMP agent.
+        This version of the ATM 1483 Profile component was supported in Juniper
+        JUNOSe 5.3, 6.0, and 6.1 system releases."
+            juniAtm1483ProfileGroup4 }
+    ::= { juniAtm1483ProfileAgent 4 }
+
+juniAtm1483ProfileAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the ATM 1483 Profile component of the JUNOSe SNMP agent.
+        This version of the ATM 1483 Profile component is supported in Juniper
+        JUNOSe 7.0 and subsequent system releases."
+            juniAtm1483ProfileGroup5 }
+    ::= { juniAtm1483ProfileAgent 5 }
+
+END

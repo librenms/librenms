@@ -12,6 +12,8 @@ JUNIPER-SRX5000-SPU-MONITORING-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32
         FROM SNMPv2-SMI
+    DisplayString 
+        FROM SNMPv2-TC
     jnxJsSPUMonitoringRoot
         FROM JUNIPER-JS-SMI;
 
@@ -53,7 +55,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
                 "System level max session possible."
         ::= { jnxJsSPUMonitoringMIB 3 }
 	
-    jnxJsSPUMonitoringObjects OBJECT-TYPE
+    jnxJsSPUMonitoringObjectsEntry OBJECT-TYPE
         SYNTAX        JnxJsSPUMonitoringObjectsEntry
         MAX-ACCESS    not-accessible
         STATUS        current
@@ -83,7 +85,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "SPU's overall index in platform."
-        ::= { jnxJsSPUMonitoringObjects 1 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 1 }
 
     jnxJsSPUMonitoringFPCIndex OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -91,7 +93,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Which FPC SPU is on."
-        ::= { jnxJsSPUMonitoringObjects 2 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 2 }
 
     jnxJsSPUMonitoringSPUIndex OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -99,7 +101,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "SPU'Index inside the FPC."
-        ::= { jnxJsSPUMonitoringObjects 3 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 3 }
 
     jnxJsSPUMonitoringCPUUsage OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -108,7 +110,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Current SPU(CPU) Utilization in percentage."
-        ::= { jnxJsSPUMonitoringObjects 4 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 4 }
 
     jnxJsSPUMonitoringMemoryUsage OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -117,7 +119,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Current memory usage of SPU(CPU) in percentage."
-        ::= { jnxJsSPUMonitoringObjects 5 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 5 }
 	
     jnxJsSPUMonitoringCurrentFlowSession OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -125,7 +127,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Current flow session number of SPU."
-        ::= { jnxJsSPUMonitoringObjects 6 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 6 }
 
     jnxJsSPUMonitoringMaxFlowSession OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -133,7 +135,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Max flow session number of SPU."
-        ::= { jnxJsSPUMonitoringObjects 7 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 7 }
 
     jnxJsSPUMonitoringCurrentCPSession OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -141,7 +143,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Current CP session number of SPU."
-        ::= { jnxJsSPUMonitoringObjects 8 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 8 }
 
     jnxJsSPUMonitoringMaxCPSession OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -149,7 +151,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         STATUS  current
         DESCRIPTION
                 "Max CP session number of SPU."
-        ::= { jnxJsSPUMonitoringObjects 9 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 9 }
 
     jnxJsSPUMonitoringNodeIndex OBJECT-TYPE
         SYNTAX  Unsigned32
@@ -159,7 +161,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
                 "This attribute is used to identify a chassis. A chassis can 
                  be configured in a single or cluster mode.  When it is in a 
                  cluster mode, the chassis can be denote as a cluster node."
-        ::= { jnxJsSPUMonitoringObjects 10 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 10 }
 
     jnxJsSPUMonitoringNodeDescr OBJECT-TYPE
         SYNTAX        DisplayString (SIZE(1..255))
@@ -170,7 +172,7 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
              node information.  Chassis can be configured as a single, or 
              cluster node.  When it is cluster mode, the chassis can be 
              denoted as a cluster node."
-        ::= { jnxJsSPUMonitoringObjects 11 }
+        ::= { jnxJsSPUMonitoringObjectsEntry 11 }
 
 END
 

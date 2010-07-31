@@ -1,0 +1,1478 @@
+
+-- *****************************************************************************
+-- Juniper-SNMP-CONF
+--
+-- SNMP Agent Capabilities definitions for the SNMP MIBs.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+-- Copyright (c) 2008 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-SNMP-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniSnmpAgent  MODULE-IDENTITY
+    LAST-UPDATED "200303102027Z"  -- 10-Mar-03 03:27 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the SNMP entity component of the
+        SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200303102027Z"  -- 10-Mar-03 03:27 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added support for management application type and MIB access permission
+        to the Juniper-SNMP-MIB."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200208201329Z"  -- 20-Aug-02 09:29 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added support for ping time window and notification log data inclusion
+        in trap varbinds."
+    REVISION    "200208141923Z"  -- 14-Aug-02 03:23 PM EDT  - JUNOSe 3.4
+    DESCRIPTION
+        "Added support for proxy enable/disable feature."
+    REVISION    "200110161344Z"  -- 16-Oct-01 09:44 AM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Added support for the snmpSetGroup.  Added new objects to the
+        Juniper-SNMP-MIB supporting interface compress, trap severities and trap
+        severity filtering."
+    REVISION    "200104131544Z"  -- 13-Apr-01 11:44 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 39 }
+
+
+-- *****************************************************************************
+-- SNMP entity SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniSnmpAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 1.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when SNMPv3 support, View
+        support, and Named Access List support were added."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+        VARIATION   sysORLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORID
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORDescr
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORUpTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGroup,
+            juniSnmpAuthFailGroup }
+    ::= { juniSnmpAgent 1 }
+
+juniSnmpAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 2.0 thru
+        2.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when the
+        juniSnmpInterfaceMode object was added."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+        VARIATION   sysORLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORID
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORDescr
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORUpTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGroup2,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 2 }
+
+juniSnmpAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 2.3 thru
+        3.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when SNMPv2-MIB.sysORTable
+        support was added."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+        VARIATION   sysORLastChange
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORID
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORDescr
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+        VARIATION   sysORUpTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The system object resource table is not supported."
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGroup3,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 3 }
+
+juniSnmpAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 3.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when SNMPv2-MIB.snmpSetGroup
+        support was added and new Juniper SNMP MIB objects were added supporting
+        interface compress, trap severities and trap severity filtering."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGroup3,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 4 }
+
+juniSnmpAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 3.3 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when support for proxy
+        enable/disable was added."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 5 }
+
+juniSnmpAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component was supported in JUNOSe 3.4 thru
+        4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        the Juniper-SNMP-MIB for ping time window and notification log data
+        inclusion in trap varbinds."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup2,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 6 }
+
+juniSnmpAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the SNMP entity component of the JUNOSe SNMP
+        agent.  This version of the SNMP entity component is supported in the
+        JUNOSe 4.1 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        the Juniper-SNMP-MIB for management application type and MIB access
+        permission."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup2,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup2,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 7 }
+
+juniSnmpAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component is supported in JUNOSe 5.1 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application 
+         in JUNOSe. These capabilities became obsolete when support was added
+         to the Juniper-SNMP-MIB for trap severity filter based on trap
+         categories."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup3,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup2,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 8 }
+
+juniSnmpAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component is supported in JUNOSe 9.3 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup3,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup3,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 9 }
+
+juniSnmpAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the SNMP entity component of the JUNOSe SNMP agent.  This
+        version of the SNMP entity component is supported in JUNOSe 10.2 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the SNMP entity application in
+        JUNOSe."
+    SUPPORTS    SNMPv2-MIB
+        INCLUDES {
+            snmpGroup,
+            snmpCommunityGroup,
+            snmpSetGroup,
+            snmpObsoleteGroup,
+            systemGroup,
+            snmpBasicNotificationsGroup }
+    SUPPORTS    Juniper-SNMP-MIB
+        INCLUDES {
+            juniSnmpGeneralGroup4,
+            juniSnmpAccessGroup,
+            juniSnmpTrapGroup3,
+            juniSnmpAuthFailGroup }
+    SUPPORTS    SNMP-FRAMEWORK-MIB
+        INCLUDES {
+            snmpEngineGroup }
+    SUPPORTS    SNMP-MPD-MIB
+        INCLUDES {
+            snmpMPDGroup }
+    SUPPORTS    SNMP-TARGET-MIB
+        INCLUDES {
+            snmpTargetBasicGroup,
+            snmpTargetResponseGroup,
+            snmpTargetCommandResponderGroup }
+        VARIATION   snmpTargetAddrTDomain
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTimeout
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRetryCount
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrTagList
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrParams
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetAddrRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetAddrTable."
+        VARIATION   snmpTargetParamsMPModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityModel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsSecurityLevel
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+        VARIATION   snmpTargetParamsRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpTargetParamsTable."
+    SUPPORTS    SNMP-NOTIFICATION-MIB
+        INCLUDES {
+            snmpNotifyGroup,
+            snmpNotifyFilterGroup }
+        VARIATION   snmpNotifyTag
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyTable."
+        VARIATION   snmpNotifyFilterProfileName
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileStorType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterProfileRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the
+                snmpNotifyFilterProfileTable."
+        VARIATION   snmpNotifyFilterMask
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterStorageType
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+        VARIATION   snmpNotifyFilterRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "Unable to create or set elements of the snmpNotifyFilterTable."
+    SUPPORTS    SNMP-USER-BASED-SM-MIB
+        INCLUDES {
+            usmMIBBasicGroup }
+    SUPPORTS    SNMP-VIEW-BASED-ACM-MIB
+        INCLUDES {
+            vacmBasicGroup }
+    ::= { juniSnmpAgent 10 }
+END

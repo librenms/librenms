@@ -7,6 +7,7 @@
 --
 -- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
 -- Copyright (c) 2002-2007 Juniper Networks, Inc.
+-- Copyright (c) 2009 Juniper Networks, Inc.
 --   All Rights Reserved.
 -- *****************************************************************************
 
@@ -25,7 +26,7 @@ IMPORTS
         FROM Juniper-PPP-MIB;
 
 juniPppProfileMIB  MODULE-IDENTITY
-    LAST-UPDATED "200707121215Z"  -- 12-Jul-07 08:15 AM EDT
+    LAST-UPDATED  "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -40,6 +41,13 @@ juniPppProfileMIB  MODULE-IDENTITY
         tables found in the Juniper-PROFILE-MIB to support profiles for PPP
         interfaces."
     -- Revision History
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+	"Added new multiclass multilink objects. Added new traffic class 
+	mapping for multiclasses."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added IPCP dns prompt and lockout option element in juniPppProfileTable."
     REVISION    "200707121215Z"  -- 12-Jul-07 08:15 AM EDT  - JUNOSe 7.3
     DESCRIPTION
         "Added new ignore magic number mismatch element in juniPppProfileEntry MIB.
@@ -138,7 +146,11 @@ JuniPppProfileEntry ::= SEQUENCE {
     juniPppProfileFragmentSize                 Integer32,
     juniPppProfileHashLinkSelection            JuniEnable,
     juniPppProfileLcpAuthentication2           JuniNibbleConfig,
-    juniPppProfileIgnoreMagicNumberMismatch    JuniEnable }
+    juniPppProfileIgnoreMagicNumberMismatch    JuniEnable,
+    juniPppProfileIpcpPromptDnsOption          JuniEnable,
+    juniPppProfileIpcpLockout                  JuniEnable,
+    juniPppProfileMultilinkMulticlass          JuniEnable,
+    juniPppProfileMultilinkMaxMultiClasses     INTEGER }
 
 juniPppProfileId  OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -485,7 +497,136 @@ juniPppProfileIgnoreMagicNumberMismatch  OBJECT-TYPE
     DEFVAL    { disable }
     ::= { juniPppProfileEntry 26 }
 
+juniPppProfileIpcpPromptDnsOption  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control prompting of IPCP options to remote peer."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 27 }
 
+juniPppProfileIpcpLockout  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lockout option for IPCP determines whether IPCP can be negotiated
+         when the interface is already running IPV6CP. On enabling this option,
+         the negotiation will be blocked after the IPV6CP service is up and
+         waited for 10 seconds for peer IPCP initiation. The address is restored
+         to the pool after the 10 second timeout. Disabling this option will re
+         enable simultaneous NCP negotiations that are configured."
+    DEFVAL { disable }
+    ::= { juniPppProfileEntry 28 }
+
+juniPppProfileMultilinkMulticlass OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables Multiclass Multilink PPP (MCML). Changing this object has an 
+		effect when the link is next restarted."
+    DEFVAL    {disable}
+    ::= { juniPppProfileEntry 29 }
+
+juniPppProfileMultilinkMaxMultiClasses OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MCML classes to be negotiated. Changing this object
+		 has an effect when the link is next restarted."
+    DEFVAL    {0}
+    ::= { juniPppProfileEntry 30 }
+
+
+--
+-- The Profile Multiclass Traffic class Configuration Table
+--
+JuniPppProfileMulticlassTcName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Name of the Traffic class. The bundle name is a characteristic of a MLPPP
+        Multiclass."
+    SYNTAX OCTET STRING (SIZE(0..64))
+    
+juniPppProfileMulticlassTraffiClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppProfileMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Multiclass to traffic class
+         mapping of the profile present in the system."
+    ::= { juniPppProfile 2 }
+ 
+juniPppProfileMulticlassTrafficClassEntry OBJECT-TYPE
+    SYNTAX      JuniPppProfileMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP multiclass to traffic class mapping of
+         profiles.Other characteristics like fragmentation and reassembly
+         for a particular traffic class can be configured."
+    INDEX     { juniPppProfileId,
+                juniPppProfileMulticlassIndex }
+    ::= { juniPppProfileMulticlassTraffiClassTable  1 }
+
+JuniPppProfileMulticlassTrafficClassEntry ::= SEQUENCE {
+    juniPppProfileMulticlassId        	                Unsigned32,
+    juniPppProfileMulticlassIndex                         INTEGER,
+    juniPppProfileMulticlassTcName     			        JuniPppProfileMulticlassTcName,
+    juniPppProfileMulticlassFragmentation                 JuniEnable,
+    juniPppProfileMulticlassReassembly                    JuniEnable }
+    
+juniPppProfileMulticlassId OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "The index of the profile.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniPppProfileId."
+    ::= { juniPppProfileMulticlassTrafficClassEntry 1 }
+    
+juniPppProfileMulticlassIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The multiclass index of a particular traffic class type. This can be
+		 configured only when MCMP is enabled in the profile."
+	DEFVAL	{ 15 }
+	::= { juniPppProfileMulticlassTrafficClassEntry 2 }
+	
+juniPppProfileMulticlassTcName OBJECT-TYPE
+	SYNTAX		JuniPppProfileMulticlassTcName
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The traffic class index mapped to the MCMP multiclass index. This can be
+		 configured only when MCMP is enabled in the profile."
+	::= { juniPppProfileMulticlassTrafficClassEntry 3 }
+	
+juniPppProfileMulticlassFragmentation  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable fragmentation for a particular multiclass. This can be
+		 configured only when MCMP is enaled in the profile."
+	DEFVAL  { disable }
+	::= { juniPppProfileMulticlassTrafficClassEntry 4 }
+
+juniPppProfileMulticlassReassembly  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable rassembly for a particular multiclass. This can be
+		 configured only when MCMP is enaled in the profile."
+	DEFVAL  { disable }
+	::= { juniPppProfileMulticlassTrafficClassEntry 5 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Notifications
@@ -593,14 +734,25 @@ juniPppProfileCompliance8  MODULE-COMPLIANCE
     ::= { juniPppProfileCompliances 8 }                            -- JUNOSe 7.2
 
 juniPppProfileCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP 
+        Profile MIB.  This statement became obsolete when object 
+        juniPppProfileIpcpDnsOption and juniPppProfileIpcpLockout was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup10 }
+    ::= { juniPppProfileCompliances 9 }                            -- JUNOSe 7.3
+
+juniPppProfileCompliance10  MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
         "The compliance statement for entities which implement the Juniper PPP
         Profile MIB."
     MODULE   -- this module
         MANDATORY-GROUPS {
-            juniPppProfileGroup10 }
-    ::= { juniPppProfileCompliances 9 }                            -- JUNOSe 7.3
+            juniPppProfileGroup11 }
+    ::= { juniPppProfileCompliances 10 }                            -- JUNOSe 11.0
 
 --
 -- units of conformance
@@ -875,10 +1027,94 @@ juniPppProfileGroup10  OBJECT-GROUP
         juniPppProfileHashLinkSelection,
         juniPppProfileLcpAuthentication2,
         juniPppProfileIgnoreMagicNumberMismatch }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality for
+        PPP interfaces in a Juniper product. This group became obsolete when
+        juniPppProfileIpcpDnsOption and juniPppProfileIpcpLockout was added"
+    ::= { juniPppProfileGroups 10 }                                 -- JUNOSe 7.3
+
+juniPppProfileGroup11  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2,
+        juniPppProfileIgnoreMagicNumberMismatch,
+        juniPppProfileIpcpPromptDnsOption,
+        juniPppProfileIpcpLockout}
+    STATUS      current
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile functionality
+        for PPP interfaces in a Juniper product. This was obsoleted when the
+        support for multiclass MLPPP was added."
+    ::= { juniPppProfileGroups 11 }                                 -- JUNOSe 11.0
+
+juniPppProfileGroup12  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2,
+        juniPppProfileIgnoreMagicNumberMismatch,
+        juniPppProfileMultilinkMulticlass,
+        juniPppProfileMultilinkMaxMultiClasses }
     STATUS      current
     DESCRIPTION
         "A collection of objects providing management of profile functionality
         for PPP interfaces in a Juniper product."
-    ::= { juniPppProfileGroups 10 }                                 -- JUNOSe 7.3
+    ::= { juniPppProfileGroups 12 }                                 -- JUNOSe 11.1
+
+juniPppProfileMulticlassTrafficClassGroup1    OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileMulticlassTcName,
+    	juniPppProfileMulticlassFragmentation,
+    	juniPppProfileMulticlassReassembly  }
+    STATUS		current
+    DESCRIPTION
+    	" A collection of object providing management of multiclass MLPPP
+		multiclass to traffic class mapping functionality in the PPP profile 
+		in a Juniper product."
+	::= { juniPppProfileGroups 13 }	                          -- JUNOSe 11.1
 
 END
