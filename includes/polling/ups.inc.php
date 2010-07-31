@@ -18,6 +18,19 @@
 # gamatronic: unknown
 
 # mge: unknown
+# MG-SNMP-UPS-MIB::upsmgConfigLowBatteryLevel.0 = INTEGER: 20
+# MG-SNMP-UPS-MIB::upsmgBatteryRemainingTime.0 = INTEGER: 15750
+# MG-SNMP-UPS-MIB::upsmgBatteryLevel.0 = INTEGER: 100
+# MG-SNMP-UPS-MIB::upsmgBatteryFaultBattery.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgBatteryReplacement.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgBatteryLowBattery.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgBatteryChargerFault.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgBatteryLowCondition.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgOutputOnBattery.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgOutputOnByPass.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgOutputUtilityOff.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgOutputOverLoad.0 = INTEGER: no(2)
+# MG-SNMP-UPS-MIB::upsmgAgentCommUPS.0 = INTEGER: 1
 
 # apc: unknown
 

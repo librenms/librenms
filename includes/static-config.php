@@ -312,7 +312,7 @@ $config['os'][$os]['type']     		= "network";
 $config['os'][$os]['icon']        	= "zyxel";
 
 $os = "ies";
-$config['os'][$os]['text']     		= "ZyXEL IES DSLAM";
+$config['os'][$os]['text']     		= "ZyXEL DSLAM";
 $config['os'][$os]['type']     		= "network";
 $config['os'][$os]['icon']            	= "zyxel";
 

@@ -6,9 +6,9 @@ global $valid_sensor;
 if ($device['os'] == "mgeups") 
 {
   echo("MGE ");
-  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.7.1", "-OsqnU"));
+  $oids = trim(snmp_walk($device, "mgoutputVoltage", "-OsqnU", "MG-SNMP-UPS-MIB"));
   if ($debug) { echo($oids."\n"); }
-  list($unused,$numPhase) = explode(' ',$oids);
+  $numPhase = count(explode("\n",$oids));
   for($i = 1; $i <= $numPhase;$i++)
   {
     $volt_oid   = ".1.3.6.1.4.1.705.1.7.2.1.2.$i";
@@ -25,9 +25,9 @@ if ($device['os'] == "mgeups")
     $index      = $i;
     echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
-  $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
+  $oids = trim(snmp_walk($device, "mgeinputVoltage", "-OsqnU", "MG-SNMP-UPS-MIB"));
   if ($debug) { echo($oids."\n"); }
-  list($unused,$numPhase) = explode(' ',$oids);
+  $numPhase = count(explode("\n",$oids));
   for($i = 1; $i <= $numPhase;$i++)
   {
     $volt_oid   = ".1.3.6.1.4.1.705.1.6.2.1.2.$i";
