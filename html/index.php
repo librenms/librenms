@@ -17,10 +17,6 @@ if(strpos($_SERVER['REQUEST_URI'], "debug")) {
   include("../includes/functions.php");  
   include("includes/functions.inc.php");
   include("includes/authenticate.inc.php");
-  if($_SESSION['authenticated']) {
-    # Load permissions used my devicepermitted() and interfacepermitted()
-    $permissions = permissions_cache($_SESSION['user_id']);
-  }
 
   $start = utime();
   $now = time();
