@@ -1,0 +1,104 @@
+	DEVCONTROL-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY
+			FROM SNMPv2-SMI
+		TruthValue
+			FROM SNMPv2-TC
+		device
+			FROM ANIROOT-MIB;
+
+-- Device Mib (Common to BSU/SU)
+
+aniDevControl  MODULE-IDENTITY
+	LAST-UPDATED "0105091130Z"      -- Wed May 9 11:30:00 PDT 2001
+	ORGANIZATION "Aperto Networks"
+	CONTACT-INFO
+	  "       
+	  Postal:  Aperto Networks Inc
+		   1637 S Main Street 
+		   Milpitas, California 95035
+	  Tel:	   +1 408 719 9977
+	  "       
+	DESCRIPTION
+	"This group allows users to handle device control operations like 
+	 resetting the device and setting to factory defaults. 
+	 It can be used for both BSU and SU.
+	" 
+	::= { device 4 }
+
+aniDevControlResetDevice OBJECT-TYPE 
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "Setting this object to true(1) causes the device to reset.
+            Setting the object to false(2) is not allowed.
+
+	    If a Get request is sent before this object is actually 
+	    set, the value false(2) will be returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevControl 1 }
+
+aniDevControlSetFactoryDefaults OBJECT-TYPE 
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "This object provides an option to reset configuration 
+	    parameters to factory defaults.
+            Setting this object to true(1) allows restoring all 
+	    configuration parameters to factory default values.
+            Setting the object to false(2) is not allowed.
+
+	    If a Get request is sent before this object is actually 
+	    set, the value false(2) will be returned.
+
+	    Note: This parameter is not supported for this release. 
+	    Hence it is defined as a read-only object.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevControl 2 }
+
+aniDevControlStartUpload OBJECT-TYPE 
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	   "Setting this object to true(1) causes the device to upload 
+	    the entire Configuration File onto the TFTP server on the 
+	    service provider side.
+	    aniDevTftpServer is the designated TFTP server used in this 
+	    upload process.
+            Setting the object to false(2) is not allowed.
+
+	    If a Get request is sent before this object is actually 
+	    set, the value false(2) will be returned.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevControl 3 }
+
+aniDevControlUploadState OBJECT-TYPE 
+	SYNTAX      INTEGER {
+		    successful(1),
+		    failed(2)
+		    }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	   "Reading this object returns the status of the previous upload 
+	    process.
+	    The possible return values are:
+            successful(1) - upload operation completed successfully
+            failed(2) - upload operation failed 
+
+	    If a Get request is sent before aniDevControlStartUpload
+	    is actually set, the value successful(1) will be returned
+	    by default.
+	   "
+	--DEFAULT next-function-async     std_next_async
+	::= { aniDevControl 4 }
+
+END
+

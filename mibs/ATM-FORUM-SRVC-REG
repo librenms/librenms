@@ -1,0 +1,112 @@
+
+-- This ILMI MIB was specified as part of the LANE 1.0 specification
+-- (af-lane-0021.000.mib).
+
+-- This MIB has been made OBSOLETE by the specification of ILMI 4.0,
+-- since an updated version is included within af-ilmi-0065.000.mib.
+
+ATM-FORUM-SRVC-REG DEFINITIONS ::= BEGIN
+
+IMPORTS
+	atmForumUni, atmForumAdmin	FROM	ATM-FORUM-TC-MIB
+	OBJECT-TYPE				FROM RFC-1212;
+
+-- Textual Convention
+--
+-- Representations of this MIB Module of an ATM address
+-- use the data type:
+
+AtmAddress ::= OCTET STRING (SIZE (8 | 20))
+
+-- New MIB Groups
+atmfSrvcRegistryGroup	OBJECT IDENTIFIER ::= { atmForumUni 8 }
+
+
+-- Object Identifier definitions
+--
+-- The following values are define dfor use as possible values
+-- of the atmfSrvcRegServiceID object.
+
+atmfSrvcRegTypes	OBJECT IDENTIFIER ::= { atmForumAdmin 5 }
+
+-- LAN Emulation Configuration Server (LECS)
+atmfSrvcRegLecs	OBJECT IDENTIFIER ::= { atmfSrvcRegTypes 1 }
+
+
+--          The Service Registry Table
+--
+-- The Service Registry Table is implemented by the network side 
+-- of the ATM UNI port
+
+atmfSrvcRegTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF AtmfSrvcRegEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The table implemented by the UNI Management Entity on the
+		network side of the ATM UNI port contains all of the
+		services that are available to the user-side of the UNI
+		indexed by service identifier."
+	::= { atmfSrvcRegistryGroup 1 }
+
+atmfSrvcRegEntry OBJECT-TYPE
+	SYNTAX	AtmfSrvcRegEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Information about a single service provider that is 
+		available to the user-side of the ATM UNI port."
+	INDEX	{ atmfSrvcRegPort, atmfSrvcRegServiceID, 
+                  atmfSrvcAddressIndex }
+	::= { atmfSrvcRegTable 1 }
+
+AtmfSrvcRegEntry ::=
+	SEQUENCE	{
+		atmfSrvcRegPort		INTEGER,
+		atmfSrvcRegServiceID	OBJECT IDENTIFIER,
+		atmfSrvcRegATMAddress	AtmAddress,
+		atmfSrvcRegAddressIndex	INTEGER
+	}
+
+atmfSrvcRegPort OBJECT-TYPE
+	SYNTAX	INTEGER (0..2147483647)
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+			"A unique value which identifies the UNI port for
+			which the service provider is available to the 
+			user-side.  The value of 0 has the special meaning 
+			of identifying the local UNI."
+      ::= { atmfSrvcRegEntry 1 }
+
+atmfSrvcRegServiceID OBJECT-TYPE
+	SYNTAX	OBJECT IDENTIFIER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"This is the service identifier which uniquely identifies
+		the type of service at the address provided in the table."
+	::= { atmfSrvcRegEntry 2 }
+
+atmfSrvcRegATMAddress OBJECT-TYPE
+	SYNTAX	AtmAddress
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"This is the full address of the service.  The user-side
+		ATM UNI port may use this address to establish a connection
+		with the service."
+	::= { atmfSrvcRegEntry 3 }
+
+atmfSrvcRegAddressIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An arbitrary integer to differentiate multiple rows
+            containing different ATM addresses for the same service
+            on the same port."
+	::= { atmfSrvcRegEntry 4 }
+
+END
+
