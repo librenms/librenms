@@ -3,14 +3,14 @@ Adding a new device class (os type)
 ===================================
 
 Create a file in includes/discovery/os, which fills the OS type variable if
-you can identify the device as such (sysDescr or similar). Please use a
+you can identify the device as such (sysDescr, sysObjectId or similar). Please use a
 meaningful name!
 
 Adjust discovery.php, running specific command based on OS type, if needed.
 
 Create includes/polling/os/$osname.inc.php, for device specific polling.
 
-Add an OS text name in includes/static-config.php
+Add an OS text name and possibly other settings in includes/static-config.php
 
 If desired, create a 32x32 logo, in html/images/os/$osname.png.
 
