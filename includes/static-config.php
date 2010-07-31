@@ -455,26 +455,122 @@ $config['os'][$os]['type']              = "network";
 
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
-$config['graph']['device']['bits']		= "Total Traffic";
-$config['graph']['device']['hrusers']   	= "Users Logged In";
-$config['graph']['device']['temperatures']	= "Temperatures";
-$config['graph']['device']['memory']  		= "Memory Usage";
-$config['graph']['device']['processors']      	= "Processor Usage";
-$config['graph']['device']['cpu']        	= "Processor Usage";
-$config['graph']['device']['storage']        	= "Disk Usage";
+### Graph Types
 
-$config['graph']['device']['ucd_load']		= "Load Averages";
-$config['graph']['device']['ucd_cpu']           = "Detailed Processor Usage";
-$config['graph']['device']['ucd_mem']           = "Detailed Memory Usage";
-$config['graph']['device']['netstats_tcp']      = "TCP Statistics";
-$config['graph']['device']['netstats_icmp_info'] = "ICMP Informational Statistics";
-$config['graph']['device']['netstats_icmp_stat'] = "ICMP Statistics";
-$config['graph']['device']['netstats_ip']        = "IP Statistics";
-$config['graph']['device']['netstats_ip_frag']   = "IP Fragmentation Statistics";
-$config['graph']['device']['netstats_udp']       = "UDP Statistics";
-$config['graph']['device']['netstats_snmp']      = "SNMP Statistics";
+$config['graph_sections'] = array('system', 'firewall', 'netstats', 'wifi', 'storage');
 
-### Device types
+$config['graph_types']['device']['cipsec_flow_bits']['section'] = 'firewall';
+$config['graph_types']['device']['cipsec_flow_bits']['order'] = '0';
+$config['graph_types']['device']['cipsec_flow_bits']['descr'] = 'IPSec Tunnel Traffic Volume';
+$config['graph_types']['device']['cipsec_flow_pkts']['section'] = 'firewall';
+$config['graph_types']['device']['cipsec_flow_pkts']['order'] = '0';
+$config['graph_types']['device']['cipsec_flow_pkts']['descr'] = 'IPSec Tunnel Traffic Packets';
+$config['graph_types']['device']['cipsec_flow_stats']['section'] = 'firewall';
+$config['graph_types']['device']['cipsec_flow_stats']['order'] = '0';
+$config['graph_types']['device']['cipsec_flow_stats']['descr'] = 'IPSec Tunnel Statistics';
+$config['graph_types']['device']['cipsec_flow_tunnels']['section'] = 'firewall';
+$config['graph_types']['device']['cipsec_flow_tunnels']['order'] = '0';
+$config['graph_types']['device']['cipsec_flow_tunnels']['descr'] = 'IPSec Active Tunnels';
+$config['graph_types']['device']['cras_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['cras_sessions']['order'] = '0';
+$config['graph_types']['device']['cras_sessions']['descr'] = 'Remote Access Sessions';
+$config['graph_types']['device']['fortigate_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['fortigate_sessions']['order'] = '0';
+$config['graph_types']['device']['fortigate_sessions']['descr'] = 'Active Sessions';
+$config['graph_types']['device']['screenos_settings']['section'] = 'firewall';
+$config['graph_types']['device']['screenos_settings']['order'] = '0';
+$config['graph_types']['device']['screenos_settings']['descr'] = 'Active Sessions';
+
+$config['graph_types']['device']['bits']['section'] = 'netstats';
+$config['graph_types']['device']['bits']['order'] = '0';
+$config['graph_types']['device']['bits']['descr'] = 'Total Traffic';
+$config['graph_types']['device']['ipsystemstats_ipv4']['section'] = 'netstats';
+$config['graph_types']['device']['ipsystemstats_ipv4']['order'] = '0';
+$config['graph_types']['device']['ipsystemstats_ipv4']['descr'] = 'IPv4 Packet Statistics';
+$config['graph_types']['device']['ipsystemstats_ipv4_frag']['section'] = 'netstats';
+$config['graph_types']['device']['ipsystemstats_ipv4_frag']['order'] = '0';
+$config['graph_types']['device']['ipsystemstats_ipv4_frag']['descr'] = 'IPv4 Fragmentation Statistics';
+$config['graph_types']['device']['ipsystemstats_ipv6']['section'] = 'netstats';
+$config['graph_types']['device']['ipsystemstats_ipv6']['order'] = '0';
+$config['graph_types']['device']['ipsystemstats_ipv6']['descr'] = 'IPv6 Packet Statistics';
+$config['graph_types']['device']['ipsystemstats_ipv6_frag']['section'] = 'netstats';
+$config['graph_types']['device']['ipsystemstats_ipv6_frag']['order'] = '0';
+$config['graph_types']['device']['ipsystemstats_ipv6_frag']['descr'] = 'IPv6 Fragmentation Statistics';
+$config['graph_types']['device']['netstat_icmp_info']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_icmp_info']['order'] = '0';
+$config['graph_types']['device']['netstat_icmp_info']['descr'] = 'ICMP Informational Statistics';
+$config['graph_types']['device']['netstat_icmp']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_icmp']['order'] = '0';
+$config['graph_types']['device']['netstat_icmp']['descr'] = 'ICMP Statistics';
+$config['graph_types']['device']['netstat_ip']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_ip']['order'] = '0';
+$config['graph_types']['device']['netstat_ip']['descr'] = 'IP Statistics';
+$config['graph_types']['device']['netstat_ip_frag']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_ip_frag']['order'] = '0';
+$config['graph_types']['device']['netstat_ip_frag']['descr'] = 'IP Fragmentation Statistics';
+$config['graph_types']['device']['netstat_snmp']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_snmp']['order'] = '0';
+$config['graph_types']['device']['netstat_snmp']['descr'] = 'SNMP Statistics';
+$config['graph_types']['device']['netstat_snmp_pkt']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_snmp_pkt']['order'] = '0';
+$config['graph_types']['device']['netstat_snmp_pkt']['descr'] = 'SNMP Packet Type Statistics';
+
+$config['graph_types']['device']['netstat_tcp']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_tcp']['order'] = '0';
+$config['graph_types']['device']['netstat_tcp']['descr'] = 'TCP Statistics';
+$config['graph_types']['device']['netstat_udp']['section'] = 'netstats';
+$config['graph_types']['device']['netstat_udp']['order'] = '0';
+$config['graph_types']['device']['netstat_udp']['descr'] = 'UDP Statistics';
+
+$config['graph_types']['device']['fdb_count']['section'] = 'system';
+$config['graph_types']['device']['fdb_count']['order'] = '0';
+$config['graph_types']['device']['fdb_count']['descr'] = 'MAC Addresses Learnt';
+$config['graph_types']['device']['hr_processes']['section'] = 'system';
+$config['graph_types']['device']['hr_processes']['order'] = '0';
+$config['graph_types']['device']['hr_processes']['descr'] = 'Running Processes';
+$config['graph_types']['device']['hr_users']['section'] = 'system';
+$config['graph_types']['device']['hr_users']['order'] = '0';
+$config['graph_types']['device']['hr_users']['descr'] = 'Users Logged In';
+$config['graph_types']['device']['mempools']['section'] = 'system';
+$config['graph_types']['device']['mempools']['order'] = '0';
+$config['graph_types']['device']['mempools']['descr'] = 'Memory Pool Usage';
+$config['graph_types']['device']['processors']['section'] = 'system';
+$config['graph_types']['device']['processors']['order'] = '0';
+$config['graph_types']['device']['processors']['descr'] = 'Processor Usage';
+$config['graph_types']['device']['storage']['section'] = 'system';
+$config['graph_types']['device']['storage']['order'] = '0';
+$config['graph_types']['device']['storage']['descr'] = 'Filesystem Usage';
+$config['graph_types']['device']['temperatures']['section'] = 'system';
+$config['graph_types']['device']['temperatures']['order'] = '0';
+$config['graph_types']['device']['temperatures']['descr'] = 'Temperatures';
+$config['graph_types']['device']['ucd_cpu']['section'] = 'system';
+$config['graph_types']['device']['ucd_cpu']['order'] = '0';
+$config['graph_types']['device']['ucd_cpu']['descr'] = 'Detailed Processor Usage';
+$config['graph_types']['device']['ucd_load']['section'] = 'system';
+$config['graph_types']['device']['ucd_load']['order'] = '0';
+$config['graph_types']['device']['ucd_load']['descr'] = 'Load Averages';
+$config['graph_types']['device']['ucd_memory']['section'] = 'system';
+$config['graph_types']['device']['ucd_memory']['order'] = '0';
+$config['graph_types']['device']['ucd_memory']['descr'] = 'Detailed Memory Usage';
+$config['graph_types']['device']['ucd_swap_io']['section'] = 'system';
+$config['graph_types']['device']['ucd_swap_io']['order'] = '0';
+$config['graph_types']['device']['ucd_swap_io']['descr'] = 'Swap I/O Activity';
+$config['graph_types']['device']['ucd_io']['section'] = 'system';
+$config['graph_types']['device']['ucd_io']['order'] = '0';
+$config['graph_types']['device']['ucd_io']['descr'] = 'System I/O Activity';
+$config['graph_types']['device']['ucd_contexts']['section'] = 'system';
+$config['graph_types']['device']['ucd_contexts']['order'] = '0';
+$config['graph_types']['device']['ucd_contexts']['descr'] = 'Context Switches';
+$config['graph_types']['device']['ucd_interrupts']['section'] = 'system';
+$config['graph_types']['device']['ucd_interrupts']['order'] = '0';
+$config['graph_types']['device']['ucd_interrupts']['descr'] = 'Interrupts';
+$config['graph_types']['device']['uptime']['section'] = 'system';
+$config['graph_types']['device']['uptime']['order'] = '0';
+$config['graph_types']['device']['uptime']['descr'] = 'System Uptime';
+
+
+
+### Device Types
 
 $i = 0;
 $config['device_types'][$i]['text'] = 'Servers';
