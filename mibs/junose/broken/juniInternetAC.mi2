@@ -1,0 +1,1710 @@
+
+-- *****************************************************************************
+-- Juniper-Internet-CONF
+--
+-- SNMP Agent Capabilities definitions for the basic Internet MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2007 Juniper Networks, Inc. 
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Internet-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniInternetAgent  MODULE-IDENTITY
+    LAST-UPDATED "200805191941Z"  -- 19-May-08 03:41 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the basic layer 3 and 4 Internet
+        component of the SNMP agent in the Juniper E-series family of products."
+    -- Revision History   
+    REVISION    "200805191941Z"  -- 19-May-08 03:41 PM EDT  - JUNOSe 9.3
+    DESCRIPTION
+        "Added the capability to disable ARP spoof checking for an IP interface."
+    REVISION    "200701172302Z"  -- 17-Jan-07 06:02 PM EST  - JUNOSe 7.3.2
+    DESCRIPTION
+        "Added warm-restart replay initial sequence preference for an IP
+        interface."
+    REVISION    "200503301349Z"  -- 30-Mar-05 01:49 PM IST  - JUNOSe 7.0
+    DESCRIPTION
+         "Added IP Route Summary support for Unicast and Multicast Routes."
+    REVISION    "200505010040Z"  -- 30-Apr-05 08:40 PM EDT
+    DESCRIPTION
+        "RLI 1925: Added support for Source Address Validation Failure traps."
+    REVISION    "200409201349Z"  -- 20-Sep-04 09:49 AM EDT  - JUNOSe 6.1
+    DESCRIPTION
+        "RLI 1684: Added support for route table limits and traps."
+    REVISION    "200409101531Z"  -- 10-Sep-04 10:31 AM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Juniper-IP-MIB:
+	Obsoleted objects rsIpVpnIdOui and rsIpVpnIdIndex."
+    REVISION    "200311031531Z"  -- 03-Nov-03 10:31 AM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Juniper-IP-MIB:
+         Added support for IP interface TCP MSS configuration."
+    REVISION    "200309161303Z"  -- 16-Sep-03 09:03 AM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-IP-MIB:
+         Added support for IP interface summary statistics.
+         Added support for Interface Mirroring.
+         Added support for IP interface auto configure."
+    REVISION    "200210242038Z"  -- 24-Oct-02 04:38 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-IP-MIB:
+         Replaced Unisphere names with Juniper names.
+         Added support for router index and unnumbered interfaces referencing
+         numbered interfaces."
+    REVISION    "200210232010Z"  -- 23-Oct-02 04:10 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-IP-MIB:
+         Added BGP new format support and obsoleted ARP timeout and rate limit
+         objects."
+    REVISION    "200204031404Z"  -- 03-Apr-02 09:04 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Juniper-IP-MIB:
+         Obsoleted the QoS related objects."
+    REVISION    "200203262146Z"  -- 26-Mar-02 04:46 PM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 21 }
+
+
+-- *****************************************************************************
+-- Internet Protocols SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniInternetAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in Juniper 2.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when the IP global objects
+        were added to the Juniper-IP-MIB."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup,
+            juniIpAddressGroup,
+            juniIpRouteGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 1 }
+
+juniInternetAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 3.0 and 3.1
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when support was added for
+        the RFC1213-MIB.ipRouteTable and the Juniper-IP-MIB.juniIpIfAssocTable."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup2,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 2 }
+
+juniInternetAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 3.2 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when the QoS related objects
+        in the Juniper-IP-MIB were obsoleted."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup3,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 3 }
+
+juniInternetAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when BGP new format objects
+        were added and ARP timeout and rate limit objects were obsoleted in the
+        Juniper-IP-MIB."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup4,
+            juniIpAddressGroup2,
+            juniIpRouteGroup,
+            juniIpGlobalGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 4 }
+
+juniInternetAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 4.1 and
+        subsequent 4.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        the Juniper-IP-MIB for router index and unnumbered interfaces
+        referencing numbered interfaces."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup4,
+            juniIpAddressGroup3,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2 }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 5 }
+
+juniInternetAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 5.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when support was added to
+        the Juniper-IP-MIB for analyzer mode and auto configure for interfaces."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup5,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 6 }
+
+juniInternetAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component was supported in JUNOSe 5.1 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe.  These capabilities became obsolete when support for TCP MSS
+        configuration of IP interfaces was added to the Juniper-IP-MIB."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup6,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2,
+            juniIpIfSummaryGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 7 }
+
+juniInternetAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component is supported in JUNOSe 5.2 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe. These capablities became obsolete when the object rsIpVpnIdOui
+	and rsIpVpnIdIndex were obsoleted."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup2,
+            juniIpIfSummaryGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 8 }
+
+juniInternetAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component is supported in JUNOSe 6.0 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe. when support for route table limits and traps was added to 
+	the Juniper-IP-MIB."
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup2,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 9 }
+
+juniInternetAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component is supported in JUNOSe 6.1 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+	"The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe."        
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 10 }
+
+juniInternetAgentV11  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 11 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component is supported in JUNOSe 7.0 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+	"The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe."        
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES {
+            ipGroup,
+            icmpGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+        INCLUDES {
+            ipForwardCidrRouteGroup }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+        INCLUDES {
+            tcpGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup7,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpNotificationGroup1,
+			juniIpRouteSummaryGroup	}
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 11 }
+
+juniInternetAgentV12  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 12 of the Internet component of the JUNOSe SNMP agent.  This
+        version of the Internet component is supported in JUNOSe 8.2 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+	"The MIBs supported by the SNMP agent for the Internet application in
+        JUNOSe."        
+    SUPPORTS    RFC1213-MIB
+    --  The RFC1213-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, we list capabilities by OID subtree "groups".
+        INCLUDES {
+            ipRouteEntry }
+        VARIATION   ipRouteDest
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing write access on an auxiliary object is absurd."
+        VARIATION   ipRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteNextHop
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteAge
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMask
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+        VARIATION   ipRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "The ipRouteTable is read-only in this agent."
+    SUPPORTS    IP-MIB
+        INCLUDES INCLUDES {
+            ipGroup,
+            ipv4GeneralGroup,
+            ipv4IfGroup,
+            ipv6GeneralGroup2,
+            ipv6IfGroup,
+            ipLastChangeGroup,
+            ipSystemStatsGroup,
+            ipv4SystemStatsGroup,
+            ipSystemStatsHCOctetGroup,
+            ipSystemStatsHCPacketGroup,
+            ipv4SystemStatsHCPacketGroup,
+            ipIfStatsGroup,
+            ipv4IfStatsGroup,
+            ipIfStatsHCOctetGroup,
+            ipIfStatsHCPacketGroup,
+            ipv4IfStatsHCPacketGroup,
+            ipAddressPrefixGroup,
+            ipAddressGroup,
+            ipNetToPhysicalGroup,
+            ipv6ScopeGroup,
+            ipDefaultRouterGroup,
+            ipv6RouterAdvertGroup,
+            icmpGroup,
+            icmpStatsGroup }
+        VARIATION   ipNetToMediaIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+        VARIATION   ipNetToMediaNetAddress
+            ACCESS      read-only
+            DESCRIPTION
+                "Allowing create/write access on an auxiliary object is absurd."
+    SUPPORTS    IP-FORWARD-MIB
+         INCLUDES {
+            ipForwardCidrRouteGroup,
+            inetForwardCidrRouteGroup  }
+        VARIATION   ipCidrRouteIfIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteType
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteInfo
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteNextHopAS
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric1
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric2
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric3
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric4
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteMetric5
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+        VARIATION   ipCidrRouteStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "An ipCidrRouteEntry cannot be created or modified."
+    SUPPORTS    TCP-MIB
+         INCLUDES {
+            tcpGroup,
+            tcpBaseGroup,
+            tcpConnectionGroup,
+            tcpListenerGroup,
+            tcpHCGroup }
+    SUPPORTS    UDP-MIB
+        INCLUDES {
+            udpGroup,
+            udpBaseGroup,
+            udpHCGroup,
+            udpEndpointGroup }
+        VARIATION   udpLocalAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+        VARIATION   udpLocalPort
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The udpTable is not supported."
+    SUPPORTS    Juniper-IP-MIB
+        INCLUDES {
+            juniIpInterfaceGroup8,
+            juniIpAddressGroup4,
+            juniIpRouteGroup3,
+            juniIpGlobalGroup3,
+            juniIpIfSummaryGroup,
+            juniIpNotificationGroup,
+            juniIpInterfaceDeprecatedGroup,
+            juniIpAddressDeprecatedGroup,
+            juniIpMIBNotificationObjectsGroup,
+            juniIpNotificationGroup1,
+            juniIpRouteSummaryGroup }
+    SUPPORTS    Juniper-HOST-MIB
+        INCLUDES {
+            juniHostGroup }
+    ::= { juniInternetAgent 12 }
+
+END
+

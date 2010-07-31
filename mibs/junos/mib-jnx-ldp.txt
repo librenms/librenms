@@ -93,14 +93,15 @@ jnxLdpLspDownReason OBJECT-TYPE
 		    neighborDown (3),
 		    filterChanged (4),
 		    bfdSessionDown (5),
-		    unknown (6) }
+		    unknown (6),
+		    lspingDown (7) }
     MAX-ACCESS    accessible-for-notify
     STATUS        current
     DESCRIPTION
 	"The reason why the LSP went down. Can be one of the following:
 	the topology changed, the neighbor withdrew the label, 
 	the neighbor went down, the filter changed, the BFD session
-	went down or the reason is unknown."
+	went down, lsping down, or the reason is unknown."
     ::= { jnxLdpTrapVars 3 }
 
 jnxLdpSesDownReason OBJECT-TYPE
@@ -118,7 +119,8 @@ jnxLdpSesDownReason OBJECT-TYPE
 		    authenticationChanged (10),
 		    initError (11),
 		    gracefulRestartAbort (12),
-		    cliCommand (13) }
+		    cliCommand (13),
+		    gracefulRestartChanged (14) }
     MAX-ACCESS    accessible-for-notify
     STATUS        current
     DESCRIPTION

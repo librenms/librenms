@@ -18,7 +18,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxPfeMib MODULE-IDENTITY
-    LAST-UPDATED "200607240000Z" -- Mon Jul 24 00:00:00 2006 UTC
+    LAST-UPDATED "201002070000Z" -- Sun Feb 07 00:00:00 2010 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -30,9 +30,15 @@ jnxPfeMib MODULE-IDENTITY
     DESCRIPTION
             "The MIB provides PFE specific data."
 
-    REVISION      "200607240000Z"
+    REVISION      "201002070000Z"
     DESCRIPTION
-               "Initial revision."
+               "Added new notification types."
+    --REVISION      "201001070000Z"
+    --DESCRIPTION
+    --         "Added new notification types."
+    --REVISION      "200607240000Z"
+    --DESCRIPTION
+    --           "Initial revision."
     ::= { jnxPfeMibRoot 1 }
 
     --
@@ -309,7 +315,11 @@ jnxPfeMib MODULE-IDENTITY
                    redirect      (7),
                    dontFragment  (8),
                    cfdf          (9),
-                   poison        (10)
+                   poison        (10),
+                   unknown       (11),
+                   specialMemPkt (12), 
+                   autoConfig    (13),
+                   reject        (14)
                }
         MAX-ACCESS  not-accessible
         STATUS      current
@@ -342,7 +352,15 @@ jnxPfeMib MODULE-IDENTITY
                                    DF (don't fragment) set.
 
                 10. poison         Packets that resolved to a poisoned next 
-                                   hop index."
+                                   hop index.
+
+                11. unknown       Packets of unknown notification type.
+  
+                12. specialMemPkt Packets with special memory pkt type notification used in diagnostics.  
+
+                13. autoconfig    Packets with autoconfig PFE notification type used for dynamic VLANs.  
+
+                14. reject        Packets of reject PFE notification type."  
     ::= { jnxPfeNotifyTypeEntry 1 }
 
     jnxPfeNotifyTypeDescr OBJECT-TYPE
