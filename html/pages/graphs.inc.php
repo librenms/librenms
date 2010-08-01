@@ -14,16 +14,19 @@ if(is_numeric($_GET['optd'])) { $to = $_GET['optd']; } else { $to = $now; }
 
   if(isset($config['graph'][$type][$subtype])) { $descr = $config['graph'][$type][$subtype]; } else { $descr = $graph_type; }
 
-  $descr = mysql_result(mysql_query("SELECT `graph_descr` FROM `graph_types` WHERE `graph_type` = '".$type."' AND `graph_subtype` = '".$subtype."'"),0);
+  #$descr = mysql_result(mysql_query("SELECT `graph_descr` FROM `graph_types` WHERE `graph_type` = '".$type."' AND `graph_subtype` = '".$subtype."'"),0);
 
-   if(is_file("includes/graphs/".$type."/auth.inc.php")) 
+  $descr = $config['graph_types'][$type][$subtype]['descr'];
+
+  if(is_file("includes/graphs/".$type."/auth.inc.php")) 
   {
     include("includes/graphs/".$type."/auth.inc.php");
-  } else {
-    #### FIXME. UGLY ERROR
-    echo("Missing auth for this graph type! This is a bug. Please report it.");
-    exit();
   }
+  
+  if(!$auth) 
+  {
+    include("includes/error-no-perm.inc.php");
+  } else {
 
   if(isset($config['graph'][$type][$subtype])) { $title .= " :: ".$config['graph'][$type][$subtype]; } else { $title .= " :: ".$graph_type; }
 
@@ -116,6 +119,8 @@ if(is_numeric($_GET['optd'])) { $to = $_GET['optd']; } else { $to = $now; }
 
 
   echo("</div>");
+
+}
 
 
 ?>

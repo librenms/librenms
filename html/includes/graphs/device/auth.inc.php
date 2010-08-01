@@ -1,11 +1,10 @@
 <?
 
-if(is_numeric($id)) {
+if(is_numeric($id) && device_permitted($id)) 
+{
   $device = device_by_id_cache($id);
+  $title = generatedevicelink($device);
+  $auth = TRUE;
 }
-
-#if(!device_permitted($device['device_id'])) { echo("Not Permitted"); exit; }
-
-$title = generatedevicelink($device);
 
 ?>

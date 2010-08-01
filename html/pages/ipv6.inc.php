@@ -73,7 +73,7 @@ if(!$ignore) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-  if( interfacepermitted($interface['interface_id']) )
+  if( port_permitted($interface['interface_id']) )
   {
     echo("<tr bgcolor=$row_colour><td></td>
           <td class=list-bold>" . generatedevicelink($interface) . "</td>

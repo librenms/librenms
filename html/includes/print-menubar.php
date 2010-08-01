@@ -181,7 +181,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
   $query = mysql_query($sql);
   $deleted_ports = 0;
   while($interface = mysql_fetch_assoc($query)) {
-    if(interfacepermitted($interface['interface_id'], $interface['device_id'])){
+    if(port_permitted($interface['interface_id'], $interface['device_id'])){
       $deleted_ports++;
     }
   }

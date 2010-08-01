@@ -2,6 +2,8 @@
 
 ## Common Functions
 
+
+
 function get_port_by_id($port_id)
 {
   if(is_numeric($port_id)) {
@@ -12,7 +14,41 @@ function get_port_by_id($port_id)
   } else {
     return FALSE;
   }
+}
 
+function get_application_by_id($application_id)
+{
+  if(is_numeric($application_id)) {
+    $application = mysql_fetch_assoc(mysql_query("SELECT * FROM `applications` WHERE `app_id` = '".$application_id."'"));
+  }
+  if(is_array($application)){
+    return $application;
+  } else {
+    return FALSE;
+  }
+}
+
+function get_sensor_by_id($sensor_id)
+{
+  if(is_numeric($sensor_id)) {
+    $sensor = mysql_fetch_assoc(mysql_query("SELECT * FROM `sensors` WHERE `sensor_id` = '".$sensor_id."'"));
+  }
+  if(is_array($sensor)){
+    return $sensor;
+  } else {
+    return FALSE;
+  }
+}
+
+function get_device_id_by_interface_id($interface_id) {
+  if(is_numeric($interface_id)) {
+    $device_id = mysql_result(mysql_query("SELECT `device_id` FROM `ports` WHERE `interface_id` = '".$interface_id."'"),0);
+  }
+  if(is_numeric($device_id)){
+    return $device_id;
+  } else {
+    return FALSE;
+  }
 }
 
 function ifclass($ifOperStatus, $ifAdminStatus)

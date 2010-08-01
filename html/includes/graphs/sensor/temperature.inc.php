@@ -7,13 +7,12 @@ include("includes/graphs/common.inc.php");
 
   $rrd_options .= " COMMENT:'                          Cur     Min    Max\\n'";
 
-  $sensor = mysql_fetch_array(mysql_query("SELECT * FROM sensors where sensor_id = '".mres($_GET['id'])."'"));
-  $device = device_by_id_cache($sensor['device_id']);
+  ### FIXME: Overwrite default because it won't work here yet
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
+
 
   $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], 22),0,22);
   $sensor['sensor_descr_fixed'] = str_replace(':','\:',str_replace('\*','*',$sensor['sensor_descr_fixed']));
-
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
 
   $rrd_options .= " DEF:temp=$rrd_filename:temp:AVERAGE";
   $rrd_options .= " DEF:temp_max=$rrd_filename:temp:MAX";

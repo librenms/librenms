@@ -67,7 +67,7 @@ if($_GET['optc'] == thumbs) {
     echo("<div style='min-height: 150px;'></div>");
   } else {
     if($_GET['opta'] == "details" ) { $port_details = 1; }
-    echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
+    echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
     $interface_query = mysql_query("select * from ports WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
     while($interface = mysql_fetch_assoc($interface_query)) {

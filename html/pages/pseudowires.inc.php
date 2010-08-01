@@ -28,8 +28,8 @@ while($pw_a = mysql_fetch_array($query)) {
                                                                                                           P.cpwVcID = '".$pw_a['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
 
-  if(!interfacepermitted($pw_a['interface_id'])) { $skip = "yes"; }
-  if(!interfacepermitted($pw_b['interface_id'])) { $skip = "yes"; }
+  if(!port_permitted($pw_a['interface_id'])) { $skip = "yes"; }
+  if(!port_permitted($pw_b['interface_id'])) { $skip = "yes"; }
 
 
   if($skip) {
