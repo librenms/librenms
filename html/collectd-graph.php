@@ -209,6 +209,14 @@ if (isset($MetaGraphDefs[$type])) {
 		$rrd_cmd = collectd_draw_rrd($host, $plugin, $pinst, $type, $tinst);
 }
 
+if(isset($rrd_cmd))
+{
+      if($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }
+      if($_GET['from'])    { $from   = mres($_GET['from']);   }
+      if($_GET['to'])      { $to     = mres($_GET['to']);     }
+      $rrd_cmd .= " -s " . $from . " -e " . $to;
+}
+
 if (isset($_GET['debug'])) {
 	header('Content-Type: text/plain; charset=utf-8');
 	printf("Would have executed:\n%s\n", $rrd_cmd);
@@ -217,9 +225,7 @@ if (isset($_GET['debug'])) {
 	header('Content-Type: image/png');
 	header('Cache-Control: max-age=60');
 	$rt = 0;
-        if($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }      
 	passthru($rrd_cmd, $rt);
-#	echo("$rrd_cmd");
 	if ($rt != 0)
 		return error500($graph_identifier, "RRD failed to generate the graph: ".$rt);
 	return $rt;

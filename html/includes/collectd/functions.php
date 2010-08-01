@@ -550,8 +550,8 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 			$graph[] = sprintf('GPRINT:%s_avg:LAST:%%5.1lf%%s\\l', $k);
 	}
 
-	#$rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $rrdfile);
-        $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
+	#$rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-t', $rrdfile);
+        $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height']);
         if($config['rrd_width'] <= "300") {
           $small_opts = array ('--font', "LEGEND:7:mono", '--font', "AXIS:6:mono", "--font-render-mode", "normal");
           $rrd_cmd = array_merge($rrd_cmd, $small_opts);
@@ -579,7 +579,7 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
  */
 function collectd_draw_generic($timespan, $host, $plugin, $pinst = null, $type, $tinst = null) {
 	global $config, $GraphDefs;
-	$timespan_def = null;
+	$timespan_def = NULL;
 	foreach ($config['timespan'] as &$ts)
 		if ($ts['name'] == $timespan)
 			$timespan_def = $ts;
@@ -590,8 +590,8 @@ function collectd_draw_generic($timespan, $host, $plugin, $pinst = null, $type, 
 		return false;
 
 	$rrd_file = sprintf('%s/%s%s%s/%s%s%s', $host, $plugin, is_null($pinst) ? '' : '-', $pinst, $type, is_null($tinst) ? '' : '-', $tinst);
-	#$rrd_cmd  = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $rrd_file);
-        $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
+	#$rrd_cmd  = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-t', $rrd_file);
+        $rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height']);
 
         if($config['rrd_width'] <= "300") {
           $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
@@ -643,10 +643,10 @@ function collectd_draw_meta_stack(&$opts, &$sources) {
 	if (isset($opts['logarithmic']) && $opts['logarithmic'])
 		array_unshift($opts['rrd_opts'], '-o');
 
-#	$cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'],
+#	$cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'],
 #                    '-t', $opts['title']);
 
-        $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
+        $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height']);
 
         if($config['rrd_width'] <= "300") {
           $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
@@ -741,10 +741,10 @@ function collectd_draw_meta_line(&$opts, &$sources) {
 	if (isset($opts['logarithmic']) && $opts['logarithmic'])
 		array_unshift($opts['rrd_opts'], '-o');
 
-#	$cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $opts['title']);
+#	$cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-t', $opts['title']);
 #	$cmd = array_merge($cmd, $config['rrd_opts_array'], $opts['rrd_opts']);
 
-        $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds']);
+        $cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height']);
 
         if($config['rrd_width'] <= "300") {
           $small_opts = array ('--font', 'LEGEND:7:mono', '--font', 'AXIS:6:mono', '--font-render-mode', 'normal');
