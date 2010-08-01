@@ -50,7 +50,7 @@ if(bill_permitted($bill_id)) {
   $unixto = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$dateto')"), 0);
   
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
-  " . $bill_name . "</h2>");
+  Bill : " . $bill_name . "</h2>");
   
   print_optionbar_start();
   
@@ -60,17 +60,20 @@ if(bill_permitted($bill_id)) {
   echo("<a href='".$config['base_url']."/bill/".$bill_id."/details/'>Details</a>");
   if($_GET['optb'] == "details") { echo("</strong>"); }
   
-  echo(" | ");
-  if($_GET['optb'] == "edit") { echo("<strong>"); }
-  echo("<a href='".$config['base_url']."/bill/".$bill_id."/edit/'>Edit</a>");
-  if($_GET['optb'] == "edit") { echo("</strong>"); }
-  
+  if($_SESSION['userlevel'] == "10")
+  {
+    echo(" | ");
+    if($_GET['optb'] == "edit") { echo("<strong>"); }
+    echo("<a href='".$config['base_url']."/bill/".$bill_id."/edit/'>Edit</a>");
+    if($_GET['optb'] == "edit") { echo("</strong>"); }
+  }
+
   print_optionbar_end();
   
   echo("<table width=715 border=0 cellspace=0 cellpadding=0><tr><td>");
   
   
-  if($_GET['optb'] == "edit") {
+  if($_GET['optb'] == "edit" && $_SESSION['userlevel'] == "10") {
   
     include("pages/bill/edit.php");
   

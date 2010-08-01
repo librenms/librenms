@@ -10,6 +10,7 @@ if($_GET['debug']) {
 
   include("../includes/defaults.inc.php");
   include("../config.php");
+  include("includes/functions.inc.php");
   include("../includes/common.php");
   include("../includes/rewrites.php");
   include("includes/authenticate.inc.php");
@@ -17,7 +18,7 @@ if($_GET['debug']) {
 
   if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
-if(isset($_GET['device_id'])){
+if(is_numeric($_GET['device_id'])){
 
 $ports = mysql_query("SELECT * FROM ports WHERE device_id = '".$_GET['device_id']."'");
   while($interface = mysql_fetch_array($ports)) {
