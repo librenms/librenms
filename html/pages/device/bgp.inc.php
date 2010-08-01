@@ -9,7 +9,7 @@ print_optionbar_start();
 echo("
   <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> |
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/bgp_updates/'>Updates</a> | Prefixes:
+  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/updates/'>Updates</a> | Prefixes:
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv4.unicast/'>IPv4</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv4.vpn/'>VPNv4</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/cbgp_prefixes/ipv6.unicast/'>IPv6</a>
@@ -85,15 +85,15 @@ print_optionbar_end();
   if (isset($_GET['opta']) && $_GET['opta'] != "macaccounting") {
     foreach(explode(" ", $_GET['opta']) as $graph_type) {        
       if($graph_type == "cbgp_prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
-      if($graph_type == "bgp_updates" || $valid_afi_safi[$afi][$safi]) {
-        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
-        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
-        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100$afisafi";
-        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150$afisafi";
-        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100$afisafi";
-        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150$afisafi";
-        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100$afisafi";
-        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150$afisafi";
+      if($graph_type == "updates" || $valid_afi_safi[$afi][$safi]) {
+        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
+        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
+        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$week&to=$now&width=210&height=100$afisafi";
+        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$week&to=$now&width=500&height=150$afisafi";
+        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$month&to=$now&width=210&height=100$afisafi";
+        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$month&to=$now&width=500&height=150$afisafi";
+        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$year&to=$now&width=210&height=100$afisafi";
+        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$year&to=$now&width=500&height=150$afisafi";
         echo("<tr bgcolor=$bg_colour><td colspan=7>");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$daily_traffic' border=0></a> ");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$weekly_traffic' border=0></a> ");
