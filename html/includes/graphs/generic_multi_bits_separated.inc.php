@@ -3,17 +3,19 @@
   include("includes/graphs/common.inc.php");
 
   $i = 0;
-  $rrd_options .= " COMMENT:'                               In\: Current     Maximum      '";
+  $rrd_options .= " COMMENT:'                     In\: Current     Maximum      '";
   if(!$nototal) {$rrd_options .= " COMMENT:'Total      '";}
   $rrd_options .= " COMMENT:'Out\: Current     Maximum'";
   if(!$nototal) {$rrd_options .= " COMMENT:'     Total'";}
-  $rrd_options .= " COMMENT:'\\\\n'";
+  $rrd_options .= " COMMENT:'\\n'";
 
   foreach($rrd_list as $rrd) {
       if(!$config['graph_colours'][$colours_in][$iter] || !$config['graph_colours'][$colours_out][$iter]) { $iter = 0; }
 
       $colour_in=$config['graph_colours'][$colours_in][$iter];
       $colour_out=$config['graph_colours'][$colours_out][$iter];
+
+      $descr = str_replace(":", "\:", substr(str_pad($rrd['descr'], 18),0,18));
 
       $rrd_options .= " DEF:".$in.$i."=".$rrd['filename'].":".$rra_in.":AVERAGE ";
       $rrd_options .= " DEF:".$out.$i."=".$rrd['filename'].":".$rra_out.":AVERAGE ";
@@ -28,7 +30,7 @@
       }
       $rrd_options .= " HRULE:999999999999999#" . $colour_out . ":\\\s:";
       if($i) {$stack="STACK";}
-      $rrd_options .= " AREA:inB".$i."#" . $colour_in . ":'" . substr(str_pad($rrd['descr'], 18),0,18) . "':$stack";
+      $rrd_options .= " AREA:inB".$i."#" . $colour_in . ":'" . $descr . "':$stack";
       $rrd_optionsb .= " AREA:outB".$i."_neg#" . $colour_out . "::$stack";
       $rrd_options .= " GPRINT:inB".$i.":LAST:%6.2lf%s$units";
       $rrd_options .= " GPRINT:inB".$i.":MAX:%6.2lf%s$units";
