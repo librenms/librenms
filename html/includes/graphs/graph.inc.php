@@ -103,7 +103,9 @@ if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.ph
       }
     }
   } else {
-    $fd = fopen($config['install_dir']."/html/images/no-48.png",r);fpassthru($fd);fclose($fd);
+    header('Content-type: image/png');
+
+    $fd = fopen($config['install_dir']."/html/images/no-48.png", "r");fpassthru($fd);fclose($fd);
   }
 
 

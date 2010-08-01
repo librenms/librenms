@@ -9,9 +9,8 @@ if(is_numeric($_GET['id']) && bill_permitted($_GET['id']))
                         WHERE B.bill_id = '".mres($_GET['id'])."' AND P.interface_id = B.port_id
                         AND D.device_id = P.device_id");
 
-} else {
-  echo("Unauthorised");
-  exit;
+  $auth = TRUE;
+
 }
 
 ?>

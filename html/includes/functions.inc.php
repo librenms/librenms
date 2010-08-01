@@ -260,6 +260,7 @@ function generate_if_link($args, $text = NULL)
   $graph_array['legend']   = "yes";
   $graph_array['height']   = "100";
   $graph_array['width']    = "340";
+  $graph_array['to']	   = $config['now'];
   $graph_array['from']     = $config['day'];
   $graph_array['id']       = $args['interface_id'];
   $content .= generate_graph_tag($graph_array);
