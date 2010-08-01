@@ -74,12 +74,26 @@ if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.ph
   }
 }
 
+function graph_error ($string) {
+        global $width, $height;
+        header('Content-type: image/png');
+        $im     = imagecreate($width+75, $height);
+        $orange = imagecolorallocate($im, 255, 255, 255);
+        $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+        imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+        imagepng($im);
+        imagedestroy($im);
+}
 
-  if($auth)
+
+if($auth)
+{
+  if($no_file)
   {
+    graph_error("Missing RRD");
+  } else {
     if($rrd_options) 
     {
-    
       if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
@@ -92,21 +106,15 @@ if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.ph
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         unlink($graphfile);
       } else {
-        header('Content-type: image/png');
-        $string = "Graph Generation Error";
-        $im     = imagecreate($width, $height);
-        $orange = imagecolorallocate($im, 255, 255, 255);
-        $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
-        imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
-        imagepng($im);
-        imagedestroy($im);
+        graph_error("Drawing Error");
       }
+    } else {
+      graph_error("Definition Error");
     }
-  } else {
-    header('Content-type: image/png');
-
-    $fd = fopen($config['install_dir']."/html/images/no-48.png", "r");fpassthru($fd);fclose($fd);
   }
+} else {
+  graph_error("Unauthorized");
+}
 
 
 ?>
