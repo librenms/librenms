@@ -27,6 +27,7 @@ if($_GET['debug']) {
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");
+include("includes/functions.inc.php");
 require('includes/collectd/config.php');
 require('includes/collectd/functions.php');
 require('includes/collectd/definitions.php');
