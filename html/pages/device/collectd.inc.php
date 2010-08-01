@@ -88,24 +88,24 @@ print_optionbar_end();
        }
        echo("</div>");
 
-       $daily_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=day&to=$now&width=215&height=100";
+       $daily_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$day&to=$now&width=215&height=100";
        $daily_traffic  .= $args;
-       $daily_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=day&to=$now&width=400&height=150";
+       $daily_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$day&to=$now&width=400&height=150";
        $daily_url      .= $args;
 
-       $weekly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=week&to=$now&width=215&height=100";
+       $weekly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$week&to=$now&width=215&height=100";
        $weekly_traffic  .= $args;
-       $weekly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=week&to=$now&width=400&height=150";
+       $weekly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$week&to=$now&width=400&height=150";
        $weekly_url      .= $args; 
 
-       $monthly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=month&to=$now&width=215&height=100";
+       $monthly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$month&to=$now&width=215&height=100";
        $monthly_traffic  .= $args;
-       $monthly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=month&to=$now&width=400&height=150";
+       $monthly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$month&to=$now&width=400&height=150";
        $monthly_url      .= $args;
 
-       $yearly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=year&to=$now&width=215&height=100";
+       $yearly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$year&to=$now&width=215&height=100";
        $yearly_traffic  .= $args;
-       $yearly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&timespan=year&to=$now&width=400&height=150";
+       $yearly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$year&to=$now&width=400&height=150";
        $yearly_url      .= $args;
  
 
