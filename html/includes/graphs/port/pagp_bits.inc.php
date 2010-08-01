@@ -2,9 +2,7 @@
 
 ## Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$parent = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE interface_id = '".mres($_GET['port'])."'"));
-
-$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$parent['device_id']."' AND `pagpGroupIfIndex` = '".$parent['ifIndex']."'");
+$query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$port['device_id']."' AND `pagpGroupIfIndex` = '".$port['ifIndex']."'");
 
 $i=0;
 while($int = mysql_fetch_array($query)) {

@@ -1,19 +1,10 @@
 <?php
 
-if($_GET['id']) { $interface = $_GET['id'];
-} elseif($_GET['port']) { $interface = $_GET['port'];
-} elseif($_GET['if']) { $interface = $_GET['if'];
-} elseif($_GET['interface']) { $interface = $_GET['interface']; }
-
-$query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.interface_id = '".$interface."'
-                      AND I.device_id = D.device_id");
-$port = mysql_fetch_array($query);
-
-if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd")))
+if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd")))
 {
-  $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
 
-  $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+  $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[1]['descr'] = $int['ifDescr'];
   $rrd_list[1]['rra_in'] = "InBroadcastPkts";
   $rrd_list[1]['rra_out'] = "OutBroadcastPkts";
@@ -21,7 +12,7 @@ if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($po
   $rrd_list[1]['colour_area_in'] = "BB77BB";
   $rrd_list[1]['colour_area_out'] = "FFDD88";
 
-  $rrd_list[4]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+  $rrd_list[4]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[4]['descr'] = $int['ifDescr'];
   $rrd_list[4]['rra_in'] = "InMulticastPkts";
   $rrd_list[4]['rra_out'] = "OutMulticastPkts";
@@ -41,9 +32,9 @@ if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/ifx-" . safename($po
   include ("includes/graphs/generic_multi_seperated.inc.php");
 
 }
-elseif(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
+elseif(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
 {
-  $rrd_filename = $config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
 
   $rra_in = "INNUCASTPKTS";
   $rra_out = "OUTNUCASTPKTS";
