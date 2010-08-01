@@ -217,6 +217,7 @@ if (isset($_GET['debug'])) {
 	header('Content-Type: image/png');
 	header('Cache-Control: max-age=60');
 	$rt = 0;
+        if($config['rrdcached']) { $rrd_cmd .= " --daemon ".$config['rrdcached'] . " "; }      
 	passthru($rrd_cmd, $rt);
 #	echo("$rrd_cmd");
 	if ($rt != 0)
