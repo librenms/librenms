@@ -27,7 +27,7 @@
     $mac = "<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
   } else { $mac = ""; }
 
-  echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
+  echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
            <td valign=top width=350>");
 
   echo("        <span class=list-large>
@@ -235,28 +235,30 @@ echo("</td>");
  
           $type = $graph_type;
 
-          $daily_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
-          $daily_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
+          $daily_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
+          $daily_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
 
-          $weekly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
-          $weekly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
+          $weekly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
+          $weekly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
 
-          $monthly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
-          $monthly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
+          $monthly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
+          $monthly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
 
-          $yearly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
-          $yearly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
+          $yearly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
+          $yearly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 
-  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
-        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
-  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
-        onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
-  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
-        onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
-  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
-        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
+include("includes/print-interface-graphs.inc.php");
+
+#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
+#        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
+#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
+#        onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
+#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+#        onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
+#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+#        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
 
   echo("</td></tr>");
 

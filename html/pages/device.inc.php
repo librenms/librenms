@@ -2,12 +2,12 @@
 
 if($_GET['id']) {$_GET['id'] = mres($_GET['id']); } 
 
-if($_GET['section'] == "interface" && is_numeric($_GET['opta']) && interfacepermitted($_GET['opta'])) {
+if($_GET['section'] == "interface" && is_numeric($_GET['opta']) && port_permitted($_GET['opta'])) {
   $check_device = get_device_id_by_interface_id($_GET['opta']);
   $permit_ports = 1;
 }
 
-if(devicepermitted($_GET['id']) || $check_device == $_GET['id']) {
+if(device_permitted($_GET['id']) || $check_device == $_GET['id']) {
 
 $selected['iface'] = "selected";
 
@@ -31,7 +31,7 @@ while($device = mysql_fetch_array($device_query)) {
 
   echo('<ul id="maintab" class="shadetabs">');
 
-if(devicepermitted($_GET['id']) && $config['show_overview_tab']) {
+if(device_permitted($_GET['id']) && $config['show_overview_tab']) {
 echo("
 <li class=" . $select['overview'] . ">
   <a href='".$config['base_url']."/device/" . $device['device_id'] . "/overview/'>
@@ -40,7 +40,7 @@ echo("
 </li>");
 }
 
-if(devicepermitted($_GET['id'])) {
+if(device_permitted($_GET['id'])) {
    echo('<li class="' . $select['graphs'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/graphs/">
     <img src="images/16/server_chart.png" align="absmiddle" border="0"> Graphs
@@ -48,7 +48,7 @@ if(devicepermitted($_GET['id'])) {
 </li>');
 }
 
-if(devicepermitted($_GET['id'])) {
+if(device_permitted($_GET['id'])) {
 
   $health =  mysql_result(mysql_query("select count(*) from storage WHERE device_id = '" . $device['device_id'] . "'"), 0) +
              mysql_result(mysql_query("select count(sensor_id) from sensors WHERE device_id = '" . $device['device_id'] . "'"), 0) +
@@ -69,7 +69,7 @@ if(devicepermitted($_GET['id'])) {
   }
 }
 
-if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') 
+if(device_permitted($_GET['id']) && @mysql_result(mysql_query("select count(app_id) from applications WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') 
 {
   echo('<li class="' . $select['apps'] . '">
   <a href="' . $config['base_url'] . '/device/' . $device['device_id'] . '/apps/">
@@ -89,7 +89,7 @@ if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(app_i
 #</li>');
 #}
 
-if(devicepermitted($_GET['id']) && is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
+if(device_permitted($_GET['id']) && is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
   echo('<li class="' . $select['collectd'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/collectd/">
     <img src="images/16/chart_line.png" align="absmiddle" border="0" /> CollectD
@@ -97,7 +97,7 @@ if(devicepermitted($_GET['id']) && is_dir($config['collectd_dir'] . "/" . $devic
 </li>');
 }
 
-if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(device_permitted($_GET['id']) && @mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['ports'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
     <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
@@ -105,7 +105,7 @@ if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(inter
 </li>');
 }
 
-if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(device_permitted($_GET['id']) && @mysql_result(mysql_query("select count(vlan_id) from vlans WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['vlans'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vlans/">
     <img src="images/16/vlans.png" align="absmiddle" border="0" /> VLANs
@@ -113,7 +113,7 @@ if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(vlan_
 </li>');
 }
 
-if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(device_permitted($_GET['id']) && @mysql_result(mysql_query("select count(*) from vrfs WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['vrfs'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/">
     <img src="images/16/layers.png" align="absmiddle" border="0" /> VRFs
@@ -122,7 +122,7 @@ if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(*) fr
 }
 
 
-if(devicepermitted($_GET['id']) && $config['enable_bgp'] && $device['bgpLocalAs']) {
+if(device_permitted($_GET['id']) && $config['enable_bgp'] && $device['bgpLocalAs']) {
   echo('<li class="' . $select['bgp'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/bgp/">
     <img src="images/16/link.png" align="absmiddle" border="0" /> BGP
@@ -149,13 +149,13 @@ if($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FR
 </li>');
 }
 
-if(devicepermitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
+if(device_permitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
   echo('<li class="' . $select['entphysical'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/entphysical/">
     <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
   </a>
 </li>');
-} elseif ( devicepermitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
+} elseif ( device_permitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$_GET['id']."'"), 0) > '0') {
   echo('<li class="' . $select['hrdevice'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/hrdevice/">
     <img src="images/16/bricks.png" align="absmiddle" border="0" /> Inventory
@@ -163,7 +163,7 @@ if(devicepermitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(
 </li>');
 }
 
-if(devicepermitted($_GET['id']) && mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(device_permitted($_GET['id']) && mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['srv'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/srv/">
     <img src="images/icons/services.png" align="absmiddle" border="0" /> Services
@@ -172,7 +172,7 @@ if(devicepermitted($_GET['id']) && mysql_result(mysql_query("select count(servic
 ');
 }
 
-if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+if(device_permitted($_GET['id']) && @mysql_result(mysql_query("select count(toner_id) from toner WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
   echo('<li class="' . $select['toner'] . '">
   <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/toner/">
     <img src="images/icons/toner.png" align="absmiddle" border="0" /> Toner
@@ -180,7 +180,7 @@ if(devicepermitted($_GET['id']) && @mysql_result(mysql_query("select count(toner
 </li>');
 }
 
-if(devicepermitted($_GET['id'])) {
+if(device_permitted($_GET['id'])) {
   echo('<li class="' . $select['events'] . '">
     <a href="'.$config['base_url']. "/device/" . $device['device_id'] . '/events/">
       <img src="images/16/report_magnify.png" align="absmiddle" border="0" /> Events
@@ -188,7 +188,7 @@ if(devicepermitted($_GET['id'])) {
   </li>');
 }
 
-if(devicepermitted($_GET['id']) && $config['enable_syslog']) { 
+if(device_permitted($_GET['id']) && $config['enable_syslog']) { 
 echo('<li class="' . $select['syslog'] . '">
   <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/syslog/">
     <img src="images/16/printer.png" align="absmiddle" border="0" /> Syslog

@@ -86,14 +86,14 @@ print_optionbar_end();
     foreach(explode(" ", $_GET['opta']) as $graph_type) {        
       if($graph_type == "cbgp_prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
       if($graph_type == "bgp_updates" || $valid_afi_safi[$afi][$safi]) {
-        $daily_traffic   = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
-        $daily_url       = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
-        $weekly_traffic  = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100$afisafi";
-        $weekly_url      = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150$afisafi";
-        $monthly_traffic = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100$afisafi";
-        $monthly_url     = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150$afisafi";
-        $yearly_traffic  = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100$afisafi";
-        $yearly_url      = $config['base_url'] . "/graph.php?peer=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150$afisafi";
+        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
+        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
+        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100$afisafi";
+        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150$afisafi";
+        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100$afisafi";
+        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150$afisafi";
+        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100$afisafi";
+        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150$afisafi";
         echo("<tr bgcolor=$bg_colour><td colspan=7>");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$daily_traffic' border=0></a> ");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$weekly_traffic' border=0></a> ");

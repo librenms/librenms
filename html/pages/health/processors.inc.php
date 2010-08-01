@@ -8,7 +8,7 @@ $graph_type = "processor_usage";
   $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname");
   while($proc = mysql_fetch_array($procs)) {
 
-   if(devicepermitted($proc['device_id'])) { 
+   if(device_permitted($proc['device_id'])) { 
 
     if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

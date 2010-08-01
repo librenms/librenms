@@ -7,7 +7,7 @@ $graph_type = "mempool_usage";
   $i = '1';
   $mempools = mysql_query("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.device_id = M.device_id ORDER BY D.hostname");
   while($mempool = mysql_fetch_array($mempools)) {
-   if(devicepermitted($mempool['device_id'])) {
+   if(device_permitted($mempool['device_id'])) {
     if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
  
     $proc_url   = "?page=device/".$device['device_id']."/health/memory/";

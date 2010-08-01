@@ -21,7 +21,7 @@ $row = 1;
 
 while($drive = mysql_fetch_array($query)) {
 
-  if(devicepermitted($drive['device_id'])){
+  if(device_permitted($drive['device_id'])){
 
     $skipdrive = 0;
 

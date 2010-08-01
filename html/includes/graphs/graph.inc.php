@@ -69,35 +69,42 @@ if($_GET['debug']) {
 
 if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
   include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
-  include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
+  if($auth) { 
+    include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
+  }
 }
 
 
-  if($rrd_options) {
+  if($auth)
+  {
+    if($rrd_options) 
+    {
     
-    if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
-    $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
-    $woo = shell_exec($rrd_cmd);
-    if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
-#    $thing = popen($config['rrdtool'] . " -",'w');
-#    fputs($thing, "graph $graphfile $rrd_options");
-#    pclose($thing);
-    if(is_file($graphfile)) {
-      header('Content-type: image/png');
-      $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
-      unlink($graphfile);
-    } else {
-      header('Content-type: image/png');
-      $string = "Graph Generation Error";
-      $im     = imagecreate($width, $height);
-      $orange = imagecolorallocate($im, 255, 255, 255);
-      $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
-      imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
-      imagepng($im);
-      imagedestroy($im);
+      if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
+      $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
+      $woo = shell_exec($rrd_cmd);
+      if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
+#      $thing = popen($config['rrdtool'] . " -",'w');
+#      fputs($thing, "graph $graphfile $rrd_options");
+#      pclose($thing);
+      if(is_file($graphfile)) {
+        header('Content-type: image/png');
+        $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
+        unlink($graphfile);
+      } else {
+        header('Content-type: image/png');
+        $string = "Graph Generation Error";
+        $im     = imagecreate($width, $height);
+        $orange = imagecolorallocate($im, 255, 255, 255);
+        $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+        imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+        imagepng($im);
+        imagedestroy($im);
+      }
     }
+  } else {
+    $fd = fopen($config['install_dir']."/html/images/no-48.png",r);fpassthru($fd);fclose($fd);
   }
-
 
 
 ?>

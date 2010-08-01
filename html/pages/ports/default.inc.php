@@ -138,7 +138,7 @@ while($interface = mysql_fetch_array($query)) {
     $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-  if( interfacepermitted($interface['interface_id'], $interface['device_id']) ) 
+  if( port_permitted($interface['interface_id'], $interface['device_id']) ) 
   {
     $interface = ifLabel($interface, $device);
     echo("<tr bgcolor=$row_colour>

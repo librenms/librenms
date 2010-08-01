@@ -75,7 +75,7 @@ function generatedevicelink($device, $text=0, $start=0, $end=0)
   }
   $text = htmlentities($text);
   $link = overlib_link($url, $text, $contents, $class);
-  if(devicepermitted($device['device_id'])) {
+  if(device_permitted($device['device_id'])) {
     return $link;
   } else {
     return $device['hostname'];
@@ -156,13 +156,14 @@ function bill_permitted($bill_id)
   return $allowed;
 
 }
-function interfacepermitted($interface_id, $device_id = NULL)
+function port_permitted($interface_id, $device_id = NULL)
 {
   global $_SESSION; global $permissions;
-  if(!$device_id) { $device_id = mysql_result(mysql_query("SELECT `device_id` from ports WHERE interface_id = '".$interface_id."'"),0); }
+  if(!is_numeric($device_id)) { $device_id = get_device_id_by_interface_id($interface_id); }
+
   if ($_SESSION['userlevel'] >= "5") {
     $allowed = TRUE;
-  } elseif ( devicepermitted($device_id)) {
+  } elseif ( device_permitted($device_id)) {
     $allowed = TRUE;
   } elseif ( $permissions['port'][$interface_id]) {
     $allowed = TRUE;
@@ -172,7 +173,29 @@ function interfacepermitted($interface_id, $device_id = NULL)
   return $allowed;
 }
 
-function devicepermitted($device_id)
+function application_permitted($app_id, $device_id = NULL)
+{
+  global $_SESSION; global $permissions;
+  if(is_numeric($app_id)) 
+  {
+    if(!$device_id) { $device_id = device_by_id_cache ($app_id); }
+    if ($_SESSION['userlevel'] >= "5") {
+      $allowed = TRUE;
+    } elseif ( device_permitted($device_id)) {
+      $allowed = TRUE;
+    } elseif ( $permissions['application'][$app_id]) {
+      $allowed = TRUE;
+    } else {
+      $allowed = FALSE;
+    }
+  } else {
+    $allowed = FALSE;
+  }
+  return $allowed;
+}
+
+
+function device_permitted($device_id)
 {
   global $_SESSION; global $permissions;
   if ($_SESSION['userlevel'] >= "5") {
@@ -250,7 +273,7 @@ function generate_if_link($args, $text = NULL)
   
   $url = $config['base_url']."/device/".$args['device_id']."/interface/" . $args['interface_id'] . "/";
 
-  if(interfacepermitted($args['interface_id'])) {
+  if(port_permitted($args['interface_id'])) {
     return overlib_link($url, $text, $content, $class);
   } else {
     return fixifName($text);

@@ -2,7 +2,7 @@
 <?php
 
 
-if(devicepermitted($entry['device_id'])) {
+if(device_permitted($entry['device_id'])) {
 
 
 $syslog_iter++;
