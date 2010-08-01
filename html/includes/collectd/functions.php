@@ -501,6 +501,18 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 		else if ($v['cf'] == 'MIN')
 			$has_min = true;
 	}
+
+        ### Build legend. This may not work for all RRDs, i don't know :)
+        if ($has_avg)
+                $graph[] = "COMMENT:           Last";
+        if ($has_min)
+                $graph[] = "COMMENT:   Min";
+        if ($has_max)
+                $graph[] = "COMMENT:   Max";
+        if ($has_avg)
+                $graph[] = "COMMENT:   Avg\\n";
+
+
 	reset($rrdinfo['DS']);
 	while (list($k, $v) = each($rrdinfo['DS'])) {
 		if (strlen($k) > $l_max)
@@ -529,13 +541,13 @@ function collectd_draw_rrd($host, $plugin, $pinst = null, $type, $tinst = null, 
 		if (isset($opts['tinylegend']) && $opts['tinylegend'])
 			continue;
 		if ($has_avg)
-			$graph[] = sprintf('GPRINT:%s_avg:AVERAGE:%%5.1lf%%s Avg%s', $k, $has_max || $has_min || $has_avg ? ',' : "\\l");
+			$graph[] = sprintf('GPRINT:%s_avg:AVERAGE:%%5.1lf%%s', $k, $has_max || $has_min || $has_avg ? ',' : "\\l");
 		if ($has_min)
-			$graph[] = sprintf('GPRINT:%s_min:MIN:%%5.1lf%%s Max%s', $k, $has_max || $has_avg ? ',' : "\\l");
+			$graph[] = sprintf('GPRINT:%s_min:MIN:%%5.1lf%%s', $k, $has_max || $has_avg ? ',' : "\\l");
 		if ($has_max)
-			$graph[] = sprintf('GPRINT:%s_max:MAX:%%5.1lf%%s Max%s', $k, $has_avg ? ',' : "\\l");
+			$graph[] = sprintf('GPRINT:%s_max:MAX:%%5.1lf%%s', $k, $has_avg ? ',' : "\\l");
 		if ($has_avg)
-			$graph[] = sprintf('GPRINT:%s_avg:LAST:%%5.1lf%%s Last\\l', $k);
+			$graph[] = sprintf('GPRINT:%s_avg:LAST:%%5.1lf%%s\\l', $k);
 	}
 
 	#$rrd_cmd = array(RRDTOOL, 'graph', '-', '-a', 'PNG', '-w', $config['rrd_width'], '-h', $config['rrd_height'], '-s', -1*$timespan_def['seconds'], '-t', $rrdfile);
