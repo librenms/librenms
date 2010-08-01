@@ -773,10 +773,10 @@ function collectd_draw_meta_line(&$opts, &$sources) {
 
 		$cmd[] = 'LINE1:'.$inst_name.'_avg#'.$line_color->as_string().':'.$legend;
 		if (!(isset($opts['tinylegend']) && $opts['tinylegend'])) {
-			$cmd[] = 'GPRINT:'.$inst_name.'_min:MIN:'.$number_format.' Min,';
-			$cmd[] = 'GPRINT:'.$inst_name.'_avg:AVERAGE:'.$number_format.' Avg,';
-			$cmd[] = 'GPRINT:'.$inst_name.'_max:MAX:'.$number_format.' Max,';
-			$cmd[] = 'GPRINT:'.$inst_name.'_avg:LAST:'.$number_format.' Last\\l';
+			$cmd[] = 'GPRINT:'.$inst_name.'_min:MIN:'.$number_format.'';
+			$cmd[] = 'GPRINT:'.$inst_name.'_avg:AVERAGE:'.$number_format.'';
+			$cmd[] = 'GPRINT:'.$inst_name.'_max:MAX:'.$number_format.'';
+			$cmd[] = 'GPRINT:'.$inst_name.'_avg:LAST:'.$number_format.'\\l';
 		}
 	}
 
