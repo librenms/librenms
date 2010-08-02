@@ -116,7 +116,7 @@ if(!$auth)
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
-      if(is_file($graphfile) && 0) {
+      if(is_file($graphfile)) {
         header('Content-type: image/png');
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         unlink($graphfile);
