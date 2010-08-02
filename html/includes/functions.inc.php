@@ -46,9 +46,9 @@ function generate_device_link($device, $text=0, $start=0, $end=0)
 
 
   $contents .= "<div>";
-  if($device['os']) { $contents .= htmlentities($config['os'][$device['os']]['text']); }
-  if($device['version']) { $contents .= " ".htmlentities($device['version']); }
-  if($device['features']) { $contents .= " (".htmlentities($device['features']).")"; }
+  if($device['os']) { $contents .= mres($config['os'][$device['os']]['text']); }
+  if($device['version']) { $contents .= " ".mres($device['version']); }
+  if($device['features']) { $contents .= " (".mres($device['features']).")"; }
 #  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
 
