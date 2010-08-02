@@ -7,17 +7,19 @@ include("includes/graphs/common.inc.php");
 
 $i=0;
 foreach($rrd_filenames as $rrd_filename) {
-    $rrd_options .= " DEF:inoctets" . $i . "=".$rrd_filename.":".$rra_in.":AVERAGE";
-    $rrd_options .= " DEF:outoctets" . $i . "=".$rrd_filename.":".$rra_out.":AVERAGE";
-    $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
-    $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
-    $pluses .= $plus;
-    $seperator = ",";
-    $plus = ",+";
-    $i++;
+  $rrd_options .= " DEF:inoctets" . $i . "=".$rrd_filename.":".$rra_in.":AVERAGE";
+  $rrd_options .= " DEF:outoctets" . $i . "=".$rrd_filename.":".$rra_out.":AVERAGE";
+  $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
+  $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
+  $pluses .= $plus;
+  $seperator = ",";
+  $plus = ",+";
+  $i++;
 }
 
-if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+if($i)
+{
+  if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
   $rrd_options .= " CDEF:".$in."octets=" . $in_thing . $pluses;
   $rrd_options .= " CDEF:".$out."octets=" . $out_thing . $pluses;
   $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
@@ -42,7 +44,8 @@ if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
    $rrd_options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
    $rrd_options .= " GPRINT:outbits:MAX:%6.2lf%s\\\l";
   }
-$rrd_options .= " HRULE:0#999999";
+}
+#$rrd_options .= " HRULE:0#999999";
 
 
 ?>
