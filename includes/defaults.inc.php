@@ -147,7 +147,7 @@ $config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
 ### Ignores & Allows
 
 $config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
-             "-atm layer", "-atm subif", "-shdsl", "-adsl", "-aal5", "-atm", "container",
+             "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
              "async", "plip", "-physical", "-signalling", "control", "container", "unrouted",
              "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
              "span rp", "span sp", "sslvpn");
