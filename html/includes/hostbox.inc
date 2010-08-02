@@ -17,7 +17,7 @@
    echo('  <tr background="'.$bg_image.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';" 
              onclick="location.href=\'/device/'.$device['device_id'].'/\'" style="cursor: hand;">
              <td width="40" align="center" valign="middle">' . $image . '</td>
-             <td width="300"><span style="font-weight: bold; font-size: 14px;">' . generatedevicelink($device) . '</span>
+             <td width="300"><span style="font-weight: bold; font-size: 14px;">' . generate_device_link($device) . '</span>
              <br />' . $device['sysName'] . '</td>
              <td width="200">' . $device['os_text'] . '<br />
              ' . $device['version'] . '</td>

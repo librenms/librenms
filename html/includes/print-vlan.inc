@@ -29,7 +29,7 @@ while($port = mysql_fetch_array($ports_query)) {
 
     
   } else {
-    echo($vlan['port_sep'] . generateiflink($port, makeshortif($port['ifDescr'])));
+    echo($vlan['port_sep'] . generate_port_link($port, makeshortif($port['ifDescr'])));
     $vlan['port_sep'] = ", ";
   }
 }

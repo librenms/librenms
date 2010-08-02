@@ -44,7 +44,7 @@ while($volt = mysql_fetch_array($query))
   $volt_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$volt_day\'><img src=\'$volt_week\'><img src=\'$volt_month\'><img src=\'$volt_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($volt) . "</td>
+          <td class=list-bold>" . generate_device_link($volt) . "</td>
           <td>$volt_popup</td>
 	  <td>$volt_minigraph</td>
 	  <td width=100>$alert</td>

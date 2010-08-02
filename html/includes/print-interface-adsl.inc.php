@@ -17,14 +17,14 @@
 
 
   if($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) { 
-    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
+    $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
   } else { $error_img = ""; }
 
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
   onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
    <td valign=top width=350>");
   echo("        <span class=list-large>
-                " . generateiflink($interface, $interface['ifIndex'] . ". ".$interface['label']) . "
+                " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . "
 
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
@@ -53,7 +53,7 @@
   echo(formatRates($interface['ifInOctets_rate'] * 8)." <img class='optionicon' src='images/icons/arrow_updown.png' /> ".formatRates($interface['ifOutOctets_rate'] * 8));
   echo("<br />");
   $interface['graph_type'] = "port_bits";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
 
@@ -61,35 +61,35 @@
   echo("".formatRates($interface['adslAturChanCurrTxRate']) . "/". formatRates($interface['adslAtucChanCurrTxRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_speed";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".formatRates($interface['adslAturCurrAttainableRate']) . "/". formatRates($interface['adslAtucCurrAttainableRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attainable";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
   
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrAtn'] . "dB/". $interface['adslAtucCurrAtn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attenuation";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrSnrMgn'] . "dB/". $interface['adslAtucCurrSnrMgn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_snr";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrOutputPwr'] . "dBm/". $interface['adslAtucCurrOutputPwr'] . "dBm");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_power";
-  echo(generateiflink($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
 

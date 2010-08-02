@@ -10,8 +10,8 @@ while($arp = mysql_fetch_array($query)) {
   if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
   $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$arp['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
-  if($arp_host) { $arp_name = generatedevicelink($arp_host); } else { unset($arp_name); }
-  if($arp_host) { $arp_if = generateiflink($arp_host); } else { unset($arp_if); }
+  if($arp_host) { $arp_name = generate_device_link($arp_host); } else { unset($arp_name); }
+  if($arp_host) { $arp_if = generate_port_link($arp_host); } else { unset($arp_if); }
 
   if($arp_host['device_id'] == $device['device_id']) { $arp_name = "Localhost"; }
   if($arp_host['interface_id'] == $arp['interface_id']) { $arp_if = "Local Port"; }

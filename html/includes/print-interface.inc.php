@@ -20,7 +20,7 @@
 
 
   if($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) { 
-    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
+    $error_img = generate_port_link($interface, "<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>", "port_errors"); 
   } else { $error_img = ""; }
 
    if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
@@ -31,7 +31,7 @@
            <td valign=top width=350>");
 
   echo("        <span class=list-large>
-                " . generateiflink($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
+                " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
 
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
@@ -57,11 +57,11 @@
 
   if($port_details) {
     $interface['graph_type'] = "port_bits";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_bits&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>", $interface['graph_type']));
+    echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
     $interface['graph_type'] = "port_upkts";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_upkts&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>",$interface['graph_type']));
+    echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
     $interface['graph_type'] = "port_errors";
-    echo(generateiflink($interface, "<img src='graph.php?type=port_errors&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>",$interface['graph_type']));
+    echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
   }
 
   echo("</td><td width=120>");
@@ -121,7 +121,7 @@ echo("</td>");
      if ( strpos($interface['label'], "oopback") === false && !$graph_type) {
        $link_query = mysql_query("select * from links AS L, ports AS I, devices AS D WHERE L.local_interface_id = '$if_id' AND L.remote_interface_id = I.interface_id AND I.device_id = D.device_id");
        while($link = mysql_fetch_array($link_query)) {
-#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generateiflink($link, makeshortif($link['label'])) . " on " . generatedevicelink($link, shorthost($link['hostname'])) . "</a><br />");
+#         echo("<img src='images/16/connect.png' align=absmiddle alt='Directly Connected' /> " . generate_port_link($link, makeshortif($link['label'])) . " on " . generate_device_link($link, shorthost($link['hostname'])) . "</a><br />");
 #         $br = "<br />";
           $int_links[$link['interface_id']] = $link['interface_id'];
           $int_links_phys[$link['interface_id']] = 1;    
@@ -181,7 +181,7 @@ echo("</td>");
        if($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
                                         echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
 
-       echo("<b>" . generateiflink($link_if, makeshortif($link_if['label'])) . " on " . generatedevicelink($link_if, shorthost($link_if['hostname'])) );
+       echo("<b>" . generate_port_link($link_if, makeshortif($link_if['label'])) . " on " . generate_device_link($link_if, shorthost($link_if['hostname'])) );
 
        if($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
        if($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }
@@ -200,19 +200,19 @@ echo("</td>");
                                                                                                           P.cpwVcID = '".$pseudowire['cpwVcID']."' AND
                                                                                                           P.interface_id = I.interface_id"));
     $pw_peer_int = ifNameDescr($pw_peer_int);
-    echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generateiflink($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generatedevicelink($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
+    echo("$br<img src='images/16/arrow_switch.png' align=absmiddle><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) ." on ". generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . "</b>");
     $br = "<br />";
   }
 
   $members = mysql_query("SELECT * FROM `ports` WHERE `pagpGroupIfIndex` = '".$interface['ifIndex']."' and `device_id` = '".$device['device_id']."'");
   while($member = mysql_fetch_array($members)) {
-    echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generateiflink($member) . " (PAgP)</strong>");
+    echo("$br<img src='images/16/brick_link.png' align=absmiddle> <strong>" . generate_port_link($member) . " (PAgP)</strong>");
     $br = "<br />";
   }
 
   if($interface['pagpGroupIfIndex'] && $interface['pagpGroupIfIndex'] != $interface['ifIndex']) {
     $parent = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE `ifIndex` = '".$interface['pagpGroupIfIndex']."' and `device_id` = '".$device['device_id']."'"));
-    echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generateiflink($parent) . " (PAgP)</strong>");
+    echo("$br<img src='images/16/bricks.png' align=absmiddle> <strong>" . generate_port_link($parent) . " (PAgP)</strong>");
     $br = "<br />";
   }
 

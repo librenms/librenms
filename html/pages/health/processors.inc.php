@@ -38,7 +38,7 @@ $graph_type = "processor_usage";
     } else { $left_background='9abf5b'; $right_background='bbd392'; }
 
     echo("    <tr bgcolor=\"$row_colour\">
-               <td>".generatedevicelink($proc)."</td>
+               <td>".generate_device_link($proc)."</td>
                <td class=\"tablehead\"><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
                <td width=\"90\"><a href=\"".$proc_url."\"  $proc_popup><img src=\"$mini_url\" /></a></td>
                <td width=\"200\"><a href=\"".$proc_url."\" $proc_popup>

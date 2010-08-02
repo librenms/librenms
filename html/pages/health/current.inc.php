@@ -45,7 +45,7 @@ while($current = mysql_fetch_array($query))
   $current_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$current_day\'><img src=\'$current_week\'><img src=\'$current_month\'><img src=\'$current_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($current) . "</td>
+          <td class=list-bold>" . generate_device_link($current) . "</td>
           <td>$current_popup</td>
 	  <td>$current_minigraph</td>
 	  <td width=100>$alert</td>

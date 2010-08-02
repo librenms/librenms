@@ -9,7 +9,7 @@ if(is_numeric($id))
   {
     $device = device_by_id_cache($mempool['device_id']);
     $rrd_filename = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
-    $title  = generatedevicelink($device);
+    $title  = generate_device_link($device);
     $title .= " :: Memory Pool :: " . htmlentities($mempool['mempool_descr']);
     $auth = TRUE;
   }

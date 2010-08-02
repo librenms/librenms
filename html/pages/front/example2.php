@@ -29,7 +29,7 @@ $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = 
 while($device = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
-      <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center></div>");
@@ -40,9 +40,9 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id
 while($interface = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
-      <center><strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
+      <center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span> 
-      <strong>".generateiflink($interface, makeshortif($interface['ifDescr']))."</strong> <br />
+      <strong>".generate_port_link($interface, makeshortif($interface['ifDescr']))."</strong> <br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
       </center></div>");
 
@@ -52,7 +52,7 @@ $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device
 while($service = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
-      <center><strong>".generatedevicelink($service, shorthost($service['hostname']))."</strong><br />
+      <center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span> 
       <strong>".$service['service_type']."</strong><br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
@@ -64,7 +64,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerSta
 while($peer = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
-      <center><strong>".generatedevicelink($peer, shorthost($peer['hostname']))."</strong><br />
+      <center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span> 
       <strong>".$peer['bgpPeerIdentifier']."</strong> <br />
       <span class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
@@ -76,7 +76,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.d
 while($device = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
-      <center><strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br /> 
       <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
       </center></div>");

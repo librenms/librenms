@@ -7,7 +7,7 @@ if(is_numeric($proc['device_id']) && device_permitted($proc['device_id']))
 {
   $device = device_by_id_cache($proc['device_id']);
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
-  $title  = generatedevicelink($device);
+  $title  = generate_device_link($device);
   $title .= " :: Processor :: " . htmlentities($proc['processor_descr']);
   $auth = TRUE;
 }

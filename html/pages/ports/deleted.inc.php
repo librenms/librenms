@@ -7,14 +7,14 @@ if($_GET['optb'] == "purge" && $_GET['optc'] == "all") {
   while($interface = mysql_fetch_assoc($query)) {
     if(port_permitted($interface['interface_id'], $interface['device_id'])){
       delete_port($interface['interface_id']);
-      echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>");
+      echo("<div class=infobox>Deleted ".generate_device_link($interface)." - ".generate_port_link($interface)."</div>");
     }
   }
 } elseif($_GET['optb'] == "purge" && $_GET['optc'])  { 
   $interface = mysql_fetch_assoc(mysql_query("SELECT * from `ports` AS P, `devices` AS D WHERE `interface_id` = '".mres($_GET['optc'])."' AND D.device_id = P.device_id"));
   if(port_permitted($interface['interface_id'], $interface['device_id']))
   delete_port($interface['interface_id']);
-  echo("<div class=infobox>Deleted ".generatedevicelink($interface)." - ".generateiflink($interface)."</div>");
+  echo("<div class=infobox>Deleted ".generate_device_link($interface)." - ".generate_port_link($interface)."</div>");
 }
 
 
@@ -33,8 +33,8 @@ while($interface = mysql_fetch_assoc($query)) {
     if(is_integer($i_deleted/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     echo("<tr bgcolor=$row_colour>");
-     echo("<td width=250>".generatedevicelink($interface)."</td>");
-     echo("<td width=250>".generateiflink($interface)."</td>");
+     echo("<td width=250>".generate_device_link($interface)."</td>");
+     echo("<td width=250>".generate_port_link($interface)."</td>");
      echo("<td></td>");
      echo("<td width=100><a href='".$config['base_url'] . "/ports/deleted/purge/".$interface['interface_id']."/'><img src='images/16/cross.png' align=absmiddle></img> Purge</a></td>");
 

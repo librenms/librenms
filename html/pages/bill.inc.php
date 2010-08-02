@@ -88,7 +88,7 @@ if(bill_permitted($bill_id)) {
 
   while ($port = mysql_fetch_array($ports)) {
   
-  	echo(generateiflink($port) . " on " . generatedevicelink($port) . "<br />");
+  	echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
   
   }
   

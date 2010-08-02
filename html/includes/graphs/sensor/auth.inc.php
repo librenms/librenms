@@ -11,7 +11,7 @@ if(is_numeric($id))
     ### This doesn't quite work for all yet.
     $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename($sensor['sensor_class']."-" . $sensor['sensor_type'] . "-".$sensor['sensor_index'].".rrd");
 
-    $title  = generatedevicelink($device);
+    $title  = generate_device_link($device);
     $title .= " :: Sensor :: " . htmlentities($sensor['sensor_descr']);
     $auth = TRUE;
   }

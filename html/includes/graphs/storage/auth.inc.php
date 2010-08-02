@@ -10,7 +10,7 @@ if(is_numeric($id))
     $device = device_by_id_cache($storage['device_id']);
     $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $storage['storage_mib'] . "-" . $storage['storage_descr'] . ".rrd");
 
-    $title  = generatedevicelink($device);
+    $title  = generate_device_link($device);
     $title .= " :: Storage :: " . htmlentities($storage['storage_descr']);
     $auth = TRUE;
   }

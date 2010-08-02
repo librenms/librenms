@@ -20,12 +20,12 @@ if(isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$li
     $dev['device_id'] = $entry['host'];
     $dev['hostname'] = $hostname;
     echo("<td class=list-bold width=150>
-      " . generatedevicelink($dev, shorthost($dev['hostname'])) . "
+      " . generate_device_link($dev, shorthost($dev['hostname'])) . "
     </td>");
   }
 
   if($entry['type'] == "interface") {
-    $entry['link'] = "<b>".generateiflink(getifbyid($entry['reference']))."</b>";
+    $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
   } else {
     $entry['link'] = "System";
   }

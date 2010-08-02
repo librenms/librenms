@@ -26,7 +26,7 @@ $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = 
 while($device = mysql_fetch_array($sql)){
    if(device_permitted($device['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #d0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffbbbb;'>
-       <strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+       <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span><br />
        <span class=body-date-1>".truncate($device['location'], 35)."</span>
       </div>");
@@ -39,9 +39,9 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id
 while($interface = mysql_fetch_array($sql)){
    if(port_permitted($interface['interface_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
-       <strong>".generatedevicelink($interface, shorthost($interface['hostname']))."</strong><br />
+       <strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
-       <strong>".generateiflink($interface, makeshortif($interface['ifDescr']))."</strong><br />
+       <strong>".generate_port_link($interface, makeshortif($interface['ifDescr']))."</strong><br />
        <span class=body-date-1>".truncate($interface['ifAlias'], 15)."</span>
       </div>");
    }
@@ -53,7 +53,7 @@ $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device
 while($service = mysql_fetch_array($sql)){
    if(device_permitted($service['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
-      <strong>".generatedevicelink($service, shorthost($service['hostname']))."</strong><br />
+      <strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span><br />
       <strong>".$service['service_type']."</strong><br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 15)."</span>
@@ -65,7 +65,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdm
 while($peer = mysql_fetch_array($sql)){
    if(device_permitted($peer['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
-      <strong>".generatedevicelink($peer, shorthost($peer['hostname']))."</strong><br />
+      <strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span><br /> 
       <strong>".$peer['bgpPeerIdentifier']."</strong><br />
       <span class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
@@ -77,7 +77,7 @@ $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.a
 while($device = mysql_fetch_array($sql)){
    if(device_permitted($device['device_id']) && $device['attrib_value'] < "84600" && $device['attrib_type'] == "uptime" ) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ddffdd;'>
-      <strong>".generatedevicelink($device, shorthost($device['hostname']))."</strong><br />
+      <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
       <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
       </div>");

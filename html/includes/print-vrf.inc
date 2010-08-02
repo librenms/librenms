@@ -26,7 +26,7 @@ while($port = mysql_fetch_array($ports_query)) {
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
    </div>");
   } else {
-    echo($vrf['port_sep'] . generateiflink($port, makeshortif($port['ifDescr'])));
+    echo($vrf['port_sep'] . generate_port_link($port, makeshortif($port['ifDescr'])));
     $vrf['port_sep'] = ", ";
   }
 }

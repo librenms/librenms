@@ -79,7 +79,7 @@ echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>
 
 while($entry = mysql_fetch_array($query)) { 
 if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
-echo("<tr style=\"background-color: $bg\"><td>" . generatedevicelink($entry, shortHost($entry['hostname'])) . "</td><td>" . $entry['entPhysicalDescr']  . 
+echo("<tr style=\"background-color: $bg\"><td>" . generate_device_link($entry, shortHost($entry['hostname'])) . "</td><td>" . $entry['entPhysicalDescr']  . 
      "</td><td>" . $entry['entPhysicalName']  . "</td><td>" . $entry['entPhysicalModelName']  . "</td><td>" . $entry['entPhysicalSerialNum'] . "</td></tr>");
 
 }

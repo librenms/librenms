@@ -37,11 +37,11 @@ else
 
     $peerhost = mysql_fetch_array(mysql_query("SELECT * FROM ipaddr AS A, ports AS I, devices AS D WHERE A.addr = '".$peer['bgpPeerIdentifier']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
 
-    if($peerhost) { $peername = generatedevicelink($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
+    if($peerhost) { $peername = generate_device_link($peerhost, shorthost($peerhost['hostname'])); } else { unset($peername); }
 
     echo("<tr bgcolor=$bg_colour background=$bg_image>
             <td></td>
-            <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generatedevicelink($peer, shorthost($peer['hostname']))."</td>
+            <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generate_device_link($peer, shorthost($peer['hostname']))."</td>
 	     <td width=30>-></td>
             <td width=150><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
 	     <td width=50><b>$peer_type</b></td>

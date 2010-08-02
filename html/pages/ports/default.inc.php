@@ -135,7 +135,7 @@ while($interface = mysql_fetch_array($query)) {
   $type = humanmedia($interface['ifType']);
 
     if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
-    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
+    $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
   if( port_permitted($interface['interface_id'], $interface['device_id']) ) 
@@ -143,8 +143,8 @@ while($interface = mysql_fetch_array($query)) {
     $interface = ifLabel($interface, $device);
     echo("<tr bgcolor=$row_colour>
           <td width=5></td>
-          <td width=200 class=list-bold>" . generatedevicelink($interface) . "</td>
-          <td width=150 class=list-bold>" . generateiflink($interface) . " $error_img</td>
+          <td width=200 class=list-bold>" . generate_device_link($interface) . "</td>
+          <td width=150 class=list-bold>" . generate_port_link($interface) . " $error_img</td>
           <td width=110 >$speed</td>
           <td width=200>$type</td>
           <td>" . $interface['ifAlias'] . "</td>

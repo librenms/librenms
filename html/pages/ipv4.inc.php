@@ -68,14 +68,14 @@ while($interface = mysql_fetch_array($query)) {
   list($prefix, $length) = explode("/", $interface['ipv4_network']);
 
     if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
-    $error_img = generateiflink($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
+    $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
   if( port_permitted($interface['interface_id']) )
   {
     echo('<tr bgcolor="' . $row_colour . '">
-          <td class="list-bold">' . generatedevicelink($interface) . '</td>
-          <td class="list-bold">' . generateiflink($interface, makeshortif(fixifname($interface['ifDescr']))) . ' ' . $error_img . '</td>
+          <td class="list-bold">' . generate_device_link($interface) . '</td>
+          <td class="list-bold">' . generate_port_link($interface, makeshortif(fixifname($interface['ifDescr']))) . ' ' . $error_img . '</td>
           <td>' . $interface['ipv4_address'] . '/'.$length.'</td>
           <td>' . $interface['ifAlias'] . "</td>
         </tr>\n");
