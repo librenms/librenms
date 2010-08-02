@@ -42,5 +42,7 @@ if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
    $rrd_options .= " GPRINT:outbits:AVERAGE:%6.2lf%s";
    $rrd_options .= " GPRINT:outbits:MAX:%6.2lf%s\\\l";
   }
+$rrd_options .= " HRULE:0#999999";
+
 
 ?>
