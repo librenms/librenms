@@ -1,8 +1,8 @@
-<?
+<?php
 
-if(is_numeric($_GET['id']))
+if(is_numeric($id))
 {
-  $sql = mysql_query("SELECT * FROM `mempools` AS C, `devices` AS D where C.`mempool_id` = '".mres($_GET['id'])."' AND C.device_id = D.device_id");
+  $sql = mysql_query("SELECT * FROM `mempools` AS C, `devices` AS D where C.`mempool_id` = '".mres($id)."' AND C.device_id = D.device_id");
   $mempool = mysql_fetch_assoc($sql);
 
   if(is_numeric($mempool['device_id']) && device_permitted($mempool['device_id']))   

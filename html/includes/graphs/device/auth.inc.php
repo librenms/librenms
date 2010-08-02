@@ -1,4 +1,4 @@
-<?
+<?php
 
 if(is_numeric($id) && device_permitted($id)) 
 {

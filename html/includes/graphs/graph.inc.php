@@ -21,8 +21,18 @@ if($_GET['debug']) {
   include("includes/functions.inc.php");
   include("includes/authenticate.inc.php");
 
-  if(!$config['allow_unauth_graphs']) {
-    if(!$_SESSION['authenticated']) { echo("not authenticated"); exit; }
+  $from     = mres($_GET['from']);
+  $to       = mres($_GET['to']);
+  $width    = mres($_GET['width']);
+  $height   = mres($_GET['height']);
+  $title    = mres($_GET['title']);
+  $vertical = mres($_GET['vertical']);
+  $legend   = mres($_GET['legend']);
+  $id       = mres($_GET['id']);
+
+  if(!$config['allow_unauth_graphs']) 
+  {
+    if(!$_SESSION['authenticated']) { graph_error("Not authenticated"); exit; }
   }
   
 #  if($_GET['device']) {
@@ -42,15 +52,6 @@ if($_GET['debug']) {
   $subtype = $graphtype['subtype'];
 
   if($debug) {print_r($graphtype);}
-
-  $from     = mres($_GET['from']);
-  $to       = mres($_GET['to']);
-  $width    = mres($_GET['width']);
-  $height   = mres($_GET['height']);
-  $title    = mres($_GET['title']);
-  $vertical = mres($_GET['vertical']);
-  $legend   = mres($_GET['legend']);
-  $id       = mres($_GET['id']);
 
   $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
@@ -76,15 +77,17 @@ if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.ph
   graph_error("Graph Template Missing");
 }
 
-function graph_error ($string) {
-        global $width, $height;
-        header('Content-type: image/png');
-        $im     = imagecreate($width+79, $height);
-        $orange = imagecolorallocate($im, 255, 225, 225);
-        $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
-        imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
-        imagepng($im);
-        imagedestroy($im);
+function graph_error ($string) 
+{
+  global $width, $height;
+  header('Content-type: image/png');
+  $im     = imagecreate($width+79, $height);
+  $orange = imagecolorallocate($im, 255, 225, 225);
+  $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
+  imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
+  imagepng($im);
+  imagedestroy($im);
+  exit();
 }
 
 
@@ -102,9 +105,6 @@ if(!$auth)
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
-#      $thing = popen($config['rrdtool'] . " -",'w');
-#      fputs($thing, "graph $graphfile $rrd_options");
-#      pclose($thing);
       if(is_file($graphfile)) {
         header('Content-type: image/png');
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
@@ -117,6 +117,5 @@ if(!$auth)
     }
   }
 }
-
 
 ?>
