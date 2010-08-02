@@ -94,11 +94,21 @@ function graph_error ($string)
 
 if(!$auth)
 {
- graph_error("Unauthorized");
+  if($width < 200)
+  {
+   graph_error("No Auth");
+  } else {
+   graph_error("No Authorisation");
+  }
 } else {
   if($no_file)
   {
-    graph_error("Missing RRD");
+    if($width < 200)
+    {
+      graph_error("No RRD");
+    } else {
+      graph_error("Missing RRD Datafile");
+    }
   } else {
     if($rrd_options) 
     {
@@ -106,15 +116,25 @@ if(!$auth)
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
-      if(is_file($graphfile)) {
+      if(is_file($graphfile) && 0) {
         header('Content-type: image/png');
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         unlink($graphfile);
       } else {
-        graph_error("Drawing Error");
+        if($width < 200)
+        {
+          graph_error("Draw Error");
+        } else {
+          graph_error("Error Drawing Graph");
+        }
       }
     } else {
-      graph_error("Definition Error");
+      if($width < 200)
+      {
+        graph_error("Def Error");
+      } else {
+        graph_error("Graph Definition Error");
+      }
     }
   }
 }
