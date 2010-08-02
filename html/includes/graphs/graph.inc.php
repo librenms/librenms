@@ -81,7 +81,7 @@ function graph_error ($string)
 {
   global $width, $height;
   header('Content-type: image/png');
-  if($height > "99")  { $width +=79; }
+  if($height > "99")  { $width +=76; }
   $im     = imagecreate($width, $height);
   $orange = imagecolorallocate($im, 255, 225, 225);
   $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
@@ -90,7 +90,6 @@ function graph_error ($string)
   imagedestroy($im);
   exit();
 }
-
 
 if(!$auth)
 {
@@ -101,6 +100,7 @@ if(!$auth)
    graph_error("No Authorisation");
   }
 } else {
+  $rrd_options .= " HRULE:0#999999";
   if($no_file)
   {
     if($width < 200)
@@ -113,7 +113,6 @@ if(!$auth)
     if($rrd_options) 
     {
       if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
-      $rrd_options .= " HRULE:0#999999";
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    

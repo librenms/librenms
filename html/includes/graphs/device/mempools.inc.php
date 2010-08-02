@@ -15,14 +15,17 @@ while($mempool = mysql_fetch_array($query)) {
   } elseif($iter=="7") {$colour="FF0084"; unset($iter); }
   $descr = substr(str_pad(short_hrDeviceDescr($mempool['mempool_descr']), 28),0,28);
   $descr = str_replace(":", "\:", $descr);
-  $rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
-  $rrd_options .= " DEF:mempoolfree$i=$rrd:free:AVERAGE ";
-  $rrd_options .= " DEF:mempoolused$i=$rrd:used:AVERAGE ";
-  $rrd_options .= " CDEF:mempooltotal$i=mempoolused$i,mempoolused$i,mempoolfree$i,+,/,100,* ";
-  $rrd_options .= " LINE1:mempooltotal$i#" . $colour . ":'" . $descr . "' ";
-  $rrd_options .= " GPRINT:mempooltotal$i:LAST:%3.0lf";
-  $rrd_options .= " GPRINT:mempooltotal$i:MAX:%3.0lf\\\l ";
-  $iter++; $i++;
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("mempool-".$mempool['mempool_type']."-".$mempool['mempool_index'].".rrd");
+  if(is_file($rrd_filename))
+  {
+    $rrd_options .= " DEF:mempoolfree$i=$rrd_filename:free:AVERAGE ";
+    $rrd_options .= " DEF:mempoolused$i=$rrd_filename:used:AVERAGE ";
+    $rrd_options .= " CDEF:mempooltotal$i=mempoolused$i,mempoolused$i,mempoolfree$i,+,/,100,* ";
+    $rrd_options .= " LINE1:mempooltotal$i#" . $colour . ":'" . $descr . "' ";
+    $rrd_options .= " GPRINT:mempooltotal$i:LAST:%3.0lf";
+    $rrd_options .= " GPRINT:mempooltotal$i:MAX:%3.0lf\\\l ";
+    $iter++; $i++;
+  }
 }
 $rrd_options .= " HRULE:0#999999";
 
