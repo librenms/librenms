@@ -1,4 +1,4 @@
-<?
+<?php
 
 if(is_numeric($id) && port_permitted($id)) {
   $port   = get_port_by_id($id);

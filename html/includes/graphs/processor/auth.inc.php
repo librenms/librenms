@@ -1,4 +1,4 @@
-<?
+<?php
 
 $sql = mysql_query("SELECT * FROM `processors` where `processor_id` = '".mres($_GET['id'])."'");
 $proc = mysql_fetch_assoc($sql);
