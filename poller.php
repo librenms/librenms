@@ -51,9 +51,10 @@ if (isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
 
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
-$device_query = mysql_query("SELECT * FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 $where  ORDER BY `device_id` ASC");
-while ($device = mysql_fetch_array($device_query)) 
+$device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 $where  ORDER BY `device_id` ASC");
+while ($device = mysql_fetch_assoc($device_query)) 
 {
+  $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
 
