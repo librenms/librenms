@@ -17,7 +17,7 @@
 
 # gamatronic: unknown
 
-# mge: unknown
+# mge:
 # MG-SNMP-UPS-MIB::upsmgConfigLowBatteryLevel.0 = INTEGER: 20
 # MG-SNMP-UPS-MIB::upsmgBatteryRemainingTime.0 = INTEGER: 15750
 # MG-SNMP-UPS-MIB::upsmgBatteryLevel.0 = INTEGER: 100
