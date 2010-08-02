@@ -109,25 +109,6 @@ function getHostOS($device)
   if ($os) { return $os; } else { return "generic"; }
 }
 
-function billpermitted($bill_id) 
-{
-  global $_SESSION;
-  if ($_SESSION['userlevel'] >= "5") 
-  {
-    $allowed = TRUE;
-  } 
-  elseif (@mysql_result(mysql_query("SELECT count(*) FROM bill_perms WHERE `user_id` = '" . $_SESSION['user_id'] . "' AND `bill_id` = $bill_id"), 0) > '0') 
-  {
-    $allowed = TRUE;
-  }
-  else 
-  {
-    $allowed = FALSE;
-  }
-
-  return $allowed;
-}
-
 function formatRates($rate) {
    $rate = format_si($rate) . "bps";
    return $rate;

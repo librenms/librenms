@@ -57,14 +57,14 @@ if(bill_permitted($bill_id)) {
   if(!$_GET['optb']) { $_GET['optb'] = "details"; }
   
   if($_GET['optb'] == "details") { echo("<strong>"); }
-  echo("<a href='".$config['base_url']."/bill/".$bill_id."/details/'>Details</a>");
+  echo("<a href='bill/".$bill_id."/details/'>Details</a>");
   if($_GET['optb'] == "details") { echo("</strong>"); }
   
   if($_SESSION['userlevel'] == "10")
   {
     echo(" | ");
     if($_GET['optb'] == "edit") { echo("<strong>"); }
-    echo("<a href='".$config['base_url']."/bill/".$bill_id."/edit/'>Edit</a>");
+    echo("<a href='bill/".$bill_id."/edit/'>Edit</a>");
     if($_GET['optb'] == "edit") { echo("</strong>"); }
   }
 
@@ -174,7 +174,7 @@ if(bill_permitted($bill_id)) {
   $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
   $rightnow = date(U);
   
-#  $di =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
+#  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
 #  $di = $di . "&from=" . $yesterday .  "&to=" . $rightnow . "&x=715&y=250";
 #  $di = $di . "$type'>";
 
@@ -183,7 +183,7 @@ if(bill_permitted($bill_id)) {
   $di = $di . "&width=715&height=200&total=1'>";
 
   
-#  $mi =       "<img src='".$config['base_url']."/billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
+#  $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
 #  $mi = $mi . "&from=" . $lastmonth .  "&to=" . $rightnow . "&x=715&y=250";
 #  $mi = $mi . "$type'>";
   
