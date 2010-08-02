@@ -18,16 +18,7 @@ function rewrite_entity_descr ($descr) {
   return $descr;
 }
 
-function generateiflink($interface, $text=0, $type = NULL)
-{
-
-   ## Exists only to support older version of this function (i suck)
-
-   if($type) { $interface['type'] = $type; }
-   return generate_if_link($interface, $text);
-}
-
-function generatedevicelink($device, $text=0, $start=0, $end=0) 
+function generate_device_link($device, $text=0, $start=0, $end=0) 
 {
   global $twoday; global $day; global $now; global $config;
   if (!$start) { $start = $day; }
@@ -242,13 +233,13 @@ function print_percentage_bar ($width, $height, $percent, $left_text, $left_colo
   return $output;
 }
 
-function generate_if_link($args, $text = NULL)
+function generate_port_link($args, $text = NULL, $type = NULL)
 {
   global $twoday; global $now; global $config; global $day; global $month;
   $args = ifNameDescr($args);
   if(!$text) { $text = fixIfName($args['label']); }
+  if($type) { $args['graph_type'] = $type; }
   if(!$args['graph_type']) { $args['graph_type'] = 'port_bits'; }
-
   
   $class = ifclass($args['ifOperStatus'], $args['ifAdminStatus']);
   if(!isset($args['hostname'])) { $args = array_merge($args, device_by_id_cache($args['device_id'])); }
@@ -286,7 +277,7 @@ function generate_port_thumbnail($args)
 {
     if(!$args['bg']) { $args['bg'] = "FFFFF"; }
     $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
-    $output = generate_if_link($args, $args['content']);
+    $output = generate_port_link($args, $args['content']);
     echo $output;
 }
 

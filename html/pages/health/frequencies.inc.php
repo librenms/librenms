@@ -44,7 +44,7 @@ while($freq = mysql_fetch_array($query))
   $freq_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$freq_day\'><img src=\'$freq_week\'><img src=\'$freq_month\'><img src=\'$freq_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($freq) . "</td>
+          <td class=list-bold>" . generate_device_link($freq) . "</td>
           <td>$freq_popup</td>
 	  <td>$freq_minigraph</td>
 	  <td width=100>$alert</td>

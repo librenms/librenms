@@ -51,8 +51,8 @@ while($customer = mysql_fetch_array($cust_query)) {
            <tr bgcolor='$bg_colour'>
              <td width='7'></td>
              <td width='250'><span style='font-weight: bold;' class=interface>".$customer_name."</span></td>
-             <td width='150'>" . generatedevicelink($device) . "</td>
-             <td width='100'>" . generateiflink($port, makeshortif($port['ifDescr'])) . "</td>
+             <td width='150'>" . generate_device_link($device) . "</td>
+             <td width='100'>" . generate_port_link($port, makeshortif($port['ifDescr'])) . "</td>
              <td width='100'>".$port['port_descr_speed']."</td>
              <td width='100'>".$port['port_descr_circuit']."</td>
              <td>".$port['port_descr_notes']."</td>

@@ -31,7 +31,7 @@ if($hrdevice['hrDeviceType'] == "hrDeviceProcessor") {
   $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
   $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'")); 
   if($interface['ifIndex']) {
-  echo("<td>".generateiflink($interface)."</td>");
+  echo("<td>".generate_port_link($interface)."</td>");
 
   $graph_array['height'] = "20";
   $graph_array['width']  = "100";

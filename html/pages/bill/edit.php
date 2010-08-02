@@ -25,7 +25,7 @@ if(mysql_affected_rows())
     if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     echo("<tr style=\"background-color: $bg\">");
     echo("<td>");
-    echo(generatedevicelink($port) . " - " . generateiflink($port));
+    echo(generate_device_link($port) . " - " . generate_port_link($port));
     if($port['ifAlias']) { echo(" - " . $port['ifAlias']); } 
     echo("</td><td>");
     echo("<form action='' method='post'><input type='hidden' name='action' value='delete_bill_port'>

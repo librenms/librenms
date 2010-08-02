@@ -49,7 +49,7 @@ while($temp = mysql_fetch_array($query))
   $temp_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$temp_day\'><img src=\'$temp_week\'><img src=\'$temp_month\'><img src=\'$temp_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($temp) . "</td>
+          <td class=list-bold>" . generate_device_link($temp) . "</td>
           <td>$temp_popup</td>
 	  <td>$temp_minigraph</td>
 	  <td width=100>$alert</td>

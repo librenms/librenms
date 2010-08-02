@@ -17,7 +17,7 @@ if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     <td class=syslog>");
 
     if($entry['type'] == "interface") {
-      $entry['link'] = "<b>".generateiflink(getifbyid($entry['reference']))."</b>";
+      $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
     }
 
     echo($entry['link'] ." ".  htmlspecialchars($entry['message'])

@@ -62,7 +62,7 @@ while($drive = mysql_fetch_array($query)) {
     } else { $left_background='9abf5b'; $right_background='bbd392'; }
 
 
-    echo("<tr bgcolor='$row_colour'><td>" . generatedevicelink($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
+    echo("<tr bgcolor='$row_colour'><td>" . generate_device_link($drive) . "</td><td class=tablehead>" . $drive['storage_descr'] . "</td>
          <td><img src='$mini_graph'></td>
          <td>
           <a href='#' $store_popup>".print_percentage_bar (400, 20, $perc, "$used / $total", "ffffff", $left_background, $free, "ffffff", $right_background)."</a>

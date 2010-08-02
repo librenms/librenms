@@ -44,7 +44,7 @@ while($fan = mysql_fetch_array($query))
   $fan_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$fan_day\'><img src=\'$fan_week\'><img src=\'$fan_month\'><img src=\'$fan_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($fan) . "</td>
+          <td class=list-bold>" . generate_device_link($fan) . "</td>
           <td>$fan_popup</td>
 	  <td>$fan_minigraph</td>
 	  <td width=100>$alert</td>

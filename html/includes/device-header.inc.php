@@ -13,7 +13,7 @@
    echo("
             <tr bgcolor=$device_colour>
              <td width='40' align=center valign=middle>$image</td>
-             <td valign=middle><span style='font-weight: bold; font-size: 20px;'>" . generatedevicelink($device) . "</span>
+             <td valign=middle><span style='font-weight: bold; font-size: 20px;'>" . generate_device_link($device) . "</span>
              <br />" . $device['location'] . "</td>
              <td></td>
            </tr>");

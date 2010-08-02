@@ -24,7 +24,7 @@ function printEntPhysical($ent, $level, $class) {
 
        if($ent['ifIndex']) {
          $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
-         $ent['entPhysicalName'] = generateiflink($interface);
+         $ent['entPhysicalName'] = generate_port_link($interface);
                 }
 
        if ($ent['entPhysicalModelName'] && $ent['entPhysicalName']) {

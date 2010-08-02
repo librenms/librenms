@@ -53,7 +53,7 @@ if($ports['total']) {
   while($data = mysql_fetch_array($query)) {
     $data = ifNameDescr($data);
     $data = array_merge($data, $device);
-    echo("$ifsep" . generate_if_link($data, makeshortif(strtolower($data['label']))));
+    echo("$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label']))));
     $ifsep = ", ";
   }
   unset($ifsep);

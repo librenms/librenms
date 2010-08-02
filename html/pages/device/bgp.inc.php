@@ -49,7 +49,7 @@ print_optionbar_end();
     } else { unset($peerhost); }
 
     if($peerhost) {
-      $peername = generatedevicelink($peerhost); 
+      $peername = generate_device_link($peerhost); 
     } else { 
       $peername = gethostbyaddr($peer['bgpPeerIdentifier']);
       if($peername == $peer['bgpPeerIdentifier']) { 

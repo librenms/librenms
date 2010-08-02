@@ -7,8 +7,8 @@
 #  $device = device_by_id_cache($port['device_id']);
 #}
 
-#$title  = generatedevicelink($device);
-#$title .= " :: Port  ".generateiflink($port);
+#$title  = generate_device_link($device);
+#$title .= " :: Port  ".generate_port_link($port);
 
 $title = "Multi Port :: ";
 

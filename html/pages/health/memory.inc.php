@@ -34,7 +34,7 @@ $graph_type = "mempool_usage";
     } else { $left_background='9abf5b'; $right_background='bbd392'; }
 
     echo("<tr bgcolor=$row_colour>
-           <td>".generatedevicelink($mempool)."</td>
+           <td>".generate_device_link($mempool)."</td>
            <td class=tablehead><a href='".$mempool_url."' $mempool_popup>" . $text_descr . "</a></td>
            <td width=90><a href='".$mempool_url."'  $mempool_popup><img src='$mini_url'></a></td>
            <td width=200><a href='".$mempool_url."' $mempool_popup>

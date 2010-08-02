@@ -32,7 +32,7 @@ print_optionbar_end();
        } else {
          if(!is_integer($x/2)) { $dev_colour = $list_colour_b_b; } else { $dev_colour = $list_colour_b_a; }
        }
-       echo("<tr bgcolor='$dev_colour'><td width=150>".generatedevicelink($device, shorthost($device['hostname'])));
+       echo("<tr bgcolor='$dev_colour'><td width=150>".generate_device_link($device, shorthost($device['hostname'])));
 	if($device['vrf_name'] != $vrf['vrf_name']) { echo("<a href='#' onmouseover=\" return overlib('Expected Name : ".$vrf['vrf_name']."<br />Configured : ".$device['vrf_name']."', CAPTION, '<span class=list-large>VRF Inconsistency</span>' ,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"> <img align=absmiddle src=images/16/exclamation.png></a>"); }
        echo("</td><td>");
        $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
@@ -54,7 +54,7 @@ print_optionbar_end();
            echo("<div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
             </div>");
          } else {
-           echo($seperator.generateiflink($port,makeshortif($port['ifDescr']))); 
+           echo($seperator.generate_port_link($port,makeshortif($port['ifDescr']))); 
 	   $seperator = ", ";         
          }
        }

@@ -126,7 +126,7 @@
    $name = gethostbyaddr($addy['ipv4_address']);
 
    $arp_host = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = '".$addy['ipv4_address']."' AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
-   if($arp_host) { $arp_name = generatedevicelink($arp_host); $arp_name .= " ".generateiflink($arp_host); } else { unset($arp_if); }
+   if($arp_host) { $arp_name = generate_device_link($arp_host); $arp_name .= " ".generate_port_link($arp_host); } else { unset($arp_if); }
 
    if($name == $addy['ipv4_address']) { unset ($name); }
    if(mysql_result(mysql_query("SELECT count(*) FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'"),0)) {

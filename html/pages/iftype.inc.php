@@ -44,8 +44,8 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
     $ifclass = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
     if($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
     echo("<tr bgcolor='$bg'>
-             <td><span class=list-large>" . generateiflink($interface,$interface['port_descr_descr']) . "</span><br /> 
-            <span class=interface-desc style='float: left;'>".generatedevicelink($interface)." ".generateiflink($interface)." </span>");
+             <td><span class=list-large>" . generate_port_link($interface,$interface['port_descr_descr']) . "</span><br /> 
+            <span class=interface-desc style='float: left;'>".generate_device_link($interface)." ".generate_port_link($interface)." </span>");
 
     if(mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0)){
       echo("<span style='float: right;'><a href='".$config['base_url']."/device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'> MAC Accounting</a></span>");

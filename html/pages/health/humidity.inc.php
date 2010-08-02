@@ -49,7 +49,7 @@ while($humidity = mysql_fetch_array($query))
   $humidity_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$humidity_day\'><img src=\'$humidity_week\'><img src=\'$humidity_month\'><img src=\'$humidity_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generatedevicelink($humidity) . "</td>
+          <td class=list-bold>" . generate_device_link($humidity) . "</td>
           <td>$humidity_popup</td>
 	  <td>$humidity_minigraph</td>
 	  <td width=100>$alert</td>

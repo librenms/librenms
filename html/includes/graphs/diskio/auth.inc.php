@@ -12,7 +12,7 @@ if(is_numeric($id))
 
     $rrd_filename = $config['rrd_dir'] . "/" . $disk['hostname'] . "/ucd_diskio-" . safename($disk['diskio_descr'] . ".rrd");
 
-    $title  = generatedevicelink($device);
+    $title  = generate_device_link($device);
     $title .= " :: Disk :: " . htmlentities($disk['diskio_descr']);
     $auth = TRUE;
   }
