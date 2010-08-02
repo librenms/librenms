@@ -1,4 +1,4 @@
-<?php
+[B<?php
 
   unset($ports);
   $ports = snmp_cache_ifIndex($device); // Cache Port List
@@ -145,7 +145,6 @@
 
       if(isset($config['port_descr_parser']) && is_file($config['install_dir'] . "/" . $config['port_descr_parser']))
       {
-
         $port_attribs = array('type','descr','circuit','speed','notes');
         include($config['install_dir'] . "/" . $config['port_descr_parser']);
 
@@ -245,8 +244,12 @@
 
       /// Do EtherLike-MIB
       if($config['enable_ports_etherlike']) { include("port-etherlike.inc.php"); }      
+      
+      /// Do ADSL MIB
       if($config['enable_ports_adsl']) { include("port-adsl.inc.php"); }
-
+      
+      /// Do PoE MIBs
+      if($config['enable_ports_poe']) { include("port-poe.inc.php"); }
 
      // Update MySQL
      if ($update) { 

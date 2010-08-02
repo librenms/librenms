@@ -129,6 +129,7 @@ $config['enable_ports_Xbcmc']           = 1; # Enable ifXEntry broadcast/multica
 $config['enable_ports_etherlike']       = 0; # Enable Polling EtherLike-MIB (doubles interface processing time)
 $config['enable_ports_junoseatmvp']     = 0; # Enable JunOSe ATM VC Discovery/Poller
 $config['enable_ports_adsl']            = 1; # Enable ADSL-LINE-MIB
+$config['enable_ports_poe']             = 0; # Enable PoE stats collection
 
 ### Billing System Configuration
 
