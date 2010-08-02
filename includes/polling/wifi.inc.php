@@ -48,7 +48,7 @@ if ($device['type'] == 'network')
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients1);
 
-    $graphs['aironet_wifi_clients'] = TRUE;
+    $graphs['wifi_clients'] = TRUE;
 
   }
 
@@ -68,7 +68,7 @@ if ($device['type'] == 'network')
 
     rrdtool_update($wificlientsrrd,"N:".$wificlients2);
 
-    $graphs['aironet_wifi_clients'] = TRUE;
+    $graphs['wifi_clients'] = TRUE;
 
   }
 
