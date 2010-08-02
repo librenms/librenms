@@ -4,12 +4,14 @@ echo "Wireless: ";
 
 if ($device['type'] == 'network')
 {
-  if ($device['os'] == 'aironet')
+
+  ##### GENERIC FRAMEWORK, FILLING VARIABLES
+  if ($device['os'] == 'airport')
   {
 
-    echo "Checking aironet Wireless clients... ";
+    echo "Checking Airport Wireless clients... ";
 
-    $wificlients1 = snmp_get($device, "wirelessNumber.0", "-OUqnv", "aironet-BASESTATION-3-MIB") +0;
+    $wificlients1 = snmp_get($device, "wirelessNumber.0", "-OUqnv", "AIRPORT-BASESTATION-3-MIB") +0;
 
     echo($wificlients1 . " clients\n");
 
@@ -26,6 +28,9 @@ if ($device['type'] == 'network')
     
     echo ($wificlients1 +0) . " clients on dot11Radio0, " . ($wificlients2 +0) . " clients on dot11Radio1\n";
   }
+  
+  
+  ##### RRD Filling Code
 
   if (isset($wificlients1) && $wificlients1 != "")
   {
