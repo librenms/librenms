@@ -113,6 +113,7 @@ if(!$auth)
     if($rrd_options) 
     {
       if($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
+      $rrd_options .= " HRULE:0#999999";
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }    
