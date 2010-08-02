@@ -1,6 +1,6 @@
 <?php
 
-$port      = mres($_GET['port']);
+$port      = mres($_GET['id']);
 if($_GET['stat']) { $stat      = mres($_GET['stat']); } else { $stat = "bits"; }
 $sort      = mres($_GET['sort']);
 
