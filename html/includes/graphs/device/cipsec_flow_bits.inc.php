@@ -7,5 +7,4 @@ $rra_out = "OutOctets";
 
 include("includes/graphs/generic_bits.inc.php");
 
-
 ?>
