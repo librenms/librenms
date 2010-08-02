@@ -1,16 +1,23 @@
 <?php
 
-  include("includes/graphs/common.inc.php");
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
+include("includes/graphs/common.inc.php");
 
-  $rrd_options .= " DEF:Tunnels=$rrd_filename:Tunnels:AVERAGE";
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
 
-  $rrd_options .= " COMMENT:'Tunnels           Current   Average   Maximum\\n'";
-  $rrd_options .= " LINE1.25:Tunnels#660000:'Active Tunnels'";
-  $rrd_options .= " GPRINT:Tunnels:LAST:%6.2lf%s";
-  $rrd_options .= " GPRINT:Tunnels:AVERAGE:\ %6.2lf%s";
-  $rrd_options .= " GPRINT:Tunnels:MAX:\ %6.2lf%s\\\\n";
+$rra = "Tunnels";
+
+$colour_area = "9999cc";
+$colour_line = "0000cc";
+
+$colour_area_max = "aaaaacc";
+
+$scale_min = 0;
+
+$unit_text = "Active Tunnels";
+
+include("includes/graphs/generic_simplex.inc.php");
+
 
 
 ?>

@@ -72,13 +72,15 @@ if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.ph
   if($auth) { 
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
   }
+} else {
+  graph_error("Graph Template Missing");
 }
 
 function graph_error ($string) {
         global $width, $height;
         header('Content-type: image/png');
-        $im     = imagecreate($width+75, $height);
-        $orange = imagecolorallocate($im, 255, 255, 255);
+        $im     = imagecreate($width+79, $height);
+        $orange = imagecolorallocate($im, 255, 225, 225);
         $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;
         imagestring($im, 3, $px, $height / 2 - 8, $string, imagecolorallocate($im, 128, 0, 0));
         imagepng($im);
@@ -86,8 +88,10 @@ function graph_error ($string) {
 }
 
 
-if($auth)
+if(!$auth)
 {
+ graph_error("Unauthorized");
+} else {
   if($no_file)
   {
     graph_error("Missing RRD");
@@ -112,8 +116,6 @@ if($auth)
       graph_error("Definition Error");
     }
   }
-} else {
-  graph_error("Unauthorized");
 }
 
 
