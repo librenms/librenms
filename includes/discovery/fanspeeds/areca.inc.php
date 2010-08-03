@@ -17,8 +17,8 @@ if ($device['os'] == "areca")
       $split_oid = explode('.',$oid);
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.18928.1.2.2.1.9.1.3." . $index;
-      $current = snmp_get($device, $oid, "-Oqv", "") / $precision;
-      discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'areca', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+      $current = snmp_get($device, $oid, "-Oqv", "");
+      discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'areca', trim($descr,'"'), '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 }
