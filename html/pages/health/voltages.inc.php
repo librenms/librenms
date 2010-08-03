@@ -40,7 +40,7 @@ while($volt = mysql_fetch_array($query))
   $volt_year   = "graph.php?id=" . $volt['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
 
   $volt_minigraph = "<img src='graph.php?id=" . $volt['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=100&amp;height=20'";
-  $volt_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$volt['hostname']." - ".$volt['sensor_descr'];
+  $volt_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$volt['hostname']." - ".mres($volt['sensor_descr']);
   $volt_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$volt_day\'><img src=\'$volt_week\'><img src=\'$volt_month\'><img src=\'$volt_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>

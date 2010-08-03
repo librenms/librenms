@@ -40,9 +40,8 @@ if(is_array($oids[$device['device_id']]))
 
       $type = $entitysensor[$entry['entPhySensorType']];
 
-      $descr = str_replace("temperature", "", $descr);
-      $descr = str_replace("temperature", "", $descr);
-      $descr = str_replace("sensor", "", $descr);
+      $descr = str_ireplace("temperature", "", $descr);
+      $descr = str_ireplace("sensor", "", $descr);
         
       ### FIXME this stuff is foul
 

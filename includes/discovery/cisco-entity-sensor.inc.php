@@ -44,8 +44,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
         ### Bit dirty also, clean later
 	$descr = str_replace("Temp: ", "", $descr);
-        $descr = str_replace("temperature ", "", $descr);
-        $descr = str_replace("Temperature ", "", $descr);
+        $descr = str_ireplace("temperature ", "", $descr);
 
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
         $current = $entry['entSensorValue'];
