@@ -1,6 +1,11 @@
 <?php
 
-### FIXME
+$auth = TRUE;
+
+foreach(explode(",", $id) as $ifid) {
+  if(!port_permitted($ifid))
+  $auth = FALSE;
+}
 
 #if(is_numeric($id)) {
 #  $port = get_port_by_id($id);
