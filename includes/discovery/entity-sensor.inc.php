@@ -34,7 +34,7 @@ if(is_array($oids[$device['device_id']]))
       #ENTITY-SENSOR-MIB::entPhySensorUnitsDisplay.11 = STRING: "C"
 
       $descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
-      if(!$descr) { snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
+      if(!$descr) { $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
 
       $valid = TRUE;
 
