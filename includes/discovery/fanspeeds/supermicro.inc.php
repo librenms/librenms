@@ -22,20 +22,20 @@ if ($device['os'] == "linux")
         $fan_oid       = "1.3.6.1.4.1.10876.2.1.1.1.1.4.$index";
         $descr_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.2.$index";
         $limit_oid     = "1.3.6.1.4.1.10876.2.1.1.1.1.6.$index";
-        $precision_oid = "1.3.6.1.4.1.10876.2.1.1.1.1.9.$index";
+        $divisor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.9.$index";
         $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10.$index";
         $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        #$precision     = snmp_get($device, $precision_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        # This returns an incorrect precision. At least using the raw value... I think. -TL
+        #$divisor       = snmp_get($device, $divisor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        # ^ This returns an incorrect precision. At least using the raw value... I think. -TL
         $divisor       = "1";
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr         = str_replace(' Fan Speed','',$descr);
         $descr         = str_replace(' Speed','',$descr);      
         if ($monitor == 'true')
         {
-          discover_sensor($valid_sensor, 'fanspeed', $device, $oid, $index, 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+          discover_sensor($valid_sensor, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
         }
       }
     }
