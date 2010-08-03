@@ -18,8 +18,6 @@ if(!is_dir($config['temp_dir']))
 if(!is_writable($config['temp_dir']))
   echo "<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>";
 
-
-
 if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
@@ -30,12 +28,13 @@ if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   $auth_message = "Logged Out";
 }
 
-if(isset($_POST['username']) && isset($_POST['password'])){
+if(isset($_GET['username']) && isset($_GET['password'])){
+  $_SESSION['username'] = mres($_GET['username']);
+  $_SESSION['password'] = mres($_GET['password']);
+} elseif(isset($_POST['username']) && isset($_POST['password'])){
   $_SESSION['username'] = mres($_POST['username']);
   $_SESSION['password'] = mres($_POST['password']);
-}
-
-if(isset($_COOKIE['username']) && isset($_COOKIE['password'])){
+} elseif(isset($_COOKIE['username']) && isset($_COOKIE['password'])){
   $_SESSION['username'] = mres($_COOKIE['username']);
   $_SESSION['password'] = mres($_COOKIE['password']);
 }
