@@ -55,4 +55,6 @@ elseif(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($
 
 }
 
+echo($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
+
 ?>
