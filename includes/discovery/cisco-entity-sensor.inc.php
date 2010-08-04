@@ -35,7 +35,15 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
       {
         $entPhysicalIndex = $index;
 	$descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
-        if(!$descr) { $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
+        if($descr || $device['os'] == "iosxr") 
+        { 
+          $descr = rewrite_entity_descr($descr);
+        } else { 
+          $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); 
+          $descr = rewrite_entity_descr($descr);
+        }
+
+
         if(is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
           $measured_descr = snmp_get($device, "entPhysicalName.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");
           if(!measured_descr) {  $measured_descr = snmp_get($device, "entPhysicalDescr.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");}
@@ -44,7 +52,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
         ### Bit dirty also, clean later
 	$descr = str_replace("Temp: ", "", $descr);
-        $descr = str_ireplace("temperature ", "", $descr);
+        $descr = str_ireplace("temperature ", "", $descr); 
 
         $oid = ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.".$index;
         $current = $entry['entSensorValue'];

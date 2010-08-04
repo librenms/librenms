@@ -5,9 +5,9 @@ echo("Doing Allied Telesyn AlliedWare ");
 ### Allied Telesis have somewhat messy MIBs. It's often hard to work out what is where. :)
 
 
-$hardware = snmp_get($device, "atiswitchProductType.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
-$version  = snmp_get($device, "atiswitchSwVersion.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
-$software = snmp_get($device, "atiswitchSw.0", "-OsvQU", "+AtiSwitch-MIB", "+".$config['mib_dir']."/alliedtelesis");
+$hardware = snmp_get($device, "atiswitchProductType.0", "-OsvQU", "+AtiSwitch-MIB");
+$version  = snmp_get($device, "atiswitchSwVersion.0", "-OsvQU", "+AtiSwitch-MIB");
+$software = snmp_get($device, "atiswitchSw.0", "-OsvQU", "+AtiSwitch-MIB");
 
 if($software && $version)
   $version = $software . " " . $version;
@@ -22,8 +22,8 @@ if($software && $version)
 # AtiL2-MIB::atiL2SwVersion.0 = STRING: "AT-S41 v1.1.6 "
 
 if(!$hardware && !$version && !$features) {
-  $hardware = snmp_get($device, "atiL2SwProduct.0", "-OsvQU", "+AtiL2-MIB", "+".$config['mib_dir']."/alliedtelesis");
-  $version = snmp_get($device, "atiL2SwVersion.0", "-OsvQU", "+AtiL2-MIB", "+".$config['mib_dir']."/alliedtelesis");
+  $hardware = snmp_get($device, "atiL2SwProduct.0", "-OsvQU", "+AtiL2-MIB");
+  $version = snmp_get($device, "atiL2SwVersion.0", "-OsvQU", "+AtiL2-MIB");
 }
 
 #Allied Telesyn AT-8948 version 2.7.4-02 22-Aug-2005
