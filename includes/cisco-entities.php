@@ -22,5 +22,4 @@ $entPhysicalVendorTypes = array (
   'cevMGBIC1000BaseLX' 		=> '1000BaseLX GBIC',
   'cevPort10GigBaseLR' 		=> '10GigBaseLR');
 
-
 ?>

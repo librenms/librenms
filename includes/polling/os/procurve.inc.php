@@ -5,7 +5,7 @@ list($features) = explode("(", $version);
 
 $fdb_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/fdb_count.rrd";
 
-$FdbAddressCount = snmp_get ($device, "hpSwitchFdbAddressCount.0", "-Ovqn", "STATISTICS-MIB", $config['mib_dir'].":".$config['mib_dir']."/hp");
+$FdbAddressCount = snmp_get ($device, "hpSwitchFdbAddressCount.0", "-Ovqn", "STATISTICS-MIB");
 
 if(is_numeric($FdbAddressCount)) 
 {

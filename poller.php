@@ -105,22 +105,13 @@ while ($device = mysql_fetch_assoc($device_query))
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
-    $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
+#    $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
 
-    #echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
+    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
 
-    #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-    $sysUptime = str_replace("(", "", $sysUptime);
-    $sysUptime = str_replace(")", "", $sysUptime);
-    list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
-    list($secs, $microsecs) = explode(".", $secs);
-    $hours = $hours + ($days * 24);
-    $mins = $mins + ($hours * 60);
-    $secs = $secs + ($mins * 60);
-    $uptime = $secs;
-
-    if ($hrSystemUptime != "No Such Object available on this agent at this OID" && $hrSystemUptime != "")
+    if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No"))
     {
+      echo("Using hrSystemUptime\n");
       $agent_uptime = $uptime; ## Move uptime into agent_uptime
       #HOST-RESOURCES-MIB::hrSystemUptime.0 = Timeticks: (63050465) 7 days, 7:08:24.65
       $hrSystemUptime = str_replace("(", "", $hrSystemUptime);
@@ -132,6 +123,17 @@ while ($device = mysql_fetch_assoc($device_query))
       $secs = $secs + ($mins * 60);
       $uptime = $secs;
       if ($device['os'] == "windows") { $uptime /= 10; }
+    } else {
+      echo("Using Agent Uptime\n");
+      #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
+      $sysUptime = str_replace("(", "", $sysUptime);
+      $sysUptime = str_replace(")", "", $sysUptime);
+      list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
+      list($secs, $microsecs) = explode(".", $secs);
+      $hours = $hours + ($days * 24);
+      $mins = $mins + ($hours * 60);
+      $secs = $secs + ($mins * 60);
+      $uptime = $secs;
     }
 
     if (is_numeric($uptime)) 
@@ -148,12 +150,7 @@ while ($device = mysql_fetch_assoc($device_query))
   
       if (!is_file($uptimerrd)) 
       {
-        $woo = shell_exec($config['rrdtool'] . " create $uptimerrd \
-        DS:uptime:GAUGE:600:0:U \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797");
+        rrdtool_create ($uptimerrd, "DS:uptime:GAUGE:600:0:U RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797");
       }
       rrdtool_update($uptimerrd, "N:$uptime");
 

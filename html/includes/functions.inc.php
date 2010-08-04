@@ -1,23 +1,5 @@
 <?php
 
-function rewrite_entity_descr ($descr) {
-
-  $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
-  $descr = preg_replace("/7600 Series SPA Interface Processor-/", "7600 SIP-", $descr);
-  $descr = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $descr);
-  $descr = preg_replace("/12000 Series Performance Route Processor/", "12000 PRP", $descr);
-  $descr = preg_replace("/^12000/", "", $descr);
-  $descr = preg_replace("/Gigabit Ethernet/", "GigE", $descr);
-  $descr = preg_replace("/^ASR1000\ /", "", $descr);
-  $descr = str_replace("Routing Processor", "RP", $descr);
-  $descr = str_replace("Route Processor", "RP", $descr);
-  $descr = str_replace("Switching Processor", "SP", $descr);
-  $descr = str_replace("Sub-Module", "Module ", $descr);
-  $descr = str_replace("DFC Card", "DFC", $descr);
-
-  return $descr;
-}
-
 function generate_device_link($device, $text=0, $start=0, $end=0) 
 {
   global $twoday; global $day; global $now; global $config;
