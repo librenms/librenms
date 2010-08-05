@@ -224,7 +224,7 @@ function delete_device($id)
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     delete_port($int_id);
-    $ret = "Removed interface $int_id ($int_if)\n";
+    $ret .= "Removed interface $int_id ($int_if)\n";
   }
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
@@ -244,7 +244,8 @@ function delete_device($id)
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
-  return $ret . "Removed device $host\n";
+  $ret = "Removed Device $host\n";
+  return $ret;
 }
 
 function addHost($host, $community, $snmpver, $port = 161) 

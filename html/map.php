@@ -138,8 +138,9 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
       $_GET['format'] = 'png';
   }
 
-  $maptool = 'unflatten -f -l 5 |dot';
-  
+  #$maptool = 'unflatten -f -l 5 |dot';
+  $maptool = 'dot';  
+
   if ($where == '') { $maptool = 'neato -Gpack'; }
 
   $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
