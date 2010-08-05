@@ -2,13 +2,13 @@
 
 $storage_cache = array();
 
-echo("Storage: ");
+#echo("Storage: ");
 
 $query = "SELECT * FROM storage WHERE device_id = '" . $device['device_id'] . "'";
 $storage_data = mysql_query($query);
 while($storage = mysql_fetch_array($storage_data)) {
 
-  echo($storage['storage_descr'] . ": ");
+  echo("Storage ".$storage['storage_descr'] . ": ");
 
   $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $storage['storage_mib'] . "-" . safename($storage['storage_descr']) . ".rrd");
 
@@ -52,10 +52,10 @@ while($storage = mysql_fetch_array($storage_data)) {
   if($debug) { echo("$update_query\n"); }
   mysql_query($update_query);
 
+  echo("\n");
+
 }
 
 unset($storage);
-
-echo("\n");
 
 ?>

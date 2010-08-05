@@ -105,9 +105,9 @@ while ($device = mysql_fetch_assoc($device_query))
     $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
     $sysName = strtolower($sysName);
 
-#    $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
+    $hrSystemUptime = snmp_get($device, ".1.3.6.1.2.1.25.1.1.0", "-Oqv", "HOST-RESOURCES-MIB");
 
-    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
+#    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
 
     if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No"))
     {
@@ -286,7 +286,7 @@ while ($device = mysql_fetch_assoc($device_query))
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
   $poll_update .= $poll_separator . "`last_polled_timetaken` = '$device_time'";
-  echo("$device_end - $device_start; $device_time $device_run");
+  #echo("$device_end - $device_start; $device_time $device_run");
   echo("Polled in $device_time seconds\n");
 
   $poll_update_query  = "UPDATE `devices` SET ";

@@ -1,12 +1,11 @@
 <?php
 
-echo("Memory: ");
 
 $query = "SELECT * FROM mempools WHERE device_id = '" . $device['device_id'] . "'";
 $mempool_data = mysql_query($query);
 while($mempool = mysql_fetch_array($mempool_data)) {
 
-  echo($mempool['mempool_descr'] . ": ");
+  echo("Mempool ". $mempool['mempool_descr'] . ": ");
 
   $mempoolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("mempool-" . $mempool['mempool_type'] . "-" . $mempool['mempool_index'] . ".rrd");
 
@@ -35,7 +34,7 @@ while($mempool = mysql_fetch_array($mempool_data)) {
     ### Do we need a generic mempool poller?
   }
 
-  $percent = round($mempool['used'] * $mempool['total'] * 100, 2);
+  $percent = round($mempool['used'] / $mempool['total'] * 100, 2);
 
   echo($percent."% ");
 
@@ -51,10 +50,11 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   mysql_query($update_query);
   if($debug) { echo($update_query); }
 
+  echo("\n");
+
 }
 
 unset($mempool_cache);
 
-echo("\n");
 
 ?>

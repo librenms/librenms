@@ -4,7 +4,7 @@ $query = "SELECT * FROM processors WHERE device_id = '" . $device['device_id'] .
 $proc_data = mysql_query($query);
 while($processor = mysql_fetch_array($proc_data)) {
 
-  echo("Checking CPU " . $processor['processor_descr'] . "... ");
+  echo("Processor " . $processor['processor_descr'] . "... ");
 
   $file = $config['install_dir']."/includes/polling/processors-".$processor['processor_type'].".inc.php";
   if(is_file($file)) {

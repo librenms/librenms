@@ -93,7 +93,7 @@
   $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."'");
   while ($port = mysql_fetch_array($port_query)) {
     
-    echo(" --> " . $port['ifDescr'] . " ");   
+    echo("Port " . $port['ifDescr'] . " ");   
     if($port_stats[$device['device_id']][$port['ifIndex']] && $port['ignore'] == "0") { // Check to make sure Port data is cached.
 
       $this_port = &$port_stats[$device['device_id']][$port['ifIndex']];
