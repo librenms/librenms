@@ -1,5 +1,7 @@
 <?php
 
+echo("Cisco Catalyst OS\n");
+
 #Cisco Systems, Inc. WS-C2948 Cisco Catalyst Operating System Software, Version 4.5(9) Copyright (c) 1995-2000 by Cisco Systems, Inc.
 #Cisco Systems WS-C5509 Cisco Catalyst Operating System Software, Version 5.5(19) Copyright (c) 1995-2003 by Cisco Systems
 #Cisco Systems WS-C5500 Cisco Catalyst Operating System Software, Version 5.5(18) Copyright (c) 1995-2002 by Cisco Systems
@@ -14,11 +16,10 @@
      $hardware = $ciscomodel;
    }
 
-   $sysDescr = str_replace("IOS (tm)", "IOS (tm),", $sysDescr);
-   list(,$features,$version) = explode(",", $sysDescr);
-   $version = str_replace("Copyright", "", $version);
-   list(,$version,) = explode(" ", trim($version));
-   list(,$features) = explode("(", $features);
+   $sysDescr = str_replace(", Inc.", "", $sysDescr); ## Make the two formats the same
+   $sysDescr = str_replace("\n", " ", $sysDescr);
+
+   list(,,$hardware,,,,,,,$version,,,$features) = explode(" ", $sysDescr);
    list(,$features) = explode("-", $features);
 
 
