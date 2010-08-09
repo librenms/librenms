@@ -38,7 +38,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 	echo("Moved RRD ");
       }
 
-      echo("|".$descr."|");
+      #echo("|".$descr."|");
 
       if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) 
       {

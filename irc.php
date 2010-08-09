@@ -49,7 +49,7 @@ class observiumbot
 
 $host = "chat.eu.freenode.net";
 $port = 6667;
-$nick = "ObserverBOT";
+$nick = "Observium";
 $chan = "#observium";
 
 $bot = &new observiumbot( );
