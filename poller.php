@@ -154,6 +154,12 @@ while ($device = mysql_fetch_assoc($device_query))
       }
       rrdtool_update($uptimerrd, "N:$uptime");
 
+      $graphs['uptime'] = TRUE;
+
+      echo("Uptime: ".formatUptime($uptime)."\n");
+
+      print_r($graphs);
+
       $poll_update .= $poll_separator . "`uptime` = '$uptime'";
       $poll_separator = ", ";
     } 
