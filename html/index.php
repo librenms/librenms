@@ -107,7 +107,8 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
 
-    echo '<br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : '');
+  
+    echo '<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : '');
     echo '<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version'];
 
     if (file_exists('.svn/entries'))
