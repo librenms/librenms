@@ -12,7 +12,7 @@ if($device['os'] == "ios" || $device['os_group'] == "ios") {
     foreach($array[$device['device_id']] as $index => $entry) {
       if(is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == "true") {
        list($entPhysicalIndex) = explode(".", $index);
-       $entPhysicalDescr = snmp_get($device, "entPhysicalDescr.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");       
+       $entPhysicalName = snmp_get($device, "entPhysicalDescr.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");       
        $descr = $entPhysicalDescr." - ".$entry['cempMemPoolName'];
 
        $descr = str_replace("Cisco ", "", $descr);

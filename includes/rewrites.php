@@ -19,12 +19,12 @@ function rewrite_entity_descr ($descr) {
   $descr = str_replace("Switching Processor", "SP", $descr);
   $descr = str_replace("Sub-Module", "Module ", $descr);
   $descr = str_replace("DFC Card", "DFC", $descr);
+  $descr = str_replace("Centralized Forwarding Card", "CFC", $descr);
   $descr = str_replace("Power Supply Module", "PSU ", $descr);
   $descr = str_replace("/Voltage Sensor/", "Voltage", $descr);
   $descr = preg_replace("/^temperatures /", "", $descr);
   $descr = preg_replace("/^voltages /", "", $descr);
   
-
   return $descr;
 }
 
