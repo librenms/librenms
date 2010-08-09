@@ -5,11 +5,7 @@ $scale_min = "0";
 include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
-if (is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd")) {
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/hrSystem.rrd";
-} else {
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
-}
 
   $rrd_options .= " DEF:uptime=$rrd_filename:uptime:AVERAGE";
   $rrd_options .= " CDEF:cuptime=uptime,86400,/";
