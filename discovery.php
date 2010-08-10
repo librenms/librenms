@@ -68,7 +68,7 @@ if (file_exists('.svn'))
   }
 
   if($db_rev+0 < 1656) { //FIXME
-     include('fix-port-rrd.php');
+     include('fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
   }
 
   if ($dbu_rev+0 > $db_rev)
