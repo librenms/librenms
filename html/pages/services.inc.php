@@ -33,7 +33,7 @@ if ($_SESSION['userlevel'] >= '5') {
          $graph_array['width']  = "215";
          $graph_array['to']     = $now;
          $graph_array['id']     = $service['service_id'];
-         $graph_array['type']   = "service";
+         $graph_array['type']   = "service_availability";
 
          $periods = array('day', 'week', 'month', 'year');
 

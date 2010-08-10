@@ -5,18 +5,10 @@ $scale_max = "1";
 
 include("includes/graphs/common.inc.php");
 
-  $iter = "1";
-
-  $sql = "SELECT * FROM `services` AS S, `devices` AS D where S.`service_id` = '".mres($_GET['id'])."' AND S.device_id = D.device_id";
-  $query = mysql_query($sql);
-  $service = mysql_fetch_array($query);
-
   $service_text = substr(str_pad($service['service_type'], 28),0,28);
 
-  $rrd  = $config['rrd_dir'] . "/" . $service['hostname'] . "/" . safename("service-" . $service['service_type'] . "-" . $service['service_id'] . ".rrd");
-
   $rrd_options .= " COMMENT:'                                Cur    Avail\\n'";
-  $rrd_options .= " DEF:status=$rrd:status:AVERAGE";
+  $rrd_options .= " DEF:status=$rrd_filename:status:AVERAGE";
   $rrd_options .= " CDEF:percent=status,100,*";
   $rrd_options .= " CDEF:down=status,1,LT,status,UNKN,IF";
   $rrd_options .= " CDEF:percentdown=down,100,*";
