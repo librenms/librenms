@@ -6,8 +6,8 @@ $query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$port['device
 
 $i=0;
 while($int = mysql_fetch_array($query)) {
-  if(is_file($config['rrd_dir'] . "/" . $hostname . "/" . safename($int['ifIndex'] . ".rrd"))) {
-    $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $hostname . "/" . safename($int['ifIndex'] . ".rrd");
+  if(is_file($config['rrd_dir'] . "/" . $hostname . "/port-" . safename($int['ifIndex'] . ".rrd"))) {
+    $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $hostname . "/port-" . safename($int['ifIndex'] . ".rrd");
     $rrd_list[$i]['descr'] = $int['ifDescr'];
     $i++;
   }

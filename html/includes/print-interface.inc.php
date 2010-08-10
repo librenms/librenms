@@ -226,9 +226,9 @@ echo("</td>");
 
     if($graph_type == "etherlike")
     { 
-      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-". safename($interface['ifIndex']) . ".rrd"; 
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($interface['ifIndex']) . "-dot3.rrd"; 
     } else {
-      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex']) . ".rrd";  
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-". safename($interface['ifIndex']) . ".rrd";  
     }
 
      if($graph_type && is_file($graph_file)) {

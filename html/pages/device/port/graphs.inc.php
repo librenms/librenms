@@ -1,6 +1,6 @@
 <?php
 
-  if(file_exists($config['rrd_dir'] . "/" . $hostname . "/". $ifIndex . ".rrd")) {
+  if(file_exists($config['rrd_dir'] . "/" . $hostname . "/port-". $ifIndex . ".rrd")) {
 
     $iid = $id;
     echo("<div class=graphhead>Interface Traffic</div>");

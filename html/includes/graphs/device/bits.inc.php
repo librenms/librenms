@@ -22,8 +22,8 @@ while($int = mysql_fetch_assoc($query)) {
     }
   }
 
-  if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($int['ifIndex'] . ".rrd")) && $ignore != 1) {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");
+  if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd")) && $ignore != 1) {
+    $rrd_filenames[] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
   }
   unset($ignore);
 }

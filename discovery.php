@@ -67,6 +67,10 @@ if (file_exists('.svn'))
     include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
   }
 
+  if($db_rev+0 < 1656) { //FIXME
+     include('fix-port-rrd.php');
+  }
+
   if ($dbu_rev+0 > $db_rev)
   {
     echo "SVN revision changed.\n";
@@ -90,6 +94,8 @@ if (file_exists('.svn'))
     }
   }
 }
+
+ 
 
 if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; } else { $debug = 0; }
 
