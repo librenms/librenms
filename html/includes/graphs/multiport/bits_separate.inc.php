@@ -13,7 +13,7 @@ function graph_multi_bits ($args) {
   foreach(explode(",", $args['ports']) as $ifid) {
     $query = mysql_query("SELECT * FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_array($query);
-    $this_rrd = $config['rrd_dir'] . "/" . $int['hostname'] . "/" . safename($int['ifIndex'] . ".rrd");
+    $this_rrd = $config['rrd_dir'] . "/" . $int['hostname'] . "/port-" . safename($int['ifIndex'] . ".rrd");
     $units='bps'; $unit='B'; $colours='greens'; $multiplier = "8"; $coloursb = 'blues';
     if(is_file($this_rrd)) {
       $name = $int['ifDescr'];

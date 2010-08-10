@@ -8,7 +8,7 @@ $oids = array('dot3StatsAlignmentErrors', 'dot3StatsFCSErrors', 'dot3StatsSingle
               'dot3StatsSymbolErrors');
 
 $i=0;
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("etherlike-" . $port['ifIndex'] . ".rrd");
+$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-" . $port['ifIndex'] . "-dot3.rrd");
 if(is_file($rrd_filename)) {
   foreach($oids as $oid){
     $oid = str_replace("dot3Stats", "", $oid);

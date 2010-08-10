@@ -1,22 +1,30 @@
 <?php
 
-$rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
+$rrd_list[1]['filename'] = $rrd_filename;
+$rrd_list[1]['descr'] = $int['ifDescr'];
+$rrd_list[1]['rra_in'] = "INERRORS";
+$rrd_list[1]['rra_out'] = "OUTERRORS";
+$rrd_list[1]['descr']   = "Errors";
+$rrd_list[1]['colour_area_in'] = "FF3300";
+$rrd_list[1]['colour_area_out'] = "FF6633";
 
-$rra_in = "INERRORS";
-$rra_out = "OUTERRORS";
+$rrd_list[4]['filename'] = $rrd_filename;
+$rrd_list[4]['descr'] = $int['ifDescr'];
+$rrd_list[4]['rra_in'] = "INDISCARDS";
+$rrd_list[4]['rra_out'] = "OUTDISCARDS";
+$rrd_list[4]['descr']   = "Discards";
+$rrd_list[4]['colour_area_in'] = "805080";
+$rrd_list[4]['colour_area_out'] = "c0a060";
 
-$colour_area_in = "FF3300";
-$colour_line_in = "FF0000";
-$colour_area_out = "FF6633";
-$colour_line_out = "CC3300";
+$units='';
+$units_descr='Packets/sec';
+$total_units='B';
+$colours_in='greens';
+$multiplier = "1";
+$colours_out = 'blues';
 
-$colour_area_in_max = "FF6633";
-$colour_area_out_max = "FF9966";
+$nototal = 1;
 
-$graph_max = 1;
-
-$unit_text = "Errors";
-
-include("includes/graphs/generic_duplex.inc.php");
+include ("includes/graphs/generic_multi_seperated.inc.php");
 
 ?>

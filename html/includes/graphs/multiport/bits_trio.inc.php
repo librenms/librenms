@@ -9,10 +9,10 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
   foreach(explode(",", $_GET['ports']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
-    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
       if(strstr($inverse, "a")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
-      $rrd_options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
-      $rrd_options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
       $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
       $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
       $pluses .= $plus;
@@ -25,10 +25,10 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
   foreach(explode(",", $_GET['ports_b']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
-    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
       if(strstr($inverse, "b")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
-      $rrd_options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
-      $rrd_options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
       $in_thingb .= $seperator . "inoctetsb" . $i . ",UN,0," . "inoctetsb" . $i . ",IF";
       $out_thingb .= $seperator . "outoctetsb" . $i . ",UN,0," . "outoctetsb" . $i . ",IF";
       $plusesb .= $plus;
@@ -43,8 +43,8 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       if(strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
-      $rrd_options .= " DEF:inoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
-      $rrd_options .= " DEF:outoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:inoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
+      $rrd_options .= " DEF:outoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
       $in_thingc .= $seperator . "inoctetsc" . $i . ",UN,0," . "inoctetsc" . $i . ",IF";
       $out_thingc .= $seperator . "outoctetsc" . $i . ",UN,0," . "outoctetsc" . $i . ",IF";
       $plusesc .= $plus;

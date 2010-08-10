@@ -1,4 +1,4 @@
-[B<?php
+<?php
 
   unset($ports);
   $ports = snmp_cache_ifIndex($device); // Cache Port List
@@ -6,9 +6,11 @@
   // Build SNMP Cache Array
   $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
                      'ifPromiscuousMode','ifConnectorPresent','ifDuplex');
+
   $stat_oids = array('ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInNUcastPkts', 'ifOutNUcastPkts', 
                      'ifHCInMulticastPkts', 'ifHCInBroadcastPkts', 'ifHCOutMulticastPkts', 'ifHCOutBroadcastPkts',
-                     'ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets');
+                     'ifInOctets', 'ifOutOctets', 'ifHCInOctets', 'ifHCOutOctets', 'ifInDiscards', 'ifOutDiscards', 'ifInUnknownProtos',
+                     'ifInBroadcastPkts', 'ifOutBroadcastPkts', 'ifInMulticastPkts', 'ifOutMulticastPkts');
 
   $stat_oids_db = array('ifInOctets', 'ifOutOctets', 'ifInErrors', 'ifOutErrors', 'ifInUcastPkts', 'ifOutUcastPkts'); // From above for DB
 
@@ -114,6 +116,14 @@
 	$this_port['ifOutOctets'] = $this_port['ifHCOutOctets'];
       }
 
+      if(is_numeric($this_port['ifHCInBroadcastPkts']) && is_numeric($this_port['ifHCOutBroadcastPkts']) && is_numeric($this_port['ifHCInMulticastPkts']) && is_numeric($this_port['ifHCOutMulticastPkts'])) {
+        echo("HC ");
+        $this_port['ifInBroadcastPkts'] = $this_port['ifHCInBroadcastPkts'];
+        $this_port['ifOutBroadcastPkts'] = $this_port['ifHCOutBroadcastPkts'];
+        $this_port['ifInMulticastPkts'] = $this_port['ifHCInMulticastPkts'];
+        $this_port['ifOutMulticastPkts'] = $this_port['ifHCOutMulticastPkts'];
+      }
+
       ### Overwrite ifSpeed with ifHighSpeed if it's over 10G
       if(is_numeric($this_port['ifHighSpeed']) && $this_port['ifSpeed'] > "1000000000")
       {
@@ -176,7 +186,7 @@
       }
 
       /// Update RRDs
-      $rrdfile = $host_rrd . "/" . safename($port['ifIndex'] . ".rrd");
+      $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
       if(!is_file($rrdfile)) {
         $woo = shell_exec($config['rrdtool'] . " create $rrdfile -s 300 \
         DS:INOCTETS:DERIVE:600:0:12500000000 \
@@ -187,6 +197,13 @@
         DS:OUTUCASTPKTS:DERIVE:600:0:12500000000 \
         DS:INNUCASTPKTS:DERIVE:600:0:12500000000 \
         DS:OUTNUCASTPKTS:DERIVE:600:0:12500000000 \
+        DS:INDISCARDS:DERIVE:600:0:12500000000 \
+        DS:OUTDISCARDS:DERIVE:600:0:12500000000 \
+        DS:INUNKNOWNPROTOS:DERIVE:600:0:12500000000 \
+        DS:INBROADCASTPKTS:DERIVE:600:0:12500000000 \
+        DS:OUTBROADCASTPKTS:DERIVE:600:0:12500000000 \
+        DS:INMULTICASTPKTS:DERIVE:600:0:12500000000 \
+        DS:OUTMULTICASTPKTS:DERIVE:600:0:12500000000 \
         RRA:AVERAGE:0.5:1:600 \
         RRA:AVERAGE:0.5:6:700 \
         RRA:AVERAGE:0.5:24:775 \
@@ -197,36 +214,21 @@
         RRA:MAX:0.5:288:797");
       }
 
-      $ifx_rrd = $host_rrd . "/ifx-" . safename($port['ifIndex'] . ".rrd");
-      $ifx_rrd_cmd = $config['rrdtool'] . " create $ifx_rrd -s 300 \
-        DS:InBroadcastPkts:DERIVE:600:0:12500000000 \
-        DS:OutBroadcastPkts:DERIVE:600:0:12500000000 \
-        DS:InMulticastPkts:DERIVE:600:0:12500000000 \
-        DS:OutMulticastPkts:DERIVE:600:0:12500000000 \
-        RRA:AVERAGE:0.5:1:600 \
-        RRA:AVERAGE:0.5:6:700 \
-        RRA:AVERAGE:0.5:24:775 \
-        RRA:AVERAGE:0.5:288:797 \
-        RRA:MAX:0.5:1:600 \
-        RRA:MAX:0.5:6:700 \
-        RRA:MAX:0.5:24:775 \
-        RRA:MAX:0.5:288:797";
-
-
       foreach ($stat_oids as $oid) {  /// Copy values from array to global variables and force numeric.
         $$oid = $this_port[$oid];      
         if(!is_numeric($$oid)) { $$oid = "0"; }
       }
 
-      $if_rrd_update = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts";
+      $if_rrd_update  = "$polled:$ifInOctets:$ifOutOctets:$ifInErrors:$ifOutErrors:$ifInUcastPkts:$ifOutUcastPkts:$ifInNUcastPkts:$ifOutNUcastPkts:$ifInDiscards:$ifOutDiscards:$ifInUnknownProtos";
+      $if_rrd_update .= ":$ifInBroadcastPkts:$ifOutBroadcastPkts:$ifInMulticastPkts:$ifOutMulticastPkts";
       $ret = rrdtool_update("$rrdfile", $if_rrd_update);
 
 
-      if($config['enable_ports_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
-        if(!is_file($ifx_rrd)) { shell_exec($ifx_rrd_cmd); }
-        $ifx_rrd_update = "$polled:$ifHCInBroadcastPkts:$ifHCOutBroadcastPkts:$ifHCInMulticastPkts:$ifHCOutMulticastPkts";
-        $ret = rrdtool_update($ifx_rrd, $ifx_rrd_update);
-      }
+#      if($config['enable_ports_Xbcmc'] && $config['os'][$device['os']]['ifXmcbc']) {
+#        if(!is_file($ifx_rrd)) { shell_exec($ifx_rrd_cmd); }
+#        $ifx_rrd_update = "$polled:$ifHCInBroadcastPkts:$ifHCOutBroadcastPkts:$ifHCInMulticastPkts:$ifHCOutMulticastPkts";
+#        $ret = rrdtool_update($ifx_rrd, $ifx_rrd_update);
+#      }
 
       /// End Update IF-MIB
 

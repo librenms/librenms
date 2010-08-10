@@ -6,6 +6,9 @@ if(is_numeric($id) && port_permitted($id)) {
   $title  = generate_device_link($device);
   $title .= " :: Port  ".generate_port_link($port);
   $auth = TRUE;
+
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
+
 }
 
 ?>

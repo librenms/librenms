@@ -1,8 +1,7 @@
 <?php
 
-if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd")))
+if(1)
 {
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
 
   $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[1]['descr'] = $int['ifDescr'];
