@@ -3,7 +3,7 @@
 if(1)
 {
 
-  $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+  $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[1]['descr'] = $int['ifDescr'];
   $rrd_list[1]['rra_in'] = "InBroadcastPkts";
   $rrd_list[1]['rra_out'] = "OutBroadcastPkts";
@@ -11,7 +11,7 @@ if(1)
   $rrd_list[1]['colour_area_in'] = "BB77BB";
   $rrd_list[1]['colour_area_out'] = "FFDD88";
 
-  $rrd_list[4]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/ifx-" . safename($port['ifIndex'] . ".rrd");
+  $rrd_list[4]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[4]['descr'] = $int['ifDescr'];
   $rrd_list[4]['rra_in'] = "InMulticastPkts";
   $rrd_list[4]['rra_out'] = "OutMulticastPkts";
