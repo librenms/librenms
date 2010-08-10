@@ -12,24 +12,36 @@ if($_GET['user_id']) {
   // Perform actions if requested
 
   if($_GET['action'] == "deldevperm") {
-    mysql_query("DELETE FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    if(mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("DELETE FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    }
   }
   if($_GET['action'] == "adddevperm") {
-    mysql_query("INSERT INTO devices_perms (`device_id`, `user_id`) VALUES ('" . $_GET['device_id'] . "', '" . $_GET['user_id'] . "')");
+    if(!mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("INSERT INTO devices_perms (`device_id`, `user_id`) VALUES ('" . $_GET['device_id'] . "', '" . $_GET['user_id'] . "')");
+    }
   }
 
   if($_GET['action'] == "delifperm") {
-    mysql_query("DELETE FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    if(mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("DELETE FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    }
   }
   if($_GET['action'] == "addifperm") {
-    mysql_query("INSERT INTO ports_perms (`interface_id`, `user_id`) VALUES ('" . $_GET['interface_id'] . "', '" . $_GET['user_id'] . "')");
+    if(!mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("INSERT INTO ports_perms (`interface_id`, `user_id`) VALUES ('" . $_GET['interface_id'] . "', '" . $_GET['user_id'] . "')");
+    }
   }
 
   if($_GET['action'] == "delbillperm") {
-    mysql_query("DELETE FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    if(mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("DELETE FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
+    }
   }
   if($_GET['action'] == "addbillperm") {
-    mysql_query("INSERT INTO bill_perms (`bill_id`, `user_id`) VALUES ('" . $_GET['bill_id'] . "', '" . $_GET['user_id'] . "')");
+    if(!mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      mysql_query("INSERT INTO bill_perms (`bill_id`, `user_id`) VALUES ('" . $_GET['bill_id'] . "', '" . $_GET['user_id'] . "')");
+    }
   }
 
 
@@ -39,6 +51,16 @@ echo("<table width=100%><tr><td valign=top width=33%>");
 
   // Display devices this users has access to
   echo("<h3>Device Access</h3>");
+
+  $device_perm_data = mysql_query("SELECT * from devices_perms as P, devices as D WHERE `user_id` = '" . $_GET['user_id'] . "' AND D.device_id = P.device_id");
+  while($device_perm = mysql_fetch_array($device_perm_data)) {
+    echo("<strong>" . $device_perm['hostname'] . " <a href='?page=edituser&action=deldevperm&user_id=" . $_GET['user_id'] . "&device_id=" . $device_perm['device_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a></strong><br />");
+    $access_list[] = $device_perm['device_id'];
+    $permdone = "yes";
+  }
+
+  if(!$permdone) { echo("None Configured"); }
+
 
   // Display devices this user doesn't have access to
   echo("<h4>Grant access to new device</h4>");
@@ -58,16 +80,6 @@ echo("<table width=100%><tr><td valign=top width=33%>");
   }
 
   echo("</select> <input type='submit' name='Submit' value='Add'></form>");
-
-
-  $device_perm_data = mysql_query("SELECT * from devices_perms as P, devices as D WHERE `user_id` = '" . $_GET['user_id'] . "' AND D.device_id = P.device_id");
-  while($device_perm = mysql_fetch_array($device_perm_data)) {
-    echo($device_perm['hostname'] . " <a href='?page=edituser&action=deldevperm&user_id=" . $_GET['user_id'] . "&device_id=" . $device_perm['device_id'] . "'><img src='images/16/cross.png' align=absmiddle border=0></a><br />");
-    $access_list[] = $device_perm['device_id'];
-    $permdone = "yes";
-  }
-
-  if(!$permdone) { echo("None Configured"); }
 
   echo("</td><td valign=top width=33%>");
   echo("<h3>Interface Access</h3>");
