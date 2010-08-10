@@ -19,6 +19,7 @@ if ($device['os'] == "linux")
       $temperature_oid  = "1.3.6.1.4.1.2021.13.16.2.1.3.$temperature_id";
       $temperature = snmp_get($device, $temperature_oid, "-Ovq") / 1000;
       $descr = str_ireplace("temperature-", "", $descr);
+      $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
       if($temperature != "0" && $temperature <= "1000")
       {

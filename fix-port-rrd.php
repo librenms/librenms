@@ -20,7 +20,7 @@
 		fixRdd($file);
 		$i++;
 		if(date("U") - $start > 1)
-			echo round(($i / $count) * 100, 2) . "%\n";
+			echo round(($i / $count) * 100, 2) . "%  \r";
 	}
 
 	function getDirectoryTree( $outerDir, &$files = array()){ 
@@ -190,9 +190,9 @@ THIRD;
 			$fileC = str_replace('</row>', $third, $fileC);		
 			$tmpfname = tempnam("/tmp", "OBS");
 			file_put_contents($tmpfname, $fileC);
-			unlink($file);
+			@unlink($file);
 			$newfile = preg_replace("/(\d+)\.rrd/", "port-\\1.rrd", $file);
-			unlink($newfile);
+			@unlink($newfile);
 			shell_exec($config['rrdtool'] . " restore $tmpfname  $newfile");
 			unlink($tmpfname);
 
@@ -200,6 +200,8 @@ THIRD;
 
 		
 	}
+	
+	echo "\n";
 
 ?>
 
