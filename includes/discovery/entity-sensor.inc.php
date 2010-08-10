@@ -2,7 +2,7 @@
 
 global $valid_sensor;
 
-echo("ENTITY-SENSOR ");
+echo(" ENTITY-SENSOR");
 
 $oids = array();  
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorType", $oids, "ENTITY-SENSOR-MIB");

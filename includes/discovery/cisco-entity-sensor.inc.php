@@ -4,7 +4,7 @@ global $valid_sensor;
 
 if ($device['os'] == "ios" || $device['os_group'] == "ios") 
 {
-  echo("CISCO-ENTITY-SENSOR");
+  echo(" CISCO-ENTITY-SENSOR");
 
   $oids = array();  
 
@@ -78,6 +78,5 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
     }
   }
 }
-
 
 ?>

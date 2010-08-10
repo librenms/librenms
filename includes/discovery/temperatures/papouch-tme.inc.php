@@ -13,7 +13,7 @@ if ($device['os'] == "papouch-tme")
   {
     $temperature_oid = ".1.3.6.1.4.1.18248.1.1.1.0";
     $descr = trim(str_replace("\"", "", $descr));
-    discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, "1", 'papouch-tme', $descr, '1', '1', NULL, NULL, NULL, NULL, $temperature);
+    discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, "1", 'papouch-tme', $descr, '10', '1', NULL, NULL, NULL, NULL, $temperature);
   }
 }
 
