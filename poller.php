@@ -139,8 +139,6 @@ while ($device = mysql_fetch_assoc($device_query))
     if (is_numeric($uptime)) 
     {
 
-      $graphs['uptime'] = TRUE;
-
       if ( $uptime < $device['uptime'] ) {
         notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device['device_id'], 'reboot', $device['uptime']);
@@ -157,8 +155,6 @@ while ($device = mysql_fetch_assoc($device_query))
       $graphs['uptime'] = TRUE;
 
       echo("Uptime: ".formatUptime($uptime)."\n");
-
-      print_r($graphs);
 
       $poll_update .= $poll_separator . "`uptime` = '$uptime'";
       $poll_separator = ", ";
