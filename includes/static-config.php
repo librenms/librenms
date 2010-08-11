@@ -194,6 +194,17 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+$os = "fortigate";
+$config['os'][$os]['text']              = "Fortinet Fortigate";
+$config['os'][$os]['type']              = "firewall";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+#$config['os'][$os]['over'][1]['graph']  = "device_processors";
+#$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+#$config['os'][$os]['over'][2]['graph']  = "device_mempools";
+#$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
+
 $os = "routeros";
 $config['os'][$os]['text']		= "Mikrotik RouterOS";
 $config['os'][$os]['type']		= "network";
@@ -447,25 +458,25 @@ $config['os'][$os]['over'][0]['text']   = "Current";
 $os = "akcp";
 $config['os'][$os]['text']              = "AKCP SensorProbe";
 $config['os'][$os]['type']              = "environment";
-$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 
 $os = "minkelsrms";
 $config['os'][$os]['text']        	= "Minkels RMS";
 $config['os'][$os]['type']        	= "environment";
-$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 
 $os = "wxgoos";
 $config['os'][$os]['text']              = "ITWatchDogs Goose";
 $config['os'][$os]['type']              = "environment";
-$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 
 $os = "papouch-tme";
 $config['os'][$os]['text']       	= "Papouch TME";
 $config['os'][$os]['type']       	= "environment";
-$config['os'][$os]['over'][0]['graph']  = "device_temperature";
+$config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 
 $os = "dell-laser";
@@ -573,9 +584,9 @@ $config['graph_types']['device']['cras_sessions']['descr'] = 'Remote Access Sess
 $config['graph_types']['device']['fortigate_sessions']['section'] = 'firewall';
 $config['graph_types']['device']['fortigate_sessions']['order'] = '0';
 $config['graph_types']['device']['fortigate_sessions']['descr'] = 'Active Sessions';
-$config['graph_types']['device']['screenos_settings']['section'] = 'firewall';
-$config['graph_types']['device']['screenos_settings']['order'] = '0';
-$config['graph_types']['device']['screenos_settings']['descr'] = 'Active Sessions';
+$config['graph_types']['device']['screenos_sessions']['section'] = 'firewall';
+$config['graph_types']['device']['screenos_sessions']['order'] = '0';
+$config['graph_types']['device']['screenos_sessions']['descr'] = 'Active Sessions';
 
 $config['graph_types']['device']['bits']['section'] = 'netstats';
 $config['graph_types']['device']['bits']['order'] = '0';
