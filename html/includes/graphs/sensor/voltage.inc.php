@@ -21,7 +21,7 @@ $rrd_options .= " AREA:volt_min#ffffffff";
 
 #$rrd_options .= " AREA:volt#FFFF99";
 $rrd_options .= " LINE1.5:volt#cc0000:'" . $sensor['sensor_descr_fixed']."'";
-$rrd_options .= " GPRINT:volt:LAST:%3.2lfV";
-$rrd_options .= " GPRINT:volt:MAX:%3.2lfV\\\\l";
+$rrd_options .= " GPRINT:volt:LAST:%6.2lfV";
+$rrd_options .= " GPRINT:volt:MAX:%6.2lfV\\\\l";
 
 ?>

@@ -29,6 +29,9 @@ if($device['os'] == "ironware")
         $descr = str_replace("Active management module", "Mgmt Module", $descr);
         $descr = str_replace("  ", " ", $descr);
         $descr = trim($descr);
+        
+        $current = $temperature / 2;
+
         discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $oid, 'ironware', $descr, '2', '1', NULL, NULL, NULL, NULL, $current);
       }
     }

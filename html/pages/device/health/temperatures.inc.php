@@ -12,13 +12,14 @@ while($temp = mysql_fetch_array($query)) {
   if(!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
-          <td width=450>" . $temp['sensor_descr'] . "</td>
-          <td >" . $temp['sensor_type'] . "</td>
-          <td width=50>" . print_temperature($temp['sensor_current'], $temp['sensor_limit']) . " &deg;C</td>
-          <td width=50>" . $temp['sensor_limit'] . " &deg;C</td>
+          <td width=400>" . $temp['sensor_descr'] . "</td>
+          <td width=100>" . $temp['sensor_type'] . "</td>
+          <td width=50>" . print_temperature($temp['sensor_current'], $temp['sensor_limit']) . "&deg;C</td>
+          <td width=50>" . $temp['sensor_limit'] . "&deg;C</td>
+          <td width=50>" . $temp['sensor_limit_low'] . "&deg;C</td>
           <td width=350>" . $temp['sensor_notes'] . "</td>
         </tr>\n");
-  echo("<tr  bgcolor=$row_colour><td colspan='5'>");
+  echo("<tr  bgcolor=$row_colour><td colspan='6'>");
 
   $graph_type = "sensor_temperature";
 
