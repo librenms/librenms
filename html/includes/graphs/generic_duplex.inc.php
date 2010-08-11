@@ -5,7 +5,16 @@
 
 include("includes/graphs/common.inc.php");
 
-$unit_text = str_pad(truncate($unit_text,10),10);
+$length = "10";
+
+if(!isset($percentile)) { $length += "2"; }
+
+if(!isset($out_text)) { $out_text = "Out"; }
+if(!isset($in_text)) { $in_text = "In"; }
+
+$unit_text = str_pad(truncate($unit_text,$length),$length);
+$in_text   = str_pad(truncate($in_text,$length),$length);
+$out_text   = str_pad(truncate($out_text,$length),$length);
 
 $rrd_options .= " DEF:".$out."=".$rrd_filename.":".$rra_out.":AVERAGE";
 $rrd_options .= " DEF:".$in."=".$rrd_filename.":".$rra_in.":AVERAGE";
@@ -33,21 +42,21 @@ if($graph_max) {
   $rrd_options .= " AREA:dout_max#".$colour_area_out_max.":";
 }
 $rrd_options .= " AREA:in#".$colour_area_in.":";
-$rrd_options .= " COMMENT:'".$unit_text."Now       Ave      Max";
+$rrd_options .= " COMMENT:'".$unit_text."      Now       Ave      Max";
 if($percentile) {
   $rrd_options .= "      ".$percentile."th %";
 }
 $rrd_options .= "\\n'";
-$rrd_options .= " LINE1.25:in#".$colour_line_in.":'In '";
+$rrd_options .= " LINE1.25:in#".$colour_line_in.":'".$in_text."'";
 $rrd_options .= " GPRINT:in:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:in:AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:in_max:MAX:%6.2lf%s";
 if($percentile) {
   $rrd_options .= " GPRINT:percentile_in:%6.2lf%s";
 }
-$rrd_options .= " COMMENT:\\\\n";
+$rrd_options .= " COMMENT:'\\n'";
 $rrd_options .= " AREA:dout#".$colour_area_out.":";
-$rrd_options .= " LINE1.25:dout#".$colour_line_out.":Out";
+$rrd_options .= " LINE1.25:dout#".$colour_line_out.":'".$out_text."'";
 $rrd_options .= " GPRINT:out:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:out:AVERAGE:%6.2lf%s";
 $rrd_options .= " GPRINT:out_max:MAX:%6.2lf%s";
