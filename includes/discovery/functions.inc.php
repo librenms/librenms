@@ -1,14 +1,15 @@
 <?php
-function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+function  discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
-  if(!$low_limit)
-  {
-    $low_limit = $config['limit']['current'];
-  } 
+
   if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
+
+    if(!$high_limit) { $high_limit = sensor_limit($class, $current); }
+    if(!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
+
     $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_divisor`, `sensor_multiplier`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
     $query .= " VALUES ('" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$divisor', '$multiplier', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
     mysql_query($query);
@@ -20,6 +21,23 @@ function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $d
   else
   {
     $sensor_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+
+    if(!$sensor_entry['sensor_limit'])      
+    { 
+      $high_limit = sensor_limit($class, $current); 
+      mysql_query("UPDATE sensors SET `sensor_limit` = '".$high_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
+      echo("H");
+      log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device['device_id'], 'sensor', $sensor_id);
+    }
+
+    if(!$sensor_entry['sensor_low_limit'])  
+    { 
+      $low_limit  = sensor_low_limit($class, $current); 
+      mysql_query("UPDATE sensors SET `sensor_limit_low` = '".$low_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
+      echo("L");
+      log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device['device_id'], 'sensor', $sensor_id);
+    }
+
     if($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'])
     {
       echo(".");
@@ -34,6 +52,61 @@ function  discover_sensor     (&$valid, $class, $device, $oid, $index, $type, $d
   }
   $valid[$class][$type][$index] = 1;
   return $return;
+}
+
+function sensor_low_limit ($class, $current) {
+
+  $limit = NULL;
+
+  switch($class) {
+    case 'temperature':
+     $limit = $current * 0.7; 
+     break;
+    case 'voltage':
+     $limit = $current * 0.95; 
+     break;
+    case 'humidity':
+     $limit = "70"; 
+     break;
+    case 'freq':
+     $limit = $current * 0.95; 
+     break;
+    case 'current':
+     $limit = $current * 0.90; 
+     break;
+    case 'fanspeed':
+     $limit = $current * 0.80; 
+     break;
+  }
+  return $limit;
+}
+
+
+function sensor_limit ($class, $current) {
+
+  $limit = NULL;
+
+  switch($class) {
+    case 'temperature':
+     $limit = $current * 1.20; 
+     break;
+    case 'voltage':
+     $limit = $current * 1.05; 
+     break;
+    case 'humidity':
+     $limit = "70"; 
+     break;
+    case 'freq':
+     $limit = $current * 1.05; 
+     break;
+    case 'current':
+     $limit = $current * 1.10; 
+     break;
+    case 'fanspeed':
+     $limit = $current * 1.30; 
+     break;
+  }
+  return $limit;
 }
 
 function check_valid_sensors($device, $class, $valid) {

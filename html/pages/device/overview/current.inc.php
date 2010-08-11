@@ -9,8 +9,6 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
   $i = '1';
   $currents = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'");
   echo("<table width=100% valign=top>");
-  echo("<tr><td width=50%>");
-  echo("<table width=100% cellspacing=0 cellpadding=2>");
   while($current = mysql_fetch_array($currents)) {
     if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
@@ -32,11 +30,8 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $current['sensor_descr'] = truncate($current['sensor_descr'], 25, '');
     echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$current_link_a</strong></td><td width=80 align=right class=tablehead>$current_link_b<td width=80 align=right class=tablehead>$current_link_c</td></tr>");
-    if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
-  echo("</table>");
-  echo("</td></tr>");
   echo("</table>");
   echo("</div>");
 }
