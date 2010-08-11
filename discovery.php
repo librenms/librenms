@@ -120,17 +120,11 @@ while ($device = mysql_fetch_array($device_query))
   #include("includes/discovery/os.inc.php");
 
   include("includes/discovery/ports.inc.php");
-#  include("includes/discovery/entity-physical.inc.php");
+  include("includes/discovery/entity-physical.inc.php");
   include("includes/discovery/processors.inc.php");
   include("includes/discovery/mempools.inc.php");
   include("includes/discovery/ipv4-addresses.inc.php");
   include("includes/discovery/ipv6-addresses.inc.php");
-#  include("includes/discovery/temperatures.inc.php");
-#  include("includes/discovery/humidity.inc.php");
-#  include("includes/discovery/voltages.inc.php");
-#  include("includes/discovery/frequencies.inc.php");
-#  include("includes/discovery/current.inc.php");
-#  include("includes/discovery/fanspeeds.inc.php");
   include("includes/discovery/sensors.inc.php");
   include("includes/discovery/storage.inc.php");
   include("includes/discovery/hr-device.inc.php");

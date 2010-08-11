@@ -4,10 +4,26 @@ global $valid_sensor;
 
 echo(" ENTITY-SENSOR");
 
+  echo("\nCaching OIDs:");
+
+  if(!is_array($entity_array))
+  {
+    $entity_array = array();
+    echo(" entPhysicalDescr");
+    $entity_array = snmpwalk_cache_multi_oid($device, "entPhysicalDescr", $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+    echo(" entPhysicalName");
+    $entity_array = snmpwalk_cache_multi_oid($device, "entPhysicalName", $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+  }
+
+
 $oids = array();  
+echo(" entPhySensorType");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorType", $oids, "ENTITY-SENSOR-MIB");
+echo(" entPhySensorScale");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorScale", $oids, "ENTITY-SENSOR-MIB");
+echo(" entPhySensorPrecision");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorPrecision", $oids, "ENTITY-SENSOR-MIB");
+echo(" entPhySensorValue");
 $oids = snmpwalk_cache_multi_oid($device, "entPhySensorValue", $oids, "ENTITY-SENSOR-MIB");
 
 $entitysensor['voltsDC']   = "voltage";
@@ -19,22 +35,27 @@ $entitysensor['percentRH'] = "humidity";
 $entitysensor['rpm']       = "fanspeed";
 $entitysensor['celsius']   = "temperature";
 
-if(is_array($oids[$device['device_id']]))
+if(is_array($oids))
 {
-  foreach($oids[$device['device_id']] as $index => $entry)
+  foreach($oids as $index => $entry)
   {
     #echo("[" . $entry['entPhySensorType'] . "|" . $entry['entPhySensorValue']. "|" . $index . "]");
 
     if($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index))
     {
       $entPhysicalIndex = $index;
-      $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-SENSOR-MIB");
       $oid = ".1.3.6.1.2.1.99.1.1.1.4.".$index;
       $current = $entry['entPhySensorValue'];
       #ENTITY-SENSOR-MIB::entPhySensorUnitsDisplay.11 = STRING: "C"
 
-      $descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
-      if(!$descr) { $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); }
+      $descr = $entity_array[$index]['entPhysicalName'];
+      if($descr || $device['os'] == "iosxr")
+      {
+        $descr = rewrite_entity_descr($descr);
+      } else {
+        $descr = $entity_array[$index]['entPhysicalDescr'];
+        $descr = rewrite_entity_descr($descr);
+      }
 
       $valid = TRUE;
 
@@ -59,6 +80,8 @@ if(is_array($oids[$device['device_id']]))
       if($type == "temperature") { if($current > "200"){ $valid = FALSE; } $descr = preg_replace("/[T|t]emperature[|s]/", "", $descr); }
 
       #echo($descr . "|" . $index . "|" .$current . "|" . $multiplier . "|" . $divisor ."|" . $entry['entPhySensorScale'] . "|" . $entry['entPhySensorPrecision'] . "\n");
+
+      if($current == "-127") { $valid = FALSE; }
 
       if($valid && mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."' AND `sensor_class` = '".$type."' AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = '".$index."'"),0) == "0") 
       ## Check to make sure we've not already seen this sensor via cisco's entity sensor mib

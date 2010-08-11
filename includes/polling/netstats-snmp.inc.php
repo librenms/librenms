@@ -27,15 +27,15 @@ if($device[os] != "Snom") {
     $rrdupdate = "N";
 
     foreach($oids as $oid){
-      if(is_numeric($data_array[$device['device_id']][0][$oid])) {
-         $value = $data_array[$device['device_id']][0][$oid];
+      if(is_numeric($data_array[0][$oid])) {
+         $value = $data_array[0][$oid];
       } else { 
         $value = "0"; 
       }
       $rrdupdate .= ":$value";
     }
 
-    if(isset($data_array[$device['device_id']][0]['snmpInPkts']) && isset($data_array[$device['device_id']][0]['snmpOutPkts'])) {
+    if(isset($data_array[0]['snmpInPkts']) && isset($data_array[0]['snmpOutPkts'])) {
       if(!file_exists($rrd_file)) { rrdtool_create($rrd_file, $rrd_create); }
       rrdtool_update($rrd_file, $rrdupdate);
       $graphs['netstat_snmp'] = TRUE;

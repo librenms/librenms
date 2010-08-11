@@ -12,9 +12,9 @@ if ($device['os'] == 'ies')
   $oids = snmpwalk_cache_multi_oid($device, "accessSwitchSysTempCurValue", $oids, "ZYXEL-AS-MIB");
   $oids = snmpwalk_cache_multi_oid($device, "accessSwitchSysTempHighThresh", $oids, "ZYXEL-AS-MIB");
   
-  if(is_array($oids[$device['device_id']]))
+  if(is_array($oids))
   {
-    foreach($oids[$device[device_id]] as $index => $entry)
+    foreach($oids as $index => $entry)
     {
       $entPhysicalIndex = $index;
       $descr = trim(snmp_get($device, "accessSwitchSysTempDescr.".$index, "-Oqv", "ZYXEL-AS-MIB"),'"');

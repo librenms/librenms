@@ -12,7 +12,7 @@ if(!is_array($mempool_cache['junos'])) {
   if($debug) {print_r($mempool_cache);}
 }
 
-$entry = $mempool_cache['junos'][$device[device_id]][$mempool[mempool_index]];
+$entry = $mempool_cache['junos'][$mempool[mempool_index]];
 
 $perc = $entry['jnxOperatingBuffer'];
 $mempool['total'] = $entry['jnxOperatingDRAMSize'];

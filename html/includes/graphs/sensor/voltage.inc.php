@@ -24,4 +24,7 @@ $rrd_options .= " LINE1.5:volt#cc0000:'" . $sensor['sensor_descr_fixed']."'";
 $rrd_options .= " GPRINT:volt:LAST:%6.2lfV";
 $rrd_options .= " GPRINT:volt:MAX:%6.2lfV\\\\l";
 
+if(is_numeric($sensor['sensor_limit'])) $rrd_options .= " HRULE:".$sensor['sensor_limit']."#999999::dashes";
+if(is_numeric($sensor['sensor_limit_low'])) $rrd_options .= " HRULE:".$sensor['sensor_limit_low']."#999999::dashes";
+
 ?>

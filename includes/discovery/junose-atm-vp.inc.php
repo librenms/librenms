@@ -12,8 +12,8 @@ if($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
   $valid_vp = array();
   if($debug) { print_r($vp_array); }
 
-  if(is_array($vp_array[$device['device_id']])) {
-    foreach($vp_array[$device['device_id']] as $index => $entry) {
+  if(is_array($vp_array)) {
+    foreach($vp_array as $index => $entry) {
 
         list($ifIndex,$vp_id)= explode('.', $index);      
 

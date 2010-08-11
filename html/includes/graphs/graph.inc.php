@@ -100,7 +100,7 @@ if(!$auth)
    graph_error("No Authorisation");
   }
 } else {
-  $rrd_options .= " HRULE:0#999999";
+  #$rrd_options .= " HRULE:0#999999";
   if($no_file)
   {
     if($width < 200)

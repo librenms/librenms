@@ -5,8 +5,8 @@
   $valid_diskio = array();
 #  if($debug) { print_r($diskio_array); }
 
-  if(is_array($diskio_array[$device['device_id']])) {
-    foreach($diskio_array[$device['device_id']] as $index => $entry) {
+  if(is_array($diskio_array)) {
+    foreach($diskio_array as $index => $entry) {
 
       if($entry['diskIONRead'] > "0" || $entry['diskIONWritten'] > "0") {
         if ($debug) { echo("$index ".$entry['diskIODevice']."\n"); }

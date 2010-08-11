@@ -11,9 +11,9 @@ if($device['os'] == "junos")
   $processors_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDescr", $processors_array, "JUNIPER-MIB" , '+'.$config['install_dir']."/mibs/junos");
   if ($debug) { print_r($processors_array); }
 
-  if (is_array($processors_array[$device['device_id']]))
+  if (is_array($processors_array))
   {
-    foreach ($processors_array[$device['device_id']] as $index => $entry) 
+    foreach ($processors_array as $index => $entry) 
     {
       if ($entry['jnxOperatingDescr'] == "Routing Engine" || $entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan")) 
       {

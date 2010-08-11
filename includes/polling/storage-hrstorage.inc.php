@@ -7,7 +7,7 @@ if(!is_array($storage_cache['hrstorage'])) {
   if ($debug) { print_r($storage_cache); }
 }
 
-$entry = $storage_cache['hrstorage'][$device[device_id]][$storage[storage_index]];
+$entry = $storage_cache['hrstorage'][$storage[storage_index]];
 
 $storage['units'] = $entry['hrStorageAllocationUnits'];
 $storage['used'] = $entry['hrStorageUsed'] * $storage['units'];

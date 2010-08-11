@@ -33,7 +33,6 @@
   #UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
 
   $ss = snmpwalk_cache_oid($device, "systemStats", array());
-  $ss = $ss[$device['device_id']][0];
 
   ## Create CPU RRD if it doesn't already exist
   $cpu_rrd_create = " --step 300 \

@@ -23,7 +23,7 @@ global $valid_mempool;
 
 if(is_array($array)) {
   echo("procurve : ");
-  foreach($array[$device[device_id]] as $index => $mempool) 
+  foreach($array as $index => $mempool) 
   {
     if(is_numeric($index) && is_numeric($mempool['hpLocalMemTotalBytes'])) {
       discover_mempool($valid_mempool, $device, $index, "hpLocal", "Local Memory ".$index, NULL, NULL, NULL);

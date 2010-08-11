@@ -96,9 +96,9 @@
   while ($port = mysql_fetch_array($port_query)) {
     
     echo("Port " . $port['ifDescr'] . " ");   
-    if($port_stats[$device['device_id']][$port['ifIndex']] && $port['ignore'] == "0") { // Check to make sure Port data is cached.
+    if($port_stats[$port['ifIndex']] && $port['ignore'] == "0") { // Check to make sure Port data is cached.
 
-      $this_port = &$port_stats[$device['device_id']][$port['ifIndex']];
+      $this_port = &$port_stats[$port['ifIndex']];
 
       $polled_period = $polled - $port['poll_time'];
 

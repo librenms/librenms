@@ -23,7 +23,7 @@ while ($acc = mysql_fetch_assoc($mac_accounting_query)) {
 
   $polled_period = $polled - $acc['poll_time'];
 
-  if($cip_array[$device_id][$ifIndex][$mac]) {
+  if($cip_array[$ifIndex][$mac]) {
 
     $update .= "`poll_time` = '".$polled."'";
     $update .= ", `poll_prev` = '".$acc['poll_time']."'";
@@ -31,12 +31,12 @@ while ($acc = mysql_fetch_assoc($mac_accounting_query)) {
 
     $mac_entries++;
 
-    $b_in = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
-    $b_out = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
-    $p_in = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
-    $p_out = $cip_array[$device_id][$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
+    $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
+    $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
+    $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
+    $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
 
-    $this_ma = &$cip_array[$device_id][$ifIndex][$mac]; 
+    $this_ma = &$cip_array[$ifIndex][$mac]; 
 
     /// Update metrics
     foreach ($cip_oids as $oid) {

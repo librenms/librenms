@@ -8,7 +8,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
   $processors_array = snmpwalk_cache_oid($device, "cpmCPU", NULL, "CISCO-PROCESS-MIB");
   if($debug) { print_r($processors_array); }
 
-  foreach ($processors_array[$device['device_id']] as $index => $entry) 
+  foreach ($processors_array as $index => $entry) 
   {
     if (is_numeric($entry['cpmCPUTotal5minRev']) || is_numeric($entry['cpmCPUTotal5min'])) 
     {
