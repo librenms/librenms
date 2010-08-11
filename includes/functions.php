@@ -93,8 +93,10 @@ function getHostOS($device)
 {
   global $config;
   
-  $sysDescr    = snmp_get ($device, "sysDescr.0", "-Ovq");
-  $sysObjectId = snmp_get ($device, "sysObjectID.0", "-Ovqn");
+  $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
+  $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
+
+  echo("| $sysDescr | $sysObjectId | ");
 
   $dir_handle = @opendir($config['install_dir'] . "/includes/discovery/os") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
