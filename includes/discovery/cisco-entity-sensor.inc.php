@@ -133,7 +133,9 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
         $ok = TRUE;
        
-	if($current == "-127") { $ok = FALSE; }
+	if($current == "-127") { $ok = FALSE; }                      	## False reading
+#        if($type == "temperature" && $current < 1) { $ok = FALSE; }	## False reading. Temperature <1 :)
+	if($descr == "") { $ok = FALSE; }				## Invalid description. Lots of these on Nexus
 
         if($ok) {
 #          echo("\n$valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");
