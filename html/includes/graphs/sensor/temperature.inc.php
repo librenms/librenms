@@ -33,4 +33,9 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " GPRINT:temp_min:MIN:%4.1lfC";
   $rrd_options .= " GPRINT:temp_max:MAX:%4.1lfC\\\\l";
 
+  $rrd_options .= " HRULE:".$sensor['sensor_limit']."#999999::dashes";
+  $rrd_options .= " HRULE:".$sensor['sensor_limit_low']."#999999::dashes";
+
+
+
 ?>
