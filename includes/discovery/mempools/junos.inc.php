@@ -11,8 +11,8 @@ if($device['os'] == "junos")
   $mempools_array = snmpwalk_cache_multi_oid($device, "jnxOperatingDescr", $mempools_array, "JUNIPER-MIB" , $config['install_dir']."/mibs/junos");
   if($debug) { print_r($mempools_array); }
 
-  if(is_array($mempools_array[$device['device_id']])) {
-    foreach($mempools_array[$device['device_id']] as $index => $entry) {
+  if(is_array($mempools_array)) {
+    foreach($mempools_array as $index => $entry) {
       if($entry['jnxOperatingDRAMSize'] && !strpos($entry['jnxOperatingDescr'], "sensor") && !strstr($entry['jnxOperatingDescr'], "fan")) {
         if ($debug) { echo($index . " " . $entry['jnxOperatingDescr'] . " -> " . $entry['jnxOperatingBuffer'] . " -> " . $entry['jnxOperatingDRAMSize'] . "\n"); }
         $usage_oid = ".1.3.6.1.4.1.2636.3.1.13.1.8." . $index;

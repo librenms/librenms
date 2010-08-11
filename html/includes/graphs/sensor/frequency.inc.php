@@ -15,4 +15,7 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " GPRINT:freq:LAST:%3.0lfHz";
   $rrd_options .= " GPRINT:freq:MAX:%3.0lfHz\\\\l";
 
+  if(is_numeric($sensor['sensor_limit'])) $rrd_options .= " HRULE:".$sensor['sensor_limit']."#999999::dashes";
+  if(is_numeric($sensor['sensor_limit_low'])) $rrd_options .= " HRULE:".$sensor['sensor_limit_low']."#999999::dashes";
+
 ?>

@@ -6,12 +6,16 @@
 
  if($config['enable_inventory']) {
 
+
+  echo("\nCaching OIDs:");
+
   $entity_array = array();
-  $entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", $entity_array, "ENTITY-MIB");
+  echo(" entPhysicalEntry");
+  $entity_array = snmpwalk_cache_oid($device, "entPhysicalEntry", $entity_array, "ENTITY-MIB");  
+  echo(" entAliasMappingIdentifier");
+  $entity_array = snmpwalk_cache_twopart_oid($device, "entAliasMappingIdentifier", $entity_array, "ENTITY-MIB:IF-MIB");
 
-  if(!$entity_array[$device['device_id']]) { $entity_array[$device['device_id']] = array(); }
-
-  foreach($entity_array[$device['device_id']] as $entPhysicalIndex => $entry) {
+  foreach($entity_array as $entPhysicalIndex => $entry) {
 
     $entPhysicalDescr		= $entry['entPhysicalDescr'];
     $entPhysicalContainedIn	= $entry['entPhysicalContainedIn'];
@@ -29,12 +33,12 @@
     $entPhysicalAlias     	= $entry['entPhysicalAlias'];
     $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
 
+    if(isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }
 
-    $ent_data  = $config['snmpget'] . " -M ".$config['mibdir']." -m ENTITY-MIB:IF-MIB -Ovqs -";
-    $ent_data  .= $device['snmpver'] . " -M ".$config['mibdir']." -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
-    $ent_data .= " entAliasMappingIdentifier." . $entPhysicalIndex. ".0";
-
-    $ifIndex = shell_exec($ent_data);
+#    $ent_data  = $config['snmpget'] . " -M ".$config['mibdir']." -m ENTITY-MIB:IF-MIB -Ovqs -";
+#    $ent_data  .= $device['snmpver'] . " -M ".$config['mibdir']." -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
+#    $ent_data .= " entAliasMappingIdentifier." . $entPhysicalIndex. ".0";
+#    $ifIndex = shell_exec($ent_data);
 
     if(!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
     list(,$ifIndex) = explode(".", $ifIndex);
@@ -65,26 +69,6 @@
         mysql_query($sql);
         echo("+");
       }
-
-#      if($entPhysicalClass == "sensor")
-#      {
-#        $entSensorType            = $entry['entSensorType'];
-#        $entSensorScale           = $entry['entSensorScale'];
-#        $entSensorPrecision       = $entry['entSensorPrecision'];
-#        $entSensorValueUpdateRate = $entry['entSensorValueUpdateRate'];
-#        $entSensorMeasuredEntity  = $entry['entSensorMeasuredEntity'];
-	
-#       if($config['allow_entity_sensor'][$entSensorType]) {
-#          $sql =  "UPDATE `entPhysical` SET entSensorType = '$entSensorType', entSensorScale = '$entSensorScale', entSensorPrecision = '$entSensorPrecision', ";
-#          $sql .= " entSensorMeasuredEntity = '$entSensorMeasuredEntity'";
-#          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
-#        } else {
-#          echo("!");
-#          $sql =  "UPDATE `entPhysical` SET entSensorType = '', entSensorScale = '', entSensorPrecision = '', entSensorMeasuredEntity = ''";
-#          $sql .= " WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'";
-#        }
-#        mysql_query($sql);
-#      }
 
       $valid[$entPhysicalIndex] = 1;
     }

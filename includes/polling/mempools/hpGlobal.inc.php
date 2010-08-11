@@ -13,7 +13,7 @@ if(!is_array($mempool_cache['hpGlobal'])) {
   if ($debug) { print_r($mempool_cache); }
 } else { if($debug) { echo("Cached!"); } }
 
-$entry = $mempool_cache['hpGlobal'][$device[device_id]][$mempool[mempool_index]];
+$entry = $mempool_cache['hpGlobal'][$mempool[mempool_index]];
 
 $mempool['units'] = "1";
 $mempool['used']  = $entry['hpGlobalMemAllocBytes'];

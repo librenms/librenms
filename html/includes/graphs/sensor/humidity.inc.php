@@ -28,4 +28,7 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " GPRINT:humidity:LAST:%3.0lf%%";
   $rrd_options .= " GPRINT:humidity:MAX:%3.0lf%%\\\\l";
 
+  if(is_numeric($sensor['sensor_limit'])) $rrd_options .= " HRULE:".$sensor['sensor_limit']."#999999::dashes";
+  if(is_numeric($sensor['sensor_limit_low'])) $rrd_options .= " HRULE:".$sensor['sensor_limit_low']."#999999::dashes";
+
 ?>

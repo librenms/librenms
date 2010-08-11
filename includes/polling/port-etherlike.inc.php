@@ -1,7 +1,7 @@
 <?php
 
-    if($port_stats[$device['device_id']][$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd" 
-       && isset($port_stats[$device['device_id']][$port['ifIndex']]['dot3StatsIndex'])) { // Check to make sure Port data is cached.
+    if($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd" 
+       && isset($port_stats[$port['ifIndex']]['dot3StatsIndex'])) { // Check to make sure Port data is cached.
 
       $this_port = &$port_stats[$device[device_id]][$port[ifIndex]];
 

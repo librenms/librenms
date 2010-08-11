@@ -9,7 +9,7 @@ if($device['os'] == "junose")
   $processors_array = snmpwalk_cache_double_oid($device, "juniSystemModule", $processors_array, "Juniper-System-MIB" , $config['install_dir']."/mibs/junose");
   if($debug) { print_r($processors_array); }
 
-  foreach ($processors_array[$device['device_id']] as $index => $entry) 
+  foreach ($processors_array as $index => $entry) 
   {
     if ($entry['juniSystemModuleCpuUtilPct'] && $entry['juniSystemModuleCpuUtilPct'] != "-1")
     {

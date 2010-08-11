@@ -32,9 +32,9 @@ if($argv[1] == "--device" && $argv[2]) {
 }
 
 if ($argv[2] == "--type" && $argv[3]) {
-  $type = $argv[3];
+  $discovery_type = $argv[3];
 } elseif ($argv[3] == "--type" && $argv[4]) {
-  $type = $argv[4];
+  $discovery_type = $argv[4];
 } else {
   echo("Require valid discovery type.\n");
   exit;
@@ -42,7 +42,7 @@ if ($argv[2] == "--type" && $argv[3]) {
 
 $devices_polled = 0;
 
-  echo("includes/discovery/".$type.".php \n");
+  echo("includes/discovery/".$discovery_type.".php \n");
 
 #$debug = 1;
 
@@ -53,7 +53,7 @@ while ($device = mysql_fetch_array($device_query)) {
   echo($device['hostname'] . "(".$device['sysName']."|".$device['device_id'].")\n");
   if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo "(".$device['os_group'].")";}
 
-  include("includes/discovery/".$type);
+  include("includes/discovery/".$discovery_type);
 
   echo("\n"); $devices_polled++;
 }

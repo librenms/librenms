@@ -1,4 +1,6 @@
 <?php
+
+### Discover sensors
 function  discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
@@ -22,17 +24,35 @@ function  discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr
   {
     $sensor_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
 
-    if(!$sensor_entry['sensor_limit'])      
+    if(!$high_limit)
     { 
-      $high_limit = sensor_limit($class, $current); 
+      if(!$sensor_entry['sensor_limit'])
+      {
+        $high_limit  = sensor_limit($class, $current);
+      } else {
+        $high_limit = $sensor_entry['sensor_limit'];
+      }
+    }
+
+    if ($high_limit != $sensor_entry['sensor_limit'])
+    {
       mysql_query("UPDATE sensors SET `sensor_limit` = '".$high_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
       echo("H");
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device['device_id'], 'sensor', $sensor_id);
     }
 
-    if(!$sensor_entry['sensor_low_limit'])  
+    if(!$low_limit)
     { 
-      $low_limit  = sensor_low_limit($class, $current); 
+      if(!$sensor_entry['sensor_limit_low'])
+      {
+        $low_limit  = sensor_low_limit($class, $current); 
+      } else {
+        $low_limit = $sensor_entry['sensor_limit_low'];
+      }
+    }
+
+    if ($sensor_entry['sensor_limit_low'] != $low_limit)
+    {
       mysql_query("UPDATE sensors SET `sensor_limit_low` = '".$low_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
       echo("L");
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device['device_id'], 'sensor', $sensor_id);
@@ -72,7 +92,7 @@ function sensor_low_limit ($class, $current) {
      $limit = $current * 0.95; 
      break;
     case 'current':
-     $limit = $current * 0.90; 
+     $limit = $current * 0.80; 
      break;
     case 'fanspeed':
      $limit = $current * 0.80; 
@@ -100,7 +120,7 @@ function sensor_limit ($class, $current) {
      $limit = $current * 1.05; 
      break;
     case 'current':
-     $limit = $current * 1.10; 
+     $limit = $current * 1.20; 
      break;
     case 'fanspeed':
      $limit = $current * 1.30; 

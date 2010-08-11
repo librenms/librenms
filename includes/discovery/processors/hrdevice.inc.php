@@ -8,7 +8,7 @@ unset($hrDevice_array);
 foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
 if(is_array($hrDevice_array))
 {
-  foreach($hrDevice_array[$device['device_id']] as $index => $entry)
+  foreach($hrDevice_array as $index => $entry)
   {
     if ($entry['hrDeviceType'] == "hrDeviceProcessor") 
     {

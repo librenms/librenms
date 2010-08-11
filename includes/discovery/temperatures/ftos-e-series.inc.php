@@ -17,9 +17,9 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
 
   $oids = snmpwalk_cache_oid($device, "chSysCardUpperTemp", array(), "F10-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos" );
 
-  if(is_array($oids[$device['device_id']]))
+  if(is_array($oids))
   {
-    foreach($oids[$device['device_id']] as $index => $entry)
+    foreach($oids as $index => $entry)
     {
       $descr = "Slot ".$index;
       $oid = ".1.3.6.1.4.1.6027.3.1.1.2.3.1.8.".$index;

@@ -6,7 +6,7 @@ $storage_array = snmpwalk_cache_oid($device, "hrStorageEntry", NULL, "HOST-RESOU
 
 if(is_array($storage_array)) {
   echo("hrStorage : ");
-  foreach($storage_array[$device[device_id]] as $index => $storage) 
+  foreach($storage_array as $index => $storage) 
   {
     $fstype = $storage['hrStorageType'];
     $descr  = $storage['hrStorageDescr'];

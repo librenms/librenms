@@ -15,9 +15,9 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
   $oids = snmpwalk_cache_oid($device, "chStackUnitSysType", $oids, "F10-S-SERIES-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos" );
 
 
-  if(is_array($oids[$device['device_id']]))
+  if(is_array($oids))
   {
-    foreach($oids[$device['device_id']] as $index => $entry)
+    foreach($oids as $index => $entry)
     {
       $descr = "Unit ".$index . " " . $entry['chStackUnitSysType'];
       $oid = ".1.3.6.1.4.1.6027.3.10.1.2.2.1.14.".$index;

@@ -9,9 +9,9 @@ $hrDevices = array();
 foreach ($hrDevice_oids as $oid) { $hrDevices = snmpwalk_cache_oid($device, $oid, $hrDevices, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
 if($debug) {print_r($hrDevices);}
 
-if(is_array($hrDevices[$device['device_id']]))
+if(is_array($hrDevices))
 {
-  $hrDevices = $hrDevices[$device['device_id']];
+  $hrDevices = $hrDevices;
   foreach($hrDevices as $hrDevice) 
   {
     if(is_array($hrDevice) && is_numeric($hrDevice['hrDeviceIndex'])) 

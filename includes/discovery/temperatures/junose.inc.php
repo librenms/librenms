@@ -8,9 +8,9 @@ if ($device['os'] == "junose")
 {
   echo("JunOSe: ");
   $oids = snmpwalk_cache_multi_oid($device, "juniSystemTempValue", array(), "Juniper-System-MIB", $config['install_dir']."/mibs/junose");
-  if(is_array($oids[$device['device_id']])) 
+  if(is_array($oids)) 
   {
-    foreach($oids[$device[device_id]] as $index => $entry) 
+    foreach($oids as $index => $entry) 
     {
       if(is_numeric($entry['juniSystemTempValue']) && is_numeric($index) && $entry['juniSystemTempValue'] > "0") 
       {

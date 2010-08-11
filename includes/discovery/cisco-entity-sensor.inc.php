@@ -4,15 +4,41 @@ global $valid_sensor;
 
 if ($device['os'] == "ios" || $device['os_group'] == "ios") 
 {
-  echo(" CISCO-ENTITY-SENSOR");
+  echo("\nCISCO-ENTITY-SENSOR");
 
   $oids = array();  
+  echo("\nCaching OIDs:");
 
+  if(!is_array($entity_array))
+  {
+    $entity_array = array();
+    echo(" entPhysicalDescr");
+    $entity_array = snmpwalk_cache_multi_oid($device, "entPhysicalDescr", $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+    echo(" entPhysicalName");
+    $entity_array = snmpwalk_cache_multi_oid($device, "entPhysicalName", $entity_array, "CISCO-ENTITY-SENSOR-MIB");
+  }
+
+  echo("  entSensorType");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorType", $oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorScale");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorScale", $oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorValue");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorValue", $oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorMeasuredEntity");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorMeasuredEntity", $oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorPrecision");
   $oids = snmpwalk_cache_multi_oid($device, "entSensorPrecision", $oids, "CISCO-ENTITY-SENSOR-MIB");
+
+  $t_oids = array();
+  echo(" entSensorThresholdSeverity");
+  $t_oids = snmpwalk_cache_twopart_oid($device, "entSensorThresholdSeverity", $t_oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorThresholdRelation");
+  $t_oids = snmpwalk_cache_twopart_oid($device, "entSensorThresholdRelation", $t_oids, "CISCO-ENTITY-SENSOR-MIB");
+  echo(" entSensorThresholdValue");
+  $t_oids = snmpwalk_cache_twopart_oid($device, "entSensorThresholdValue", $t_oids, "CISCO-ENTITY-SENSOR-MIB");
+
+  echo("\nSensors: ");
+
 
   if($debug) { print_r($oids); } 
 
@@ -25,28 +51,31 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
   $entitysensor['rpm']       = "fanspeed";
   $entitysensor['celsius']   = "temperature";
 
-  if(is_array($oids[$device['device_id']]))
+  if(is_array($oids))
   {
-    foreach($oids[$device['device_id']] as $index => $entry)
+    foreach($oids as $index => $entry)
     {
       #echo("[" . $entry['entSensorType'] . "|" . $entry['entSensorValue']. "|" . $index . "]");
 
       if($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index))
       {
         $entPhysicalIndex = $index;
-	$descr = snmp_get($device, "entPhysicalName.".$index, "-Oqv", "ENTITY-MIB");
+	$descr = $entity_array[$index]['entPhysicalName'];
         if($descr || $device['os'] == "iosxr") 
         { 
           $descr = rewrite_entity_descr($descr);
         } else { 
-          $descr = snmp_get($device, "entPhysicalDescr.".$index, "-Oqv", "ENTITY-MIB"); 
+          $descr = $entity_array[$index]['entPhysicalDescr']; 
           $descr = rewrite_entity_descr($descr);
         }
 
-
+        ## Set description based on measured entity if it exists
         if(is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
-          $measured_descr = snmp_get($device, "entPhysicalName.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");
-          if(!measured_descr) {  $measured_descr = snmp_get($device, "entPhysicalDescr.".$entry['entSensorMeasuredEntity'],"-Oqv", "ENTITY-MIB");}
+          $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
+          if(!measured_descr) 
+          {
+            $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
+          }          
           $descr = $measured_descr . " - " . $descr;
         }
 
@@ -70,10 +99,49 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         if(is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > "0") { $divisor = $divisor . str_pad('', $entry['entSensorPrecision'], "0"); }
         $current = $current * $multiplier / $divisor;
 
-	$current = $current * $multiplier / $divisor;
-        discover_sensor($valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, NULL, NULL, NULL, NULL, $temperature);
+        ### Set thresholds to null
+        $limit = NULL; $low_limit = NULL; $warn_limit = NULL; $warn_limit_low = NULL;
 
+        ### Check thresholds for this entry (bit dirty, but it works!)
+        if(is_array($t_oids[$index])) 
+        {
+         foreach($t_oids[$index] as $t_index => $entry)
+         {
+          ### Critical Limit
+          if($entry['entSensorThresholdSeverity'] == "major" && $entry['entSensorThresholdRelation'] == "greaterOrEqual")
+          {
+            $limit = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
+          }
+
+          if($entry['entSensorThresholdSeverity'] == "major" && $entry['entSensorThresholdRelation'] == "lessOrEqual")
+          {
+            $limit_low = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
+          }
+          ### Warning Limit
+          if($entry['entSensorThresholdSeverity'] == "minor" && $entry['entSensorThresholdRelation'] == "greaterOrEqual")
+          {
+            $warn_limit = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
+          }
+
+          if($entry['entSensorThresholdSeverity'] == "minor" && $entry['entSensorThresholdRelation'] == "lessOrEqual")
+          {
+            $warn_limit_low = $entry['entSensorThresholdValue'] * $multiplier / $divisor;
+          }
+         }
+        }
+        ### End Threshold code
+
+        $ok = TRUE;
+       
+	if($current == "-127") { $ok = FALSE; }
+
+        if($ok) {
+#          echo("\n$valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current");
+          discover_sensor($valid_sensor, $type, $device, $oid, $index, 'cisco-entity-sensor', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $limit, $warn_limit, $current);
+        }
         $cisco_entity_temperature = 1;
+        unset($limit, $limit_low, $warn_limit, $warn_limit_low);
+
       }
     }
   }

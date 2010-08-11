@@ -14,9 +14,9 @@ while($temp = mysql_fetch_array($query)) {
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
           <td width=500>" . $temp['sensor_descr'] . "</td>
           <td>" . $temp['sensor_type'] . "</td>
-          <td width=50>" . print_temperature($temp['sensor_current'], $temp['sensor_limit']) .$unit. "</td>
-          <td width=50>" . $temp['sensor_limit'] . $unit . "</td>
-          <td width=50>" . $temp['sensor_limit_low'] . $unit ."</td>
+          <td width=50>" . format_si($temp['sensor_current']) .$unit. "</td>
+          <td width=50>" . format_si($temp['sensor_limit']) . $unit . "</td>
+          <td width=50>" . format_si($temp['sensor_limit_low']) . $unit ."</td>
         </tr>\n");
   echo("<tr  bgcolor=$row_colour><td colspan='5'>");
 

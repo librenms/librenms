@@ -12,11 +12,11 @@ $peth_oids = array('pethPsePortAdminEnable', 'pethPsePortPowerPairsControlAbilit
 $port_stats = snmpwalk_cache_oid($device, "pethPsePortEntry", $port_stats, "POWER-ETHERNET-MIB"); 
 $port_stats = snmpwalk_cache_oid($device, "cpeExtPsePortEntry", $port_stats, "CISCO-POWER-ETHERNET-EXT-MIB"); 
 
-if($port_stats[$device['device_id']][$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd" 
-   && isset($port_stats[$device['device_id']][$port['ifIndex']]['dot3StatsIndex'])) 
+if($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd" 
+   && isset($port_stats[$port['ifIndex']]['dot3StatsIndex'])) 
   { // Check to make sure Port data is cached.
 
-    $this_port = &$port_stats[$device['device_id']][$port['ifIndex']];
+    $this_port = &$port_stats[$port['ifIndex']];
 
     $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-poe.rrd");
 

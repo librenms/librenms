@@ -113,7 +113,7 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
     $mac = "$h_a$h_b$h_c$h_d$h_e$h_f";
     if($dir == "1") { $dir = "input"; } elseif($dir == "2") { $dir = "output"; }
     if($mac && $dir) {
-      $array[$device_id][$ifIndex][$mac][$oid][$dir] = $this_value;
+      $array[$ifIndex][$mac][$oid][$dir] = $this_value;
     }
   }
   return $array;
@@ -158,7 +158,7 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
     $oid = trim($oid); $value = trim($value);
     list($oid, $index) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($index)) {
-      $array[$device[device_id]][$index][$oid] = $value;
+      $array[$index][$oid] = $value;
     }
   }
   return $array;
@@ -179,7 +179,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = 
     if(isset($oid_parts['5'])) { $index .= ".".$oid_parts['5']; }
     if(isset($oid_parts['6'])) { $index .= ".".$oid_parts['6']; }
     if (!strstr($value, "at this OID") && isset($oid) && isset($index)) {
-      $array[$device[device_id]][$index][$oid] = $value;
+      $array[$index][$oid] = $value;
     }
   }
   return $array;
@@ -195,7 +195,7 @@ function snmpwalk_cache_double_oid($device, $oid, $array, $mib = NULL, $mibdir =
     list($oid, $first, $second) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
       $double = $first.".".$second;
-      $array[$device[device_id]][$double][$oid] = $value;
+      $array[$double][$oid] = $value;
     }
   }
   return $array;
@@ -210,7 +210,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = NULL, $mibdir =
     list($oid, $first, $second, $third) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
       $index = $first.".".$second.".".$third;
-      $array[$device[device_id]][$index][$oid] = $value;
+      $array[$index][$oid] = $value;
     }
   }
   return $array;
@@ -242,7 +242,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
     $oid = trim($oid); $value = trim($value); $value = str_replace("\"", "", $value);
     list($oid, $first, $second) = explode(".", $oid);
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second)) {
-      $array[$device_id][$first][$second][$oid] = $value;
+      $array[$first][$second][$oid] = $value;
     }
   }
   return $array;
@@ -272,7 +272,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0) {
     list($oid, $first, $second, $third) = explode(".", $oid);
     if($debug) {echo("$entry || $oid || $first || $second || $third\n");}
     if (!strstr($value, "at this OID") && isset($oid) && isset($first) && isset($second) && isset($third)) {
-      $array[$device_id][$first][$second][$third][$oid] = $value;
+      $array[$first][$second][$third][$oid] = $value;
     }
   }
   return $array;
@@ -300,10 +300,10 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
     $entry = str_replace($oid.".", "", $entry);
     list($slotport, $value) = explode("=", $entry);
     $slotport = trim($slotport); $value = trim($value);
-    if ($array[$device_id][$slotport]['ifIndex']) {
-      $ifIndex = $array[$device_id][$slotport]['ifIndex'];
-      #$array[$device_id][$slotport][$oid] = $value;
-      $array[$device_id][$ifIndex][$oid] = $value;
+    if ($array[$slotport]['ifIndex']) {
+      $ifIndex = $array[$slotport]['ifIndex'];
+      #$array[$slotport][$oid] = $value;
+      $array[$ifIndex][$oid] = $value;
     }
   }
   return $array;
@@ -332,7 +332,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   #echo("Caching: ifIndex $port\n");
   foreach($oids as $oid){
     if(!strstr($values[$x], "at this OID")) {
-      $array[$device[device_id]][$port][$oid] = $values[$x];
+      $array[$port][$oid] = $values[$x];
     }
     $x++;
   }
@@ -351,8 +351,8 @@ function snmp_cache_portIfIndex ($device, $array) {
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
     list($slotport, $ifIndex) = explode(" ", $entry);
     if($slotport && $ifIndex){
-      $array[$device_id][$ifIndex]['portIfIndex'] = $slotport;
-      $array[$device_id][$slotport]['ifIndex'] = $ifIndex;
+      $array[$ifIndex]['portIfIndex'] = $slotport;
+      $array[$slotport]['ifIndex'] = $ifIndex;
     }
   }
   return $array;
@@ -371,10 +371,10 @@ function snmp_cache_portName ($device, $array) {
     $entry = str_replace("portName.", "", $entry);
     list($slotport, $portName) = explode("=", $entry);
     $slotport = trim($slotport); $portName = trim($portName);
-    if ($array[$device_id][$slotport]['ifIndex']) {
-      $ifIndex = $array[$device_id][$slotport]['ifIndex'];
-      $array[$device_id][$slotport]['portName'] = $portName;
-      $array[$device_id][$ifIndex]['portName'] = $portName;
+    if ($array[$slotport]['ifIndex']) {
+      $ifIndex = $array[$slotport]['ifIndex'];
+      $array[$slotport]['portName'] = $portName;
+      $array[$ifIndex]['portName'] = $portName;
     }
   }
   return $array;

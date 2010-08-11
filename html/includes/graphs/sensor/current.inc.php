@@ -16,4 +16,8 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " GPRINT:current:LAST:%5.2lfA";
   $rrd_options .= " GPRINT:current:MAX:%5.2lfA\\\\l";
 
+  if(is_numeric($sensor['sensor_limit'])) $rrd_options .= " HRULE:".$sensor['sensor_limit']."#999999::dashes";
+  if(is_numeric($sensor['sensor_limit_low'])) $rrd_options .= " HRULE:".$sensor['sensor_limit_low']."#999999::dashes";
+
+
 ?>

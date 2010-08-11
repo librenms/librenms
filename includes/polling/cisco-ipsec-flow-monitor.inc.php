@@ -35,7 +35,7 @@
 if($device['os_group'] == "ios") {
 
   $data = snmpwalk_cache_oid($device, "cipSecGlobalStats", NULL, "CISCO-IPSEC-FLOW-MONITOR-MIB");
-  $data = $data[$device['device_id']][0];
+  $data = $data[0];
 
   ## Use HC Counters if they exist
   if(is_numeric($data['cipSecGlobalHcInOctets'])) { $data['cipSecGlobalInOctets']= $data['cipSecGlobalHcInOctets']; }
