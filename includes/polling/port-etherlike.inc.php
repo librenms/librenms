@@ -3,7 +3,7 @@
     if($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd" 
        && isset($port_stats[$port['ifIndex']]['dot3StatsIndex'])) { // Check to make sure Port data is cached.
 
-      $this_port = &$port_stats[$device[device_id]][$port[ifIndex]];
+      $this_port = &$port_stats[$port[ifIndex]];
 
       $old_rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("etherlike-".$port['ifIndex'].".rrd");
       $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-dot3.rrd");

@@ -19,7 +19,7 @@
     $graph_type = "port_errors";
     include("includes/print-interface-graphs.inc.php");
 
-    if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-" . $interface['ifIndex'] . ".rrd")) {
+    if(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . $interface['ifIndex'] . "-dot3.rrd")) {
       echo("<div class=graphhead>Ethernet Errors</div>");
       $graph_type = "port_etherlike";
       include("includes/print-interface-graphs.inc.php");
