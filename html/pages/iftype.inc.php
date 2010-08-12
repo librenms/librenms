@@ -54,7 +54,7 @@ echo("<table cellpadding=7 cellspacing=0 class=devicetable width=100%>");
 
     echo("</td></tr><tr bgcolor='$bg'><td>");
 
-if(file_exists($config['rrd_dir'] . "/" . $interface['hostname'] . "/" . $interface['ifIndex'] . ".rrd")) {
+if(file_exists($config['rrd_dir'] . "/" . $interface['hostname'] . "/port-" . $interface['ifIndex'] . ".rrd")) {
 
     $graph_type = "port_bits";
     include("includes/print-interface-graphs.inc.php");
