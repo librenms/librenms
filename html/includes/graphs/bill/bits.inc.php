@@ -4,8 +4,8 @@
 
 $i=0;
 while($port = mysql_fetch_array($ports)) {
-  if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) {
-    $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
+  if(is_file($config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd"))) {
+    $rrd_list[$i]['filename'] = $config['rrd_dir'] . "/" . $port['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
     $rrd_list[$i]['descr'] = $port['ifDescr'];
     $i++;
   }
