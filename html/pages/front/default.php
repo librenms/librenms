@@ -1,23 +1,9 @@
 <?php
 
-function generate_front_box ($type, $content) {
- echo("<div style='float: left; padding: 5px; width: 135px; margin: 0px;'>
-  <b class='box-".$type."'>
-  <b class='box-".$type."1'></b>
-  <b class='box-".$type."2'></b>
-  <b class='box-".$type."3'></b>
-  <b class='box-".$type."4'></b>
-  <b class='box-".$type."5'></b></b>
-  <div class='box-".$type."fg' style='height: 90px;'>
-   ".$content."
-  </div>
-  <b class='box-".$type."'>
-  <b class='box-".$type."5'></b>
-  <b class='box-".$type."4'></b>
-  <b class='box-".$type."3'></b>
-  <b class='box-".$type."2'></b>
-  <b class='box-".$type."1'></b></b>
- </div>");
+function generate_front_box ($background, $content) {
+echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 117px; height: 85px; background: $background;'>
+      $content
+      </div>");
 }
 
 echo("<div style='padding: 3px 10px; background: #fff;'>");
@@ -29,11 +15,10 @@ $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.dev
 }
 while($device = mysql_fetch_array($sql)){
 
-      generate_front_box("alert", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
+      generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> <br />
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center>");
-
 
 }
 
@@ -48,7 +33,7 @@ $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D, devices_perms AS
 while($interface = mysql_fetch_array($sql)){
  if(!$interface['deleted']){
   $interface = ifNameDescr($interface);
-  generate_front_box("warn", "<center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
+  generate_front_box("#ffdd99", "<center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
 <!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
       <strong>".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
@@ -61,12 +46,11 @@ while($interface = mysql_fetch_array($sql)){
 /* FIXME service permissions? seem nonexisting now.. */
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
 while($service = mysql_fetch_array($sql)){
-      generate_front_box("alert", "<center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
+      generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span> 
       <strong>".$service['service_type']."</strong><br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
       </center>");
-
 }
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
@@ -78,10 +62,10 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   }
   while($peer = mysql_fetch_array($sql))
   {
-  generate_front_box("alert", "<center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
+  generate_front_box("#ffaaaa", "<center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span> 
       <span style='" . (strstr($peer['bgpPeerIdentifier'],':') ? 'font-size: 10px' : '') . "'><strong>".$peer['bgpPeerIdentifier']."</strong></span><br />
-      <span title='" . $peer['astext'] . "' class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
+      <span class=body-date-1>AS".truncate($peer['bgpPeerRemoteAs']." ".$peer['astext'], 14, "")."</span>
       </center>");
   }
 }
@@ -92,7 +76,7 @@ $sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.upti
 $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '84600' AND D.ignore = 0");
 }
 while($device = mysql_fetch_array($sql)){
-   generate_front_box("info", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
+   generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
       <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
       </center>");
