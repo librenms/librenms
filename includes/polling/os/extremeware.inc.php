@@ -33,7 +33,6 @@ if(!strpos($sysDescr, "XOS")) {
 }
 
 
-$sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
 $hardware = rewrite_extreme_hardware($sysObjectID);
 if($hardware == $sysObjectID) { unset($hardware); }
 
