@@ -67,7 +67,7 @@ if (file_exists('.svn'))
     include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
   }
 
-  if($db_rev+0 < 1656) { //FIXME
+  if($db_rev+0 < 1656) {
      include('fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
   }
 

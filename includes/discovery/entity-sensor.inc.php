@@ -2,7 +2,7 @@
 
 global $valid_sensor;
 
-echo(" ENTITY-SENSOR");
+echo(" ENTITY-SENSOR ");
 
   echo("\nCaching OIDs:");
 
