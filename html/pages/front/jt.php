@@ -139,11 +139,11 @@ if($_SESSION['userlevel'] >= '5')
   if($ports['peering'] && $ports['transit']) {
     echo("<div style='width: 235px; '>
     <a href='internet/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits_duo&id=".$ports['peering']."&ports_b=".$ports['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
-    <img src=\'graph.php?type=multiport_bits_duo&id=".$ports['peering']."&ports_b=".$ports['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multiport_bits_duo&id=".$ports['peering']."&idb=".$ports['transit']."&from=".$day."&to=".$now."&width=400&height=150\'>\
+    <img src=\'graph.php?type=multiport_bits_duo&id=".$ports['peering']."&idb=".$ports['transit']."&from=".$week."&to=".$now."&width=400&height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Aggregate Internet Traffic</div>".
-    "<img src='graph.php?type=multiport_bits_duo&id=".$ports['peering']."&ports_b=".$ports['transit'].
+    "<img src='graph.php?type=multiport_bits_duo&id=".$ports['peering']."&idb=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=385&height=100&legend=no'></a></div>");
   }
 
@@ -180,11 +180,11 @@ if($_SESSION['userlevel'] >= '5')
   if($ports['broadband'] && $ports['wave_broadband'] && $ports['new_broadband']) {
     echo("<div style='width: 466px; '>
     <a href='broadband/' onmouseover=\"return overlib('\
-    <img src=\'graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=c\'>\
-    <img src=\'graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=c\'>\
+    <img src=\'graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&idb=".$ports['new_broadband']."&idc=".$ports['wave_broadband']."&from=".$day."&to=".$now."&width=400&height=150&inverse=c\'>\
+    <img src=\'graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&idb=".$ports['new_broadband']."&idc=".$ports['wave_broadband']."&from=".$week."&to=".$now."&width=400&height=150&inverse=c\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 16px; font-weight: bold; color: #555555;'>Aggregate Broadband Traffic</div>".
-    "<img src='graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&ports_b=".$ports['new_broadband']."&ports_c=".$ports['wave_broadband'].
+    "<img src='graph.php?type=multiport_bits_trio&id=".$ports['broadband']."&idb=".$ports['new_broadband']."&idc=".$ports['wave_broadband'].
     "&from=".$day."&to=".$now."&width=385&height=100&legend=no&inverse=c'></a></div>");
   }
 
