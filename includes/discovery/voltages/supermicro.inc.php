@@ -36,7 +36,7 @@ if ($device['os'] == "linux")
 
         if ($monitor == 'true')
         {
-          echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, $limit, NULL, $current);
+          echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, NULL, $limit, $current);
         }
       }
     }

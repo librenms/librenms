@@ -26,7 +26,7 @@ if ($device['os'] == "linux")
         $monitor_oid   = "1.3.6.1.4.1.10876.2.1.1.1.1.10.$index";
         $descr         = snmp_get($device, $descr_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $current       = snmp_get($device, $fan_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
-        $limit         = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
+        $low_limit     = snmp_get($device, $limit_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         #$divisor       = snmp_get($device, $divisor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         # ^ This returns an incorrect precision. At least using the raw value... I think. -TL
         $divisor       = "1";
@@ -35,7 +35,7 @@ if ($device['os'] == "linux")
         $descr         = str_replace(' Speed','',$descr);      
         if ($monitor == 'true')
         {
-          discover_sensor($valid_sensor, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+          discover_sensor($valid_sensor, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, NULL, NULL, NULL, $current);
         }
       }
     }

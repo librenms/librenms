@@ -1,7 +1,7 @@
 <?php
 
 ### Discover sensors
-function  discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
 {
   global $config, $debug;
   if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
@@ -83,7 +83,7 @@ function sensor_low_limit ($class, $current) {
      $limit = $current * 0.7; 
      break;
     case 'voltage':
-     $limit = $current * 0.95; 
+     $limit = $current * 0.85; 
      break;
     case 'humidity':
      $limit = "70"; 
@@ -108,10 +108,10 @@ function sensor_limit ($class, $current) {
 
   switch($class) {
     case 'temperature':
-     $limit = $current * 1.20; 
+     $limit = $current * 1.60; 
      break;
     case 'voltage':
-     $limit = $current * 1.05; 
+     $limit = $current * 1.15; 
      break;
     case 'humidity':
      $limit = "70"; 
@@ -120,7 +120,7 @@ function sensor_limit ($class, $current) {
      $limit = $current * 1.05; 
      break;
     case 'current':
-     $limit = $current * 1.20; 
+     $limit = $current * 1.50; 
      break;
     case 'fanspeed':
      $limit = $current * 1.30; 

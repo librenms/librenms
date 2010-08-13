@@ -9,7 +9,7 @@ $device = device_by_id_cache($id);
 
   $iter = "1";
   $sql = mysql_query("SELECT * FROM storage where device_id = '$id'");
-  $rrd_options .= " COMMENT:'                      Size      Used    %age\\l'";
+  $rrd_options .= " COMMENT:'                    Size      Used    %age\\l'";
   while($storage = mysql_fetch_array($sql)) {
     if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
     } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";

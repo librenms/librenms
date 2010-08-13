@@ -74,8 +74,20 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   $runtime_stats['snmpwalk']++;
   if($debug) { echo("$data\n"); }
   if (is_string($data) && (preg_match("/No Such (Object|Instance)/i", $data)))
-  ##  || preg_match("/No more variables left/i", $data)))
-  { $data = false; } else { return $data; }
+  { 
+    $data = false; 
+  } 
+  else 
+  { 
+    if (preg_match("/No more variables left in this MIB View \(It is past the end of the MIB tree\)$/",$data)) 
+    { 
+      # Bit ugly :-(
+      $d_ex = explode("\n",$data);
+      unset($d_ex[count($d_ex)-1]);
+      $data = implode("\n",$d_ex);
+    }
+    return $data; 
+  }
 }
 
 function snmpwalk_cache_cip($device, $oid, $array, $mib = 0) 
