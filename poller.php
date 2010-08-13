@@ -106,6 +106,7 @@ while ($device = mysql_fetch_assoc($device_query))
     $sysName = strtolower($sysName);
 
     $hrSystemUptime = snmp_get($device, "HOST-RESOURCES-MIB::hrSystemUptime.0", "-Oqv");
+    $sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
 
 #    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
 
