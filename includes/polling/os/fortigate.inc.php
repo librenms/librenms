@@ -7,8 +7,6 @@ echo("Fortinet Fortigate Poller\n");
 $fnSysVersion = snmp_get($device, "FORTINET-MIB-280::fnSysVersion.0", "-Ovq");
 $serial       = snmp_get($device, "FORTINET-MIB-280::fnSysSerial.0", "-Ovq");
 
-echo("$fnSysVersion");
-
 $version = preg_replace("/(.+),(.+),(.+)/", "\\1||\\2||\\3", $fnSysVersion);
 list($version,$features) = explode("||", $version);
 
