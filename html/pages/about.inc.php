@@ -40,8 +40,6 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
     $stat_processors = mysql_result(mysql_query("SELECT COUNT(*) FROM `processors`"),0);
     $stat_memory = mysql_result(mysql_query("SELECT COUNT(*) FROM `mempools`"),0);
     $stat_sensors = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors`"),0);
-    $stat_hz = mysql_result(mysql_query("SELECT COUNT(*) FROM `frequency`"),0);
-    $stat_humid = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE sensor_class='humidity'"),0);
     $stat_toner = mysql_result(mysql_query("SELECT COUNT(*) FROM `toner`"),0);
     $stat_hrdev = mysql_result(mysql_query("SELECT COUNT(*) FROM `hrDevice`"),0);
     $stat_entphys = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical`"),0);
@@ -93,11 +91,6 @@ along with this program.  If not, see <a href="http://www.gnu.org/licenses/">htt
 </tr>
 <tr>
     <td ><img src='images/icons/sensors.png' class='optionicon'> <b>Sensors</b></td><td align=right>$stat_sensors</td>
-    <td ><img src='images/icons/humidity.png' class='optionicon'> <b>Humidity</b></td><td align=right>$stat_humid</td>
-</tr>
-
-<tr>
-    <td ><img src='images/icons/frequencies.png' class='optionicon'> <b>Frequency</b></td><td align=right>$stat_hz</td>
     <td><img src='images/icons/toner.png' class='optionicon'> <b>Toner</b></td><td align=right>$stat_toner</td>
 </tr>
 
