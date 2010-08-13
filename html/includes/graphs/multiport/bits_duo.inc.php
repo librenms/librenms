@@ -1,20 +1,18 @@
 <?php
 
-$ports_a = $_GET['ports'];
-$ports_b = $_GET['ports_b'];
-
 if($_GET['legend']) { $legend = $_GET['legend']; }
 
-  $rrd_options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height";
+  $rrd_options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
   $rrd_options .= $config['rrdgraph_def_text'];
   if($height < "99") { $rrd_options .= " --only-graph"; }
   $i = 1;
-  foreach(explode(",", $ports_a) as $ifid) {
+
+  foreach(explode(",", $_GET['id']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
-    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
-      $rrd_options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/port-" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";
-      $rrd_options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/port-" . $int[1] . "/" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
+      $rrd_options .= " DEF:inoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:INOCTETS:AVERAGE";
+      $rrd_options .= " DEF:outoctets" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
       $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
       $out_thing .= $seperator . "outoctets" . $i . ",UN,0," . "outoctets" . $i . ",IF";
       $pluses .= $plus;
@@ -24,12 +22,12 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $ports_b) as $ifid) {
+  foreach(explode(",", $_GET['idb']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
-    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
-      $rrd_options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/port-" . $int[1] . "/" . $int[0] . ".rrd:INOCTETS:AVERAGE";
-      $rrd_options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/port-" . $int[1] . "/" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
+      $rrd_options .= " DEF:inoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:INOCTETS:AVERAGE";
+      $rrd_options .= " DEF:outoctetsb" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:OUTOCTETS:AVERAGE";
       $in_thingb .= $seperator . "inoctetsb" . $i . ",UN,0," . "inoctetsb" . $i . ",IF";
       $out_thingb .= $seperator . "outoctetsb" . $i . ",UN,0," . "outoctetsb" . $i . ",IF";
       $plusesb .= $plus;

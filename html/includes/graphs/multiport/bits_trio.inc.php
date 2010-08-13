@@ -6,8 +6,8 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
   $rrd_options .= $config['rrdgraph_def_text'];
   if($height < "99") { $rrd_options .= " --only-graph"; }
   $i = 1;
-  foreach(explode(",", $_GET['ports']) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $_GET['id']) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `id` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
       if(strstr($inverse, "a")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -22,8 +22,8 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $_GET['ports_b']) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $_GET['idb']) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `id` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
       if(strstr($inverse, "b")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
@@ -38,8 +38,8 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
     }
   }
   unset($seperator); unset($plus);
-  foreach(explode(",", $_GET['ports_c']) as $ifid) {
-    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
+  foreach(explode(",", $_GET['idc']) as $ifid) {
+    $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `id` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
     if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
       if(strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
