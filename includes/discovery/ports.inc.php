@@ -40,7 +40,7 @@ foreach(explode("\n", $ports) as $entry){
     if ($nullintf == 0) {
       if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
 	mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
-# Add Interface
+        # Add Interface
 	echo("+");
       } else {
 	mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
@@ -48,10 +48,10 @@ foreach(explode("\n", $ports) as $entry){
       }
       $int_exists[] = "$ifIndex";
     } else { 
-# Ignored Interface
+      # Ignored Interface
       if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
 	mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-# Delete Interface
+        # Delete Interface
 	echo("-"); ## Deleted Interface
       } else {
 	echo("X"); ## Ignored Interface

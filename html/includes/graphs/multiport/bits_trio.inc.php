@@ -41,7 +41,7 @@ if($_GET['legend']) { $legend = $_GET['legend']; }
   foreach(explode(",", $_GET['idc']) as $ifid) {
     $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `id` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
     $int = mysql_fetch_row($query);
-    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/" . $int[0] . ".rrd")) {
+    if(is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd")) {
       if(strstr($inverse, "c")) { $in = "OUT"; $out = "IN"; } else { $in = "IN"; $out = "OUT"; }
       $rrd_options .= " DEF:inoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$in."OCTETS:AVERAGE";
       $rrd_options .= " DEF:outoctetsc" . $i . "=" . $config['rrd_dir'] . "/" . $int[1] . "/port-" . $int[0] . ".rrd:".$out."OCTETS:AVERAGE";
