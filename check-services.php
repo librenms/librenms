@@ -52,7 +52,7 @@ while ($service = mysql_fetch_array($query)) {
     shell_exec($create);
   }
 
-  if($status = "1" || $status = "0") {
+  if($status == "1" || $status == "0") {
     rrdtool_update($rrd,"N:".$status);
   }
 }
