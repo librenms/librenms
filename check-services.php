@@ -13,7 +13,7 @@ while ($service = mysql_fetch_array($query)) {
   $service_status = $service['service_status'];
   $service_type = strtolower($service['service_type']);
   $service_param = $service['service_param'];
-  $checker_script = $config['install_dir'] . "includes/services/" . $service_type . "/check.inc";
+  $checker_script = $config['install_dir'] . "/includes/services/" . $service_type . "/check.inc";
   if(is_file($checker_script)) {
     include($checker_script);
   } else {
