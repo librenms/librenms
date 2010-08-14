@@ -2,6 +2,8 @@
 
 ### FIXME : remove link when port/host is not in the database (things /seen/ but not *discovered*)
 
+$links = 1;
+
 include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");
@@ -65,6 +67,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
           if(!$done) 
           {
             $linkdone[] = "$local_interface_id $remote_interface_id";
+
+	    $links++;
 
             if($link['ifSpeed'] >= "10000000000") 
             {
@@ -138,8 +142,12 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
       $_GET['format'] = 'png';
   }
 
-  #$maptool = 'unflatten -f -l 5 |dot';
-  $maptool = 'dot';  
+  if($links > 10) ### Unflatten if there are more than 10 links. beyond that it gets messy
+  {
+    $maptool = 'unflatten -f -l 5 |dot';
+  } else {
+    $maptool = 'dot';  
+  }
 
   if ($where == '') { $maptool = 'neato -Gpack'; }
 
