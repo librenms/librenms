@@ -709,11 +709,6 @@ $config['device_types'][$i]['text'] = 'Environment';
 $config['device_types'][$i]['type'] = 'environment';
 $config['device_types'][$i]['icon'] = 'environment.png';
 
-$i++;
-$config['device_types'][$i]['text'] = 'Servers';
-$config['device_types'][$i]['type'] = 'server';
-$config['device_types'][$i]['icon'] = 'server.png';
-
 if (isset($config['enable_printers']) && $config['enable_printers'])
 {
   $i++;
