@@ -736,7 +736,7 @@ if(!isset($config['log_file']))
   $config['log_file']     = $config['install_dir'] . "/observium.log";
 }
 
-if(isset($config['mibdir'])) 
+if(!isset($config['mibdir'])) 
 {
   $config['mibdir'] =  $config['install_dir']."/mibs/";
 }
