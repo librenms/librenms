@@ -36,6 +36,22 @@ if ($options['i'] && isset($options['n'])) {
   $doing = $options['n'] ."/".$options['i'];
 }
 
+if (isset($options['d'])) {
+  echo("DEBUG!\n");
+  $debug = TRUE;
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', 1);
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('error_reporting', 0);
+}
+
+
 if(!$where) {
   echo("-h <device id> | <device hostname>  Poll single device\n");
   echo("-h odd                              Poll odd numbered devices  (same as -i 2 -n 0)\n");
@@ -94,11 +110,6 @@ if (file_exists('.svn'))
     }
   }
 }
-
- 
-
-if(isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; } else { $debug = 0; }
-
 
 $devices_discovered = 0;
 

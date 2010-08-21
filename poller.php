@@ -46,7 +46,20 @@ if (!$where) {
   exit;
  }
 
-if (isset($options['d'])) { echo("DEBUG!\n"); $debug = 1; }
+if (isset($options['d'])) { 
+  echo("DEBUG!\n");
+  $debug = TRUE;
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 1);
+  ini_set('log_errors', 1);
+  ini_set('error_reporting', 1);
+} else {
+  $debug = FALSE;
+  ini_set('display_errors', 0);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('error_reporting', 0);
+}
 
 
 echo("Starting polling run:\n\n");
