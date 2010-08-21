@@ -276,7 +276,7 @@ function addHost($host, $community, $snmpver, $port = 161)
 
 function scanUDP ($host, $port, $timeout) 
 { 
-  $handle = fsockopen($host, $port, &$errno, &$errstr, 2); 
+  $handle = fsockopen($host, $port, $errno, $errstr, 2); 
   if (!$handle) { 
   } 
   socket_set_timeout ($handle, $timeout); 
