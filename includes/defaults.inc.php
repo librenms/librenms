@@ -29,7 +29,9 @@ $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
 
 ### Web Interface Settings
 
-$config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"];
+if(isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"])) {
+  $config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"];
+}
 $config['title_image']      = "images/observium-logo.png";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
