@@ -9,7 +9,7 @@ $sql .= " WHERE J.juniAtmVp_id = '".$atm_vp_id."' AND I.interface_id = J.interfa
 $query = mysql_query($sql);
 $vp = mysql_fetch_array($query);
 
-if(port_permitted($vp['interface_id'])) {
+if($config['allow_unauth_graphs'] || port_permitted($vp['interface_id'])) {
 
   $port   = $vp;
   $device = device_by_id_cache($port['device_id']);

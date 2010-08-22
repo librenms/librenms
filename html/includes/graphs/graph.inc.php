@@ -30,22 +30,13 @@ if(isset($_GET['debug'])) {
   $legend   = mres($_GET['legend']);
   $id       = mres($_GET['id']);
 
-  if(!$config['allow_unauth_graphs']) 
+  if($config['allow_unauth_graphs']) 
   {
+    $allow_unauth = TRUE;
+  } else {
     if(!$_SESSION['authenticated']) { graph_error("Not authenticated"); exit; }
   }
   
-#  if($_GET['device']) {
-#    $_GET['id'] = $_GET['device'];
-#    $device_id = $_GET['device'];
-#  } elseif($_GET['if']) {
-#    $_GET['id'] = $_GET['if'];
-#  } elseif($_GET['port']) {
-#    $_GET['id'] = $_GET['port'];
-#  } elseif($_GET['peer']) {
-#    $_GET['id'] = $_GET['peer'];
-#  }
-
   preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $graphtype);
 
   $type = $graphtype['type'];
@@ -54,19 +45,6 @@ if(isset($_GET['debug'])) {
   if($debug) {print_r($graphtype);}
 
   $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
-
-#  $os = gethostosbyid($device_id);
-#  if($config['os'][$os]['group']) {$os_group = $config['os'][$os]['group'];}
-#  if(is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".$os.".inc.php")) {
-#    /// Type + OS Specific
-#    include($config['install_dir'] . "/html/includes/graphs/".$type."_".$os.".inc.php");
-#  }elseif($os_group && is_file($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_group.".inc.php")) {
-#    /// Type + OS Group Specific
-#    include($config['install_dir'] . "/html/includes/graphs/".$type."_".$os_group.".inc.php");
-#  } elseif(is_file($config['install_dir'] . "/html/includes/graphs/$type.inc.php")) {
-#    /// Type Specific
-#    include($config['install_dir'] . "/html/includes/graphs/$type.inc.php");
-#  }
 
 if(is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php")) {
   include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
