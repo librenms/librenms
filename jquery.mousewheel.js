@@ -3,6 +3,7 @@
  *
  * Thanks to: http://adomas.org/javascript-mouse-wheel/ for some pointers.
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
+ * Thanks to: Seamus Leahy for adding deltaX and deltaY
  *
  * Version: 3.0.3-pre
  * 
@@ -43,8 +44,7 @@ $.fn.extend({
 
 
 function handler(event) {
-	var orgEvent = event;
-    var args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true, deltaX = 0, deltaY = 0;
+    var orgEvent = event, args = [].slice.call( arguments, 1 ), delta = 0, returnValue = true, deltaX = 0, deltaY = 0;
     
     event = $.event.fix(event || window.event);
     event.type = "mousewheel";
@@ -57,18 +57,18 @@ function handler(event) {
     deltaY = delta;
     
     // Gecko
-    if( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
-    	deltaY = 0;
-    	deltaX = -1*delta;
+    if ( orgEvent.axis !== undefined && orgEvent.axis === orgEvent.HORIZONTAL_AXIS ) {
+        deltaY = 0;
+        deltaX = -1*delta;
     }
     
     // Webkit
-    if( orgEvent.wheelDeltaY !== undefined ) deltaY = orgEvent.wheelDeltaY/120;
-    if( orgEvent.wheelDeltaX !== undefined ) deltaX = -1*orgEvent.wheelDeltaX/120;
+    if ( orgEvent.wheelDeltaY !== undefined ) deltaY = orgEvent.wheelDeltaY/120;
+    if ( orgEvent.wheelDeltaX !== undefined ) deltaX = -1*orgEvent.wheelDeltaX/120;
     
     // Add event and delta to the front of the arguments
     args.unshift(event, delta, deltaX, deltaY);
-
+    
     return $.event.handle.apply(this, args);
 }
 
