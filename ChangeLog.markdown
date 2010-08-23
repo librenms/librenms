@@ -1,5 +1,10 @@
 # Mouse Wheel ChangeLog
 
+# 3.0.3
+
+* Added deltaX and deltaY for horizontal scrolling support (Thanks to Seamus Leahy)
+
+
 # 3.0.2
 
 * Fixed delta being opposite value in latest Opera
