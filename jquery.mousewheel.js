@@ -16,19 +16,23 @@ var types = ['DOMMouseScroll', 'mousewheel'];
 
 $.event.special.mousewheel = {
     setup: function() {
-        if ( this.addEventListener )
-            for ( var i=types.length; i; )
+        if ( this.addEventListener ) {
+            for ( var i=types.length; i; ) {
                 this.addEventListener( types[--i], handler, false );
-        else
+            }
+        } else {
             this.onmousewheel = handler;
+        }
     },
     
     teardown: function() {
-        if ( this.removeEventListener )
-            for ( var i=types.length; i; )
+        if ( this.removeEventListener ) {
+            for ( var i=types.length; i; ) {
                 this.removeEventListener( types[--i], handler, false );
-        else
+            }
+        } else {
             this.onmousewheel = null;
+        }
     }
 };
 
@@ -50,8 +54,8 @@ function handler(event) {
     event.type = "mousewheel";
     
     // Old school scrollwheel delta
-    if ( event.wheelDelta ) delta = event.wheelDelta/120;
-    if ( event.detail     ) delta = -event.detail/3;
+    if ( event.wheelDelta ) { delta = event.wheelDelta/120; }
+    if ( event.detail     ) { delta = -event.detail/3; }
     
     // New school multidimensional scroll (touchpads) deltas
     deltaY = delta;
@@ -63,8 +67,8 @@ function handler(event) {
     }
     
     // Webkit
-    if ( orgEvent.wheelDeltaY !== undefined ) deltaY = orgEvent.wheelDeltaY/120;
-    if ( orgEvent.wheelDeltaX !== undefined ) deltaX = -1*orgEvent.wheelDeltaX/120;
+    if ( orgEvent.wheelDeltaY !== undefined ) { deltaY = orgEvent.wheelDeltaY/120; }
+    if ( orgEvent.wheelDeltaX !== undefined ) { deltaX = -1*orgEvent.wheelDeltaX/120; }
     
     // Add event and delta to the front of the arguments
     args.unshift(event, delta, deltaX, deltaY);
