@@ -150,6 +150,18 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+$os = "sanos";
+$config['os'][$os]['group']             = "ios";
+$config['os'][$os]['text']              = "Cisco SAN-OS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "cisco";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['over'][1]['graph']  = "device_processors";
+$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+$config['os'][$os]['over'][2]['graph']  = "device_mempools";
+$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+
 $os = "catos";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco CatOS";

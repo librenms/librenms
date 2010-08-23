@@ -335,7 +335,7 @@ function formatUptime($diff, $format="long")
 function isSNMPable($hostname, $community, $snmpver, $port) 
 {
      global $config;
-     $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
+     $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysObjectID.0");
      if ($pos == '') {
        return false;
      } else {
