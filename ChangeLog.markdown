@@ -1,5 +1,10 @@
 # Mouse Wheel ChangeLog
 
+# 3.0.4
+
+* Fix IE issue
+
+
 # 3.0.3
 
 * Added deltaX and deltaY for horizontal scrolling support (Thanks to Seamus Leahy)

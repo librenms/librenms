@@ -5,7 +5,7 @@
  * Thanks to: Mathias Bank(http://www.mathias-bank.de) for a scope bug fix.
  * Thanks to: Seamus Leahy for adding deltaX and deltaY
  *
- * Version: 3.0.3
+ * Version: 3.0.4
  * 
  * Requires: 1.2.2+
  */
