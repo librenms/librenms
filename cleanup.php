@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 
 ### Clean up the database removing old IPs and links
 
