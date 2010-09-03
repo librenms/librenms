@@ -9,20 +9,22 @@
           </td>
           <td align="center"><?php
 
-        $data = trim(shell_exec("cat " . $config['install_dir'] . "/rrd/version.txt"));
+## WE ARE SVN
 
-        list($major, $minor, $release) = explode(".", $data);
-                if (strstr('-',$config['version'])) { list($cur, $tag) = explode("-", $config['version']); } else { $cur = $config['version']; }
-                list($cur_major, $cur_minor, $cur_release) = explode(".", $cur);
+#        $data = trim(shell_exec("cat " . $config['install_dir'] . "/rrd/version.txt"));
 
-                if($major > $cur_major) {
-                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
-                } elseif ($major == $cur_major && $minor > $cur_minor) {
-                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
-                } elseif ($major == $cur_major && $minor == $cur_minor && $release > $cur_release) {
-                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
-                } elseif($major < $cur_major || ($major == $cur_major && $minor < $cur_minor) || ($major == $cur_major && $minor == $cur_minor && $release < $cur_release)) {
-                }
+#        list($major, $minor, $release) = explode(".", $data);
+#                if (strstr('-',$config['version'])) { list($cur, $tag) = explode("-", $config['version']); } else { $cur = $config['version']; }
+#                list($cur_major, $cur_minor, $cur_release) = explode(".", $cur);
+
+#                if($major > $cur_major) {
+#                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+ #               } elseif ($major == $cur_major && $minor > $cur_minor) {
+#                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+#                } elseif ($major == $cur_major && $minor == $cur_minor && $release > $cur_release) {
+#                  echo("<a href='http://www.observernms.org'><span class=red>New Version! <br /> <b>$major.$minor.$release</b></span></a>");
+#                } elseif($major < $cur_major || ($major == $cur_major && $minor < $cur_minor) || ($major == $cur_major && $minor == $cur_minor && $release < $cur_release)) {
+#                }
 ?>
           </td>
           <td align="right" style="margin-right: 10px;">
