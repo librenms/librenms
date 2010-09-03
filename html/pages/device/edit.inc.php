@@ -6,6 +6,7 @@ if($_SESSION['userlevel'] < '7') {
 
 
 $panes =  array('device'   => 'Device Settings',
+		'ports'     => 'Port Settings',
                 'apps'     => 'Applications',
 		'services' => 'Services');
 
