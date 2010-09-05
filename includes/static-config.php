@@ -57,6 +57,9 @@ $os = "adva";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "Adva";
 $config['os'][$os]['ifalias']		= 1;
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "opensolaris";
 $config['os'][$os]['group']		= "unix";
