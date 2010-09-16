@@ -63,6 +63,10 @@ $os = "opensolaris";
 $config['os'][$os]['group']		= "unix";
 $config['os'][$os]['text']		= "Sun OpenSolaris";
 
+$os = "openindiana";
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['text']              = "OpenIndiana";
+
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS";

@@ -6,6 +6,9 @@ if(!$os) {
     $os = "solaris"; 
     list(,,$version) = explode (" ", $sysDescr);
     if($version > "5.10") { $os = "opensolaris"; }
+    if($version > "5.10") { 
+      if(preg_match("/oi_/", $sysDescr)) { $os = "openindiana"; }
+    }
   }
 }
 
