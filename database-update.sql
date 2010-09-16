@@ -11,3 +11,5 @@ DROP TABLE `frequency`;
 ALTER TABLE  `mempools` CHANGE  `mempool_index`  `mempool_index` VARCHAR( 16 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL;
 ALTER TABLE `vrfs` CHANGE `mplsVpnVrfRouteDistinguisher` `mplsVpnVrfRouteDistinguisher` varchar(26) default NOT NULL;
 ## Change port rrds
+ALTER TABLE  `devices` ADD  `timeout` INT NULL DEFAULT NULL AFTER  `port`;
+

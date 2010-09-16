@@ -57,8 +57,8 @@ $config['show_services']           = 1;  # Enable Services on menu
 $config['ports_page_default']      = "details/"; ## eg "details/" "graphs/bits/"
 
 ### SNMP Settings
-$config['snmp']['timeout'] = 300;          # timeout in ms
-$config['snmp']['retries'] = 6;            # how many times to retry the query
+$config['snmp']['timeout'] = 1000;         # timeout in ms
+$config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['community'][] = "public"; # Communities to try during discovery (dangerous)
 
 ### Autodiscovery Settings
