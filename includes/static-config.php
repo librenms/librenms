@@ -16,27 +16,33 @@ $os = "generic";
 $config['os'][$os]['text']      	= "Generic Device";
 
 $os = "linux";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "Linux";
 $config['os'][$os]['ifXmcbc']		= 1;
 
 $os = "freebsd";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "FreeBSD";
 
 $os = "openbsd";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "OpenBSD";
 
 $os = "netbsd";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "NetBSD";
 
 $os = "dragonfly";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "DragonflyBSD";
 
 $os = "netware";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['text']  		= "Novell Netware";
 $config['os'][$os]['icon']  		= "novell";
 
@@ -52,6 +58,7 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $os = "solaris";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "Sun Solaris";
+$config['os'][$os]['type']              = "server";
 
 $os = "adva";
 $config['os'][$os]['type']              = "network";
@@ -60,10 +67,12 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
 $os = "opensolaris";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']		= "unix";
 $config['os'][$os]['text']		= "Sun OpenSolaris";
 
 $os = "openindiana";
+$config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "OpenIndiana";
 
