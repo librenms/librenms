@@ -158,11 +158,6 @@ while ($device = mysql_fetch_array($device_query))
     {
       $device['type'] = $config['os'][$device['os']]['type'];
     }
-    
-    if ($device['os'] == "linux")
-    {
-      if (preg_match("/-server$/", $device['version'])) { $device['type'] = 'server'; }
-    }
   }
 
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
