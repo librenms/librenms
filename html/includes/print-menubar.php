@@ -192,7 +192,7 @@ echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="
 <li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
 <?php
 
-  if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted</a></li>'); }
+  if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
 
 ?>
 </ul></td></tr></table>
