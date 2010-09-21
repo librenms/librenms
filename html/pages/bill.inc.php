@@ -1,6 +1,8 @@
 <?php
   
 $bill_id = mres($_GET['opta']);
+
+include("bill/actions.inc.php");
   
 if(bill_permitted($bill_id)) {
  
@@ -70,12 +72,12 @@ if(bill_permitted($bill_id)) {
 
   print_optionbar_end();
   
-  echo("<table width=715 border=0 cellspace=0 cellpadding=0><tr><td>");
+#  echo("<table width=715 border=0 cellspace=0 cellpadding=0><tr><td>");
   
   
   if($_GET['optb'] == "edit" && $_SESSION['userlevel'] == "10") {
   
-    include("pages/bill/edit.php");
+    include("pages/bill/edit.inc.php");
   
   }elseif($_GET['optb'] == "details") {
   
@@ -158,7 +160,7 @@ if(bill_permitted($bill_id)) {
   
   }
   
-  echo("</td><td><img src='images/billing-key.png'></td></tr></table>");
+#  echo("</td><td><img src='images/billing-key.png'></td></tr></table>");
   
 #  $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code']; 
 #  $bi = $bi . "&from=" . $unixfrom .  "&to=" . $unixto;

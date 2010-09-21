@@ -4,14 +4,68 @@ include("includes/javascript-interfacepicker.inc.php");
 
 ### This needs more verification. Is it already added? Does it exist?
 
-if($_POST['action'] == "add_bill_port") { mysql_query("INSERT INTO `bill_ports` (`bill_id`, `port_id`) VALUES ('".mres($_POST['bill_id'])."','".mres($_POST['interface_id'])."')"); }
-if($_POST['action'] == "delete_bill_port") { mysql_query("DELETE FROM `bill_ports` WHERE `bill_id` = '".mres($bill_id)."' AND `port_id` = '".mres($_POST['interface_id'])."'"); }
+echo("
 
-#print_r($_POST);
+<h3>Bill Properties</h3>
+
+<form id='edit' name='edit' method='post' action=''>
+  <input type=hidden name='action' value='update_bill'>
+  <table width='400' border='0'>
+    <tr>
+      <td><div align='right'>Name</div></td>
+      <td colspan='3'><input name='bill_name' size='32' value='" . $bill_data['bill_name'] . "'></input></td>
+    </tr>
+    <tr>
+      <td width='300'><div align='right'>Billing Day</div></td>
+      <td colspan='3'><input name='bill_day' size='20' value='" . $bill_data['bill_day'] . "'></input>Kbps
+      </td>
+    </tr>
+    <tr>
+      <td width='300'><div align='right'>Monthly Quota</div></td>
+      <td colspan='3'><input name='bill_gb' size='20' value='" . $bill_data['bill_gb'] . "'></input>GB
+      </td>
+    </tr>
+    <tr>
+      <td width='300'><div align='right'>CDR with 95th</div></td>
+      <td colspan='3'><input name='bill_cdr' size='20' value='" . $bill_data['bill_cdr'] . "'></input>
+      </td>
+    </tr>
+    <tr>
+      <td align='right'>
+        Type
+      </td>
+      <td>
+        <select name='bill_type'>");
+
+$bill_data_types = array ('cdr' => 'CDR with 95th', 'quota' => 'Monthly Quota');
+
+$unknown = 1;
+foreach ($bill_data_types as $type => $text)
+{
+  echo '          <option value="'.$type.'"';
+  if ($bill_data['bill_type'] == $type)
+  {
+    echo 'selected="1"';
+    $unknown = 0;
+  }
+  echo ' >' . ucfirst($text) . '</option>';
+}
+echo("
+        </select>
+      </td>
+    </tr>");
+
+echo('
+  </table>
+  <input type="submit" name="Submit" value="Save" />
+</form>
+');
+
+echo("<hr />");
 
 
 $ports_array = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                            WHERE B.bill_id = '".$bill_id."' AND P.interface_id = B.port_id
+                            WHERE B.bill_id = '".$bill_data_id."' AND P.interface_id = B.port_id
                             AND D.device_id = P.device_id");
 
 if(mysql_affected_rows()) 
@@ -36,11 +90,11 @@ if(mysql_affected_rows())
   echo("</table>");
 }
 
-  echo("<h3>Add Billed Port</h3>");
+  echo("<h4>Add Port</h4>");
 
   echo("<form action='' method='post'>
       <input type='hidden' name='action' value='add_bill_port'>
-      <input type='hidden' name='bill_id' value='".$bill_id."'>
+      <input type='hidden' name='bill_id' value='".$bill_data_id."'>
 
       <table><tr><td>Device: </td>
        <td><select id='device' class='selector' name='device' onchange='getInterfaceList(this)'>
