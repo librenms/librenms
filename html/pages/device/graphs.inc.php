@@ -19,7 +19,7 @@ while($graph = mysql_fetch_assoc($query))
 
 foreach($config['graph_sections'] as $section) 
 {
-  if(is_array($graph_enable[$section])) 
+  if(isset($graph_enable) && is_array($graph_enable[$section])) 
   {
     $type = strtolower($section);
     if(!$_GET['opta']) { $_GET['opta'] = $type; }
