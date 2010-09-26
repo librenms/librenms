@@ -117,7 +117,7 @@ if ($_GET['status'] == "alerted") {
 }
 
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
-<tr class="tablehead"><th></th><th>Device</th><th>Operating System</th><th>Platform</th><th>Uptime</th></tr>');
+<tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime</th></tr>');
 
 $device_query = mysql_query($sql);
 while ($device = mysql_fetch_array($device_query)) {
