@@ -35,6 +35,7 @@ if(isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"])) {
 $config['title_image']      = "images/observium-logo.png";
 $config['stylesheet']       = "css/styles.css";
 $config['mono_font']        = "DejaVuSansMono";
+#$config['mono_font']	    = "LiberationMono";
 $config['favicon']          = "images/observium-icon.png";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  ## Refresh the page every xx seconds
@@ -60,6 +61,7 @@ $config['ports_page_default']      = "details/"; ## eg "details/" "graphs/bits/"
 $config['snmp']['timeout'] = 1;            # timeout in seconds
 $config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['community'][] = "public"; # Communities to try during discovery (dangerous)
+$config['snmp']['internal'] = false;	   # Enable php_snmp functions to make gets faster
 
 ### Autodiscovery Settings
 
@@ -220,6 +222,5 @@ $config['astext'][65333] = "Cymru Bogon Feed";
 
 ### What should we warn about?
 $config['warn']['ifdown'] = false;
-
 
 ?>

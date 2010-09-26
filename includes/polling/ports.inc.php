@@ -3,6 +3,11 @@
   unset($ports);
   $ports = snmp_cache_ifIndex($device); // Cache Port List
 
+  #mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`) VALUES ('".$device['device_id']."','$ifIndex')");
+
+
+
+
   // Build SNMP Cache Array
   $data_oids = array('ifName','ifDescr','ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifMtu', 'ifSpeed', 'ifHighSpeed', 'ifType', 'ifPhysAddress',
                      'ifPromiscuousMode','ifConnectorPresent','ifDuplex');
@@ -276,7 +281,8 @@
           }
       }
     } elseif($port['ignore'] == "0") {
-      echo("Port Deleted?"); // Port missing from SNMP cache?
+      echo("Port Deleted"); // Port missing from SNMP cache.
+      mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$this_port['ifIndex']."'");
     } else {
       echo("Port Ignored.");
     }

@@ -12,4 +12,5 @@ ALTER TABLE  `mempools` CHANGE  `mempool_index`  `mempool_index` VARCHAR( 16 ) C
 ALTER TABLE `vrfs` CHANGE `mplsVpnVrfRouteDistinguisher` `mplsVpnVrfRouteDistinguisher` varchar(26) default NOT NULL;
 ## Change port rrds
 ALTER TABLE  `devices` ADD  `timeout` INT NULL DEFAULT NULL AFTER  `port`;
-
+ALTER TABLE `devices` ADD `retries` INT NULL DEFAULT NULL AFTER `timeout`;
+ALTER TABLE  `perf_times` CHANGE  `duration`  `duration` DOUBLE( 8, 2 ) NOT NULL
