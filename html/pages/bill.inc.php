@@ -2,7 +2,10 @@
   
 $bill_id = mres($_GET['opta']);
 
-include("bill/actions.inc.php");
+if($_SESSION['userlevel'] == "10") 
+{
+  include("pages/bill/actions.inc.php");
+}
   
 if(bill_permitted($bill_id)) {
  
@@ -68,6 +71,11 @@ if(bill_permitted($bill_id)) {
     if($_GET['optb'] == "edit") { echo("<strong>"); }
     echo("<a href='bill/".$bill_id."/edit/'>Edit</a>");
     if($_GET['optb'] == "edit") { echo("</strong>"); }
+
+    echo(" | ");
+    if($_GET['optb'] == "delete") { echo("<strong>"); }
+    echo("<a href='bill/".$bill_id."/delete/'>Delete</a>");
+    if($_GET['optb'] == "delete") { echo("</strong>"); }
   }
 
   print_optionbar_end();
@@ -79,7 +87,11 @@ if(bill_permitted($bill_id)) {
   
     include("pages/bill/edit.inc.php");
   
-  }elseif($_GET['optb'] == "details") {
+  } elseif($_GET['optb'] == "delete" && $_SESSION['userlevel'] == "10") {
+
+    include("pages/bill/delete.inc.php");
+
+  } elseif($_GET['optb'] == "details") {
   
   
   echo("<h3>Billed Ports</h3>");

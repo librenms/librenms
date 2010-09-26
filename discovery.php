@@ -111,7 +111,7 @@ if (file_exists('.svn'))
   }
 }
 
-$devices_discovered = 0;
+$discovered_devices = 0;
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
 while ($device = mysql_fetch_array($device_query))
@@ -170,18 +170,18 @@ while ($device = mysql_fetch_array($device_query))
 
   echo("Discovered in $device_time seconds\n");
   unset($cache); // Clear cache (unify all things here?)
-  echo("\n"); $devices_discovered++;
+  echo("\n"); $discovered_devices++;
 }
 
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-if($devices_discovered) {
+if($discovered_devices) {
   mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
-                               VALUES ('discover', '$doing', '$start', '$proctime', '$devices_discovered')");
+                               VALUES ('discover', '$doing', '$start', '$proctime', '$discovered_devices')");
 }
 
-$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $polled_devices devices discovered in $proctime secs";
+$string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
 shell_exec("echo '".$string."' >> ".$config['log_file']);

@@ -49,6 +49,17 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
       <td colspan='3'><input name='port' size='20' value='" . $device['port'] . "'></input>
       </td>
     </tr>
+    <tr>
+      <td width='300'><div align='right'>SNMP Timeout</div></td>
+      <td colspan='3'><input name='timeout' size='20' value='" . $device['timeout'] . "'></input>&nbsp;
+      <em>seconds</em>
+      </td>
+    </tr>
+    <tr>
+      <td width='300'><div align='right'>SNMP Retries</div></td>
+      <td colspan='3'><input name='retries' size='20' value='" . $device['retries'] . "'></input>
+      </td>
+    </tr>
 
    <tr>
       <td align='right'>

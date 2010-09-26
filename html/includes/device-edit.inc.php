@@ -7,11 +7,14 @@
   $community = mres($_POST['community']);
   $snmpver = mres($_POST['snmpver']);
   $port = mres($_POST['port']);
+  $timeout = mres($_POST['timeout']);
+  $retries = mres($_POST['retries']);
 
   #FIXME needs more sanity checking! and better feedback
 
   $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `community` = '" . $community . "', `type` = '$type'";
-  $sql .= ", `snmpver` = '" . $snmpver . "', `ignore` = '$ignore',  `disabled` = '$disabled', `port` = '$port' WHERE `device_id` = '".$device['device_id']."'";
+  $sql .= ", `snmpver` = '" . $snmpver . "', `ignore` = '$ignore',  `disabled` = '$disabled', `port` = '$port', ";
+  $sql .= "`timeout` = '$timeout', `retries` = '$retries' WHERE `device_id` = '".$device['device_id']."'";
   $query = mysql_query($sql);
 
   $rows_updated = mysql_affected_rows();
