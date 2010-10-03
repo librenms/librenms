@@ -21,7 +21,7 @@ $graph_type = "processor_usage";
     $text_descr = str_replace("DFC Card", "DFC", $text_descr);
 
 
-    $proc_url   = "?page=device/".$device['device_id']."/health/processors/";
+    $proc_url   = "/device/".$device['device_id']."/health/processors/";
 
     $mini_url = $config['base_url'] . "/graph.php?id=".$proc['processor_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 

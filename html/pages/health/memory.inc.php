@@ -14,7 +14,7 @@ $graph_type = "mempool_usage";
  
     $text_descr = $mempool['mempool_descr'];
 
-    $mempool_url   = "/device/".$device['device_id']."/health/memory/";
+    $mempool_url   = "/device/".$mempool['device_id']."/health/memory/";
     $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
