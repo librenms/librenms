@@ -63,9 +63,8 @@ echo('
 
 echo("<hr />");
 
-
 $ports_array = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
-                            WHERE B.bill_id = '".$bill_data_id."' AND P.interface_id = B.port_id
+                            WHERE B.bill_id = '".$bill_data['bill_id']."' AND P.interface_id = B.port_id
                             AND D.device_id = P.device_id");
 
 if(mysql_affected_rows()) 
@@ -94,7 +93,7 @@ if(mysql_affected_rows())
 
   echo("<form action='' method='post'>
       <input type='hidden' name='action' value='add_bill_port'>
-      <input type='hidden' name='bill_id' value='".$bill_data_id."'>
+      <input type='hidden' name='bill_id' value='".$bill_id."'>
 
       <table><tr><td>Device: </td>
        <td><select id='device' class='selector' name='device' onchange='getInterfaceList(this)'>
