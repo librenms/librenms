@@ -27,6 +27,9 @@ if($multiplier)
   $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
 }
 
+## No?
+#print $multiplier;
+
 $rrd_options .= " CDEF:octets=inoctets,outoctets,+";
 $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
 $rrd_options .= " CDEF:outbits=outoctets,8,*";
