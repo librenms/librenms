@@ -8,7 +8,7 @@ if($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 
-$graph_type = "humidity";
+$graph_type = "sensor_humidity";
 
 echo('<table cellspacing="0" cellpadding="6" width="100%">');
 

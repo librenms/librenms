@@ -24,7 +24,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
     $humidity_year  = "graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
     $humidity_minigraph = "<img src='graph.php?id=" . $humidity['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
 
-    $humidity_link  = "<a href='device/".$device['device_id']."/health/humiditys/' onmouseover=\"return ";
+    $humidity_link  = "<a href='device/".$device['device_id']."/health/humidity/' onmouseover=\"return ";
     $humidity_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$humidity['sensor_descr'];
     $humidity_link .= "</div><div style=\'width: 750px\'><img src=\'$humidity_day\'><img src=\'$humidity_week\'><img src=\'$humidity_month\'><img src=\'$humidity_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
@@ -34,7 +34,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
 
     $humidity['sensor_descr'] = truncate($humidity['sensor_descr'], 25, '');
     echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$humidity_link_a</strong></td><td width=80 align=right class=tablehead>$humidity_link_b<td width=80 align=right class=tablehead>$humidity_link_c</td></tr>");
-    if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
+#    if($i == $rows) { echo("</table></td><td valign=top><table width=100% cellspacing=0 cellpadding=2>"); }
     $i++;
   }
   echo("</table>");

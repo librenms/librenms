@@ -499,6 +499,12 @@ $config['os'][$os]['type']        	= "environment";
 $config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 
+$os = "ipoman";
+$config['os'][$os]['text']              = "Ingrasys iPoMan";
+$config['os'][$os]['type']              = "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
 $os = "wxgoos";
 $config['os'][$os]['text']              = "ITWatchDogs Goose";
 $config['os'][$os]['type']              = "environment";

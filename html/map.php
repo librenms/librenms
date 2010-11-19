@@ -156,7 +156,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
     header("Content-type: image/".$_GET['format']);
   } elseif ($_GET['format'] == "svg") {
     header("Content-type: image/svg+xml");
-    $img = str_replace("<a ", "<a target  = \"_parent\" ", $img);
+    $img = str_replace("<a ", '<a target="_parent" ', $img);
   }
   echo("$img");
 }
