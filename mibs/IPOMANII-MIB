@@ -1,0 +1,4570 @@
+-- Ingrasys iPoManII MIB
+-- MIB for Intelligent Power Management 
+--
+-- { iso org(3) dod(6) internet(1) private(4) enterprises(1) ingrasys(2468)
+-- product(1) pduAgent(4) iPoManII(1)
+-- ==============================================================================================
+---
+---     Revision History
+---
+---     v0.80   20-Apr-2005     Ming Lu/Ingrasys
+---                             Created
+---
+---     v0.81   04-Aug-2007     Ming Lu/Ingrasys
+---                             Modify Some error from Web check issue
+---                             Add Slave mib data and control
+---                             
+---     v0.82   04-Oct-2007     Ming Lu/Ingrasys
+---                             Modify Some error from Web check issue
+---                             
+---     v1.00   06-Dec-2007     Ming Lu/Ingrasys
+---                             Add Slave trap 26-150
+---
+---     v1.01   25-Jan-2008     Ming Lu/Ingrasys
+---                             Modify Some mib wording error
+---                             
+---     v1.02   30-Jan-2008     Ming Lu/Ingrasys
+---                             Modify Some mib wording error
+---                             
+---     v1.03   09-Apr-2010     Ming Lu/Ingrasys
+---                             Add reset WattItem
+---
+IPOMANII-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  enterprises
+    FROM RFC1155-SMI
+  OBJECT-TYPE
+    FROM RFC-1212
+  DisplayString
+    FROM RFC1213-MIB
+  TRAP-TYPE
+    FROM RFC-1215;
+
+ingrasys            OBJECT IDENTIFIER ::= { enterprises 2468 }
+product             OBJECT IDENTIFIER ::= { ingrasys 1 }
+pduAgent            OBJECT IDENTIFIER ::= { product 4 }
+iPoManII              OBJECT IDENTIFIER ::= { pduAgent  2 }
+ipmObjects          OBJECT IDENTIFIER ::= { iPoManII 1 }
+ipmTraps            OBJECT IDENTIFIER ::= { iPoManII 2 }
+                    
+ipmIdent            OBJECT IDENTIFIER ::= { ipmObjects 1 }
+ipmAgent	        OBJECT IDENTIFIER ::= { ipmObjects 2 }
+ipmDevice           OBJECT IDENTIFIER ::= { ipmObjects 3 }
+ipmSlave            OBJECT IDENTIFIER ::= { ipmObjects 4 }
+ipmEnv              OBJECT IDENTIFIER ::= { ipmObjects 5 }
+
+-- ===========================================================================
+--
+-- ipmIdent
+--
+--	iPoManII Identification Group
+--
+-- ===========================================================================
+ipmIdentManufacturer OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of manufacturer."
+       ::= { ipmIdent 1 }
+
+ipmIdentModel OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "The Model designation of device."
+      ::= { ipmIdent 2 }
+
+ipmIdentAgentSoftwareVersion OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..63))
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+               "The firmware version of the device."
+      ::= { ipmIdent 3 }
+
+ipmIdentName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+               "A description of this device."
+      ::= { ipmIdent 4 }
+
+ipmAgentConfig    OBJECT IDENTIFIER ::= { ipmAgent 1 }
+-- ===========================================================================
+--
+-- ipmConfig
+--
+--	iPoManII Configuration Group, configure the secific features of iPoManII
+--
+-- ===========================================================================
+ipmAgentMibVersion OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Mib Version implemented on this device."
+        ::= { ipmAgentConfig 1 }
+
+ipmAgentTime    OBJECT IDENTIFIER ::= { ipmAgent 2 }
+-- ===========================================================================
+--
+-- ipmConfigTime
+--
+--	Date/Time Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentTimeDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date in agent, format is (dd/mm/yyyy)"
+        ::= { ipmAgentTime 1 }
+
+ipmAgentTimeTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (8..8))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in agent, format is (hh:mm:ss)"
+        ::= { ipmAgentTime 2 }
+
+ipmAgentTimerFromNtp OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable the agent to synchronize date/time with NTP server."
+        ::= { ipmAgentTime 3 }
+
+ipmAgentNtpIpAddress OBJECT-TYPE
+       SYNTAX IpAddress
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The ip address of NTP server."
+       ::= { ipmAgentTime 4 }
+
+ipmAgentNtpTimeZone OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    gMT-1200(1),
+                    gMT-1100(2),
+                    gMT-1000(3),
+                    gMT-0900(4),
+                    gMT-0800(5),
+                    gMT-0700(6),
+                    gMT-0600(7),
+                    gMT-0500(8),
+                    gMT-0400(9),
+                    gMT-0330(10),
+                    gMT-0300(11),
+                    gMT-0200(12),
+                    gMT-0100(13),
+                    gMT-0000(14),
+                    gMT0100(15),
+                    gMT0200(16),
+                    gMT0300(17),
+                    gMT0330(18),
+                    gMT0400(19),
+                    gMT0500(20),
+                    gMT0530(21),
+                    gMT0600(22),
+                    gMT0700(23),
+                    gMT0800(24),
+                    gMT0900(25),
+                    gMT1000(26),
+                    gMT1100(27),
+                    gMT1200(28)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Time Zone to use when synchronize with NTP server."
+        ::= { ipmAgentTime 5 }
+
+ipmAgentDayLightSaving OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable the Day Light Saving when synchronize with NTP server."
+        ::= { ipmAgentTime 6 }
+
+ipmAgentNetwork    OBJECT IDENTIFIER ::= { ipmAgent 3 }
+-- ===========================================================================
+--
+-- ipmConfigNetwork
+--
+--	Network Configuration Group of the device.
+--
+-- ===========================================================================
+
+ipmAgentNetworkIp    OBJECT IDENTIFIER ::= { ipmAgentNetwork 1 }
+-- ===========================================================================
+--
+-- ipmAgentNetworkIp
+--
+--	Ip address Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentNetworkIpAdress OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The ip address that NMS can identify the managed device."
+        ::= { ipmAgentNetworkIp 1}
+
+ipmAgentNetworkIpGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The default gateway that allow device managed through routers."
+        ::= { ipmAgentNetworkIp 2}
+
+ipmAgentNetworkIpSubnet OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Internet address subnet mask"
+        ::= { ipmAgentNetworkIp 3}
+
+ipmAgentNetworkDhcpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable DHCP protocol"
+        ::= { ipmAgentNetwork 2 }
+
+ipmAgentNetworkPingControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable to response to PING request."
+        ::= { ipmAgentNetwork 3 }
+
+ipmAgentNetworkTftpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable TFTP protocol"
+        ::= { ipmAgentNetwork 4 }
+
+ipmAgentNetworkTelnet    OBJECT IDENTIFIER ::= { ipmAgentNetwork 5 }
+-- ===========================================================================
+--
+-- ipmConfigNetworkTelnet
+--
+--	Telnet Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentTelnetControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable Telnet protocol."
+        ::= { ipmAgentNetworkTelnet 1 }
+        
+ipmAgentTelnetPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The TCP port for telnet"
+        ::= { ipmAgentNetworkTelnet 2}
+
+ipmAgentNetworkHttp    OBJECT IDENTIFIER ::= { ipmAgentNetwork 6 }
+-- ===========================================================================
+--
+-- ipmConfigNetworkHttp
+--
+--	HTTP Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentHttpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable HTTP protocol."
+        ::= { ipmAgentNetworkHttp 1 }
+        
+ipmAgentHttpPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The TCP port for HTTP."
+        ::= { ipmAgentNetworkHttp 2}
+
+ipmAgentNetworkSnmp    OBJECT IDENTIFIER ::= { ipmAgentNetwork 7 }
+-- ===========================================================================
+--
+-- ipmAgentNetworkSnmp
+--
+--	SNMP Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentSnmpControl OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disable SNMP protocol."
+        ::= { ipmAgentNetworkSnmp 1 }
+        
+ipmAgentSnmpPort OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The UDP port for SNMP."
+        ::= { ipmAgentNetworkSnmp 2}
+
+ipmAgentLog    OBJECT IDENTIFIER ::= { ipmAgentConfig 4 }
+-- ===========================================================================
+--
+-- ipmConfigLog
+--
+--	Log Configuration Group of the device.
+--
+-- ===========================================================================
+pduAgentDataLogInterval OBJECT-TYPE
+        SYNTAX INTEGER (60..28800) -- in seconds
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The interval of the updation of the data log. The value
+                 is in seconds"
+        ::= { ipmAgentLog 1 }
+
+ipmAgentControl    OBJECT IDENTIFIER ::= { ipmAgentConfig 5 }
+-- ===========================================================================
+--
+-- ipmAgentAgentControl
+--
+--	Agent Control Configuration Group of the device.
+--
+-- ===========================================================================
+ipmAgentControlDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+                reset(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset all parameters of the agent to default value."
+        ::= { ipmAgentControl 1}
+
+ipmAgentControlRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                restart(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Restart the agent."
+        ::= { ipmAgentControl 2}
+
+ipmAgentTrap    OBJECT IDENTIFIER ::= { ipmAgentConfig 6 }
+-- ===========================================================================
+--
+-- ipmAgentTrap
+--
+--	Trap Configuration Group of the agent.
+--
+-- ===========================================================================
+ipmAgentTrapRetryCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The count of repeat traps send to NMS before trap
+                 acknowledgement received."
+        ::= { ipmAgentTrap 1}
+
+ipmAgentTrapRetryTime OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time interval in seconds between retry traps sned to NMS."
+        ::= { ipmAgentTrap 2}
+
+ipmAgentTrapAckSignature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The signature of trap acknowledgement."
+        ::= { ipmAgentTrap 3}
+
+
+-- ===========================================================================
+--
+-- ipmAgentTrapsReceiversTable
+-- 
+-- ===========================================================================
+
+ipmAgentTrapsReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmAgentTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send traps to.  The number of
+                 entries is given by the value of agentConfigNumTrapReceivers"
+        ::= { ipmAgentConfig 7}
+
+ipmAgentTrapsReceiversEntry OBJECT-TYPE
+        SYNTAX IpmAgentTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send traps to."
+        INDEX  { trapsIndex }
+        ::= { ipmAgentTrapsReceiversTable 1 }
+
+IpmAgentTrapsReceiversEntry ::=
+        SEQUENCE {
+                trapsIndex              INTEGER,
+                trapsReceiverAddr       IpAddress,
+                receiverCommunityString DisplayString,
+                receiverNmsType         INTEGER,
+                receiverSeverityLevel   INTEGER,
+                receiverDescription     DisplayString
+        }
+
+trapsIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a trap receiver entry."
+        ::= { ipmAgentTrapsReceiversEntry 1 }
+
+trapsReceiverAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to send a trap to."
+        ::= { ipmAgentTrapsReceiversEntry 2 }
+
+receiverCommunityString OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..15))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The community name to use in the trap when
+                 sent to the manager."
+        ::= { ipmAgentTrapsReceiversEntry 3 }
+
+receiverNmsType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                iPoManII-trap(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The trap group that NMS desired."
+        ::= { ipmAgentTrapsReceiversEntry 4 }
+
+receiverSeverityLevel OBJECT-TYPE
+        SYNTAX  INTEGER {
+                informational(1),
+                warning(2),
+                severe(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The severity level of traps to be received by this manager."
+        ::= { ipmAgentTrapsReceiversEntry 5 }
+
+receiverDescription OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Description of trap receivers"
+        ::= { ipmAgentTrapsReceiversEntry 6 }
+
+
+-- ===========================================================================
+--
+-- ipmAgentAccessControlTable
+-- 
+-- ===========================================================================
+ipmAgentAccessControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmAgentAccessControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers which can access the device with private
+                community string."
+        ::= { ipmAgentConfig 8}
+
+ipmAgentAccessControlEntry OBJECT-TYPE
+        SYNTAX IpmAgentAccessControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers."
+        INDEX  { accessIndex}
+        ::= { ipmAgentAccessControlTable 1 }
+
+IpmAgentAccessControlEntry ::=
+        SEQUENCE {
+                accessIndex
+                        INTEGER,
+                accessControlAddr
+                        IpAddress,
+                accessControlMode
+                        INTEGER
+        }
+
+accessIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access control entry."
+        ::= { ipmAgentAccessControlEntry 1 }
+
+accessControlAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to access the device."
+        ::= { ipmAgentAccessControlEntry 2 }
+
+accessControlMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                permitted (1),
+                denied (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Access type, only read/Write access type can change parameter
+                 of the device."
+        ::= { ipmAgentAccessControlEntry 3 }
+
+ipmDeviceInlet	    OBJECT IDENTIFIER ::= { ipmDevice 1 }      
+-- ===========================================================================
+--
+-- ipmDeviceInlet
+--
+--	Inlet  Group
+--
+-- ===========================================================================
+ipmDeviceInletNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number on this device."
+        ::= { ipmDeviceInlet 1}
+
+ipmDeviceInletConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceInletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of inlet on this device."
+        ::= { ipmDeviceInlet 2}
+
+ipmDeviceInletConfigEntry OBJECT-TYPE
+        SYNTAX IpmDeviceInletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number of device."
+        INDEX  { inletConfigIndex}
+        ::= { ipmDeviceInletConfigTable 1 }
+
+IpmDeviceInletConfigEntry ::=
+        SEQUENCE {
+                inletConfigIndex
+                        INTEGER,
+                inletConfigDesc
+                        DisplayString,
+                inletConfigVoltageHigh
+                        INTEGER,
+                inletConfigVoltageHighAction
+                        INTEGER,
+                inletConfigVoltageLow
+                        INTEGER,
+                inletConfigVoltageLowAction
+                        INTEGER,
+                inletConfigCurrentHigh
+                        INTEGER,
+                inletConfigCurrentHighAction
+                        INTEGER,
+                inletConfigFrequencyHigh
+                        INTEGER,
+                inletConfigfrequencyHighAction
+                        INTEGER,                
+                inletConfigFrequencyLow
+                        INTEGER,
+                inletConfigfrequencyLowAction
+                        INTEGER
+        }
+
+inletConfigIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access inlet configuration table."
+        ::= { ipmDeviceInletConfigEntry 1 }
+
+inletConfigDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of inlet of device."
+        ::= { ipmDeviceInletConfigEntry 2 }
+
+inletConfigVoltageHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet high voltage threshold, in volts."
+        ::= { ipmDeviceInletConfigEntry 3 }
+
+inletConfigVoltageHighAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletsOff (1),
+                nothing (2)
+                } 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when inlet voltage higher than set point."
+        ::= { ipmDeviceInletConfigEntry 4 }
+
+inletConfigVoltageLow OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet low voltage threshold, in volts."
+        ::= { ipmDeviceInletConfigEntry 5 }
+
+inletConfigVoltageLowAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletsOff (1),
+                nothing (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when inlet voltage lower than set point."
+        ::= { ipmDeviceInletConfigEntry 6 }
+        
+inletConfigCurrentHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..160) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet low voltage threshold, in 0.1 amps."
+        ::= { ipmDeviceInletConfigEntry 7 }
+
+inletConfigCurrentHighAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletsOff (1),
+                nothing (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when inlet current higher than set point."
+        ::= { ipmDeviceInletConfigEntry 8 }
+
+inletConfigFrequencyHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet high frequency threshold, in hz."
+        ::= { ipmDeviceInletConfigEntry 9 }
+
+inletConfigfrequencyHighAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletsOff (1),
+                nothing (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when inlet frequency higher than set point."
+        ::= { ipmDeviceInletConfigEntry 10 }
+
+inletConfigFrequencyLow OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet low frequency threshold, in hz."
+        ::= { ipmDeviceInletConfigEntry 11 }
+
+inletConfigfrequencyLowAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletsOff (1),
+                nothing (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when inlet frequency lower than set point."
+        ::= { ipmDeviceInletConfigEntry 12 }
+
+ipmDeviceInletStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of inlet on this device."
+        ::= { ipmDeviceInlet 3}
+
+ipmDeviceInletStatusEntry OBJECT-TYPE
+        SYNTAX IpmDeviceInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number of device."
+        INDEX  { inletStatusIndex}
+        ::= { ipmDeviceInletStatusTable 1 }
+
+IpmDeviceInletStatusEntry ::=
+        SEQUENCE {
+                inletStatusIndex
+                        INTEGER,
+                inletStatusVoltage
+                        INTEGER,
+                inletStatusCurrent
+                        INTEGER,
+                inletStatusFrequency
+                        INTEGER,
+                inletStatusKwatt
+                        INTEGER,
+                inletStatusWH
+                        INTEGER
+        }
+
+inletStatusIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access inlet configuration table."
+        ::= { ipmDeviceInletStatusEntry 1 }
+
+inletStatusVoltage OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Voltage in 0.1 volts"
+        ::= { ipmDeviceInletStatusEntry 2 }
+        
+inletStatusCurrent OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Current in 0.001 Amp."
+        ::= { ipmDeviceInletStatusEntry 3 }
+
+inletStatusFrequency OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Frequency in 0.1 Hz"
+        ::= { ipmDeviceInletStatusEntry 4 }
+
+inletStatusKwatt OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.1 KW/H"
+        ::= { ipmDeviceInletStatusEntry 5 }
+
+inletStatusWH OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.1 W/H"
+        ::= { ipmDeviceInletStatusEntry 6 }
+
+
+inletWattReset OBJECT-TYPE
+        SYNTAX INTEGER {
+		        none(1),
+                inlet1(2),
+                inlet2(3)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset inlet kw."
+        ::= { ipmDeviceInlet 4}
+
+
+ipmDeviceOutlet	    OBJECT IDENTIFIER ::= { ipmDevice 2 }      
+-- ===========================================================================
+--
+-- ipmDeviceOutlet
+--
+--	Inlet  Group
+--
+-- ===========================================================================
+ipmDeviceOutletNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number on this device."
+        ::= { ipmDeviceOutlet 1}
+
+ipmDeviceOutletConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceOutletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmDeviceOutlet 2}
+
+ipmDeviceOutletConfigEntry OBJECT-TYPE
+        SYNTAX IpmDeviceOutletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number of device."
+        INDEX  { inletConfigIndex}
+        ::= { ipmDeviceOutletConfigTable 1 }
+
+IpmDeviceOutletConfigEntry ::=
+        SEQUENCE {
+                outletConfigIndex
+                        INTEGER,
+                outletConfigDesc
+                        DisplayString,
+                outletConfigLocation
+                        DisplayString,
+                outletConfigOnDelay
+                        INTEGER,
+                outletConfigOffDelay
+                        INTEGER,
+                outletConfigCurrentHigh
+                        INTEGER,
+                outletConfigCurrentHighAction
+                        INTEGER
+         }
+
+outletConfigIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access inlet configuration table."
+        ::= { ipmDeviceOutletConfigEntry 1 }
+
+outletConfigDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of outlet of device."
+        ::= { ipmDeviceOutletConfigEntry 2 }
+
+outletConfigLocation OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Location of device connectted to this outlet."
+        ::= { ipmDeviceOutletConfigEntry 3 }
+
+outletConfigOnDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmDeviceOutletConfigEntry 4 }
+
+outletConfigOffDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn off tis outlet, in seconds."
+        ::= { ipmDeviceOutletConfigEntry 5 }
+
+outletConfigCurrentHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet high current threshold, in amp."
+        ::= { ipmDeviceOutletConfigEntry 6 }
+
+outletConfigCurrentHighAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+                outletOff (1),
+                nothing (2)
+                } 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reaction of the device when outlet current higher than set point."
+        ::= { ipmDeviceOutletConfigEntry 7 }
+
+   
+
+ipmDeviceOutletStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceOutletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmDeviceOutlet 3}
+
+ipmDeviceOutletStatusEntry OBJECT-TYPE
+        SYNTAX IpmDeviceOutletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { outletStatusIndex}
+        ::= { ipmDeviceOutletStatusTable 1 }
+
+IpmDeviceOutletStatusEntry ::=
+        SEQUENCE {
+                outletStatusIndex
+                        INTEGER,
+                outletStatusStatus
+                        INTEGER,
+                outletStatusCurrent
+                        INTEGER,
+                outletStatusKwatt
+                        INTEGER,
+                outletStatusWH
+                        INTEGER,
+                outletStatusStateTime
+                        INTEGER,
+                outletStatusTimeToGo
+                        INTEGER
+        }
+
+outletStatusIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmDeviceOutletStatusEntry 1 }
+
+outletStatusStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknow (1),
+                outletOff (2),
+                outletOn (3),
+                outletOffToOn (4),
+                outletOnToOff (5),
+		outletCycling (6)
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Outlet state"
+        ::= { ipmDeviceOutletStatusEntry 2 }     
+
+outletStatusCurrent OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet Current in 0.001 Amp."
+        ::= { ipmDeviceOutletStatusEntry 3 }
+        
+outletStatusKwatt OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet Kwatt in 0.001 KW/H."
+        ::= { ipmDeviceOutletStatusEntry 4 }
+
+outletStatusWH OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet Watt in 0.1 W/H."
+        ::= { ipmDeviceOutletStatusEntry 5 }
+
+outletStatusStateTime OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Time in seconds since the outlet changed to current state."
+        ::= { ipmDeviceOutletStatusEntry 6 }     
+
+outletStatusTimeToGo OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Remain time the outlet state will be changed by agent, in seconds"
+        ::= { ipmDeviceOutletStatusEntry 7 }     
+
+ipmDeviceOutletControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceOutletControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmDeviceOutlet 4}
+
+ipmDeviceOutletControlEntry OBJECT-TYPE
+        SYNTAX IpmDeviceOutletControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { outletControlIndex}
+        ::= { ipmDeviceOutletControlTable 1 }
+
+IpmDeviceOutletControlEntry ::=
+        SEQUENCE {
+                outletControlIndex
+                        INTEGER,
+                outletControlControl
+                        INTEGER
+        }
+
+outletControlIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmDeviceOutletControlEntry 1 }
+
+outletControlControl OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+                cancelAction(2),
+                onImmediately(3),
+                offImmediately(4),
+                cycleImmediately(5),
+                onByActionTimer(6),
+                offByActionTimer(7),
+                cycleByActionTimer(8),
+                onThenOffByActionTimers(9),
+                offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmDeviceOutletControlEntry 2 }
+
+ipmDeviceOutletControlAll OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+                cancelAction(2),
+                onImmediately(3),
+                offImmediately(4),
+                cycleImmediately(5),
+                onByActionTimers(6),
+                offByActionTimers(7),
+                cycleByActionTimers(8),
+                onThenOffByActionTimers(9),
+                offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control all outlets perform action as requested."
+        ::= { ipmDeviceOutlet 5}
+
+ipmDeviceOutletWattReset OBJECT-TYPE
+        SYNTAX INTEGER {
+		        none(1),
+                outleta(2),
+                outletb(3),
+                outletc(4),
+                outletd(5),
+                outlete(6),
+                outletf(7),
+                
+                outletg(8),
+                outleth(9),
+                outleti(10),
+                outletj(11),
+                outletk(12),
+                outletl(13)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset outlet kw."
+        ::= { ipmDeviceOutlet 6}
+
+
+ipmDeviceCcOut	    OBJECT IDENTIFIER ::= { ipmDevice 3 }      
+-- ===========================================================================
+--
+-- ipmDeviceCCOut
+--
+--	Contact Closure Output Group
+--
+-- ===========================================================================
+ipmDeviceCcOutNumber OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The contact closure output number on this device."
+        ::= { ipmDeviceCcOut 1}
+
+ipmDeviceCcOutConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceCcOutConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of contact closure output on this device."
+        ::= { ipmDeviceCcOut 2}
+
+ipmDeviceCcOutConfigEntry OBJECT-TYPE
+        SYNTAX IpmDeviceCcOutConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The CC number of device."
+        INDEX  { ccOutConfigIndex}
+        ::= { ipmDeviceCcOutConfigTable 1 }
+
+IpmDeviceCcOutConfigEntry ::=
+        SEQUENCE {
+                ccOutConfigIndex
+                        INTEGER,
+                ccOutConfigDesc
+                        DisplayString,
+                ccOutConfigEventAction
+                        INTEGER,
+                ccOutConfigCloseDelay
+                        INTEGER,
+                ccOutConfigOpenDelay
+                        INTEGER
+         }
+
+ccOutConfigIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to access contact closure output configuration table."
+        ::= { ipmDeviceCcOutConfigEntry 1 }
+
+ccOutConfigDesc OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a contact closure output of device."
+        ::= { ipmDeviceCcOutConfigEntry 2 }
+
+ccOutConfigEventAction OBJECT-TYPE
+        SYNTAX INTEGER {
+		yes (1),
+		no (2)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable/disble the contact closure output to react to events."
+        ::= { ipmDeviceCcOutConfigEntry 3 }
+
+ccOutConfigCloseDelay OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time in seconds when the contact closure output set to close."
+        ::= { ipmDeviceCcOutConfigEntry 4 }
+
+ccOutConfigOpenDelay OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time in seconds when the contact closure output set to open."
+        ::= { ipmDeviceCcOutConfigEntry 5 }
+
+ipmDeviceCcOutStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceCcOutStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of contact closure output on this device."
+        ::= { ipmDeviceCcOut 3}
+
+ipmDeviceCcOutStatusEntry OBJECT-TYPE
+        SYNTAX IpmDeviceCcOutStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The CC number of device."
+        INDEX  { ccOutStatusIndex}
+        ::= { ipmDeviceCcOutStatusTable 1 }
+
+IpmDeviceCcOutStatusEntry ::=
+        SEQUENCE {
+                ccOutStatusIndex
+                        INTEGER,
+                ccOutStatusStatus
+                        INTEGER,
+                ccOutStatusTimeOnState
+                        INTEGER
+         }
+
+ccOutStatusIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to access contact closure output configuration table."
+        ::= { ipmDeviceCcOutStatusEntry 1 }
+
+ccOutStatusStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+		closed (1),
+		open (2)
+	}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "State of a contact closure output of device."
+        ::= { ipmDeviceCcOutStatusEntry 2 }
+
+ccOutStatusTimeOnState OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Time in seconds since the contact closure output changed to current state."
+        ::= { ipmDeviceCcOutStatusEntry 3 }
+
+ipmDeviceCcOutControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceCcOutControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of contact closure output on this device."
+        ::= { ipmDeviceCcOut 4}
+
+ipmDeviceCcOutControlEntry OBJECT-TYPE
+        SYNTAX IpmDeviceCcOutControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { ccOutControlIndex}
+        ::= { ipmDeviceCcOutControlTable 1 }
+
+IpmDeviceCcOutControlEntry ::=
+        SEQUENCE {
+                ccOutControlIndex
+                        INTEGER,
+		ccOutControlControl
+			INTEGER
+        }
+
+ccOutControlIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access contact closure output configuration table."
+        ::= { ipmDeviceCcOutControlEntry 1 }
+
+ccOutControlControl OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+                cancelAction(2),
+                closeImmediately(3),
+                openImmediately(4),
+                cycleImmediately(5),
+                closeByCloseTimer(6),
+                openByOpenTimer(7),
+                cycleByActionTimer(8),
+                closeThenOpenByActionTimers(9),
+                openThenCloseByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the contact closure output perform action as requested."
+        ::= { ipmDeviceCcOutControlEntry 2 }
+
+ipmSlaveState	    OBJECT IDENTIFIER ::= { ipmSlave 1 }      
+-- ===========================================================================
+-- 
+-- ipmSlaveState
+-- 
+--     Daisy Chain Device Group
+-- 
+-- ===========================================================================
+--
+
+ipmSlaveStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveStateEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveState 1}
+
+ipmSlaveStateEntry OBJECT-TYPE
+        SYNTAX IpmSlaveStateEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveStateIndex}
+        ::= { ipmSlaveStateTable 1 }
+
+IpmSlaveStateEntry ::=
+        SEQUENCE {
+                slaveStateIndex
+                        INTEGER,
+                slaveStateControl01
+                        INTEGER
+        }
+
+slaveStateIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveStateEntry 1 }
+
+slaveStateControl01 OBJECT-TYPE
+        SYNTAX INTEGER {
+		        disconnected(1),
+                connected(2)
+	}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested to slave outlet A"
+        ::= { ipmSlaveStateEntry 2 }
+
+ipmSlaveInlet	    OBJECT IDENTIFIER ::= { ipmSlave 2 }      
+-- ===========================================================================
+-- 
+-- ipmSlaveAllDevice
+-- 
+--     Daisy Chain Device Group
+-- 
+-- ===========================================================================
+
+ipmSlaveInletStatus	    OBJECT IDENTIFIER ::= { ipmSlaveInlet 1 }      
+-- ===========================================================================
+-- 
+-- ipmSlaveAllDevice
+-- 
+--     Daisy Chain Device Group
+-- 
+-- ===========================================================================
+
+
+ipmDeviceSlaveInletStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceSlaveInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of inlet on this device."
+        ::= { ipmSlaveInletStatus 1}
+
+ipmDeviceSlaveInletStatusEntry OBJECT-TYPE
+        SYNTAX IpmDeviceSlaveInletStatusEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number of device."
+        INDEX  { inletStatusIndex}
+        ::= { ipmDeviceSlaveInletStatusTable 1 }
+
+IpmDeviceSlaveInletStatusEntry ::=
+        SEQUENCE {
+                inletSlaveStatusIndex
+                        INTEGER,
+                inletSlaveStatusVoltage
+                        INTEGER,
+                inletSlaveStatusCurrent
+                        INTEGER,
+                inletSlaveStatusFrequency
+                        INTEGER,
+                inletSlaveStatusKwatt
+                        INTEGER,
+                inletSlaveStatusWH
+                        INTEGER,
+                inletSlaveStatusVoltage2
+                        INTEGER,
+                inletSlaveStatusCurrent2
+                        INTEGER,
+                inletSlaveStatusFrequency2
+                        INTEGER,
+                inletSlaveStatusKwatt2
+                        INTEGER,
+                inletSlaveStatusWH2
+                        INTEGER
+        }
+
+inletSlaveStatusIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access inlet configuration table."
+        ::= { ipmDeviceSlaveInletStatusEntry 1 }
+
+inletSlaveStatusVoltage OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Voltage in 0.1 volts"
+        ::= { ipmDeviceSlaveInletStatusEntry 2 }
+        
+inletSlaveStatusCurrent OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Current in 0.001 Amp."
+        ::= { ipmDeviceSlaveInletStatusEntry 3 }
+
+inletSlaveStatusFrequency OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Frequency in 0.1 Hz"
+        ::= { ipmDeviceSlaveInletStatusEntry 4 }
+
+inletSlaveStatusKwatt OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.001 KW/H"
+        ::= { ipmDeviceSlaveInletStatusEntry 5 }
+
+inletSlaveStatusWH OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.001 KW/H"
+        ::= { ipmDeviceSlaveInletStatusEntry 6 }
+
+inletSlaveStatusVoltage2 OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Voltage in 0.1 volts"
+        ::= { ipmDeviceSlaveInletStatusEntry 7 }
+        
+inletSlaveStatusCurrent2 OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Current in 0.001 Amp."
+        ::= { ipmDeviceSlaveInletStatusEntry 8 }
+
+inletSlaveStatusFrequency2 OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Frequency in 0.1 Hz"
+        ::= { ipmDeviceSlaveInletStatusEntry 9 }
+
+inletSlaveStatusKwatt2 OBJECT-TYPE
+        SYNTAX INTEGER (0..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.001 KW/H"
+        ::= { ipmDeviceSlaveInletStatusEntry 10 }
+
+inletSlaveStatusWH2 OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet Kwatt in 0.001 KW/H"
+        ::= { ipmDeviceSlaveInletStatusEntry 11 }
+
+ipmSlaveInletConfig	    OBJECT IDENTIFIER ::= { ipmSlaveInlet 2 }      
+-- ===========================================================================
+-- 
+-- ipmSlaveAllDevice
+-- 
+--     Daisy Chain Device Group
+-- 
+-- ===========================================================================
+
+
+ipmDeviceslaveInletConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmDeviceslaveInletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of inlet on this device."
+        ::= { ipmSlaveInletConfig 1}
+
+ipmDeviceslaveInletConfigEntry OBJECT-TYPE
+        SYNTAX IpmDeviceslaveInletConfigEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The inlet number of device."
+        INDEX  { slaveInletConfigIndex}
+        ::= { ipmDeviceslaveInletConfigTable 1 }
+
+IpmDeviceslaveInletConfigEntry ::=
+        SEQUENCE {
+                slaveInletConfigIndex
+                        INTEGER,
+                slaveInletConfigVoltageHigh
+                        INTEGER,
+                slaveInletConfigVoltageLow
+                        INTEGER,
+                slaveInlet2ConfigVoltageHigh
+                        INTEGER,
+                slaveInlet2ConfigVoltageLow
+                        INTEGER
+        }
+
+slaveInletConfigIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access inlet configuration table."
+        ::= { ipmDeviceslaveInletConfigEntry 1 }
+
+
+slaveInletConfigVoltageHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet high voltage threshold, in volts."
+        ::= { ipmDeviceslaveInletConfigEntry 2 }
+
+
+slaveInletConfigVoltageLow OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet low voltage threshold, in volts."
+        ::= { ipmDeviceslaveInletConfigEntry 3 }
+
+        
+slaveInlet2ConfigVoltageHigh OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet 2 high voltage threshold, in volts."
+        ::= { ipmDeviceslaveInletConfigEntry 4 }
+
+slaveInlet2ConfigVoltageLow OBJECT-TYPE
+        SYNTAX INTEGER (1..65500) -- 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Inlet low voltage threshold, in volts."
+        ::= { ipmDeviceslaveInletConfigEntry 5 }
+
+
+ipmSlaveOutlet	    OBJECT IDENTIFIER ::= { ipmSlave 3 }      
+-- ===========================================================================
+-- 
+-- ipmSlaveAllDevice
+-- 
+--     Daisy Chain Device Group
+-- 
+-- ===========================================================================
+
+ipmSlaveOutletConfig	    OBJECT IDENTIFIER ::= { ipmSlaveOutlet 1 }      
+-- ===========================================================================
+-- 
+-- ipmOutletConfig
+-- 
+--     Outlet Config Group
+-- 
+-- ===========================================================================
+
+--
+-- Outlet Name Description
+--
+
+ipmSlaveDeviceOutletNameTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletNameEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletConfig 1}
+
+ipmSlaveDeviceOutletNameEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletNameEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletNameIndex}
+        ::= { ipmSlaveDeviceOutletNameTable 1 }
+
+IpmSlaveDeviceOutletNameEntry ::=
+        SEQUENCE {
+                slaveOutletNameIndex
+                        INTEGER,
+                slaveOutletName01
+                        DisplayString,
+                slaveOutletName02
+                        DisplayString,
+                slaveOutletName03
+                        DisplayString,
+                slaveOutletName04
+                        DisplayString,
+                slaveOutletName05
+                        DisplayString,
+                slaveOutletName06
+                        DisplayString,
+                slaveOutletName07
+                        DisplayString,
+                slaveOutletName08
+                        DisplayString,
+                slaveOutletName09
+                        DisplayString,
+                slaveOutletName10
+                        DisplayString,
+                slaveOutletName11
+                        DisplayString,
+                slaveOutletName12
+                        DisplayString
+        }
+
+slaveOutletNameIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletNameEntry 1 }
+
+slaveOutletName01 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 2 }
+
+slaveOutletName02 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 3 }
+
+slaveOutletName03 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 4 }
+
+slaveOutletName04 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 5 }
+
+slaveOutletName05 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 6 }
+
+slaveOutletName06 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 7 }
+
+slaveOutletName07 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 8 }
+
+slaveOutletName08 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 9 }
+
+slaveOutletName09 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 10 }
+
+slaveOutletName10 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 11 }
+
+slaveOutletName11 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 12 }
+
+slaveOutletName12 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletNameEntry 13 }
+
+-- ===============================
+-- Outlet Location Description
+-- ===============================
+
+
+ipmSlaveDeviceOutletLocationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletLocationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletConfig 2}
+
+ipmSlaveDeviceOutletLocationEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletLocationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletLocationIndex}
+        ::= { ipmSlaveDeviceOutletLocationTable 1 }
+
+IpmSlaveDeviceOutletLocationEntry ::=
+        SEQUENCE {
+                slaveOutletLocationIndex
+                        INTEGER,
+                slaveOutletLocation01
+                        DisplayString,
+                slaveOutletLocation02
+                        DisplayString,
+                slaveOutletLocation03
+                        DisplayString,
+                slaveOutletLocation04
+                        DisplayString,
+                slaveOutletLocation05
+                        DisplayString,
+                slaveOutletLocation06
+                        DisplayString,
+                slaveOutletLocation07
+                        DisplayString,
+                slaveOutletLocation08
+                        DisplayString,
+                slaveOutletLocation09
+                        DisplayString,
+                slaveOutletLocation10
+                        DisplayString,
+                slaveOutletLocation11
+                        DisplayString,
+                slaveOutletLocation12
+                        DisplayString
+        }
+
+slaveOutletLocationIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletLocationEntry 1 }
+
+slaveOutletLocation01 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 2 }
+
+slaveOutletLocation02 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 3 }
+
+slaveOutletLocation03 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 4 }
+
+slaveOutletLocation04 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 5 }
+
+slaveOutletLocation05 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 6 }
+
+slaveOutletLocation06 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 7 }
+
+slaveOutletLocation07 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 8 }
+
+slaveOutletLocation08 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 9 }
+
+slaveOutletLocation09 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 10 }
+
+slaveOutletLocation10 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 11 }
+
+slaveOutletLocation11 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 12 }
+
+slaveOutletLocation12 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "A Description of a outlet name of device."
+        ::= { ipmSlaveDeviceOutletLocationEntry 13 }
+
+-- ==========================================
+-- Outlet On Delay Time
+-- ==========================================
+
+ipmSlaveDeviceOutletOnTimeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletOnTimeEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletConfig 3}
+
+ipmSlaveDeviceOutletOnTimeEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletOnTimeEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletOnTimeIndex}
+        ::= { ipmSlaveDeviceOutletOnTimeTable 1 }
+
+IpmSlaveDeviceOutletOnTimeEntry ::=
+        SEQUENCE {
+                slaveOutletOnTimeIndex
+                        INTEGER,
+                slaveOutletOnTime01
+                        INTEGER,
+                slaveOutletOnTime02
+                        INTEGER,
+                slaveOutletOnTime03
+                        INTEGER,
+                slaveOutletOnTime04
+                        INTEGER,
+                slaveOutletOnTime05
+                        INTEGER,
+                slaveOutletOnTime06
+                        INTEGER,
+                slaveOutletOnTime07
+                        INTEGER,
+                slaveOutletOnTime08
+                        INTEGER,
+                slaveOutletOnTime09
+                        INTEGER,
+                slaveOutletOnTime10
+                        INTEGER,
+                slaveOutletOnTime11
+                        INTEGER,
+                slaveOutletOnTime12
+                        INTEGER
+        }
+
+slaveOutletOnTimeIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 1 }
+
+slaveOutletOnTime01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 2 }
+
+slaveOutletOnTime02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 3 }
+
+slaveOutletOnTime03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 4 }
+
+slaveOutletOnTime04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 5 }
+
+slaveOutletOnTime05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 6 }
+
+slaveOutletOnTime06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 7 }
+
+slaveOutletOnTime07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 8 }
+
+slaveOutletOnTime08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 9 }
+
+slaveOutletOnTime09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 10 }
+
+slaveOutletOnTime10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 11 }
+
+
+slaveOutletOnTime11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 12 }
+
+slaveOutletOnTime12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOnTimeEntry 13 }
+
+-- ==========================================
+-- Outlet Off Delay Time
+-- ==========================================
+
+ipmSlaveDeviceOutletOffTimeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletOffTimeEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletConfig 4}
+
+ipmSlaveDeviceOutletOffTimeEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletOffTimeEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletOffTimeIndex}
+        ::= { ipmSlaveDeviceOutletOffTimeTable 1 }
+
+IpmSlaveDeviceOutletOffTimeEntry ::=
+        SEQUENCE {
+                slaveOutletOffTimeIndex
+                        INTEGER,
+                slaveOutletOffTime01
+                        INTEGER,
+                slaveOutletOffTime02
+                        INTEGER,
+                slaveOutletOffTime03
+                        INTEGER,
+                slaveOutletOffTime04
+                        INTEGER,
+                slaveOutletOffTime05
+                        INTEGER,
+                slaveOutletOffTime06
+                        INTEGER,
+                slaveOutletOffTime07
+                        INTEGER,
+                slaveOutletOffTime08
+                        INTEGER,
+                slaveOutletOffTime09
+                        INTEGER,
+                slaveOutletOffTime10
+                        INTEGER,
+                slaveOutletOffTime11
+                        INTEGER,
+                slaveOutletOffTime12
+                        INTEGER
+        }
+
+slaveOutletOffTimeIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 1 }
+
+slaveOutletOffTime01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 2 }
+
+slaveOutletOffTime02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 3 }
+
+slaveOutletOffTime03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 4 }
+
+slaveOutletOffTime04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 5 }
+
+slaveOutletOffTime05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 6 }
+
+slaveOutletOffTime06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 7 }
+
+slaveOutletOffTime07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 8 }
+
+slaveOutletOffTime08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 9 }
+
+slaveOutletOffTime09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 10 }
+
+slaveOutletOffTime10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 11 }
+
+
+slaveOutletOffTime11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 12 }
+
+slaveOutletOffTime12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay time before turn on tis outlet, in seconds."
+        ::= { ipmSlaveDeviceOutletOffTimeEntry 13 }
+
+
+-- ==========================================
+-- Outlet Current TH
+-- ==========================================
+
+ipmSlaveDeviceOutletCurrThTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletCurrThEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletConfig 5}
+
+ipmSlaveDeviceOutletCurrThEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletCurrThEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletCurrThIndex}
+        ::= { ipmSlaveDeviceOutletCurrThTable 1 }
+
+IpmSlaveDeviceOutletCurrThEntry ::=
+        SEQUENCE {
+                slaveOutletCurrThIndex
+                        INTEGER,
+                slaveOutletCurrTh01
+                        INTEGER,
+                slaveOutletCurrTh02
+                        INTEGER,
+                slaveOutletCurrTh03
+                        INTEGER,
+                slaveOutletCurrTh04
+                        INTEGER,
+                slaveOutletCurrTh05
+                        INTEGER,
+                slaveOutletCurrTh06
+                        INTEGER,
+                slaveOutletCurrTh07
+                        INTEGER,
+                slaveOutletCurrTh08
+                        INTEGER,
+                slaveOutletCurrTh09
+                        INTEGER,
+                slaveOutletCurrTh10
+                        INTEGER,
+                slaveOutletCurrTh11
+                        INTEGER,
+                slaveOutletCurrTh12
+                        INTEGER
+        }
+
+slaveOutletCurrThIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 1 }
+
+slaveOutletCurrTh01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 2 }
+
+slaveOutletCurrTh02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 3 }
+
+slaveOutletCurrTh03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 4 }
+
+slaveOutletCurrTh04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 5 }
+
+slaveOutletCurrTh05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 6 }
+
+slaveOutletCurrTh06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 7 }
+
+slaveOutletCurrTh07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 8 }
+
+slaveOutletCurrTh08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 9 }
+
+slaveOutletCurrTh09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 10 }
+
+slaveOutletCurrTh10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 11 }
+
+
+slaveOutletCurrTh11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 12 }
+
+slaveOutletCurrTh12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Outlet Current Threshold ,in 0.1 Amp."
+        ::= { ipmSlaveDeviceOutletCurrThEntry 13 }
+
+ipmSlaveOutletStatus	    OBJECT IDENTIFIER ::= { ipmSlaveOutlet 2 }      
+-- ===========================================================================
+-- 
+-- ipmOutletStatus
+-- 
+--     Outlet Status Group
+-- 
+-- ===========================================================================
+-- ==========================================
+-- Outlet Current
+-- ==========================================
+
+ipmSlaveDeviceOutletCurrentTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletCurrentEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletStatus 1}
+
+ipmSlaveDeviceOutletCurrentEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletCurrentEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletCurrentIndex}
+        ::= { ipmSlaveDeviceOutletCurrentTable 1 }
+
+IpmSlaveDeviceOutletCurrentEntry ::=
+        SEQUENCE {
+                slaveOutletCurrentIndex
+                        INTEGER,
+                slaveOutletCurrent01
+                        INTEGER,
+                slaveOutletCurrent02
+                        INTEGER,
+                slaveOutletCurrent03
+                        INTEGER,
+                slaveOutletCurrent04
+                        INTEGER,
+                slaveOutletCurrent05
+                        INTEGER,
+                slaveOutletCurrent06
+                        INTEGER,
+                slaveOutletCurrent07
+                        INTEGER,
+                slaveOutletCurrent08
+                        INTEGER,
+                slaveOutletCurrent09
+                        INTEGER,
+                slaveOutletCurrent10
+                        INTEGER,
+                slaveOutletCurrent11
+                        INTEGER,
+                slaveOutletCurrent12
+                        INTEGER
+        }
+
+slaveOutletCurrentIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 1 }
+
+slaveOutletCurrent01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet A Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 2 }
+
+slaveOutletCurrent02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet B Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 3 }
+
+slaveOutletCurrent03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet C Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 4 }
+
+slaveOutletCurrent04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet D Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 5 }
+
+slaveOutletCurrent05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet E Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 6 }
+
+slaveOutletCurrent06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet F Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 7 }
+
+slaveOutletCurrent07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet G Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 8 }
+
+slaveOutletCurrent08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet H Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 9 }
+
+slaveOutletCurrent09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet I Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 10 }
+
+slaveOutletCurrent10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet J Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 11 }
+
+
+slaveOutletCurrent11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet K Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 12 }
+
+slaveOutletCurrent12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet L Current in 0.001 Amp."
+        ::= { ipmSlaveDeviceOutletCurrentEntry 13 }
+
+-- ==========================================
+-- Outlet W/H
+-- ==========================================
+
+ipmSlaveDeviceOutletWattTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletWattEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletStatus 2}
+
+ipmSlaveDeviceOutletWattEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletWattEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletWattIndex}
+        ::= { ipmSlaveDeviceOutletWattTable 1 }
+
+IpmSlaveDeviceOutletWattEntry ::=
+        SEQUENCE {
+                slaveOutletWattIndex
+                        INTEGER,
+                slaveOutletWatt01
+                        INTEGER,
+                slaveOutletWatt02
+                        INTEGER,
+                slaveOutletWatt03
+                        INTEGER,
+                slaveOutletWatt04
+                        INTEGER,
+                slaveOutletWatt05
+                        INTEGER,
+                slaveOutletWatt06
+                        INTEGER,
+                slaveOutletWatt07
+                        INTEGER,
+                slaveOutletWatt08
+                        INTEGER,
+                slaveOutletWatt09
+                        INTEGER,
+                slaveOutletWatt10
+                        INTEGER,
+                slaveOutletWatt11
+                        INTEGER,
+                slaveOutletWatt12
+                        INTEGER
+        }
+
+slaveOutletWattIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletWattEntry 1 }
+
+slaveOutletWatt01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet A Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 2 }
+
+slaveOutletWatt02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet B Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 3 }
+
+slaveOutletWatt03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet C Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 4 }
+
+slaveOutletWatt04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet D Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 5 }
+
+slaveOutletWatt05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet E Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 6 }
+
+slaveOutletWatt06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet F Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 7 }
+
+slaveOutletWatt07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet G Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 8 }
+
+slaveOutletWatt08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet H Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 9 }
+
+slaveOutletWatt09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet I Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 10 }
+
+slaveOutletWatt10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet J Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 11 }
+
+
+slaveOutletWatt11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet K Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 12 }
+
+slaveOutletWatt12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet L Watt in 0.1 W/H."
+        ::= { ipmSlaveDeviceOutletWattEntry 13 }
+
+-- ==========================================
+-- Outlet W/H
+-- ==========================================
+
+ipmSlaveDeviceOutletKwattTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletKwattEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletStatus 3}
+
+ipmSlaveDeviceOutletKwattEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletKwattEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletKwattIndex}
+        ::= { ipmSlaveDeviceOutletKwattTable 1 }
+
+IpmSlaveDeviceOutletKwattEntry ::=
+        SEQUENCE {
+                slaveOutletKwattIndex
+                        INTEGER,
+                slaveOutletKwatt01
+                        INTEGER,
+                slaveOutletKwatt02
+                        INTEGER,
+                slaveOutletKwatt03
+                        INTEGER,
+                slaveOutletKwatt04
+                        INTEGER,
+                slaveOutletKwatt05
+                        INTEGER,
+                slaveOutletKwatt06
+                        INTEGER,
+                slaveOutletKwatt07
+                        INTEGER,
+                slaveOutletKwatt08
+                        INTEGER,
+                slaveOutletKwatt09
+                        INTEGER,
+                slaveOutletKwatt10
+                        INTEGER,
+                slaveOutletKwatt11
+                        INTEGER,
+                slaveOutletKwatt12
+                        INTEGER
+        }
+
+slaveOutletKwattIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletKwattEntry 1 }
+
+slaveOutletKwatt01 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet A Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 2 }
+
+slaveOutletKwatt02 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet B Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 3 }
+
+slaveOutletKwatt03 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet C Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 4 }
+
+slaveOutletKwatt04 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet D Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 5 }
+
+slaveOutletKwatt05 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet E Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 6 }
+
+slaveOutletKwatt06 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet F Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 7 }
+
+slaveOutletKwatt07 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet G Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 8 }
+
+slaveOutletKwatt08 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet H Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 9 }
+
+slaveOutletKwatt09 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet I Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 10 }
+
+slaveOutletKwatt10 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet J Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 11 }
+
+
+slaveOutletKwatt11 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet K Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 12 }
+
+slaveOutletKwatt12 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet L Kwatt in 0.001 KW/H."
+        ::= { ipmSlaveDeviceOutletKwattEntry 13 }
+
+
+ipmSlaveOutletAction	    OBJECT IDENTIFIER ::= { ipmSlaveOutlet 3 }      
+-- ===========================================================================
+-- 
+-- ipmOutletStatus
+-- 
+--     Outlet Action Group
+-- 
+-- ===========================================================================
+
+ipmSlaveDeviceOutletActionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpmSlaveDeviceOutletActionEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of outlet on this device."
+        ::= { ipmSlaveOutletAction 1}
+
+ipmSlaveDeviceOutletActionEntry OBJECT-TYPE
+        SYNTAX IpmSlaveDeviceOutletActionEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The outlet number of device."
+        INDEX  { slaveOutletActionIndex}
+        ::= { ipmSlaveDeviceOutletActionTable 1 }
+
+IpmSlaveDeviceOutletActionEntry ::=
+        SEQUENCE {
+                slaveOutletActionIndex
+                        INTEGER,
+                slaveOutletAction01
+                        INTEGER,
+                slaveOutletAction02
+                        INTEGER,
+                slaveOutletAction03
+                        INTEGER,
+                slaveOutletAction04
+                        INTEGER,
+                slaveOutletAction05
+                        INTEGER,
+                slaveOutletAction06
+                        INTEGER,
+                slaveOutletAction07
+                        INTEGER,
+                slaveOutletAction08
+                        INTEGER,
+                slaveOutletAction09
+                        INTEGER,
+                slaveOutletAction10
+                        INTEGER,
+                slaveOutletAction11
+                        INTEGER,
+                slaveOutletAction12
+                        INTEGER
+        }
+
+slaveOutletActionIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a access outlet configuration table."
+        ::= { ipmSlaveDeviceOutletActionEntry 1 }
+
+slaveOutletAction01 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 2 }
+
+slaveOutletAction02 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 3 }
+
+slaveOutletAction03 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 4 }
+
+slaveOutletAction04 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 5 }
+
+slaveOutletAction05 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 6 }
+
+slaveOutletAction06 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 7 }
+
+slaveOutletAction07 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 8 }
+
+slaveOutletAction08 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 9 }
+
+slaveOutletAction09 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 10 }
+
+slaveOutletAction10 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 11 }
+
+slaveOutletAction11 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 12 }
+
+slaveOutletAction12 OBJECT-TYPE
+        SYNTAX INTEGER {
+		none(1),
+        cancelAction(2),
+        onImmediately(3),
+        offImmediately(4),
+        cycleImmediately(5),
+        onByActionTimer(6),
+        offByActionTimer(7),
+        cycleByActionTimer(8),
+        onThenOffByActionTimers(9),
+        offThenOnByActionTimers(10)
+	}
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Set to control the outlet perform action as requested."
+        ::= { ipmSlaveDeviceOutletActionEntry 13 }
+
+ipmEnvEmd	    OBJECT IDENTIFIER ::= { ipmEnv 1 }      
+-- ===========================================================================
+--
+-- ipmEnvEmd
+--
+--	Environmental Monitor Device Group
+--
+-- ===========================================================================
+
+ipmEnvEmdStatus	    OBJECT IDENTIFIER ::= { ipmEnvEmd 1 }      
+-- ===========================================================================
+--
+-- ipmEnvEmd
+--
+--	Environmental Monitor Device Status Group
+--
+-- ===========================================================================
+
+ipmEnvEmdStatusEmdType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                disabled(2),
+                eMD-HT(3),
+                eMD-T(4)
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Type."
+        ::= { ipmEnvEmdStatus 1 }
+
+ipmEnvEmdStatusTemperature OBJECT-TYPE
+        SYNTAX INTEGER (1..10000) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Temperature in 0.1 degree C."
+        ::= { ipmEnvEmdStatus  2 }
+
+ipmEnvEmdStatusHumidity OBJECT-TYPE
+        SYNTAX INTEGER (1..10000) --
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Humidity in 0.1%."
+        ::= { ipmEnvEmdStatus  3 }
+
+ipmEnvEmdStatusAlarm1 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                disabled(2),
+                alarm(3),
+                normal(4)
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Alarm-1 state."
+        ::= { ipmEnvEmdStatus 4 }
+
+ipmEnvEmdStatusAlarm2 OBJECT-TYPE
+        SYNTAX  INTEGER {
+                unknown(1),
+                disabled(2),
+                alarm(3),
+                normal(4)
+                }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Alarm-2 state."
+        ::= { ipmEnvEmdStatus 5 }
+
+ipmEnvEmdConfig	    OBJECT IDENTIFIER ::= { ipmEnvEmd 2 }      
+-- ===========================================================================
+--
+-- ipmEnvEmd
+--
+--	Environmental Monitor Device Configuration Group
+--
+-- ===========================================================================
+ipmEnvEmdConfigEmdPresence OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                autoDetect(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Configure the EMD presence by auto-detect or not exist (disabled)."
+        ::= { ipmEnvEmdConfig 1 }
+
+ipmEnvEmdConfigEmdName OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of Emd."
+       ::= { ipmEnvEmdConfig 2 }
+
+ipmEnvEmdConfigTemp	    OBJECT IDENTIFIER ::= { ipmEnvEmdConfig 3 }      
+-- ===========================================================================
+--
+-- ipmEnvEmdConfigTemp
+--
+--	Environmental Monitor Device Temperature Configuration Group
+--
+-- ===========================================================================
+ipmEnvEmdConfigTempName OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of EMD Temperature sensor."
+       ::= { ipmEnvEmdConfigTemp 1 }
+
+ipmEnvEmdConfigTempHighSetPoint OBJECT-TYPE
+        SYNTAX INTEGER (5..65) --
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Temperature set point high, alarm will active when temperature 
+		 over this value, in degree C."
+        ::= { ipmEnvEmdConfigTemp  2 }
+
+ipmEnvEmdConfigTempHighStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enabled/disabled the high setpoint be applied or not"
+        ::= { ipmEnvEmdConfigTemp 3 }
+
+ipmEnvEmdConfigTempLowSetPoint OBJECT-TYPE
+        SYNTAX INTEGER (5..65) --
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Temperature set point high, alarm will active when temperature 
+		 under this value, in degree C."
+        ::= { ipmEnvEmdConfigTemp  4 }
+
+ipmEnvEmdConfigTempLowStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enabled/disabled the low setpoint be applied or not"
+        ::= { ipmEnvEmdConfigTemp 5 }
+
+ipmEnvEmdConfigTempOffset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                t0p0(1),
+                t0p5(2),
+                t1p0(3),
+                t1p5(4),
+                t2p0(5),
+                t2p5(6),
+                t3p0(7),
+                t-0p5(8),
+                t-1p0(9),
+                t-1p5(10),
+                t-2p0(11),
+                t-2p5(12),
+                t-3p0(13)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Offset of temperature in degree C to adjust EMD temperature measurement."
+        ::= { ipmEnvEmdConfigTemp 6 }
+        
+ipmEnvEmdConfigHumi	    OBJECT IDENTIFIER ::= { ipmEnvEmdConfig 4 }      
+-- ===========================================================================
+--
+-- ipmEnvEmdConfigHumi
+--
+--	Environmental Monitor Device Humidity Configuration Group
+--
+-- ===========================================================================
+ipmEnvEmdConfigHumiName OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of EMD Humidity."
+       ::= { ipmEnvEmdConfigHumi 1 }
+
+ipmEnvEmdConfigHumiHighSetPoint OBJECT-TYPE
+        SYNTAX INTEGER (5..95) --
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD humidity set point high, alarm will active when humidity 
+		 over this value, in %."
+        ::= { ipmEnvEmdConfigHumi  2 }
+
+ipmEnvEmdConfigHumiHighStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enabled/disabled the high setpoint be applied or not"
+        ::= { ipmEnvEmdConfigHumi 3 }
+
+ipmEnvEmdConfigHumiLowSetPoint OBJECT-TYPE
+        SYNTAX INTEGER (5..95) --
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD humidity set point low, alarm will active when humidity 
+		 under this value, in %."
+        ::= { ipmEnvEmdConfigHumi  4 }
+
+ipmEnvEmdConfigHumiLowStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enabled/disabled the high setpoint be applied or not"
+        ::= { ipmEnvEmdConfigHumi 5 }
+
+ipmEnvEmdConfigHumiOffset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                h0p0(1),
+                h1p0(2),
+                h2p0(3),
+                h3p0(4),
+                h4p0(5),
+                h5p0(6),
+                h6p0(7),
+                h-1p0(8),
+                h-2p0(9),
+                h-3p0(10),
+                h-4p0(11),
+                h-5p0(12),
+                h-6p0(13)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Emd Hum Offset;"
+        ::= { ipmEnvEmdConfigHumi 6 }
+
+ipmEnvEmdConfigAlarm1	    OBJECT IDENTIFIER ::= { ipmEnvEmdConfig 5 }      
+-- ===========================================================================
+--
+-- ipmEnvEmdConfigAlarm1
+--
+--	Environmental Monitor Device Alarm-1 Configuration Group
+--
+-- ===========================================================================
+ipmEnvEmdConfigAlarm1Name OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of EMD Alarm-1."
+       ::= { ipmEnvEmdConfigAlarm1 1 }
+
+ipmEnvEmdConfigAlarm1Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                normalOpen(2),
+                normalClose(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Alarm-1 type"
+        ::= { ipmEnvEmdConfigAlarm1 2 }
+
+ipmEnvEmdConfigAlarm2	    OBJECT IDENTIFIER ::= { ipmEnvEmdConfig 6 }      
+-- ===========================================================================
+--
+-- ipmEnvEmdConfigAlarm2
+--
+--	Environmental Monitor Device Alarm-2 Configuration Group
+--
+-- ===========================================================================
+ipmEnvEmdConfigAlarm2Name OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+       ACCESS read-write
+       STATUS mandatory
+       DESCRIPTION
+               "The name of EMD Alarm-2."
+       ::= { ipmEnvEmdConfigAlarm2 1 }
+
+ipmEnvEmdConfigAlarm2Type OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                normalOpen(2),
+                normalClose(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "EMD Alarm-2 type"
+        ::= { ipmEnvEmdConfigAlarm2 2 }
+
+
+-- ===========================================================================
+-- ipmTraps
+--
+-- iPoManII Trap group
+-- ===========================================================================
+
+   -- This section defines the well-known notifications sent by
+   -- iPoManII agents.
+
+ipmInletVoltageTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusVoltage,
+        inletConfigVoltageHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The input voltage over high threshold."
+        ::= 1
+
+ipmInletVoltageNotTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusVoltage,
+        inletConfigVoltageHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The input voltage return from over high threshold."
+        ::= 2
+
+ipmInletVoltageTooLow TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusVoltage,
+        inletConfigVoltageLow,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The input voltage under low threshold."
+        ::= 3
+
+ipmInletVoltageNotTooLow TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusVoltage,
+        inletConfigVoltageLow,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The input voltage return from under low threshold."
+        ::= 4
+
+ipmInletCurrentTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusCurrent,
+        inletConfigCurrentHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The input current over high threshold."
+        ::= 5
+
+ipmInletCurrentNotTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusCurrent,
+        inletConfigCurrentHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The input current return from over high threshold."
+        ::= 6
+
+ipmInletFrequencyTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusFrequency,
+        inletConfigFrequencyHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The input frequency over high threshold."
+        ::= 7
+
+ipmInletFrequencyNotTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusFrequency,
+        inletConfigFrequencyHigh,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The input frequency return from over high threshold."
+        ::= 8
+
+ipmInletFrequencyTooLow TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusFrequency,
+        inletConfigFrequencyLow,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The input frequency under low threshold."
+        ::= 9
+
+ipmInletFrequencyNotTooLow TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	inletConfigIndex,
+        inletStatusFrequency,
+        inletConfigFrequencyLow,
+        inletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The input frequency return from under low threshold."
+        ::= 10
+
+ipmOutletCurrentTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	outletConfigIndex,
+        outletStatusCurrent,
+        outletConfigCurrentHigh,
+        outletConfigDesc
+        }
+        DESCRIPTION
+                "CRITICAL: The output current of outlet over high threshold."
+        ::= 11
+
+ipmOutletCurrentNotTooHigh TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	outletConfigIndex,
+        outletStatusCurrent,
+        outletConfigCurrentHigh,
+        outletConfigDesc
+        }
+        DESCRIPTION
+                "WARNING: The output current of outlet return from over high threshold."
+        ::= 12
+
+ipmOutletStateChanged TRAP-TYPE
+        ENTERPRISE ipmTraps
+        VARIABLES {
+	outletConfigIndex,
+	outletStatusStatus,
+        outletConfigDesc
+        }
+        DESCRIPTION
+                "INFORMATION: The outlet state had changed from on to off, or from off to on."
+        ::= 13
+
+ipmEmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusTemperature,
+        ipmEnvEmdConfigTempHighSetPoint,
+        ipmEnvEmdConfigTempName
+        }
+        DESCRIPTION
+                "INFORMATION: emd Temperature Not High."
+        ::= 14
+
+ipmEmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusTemperature,
+        ipmEnvEmdConfigTempHighSetPoint,
+        ipmEnvEmdConfigTempName
+        }
+        DESCRIPTION
+                "WARNING:  emd Temperature Too High."
+        ::= 15
+
+ipmEmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusTemperature,
+        ipmEnvEmdConfigTempLowSetPoint,
+        ipmEnvEmdConfigTempName
+        }
+        DESCRIPTION
+                "INFORMATION: emd Temperature Not Low."
+        ::= 16
+
+ipmEmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusTemperature,
+        ipmEnvEmdConfigTempLowSetPoint,
+        ipmEnvEmdConfigTempName
+        }
+        DESCRIPTION
+                "WARNING: emd Temperature Too Low."
+        ::= 17
+
+ipmEmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusHumidity,
+        ipmEnvEmdConfigHumiHighSetPoint,
+        ipmEnvEmdConfigHumiName
+        }
+        DESCRIPTION
+                "INFORMATION: emd Humidity Not High."
+        ::= 18
+
+ipmEmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusHumidity,
+        ipmEnvEmdConfigHumiHighSetPoint,
+        ipmEnvEmdConfigHumiName
+        }
+        DESCRIPTION
+                "WARNING: emd Humidity Too High."
+        ::= 19
+
+ipmEmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusHumidity,
+        ipmEnvEmdConfigHumiLowSetPoint,
+        ipmEnvEmdConfigHumiName
+        }
+        DESCRIPTION
+                "INFORMATION: emd Humidity Not Low."
+        ::= 20
+
+ipmEmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdStatusHumidity,
+        ipmEnvEmdConfigHumiLowSetPoint,
+        ipmEnvEmdConfigHumiName
+        }
+        DESCRIPTION
+                "WARNING: emd Humidity Too Low."
+        ::= 21
+
+ipmEmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdConfigAlarm1Type,
+        ipmEnvEmdConfigAlarm1Name
+        }
+        DESCRIPTION
+                "INFORMATION: emd Alarm1 Normal."
+        ::= 22
+
+ipmEmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdConfigAlarm1Type,
+        ipmEnvEmdConfigAlarm1Name
+        }
+        DESCRIPTION
+                "WARNING: emd Alarm1 Active."
+        ::= 23
+        
+ipmEmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdConfigAlarm2Type,
+        ipmEnvEmdConfigAlarm2Name
+        }
+        DESCRIPTION
+                "INFORMATION: emd Alarm2 Normal."
+        ::= 24
+
+ipmEmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        VARIABLES {
+        ipmEnvEmdConfigAlarm2Type,
+        ipmEnvEmdConfigAlarm2Name
+        }
+        DESCRIPTION
+                "WARNING: emd Alarm2 Active."
+        ::= 25
+
+ipmSlave01Inlet01OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 voltage over high threshold."
+        ::= 26
+
+ipmSlave01Inlet01NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 voltage Not over high threshold."
+        ::= 27
+
+ipmSlave01Inlet02OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 voltage over high threshold."
+        ::= 28
+
+ipmSlave01Inlet02NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 voltage Not over high threshold."
+        ::= 29
+
+ipmSlave01Inlet01UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 voltage under low threshold."
+        ::= 30
+
+ipmSlave01Inlet01NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 voltage Not under low threshold."
+        ::= 31
+
+ipmSlave01Inlet02UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 voltage under low threshold."
+        ::= 32
+
+ipmSlave01Inlet02NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 voltage Not under low threshold."
+        ::= 33
+
+ipmSlave01Inlet01CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 current over high threshold."
+        ::= 34
+
+ipmSlave01Inlet01NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input01 current not over high threshold."
+        ::= 35
+
+ipmSlave01Inlet02CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 current over high threshold."
+        ::= 36
+
+ipmSlave01Inlet02NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave01 input02 current not over high threshold."
+        ::= 37
+
+ipmSlave01EmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Temperature Not High."
+        ::= 38
+
+ipmSlave01EmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Temperature Too High."
+        ::= 39
+
+ipmSlave01EmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Temperature Not Low."
+        ::= 40
+
+ipmSlave01EmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Temperature Too Low."
+        ::= 41
+
+ipmSlave01EmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Humidity Not High."
+        ::= 42
+
+ipmSlave01EmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Humidity Too High."
+        ::= 43
+
+ipmSlave01EmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Humidity Not Low."
+        ::= 44
+
+ipmSlave01EmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Humidity Too Low."
+        ::= 45
+
+ipmSlave01EmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Alarm1 Normal."
+        ::= 46
+
+ipmSlave01EmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Alarm1 Active."
+        ::= 47
+        
+ipmSlave01EmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave01 emd Alarm2 Normal."
+        ::= 48
+
+ipmSlave01EmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 emd Alarm2 Active."
+        ::= 49
+
+ipmSlave01OutletCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave01 Outlet Current over threshold."
+        ::= 50
+
+ipmSlave02Inlet01OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 voltage over high threshold."
+        ::= 51
+
+ipmSlave02Inlet01NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 voltage Not over high threshold."
+        ::= 52
+
+ipmSlave02Inlet02OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 voltage over high threshold."
+        ::= 53
+
+ipmSlave02Inlet02NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 voltage Not over high threshold."
+        ::= 54
+
+ipmSlave02Inlet01UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 voltage under low threshold."
+        ::= 55
+
+ipmSlave02Inlet01NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 voltage Not under low threshold."
+        ::= 56
+
+ipmSlave02Inlet02UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 voltage under low threshold."
+        ::= 57
+
+ipmSlave02Inlet02NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 voltage Not under low threshold."
+        ::= 58
+
+ipmSlave02Inlet01CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 current over high threshold."
+        ::= 59
+
+ipmSlave02Inlet01NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input01 current not over high threshold."
+        ::= 60
+
+ipmSlave02Inlet02CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 current over high threshold."
+        ::= 61
+
+ipmSlave02Inlet02NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave02 input02 current not over high threshold."
+        ::= 62
+
+ipmSlave02EmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Temperature Not High."
+        ::= 63
+
+ipmSlave02EmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Temperature Too High."
+        ::= 64
+
+ipmSlave02EmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Temperature Not Low."
+        ::= 65
+
+ipmSlave02EmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Temperature Too Low."
+        ::= 66
+
+ipmSlave02EmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Humidity Not High."
+        ::= 67
+
+ipmSlave02EmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Humidity Too High."
+        ::= 68
+
+ipmSlave02EmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Humidity Not Low."
+        ::= 69
+
+ipmSlave02EmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Humidity Too Low."
+        ::= 70
+
+ipmSlave02EmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Alarm1 Normal."
+        ::= 71
+
+ipmSlave02EmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Alarm1 Active."
+        ::= 72
+        
+ipmSlave02EmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave02 emd Alarm2 Normal."
+        ::= 73
+
+ipmSlave02EmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 emd Alarm2 Active."
+        ::= 74
+
+ipmSlave02OutletCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave02 Outlet Current over threshold."
+        ::= 75
+
+ipmSlave03Inlet01OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 voltage over high threshold."
+        ::= 76
+
+ipmSlave03Inlet01NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 voltage Not over high threshold."
+        ::= 77
+
+ipmSlave03Inlet02OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 voltage over high threshold."
+        ::= 78
+
+ipmSlave03Inlet02NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 voltage Not over high threshold."
+        ::= 79
+
+ipmSlave03Inlet01UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 voltage under low threshold."
+        ::= 80
+
+ipmSlave03Inlet01NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 voltage Not under low threshold."
+        ::= 81
+
+ipmSlave03Inlet02UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 voltage under low threshold."
+        ::= 82
+
+ipmSlave03Inlet02NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 voltage Not under low threshold."
+        ::= 83
+
+ipmSlave03Inlet01CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 current over high threshold."
+        ::= 84
+
+ipmSlave03Inlet01NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input01 current not over high threshold."
+        ::= 85
+
+ipmSlave03Inlet02CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 current over high threshold."
+        ::= 86
+
+ipmSlave03Inlet02NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave03 input02 current not over high threshold."
+        ::= 87
+
+ipmSlave03EmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Temperature Not High."
+        ::= 88
+
+ipmSlave03EmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Temperature Too High."
+        ::= 89
+
+ipmSlave03EmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Temperature Not Low."
+        ::= 90
+
+ipmSlave03EmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Temperature Too Low."
+        ::= 91
+
+ipmSlave03EmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Humidity Not High."
+        ::= 92
+
+ipmSlave03EmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Humidity Too High."
+        ::= 93
+
+ipmSlave03EmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Humidity Not Low."
+        ::= 94
+
+ipmSlave03EmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Humidity Too Low."
+        ::= 95
+
+ipmSlave03EmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Alarm1 Normal."
+        ::= 96
+
+ipmSlave03EmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Alarm1 Active."
+        ::= 97
+        
+ipmSlave03EmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave03 emd Alarm2 Normal."
+        ::= 98
+
+ipmSlave03EmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 emd Alarm2 Active."
+        ::= 99
+
+ipmSlave03OutletCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave03 Outlet Current over threshold."
+        ::= 100
+
+ipmSlave04Inlet01OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 voltage over high threshold."
+        ::= 101
+
+ipmSlave04Inlet01NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 voltage Not over high threshold."
+        ::= 102
+
+ipmSlave04Inlet02OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 voltage over high threshold."
+        ::= 103
+
+ipmSlave04Inlet02NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 voltage Not over high threshold."
+        ::= 104
+
+ipmSlave04Inlet01UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 voltage under low threshold."
+        ::= 105
+
+ipmSlave04Inlet01NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 voltage Not under low threshold."
+        ::= 106
+
+ipmSlave04Inlet02UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 voltage under low threshold."
+        ::= 107
+
+ipmSlave04Inlet02NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 voltage Not under low threshold."
+        ::= 108
+
+ipmSlave04Inlet01CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 current over high threshold."
+        ::= 109
+
+ipmSlave04Inlet01NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input01 current not over high threshold."
+        ::= 110
+
+ipmSlave04Inlet02CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 current over high threshold."
+        ::= 111
+
+ipmSlave04Inlet02NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave04 input02 current not over high threshold."
+        ::= 112
+
+ipmSlave04EmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Temperature Not High."
+        ::= 113
+
+ipmSlave04EmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Temperature Too High."
+        ::= 114
+
+ipmSlave04EmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Temperature Not Low."
+        ::= 115
+
+ipmSlave04EmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Temperature Too Low."
+        ::= 116
+
+ipmSlave04EmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Humidity Not High."
+        ::= 117
+
+ipmSlave04EmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Humidity Too High."
+        ::= 118
+
+ipmSlave04EmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Humidity Not Low."
+        ::= 119
+
+ipmSlave04EmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Humidity Too Low."
+        ::= 120
+
+ipmSlave04EmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Alarm1 Normal."
+        ::= 121
+
+ipmSlave04EmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Alarm1 Active."
+        ::= 122
+        
+ipmSlave04EmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave04 emd Alarm2 Normal."
+        ::= 123
+
+ipmSlave04EmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 emd Alarm2 Active."
+        ::= 124
+
+ipmSlave04OutletCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave04 Outlet Current over threshold."
+        ::= 125
+
+ipmSlave05Inlet01OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 voltage over high threshold."
+        ::= 126
+
+ipmSlave05Inlet01NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 voltage Not over high threshold."
+        ::= 127
+
+ipmSlave05Inlet02OverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 voltage over high threshold."
+        ::= 128
+
+ipmSlave05Inlet02NotOverHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 voltage Not over high threshold."
+        ::= 129
+
+ipmSlave05Inlet01UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 voltage under low threshold."
+        ::= 130
+
+ipmSlave05Inlet01NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 voltage Not under low threshold."
+        ::= 131
+
+ipmSlave05Inlet02UnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 voltage under low threshold."
+        ::= 132
+
+ipmSlave05Inlet02NotUnderLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 voltage Not under low threshold."
+        ::= 133
+
+ipmSlave05Inlet01CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 current over high threshold."
+        ::= 134
+
+ipmSlave05Inlet01NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input01 current not over high threshold."
+        ::= 135
+
+ipmSlave05Inlet02CurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 current over high threshold."
+        ::= 136
+
+ipmSlave05Inlet02NotCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "CRITICAL: The Slave05 input02 current not over high threshold."
+        ::= 137
+
+ipmSlave05EmdTemperatureNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Temperature Not High."
+        ::= 138
+
+ipmSlave05EmdTemperatureTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Temperature Too High."
+        ::= 139
+
+ipmSlave05EmdTemperatureNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Temperature Not Low."
+        ::= 140
+
+ipmSlave05EmdTemperatureTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Temperature Too Low."
+        ::= 141
+
+ipmSlave05EmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Humidity Not High."
+        ::= 142
+
+ipmSlave05EmdHumidityTooHigh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Humidity Too High."
+        ::= 143
+
+ipmSlave05EmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Humidity Not Low."
+        ::= 144
+
+ipmSlave05EmdHumidityTooLow TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Humidity Too Low."
+        ::= 145
+
+ipmSlave05EmdAlarm1Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Alarm1 Normal."
+        ::= 146
+
+ipmSlave05EmdAlarm1Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Alarm1 Active."
+        ::= 147
+        
+ipmSlave05EmdAlarm2Normal TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "INFORMATION: The Slave05 emd Alarm2 Normal."
+        ::= 148
+
+ipmSlave05EmdAlarm2Active TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 emd Alarm2 Active."
+        ::= 149
+
+ipmSlave05OutletCurrentOverTh TRAP-TYPE
+        ENTERPRISE      ipmTraps
+        DESCRIPTION
+                "WARNING: The Slave05 Outlet Current over threshold."
+        ::= 150
+
+   END

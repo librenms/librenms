@@ -7,7 +7,7 @@ if($total = mysql_result(mysql_query("SELECT count(sensor_id) from sensors WHERE
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/current.png'> Current</p>");
   $i = '1';
-  $currents = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'");
+  $currents = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "' ORDER BY sensor_index");
   echo("<table width=100% valign=top>");
   while($current = mysql_fetch_array($currents)) {
     if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
