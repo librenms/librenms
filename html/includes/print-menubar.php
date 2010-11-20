@@ -54,12 +54,12 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 
 foreach ($config['device_types'] as $devtype)
 {
-  echo '        <li><a href="devices/' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>';
+  echo('        <li><a href="devices/' . $devtype['type'] . '/"><img src="images/icons/' . $devtype['icon'] . '" border="0" align="absmiddle" /> ' . $devtype['text'] . '</a></li>');
 }
 
 ?>
         <li><hr width="140" /></li>
-        <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo $device_alerts ?>)</a></li>
+        <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo($device_alerts) ?>)</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
   echo('
@@ -118,7 +118,7 @@ if ($config['show_locations'])
     {
       if ($row['location'] != '')
       {
-        echo '        <li><a href="?page=devices&location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>';
+        echo('        <li><a href="?page=devices&location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>');
       }
     }
 ?>
@@ -277,7 +277,7 @@ echo('        <li><hr /></li>
         <li><a href="?page=edituser"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
         <li><hr width="140" /></li>');
       }
-      echo ('
+      echo('
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
     </ul>

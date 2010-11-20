@@ -10,7 +10,6 @@ include_once("Net/IPv6.php");
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
 include_once($config['install_dir'] . "/includes/generic.php");
-include_once($config['install_dir'] . "/includes/procurve.php");
 include_once($config['install_dir'] . "/includes/print-functions.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");

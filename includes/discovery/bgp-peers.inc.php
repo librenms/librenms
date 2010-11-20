@@ -31,7 +31,7 @@ if ($config['enable_bgp'])
       
       if($peer && $peer_ip != "0.0.0.0") 
       {
-        if ($debug) echo "Found peer $peer_ip (AS$peer_as)\n";
+        if ($debug) echo("Found peer $peer_ip (AS$peer_as)\n");
 	$peerlist[] = array('ip' => $peer_ip, 'as' => $peer_as);
       } 
     } # Foreach  
@@ -51,7 +51,7 @@ if ($config['enable_bgp'])
       
         if($peer) 
         {
-          if ($debug) echo "Found peer $peer_ip (AS$peer_as)\n";
+          if ($debug) echo("Found peer $peer_ip (AS$peer_as)\n");
 	  $peerlist[] = array('ip' => $peer_ip, 'as' => $peer_as);
         }
       } # Foreach  

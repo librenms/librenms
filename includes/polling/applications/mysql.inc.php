@@ -8,7 +8,7 @@ $mysql_cmd .= " nsExtendOutputFull.5.109.121.115.113.108";
 
 $mysql  = shell_exec($mysql_cmd);
 
-echo " mysql...";
+echo(" mysql...");
 
 
 $data = explode("\n", $mysql);
@@ -110,5 +110,5 @@ if (!is_file($mysql_rrd)) {
 }
 
 rrdtool_update($mysql_rrd, "N:$nstring");
-echo "done ";
+echo("done ");
 ?>

@@ -40,7 +40,7 @@ if (is_numeric($cpu_usage))
                     RRA:MIN:0.5:24:2000 \
                     RRA:MIN:0.5:288:2000");
   }
-  echo "CPU: $cpu_usage%\n";
+  echo("CPU: $cpu_usage%\n");
   rrdtool_update($cpurrd, " N:$cpu_usage");
 }
 

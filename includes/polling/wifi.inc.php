@@ -1,6 +1,6 @@
 <?php
 
-echo "Wireless: ";
+echo("Wireless: ");
 
 if ($device['type'] == 'network')
 {
@@ -9,7 +9,7 @@ if ($device['type'] == 'network')
   if ($device['os'] == 'airport')
   {
 
-    echo "Checking Airport Wireless clients... ";
+    echo("Checking Airport Wireless clients... ");
 
     $wificlients1 = snmp_get($device, "wirelessNumber.0", "-OUqnv", "AIRPORT-BASESTATION-3-MIB") +0;
 
@@ -21,12 +21,12 @@ if ($device['type'] == 'network')
   if ($device['os'] == 'ios' and substr($device['hardware'],0,4) == 'AIR-')
   {
 
-    echo "Checking Aironet Wireless clients... ";
+    echo("Checking Aironet Wireless clients... ");
 
     $wificlients1 = snmp_get($device, "cDot11ActiveWirelessClients.1", "-OUqnv", "CISCO-DOT11-ASSOCIATION-MIB");
     $wificlients2 = snmp_get($device, "cDot11ActiveWirelessClients.2", "-OUqnv", "CISCO-DOT11-ASSOCIATION-MIB");
     
-    echo ($wificlients1 +0) . " clients on dot11Radio0, " . ($wificlients2 +0) . " clients on dot11Radio1\n";
+    echo(($wificlients1 +0) . " clients on dot11Radio0, " . ($wificlients2 +0) . " clients on dot11Radio1\n");
   }
   
   
@@ -76,6 +76,6 @@ if ($device['type'] == 'network')
 
 }
 
-echo "\n";
+echo("\n");
 
 ?>

@@ -1,11 +1,11 @@
 #!/usr/bin/env php
 <?php
 
-echo("PLEASE USE 'poller.php' INSTEAD!");
+echo("\nPLEASE USE 'poller.php' INSTEAD!\n");
 
 include("poller.php");
 
-echo("PLEASE USE 'poller.php' INSTEAD!");
+echo("\nPLEASE USE 'poller.php' INSTEAD!\n");
 
 
 ?>

@@ -8,7 +8,7 @@ $nginx_cmd .= " nsExtendOutputFull.5.110.103.105.110.120";
 
 $nginx  = shell_exec($nginx_cmd);
 
-echo " nginx statistics\n";
+echo(" nginx statistics\n");
 
 list($active, $reading, $writing, $waiting, $req) = explode("\n", $nginx);
 if (!is_file($nginx_rrd)) {

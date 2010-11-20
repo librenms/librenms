@@ -32,7 +32,6 @@ while($humidity = mysql_fetch_array($hum_data)) {
 
   if($humidity['sensor_current'] > $humidity['sensor_limit_low'] && $hum <= $humidity['sensor_limit_low']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
     notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
@@ -41,7 +40,6 @@ while($humidity = mysql_fetch_array($hum_data)) {
   }
   else if($humidity['sensor_current'] < $humidity['sensor_limit'] && $hum >= $humidity['sensor_limit']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
     notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);

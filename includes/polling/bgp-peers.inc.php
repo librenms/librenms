@@ -15,7 +15,7 @@ while($peer = mysql_fetch_array($peers)) {
 if (!strstr($peer['bgpPeerIdentifier'],':'))
 {
   # v4 BGP4 MIB
-  ## FIX ME - needs moved to function
+  ## FIXME - needs moved to function
   $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m BGP4-MIB -OUvq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
   $peer_cmd .= "bgpPeerState." . $peer['bgpPeerIdentifier'] . " bgpPeerAdminStatus." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerOutUpdates." . $peer['bgpPeerIdentifier'] . " bgpPeerInTotalMessages." . $peer['bgpPeerIdentifier'] . " ";
   $peer_cmd .= "bgpPeerOutTotalMessages." . $peer['bgpPeerIdentifier'] . " bgpPeerFsmEstablishedTime." . $peer['bgpPeerIdentifier'] . " bgpPeerInUpdateElapsedTime." . $peer['bgpPeerIdentifier'] . " ";
@@ -31,8 +31,8 @@ if ($device['os'] == "junos")
 
   if (!isset($junos_v6))
   {
-    echo "\nCaching Oids...";
-    ## FIX ME - needs moved to function
+    echo("\nCaching Oids...");
+    ## FIXME - needs moved to function
     $peer_cmd  = $config['snmpwalk'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUnq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6";
     foreach (explode("\n",trim(`$peer_cmd`)) as $oid)
@@ -42,7 +42,7 @@ if ($device['os'] == "junos")
       $junos_v6[implode('.',array_slice($peer_id,35))] = implode('.',array_slice($peer_id,18));
     }
   }
-  ## FIX ME - move to function (and clean up, wtf?)
+  ## FIXME - move to function (and clean up, wtf?)
   $peer_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . "/junos -m BGP4-V2-MIB-JUNIPER -OUvq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $peer_cmd .= " jnxBgpM2PeerState.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6." . $junos_v6[$peer_ip]; # Should be jnxBgpM2CfgPeerAdminStatus but doesn't seem to be implemented?
@@ -54,11 +54,11 @@ if ($device['os'] == "junos")
   $peer_cmd .= " jnxBgpM2PeerInUpdatesElapsedTime.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= " jnxBgpM2PeerLocalAddr.0.ipv6." . $junos_v6[$peer_ip];
   $peer_cmd .= ' -M"' . $config['install_dir'] . '/mibs/junos"|grep -v "No Such Instance"';
-  if ($debug) echo "\n$peer_cmd\n";
+  if ($debug) echo("\n$peer_cmd\n");
   $peer_data = trim(`$peer_cmd`);
   list($bgpPeerState, $bgpPeerAdminStatus, $bgpPeerInUpdates, $bgpPeerOutUpdates, $bgpPeerInTotalMessages, $bgpPeerOutTotalMessages, $bgpPeerFsmEstablishedTime, $bgpPeerInUpdateElapsedTime, $bgpLocalAddr) = explode("\n", $peer_data);
   
-  if ($debug) { echo "State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n"; }
+  if ($debug) { echo("State = $bgpPeerState - AdminStatus: $bgpPeerAdminStatus\n"); }
   
   $bgpLocalAddr = str_replace('"','',str_replace(' ','',$bgpLocalAddr));
   if ($bgpLocalAddr == "00000000000000000000000000000000") 
@@ -131,7 +131,7 @@ if ($device['os'] == "junos")
      $afi = $peer_afi['afi'];
      $safi = $peer_afi['safi'];
      if($debug) { echo("$afi $safi". $config['afi'][$afi][$safi]. "\n"); }
-     ## FIX ME - move to function
+     ## FIXME - move to function
      $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
      $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
      $cbgp_cmd .= " cbgpPeerDeniedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
