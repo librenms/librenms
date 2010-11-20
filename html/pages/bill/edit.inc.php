@@ -42,13 +42,13 @@ $bill_data_types = array ('cdr' => 'CDR with 95th', 'quota' => 'Monthly Quota');
 $unknown = 1;
 foreach ($bill_data_types as $type => $text)
 {
-  echo '          <option value="'.$type.'"';
+  echo('          <option value="'.$type.'"');
   if ($bill_data['bill_type'] == $type)
   {
-    echo 'selected="1"';
+    echo('selected="1"');
     $unknown = 0;
   }
-  echo ' >' . ucfirst($text) . '</option>';
+  echo(' >' . ucfirst($text) . '</option>');
 }
 echo("
         </select>

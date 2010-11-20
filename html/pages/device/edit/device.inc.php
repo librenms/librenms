@@ -71,17 +71,17 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
 $unknown = 1;
 foreach ($device_types as $type)
 {
-  echo '          <option value="'.$type.'"';
+  echo('          <option value="'.$type.'"');
   if ($device['type'] == $type)
   {
-    echo 'selected="1"';
+    echo('selected="1"');
     $unknown = 0;
   }
-  echo ' >' . ucfirst($type) . '</option>';
+  echo(' >' . ucfirst($type) . '</option>');
 }
   if ($unknown)
   {
-    echo '          <option value="other">Other</option>';
+    echo('          <option value="other">Other</option>');
   }
 echo("
         </select>

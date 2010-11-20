@@ -164,10 +164,10 @@ else
 {
   if ($_SESSION['authenticated']) ## FIXME level 10 only?
   {
-    echo '<center>
+    echo('<center>
     <object data="'. $config['base_url'] . '/map.php?format=svg" type="image/svg+xml">
     </object>
-</center>';
+</center>');
   }
 }
 ?>

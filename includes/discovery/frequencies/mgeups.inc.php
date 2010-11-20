@@ -23,7 +23,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $divisor  = 10;
     $index      = $i;
-    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
@@ -42,7 +42,7 @@ if ($device['os'] == "mgeups")
     $type       = "mge-ups";
     $divisor  = 10;
     $index      = 100+$i;
-    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 }
 ?>

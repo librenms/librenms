@@ -11,7 +11,7 @@ if (file_exists('html/includes/authentication/' . $config['auth_mechanism'] . '.
 }
 else
 {
-  echo "ERROR: no valid auth_mechanism defined.\n";
+  echo("ERROR: no valid auth_mechanism defined.\n)";
   exit();
 }        
         
@@ -31,7 +31,7 @@ if (auth_usermanagement())
 }
 else
 {
-  echo "Auth module does not allow adding users!\n";
+  echo("Auth module does not allow adding users!\n");
 }
 
 ?>

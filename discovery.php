@@ -89,7 +89,7 @@ if (file_exists('.svn'))
 
   if ($dbu_rev+0 > $db_rev)
   {
-    echo "SVN revision changed.\n";
+    echo("SVN revision changed.\n");
     if($db_rev+0 < "1000") {
       echo("Running pre-revision 1000 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1000.sql");
@@ -124,7 +124,7 @@ while ($device = mysql_fetch_array($device_query))
     mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
     $device['os'] = strtolower($device['os']); echo("OS lowercased.");
   }
-  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo "(".$device['os_group'].")";}
+  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo("(".$device['os_group'].")");}
 
   echo("\n");
 
@@ -184,6 +184,7 @@ if($discovered_devices) {
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
+# FIXME EWW
 shell_exec("echo '".$string."' >> ".$config['log_file']);
 
 ?>

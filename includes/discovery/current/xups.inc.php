@@ -24,7 +24,7 @@ if ($device['os'] == "powerware")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
       $type = "xups";
       $index = "1.2.3.".$current_id;
-      echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
     }
   }
 
@@ -39,7 +39,7 @@ if ($device['os'] == "powerware")
     $type       = "xups";
     $divisor    = 1;
     $index      = "4.4.1.3.".$i;
-    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 
   $oids = trim(snmp_walk($device, "xupsInputCurrent", "-OsqnU", "XUPS-MIB"));
@@ -53,7 +53,7 @@ if ($device['os'] == "powerware")
     $type       = "xups";
     $divisor    = 1;
     $index      = "3.4.1.3.".$i;
-    echo discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 }
 

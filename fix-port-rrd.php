@@ -13,14 +13,14 @@
           $rrdcached = " --daemon " . $config['rrdcached'];
         }
 
-	echo $count . " Files \n";
+	echo($count . " Files \n");
 	$start = date("U");
         $i = 0;
 	foreach($files as $file){
 		fixRdd($file);
 		$i++;
 		if(date("U") - $start > 1)
-			echo round(($i / $count) * 100, 2) . "%  \r";
+			echo(round(($i / $count) * 100, 2) . "%  \r");
 	}
 
 	function getDirectoryTree( $outerDir, &$files = array()){ 
@@ -201,7 +201,7 @@ THIRD;
 		
 	}
 	
-	echo "\n";
+	echo("\n");
 
 ?>
 

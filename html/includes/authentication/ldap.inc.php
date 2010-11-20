@@ -27,7 +27,7 @@ function authenticate($username,$password)
     }
     else
     {
-      echo ldap_error($ds);
+      echo(ldap_error($ds));
     }
   }
   else

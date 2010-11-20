@@ -8,7 +8,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
   {
-    if ($debug) echo "Attempt $i ";
+    if ($debug) echo("Attempt $i ");
     $temp_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['sensor_oid'] . "|grep -v \"No Such Instance\"";
     $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
 
@@ -46,13 +46,13 @@ while($temperature = mysql_fetch_array($temp_data)) {
 
   rrdtool_update($rrd_file,"N:$temp");
 
-  if($temperature['sensor_current'] < $temperature['sensor_limit'] && $temp >= $temperature['sensor_limit']) {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
+  if($temperature['sensor_current'] < $temperature['sensor_limit'] && $temp >= $temperature['sensor_limit']) 
+  {
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['sensor_descr'] . " is " . $temp . " (Limit " . $temperature['sensor_limit'];
     $msg .= ") at " . date($config['timestamp_format']);
     notify($device, "Temp Alarm: " . $device['hostname'] . " " . $temperature['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $temperature['sensor_descr'] . "\n");
-    log_event('Temperature ' . $temperature['sensor_descr'] . " over threshold: " . $temp . " °C (> " . $temperature['sensor_limit'] . " °C)", $device['device_id'], 'temperature', $temperature['sensor_id']);
+    log_event('Temperature ' . $temperature['sensor_descr'] . " over threshold: " . $temp . " " . html_entity_decode('&deg;') . "C (> " . $temperature['sensor_limit'] . " " . html_entity_decode('&deg;') . 'C)', $device['device_id'], 'temperature', $temperature['sensor_id']);
   }
 
   mysql_query("UPDATE sensors SET sensor_current = '$temp' WHERE sensor_class='temperature' AND sensor_id = '" . $temperature['sensor_id'] . "'");

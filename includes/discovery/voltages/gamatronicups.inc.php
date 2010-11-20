@@ -14,7 +14,7 @@ if ($device['os'] == "gamatronicups")
     $index = $i;
     $lowlimit = 0;
     $limit = NULL;
-    echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
+    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt));
   }
 
   for($i = 1; $i <= 3 ;$i++) 
@@ -27,7 +27,7 @@ if ($device['os'] == "gamatronicups")
     $index = 100+$i;
     $lowlimit = 0;
     $limit = NULL;
-    echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
+    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt));
   }
 
 }

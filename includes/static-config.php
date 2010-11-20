@@ -777,7 +777,7 @@ $config['mib_dir'] = $config['mibdir'];
 if(isset($config['enable_nagios']) && $config['enable_nagios']) {
   $nagios_link = mysql_connect($config['nagios_db_host'], $config['nagios_db_user'], $config['nagios_db_pass']);
   if (!$nagios_link) {
-    echo "<h2>Nagios MySQL Error</h2>";
+    echo("<h2>Nagios MySQL Error</h2>");
     die;
 }
 $nagios_db = mysql_select_db($config['nagios_db_name'], $nagios_link);
@@ -793,8 +793,8 @@ if(isset($_SERVER['HTTPS']))
 $observium_link = mysql_pconnect($config['db_host'], $config['db_user'], $config['db_pass']);
 if (!$observium_link) 
 {
-        echo "<h2>Observer MySQL Error</h2>";
-        echo mysql_error();
+        echo("<h2>Observer MySQL Error</h2>");
+        echo(mysql_error());
         die;
 }
 $observium_db = mysql_select_db($config['db_name'], $observium_link);

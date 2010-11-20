@@ -43,8 +43,6 @@ if(strpos($_SERVER['REQUEST_URI'], "debug")) {
               eval("\$config['" . $confitem . "'] = \$confval;");
           }
       }
-  } else {
-#      echo "Please check config.php.default and adjust your settings to reflect the new Multi-Tenancy configuration.";
   }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -113,24 +111,24 @@ function popUp(URL) {
     $end = utime(); $run = $end - $start;
     $gentime = substr($run, 0, 5);
 
-  
-    echo '<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : '');
-    echo '<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version'];
+    echo('<br /> <br /> <br /> <br />  <div id="footer">' . (isset($config['footer']) ? $config['footer'] : ''));
+    echo('<br />Powered by <a href="http://www.observium.org" target="_blank">Observium ' . $config['version']);
 
     if (file_exists('.svn/entries'))
     {
       $svn = File('.svn/entries');
-      echo '-SVN r' . trim($svn[3]);
+      echo('-SVN r' . trim($svn[3]));
       unset($svn);
     }
 
-    echo '</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights reserved.';
+    echo('</a>. Copyright &copy; 2006-'. date("Y"). ' by Adam Armstrong. All rights reserved.');
 
-    if ($config['page_gen']) {
-        echo '<br />Generated in ' . $gentime . ' seconds.';
+    if ($config['page_gen'])
+    {
+        echo('<br />Generated in ' . $gentime . ' seconds.');
     }
 
-    echo '</div>';
+    echo('</div>');
 ?>
 </body>
 </html>

@@ -2,7 +2,7 @@
 
   $iftype = fixiftype($interface[ifType]);
 
-  echo ("<p class=interface-header>$inf</p>");
+  echo("<p class=interface-header>$inf</p>");
   if($ifalias && $ifalias != "") { echo("<span class=box-desc>$ifalias</span><br />"); }
   if($iftype && $iftype != "") { echo("<span class=box-desc>$iftype</span> "); 
     if($mac && $mac != "") { echo("<span class=box-desc>$mac</span><br />");
@@ -17,6 +17,6 @@
     echo("</span>");
   }
 
-  echo ("<span class=box-desc><b>$status</b></span>");
+  echo("<span class=box-desc><b>$status</b></span>");
 
 ?>

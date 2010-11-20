@@ -6,17 +6,13 @@ session_start();
 
 // Preflight checks
 if(!is_dir($config['rrd_dir']))
-  echo "<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>";
-
-### RRD dir probably shouldn't be writable by apache :>
-#if(!$config['rrdcached'] && !is_writable($config['rrd_dir']))
-#  echo "<div class='errorbox'>RRD Log Directory is not writable ({$config['rrd_dir']}).  Graphing may fail.</div>";
+  echo("<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>");
 
 if(!is_dir($config['temp_dir']))
-  echo "<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>";
+  echo("<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>");
 
 if(!is_writable($config['temp_dir']))
-  echo "<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>";
+  echo("<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>");
 
 if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
@@ -50,7 +46,7 @@ if (file_exists('includes/authentication/' . $config['auth_mechanism'] . '.inc.p
 }
 else
 {
-  echo "<div class='errorbox'>ERROR: no valid auth_mechanism defined</div>";
+  echo("<div class='errorbox'>ERROR: no valid auth_mechanism defined</div>");
   exit();
 }
 

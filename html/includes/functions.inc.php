@@ -93,7 +93,7 @@ function generate_graph_popup($graph_array)
 
 function print_graph_popup($graph_array)
 {
-  echo (generate_graph_popup($graph_array));
+  echo(generate_graph_popup($graph_array));
 }
 
 
@@ -185,7 +185,7 @@ function device_permitted($device_id)
 
 function print_graph_tag ($args) 
 {
-  echo generate_graph_tag ($args);
+  echo(generate_graph_tag ($args));
 }
 
 function generate_graph_tag ($args) 
@@ -260,7 +260,7 @@ function generate_port_thumbnail($args)
     if(!$args['bg']) { $args['bg'] = "FFFFF"; }
     $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
     $output = generate_port_link($args, $args['content']);
-    echo $output;
+    echo($output);
 }
 
 function print_optionbar_start ($height = 20, $width = 0, $marginbottom = 5) 

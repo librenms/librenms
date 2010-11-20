@@ -25,7 +25,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "rfc1628";
       $index = "1.2.5.".$volt_id;
-      echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
+      echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt));
     }
   }
 
@@ -40,7 +40,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = $i;
-    echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
@@ -54,7 +54,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 100+$i;
-    echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.5.2.0", "-OsqnU"));
@@ -68,7 +68,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 200+$i;
-    echo discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 }
 ?>

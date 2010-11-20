@@ -32,7 +32,6 @@ while($sensor = mysql_fetch_array($volt_data)) {
 
   if($sensor['sensor_current'] > $sensor['sensor_limit_low'] && $volt <= $sensor['sensor_limit_low']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $volt . "V (Limit " . $sensor['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
     notify($device, "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
@@ -41,7 +40,6 @@ while($sensor = mysql_fetch_array($volt_data)) {
   }
   else if($sensor['sensor_current'] < $sensor['sensor_limit'] && $volt >= $sensor['sensor_limit']) 
   {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $volt . "V (Limit " . $sensor['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
     notify($device, "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);

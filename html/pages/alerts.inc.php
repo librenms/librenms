@@ -1,6 +1,8 @@
 <meta http-equiv="refresh" content="60">
 <?php
 
+# FIXME is this used anywhere??
+
 if($_GET['del']) { 
   $id = mres($_GET['del']);
   $query = "DELETE FROM `alerts` WHERE `id` = '$id'";
@@ -37,7 +39,7 @@ case "0":
 }
 
 if(!$argh) {
-   echo ("
+   echo("
   <tr style=\"background-color: $bg;\">
     <td width=10></td>
     <td class=syslog width=200>

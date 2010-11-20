@@ -1,5 +1,7 @@
 <?php
 
+# FIXME not used, do we still need this?
+
 function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config;
   $database = $config['rrd_dir'] . "/" . $rrd;
@@ -24,7 +26,7 @@ function callsgraphSNOM ($rrd, $graph, $from, $to, $width, $height, $title, $ver
 
   if( !is_array($ret) ) {
     $err = rrd_error();
-    echo "rrd_graph() ERROR: $err\n";
+    echo("rrd_graph() ERROR: $err\n");
     return FALSE;
   } else {
     return $imgfile;

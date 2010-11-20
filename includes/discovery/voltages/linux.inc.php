@@ -20,7 +20,7 @@ if ($device['os'] == "linux")
       $index = $split_oid[count($split_oid)-1];
       $oid  = "1.3.6.1.4.1.2021.13.16.4.1.3." . $index;
       $current = snmp_get($device, $oid, "-Oqv", "LM-SENSORS-MIB") / $divisor;
-      echo discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+      echo(discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
     }
   }
 }

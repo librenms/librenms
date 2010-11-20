@@ -22,7 +22,7 @@ if ($device['os'] == "areca")
       $current = snmp_get($device, $oid, "-Oqv", "") / $divisor;
       if ($descr != '"Battery Status"' || $current != 0.255) # FIXME not sure if this is supposed to be a voltage, but without BBU it's 225, then ignore.
       {
-        echo discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, trim($descr,'"'), $divisor, '1', NULL, NULL, NULL, NULL, $current);
+        echo(discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, trim($descr,'"'), $divisor, '1', NULL, NULL, NULL, NULL, $current));
       }
     }
   }

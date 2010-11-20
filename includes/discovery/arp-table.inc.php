@@ -38,7 +38,7 @@
       $old_mac = mysql_fetch_row(mysql_query("SELECT mac_address from ipv4_mac WHERE ipv4_address='$ip' AND interface_id = '".$interface['interface_id']."'"));
       if($clean_mac != $old_mac[0]) 
       {
-        if ($debug) { echo "Changed mac address for $ip from $old_mac[0] to $clean_mac\n"; }
+        if ($debug) { echo("Changed mac address for $ip from $old_mac[0] to $clean_mac\n"); }
         log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac[0]) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['interface_id']);
       }
       mysql_query($sql);

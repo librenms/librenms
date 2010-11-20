@@ -1,6 +1,6 @@
 <?php
 
-echo "Discovery protocols:";
+echo("Discovery protocols:");
 
 $community = $device['community'];
 

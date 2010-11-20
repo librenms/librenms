@@ -24,23 +24,23 @@ echo("<div style='float: left;'>
 
 $query = mysql_query("SELECT * FROM `ports` WHERE device_id='".$device['device_id']."' ORDER BY `ifIndex` ");
 while($device = mysql_fetch_array($query)) {
-  echo "<tr>";
-  echo "<td align=right>". $device['ifIndex']."</td>";
-  echo "<td align=left>".$device['ifDescr'] . "</td>";
-  echo "<td align=right>". $device['ifAdminStatus']."</td>";
+  echo("<tr>");
+  echo("<td align=right>". $device['ifIndex']."</td>");
+  echo("<td align=left>".$device['ifDescr'] . "</td>");
+  echo("<td align=right>". $device['ifAdminStatus']."</td>");
 
   # Mark interfaces which are down yet not ignored, or up - yet ignored - as to draw the attention 
   # to a possible problem.
   #
   $outofsync =  ($device['ignore'] == ($device['ifOperStatus'] == 'down' ? 1 : 0))  ? "" : "class=red";
 
-  echo "<td align=right><span ".$outofsync.">". $device['ifOperStatus']."</span></td>"; 
+  echo("<td align=right><span ".$outofsync.">". $device['ifOperStatus']."</span></td>");
 
-  echo "<td>";
-  echo "<input type=checkbox name='ignore_".$device['interface_id']."'".($device['ignore'] ? 'checked' : '').">";
-  echo "<input type=hidden name='oldval_".$device['interface_id']."' value=".($device['ignore'] ? 1 : 0).">";
-  echo "</td>";
-  echo "</tr>";
+  echo("<td>");
+  echo("<input type=checkbox name='ignore_".$device['interface_id']."'".($device['ignore'] ? 'checked' : '').">");
+  echo("<input type=hidden name='oldval_".$device['interface_id']."' value=".($device['ignore'] ? 1 : 0).">");
+  echo("</td>");
+  echo("</tr>");
 }
 
 echo('<tr><td></td><td></td><td></td><td></td><td><input type="submit" value="Save"></td></tr>');

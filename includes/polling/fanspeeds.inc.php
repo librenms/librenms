@@ -28,12 +28,11 @@ while($fanspeed = mysql_fetch_array($fan_data)) {
   rrdtool_update($fanrrd,"N:$fan");
 
   if($fanspeed['sensor_current'] > $fanspeed['sensor_limit'] && $fan <= $fanspeed['sensor_limit']) {
-    if($device['sysContact']) { $email = $device['sysContact']; } else { $email = $config['email_default']; }
     $msg  = "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . " is " . $fan . "rpm (Limit " . $fanspeed['sensor_limit'];
     $msg .= "rpm) at " . date($config['timestamp_format']);
     notify($device, "Fan Alarm: " . $device['hostname'] . " " . $fanspeed['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . "\n");
-    log_event('Fan speed ' . $fanspeed['sensor_descr'] . " under threshold: " . $fanspeed['sensor_current'] . " rpm (&gt; " . $fanspeed['sensor_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['sensor_id']);
+    log_event('Fan speed ' . $fanspeed['sensor_descr'] . " under threshold: " . $fanspeed['sensor_current'] . " rpm (> " . $fanspeed['sensor_limit'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['sensor_id']);
   }
 
   mysql_query("UPDATE sensors SET sensor_current = '$fan' WHERE sensor_class='fanspeed' AND sensor_id = '" . $fanspeed['sensor_id'] . "'");

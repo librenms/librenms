@@ -18,7 +18,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $type       = "rfc1628";
     $divisor  = 10;
     $index      = '3.2.0.'.$i;
-    echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+    echo(discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 
   $freq_oid   = "1.3.6.1.2.1.33.1.4.2.0";
@@ -27,7 +27,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
   $type       = "rfc1628";
   $divisor  = 10;
   $index      = '4.2.0';
-  echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  echo(discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
 
   $freq_oid   = "1.3.6.1.2.1.33.1.5.1.0";
   $descr      = "Bypass";
@@ -35,6 +35,6 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
   $type       = "rfc1628";
   $divisor  = 10;
   $index      = '5.1.0';
-  echo discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  echo(discover_sensor($valid_sensor, 'freq', $device, $freq_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
 }
 ?>
