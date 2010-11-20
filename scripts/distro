@@ -51,6 +51,10 @@ GetVersionFromFile()
                         fi
 #                        OSSTR="${OS} ${DIST} ${REV}(${PSUEDONAME} ${KERNEL} ${MACH})"
                         OSSTR="${DIST} ${REV}"
+		elif [ "${OS}" = "Darwin" ] ; then
+			if [ -f /usr/bin/sw_vers ] ; then
+				OSSTR=`/usr/bin/sw_vers|grep -v Build|sed 's/^.*:.//'| tr "\n" ' '`
+			fi
                 fi
         echo ${OSSTR}
 
