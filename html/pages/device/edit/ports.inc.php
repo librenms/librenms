@@ -29,10 +29,10 @@ while($device = mysql_fetch_array($query)) {
   echo("<td align=left>".$device['ifDescr'] . "</td>");
   echo("<td align=right>". $device['ifAdminStatus']."</td>");
 
-  # Mark interfaces which are down yet not ignored, or up - yet ignored - as to draw the attention 
+  # Mark interfaces which are OperDown (but not AdminDown) yet not ignored, or up - yet ignored - as to draw the attention 
   # to a possible problem.
   #
-  $outofsync =  ($device['ignore'] == ($device['ifOperStatus'] == 'down' ? 1 : 0))  ? "" : "class=red";
+  $outofsync =  ($device['ignore'] == ($device['ifOperStatus'] == 'down' && $device['ifAdminStatus'] != 'down' ? 1 : 0))  ? "" : "class=red";
 
   echo("<td align=right><span ".$outofsync.">". $device['ifOperStatus']."</span></td>");
 
