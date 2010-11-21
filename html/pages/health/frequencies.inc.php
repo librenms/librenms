@@ -29,7 +29,7 @@ while($freq = mysql_fetch_array($query))
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $weekly_freq  = "graph.php?id=" . $freq['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $sensor_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_freq\'>', LEFT);\" onmouseout=\"return nd();\">
+  $sensor_popup = "<a href=\"graphs/" . $freq['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_freq\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $freq['sensor_descr'] . "</a>";
 
   if($freq['sensor_current'] >= $freq['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }

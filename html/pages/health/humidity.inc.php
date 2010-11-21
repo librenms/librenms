@@ -29,7 +29,7 @@ while($humidity = mysql_fetch_array($query))
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $weekly_humidity  = "graph.php?id=" . $humidity['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $humidity_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_humidity\'>', LEFT);\" onmouseout=\"return nd();\">
+  $humidity_popup = "<a href=\"graphs/" . $humidity['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_humidity\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $humidity['sensor_descr'] . "</a>";
 
   $humidity['sensor_current'] = round($humidity['sensor_current'],1);
