@@ -29,7 +29,7 @@ while($fan = mysql_fetch_array($query))
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $weekly_fan  = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $fan_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_fan\'>', LEFT);\" onmouseout=\"return nd();\">
+  $fan_popup = "<a href=\"graphs/" . $fan['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_fan\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $fan['sensor_descr'] . "</a>";
 
   if($fan['sensor_current'] <= $fan['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }

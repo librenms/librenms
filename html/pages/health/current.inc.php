@@ -30,7 +30,7 @@ while($current = mysql_fetch_array($query))
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $weekly_current  = "graph.php?id=" . $current['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $current_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_current\'>', LEFT);\" onmouseout=\"return nd();\">
+  $current_popup = "<a href=\"graphs/" . $current['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_current\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $current['sensor_descr'] . "</a>";
 
   if($current['sensor_current'] >= $current['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }

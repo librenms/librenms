@@ -29,7 +29,7 @@ while($temp = mysql_fetch_array($query))
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $weekly_temp  = "graph.php?id=" . $temp['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $temp_popup = "<a onmouseover=\"return overlib('<img src=\'$weekly_temp\'>', LEFT);\" onmouseout=\"return nd();\">
+  $temp_popup = "<a href=\"graphs/" . $temp['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_temp\'>', LEFT);\" onmouseout=\"return nd();\">
         " . $temp['sensor_descr'] . "</a>";
 
   $temp['sensor_current'] = round($temp['sensor_current'],1);
