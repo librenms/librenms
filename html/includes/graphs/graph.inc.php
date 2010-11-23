@@ -59,7 +59,7 @@ function graph_error ($string)
 {
   global $width, $height;
   header('Content-type: image/png');
-  if($height > "99")  { $width +=76; }
+  if($height > "99")  { $width +=75; }
   $im     = imagecreate($width, $height);
   $orange = imagecolorallocate($im, 255, 225, 225);
   $px     = (imagesx($im) - 7.5 * strlen($string)) / 2;

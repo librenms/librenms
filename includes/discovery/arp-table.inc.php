@@ -33,17 +33,20 @@
     $mac_table[$if][$mac]['cleanmac'] = $clean_mac;
     $interface_id = $interface['interface_id'];
     $mac_table[$interface_id][$clean_mac] = 1;
-    if(mysql_result(mysql_query("SELECT COUNT(*) from ipv4_mac WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'"),0)) {
+    if(mysql_result(mysql_query("SELECT COUNT(*) from ipv4_mac WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'"),0)) 
+    {
       $sql = "UPDATE `ipv4_mac` SET `mac_address` = '$clean_mac' WHERE interface_id = '".$interface['interface_id']."' AND ipv4_address = '$ip'";
       $old_mac = mysql_fetch_row(mysql_query("SELECT mac_address from ipv4_mac WHERE ipv4_address='$ip' AND interface_id = '".$interface['interface_id']."'"));
-      if($clean_mac != $old_mac[0]) 
+      if($clean_mac != $old_mac[0] && $clean_mac != '' && $old_mac[0] != '') 
       {
         if ($debug) { echo("Changed mac address for $ip from $old_mac[0] to $clean_mac\n"); }
         log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac[0]) . " -> " . mac_clean_to_readable($clean_mac), $device, "interface", $interface['interface_id']);
       }
       mysql_query($sql);
       echo(".");
-    } else {
+    } 
+    else 
+    {
       echo("+");
       #echo("Add MAC $mac\n");
       mysql_query("INSERT INTO `ipv4_mac` (interface_id, mac_address, ipv4_address) VALUES ('".$interface['interface_id']."','$clean_mac','$ip')");
@@ -52,10 +55,12 @@
   }
   $sql = "SELECT * from ipv4_mac AS M, ports as I WHERE M.interface_id = I.interface_id and I.device_id = '".$device['device_id']."'";
   $query = mysql_query($sql);
-  while($entry = mysql_fetch_array($query)) {
+  while($entry = mysql_fetch_array($query)) 
+  {
     $entry_mac = $entry['mac_address'];
     $entry_if  = $entry['interface_id'];
-    if(!$mac_table[$entry_if][$entry_mac]) {
+    if(!$mac_table[$entry_if][$entry_mac]) 
+    {
       mysql_query("DELETE FROM ipv4_mac WHERE interface_id = '".$entry_if."' AND mac_address = '".$entry_mac."'");
       #echo("Removing MAC $entry_mac from interface ".$interface['ifName']);
       echo("-");
