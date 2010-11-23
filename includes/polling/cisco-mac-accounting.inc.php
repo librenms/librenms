@@ -90,4 +90,6 @@ unset($cip_array);
 
 if($mac_entries) { echo(" $mac_entries MAC accounting entries\n"); }
 
+echo("\n");
+
 ?>
