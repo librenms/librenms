@@ -122,47 +122,92 @@ if ($device['os'] == "junos")
 
   mysql_query($update);
 
-  if($device['os_group'] == "ios") {
-
-   ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB)
-   $afi_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'");
-   while($peer_afi = mysql_fetch_array($afi_query)) {
-   
-     $afi = $peer_afi['afi'];
-     $safi = $peer_afi['safi'];
-     if($debug) { echo("$afi $safi". $config['afi'][$afi][$safi]. "\n"); }
-     ## FIXME - move to function
-     $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
-     $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerDeniedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerPrefixAdminLimit." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerPrefixThreshold." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerPrefixClearThreshold." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
-     $cbgp_cmd .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+  if($device['os_group'] == "ios" || $device['os'] == "junos")
+  {
+    ## Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
+    $afi_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "'");
+    while($peer_afi = mysql_fetch_assoc($afi_query)) 
+    {
+      $afi = $peer_afi['afi'];
+      $safi = $peer_afi['safi'];
+      if($debug) { echo("$afi $safi". $config['afi'][$afi][$safi]. "\n"); }
+      
+      if ($device['os_group'] == "ios")
+      {
+        ## FIXME - move to function
+        $cbgp_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-BGP4-MIB -Ovq -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'];
+        $cbgp_cmd .= " cbgpPeerAcceptedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerDeniedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerPrefixAdminLimit." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerPrefixThreshold." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerPrefixClearThreshold." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerAdvertisedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerSuppressedPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
+        $cbgp_cmd .= " cbgpPeerWithdrawnPrefixes." . $peer['bgpPeerIdentifier'] . ".$afi.$safi";
     
-     if($debug) { echo("$cbgp_cmd\n"); }
-     $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
-     if($debug) { echo("$cbgp_data\n"); }
-     list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
+        if($debug) { echo("$cbgp_cmd\n"); }
+        $cbgp_data = preg_replace("/^OID.*$/", "", trim(`$cbgp_cmd`));
+        if($debug) { echo("$cbgp_data\n"); }
+        list($cbgpPeerAcceptedPrefixes,$cbgpPeerDeniedPrefixes,$cbgpPeerPrefixAdminLimit,$cbgpPeerPrefixThreshold,$cbgpPeerPrefixClearThreshold,$cbgpPeerAdvertisedPrefixes,$cbgpPeerSuppressedPrefixes,$cbgpPeerWithdrawnPrefixes) = explode("\n", $cbgp_data);
+      }
 
-     $update  = "UPDATE bgpPeers_cbgp SET";
-     $update .= " `cbgpPeerAcceptedPrefixes` = '$cbgpPeerAcceptedPrefixes'";
-     $update .= ", `cbgpPeerDeniedPrefixes` = '$cbgpPeerDeniedPrefixes'";
-     $update .= ", `cbgpPeerPrefixAdminLimit` = '$cbgpPeerAdminLimit'";
-     $update .= ", `cbgpPeerPrefixThreshold` = '$cbgpPeerPrefixThreshold'";
-     $update .= ", `cbgpPeerPrefixClearThreshold` = '$cbgpPeerPrefixClearThreshold'";
-     $update .= ", `cbgpPeerAdvertisedPrefixes` = '$cbgpPeerAdvertisedPrefixes'";
-     $update .= ", `cbgpPeerSuppressedPrefixes` = '$cbgpPeerSuppressedPrefixes'";
-     $update .= ", `cbgpPeerWithdrawnPrefixes` = '$cbgpPeerWithdrawnPrefixes'";
-     $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "' AND afi = '$afi' AND safi = '$safi'";
-     if($debug) { echo("MYSQL: $update\n"); }
-     mysql_query($update);
+      if ($device['os'] == "junos")
+      {
+        # Missing: cbgpPeerAdminLimit cbgpPeerPrefixThreshold cbgpPeerPrefixClearThreshold cbgpPeerSuppressedPrefixes cbgpPeerWithdrawnPrefixes
 
-     $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd");
-     if(!is_file($cbgp_rrd)) {
-       $rrd_create = "DS:AcceptedPrefixes:GAUGE:600:U:100000000000 \
+        $safis['unicast'] = 1;
+        $safis['multicast'] = 2;
+
+        if (!isset($peerIndexes))
+        {
+          $j_bgp = snmpwalk_cache_multi_oid($device, "jnxBgpM2PeerTable", $jbgp, "BGP4-V2-MIB-JUNIPER", $config['install_dir']."/mibs/junos");
+          foreach($j_bgp as $index => $entry) 
+          {
+            switch ($entry['jnxBgpM2PeerRemoteAddrType'])
+            {
+              case 'ipv4':
+                $ip = long2ip(hexdec($entry['jnxBgpM2PeerRemoteAddr']));
+                $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
+                break;
+              case 'ipv6':
+                # FIXME not implemented yet
+                break;
+              default:
+                echo("PANIC: Don't know RemoteAddrType " . $entry['jnxBgpM2PeerRemoteAddrType'] . "!\n");
+                break;
+            }
+          }
+        }
+        
+        $j_prefixes = snmpwalk_cache_multi_oid($device, "jnxBgpM2PrefixCountersTable", $jbgp, "BGP4-V2-MIB-JUNIPER", $config['install_dir']."/mibs/junos");
+
+        $cbgpPeerAcceptedPrefixes = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi." . $safis[$safi]]['jnxBgpM2PrefixInPrefixesAccepted'];
+        $cbgpPeerDeniedPrefixes = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi." . $safis[$safi]]['jnxBgpM2PrefixInPrefixesRejected'];
+        $cbgpPeerAdvertisedPrefixes = $j_prefixes[$j_peerIndexes[$peer['bgpPeerIdentifier']].".$afi." . $safis[$safi]]['jnxBgpM2PrefixOutPrefixes'];
+        
+        unset($j_prefixes);
+        unset($j_bgp);
+        unset($j_peerIndexes);
+      }
+
+      # FIXME THESE FIELDS DO NOT EXIST IN THE DATABASE!
+      $update  = "UPDATE bgpPeers_cbgp SET";
+      $update .= " `cbgpPeerAcceptedPrefixes` = '$cbgpPeerAcceptedPrefixes'";
+      $update .= ", `cbgpPeerDeniedPrefixes` = '$cbgpPeerDeniedPrefixes'";
+      $update .= ", `cbgpPeerPrefixAdminLimit` = '$cbgpPeerAdminLimit'";
+      $update .= ", `cbgpPeerPrefixThreshold` = '$cbgpPeerPrefixThreshold'";
+      $update .= ", `cbgpPeerPrefixClearThreshold` = '$cbgpPeerPrefixClearThreshold'";
+      $update .= ", `cbgpPeerAdvertisedPrefixes` = '$cbgpPeerAdvertisedPrefixes'";
+      $update .= ", `cbgpPeerSuppressedPrefixes` = '$cbgpPeerSuppressedPrefixes'";
+      $update .= ", `cbgpPeerWithdrawnPrefixes` = '$cbgpPeerWithdrawnPrefixes'";
+      $update .= " WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '" . $peer['bgpPeerIdentifier'] . "' AND afi = '$afi' AND safi = '$safi'";
+      if($debug) { echo("MYSQL: $update\n"); }
+      mysql_query($update);
+  
+      $cbgp_rrd    = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cbgp-" . $peer['bgpPeerIdentifier'] . ".$afi.$safi.rrd");
+      if(!is_file($cbgp_rrd)) 
+      {
+      $rrd_create = "DS:AcceptedPrefixes:GAUGE:600:U:100000000000 \
          DS:DeniedPrefixes:GAUGE:600:U:100000000000 \
          DS:AdvertisedPrefixes:GAUGE:600:U:100000000000 \
          DS:SuppressedPrefixes:GAUGE:600:U:100000000000 \
@@ -175,11 +220,11 @@ if ($device['os'] == "junos")
          RRA:MAX:0.5:6:700 \
          RRA:MAX:0.5:24:775 \
          RRA:MAX:0.5:288:797";
-         rrdtool_create($cbgp_rrd, $rrd_create);
-     }
-     rrdtool_update("$cbgp_rrd", "N:$cbgpPeerAcceptedPrefixes:$cbgpPeerDeniedPrefixes:$cbgpPeerAdvertisedPrefixes:$cbgpPeerSuppressedPrefixes:$cbgpPeerWithdrawnPrefixes");
-   }
-  }
+        rrdtool_create($cbgp_rrd, $rrd_create);
+      }
+      rrdtool_update("$cbgp_rrd", "N:$cbgpPeerAcceptedPrefixes:$cbgpPeerDeniedPrefixes:$cbgpPeerAdvertisedPrefixes:$cbgpPeerSuppressedPrefixes:$cbgpPeerWithdrawnPrefixes");
+    } # while
+  } # os=ios | junos
   echo("\n");
 
 } ## End While loop on peers
