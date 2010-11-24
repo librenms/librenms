@@ -6,7 +6,7 @@ include("includes/graphs/common.inc.php");
 
   $iter = "1";
 
-  $rrd_options .= " COMMENT:'                                Cur    Max\\n'";
+  $rrd_options .= " COMMENT:'                                 Cur   Max\\n'";
 
   if($iter=="1") {$colour="CC0000";} elseif($iter=="2") {$colour="008C00";} elseif($iter=="3") {$colour="4096EE";
   } elseif($iter=="4") {$colour="73880A";} elseif($iter=="5") {$colour="D01F3C";} elseif($iter=="6") {$colour="36393D";
@@ -22,8 +22,8 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " AREA:proc_min#ffffffff";
 
   $rrd_options .= " LINE1:proc" . $proc['hrDeviceIndex'] . "#" . $colour . ":'" . $descr . "' ";
-  $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":LAST:%3.0lf";
-  $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":MAX:%3.0lf\\\l ";
+  $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":LAST:%3.0lf%%";
+  $rrd_options .= " GPRINT:proc" . $proc['hrDeviceIndex'] . ":MAX:%3.0lf%%\\\l ";
   $iter++;
 
 ?>
