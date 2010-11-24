@@ -45,9 +45,18 @@ function zeropad_lineno($num, $length)
   return $num;
 }
 
-function only_alphanumeric( $string )
+function only_alphanumeric($string)
 {
   return preg_replace('/[^a-zA-Z0-9]/', '', $string);
+}
+
+function logfile($string)
+{
+  global $config;
+
+  $fd = fopen($config['log_file'],'a');
+  fputs($fd,$string);
+  fclose($fd);
 }
 
 function write_dev_attrib($device_id, $attrib_type, $attrib_value)
