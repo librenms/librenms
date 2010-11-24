@@ -40,7 +40,7 @@ else
 
     echo("<tr bgcolor=$bg_colour background=$bg_image>
             <td></td>
-            <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generate_device_link($peer, shorthost($peer['hostname']))."</td>
+            <td width=150><span class=list-large>" . $peer['bgpLocalAddr'] . "</span><br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
 	     <td width=30>-></td>
             <td width=150><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
 	     <td width=50><b>$peer_type</b></td>

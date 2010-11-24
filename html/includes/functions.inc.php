@@ -1,6 +1,6 @@
 <?php
 
-function generate_device_link($device, $text=0, $start=0, $end=0) 
+function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0) 
 {
   global $twoday; global $day; global $now; global $config;
   if (!$start) { $start = $day; }
@@ -21,7 +21,7 @@ function generate_device_link($device, $text=0, $start=0, $end=0)
     $graphs = $config['os']['default']['over']; 
   }
 
-  $url  = $config['base_url']."/device/" . $device['device_id'] . "/";
+  $url  = $config['base_url']."/device/" . $device['device_id'] . "/" . $linksuffix;
   $contents = "<div class=list-large>".$device['hostname'];
   if($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
@@ -33,7 +33,6 @@ function generate_device_link($device, $text=0, $start=0, $end=0)
   if($device['features']) { $contents .= " (".mres($device['features']).")"; }
 #  if($device['hardware']) { $contents .= " - ".$device['hardware']; }
   $contents .= "</div>";
-
 
 #  if (isset($device['location'])) { $contents .= "" . htmlentities($device['location'])."<br />"; }
   foreach ($graphs as $entry)
