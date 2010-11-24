@@ -230,23 +230,32 @@ function snmpwalk_cache_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL)
 
 function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = NULL) 
 {
-  $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
-  foreach(explode("\n", $data) as $entry) {
-    list($oid,$value) = explode("=", $entry);
-    $oid = trim($oid); $value = trim($value);
-    $oid_parts = explode(".", $oid);
-    $oid = $oid_parts['0'];
-    $index = $oid_parts['1'];
-    if (isset($oid_parts['2'])) { $index .= ".".$oid_parts['2']; }
-    if (isset($oid_parts['3'])) { $index .= ".".$oid_parts['3']; }
-    if (isset($oid_parts['4'])) { $index .= ".".$oid_parts['4']; }
-    if (isset($oid_parts['5'])) { $index .= ".".$oid_parts['5']; }
-    if (isset($oid_parts['6'])) { $index .= ".".$oid_parts['6']; }
-    if (!strstr($value, "at this OID") && isset($oid) && isset($index)) {
-      $array[$index][$oid] = $value;
+  global $cache;
+  
+  if (!array_key_exists($oid,$cache['snmp'][$device['device_id']]))
+  {
+    $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
+    foreach(explode("\n", $data) as $entry) 
+    {
+      list($r_oid,$value) = explode("=", $entry);
+      $r_oid = trim($r_oid); $value = trim($value);
+      $oid_parts = explode(".", $r_oid);
+      $r_oid = $oid_parts['0'];
+      $index = $oid_parts['1'];
+      if (isset($oid_parts['2'])) { $index .= ".".$oid_parts['2']; }
+      if (isset($oid_parts['3'])) { $index .= ".".$oid_parts['3']; }
+      if (isset($oid_parts['4'])) { $index .= ".".$oid_parts['4']; }
+      if (isset($oid_parts['5'])) { $index .= ".".$oid_parts['5']; }
+      if (isset($oid_parts['6'])) { $index .= ".".$oid_parts['6']; }
+      if (!strstr($value, "at this OID") && isset($r_oid) && isset($index)) 
+      {
+        $array[$index][$r_oid] = $value;
+      }
     }
+    $cache['snmp'][$device['device_id']][$oid] = $array;
   }
-  return $array;
+
+  return $cache['snmp'][$device['device_id']][$oid];
 }
 
 
