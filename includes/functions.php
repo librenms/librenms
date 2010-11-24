@@ -55,7 +55,7 @@ function logfile($string)
   global $config;
 
   $fd = fopen($config['log_file'],'a');
-  fputs($fd,$string);
+  fputs($fd,$string . "\n");
   fclose($fd);
 }
 
