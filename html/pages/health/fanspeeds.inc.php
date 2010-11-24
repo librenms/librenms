@@ -1,12 +1,13 @@
 <?php
 
+$graph_type = "sensor_fanspeed";
+$unit = "rpm";
+
 if($_SESSION['userlevel'] >= '5') {
   $sql = "SELECT * FROM `sensors` AS S, `devices` AS D WHERE S.sensor_class='fanspeed' AND S.device_id = D.device_id ORDER BY D.hostname, S.sensor_descr";
 } else {
   $sql = "SELECT * FROM `sensors` AS S, `devices` AS D, devices_perms as P WHERE S.sensor_class='fanspeed' AND S.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, S.sensor_descr";
 }
-
-$graph_type = "sensor_fanspeed";
 
 $query = mysql_query($sql);
 
@@ -24,50 +25,50 @@ echo('<tr class=tablehead>
 
 $row = 1;
 
-while($fan = mysql_fetch_array($query))
+while($sensor = mysql_fetch_array($query))
 {
   if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-  $weekly_fan  = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-  $fan_popup = "<a href=\"graphs/" . $fan['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_fan\'>', LEFT);\" onmouseout=\"return nd();\">
-        " . $fan['sensor_descr'] . "</a>";
+  $weekly_sensor = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
+  $sensor_popup = "<a href=\"graphs/" . $sensor['sensor_id'] . "/".$graph_type."/\" onmouseover=\"return overlib('<img src=\'$weekly_sensor\'>', LEFT);\" onmouseout=\"return nd();\">
+        " . $sensor['sensor_descr'] . "</a>";
 
-  if($fan['sensor_current'] <= $fan['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
+  if($sensor['sensor_current'] <= $sensor['sensor_limit']) { $alert = '<img src="images/16/flag_red.png" alt="alert" />'; } else { $alert = ""; }
    
-  $fan_day    = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
-  $fan_week   = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
-  $fan_month  = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
-  $fan_year   = "graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
+  $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
+  $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
+  $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
+  $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
 
-  $fan_minigraph = "<img src='graph.php?id=" . $fan['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=100&amp;height=20'";
-  $fan_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$fan['hostname']." - ".$fan['sensor_descr'];
-  $fan_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$fan_day\'><img src=\'$fan_week\'><img src=\'$fan_month\'><img src=\'$fan_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
+  $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=100&amp;height=20'";
+  $sensor_minigraph .= " onmouseover=\"return overlib('<div class=list-large>".$sensor['hostname']." - ".$sensor['sensor_descr'];
+  $sensor_minigraph .= "</div><div style=\'width: 750px\'><img src=\'$sensor_day\'><img src=\'$sensor_week\'><img src=\'$sensor_month\'><img src=\'$sensor_year\'></div>', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\" >";
 
   echo("<tr bgcolor=$row_colour>
-          <td class=list-bold>" . generate_device_link($fan) . "</td>
-          <td>$fan_popup</td>
-	  <td>$fan_minigraph</td>
+          <td class=list-bold>" . generate_device_link($sensor) . "</td>
+          <td>$sensor_popup</td>
+	  <td>$sensor_minigraph</td>
 	  <td width=100>$alert</td>
-          <td style='text-align: center; font-weight: bold;'>" . $fan['sensor_current'] . "  rpm</td>
-          <td style='text-align: center'>" . $fan['sensor_limit'] . "  rpm</td>
-          <td>" . (isset($fan['sensor_notes']) ? $fan['sensor_notes'] : '') . "</td>
+          <td style='text-align: center; font-weight: bold;'>" . $sensor['sensor_current'] . $unit . "</td>
+          <td style='text-align: center'>" . $sensor['sensor_limit'] . $unit . "</td>
+          <td>" . (isset($sensor['sensor_notes']) ? $sensor['sensor_notes'] : '') . "</td>
         </tr>\n");
 
       if($_GET['optb'] == "graphs") { ## If graphs
 
   echo("<tr bgcolor='$row_colour'><td colspan=6>");
 
-  $daily_graph   = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
-  $daily_url       = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
+  $daily_graph   = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
+  $daily_url       = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
 
-  $weekly_graph  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
-  $weekly_url      = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
+  $weekly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
+  $weekly_url      = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
 
-  $monthly_graph = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
-  $monthly_url     = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
+  $monthly_graph = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
+  $monthly_url     = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
 
-  $yearly_graph  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
-  $yearly_url  = "graph.php?id=" . $fan['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
+  $yearly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
+  $yearly_url  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
 
   echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");

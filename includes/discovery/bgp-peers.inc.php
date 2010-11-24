@@ -157,11 +157,6 @@ if (isset($peerlist))
             mysql_query("INSERT INTO `bgpPeers_cbgp` (device_id,bgpPeerIdentifier, afi, safi) VALUES ('".$device['device_id']."','".$peer['ip']."','$afi','$safi')");
           }
         }
-
-        unset($j_afisafi);
-        unset($j_prefixes);
-        unset($j_bgp);
-        unset($j_peerIndexes);
       } # os=junos
     
       $af_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
@@ -176,6 +171,11 @@ if (isset($peerlist))
       } # AF list
     } # os=ios|junos
   } # Foreach
+  
+  unset($j_afisafi);
+  unset($j_prefixes);
+  unset($j_bgp);
+  unset($j_peerIndexes);
 } # isset
 
 ## Delete removed peers
