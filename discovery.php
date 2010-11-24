@@ -184,7 +184,6 @@ if($discovered_devices) {
 $string = $argv[0] . " $doing " .  date("F j, Y, G:i") . " - $discovered_devices devices discovered in $proctime secs";
 if ($debug) echo("$string\n");
 
-# FIXME EWW
-shell_exec("echo '".$string."' >> ".$config['log_file']);
+logfile($string);
 
 ?>
