@@ -1,20 +1,20 @@
 <?php
 
-global $valid_sensor, $ipoman_array;
+global $valid_sensor, $cache;
 
 ## IPOMANII-MIB
 if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
 
-  if(!is_array($ipoman_array))
+  if(!is_array($cache['ipoman']))
   { 
     echo("outletConfigDesc ");
-    $ipoman_array['out'] = snmpwalk_cache_multi_oid($device, "outletConfigDesc", $ipoman_array['out'], "IPOMANII-MIB");
+    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, "outletConfigDesc", $cache['ipoman']['out'], "IPOMANII-MIB");
     echo("outletConfigLocation ");
-    $ipoman_array['out'] = snmpwalk_cache_multi_oid($device, "outletConfigLocation", $ipoman_array['out'], "IPOMANII-MIB");
+    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, "outletConfigLocation", $cache['ipoman']['out'], "IPOMANII-MIB");
     echo("inletConfigDesc ");
-    $ipoman_array['in'] = snmpwalk_cache_multi_oid($device, "inletConfigDesc", $ipoman_array['in'], "IPOMANII-MIB");
+    $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, "inletConfigDesc", $cache['ipoman']['in'], "IPOMANII-MIB");
   }
 
   $oids = array();
@@ -32,7 +32,7 @@ if ($device['os'] == "ipoman")
     {
       $volt_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.2.' . $index;
       $divisor = 10;
-      $descr = (trim($ipoman_array['in'][$index]['inletConfigDesc'],'"') != '' ? trim($ipoman_array['in'][$index]['inletConfigDesc'],'"') : "Inlet $index");
+      $descr = (trim($cache['ipoman']['in'][$index]['inletConfigDesc'],'"') != '' ? trim($cache['ipoman']['in'][$index]['inletConfigDesc'],'"') : "Inlet $index");
       $current = $entry['inletStatusVoltage'] / 10;
       $low_limit = $entry['inletConfigVoltageLow'];
       $high_limit = $entry['inletConfigVoltageHigh'];
