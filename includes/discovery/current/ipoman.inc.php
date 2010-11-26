@@ -1,20 +1,20 @@
 <?php
 
-global $valid_sensor, $ipoman_array;
+global $valid_sensor, $cache;
 
 ## IPOMANII-MIB
 if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
 
-  if(!is_array($ipoman_array))
+  if(!is_array($cache['ipoman']))
   { 
     echo("outletConfigDesc ");
-    $ipoman_array['out'] = snmpwalk_cache_multi_oid($device, "outletConfigDesc", $ipoman_array['out'], "IPOMANII-MIB");
+    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, "outletConfigDesc", $cache['ipoman']['out'], "IPOMANII-MIB");
     echo("outletConfigLocation ");
-    $ipoman_array['out'] = snmpwalk_cache_multi_oid($device, "outletConfigLocation", $ipoman_array['out'], "IPOMANII-MIB");
+    $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, "outletConfigLocation", $cache['ipoman']['out'], "IPOMANII-MIB");
     echo("inletConfigDesc ");
-    $ipoman_array['in'] = snmpwalk_cache_multi_oid($device, "inletConfigDesc", $ipoman_array, "IPOMANII-MIB");
+    $cache['ipoman']['in'] = snmpwalk_cache_multi_oid($device, "inletConfigDesc", $cache['ipoman'], "IPOMANII-MIB");
   }
 
   $oids_in = array();
@@ -37,7 +37,7 @@ if ($device['os'] == "ipoman")
     {
       $cur_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.3.' . $index;
       $divisor = 1000;
-      $descr = (trim($ipoman_array['in'][$index]['inletConfigDesc'],'"') != '' ? trim($ipoman_array['in'][$index]['inletConfigDesc'],'"') : "Inlet $index");
+      $descr = (trim($cache['ipoman']['in'][$index]['inletConfigDesc'],'"') != '' ? trim($cache['ipoman']['in'][$index]['inletConfigDesc'],'"') : "Inlet $index");
       $current = $entry['inletStatusCurrent'] / $divisor;
       $high_limit = $entry['inletConfigCurrentHigh'] / 10;
       echo(discover_sensor($valid_sensor, 'current', $device, $cur_oid, '1.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current));
@@ -51,7 +51,7 @@ if ($device['os'] == "ipoman")
     {
       $cur_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.3.' . $index;
       $divisor = 1000;
-      $descr = (trim($ipoman_array['out'][$index]['outletConfigDesc'],'"') != '' ? trim($ipoman_array['out'][$index]['outletConfigDesc'],'"') : "Output $index");
+      $descr = (trim($cache['ipoman']['out'][$index]['outletConfigDesc'],'"') != '' ? trim($cache['ipoman']['out'][$index]['outletConfigDesc'],'"') : "Output $index");
       $current = $entry['outletStatusCurrent'] / $divisor;
       $high_limit = $entry['outletConfigCurrentHigh'] / 10;
       echo(discover_sensor($valid_sensor, 'current', $device, $cur_oid, '2.3.1.3.'.$index, $type, $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current));
