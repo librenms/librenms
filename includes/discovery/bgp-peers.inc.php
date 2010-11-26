@@ -129,7 +129,10 @@ if (isset($peerlist))
                 $j_peerIndexes[$ip] = $entry['jnxBgpM2PeerIndex'];
                 break;
               case 'ipv6':
-                # FIXME not implemented yet
+                $ip6 = trim(str_replace(' ','',$entry['jnxBgpM2PeerRemoteAddr']),'"');
+                $ip6 = substr($ip6,0,4) . ':' . substr($ip6,4,4) . ':' . substr($ip6,8,4) . ':' . substr($ip6,12,4) . ':' . substr($ip6,16,4) . ':' . substr($ip6,20,4) . ':' . substr($ip6,24,4) . ':' . substr($ip6,28,4);
+                $ip6 = Net_IPv6::compress($ip6);
+                $j_peerIndexes[$ip6] = $entry['jnxBgpM2PeerIndex'];
                 break;
               default:
                 echo("PANIC: Don't know RemoteAddrType " . $entry['jnxBgpM2PeerRemoteAddrType'] . "!\n");
