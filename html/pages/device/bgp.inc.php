@@ -128,6 +128,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
       }
     }
   }
+
   if ($_GET['opta'] == "macaccounting" && $has_macaccounting) 
   {
     $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, ports AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
@@ -157,6 +158,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
   }
 
   $i++;
+  unset($valid_afi_safi);
 }
 ?>
 
