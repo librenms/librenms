@@ -28,7 +28,7 @@ if($ports['total']) {
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $graph_array['day'] . "/" . $config['now'] . "/";
+  $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $day . "/" . $config['now'] . "/";
 
 
   echo(overlib_link($link, $graph, $content, NULL));
