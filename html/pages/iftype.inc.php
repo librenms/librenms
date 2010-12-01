@@ -30,7 +30,7 @@ $types = implode(' + ',$types_array);
 echo("<tr bgcolor='$bg'>
              <td><span class=list-large>Total Graph for ports of type : ".$types."</span></td></tr>");
 
-if ($iflist)
+if ($if_list)
 {
   echo("<tr bgcolor='$bg'><td>");
   $graph_type = "multiport_bits";
