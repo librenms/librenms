@@ -214,6 +214,11 @@ $config['syslog_filter'] = array("last message repeated", "Connection from UDP: 
 ### LDAP Authentication
 
 $config['auth_ldap_version'] = 3; # v2 or v3
+$config['auth_ldap_server'] = "ldap.yourserver.com";
+$config['auth_ldap_port']   = 389;
+$config['auth_ldap_prefix'] = "uid=";
+$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
+$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
 
 ### Hardcoded ASN descriptions
 $config['astext'][65333] = "Cymru Bogon Feed";

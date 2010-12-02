@@ -32,13 +32,6 @@ $config['snmp']['internal'] = false;       # Enable php_snmp functions to make g
 $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['http_auth_guest'] = "guest"; # remember to configure this user if you use http-auth
 
-# LDAP module configuration
-#$config['auth_ldap_server'] = "ldap.yourserver.com";
-#$config['auth_ldap_port']   = 389;
-#$config['auth_ldap_prefix'] = "uid=";
-#$config['auth_ldap_suffix'] = ",ou=People,dc=example,dc=com";
-#$config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
-
 ### List of networks to allow scanning-based discovery
 $config['nets'][] = "172.22.0.0/16";
 $config['nets'][] = "192.168.0.0/24";
