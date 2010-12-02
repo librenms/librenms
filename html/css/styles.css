@@ -216,6 +216,12 @@ A:visited { color: #0000cc; }
 A:hover   { color: #990099; }
 A:active  { color: #00000; }
 
+A.sectionhead         { text-decoration: none; color: #555; }
+A.sectionhead:link    { text-decoration: none; color: #555; }
+A.sectionhead:visited    { text-decoration: none; color: #555; }
+A.sectionhead:hover    { text-decoration: none; color: #555; }
+A.sectionhead:active    { text-decoration: none; color: #555; }
+
 A.red:visited, a.red, .red {color: #CC0000;}
 A.grey:visited, A.grey, .gray {color: #36393D;}
 A.black:visited, A.black, .black {color: #000000;}
