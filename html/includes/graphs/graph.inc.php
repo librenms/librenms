@@ -60,6 +60,7 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
       if (Net_IPv4::ipInNetwork($_SERVER['REMOTE_ADDR'], $range))
       {
         $auth = TRUE;
+        break;
       }
     }
   }
