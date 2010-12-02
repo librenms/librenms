@@ -185,11 +185,6 @@ $config['allow_entity_sensor']['watts'] = 1;
 $config['allow_entity_sensor']['truthvalue'] = 1;
 $config['allow_entity_sensor']['specialEnum'] = 1;
 
-### Set default alert limits for various sensors and metrics
-#FIXME THESE SUCK
-$config['limit']['fan']  = "1000";
-$config['limit']['temp'] = "60";
-
 ### Filesystems
 
 $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc", "/dev");
@@ -222,9 +217,6 @@ $config['auth_ldap_group']  = "cn=observium,ou=groups,dc=example,dc=com";
 
 ### Hardcoded ASN descriptions
 $config['astext'][65333] = "Cymru Bogon Feed";
-
-### Default warning settings
-## FIXME THESE SUCK
 
 ### What should we warn about?
 $config['warn']['ifdown'] = false;
