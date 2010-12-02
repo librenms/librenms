@@ -64,10 +64,9 @@ if (is_file($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.p
       }
     }
   }
-  if (!$auth)
-  {
-    include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
-  }
+
+  include($config['install_dir'] . "/html/includes/graphs/$type/auth.inc.php");
+
   if ($auth)
   {
     include($config['install_dir'] . "/html/includes/graphs/$type/$subtype.inc.php");
@@ -117,7 +116,8 @@ if (!$auth)
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
       if ($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }   
-      if (is_file($graphfile)) {
+      if (is_file($graphfile)) 
+      {
         header('Content-type: image/png');
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
         unlink($graphfile);
