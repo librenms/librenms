@@ -1,8 +1,8 @@
-<?php 
+<?php
 
   $service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
   $if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
-  $device_alerts = "0"; 
+  $device_alerts = "0";
   $device_alert_sql = "WHERE 0";
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
@@ -17,10 +17,10 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
       if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
       if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1";}
     }
-    if ($this_alert) { 
+    if ($this_alert) {
      $device_alerts++;
-     $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'"; 
-    }    
+     $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'";
+    } 
   }
 ?>
 
@@ -81,9 +81,9 @@ if (!isset($config['show_services']) || $config['show_services'])
         <table><tr><td>
         <ul>
         <li><a href="services/"><img src="images/16/cog.png" border="0" align="absmiddle" /> All Services </a></li>
-<?php if ($service_alerts) { 
+<?php if ($service_alerts) {
 echo('  <li><hr width=140 /></li>
-        <li><a href="services/?status=0"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>'); 
+        <li><a href="services/?status=0"><img src="images/16/cog_error.png" border="0" align="absmiddle" /> Alerts ('.$service_alerts.')</a></li>');
 } ?>
 
 <?php
@@ -102,8 +102,8 @@ if ($_SESSION['userlevel'] >= '10') {
 }
 
 ## Display Locations entry if $config['show_locations']
-if ($config['show_locations']) 
-{ 
+if ($config['show_locations'])
+{
   $locations = mysql_query("SELECT DISTINCT location FROM devices ORDER BY location");
 ?>
 <li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
@@ -141,11 +141,13 @@ if ($config['show_locations'])
 
 <?php
 
-if ($ports['errored']) {
+if ($ports['errored'])
+{
   echo('<li><a href="ports/errors/"><img src="images/16/chart_curve_error.png" border="0" align="absmiddle" /> Errored ('.$ports['errored'].')</a></li>');
 }
 
-if ($ports['ignored']) {
+if ($ports['ignored'])
+{
   echo('<li><a href="ports/ignored/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
 
@@ -155,13 +157,14 @@ if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="
 
 if ($config['enable_pseudowires']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1;}
 
-?> 
+?>
 <li><a href="ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
 <li><a href="ipv6/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv6 Search</a></li>
 
 <?php
 
-if ($_SESSION['userlevel'] >= '5') {##FIXME html
+if ($_SESSION['userlevel'] >= '5')
+{
   echo('<li><hr width="140" /></li>');
   if ($config['int_customers']) { echo('<li><a href="customers/"><img src="images/16/group_link.png" border="0" align="absmiddle" /> Customers</a></li>'); $ifbreak = 1;}
   if ($config['int_l2tp']) { echo('<li><a href="iftype/l2tp/"><img src="images/16/user.png" border="0" align="absmiddle" /> L2TP</a></li>'); $ifbreak = 1; }
@@ -173,26 +176,28 @@ if ($_SESSION['userlevel'] >= '5') {##FIXME html
 
 if ($ifbreak) { echo('<li><hr width="140" /></li>'); }
 
-if (isset($interface_alerts)) {
-echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
+if (isset($interface_alerts))
+{
+  echo('<li><a href="ports/?status=0"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerts ('.$interface_alerts.')</a></li>');
 }
 
-  $sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
-  $query = mysql_query($sql);
-  $deleted_ports = 0;
-  while($interface = mysql_fetch_assoc($query)) {
-    if(port_permitted($interface['interface_id'], $interface['device_id'])){
-      $deleted_ports++;
-    }
+$sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
+$query = mysql_query($sql);
+$deleted_ports = 0;
+while($interface = mysql_fetch_assoc($query))
+{
+  if(port_permitted($interface['interface_id'], $interface['device_id']))
+  {
+    $deleted_ports++;
   }
-
+}
 ?>
 
 <li><a href="ports/down/"><img src="images/16/if-disconnect.png" border="0" align="absmiddle" /> Down</a></li>
 <li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
 <?php
 
-  if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
+if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
 
 ?>
 </ul></td></tr></table>
@@ -238,7 +243,7 @@ echo('
 if ($bgp_alerts) { echo('
         <li><hr width="140" /></li>
         <li><a href="bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted (' . $bgp_alerts . ')</a></li>
-'); } 
+'); }
 
 echo('        <li><hr /></li>
 
@@ -250,7 +255,6 @@ echo('        <li><hr /></li>
 } # If level > 5 && BGP enabled
 
 ?>
-
 
 <li style="float: right;"><a><img src="images/16/wrench.png" border="0" align="absmiddle" /> System
 <!--[if IE 7]><!--></a><!--<![endif]-->
@@ -268,7 +272,7 @@ echo('        <li><hr /></li>
     <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
         <li><hr width="140" /></li>');
-        
+     
       if (auth_usermanagement())
       {
       echo('
@@ -280,10 +284,9 @@ echo('        <li><hr /></li>
       echo('
         <li><a href="authlog/"><img src="images/16/lock.png" border="0" align="absmiddle" /> Authlog</a></li>');
     } ?>
-    </ul>
-  </td></tr></table>
+        </ul>
+      </td></tr></table>
 <!--[if lte IE 6]></a><![endif]-->
-</li>
-</ul>
-
+    </li>
+  </ul>
 </div>
