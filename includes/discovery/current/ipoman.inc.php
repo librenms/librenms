@@ -54,7 +54,7 @@ if ($device['os'] == "ipoman")
       $descr = (trim($cache['ipoman']['out'][$index]['outletConfigDesc'],'"') != '' ? trim($cache['ipoman']['out'][$index]['outletConfigDesc'],'"') : "Output $index");
       $current = $entry['outletStatusCurrent'] / $divisor;
       $high_limit = $entry['outletConfigCurrentHigh'] / 10;
-      echo(discover_sensor($valid_sensor, 'current', $device, $cur_oid, '2.3.1.3.'.$index, $type, $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current));
+      echo(discover_sensor($valid_sensor, 'current', $device, $cur_oid, '2.3.1.3.'.$index, 'ipoman', $descr, $divisor, '1', NULL, NULL, NULL, $high_limit, $current));
     }
   }
 }
