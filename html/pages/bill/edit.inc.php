@@ -17,7 +17,7 @@ echo("
     </tr>
     <tr>
       <td width='300'><div align='right'>Billing Day</div></td>
-      <td colspan='3'><input name='bill_day' size='20' value='" . $bill_data['bill_day'] . "'></input>Kbps
+      <td colspan='3'><input name='bill_day' size='20' value='" . $bill_data['bill_day'] . "'></input>
       </td>
     </tr>
     <tr>
@@ -27,7 +27,7 @@ echo("
     </tr>
     <tr>
       <td width='300'><div align='right'>CDR with 95th</div></td>
-      <td colspan='3'><input name='bill_cdr' size='20' value='" . $bill_data['bill_cdr'] . "'></input>
+      <td colspan='3'><input name='bill_cdr' size='20' value='" . $bill_data['bill_cdr'] . "'></input>Kbps
       </td>
     </tr>
     <tr>

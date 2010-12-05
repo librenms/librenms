@@ -27,6 +27,7 @@ $config['snmp']['community'][] = "public";
 
 ### Enable php_snmp
 $config['snmp']['internal'] = false;       # Enable php_snmp functions to make gets faster
+                                           # Often doesn't work, because jwh can't code for shit.
 
 ### Authentication Model
 $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
