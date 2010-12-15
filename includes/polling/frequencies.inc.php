@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM `sensors` WHERE device_id = '" . $device['device_id'] . "' AND `sensor_class` = 'freq'";
+$query = "SELECT * FROM `sensors` WHERE device_id = '" . $device['device_id'] . "' AND `sensor_class` = 'freq' AND poller_type='snmp'";
 $sensor_data = mysql_query($query);
 while($sensor = mysql_fetch_array($sensor_data)) {
 
@@ -11,12 +11,12 @@ while($sensor = mysql_fetch_array($sensor_data)) {
   if ($sensor['sensor_divisor'])    { $freq = $freq / $sensor['sensor_divisor']; }
   if ($sensor['sensor_multiplier']) { $freq = $freq * $sensor['sensor_multiplier']; }
     
-  $rrd_file      = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("freq-" . $sensor['sensor_descr'] . ".rrd");
+  $rrd_file      = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("frequency-" . $sensor['sensor_descr'] . ".rrd");
 
   if (!is_file($rrd_file)) {
     `rrdtool create $rrd_file \
      --step 300 \
-     DS:freq:GAUGE:600:-273:1000 \
+     DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \

@@ -1,9 +1,10 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $fan_data = mysql_query($query);
-while ($fanspeed = mysql_fetch_array($fan_data)) {
 
+while ($fanspeed = mysql_fetch_array($fan_data))
+{
   echo("Checking fan " . $fanspeed['sensor_descr'] . "... ");
 
   $fan = snmp_get($device, $fanspeed['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
@@ -11,12 +12,13 @@ while ($fanspeed = mysql_fetch_array($fan_data)) {
   if ($fanspeed['sensor_divisor'])    { $fan = $fan / $fanspeed['sensor_divisor']; }
   if ($fanspeed['sensor_multiplier']) { $fan = $fan * $fanspeed['sensor_multiplier']; }
 
-  $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");
+  $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fanspeed-" . $fanspeed['sensor_descr'] . ".rrd");
 
-  if (!is_file($fanrrd)) {
+  if (!is_file($fanrrd))
+  {
      `rrdtool create $fanrrd \
      --step 300 \
-     DS:fan:GAUGE:600:0:20000 \
+     DS:sensor:GAUGE:600:0:20000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \

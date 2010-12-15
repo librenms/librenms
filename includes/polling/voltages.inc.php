@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $volt_data = mysql_query($query);
 while($sensor = mysql_fetch_array($volt_data)) {
 
@@ -11,15 +11,15 @@ while($sensor = mysql_fetch_array($volt_data)) {
   if ($sensor['sensor_divisor'])    { $volt = $volt / $sensor['sensor_divisor']; }
   if ($sensor['sensor_multiplier']) { $volt = $volt * $sensor['sensor_multiplier']; }
 
-  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("volt-" . $sensor['sensor_descr'] . ".rrd");
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/volt-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
+  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("voltage-" . $sensor['sensor_descr'] . ".rrd");
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/voltage-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
 
   if(is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
 
   if (!is_file($rrd_file)) {
     `rrdtool create $rrd_file \
      --step 300 \
-     DS:volt:GAUGE:600:-273:1000 \
+     DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \

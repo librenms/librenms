@@ -2,34 +2,16 @@
 
   if ($config['overview_show_sysDescr']) 
   {
-    echo('<div style="font-family: courier, serif; margin: 10px";><strong>' . $device['sysDescr'] . "</strong></div>");
+    echo('<div style="font-family: courier, serif; margin: 10px"><strong>' . $device['sysDescr'] . "</strong></div>");
   }
 
   $uptime = $device['uptime'];
-
-#  if(is_file("images/devices/" . $device['hardware'] . ".gif")) 
-#  {
-#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".gif' align=absmiddle></img></div>";
-#  } 
-#  elseif (is_file("images/devices/" . $device['hardware'] . ".jpg")) 
-#  {
-#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".jpg' align=absmiddle></img></div>";
-#  }
-#  elseif (is_file("images/devices/" . $device['hardware'] . ".png")) 
-#  {
-#    $dev_img = "<div style='float: left;'><img src='images/devices/" . $device['hardware'] . ".png' align=absmiddle></img></div>";
-#  }
-#  else
-#  {
-#    $dev_img = '';
-#  }
 
   if ($device['os'] == "ios") { formatCiscoHardware($device); }
   if ($device['features']) { $device['features'] = "(".$device['features'].")"; }
   $device['os_text'] = $config['os'][$device['os']]['text'];
 
-  echo($dev_img . '
-      <table width="100%">');
+  echo('<table width="100%">');
 
   if($device['hardware']) 
   {

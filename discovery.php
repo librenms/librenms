@@ -45,10 +45,10 @@ if (isset($options['d'])) {
   ini_set('error_reporting', 1);
 } else {
   $debug = FALSE;
-  ini_set('display_errors', 0);
+#  ini_set('display_errors', 0);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
+#  ini_set('error_reporting', 0);
 }
 
 
@@ -79,22 +79,26 @@ if (file_exists('.svn'))
     $db_rev = 0;
   }
 
-  if ($db_rev+0 < "1223") {
+  if ($db_rev+0 < 1223) {
     include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
   }
 
-  if($db_rev+0 < 1656) {
+  if ($db_rev+0 < 1656) {
      include('fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
+  }
+
+  if ($db_rev+0 < 1757) {
+     include('fix-sensor-rrd.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
   }
 
   if ($dbu_rev+0 > $db_rev)
   {
     echo("SVN revision changed.\n");
-    if($db_rev+0 < "1000") {
+    if ($db_rev+0 < "1000") {
       echo("Running pre-revision 1000 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1000.sql");
     }
-    if($db_rev+0 < "1435") {
+    if ($db_rev+0 < "1435") {
       echo("Running pre-revision 1435 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1435.sql");
     }

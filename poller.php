@@ -55,10 +55,10 @@ if (isset($options['d'])) {
   ini_set('error_reporting', 1);
 } else {
   $debug = FALSE;
-  ini_set('display_errors', 0);
+#  ini_set('display_errors', 0);
   ini_set('display_startup_errors', 0);
   ini_set('log_errors', 0);
-  ini_set('error_reporting', 0);
+#  ini_set('error_reporting', 0);
 }
 
 
@@ -193,6 +193,7 @@ while ($device = mysql_fetch_assoc($device_query))
 
     $sysLocation = str_replace("\"","", $sysLocation); 
   
+    include("includes/polling/ipmi.inc.php");
     include("includes/polling/temperatures.inc.php");
     include("includes/polling/humidity.inc.php");
     include("includes/polling/fanspeeds.inc.php");

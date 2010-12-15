@@ -76,6 +76,19 @@ function write_dev_attrib($device_id, $attrib_type, $attrib_value)
   return mysql_affected_rows();
 }
 
+function get_dev_attrib($device, $attrib_type)
+{
+  $sql = "SELECT attrib_value FROM devices_attribs WHERE `device_id` = '" . $device['device_id'] . "' AND `attrib_type` = '$attrib_type'";
+  if ($row = mysql_fetch_assoc(mysql_query($sql))) 
+  {
+    return $row['attrib_value'];
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 function shorthost($hostname, $len=16)
 {
   $parts = explode(".", $hostname);
@@ -679,7 +692,7 @@ function isHexString($str)
 }
 
 # Include all .inc.php files in $dir
-function include_dir($dir, $regex)
+function include_dir($dir, $regex = "")
 {
   global $device, $config;
   if ( $regex == "")
