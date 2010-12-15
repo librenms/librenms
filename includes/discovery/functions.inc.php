@@ -1,28 +1,27 @@
 <?php
 
 ### Discover sensors
-function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL)
+function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = '1', $multiplier = '1', $low_limit = NULL, $low_warn_limit = NULL, $warn_limit = NULL, $high_limit = NULL, $current = NULL, $poller_type = 'snmp')
 {
   global $config, $debug;
   if($debug) { echo("$oid, $index, $type, $descr, $precision\n"); }
 
-  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
+  if (mysql_result(mysql_query("SELECT count(sensor_id) FROM `sensors` WHERE poller_type='" . mres($poller_type) . "' AND sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0) == '0')
   {
 
     if(!$high_limit) { $high_limit = sensor_limit($class, $current); }
     if(!$low_limit)  { $low_limit  = sensor_low_limit($class, $current); }
 
-    $query = "INSERT INTO sensors (`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_divisor`, `sensor_multiplier`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
-    $query .= " VALUES ('" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$divisor', '$multiplier', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
+    $query = "INSERT INTO sensors (`poller_type`,`sensor_class`, `device_id`, `sensor_oid`, `sensor_index`, `sensor_type`, `sensor_descr`, `sensor_divisor`, `sensor_multiplier`, `sensor_limit`, `sensor_limit_warn`, `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_current`) ";
+    $query .= " VALUES ('" . mres($poller_type) . "','" . mres($class) . "', '".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$divisor', '$multiplier', '$high_limit', '$warn_limit', '$low_limit', '$low_warn_limit', '$current')";
     mysql_query($query);
-    if($debug) { echo("$query ". mysql_affected_rows() . " inserted"); }
+    if($debug) { echo("$query\n". mysql_affected_rows() . " inserted\n"); }
     echo("+");
-    $sensor_id = mysql_result(mysql_query("SELECT `sensor_id` FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"),0);
-    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', $sensor_id);
+    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', mysql_insert_id());
   }
   else
   {
-    $sensor_entry = mysql_fetch_array(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
+    $sensor_entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `sensors` WHERE sensor_class='" . mres($class) . "' AND device_id = '".$device['device_id']."' AND sensor_type = '$type' AND `sensor_index` = '$index'"));
 
     if(!$high_limit)
     { 
@@ -36,7 +35,9 @@ function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr,
 
     if ($high_limit != $sensor_entry['sensor_limit'])
     {
-      mysql_query("UPDATE sensors SET `sensor_limit` = '".$high_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
+      $query = "UPDATE sensors SET `sensor_limit` = '".$high_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"; 
+      mysql_query($query);
+      if($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("H");
       log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device['device_id'], 'sensor', $sensor_id);
     }
@@ -53,7 +54,9 @@ function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr,
 
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
-      mysql_query("UPDATE sensors SET `sensor_limit_low` = '".$low_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'"); 
+      $query = "UPDATE sensors SET `sensor_limit_low` = '".$low_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
+      mysql_query($query); 
+      if($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("L");
       log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device['device_id'], 'sensor', $sensor_id);
     }
@@ -64,21 +67,23 @@ function discover_sensor (&$valid, $class, $device, $oid, $index, $type, $descr,
     }
     else
     {
-      mysql_query("UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index' ");
+      $query = "UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index'";
+      mysql_query($query);
       echo("U");
       log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', $sensor_id);
-      if($debug) { echo("$query ". mysql_affected_rows() . " updated"); }
+      if($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
     }
   }
   $valid[$class][$type][$index] = 1;
   return $return;
 }
 
-function sensor_low_limit ($class, $current) {
-
+function sensor_low_limit ($class, $current) 
+{
   $limit = NULL;
 
-  switch($class) {
+  switch($class) 
+  {
     case 'temperature':
      $limit = $current * 0.7; 
      break;
@@ -102,11 +107,12 @@ function sensor_low_limit ($class, $current) {
 }
 
 
-function sensor_limit ($class, $current) {
-
+function sensor_limit ($class, $current) 
+{
   $limit = NULL;
 
-  switch($class) {
+  switch($class)
+  {
     case 'temperature':
      $limit = $current * 1.60; 
      break;
@@ -129,11 +135,12 @@ function sensor_limit ($class, $current) {
   return $limit;
 }
 
-function check_valid_sensors($device, $class, $valid) {
+function check_valid_sensors($device, $class, $valid) 
+{
   $sql = "SELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class='".$class."' AND S.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
   if ($query = mysql_query($sql))
   {
-    while ($test = mysql_fetch_array($query))
+    while ($test = mysql_fetch_assoc($query))
     {
       $index = $test['sensor_index'];
       $type = $test['sensor_type'];
@@ -181,7 +188,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
   }
   else
   {
-    $data = mysql_fetch_array(mysql_query("SELECT * FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
+    $data = mysql_fetch_assoc(mysql_query("SELECT * FROM `links` WHERE `remote_hostname` = '$remote_hostname' AND `local_interface_id` = '$local_interface_id'
                                                AND `protocol` = '$protocol' AND `remote_port` = '$remote_port'"));
     if($data['remote_interface_id'] == $remote_interface_id && $data['remote_platform'] == $remote_platform && $remote_version == $remote_version)
     {
@@ -275,7 +282,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
     else
     {
       echo(".");
-#      entry = mysql_fetch_assoc(mysql_query());
       $query  = "UPDATE `mempools` SET `mempool_descr` = '".$descr."', `entPhysicalIndex` = '".$entPhysicalIndex."'";
       $query .= ", `hrDeviceIndex` = '$hrDeviceIndex' ";
       $query .= "WHERE `device_id` = '".$device['device_id']."' AND `mempool_index` = '".$index."' AND `mempool_type` = '".$type."'";
@@ -302,7 +308,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
   } 
   else 
   {
-    $toner_entry = mysql_fetch_array(mysql_query("SELECT * FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index'"));
+    $toner_entry = mysql_fetch_assoc(mysql_query("SELECT * FROM `toner` WHERE device_id = '".$device['device_id']."' AND toner_type = '$type' AND `toner_index` = '$index'"));
     if($oid == $toner_entry['toner_oid'] && $descr == $toner_entry['toner_descr'] && $capacity == $toner_entry['toner_capacity'])
     {
       echo(".");

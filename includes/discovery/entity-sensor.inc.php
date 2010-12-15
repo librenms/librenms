@@ -60,9 +60,6 @@ if(is_array($oids))
       $valid = TRUE;
 
       $type = $entitysensor[$entry['entPhySensorType']];
-
-      $descr = str_ireplace("temperature", "", $descr);
-      $descr = str_ireplace("sensor", "", $descr);
         
       ### FIXME this stuff is foul
 

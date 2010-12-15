@@ -1,15 +1,12 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $hum_data = mysql_query($query);
 while($humidity = mysql_fetch_array($hum_data)) {
 
   echo("Checking humidity " . $humidity['sensor_descr'] . "... ");
 
-  $hum_cmd = $config['snmpget'] . " -M ".$config['mibdir']. " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $humidity['sensor_oid'] . "|grep -v \"No Such Instance\"";
-  $hum = trim(str_replace("\"", "", shell_exec($hum_cmd)));
-
-  ## fixme snmp_get()
+  $hum = snmp_get($device, $humidity['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
   if ($humidity['sensor_divisor'])    { $hum = $hum / $humidity['sensor_divisor']; }
   if ($humidity['sensor_multiplier']) { $hum = $hum / $humidity['sensor_multiplier']; }
@@ -19,7 +16,7 @@ while($humidity = mysql_fetch_array($hum_data)) {
   if (!is_file($humrrd)) {
     `rrdtool create $humrrd \
      --step 300 \
-     DS:humidity:GAUGE:600:-273:1000 \
+     DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \

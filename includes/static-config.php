@@ -393,6 +393,11 @@ $config['os'][$os]['text']  		= "Delta UPS";
 $config['os'][$os]['type']  		= "power";
 $config['os'][$os]['icon']  		= "delta";
 
+$os = "engenius";
+$config['os'][$os]['type'] 		= "network";
+$config['os'][$os]['text']  		= "EnGenius Access Point";
+$config['os'][$os]['icon']  		= "engenius";
+
 $os = "airport";
 $config['os'][$os]['type'] 		= "network";
 $config['os'][$os]['text']  		= "Apple AirPort";
@@ -818,5 +823,11 @@ $config['twomonth']   = time() - (2 * 31 * 24 * 60 * 60);
 $config['threemonth'] = time() - (3 * 31 * 24 * 60 * 60);
 $config['year']       = time() - (365 * 24 * 60 * 60);
 
+# IPMI sensor type mappings
+$ipmi_unit['Volts']     = 'voltage';
+$ipmi_unit['degrees C'] = 'temperature';
+$ipmi_unit['RPM']       = 'fanspeed';
+$ipmi_unit['Watts']     = '';
+$ipmi_unit['discrete']  = '';
 
 ?>

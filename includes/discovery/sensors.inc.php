@@ -6,6 +6,7 @@ echo("Sensors: ");
 
 include("includes/discovery/cisco-entity-sensor.inc.php");
 include("includes/discovery/entity-sensor.inc.php");
+include("includes/discovery/ipmi.inc.php");
 
 include("includes/discovery/temperatures.inc.php");
 include("includes/discovery/humidity.inc.php");

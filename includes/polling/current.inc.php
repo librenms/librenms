@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $current_data = mysql_query($query);
 while($dbcurrent = mysql_fetch_array($current_data)) {
 
@@ -16,7 +16,7 @@ while($dbcurrent = mysql_fetch_array($current_data)) {
   if (!is_file($currentrrd)) {
     `rrdtool create $currentrrd \
      --step 300 \
-     DS:current:GAUGE:600:-273:1000 \
+     DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
      RRA:MAX:0.5:12:2400 \

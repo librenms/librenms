@@ -1,6 +1,6 @@
 <?php
 
-$query = "SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "'";
+$query = "SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $temp_data = mysql_query($query);
 while($temperature = mysql_fetch_array($temp_data)) {
 
@@ -9,6 +9,7 @@ while($temperature = mysql_fetch_array($temp_data)) {
   for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
   {
     if ($debug) echo("Attempt $i ");
+    #FIXME snmp_get
     $temp_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['sensor_oid'] . "|grep -v \"No Such Instance\"";
     $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
 
@@ -19,15 +20,15 @@ while($temperature = mysql_fetch_array($temp_data)) {
   if ($temperature['sensor_divisor'])    { $temp = $temp / $temperature['sensor_divisor']; }
   if ($temperature['sensor_multiplier']) { $temp = $temp * $temperature['sensor_multiplier']; }
 
-  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temp-" . $temperature['sensor_descr'] . ".rrd");
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
+  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temperature-" . $temperature['sensor_descr'] . ".rrd");
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temperature-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
 
   if(is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
 
   if (!is_file($rrd_file)) {
     `rrdtool create $rrd_file \
      --step 300 \
-     DS:temp:GAUGE:600:-273:1000 \
+     DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:600 \
      RRA:AVERAGE:0.5:6:700 \
      RRA:AVERAGE:0.5:24:775 \

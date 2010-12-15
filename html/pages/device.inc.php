@@ -229,6 +229,7 @@ echo("</ul>");
 echo('
 <div class="contentstyle">');
 
+## FIXME safe??
 include("pages/device/".mres($section).".inc.php");
 
 
