@@ -12,11 +12,14 @@ while ($fanspeed = mysql_fetch_array($fan_data))
   if ($fanspeed['sensor_divisor'])    { $fan = $fan / $fanspeed['sensor_divisor']; }
   if ($fanspeed['sensor_multiplier']) { $fan = $fan * $fanspeed['sensor_multiplier']; }
 
-  $fanrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fanspeed-" . $fanspeed['sensor_descr'] . ".rrd");
+  $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fanspeed-" . $fanspeed['sensor_descr'] . ".rrd");
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/fanspeed-" . safename($fanspeed['sensor_type']."-".$fanspeed['sensor_index']) . ".rrd";
 
-  if (!is_file($fanrrd))
+  if(is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
+
+  if (!is_file($rrd_file))
   {
-     `rrdtool create $fanrrd \
+     `rrdtool create $rrd_file \
      --step 300 \
      DS:sensor:GAUGE:600:0:20000 \
      RRA:AVERAGE:0.5:1:1200 \
@@ -27,7 +30,7 @@ while ($fanspeed = mysql_fetch_array($fan_data))
 
   echo($fan . " rpm\n");
 
-  rrdtool_update($fanrrd,"N:$fan");
+  rrdtool_update($rrd_file,"N:$fan");
 
   if ($fanspeed['sensor_current'] > $fanspeed['sensor_limit_low'] && $fan <= $fanspeed['sensor_limit_low']) 
   {
