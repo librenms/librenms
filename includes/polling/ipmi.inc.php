@@ -15,14 +15,16 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   foreach (explode("\n",$results) as $row)
   {
     list($desc,$value,$type,$status) = explode(',',$row);
-    $ipmi_sensor[$desc][$ipmi_unit[$type]] = $value;
+    $ipmi_sensor[$desc][$ipmi_unit[$type]]['value'] = $value;
+    $ipmi_sensor[$desc][$ipmi_unit[$type]]['unit'] = $type;
   }
 
   while ($ipmisensors = mysql_fetch_array($ipmi_data)) 
   {
     echo("Updating IPMI sensor " . $ipmisensors['sensor_descr'] . "... ");
 
-    $sensor = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']];
+    $sensor = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['value'];
+    $unit   = $ipmi_sensor[$ipmisensors['sensor_descr']][$ipmisensors['sensor_class']]['unit'];
 
     $sensorrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($ipmisensors['sensor_class'].'-'.$ipmisensors['sensor_type'].'-'.$ipmisensors['sensor_index'] . ".rrd");
 
@@ -45,7 +47,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
       RRA:MIN:0.5:288:797`;
     }
 
-    echo($sensor . " \n"); # FIXME unit should follow?
+    echo($sensor . " $unit\n");
 
     rrdtool_update($sensorrrd,"N:$sensor");
 
