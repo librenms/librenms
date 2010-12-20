@@ -9,7 +9,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
       
   echo("Fetching IPMI sensor data...");
-  $results = shell_exec("ipmitool -c -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sdr");
+  $results = shell_exec($config['ipmitool'] . " -c -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sdr");
   echo(" done.\n");
 
   foreach (explode("\n",$results) as $row)
