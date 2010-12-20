@@ -15,8 +15,8 @@ include("includes/graphs/common.inc.php");
   $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
   $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
   $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
-  $rrd_options .= " CDEF:sensorwarm=humidity_max,".$sensor['sensor_limit'].",GT,humidity,UNKN,IF";
-  $rrd_options .= " CDEF:sensorcold=humidity_min,20,LT,humidity,UNKN,IF";
+  $rrd_options .= " CDEF:sensorwarm=sensor_max,".$sensor['sensor_limit'].",GT,sensor,UNKN,IF";
+  $rrd_options .= " CDEF:sensorcold=sensor_min,20,LT,sensor,UNKN,IF";
   $rrd_options .= " AREA:sensor_max#c5c5c5";
   $rrd_options .= " AREA:sensor_min#ffffffff";
 
