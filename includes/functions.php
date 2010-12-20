@@ -473,6 +473,7 @@ function createHost ($host, $community, $snmpver, $port = 161)
     if (mysql_affected_rows())
     {
       $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
+      # vv FIXME set_dev_attrib()
       mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
       return("Created host : $host (id:$device_id) (os:$host_os)");
     } 

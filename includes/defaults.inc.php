@@ -22,6 +22,7 @@ $config['ping']           = "/bin/ping";
 $config['mtr']            = "/usr/bin/mtr";
 $config['nmap']           = "/usr/bin/nmap";
 $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
+$config['ipmitool']       = "/usr/bin/ipmitool";
 
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
