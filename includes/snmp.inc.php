@@ -243,7 +243,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array, $mib = NULL, $mibdir = 
 {
   global $cache;
   
-  if (!array_key_exists($oid,$cache['snmp'][$device['device_id']]))
+  if (!(is_array($cache['snmp'][$device['device_id']]) && array_key_exists($oid,$cache['snmp'][$device['device_id']])))
   {
     $data = snmp_walk($device, $oid, "-OQUs", $mib, $mibdir);
     foreach(explode("\n", $data) as $entry) 
