@@ -701,7 +701,7 @@ function isHexString($str)
 # Include all .inc.php files in $dir
 function include_dir($dir, $regex = "")
 {
-  global $device, $config;
+  global $device, $config, $debug;
   if ( $regex == "")
   {
     $regex = "/\.inc\.php$/";
@@ -713,6 +713,7 @@ function include_dir($dir, $regex = "")
     {
       if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file))
       {
+        if ($debug) { echo("Including: " . $config['install_dir'] . '/' . $dir . '/' . $file . "\n"); }
         include($config['install_dir'] . '/' . $dir . '/' . $file);
       }
     }

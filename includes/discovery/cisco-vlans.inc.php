@@ -1,7 +1,7 @@
 <?php
 
-if($device['os_group'] == "ios") {
-
+if($device['os_group'] == "ios")
+{
   echo("Cisco VLANs : ");
 
   $vtpversion_cmd  = $config['snmpget'] . " -M " . $config['mibdir'] . " -m CISCO-VTP-MIB -Oqv -" . $device['snmpver'] . " -c " . $device['community'] . " ";
@@ -60,3 +60,4 @@ if($device['os_group'] == "ios") {
   echo("\n");
 
 }
+?>
