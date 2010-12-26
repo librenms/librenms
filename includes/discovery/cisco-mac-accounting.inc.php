@@ -1,8 +1,7 @@
 <?php
 
-
-if($device['os_group'] == "ios") {
-
+if ($device['os_group'] == "ios")
+{
   echo("Cisco MAC Accounting : ");
 
   $datas = shell_exec($config['snmpbulkwalk'] . " -M ".$config['mibdir']." -m CISCO-IP-STAT-MIB -Oqn -".$device['snmpver']." -c ".$device['community']." ".$device['hostname']." cipMacSwitchedBytes");
@@ -44,10 +43,7 @@ if($device['os_group'] == "ios") {
     }
   }
   echo("\n");
-
-}
+} # os_group=ios
 
 // FIXME - NEEDS TO REMOVE STALE ENTRIES?? :O
-
-
 ?>

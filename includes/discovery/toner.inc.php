@@ -60,4 +60,3 @@ if ($config['enable_printers'])
   
 } # if ($config['enable_printers'])
 ?>
-  
