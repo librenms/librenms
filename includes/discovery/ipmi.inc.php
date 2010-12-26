@@ -11,6 +11,8 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
   
   $results = shell_exec($config['ipmitool'] . " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sensor|sort");
+  
+  $index = 0;
 
   foreach (explode("\n",$results) as $sensor)
   {
