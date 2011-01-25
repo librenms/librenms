@@ -16,7 +16,7 @@ $interface_added   = 0;
 foreach(explode("\n", $ports) as $entry){
 
   $entry = trim($entry);
-  list($ifIndex, $ifDescr) = explode("||", $entry);
+  list($ifIndex, $ifDescr) = explode("||", $entry, 2);
 
   if(!strstr($entry, "irtual")) {
     $if = trim(strtolower($ifDescr));
