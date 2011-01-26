@@ -17,7 +17,6 @@ foreach(explode("\n", $ports) as $entry){
 
   $entry = trim($entry);
   list($ifIndex, $ifDescr) = explode("||", $entry, 2);
-
   if(!strstr($entry, "irtual")) {
     $if = trim(strtolower($ifDescr));
     $nullintf = 0;
@@ -30,6 +29,7 @@ foreach(explode("\n", $ports) as $entry){
       }
     }
 
+    if(empty($ifDescr)) { $nullintf = 1; }
     if($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; } 
     $ifDescr = fixifName($ifDescr);
     if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
