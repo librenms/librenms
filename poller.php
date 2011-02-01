@@ -110,6 +110,7 @@ while ($device = mysql_fetch_assoc($device_query))
   { 
 
     $graphs = array();
+    $oldgraphs = array();
 
     $snmp_cmd =  $config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'];
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
@@ -123,7 +124,7 @@ while ($device = mysql_fetch_assoc($device_query))
 
 #    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
 
-    if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No"))
+    if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No") && ($device['os'] != "windows"))
     {
       echo("Using hrSystemUptime\n");
       $agent_uptime = $uptime; ## Move uptime into agent_uptime
@@ -136,7 +137,6 @@ while ($device = mysql_fetch_assoc($device_query))
       $mins = $mins + ($hours * 60);
       $secs = $secs + ($mins * 60);
       $uptime = $secs;
-      if ($device['os'] == "windows") { $uptime /= 10; }
     } else {
       echo("Using Agent Uptime\n");
       #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
