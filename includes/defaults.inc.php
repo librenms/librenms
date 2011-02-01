@@ -166,8 +166,8 @@ $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 $config['ignore_mount_optical']   = 1; # Ignore mounted optical discs
 
-$config['device_traffic_iftype']  = array('/loopback/','/tunnel/','/virtual/','/mpls/');
-$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/');
+$config['device_traffic_iftype']  = array('/loopback/','/tunnel/','/virtual/','/mpls/','/ieee8023adLag/');
+$config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d+/','/bond/');
 
 ### Authentication
 
