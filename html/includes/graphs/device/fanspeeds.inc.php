@@ -39,14 +39,14 @@ while($fanspeed = mysql_fetch_array($sql))
   }
 
   $descr = substr(str_pad($fanspeed['sensor_descr'], 17),0,17);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("fan-" . $fanspeed['sensor_descr'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("fanspeed-" . safename($fanspeed['sensor_type']."-".$fanspeed['sensor_index']) . ".rrd");
   $fan_id = $fanspeed['sensor_id'];
 
-  $rrd_options .= " DEF:fan$fan_id=$rrd_filename:fan:AVERAGE";
-  $rrd_options .= " LINE1:fan$fan_id#".$colour.":'" . $descr . "'";
-  $rrd_options .= " GPRINT:fan$fan_id:AVERAGE:%5.0lf\ ";
-  $rrd_options .= " GPRINT:fan$fan_id:MIN:%5.0lf\ ";
-  $rrd_options .= " GPRINT:fan$fan_id:MAX:%5.0lf\\\\l";
+  $rrd_options .= " DEF:sensor$fan_id=$rrd_filename:sensor:AVERAGE";
+  $rrd_options .= " LINE1:sensor$fan_id#".$colour.":'" . $descr . "'";
+  $rrd_options .= " GPRINT:sensor$fan_id:AVERAGE:%5.0lf\ ";
+  $rrd_options .= " GPRINT:sensor$fan_id:MIN:%5.0lf\ ";
+  $rrd_options .= " GPRINT:sensor$fan_id:MAX:%5.0lf\\\\l";
 
   $iter++;
 }

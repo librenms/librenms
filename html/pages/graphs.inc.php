@@ -28,7 +28,8 @@ if(is_numeric($_GET['optd'])) { $to = $_GET['optd']; } else { $to = $now; }
     include("includes/error-no-perm.inc.php");
   } else {
 
-  if(isset($config['graph'][$type][$subtype])) { $title .= " :: ".$config['graph'][$type][$subtype]; } else { $title .= " :: ".$graph_type; }
+# Do we really need to show the type? User does not have to see the type of graph (i.e. sensor_temperature) 
+#  if(isset($config['graph'][$type][$subtype])) { $title .= " :: ".$config['graph'][$type][$subtype]; } else { $title .= " :: ".$graph_type; }
 
   $graph_array['height'] = "60";
   $graph_array['width']  = "150";
@@ -95,7 +96,6 @@ if(is_numeric($_GET['optd'])) { $to = $_GET['optd']; } else { $to = $now; }
   echo(generate_graph_tag($graph_array));
   echo("   </a>
   </div>");
-
 
   $graph_array['from']   = $year;
   echo("<div style='width: 150px; margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5; float: left;'>

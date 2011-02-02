@@ -41,13 +41,12 @@ while($current = mysql_fetch_array($sql))
   
   $descr = substr(str_pad($current['sensor_descr'], 15),0,15);
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("current-" . $current['sensor_descr'] . ".rrd");
-  $current_id = $current['sensor_id'];
 
-  $rrd_options .= " DEF:current$current_id=$rrd_filename:current:AVERAGE";
-  $rrd_options .= " LINE1:current$current_id#".$colour.":'" . $descr . "'";
-  $rrd_options .= " GPRINT:current$current_id:AVERAGE:%5.2lfA";
-  $rrd_options .= " GPRINT:current$current_id:MIN:%5.2lfA";
-  $rrd_options .= " GPRINT:current$current_id:MAX:%5.2lfA\\\\l";
+  $rrd_options .= " DEF:sensor" . $current['sensor_id'] . "=$rrd_filename:sensor:AVERAGE";
+  $rrd_options .= " LINE1:sensor" . $current['sensor_id'] . "#".$colour.":'" . $descr . "'";
+  $rrd_options .= " GPRINT:sensor" . $current['sensor_id'] . ":AVERAGE:%5.2lfA";
+  $rrd_options .= " GPRINT:sensor" . $current['sensor_id'] . ":MIN:%5.2lfA";
+  $rrd_options .= " GPRINT:sensor" . $current['sensor_id'] . ":MAX:%5.2lfA\\\\l";
 
   $iter++;
 }

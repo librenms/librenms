@@ -39,12 +39,12 @@ while($temperature = mysql_fetch_array($sql))
   }
   
   $temperature['sensor_descr_fixed'] = substr(str_pad($temperature['sensor_descr'], $descr_len),0,$descr_len);
-  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temp-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
-  $rrd_options .= " DEF:temp" . $temperature['sensor_id'] . "=$rrd_file:temp:AVERAGE ";
-  $rrd_options .= " LINE1:temp" . $temperature['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',$temperature['sensor_descr_fixed'])) . "'";
-  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":LAST:%4.1lfC ";
-  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":MIN:%4.1lfC ";
-  $rrd_options .= " GPRINT:temp" . $temperature['sensor_id'] . ":MAX:%4.1lfC\\\l ";
+  $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temperature-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
+  $rrd_options .= " DEF:sensor" . $temperature['sensor_id'] . "=$rrd_file:sensor:AVERAGE ";
+  $rrd_options .= " LINE1:sensor" . $temperature['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',$temperature['sensor_descr_fixed'])) . "'";
+  $rrd_options .= " GPRINT:sensor" . $temperature['sensor_id'] . ":LAST:%4.1lfC ";
+  $rrd_options .= " GPRINT:sensor" . $temperature['sensor_id'] . ":MIN:%4.1lfC ";
+  $rrd_options .= " GPRINT:sensor" . $temperature['sensor_id'] . ":MAX:%4.1lfC\\\l ";
   $iter++;
 }
 

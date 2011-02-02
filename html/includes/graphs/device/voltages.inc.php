@@ -43,14 +43,13 @@ while($sensor = mysql_fetch_array($sql))
   $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], $descr_len),0,$descr_len);
   $sensor['sensor_descr_fixed'] = str_replace(':','\:',str_replace('\*','*',$sensor['sensor_descr_fixed']));
 
-  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/volt-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
-  $sensor_id = $sensor['sensor_id'];
+  $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/voltage-" . safename($sensor['sensor_type']."-".$sensor['sensor_index']) . ".rrd";
 
-  $rrd_options .= " DEF:s$sensor_id=$rrd_filename:volt:AVERAGE";
-  $rrd_options .= " LINE1:s$sensor_id#".$colour.":'" . $sensor['sensor_descr_fixed'] . "'";
-  $rrd_options .= " GPRINT:s$sensor_id:AVERAGE:%5.2lfV";
-  $rrd_options .= " GPRINT:s$sensor_id:MIN:%5.2lfV";
-  $rrd_options .= " GPRINT:s$sensor_id:MAX:%5.2lfV\\\\l";
+  $rrd_options .= " DEF:sensor" . $sensor['sensor_id'] . "=$rrd_filename:sensor:AVERAGE";
+  $rrd_options .= " LINE1:sensor" . $sensor['sensor_id'] . "#".$colour.":'" . $sensor['sensor_descr_fixed'] . "'";
+  $rrd_options .= " GPRINT:sensor" . $sensor['sensor_id'] . ":AVERAGE:%5.2lfV";
+  $rrd_options .= " GPRINT:sensor" . $sensor['sensor_id'] . ":MIN:%5.2lfV";
+  $rrd_options .= " GPRINT:sensor" . $sensor['sensor_id'] . ":MAX:%5.2lfV\\\\l";
 
   $iter++;
 }
