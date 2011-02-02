@@ -38,12 +38,12 @@ while($humidity = mysql_fetch_array($sql))
   }
   
   $humidity['sensor_descr_fixed'] = substr(str_pad($humidity['sensor_descr'], 22),0,22);
-  $humidityrrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("humidity-" . $humidity['sensor_descr'] . ".rrd");
-  $rrd_options .= " DEF:humidity" . $humidity['sensor_id'] . "=$humidityrrd:humidity:AVERAGE ";
-  $rrd_options .= " LINE1:humidity" . $humidity['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($humidity['sensor_descr_fixed']))) . "' ";
-  $rrd_options .= " GPRINT:humidity" . $humidity['sensor_id'] . ":LAST:%3.0lf%% ";
-  $rrd_options .= " GPRINT:humidity" . $humidity['sensor_id'] . ":MIN:%3.0lf%% ";
-  $rrd_options .= " GPRINT:humidity" . $humidity['sensor_id'] . ":MAX:%3.0lf%%\\\l ";
+  $humidityrrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("humidity-" . safename($humidity['sensor_type']."-".$humidity['sensor_index']) . ".rrd");
+  $rrd_options .= " DEF:sensor" . $humidity['sensor_id'] . "=$humidityrrd:sensor:AVERAGE ";
+  $rrd_options .= " LINE1:sensor" . $humidity['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($humidity['sensor_descr_fixed']))) . "' ";
+  $rrd_options .= " GPRINT:sensor" . $humidity['sensor_id'] . ":LAST:%3.0lf%% ";
+  $rrd_options .= " GPRINT:sensor" . $humidity['sensor_id'] . ":MIN:%3.0lf%% ";
+  $rrd_options .= " GPRINT:sensor" . $humidity['sensor_id'] . ":MAX:%3.0lf%%\\\l ";
   $iter++;
 }
 
