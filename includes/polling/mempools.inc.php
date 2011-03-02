@@ -34,7 +34,14 @@ while($mempool = mysql_fetch_array($mempool_data)) {
     ### Do we need a generic mempool poller?
   }
 
-  $percent = round($mempool['used'] / $mempool['total'] * 100, 2);
+  if ($mempool['total'])
+  {
+    $percent = round($mempool['used'] / $mempool['total'] * 100, 2);
+  }
+  else
+  {
+    $percent = 0;
+  }
 
   echo($percent."% ");
 
