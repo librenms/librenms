@@ -70,10 +70,11 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
   return $array;
 }
 
-function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)	{
+function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
+{
    global $debug,$config,$runtime_stats,$mibs_loaded;
    if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-   if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+   if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
    if ($config['snmp']['internal'] == true) 
    {
      if ($mib && $mibdir && !$mibs_loaded[$mib])	
@@ -115,7 +116,7 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)	{
 function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)	{
 	global $debug,$config,$runtime_stats;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
 	// php has no bulkwalk functionality, so use binary for this.
 	if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])	{
 		$snmpcommand = $config['snmpwalk'];
@@ -153,7 +154,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)	
 function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)	{
 	global $config;
         if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-        if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+        if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
 	if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])	{
 		$snmpcommand = $config['snmpwalk'];
 	}
@@ -195,7 +196,7 @@ function snmp_cache_ifIndex($device)
 {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
@@ -306,7 +307,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
@@ -338,7 +339,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
 function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0) {
   global $config, $debug;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
@@ -371,7 +372,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0) {
 function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0) {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   { 
     $snmpcommand = $config['snmpwalk'];
@@ -411,7 +412,7 @@ function snmp_cache_oid($oid, $device, $array, $mib = 0)
 function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   foreach($oids as $oid){
     $string .= " $oid.$port";
   }
@@ -439,7 +440,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
 function snmp_cache_portIfIndex ($device, $array) {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " ";
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -461,7 +462,7 @@ function snmp_cache_portIfIndex ($device, $array) {
 function snmp_cache_portName ($device, $array) {
   global $config;
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
-  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $timeout =  $config['snmp']['retries']; }
+  if (is_numeric($device['retries'])) { $timeout = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
