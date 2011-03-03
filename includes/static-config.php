@@ -15,6 +15,11 @@ $config['os']['default']['over'][1]['text']	= "Memory Usage";
 $os = "generic";
 $config['os'][$os]['text']      	= "Generic Device";
 
+$os = "vyatta";
+$config['os'][$os]['text']              = "Vyatta";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifname']            = 1;
+
 $os = "linux";
 $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
