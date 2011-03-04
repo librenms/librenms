@@ -22,7 +22,7 @@ $colour_area_out_max = "FF9966";
 
 $graph_max = 1;
 
-$unit_text = "Ops/s";
+$unit_text = "Ops/sec";
 
 include("includes/graphs/generic_duplex.inc.php");
 
