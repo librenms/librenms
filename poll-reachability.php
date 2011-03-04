@@ -8,21 +8,13 @@ include("includes/functions.php");
 $device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` LIKE '%" . $argv[1] . "' AND disabled = '0' ORDER BY `device_id` DESC");
 while ($device = mysql_fetch_array($device_query)) {
 
-   $id = $device['device_id'];
-   $hostname = $device['hostname'];
-   $old_status = $device['status'];
-   $community = $device['community'];
-   $snmpver = $device['snmpver'];
    $port = $device['port'];
 
-   echo("$hostname ");
+   echo($device['hostname']. " ");
 
-   $status = shell_exec($config['fping'] . " $hostname | cut -d ' ' -f 3");
-   $status = trim($status);
-
-   if(strstr($status, "alive")) {
-     $pos = shell_exec($config['snmpget'] . " -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
-     echo($config['snmpget'] . " -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysDescr.0");
+   if( isPingable($device['hostname']) ) {
+     $pos = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
+     echo($device['protocol'].":".$device['hostname'].":".$device['port']." - ".$device['community']." ".$device['snmpver'].": ");
      if($pos == '') { 
        $status='0';
      } else { 
