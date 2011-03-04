@@ -21,7 +21,6 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
       $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
       $divisor = 10;
       $volt = snmp_get($device, $volt_oid, "-O vq") / $divisor;
-      #$volt = trim(shell_exec($config['snmpget'] . " -O qv -$snmpver -c $community $hostname:$port $volt_oid")) / $divisor;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "rfc1628";
       $index = "1.2.5.".$volt_id;
