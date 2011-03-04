@@ -39,7 +39,14 @@ while($storage = mysql_fetch_array($storage_data)) {
 
   if($debug) {print_r($storage);}
 
-  $percent = round($storage['used'] / $storage['size'] * 100);
+  if ($storage['size'])
+  {
+    $percent = round($storage['used'] / $storage['size'] * 100);
+  }
+  else
+  {
+    $percent = 0;
+  }
 
   echo($percent."% ");
 
