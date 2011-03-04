@@ -41,7 +41,7 @@ $rrd_options .= " VDEF:tot=octets,TOTAL";
 
 $rrd_options .= " AREA:inoctets_max#aDEB7B:";
 $rrd_options .= " AREA:inoctets#CDEB8B:";
-$rrd_options .= " COMMENT:'Bytes\sec           Now       Ave      Max\\n'";
+$rrd_options .= " COMMENT:'Bytes/sec           Now       Ave      Max\\n'";
 $rrd_options .= " LINE1.25:inoctets#006600:'In            '";
 $rrd_options .= " GPRINT:inoctets:LAST:%6.2lf%s";
 $rrd_options .= " GPRINT:inoctets:AVERAGE:%6.2lf%s";
