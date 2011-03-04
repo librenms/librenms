@@ -9,7 +9,8 @@
 
   ## Cisco Processors
   if($device['os'] == "ios") {
-    $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m CISCO-PROCESS-MIB -".$device['snmpver']." -CI -Osqn -c ".$community." ".$hostname.":".$port." .1.3.6.1.4.1.9.9.109.1.1.1.1.2 | sed s/.1.3.6.1.4.1.9.9.109.1.1.1.1.2.//g");
+    /* FIXME: switch to snmp.inc.php:snmp_walk() */
+    $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -m CISCO-PROCESS-MIB -".$device['snmpver']." -CI -Osqn -c ".$community." ".$protocol.":".$hostname.":".$port." .1.3.6.1.4.1.9.9.109.1.1.1.1.2 | sed s/.1.3.6.1.4.1.9.9.109.1.1.1.1.2.//g");
     $oids = trim($oids);
     foreach(explode("\n", $oids) as $data) {
      $data = trim($data);
@@ -17,8 +18,8 @@
       list($oid, $entPhysicalIndex) = explode(" ", $data);
       $usage_oid = "cpmCPUTotal5minRev.$oid";
       $descr_oid = "entPhysicalName.$entPhysicalIndex";
-      $descr = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m ENTITY-MIB -O qv -".$device['snmpver']." -c $community $hostname:$port $descr_oid"));
-      $usage = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -m CISCO-PROCESS-MIB -O qv -".$device['snmpver']." -c $community $hostname:$port $usage_oid"));
+      $descr = snmp_get($device, $descr_oid, "-O qv", "ENTITY-MIB", $config['mibdir']);
+      $usage = snmp_get($device, $usage_oid, "-O qv", "CISCO-PROCESS-MIB", $config['mibdir']);
       if($entPhysicalIndex == "0") { $descr = "Proc $oid"; }
       if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" ) {
         $descr = str_replace("\"", "", $descr);
