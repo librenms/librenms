@@ -11,8 +11,6 @@ input,select {
   background:#FFFFFF url('/images/textbg.png') repeat-x scroll 0 0;
   font-size:1em;
   border:1px solid #B2B2B2
-  bbackground-color:cornsilk;
-  border:1px solid #B2B2B2;
   border-color:#B2B2B2 #d2d2d2 #d2d2d2 #B2B2B2;
   border-style:solid;
   border-width:1px;
@@ -214,26 +212,26 @@ A         { text-decoration: none; }
 A:link    { color: #0000cc; }
 A:visited { color: #0000cc; }
 A:hover   { color: #990099; }
-A:active  { color: #00000; }
+A:active  { color: #000000; }
 
 A.sectionhead         { text-decoration: none; color: #555; }
 A.sectionhead:link    { text-decoration: none; color: #555; }
-A.sectionhead:visited    { text-decoration: none; color: #555; }
-A.sectionhead:hover    { text-decoration: none; color: #555; }
-A.sectionhead:active    { text-decoration: none; color: #555; }
+A.sectionhead:visited { text-decoration: none; color: #555; }
+A.sectionhead:hover   { text-decoration: none; color: #555; }
+A.sectionhead:active  { text-decoration: none; color: #555; }
 
-A.red:visited, a.red, .red {color: #CC0000;}
-A.grey:visited, A.grey, .gray {color: #36393D;}
-A.black:visited, A.black, .black {color: #000000;}
-A.green:visited, A.green, .green {color: #008C00;}
-A.blue:visited, A.blue, .blue {color: #0000ff;}
-A.orange:visited, a.orange, .orange {color: #FF7400;}
+A.red:visited, A.red, .red          { color: #CC0000; }
+A.grey:visited, A.grey, .gray       { color: #36393D; }
+A.black:visited, A.black, .black    { color: #000000; }
+A.green:visited, A.green, .green    { color: #008C00; }
+A.blue:visited, A.blue, .blue       { color: #0000ff; }
+A.orange:visited, a.orange, .orange { color: #FF7400; }
 
-.pinkbg { background-color: #ffbbbb; }
-.redbg { background-color: #ff8585; }
-.bluebg { background-color: #aaaaff; }
+.pinkbg  { background-color: #ffbbbb; }
+.redbg   { background-color: #ff8585; }
+.bluebg  { background-color: #aaaaff; }
 .greenbg { background-color: #aaffaa; }
-.greybg { background-color: #dddddd; }
+.greybg  { background-color: #dddddd; }
 
 .selector {
         width:275px;
@@ -325,7 +323,7 @@ A.orange:visited, a.orange, .orange {color: #FF7400;}
 }
 
 .device-head, .list-device {
-	color: #000cc;
+	color: #000ccc;
 }
 
 .list-device-down, a.list-device-down, a.list-device-down:visited {
@@ -389,7 +387,7 @@ a.list-device-disabled {
 }
 
 .body-field-1 {
-  font-family: verdana, font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 13px;
         font-style: normal;
         font-weight: bold;
@@ -480,8 +478,8 @@ body {
     line-height: 20px;
 }
 
-<table { border-collapse: collapse; margin: 0px; }
-<table tr td { border: 0px solid #ddd; vertical-align: top; }
+table { border-collapse: collapse; margin: 0px; }
+table tr td { border: 0px solid #ddd; vertical-align: top; }
 form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
@@ -530,7 +528,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 #topnav ul { margin: 5px 0px 0px 0px; padding: 0px; }
-#topnav ul li { list-style: none; display: text-indent: 0px; display: inline; padding-right: 10px;}
+#topnav ul li { list-style: none; text-indent: 0px; display: inline; padding-right: 10px;}
 #topnav a { color: #000; text-decoration: none;}
 #topnav a:hover { color: #a00;}
 
@@ -591,11 +589,11 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 }
 
 
-.graphcell, .ifcell, .devicecell, .datacell { margin: 0px 0px 7px 0px; left; padding: 7px; border: 0px; background: #e8e8e8; float: left; }
+.graphcell, .ifcell, .devicecell, .datacell { margin: 0px 0px 7px 0px; padding: 7px; border: 0px; background: #e8e8e8; float: left; }
 .ifcell { float: left; clear:right; background:none; }
 
 .datacell { clear: both; }
-.devicecell { margin: 2px auto; };
+.devicecell { margin: 2px auto; }
 
 
 .sidepane { clear: left; background:none;}
@@ -626,10 +624,10 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
 #top{
                 height:17px;
                 padding:2px 21px 0px 21px;
-#                background:#163275;
                 font:normal 11px arial;
 		color: white;
         }
+
 #top A {
 	color: #aaaaaa;
 }
@@ -780,7 +778,7 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
 .left {clear:both;}
 
 
-#### For fancy tabs
+/* For fancy tabs */
 
 .shadetabs {
  padding: 3px 3px;
