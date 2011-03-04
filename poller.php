@@ -28,7 +28,7 @@ elseif ($options['h']) {
   }
 }
 
-if (isset($options['i'] && $options['i'] && isset($options['n'])) {
+if (isset($options['i']) && $options['i'] && isset($options['n'])) {
   $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";  
   $doing = $options['n'] ."/".$options['i'];
 }
