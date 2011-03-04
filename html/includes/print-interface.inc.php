@@ -27,7 +27,7 @@
     $mac = "<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
   } else { $mac = ""; }
 
-  echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
+  echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: pointer;'>
            <td valign=top width=350>");
 
   echo("        <span class=list-large>

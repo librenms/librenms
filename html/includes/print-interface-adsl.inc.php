@@ -21,7 +21,7 @@
   } else { $error_img = ""; }
 
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
-  onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: hand;'>
+  onclick=\"location.href='/device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: pointer;'>
    <td valign=top width=350>");
   echo("        <span class=list-large>
                 " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . "
