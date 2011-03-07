@@ -479,7 +479,6 @@ body {
 }
 
 table { border-collapse: collapse; margin: 0px; }
-table tr td { border: 0px solid #ddd; vertical-align: top; }
 form { margin: 0px; padding: 0px; }
 hr { border: 0px; height: 1px; background-color: #ccc; color: #ccc; }
 p { margin: 0px; padding: 0px; }
