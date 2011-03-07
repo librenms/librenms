@@ -1,5 +1,7 @@
 <?php
 
+/* FIXME: dead file */
+
 if($device['os_group'] == "ios") { 
   $portifIndex = array();
   $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -M ".$config['mibdir']. " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 

@@ -1,4 +1,5 @@
 <?php
+/* FIXME: dead file */
 
  echo("Physical Inventory : ");
 

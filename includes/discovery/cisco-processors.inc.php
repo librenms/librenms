@@ -1,4 +1,6 @@
 <?php
+/* FIXME: dead file */
+
   $id = $device['device_id'];
   $hostname = $device['hostname'];
   $community = $device['community'];
