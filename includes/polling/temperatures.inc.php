@@ -9,9 +9,8 @@ while($temperature = mysql_fetch_array($temp_data)) {
   for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
   {
     if ($debug) echo("Attempt $i ");
-    #FIXME snmp_get
-    $temp_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m SNMPv2-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $temperature['sensor_oid'] . "|grep -v \"No Such Instance\"";
-    $temp = trim(str_replace("\"", "", shell_exec($temp_cmd)));
+    $temp = snmp_get($device, $temperature['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+    $temp = trim(str_replace("\"", "", $temp));
 
     if ($temp != 9999) break; # TME sometimes sends 999.9 when it is right in the middle of an update;
     sleep(1); # Give the TME some time to reset
