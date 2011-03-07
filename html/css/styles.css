@@ -780,12 +780,12 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
 /* For fancy tabs */
 
 .shadetabs {
- padding: 3px 3px;
+ padding: 0px 5px;
  margin-left: 0;
  margin-top: 1px;
  margin-bottom: 0px;
  font-family: Verdana, arial, sans-serif; 
- font-weight: bold;
+ font-weight: none;
  font-size: 12px;
  list-style-type: none;
  text-align: left; /*set to left, center, or right to align the menu as desired*/
@@ -799,7 +799,7 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
 
 .shadetabs li a{
  text-decoration: none;
- padding: 2px 7px;
+ padding: 3px 7px;
  margin-right: 3px;
  border: 1px solid #aaa;
  color: #2d2b2b;
