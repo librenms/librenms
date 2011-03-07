@@ -2,12 +2,6 @@
 
 if ($config['discover_services'])
 {
-  $id = $device['device_id'];
-  $hostname = $device['hostname'];
-  $community = $device['community'];
-  $snmpver = $device['snmpver'];
-  $port = $device['port'];
-
   echo("Services: ");
 
   $known_services = array(22 => "ssh", 25 => "smtp", 53 => "dns", 80 => "http", 110 => "pop", 143 => "imap");
