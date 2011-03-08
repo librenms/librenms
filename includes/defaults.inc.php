@@ -10,7 +10,6 @@ $config['log_file']      = $config['install_dir'] . "/observium.log";
 
 ### Location of executables
 
-$config['sipcalc']        = "/usr/bin/sipcalc";
 $config['rrdtool']        = "/usr/bin/rrdtool";
 $config['fping']          = "/usr/bin/fping";
 $config['snmpwalk']       = "/usr/bin/snmpwalk";

@@ -551,12 +551,14 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
 {
   global $valid_v6,$device,$config;
 
-  $ipv6_network   = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Subnet | cut -f 2 -d '-'"));
-  $ipv6_compressed = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Compressed | cut -f 2 -d '-'"));
+  $ipv6_network = Net_IPv6::getNetmask("$ipv6_address/$ipv6_prefixlen") . '/' . $ipv6_prefixlen;
+  $ipv6_compressed = Net_IPv6::compress($ipv6_address);
 
-  $ipv6_type = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep \"Address type\" | cut -f 2- -d '-'"));
-
-  if ($ipv6_type == "Link-Local Unicast Addresses") return; # ignore link-locals (coming from IPV6-MIB)
+  if (Net_IPv6::getAddressType($ipv6_address) == NET_IPV6_LOCAL_LINK)
+  {
+    # ignore link-locals (coming from IPV6-MIB)
+    return;
+  }
 
   if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
         WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
