@@ -40,7 +40,7 @@ function zeropad_lineno($num, $length)
   {
     $num = '0'.$num;
   }
- 
+
   return $num;
 }
 
@@ -61,7 +61,7 @@ function logfile($string)
 function set_dev_attrib($device, $attrib_type, $attrib_value)
 {
   $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if (mysql_result(mysql_query($count_sql),0)) 
+  if (mysql_result(mysql_query($count_sql),0))
   {
     $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
     mysql_query($update_sql);
@@ -71,14 +71,14 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
     $insert_sql = "INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . mres($device['device_id'])."', '$attrib_type', '$attrib_value')";
     mysql_query($insert_sql);
   }
-  
+
   return mysql_affected_rows();
 }
 
 function get_dev_attrib($device, $attrib_type)
 {
   $sql = "SELECT attrib_value FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if ($row = mysql_fetch_assoc(mysql_query($sql))) 
+  if ($row = mysql_fetch_assoc(mysql_query($sql)))
   {
     return $row['attrib_value'];
   }
@@ -118,7 +118,7 @@ function device_array($device_id)
 function getHostOS($device)
 {
   global $config;
-  
+
   $sysDescr    = snmp_get ($device, "SNMPv2-MIB::sysDescr.0", "-Ovq");
   $sysObjectId = snmp_get ($device, "SNMPv2-MIB::sysObjectID.0", "-Ovqn");
 
@@ -127,13 +127,13 @@ function getHostOS($device)
   $dir_handle = @opendir($config['install_dir'] . "/includes/discovery/os") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
-    if ( preg_match("/.php$/", $file) )
+    if (preg_match("/.php$/", $file) )
     {
       include($config['install_dir'] . "/includes/discovery/os/" . $file);
     }
   }
   closedir($dir_handle);
-  
+
   if ($os) { return $os; } else { return "generic"; }
 }
 
@@ -142,15 +142,15 @@ function formatRates($rate) {
    return $rate;
 }
 
-function formatstorage($rate, $round = '2') 
+function formatstorage($rate, $round = '2')
 {
    $rate = format_bi($rate, $round) . "B";
    return $rate;
 }
 
-function format_si($rate) 
+function format_si($rate)
 {
-  if($rate >= "0.1") {
+  if ($rate >= "0.1") {
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
     $round = Array('2','2','2','2','2','2','2','2','2');
     $ext = $sizes[0];
@@ -165,7 +165,7 @@ function format_si($rate)
   return round($rate, $round[$i]).$ext;
 }
 
-function format_bi($size, $round = '2') 
+function format_bi($size, $round = '2')
 {
   $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
@@ -178,17 +178,18 @@ function percent_colour($perc)
  $r = min(255, 5 * ($perc - 25));
  $b = max(0, 255 - (5 * ($perc + 25)));
  return sprintf('#%02x%02x%02x', $r, $b, $b);
-} 
+}
 
 function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
-  foreach( explode("\n", $data) as $entry) {
-        list($in, $out) = explode(" ", $entry);
-        $in_errors += ($in * 300);
-        $out_errors += ($out * 300);
+  foreach (explode("\n", $data) as $entry)
+  {
+    list($in, $out) = explode(" ", $entry);
+    $in_errors += ($in * 300);
+    $out_errors += ($out * 300);
   }
   $errors['in'] = round($in_errors);
   $errors['out'] = round($out_errors);
@@ -196,23 +197,23 @@ function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/ou
 }
 
 # FIXME: below function is unused, only commented out in html/pages/device/overview/ports.inc.php - do we still need it?
-function device_traffic_image($device, $width, $height, $from, $to) 
+function device_traffic_image($device, $width, $height, $from, $to)
 {
   return "<img src='graph.php?device=" . $device . "&amp;type=device_bits&amp;from=" . $from . "&amp;to=" . $to . "&amp;width=" . $width . "&amp;height=" . $height . "&amp;legend=no' />";
 }
 
-function getImage($host) 
+function getImage($host)
 {
   global $config;
   $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
   $data = mysql_fetch_array(mysql_query($sql));
   $type = strtolower($data['os']);
   if ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$type]['icon']  . ".png"))
-  { 
+  {
     $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.png" />';
   } elseif ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/". $config['os'][$type]['icon'] . ".gif"))
-  { 
-    $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.gif" />'; 
+  {
+    $image = '<img src="'.$config['base_url'].'/images/os/'.$config['os'][$type]['icon'].'.gif" />';
   } else {
     if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
     } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
@@ -234,7 +235,7 @@ function renamehost($id, $new) {
   eventlog("Hostname changed -> $new (console)", $id);
 }
 
-function delete_port($int_id) 
+function delete_port($int_id)
 {
     $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = '".$int_id."' AND D.device_id = P.device_id"));
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
@@ -250,7 +251,7 @@ function delete_port($int_id)
     shell_exec("rm -rf ".trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
 }
 
-function delete_device($id) 
+function delete_device($id)
 {
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
@@ -266,7 +267,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `bgpPeers` WHERE `device_id` = '$id'");
-  mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");  
+  mysql_query("DELETE FROM `vlans` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `vrfs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `storage` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `alerts` WHERE `device_id` = '$id'");
@@ -284,15 +285,19 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community, $snmpver, $port = 161) 
+function addHost($host, $community, $snmpver, $port = 161)
 {
   global $config;
   list($hostshort)      = explode(".", $host);
-  if ( isDomainResolves($host)) {
-    if ( isPingable($host)) {
-      if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' ) {
+  if (isDomainResolves($host))
+  {
+    if (isPingable($host))
+    {
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' )
+      {
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
-        if ($snmphost == $host || $hostshort = $host) {
+        if ($snmphost == $host || $hostshort = $host)
+        {
           createHost ($host, $community, $snmpver, $port);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
       } else { echo("Already got host $host\n"); }
@@ -300,35 +305,35 @@ function addHost($host, $community, $snmpver, $port = 161)
   } else { echo("Could not resolve $host\n"); }
 }
 
-function scanUDP ($host, $port, $timeout) 
-{ 
-  $handle = fsockopen($host, $port, $errno, $errstr, 2); 
-  if (!$handle) { 
-  } 
-  socket_set_timeout ($handle, $timeout); 
-  $write = fwrite($handle,"\x00"); 
-  if (!$write) { next; } 
-  $startTime = time(); 
-  $header = fread($handle, 1); 
-  $endTime = time(); 
-  $timeDiff = $endTime - $startTime;  
-  if ($timeDiff >= $timeout) { 
-    fclose($handle); return 1; 
-  } else { fclose($handle); return 0; } 
+function scanUDP ($host, $port, $timeout)
+{
+  $handle = fsockopen($host, $port, $errno, $errstr, 2);
+  if (!$handle) {
+  }
+  socket_set_timeout ($handle, $timeout);
+  $write = fwrite($handle,"\x00");
+  if (!$write) { next; }
+  $startTime = time();
+  $header = fread($handle, 1);
+  $endTime = time();
+  $timeDiff = $endTime - $startTime;
+  if ($timeDiff >= $timeout) {
+    fclose($handle); return 1;
+  } else { fclose($handle); return 0; }
 }
 
-function netmask2cidr($netmask) 
+function netmask2cidr($netmask)
 {
   list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
   return $cidr;
 }
 
-function cidr2netmask() 
+function cidr2netmask()
 {
   return (long2ip(ip2long("255.255.255.255") << (32-$netmask)));
 }
 
-function formatUptime($diff, $format="long") 
+function formatUptime($diff, $format="long")
 {
   $yearsDiff = floor($diff/31536000);
   $diff -= $yearsDiff*31536000;
@@ -339,9 +344,9 @@ function formatUptime($diff, $format="long")
   $minsDiff = floor($diff/60);
   $diff -= $minsDiff*60;
   $secsDiff = $diff;
-  
+
   $uptime = "";
-  
+
   if ($format == "short") {
     if ($yearsDiff > '0') { $uptime .= $yearsDiff . "y "; }
     if ($daysDiff > '0') { $uptime .= $daysDiff . "d "; }
@@ -358,7 +363,7 @@ function formatUptime($diff, $format="long")
   return trim($uptime);
 }
 
-function isSNMPable($hostname, $community, $snmpver, $port) 
+function isSNMPable($hostname, $community, $snmpver, $port)
 {
      global $config;
      $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysObjectID.0");
@@ -379,8 +384,8 @@ function isPingable($hostname) {
    }
 }
 
-function is_odd($number) {  
-  return $number & 1; // 0 = even, 1 = odd 
+function is_odd($number) {
+  return $number & 1; // 0 = even, 1 = odd
 }
 
 function isValidInterface($if) {
@@ -400,9 +405,9 @@ function isValidInterface($if) {
       }  else { return 0; }
 }
 
-function utime() 
+function utime()
 {
-  $time = explode( " ", microtime());
+  $time = explode(" ", microtime());
   $usec = (double)$time[0];
   $sec = (double)$time[1];
   return $sec + $usec;
@@ -465,7 +470,7 @@ function createHost ($host, $community, $snmpver, $port = 161)
 {
   $host = trim(strtolower($host));
   $device = array('hostname' => $host, 'community' => $community, 'snmpver' => $snmpver, 'port' => $port);
-  $host_os = getHostOS($device); 
+  $host_os = getHostOS($device);
   if ($host_os)
   {
     $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1','$snmpver')");
@@ -475,9 +480,9 @@ function createHost ($host, $community, $snmpver, $port = 161)
       # vv FIXME set_dev_attrib()
       mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
       return("Created host : $host (id:$device_id) (os:$host_os)");
-    } 
-    else 
-    { 
+    }
+    else
+    {
       return FALSE;
     }
   }
@@ -492,11 +497,11 @@ function isDomainResolves($domain)
   return gethostbyname($domain) != $domain;
 }
 
-function hoststatus($id) 
+function hoststatus($id)
 {
   $sql = mysql_query("SELECT `status` FROM `devices` WHERE `device_id` = '$id'");
   $result = @mysql_result($sql, 0);
-  
+
   return $result;
 }
 
@@ -519,7 +524,7 @@ function match_network ($nets, $ip, $first=false)
            if ($first && $return) return true;
        }
    }
-   
+
    return $return;
 }
 
@@ -528,7 +533,7 @@ function snmp2ipv6($ipv6_snmp)
   $ipv6 = explode('.',$ipv6_snmp);
   for ($i = 0;$i <= 15;$i++) { $ipv6[$i] = zeropad(dechex($ipv6[$i])); }
   for ($i = 0;$i <= 15;$i+=2) { $ipv6_2[] = $ipv6[$i] . $ipv6[$i+1]; }
-  
+
   return implode(':',$ipv6_2);
 }
 
@@ -538,7 +543,7 @@ function ipv62snmp($ipv6)
   for ($i = 0;$i < 8;$i++) { $ipv6_ex[$i] = zeropad_lineno($ipv6_ex[$i],4); }
   $ipv6_ip = implode('',$ipv6_ex);
   for ($i = 0;$i < 32;$i+=2) $ipv6_split[] = hexdec(substr($ipv6_ip,$i,2));
-  
+
   return implode('.',$ipv6_split);
 }
 
@@ -548,13 +553,14 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
 
   $ipv6_network   = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Subnet | cut -f 2 -d '-'"));
   $ipv6_compressed = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep Compressed | cut -f 2 -d '-'"));
-  
+
   $ipv6_type = trim(shell_exec($config['sipcalc']." $ipv6_address/$ipv6_prefixlen | grep \"Address type\" | cut -f 2- -d '-'"));
-  
+
   if ($ipv6_type == "Link-Local Unicast Addresses") return; # ignore link-locals (coming from IPV6-MIB)
 
   if (mysql_result(mysql_query("SELECT count(*) FROM `ports`
-        WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
+        WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1')
+  {
     $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
     $interface_id = mysql_result(mysql_query($i_query), 0);
     if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1') {
@@ -573,7 +579,11 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
      mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `interface_id`)
                                    VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$interface_id')");
      echo("+");
-    } else { echo("."); }
+    }
+    else
+    {
+      echo(".");
+    }
     $full_address = "$ipv6_address/$ipv6_prefixlen";
     $valid = $full_address  . "-" . $interface_id;
     $valid_v6[$valid] = 1;
@@ -614,36 +624,36 @@ function eventlog($eventtext,$device_id = "", $interface_id = "")
 }
 
 # Use this function to write to the eventlog table
-function log_event($text, $device = NULL, $type = NULL, $reference = NULL) 
+function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
 {
   global $debug;
 
-  if(!is_array($device)) {  $device = device_by_id_cache($device); }
+  if (!is_array($device)) {  $device = device_by_id_cache($device); }
 
   $event_query = "INSERT INTO eventlog (host, reference, type, datetime, message) VALUES (" . ($device['device_id'] ? $device['device_id'] : "NULL");
   $event_query .= ", '" . ($reference ? $reference : "NULL") . "', '" . ($type ? $type : "NULL") . "', NOW(), '" . mres($text) . "')";
   if ($debug) { echo($event_query . "\n"); }
   mysql_query($event_query);
-} 
+}
 
 function notify($device,$title,$message)
 {
   global $config;
 
-  if($config['alerts']['email']['enable']) 
+  if ($config['alerts']['email']['enable'])
   {
-    if($config['alerts']['email']['default_only']) 
+    if ($config['alerts']['email']['default_only'])
     {
       $email = $config['alerts']['email']['default'];
     } else {
-      if ($device['sysContact']) 
-      { 
-        $email = $device['sysContact']; 
-      } else { 
-        $email = $config['alerts']['email']['default']; 
+      if ($device['sysContact'])
+      {
+        $email = $device['sysContact'];
+      } else {
+        $email = $config['alerts']['email']['default'];
       }
     }
-    if($email) 
+    if ($email)
     {
       mail($email, $title, $message, $config['email_headers']);
     }
@@ -701,14 +711,14 @@ function isHexString($str)
 function include_dir($dir, $regex = "")
 {
   global $device, $config, $debug;
-  if ( $regex == "")
+  if ($regex == "")
   {
     $regex = "/\.inc\.php$/";
   }
 
-  if ($handle = opendir($config['install_dir'] . '/' . $dir)) 
+  if ($handle = opendir($config['install_dir'] . '/' . $dir))
   {
-    while (false !== ($file = readdir($handle))) 
+    while (false !== ($file = readdir($handle)))
     {
       if (filetype($config['install_dir'] . '/' . $dir . '/' . $file) == 'file' && preg_match($regex, $file))
       {
