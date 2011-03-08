@@ -65,14 +65,20 @@ if (isset($options['d'])) {
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
 $device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 $where  ORDER BY `device_id` ASC");
+
 while ($device = mysql_fetch_assoc($device_query))
 {
   $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
+
   $status = 0; unset($array);
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo("(".$device['os_group'].")");}
+  if($config['os'][$device['os']]['group'])
+  {
+    $device['os_group'] = $config['os'][$device['os']]['group'];
+    echo("(".$device['os_group'].")");
+  }
   echo("\n");
 
   unset($poll_update); unset($poll_update_query); unset($poll_separator); unset($version); unset($uptime); unset($features);
@@ -278,7 +284,7 @@ while ($device = mysql_fetch_assoc($device_query))
 
   }
 
-  ## FIX ME EVENTLOGGING
+  ## FIXME EVENTLOGGING
   ### This code cycles through the graphs already known in the database and the ones we've defined as being polled here
   ### If there any don't match, they're added/deleted from the database.
   ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
