@@ -87,13 +87,7 @@ if ($config['enable_bgp'])
           ## Get afi/safi and populate cbgp on cisco ios (xe/xr)
           unset($af_list);
           
-          # FIXME: this could be replaced by the following line:
-          # $af_data = snmp_walk($device, "cbgpPeerAddrFamilyName." . $peer['ip'], "-OsQ", "CISCO-BGP4-MIB", $config['mibdir']);
-          # but I am unable to test it for now.
-          $af_cmd  = $config['snmpwalk'] . " -M " . $config['mibdir'] . " -CI -m CISCO-BGP4-MIB -OsQ -" . $device['snmpver'] . " -c" . $device['community'] . " " . $device['hostname'].":".$device['port'] . " ";
-          $af_cmd .= "cbgpPeerAddrFamilyName." . $peer['ip'];
-          $af_data = shell_exec($af_cmd);
-          # FIXME replace until here
+          $af_data = snmp_walk($device, "cbgpPeerAddrFamilyName." . $peer['ip'], "-OsQ", "CISCO-BGP4-MIB", $config['mibdir']);
           if ($debug) { echo("afi data :: $af_data \n"); }
           
           $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", $af_data));
