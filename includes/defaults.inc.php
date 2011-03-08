@@ -13,7 +13,6 @@ $config['log_file']      = $config['install_dir'] . "/observium.log";
 $config['sipcalc']        = "/usr/bin/sipcalc";
 $config['rrdtool']        = "/usr/bin/rrdtool";
 $config['fping']          = "/usr/bin/fping";
-$config['ipcalc']         = "/usr/bin/ipcalc";
 $config['snmpwalk']       = "/usr/bin/snmpwalk";
 $config['snmpget']        = "/usr/bin/snmpget";
 $config['snmpbulkwalk']   = "/usr/bin/snmpbulkwalk";

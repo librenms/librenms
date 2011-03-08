@@ -324,8 +324,8 @@ function scanUDP ($host, $port, $timeout)
 
 function netmask2cidr($netmask)
 {
-  list ($network, $cidr) = explode("/", trim(`ipcalc $address/$mask | grep Network | cut -d" " -f 4`));
-  return $cidr;
+  $addr = Net_IPv4::parseAddress("1.2.3.4/$netmask");
+  return $addr->bitmask;
 }
 
 function cidr2netmask()
