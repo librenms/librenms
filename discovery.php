@@ -18,7 +18,8 @@ $options = getopt("h:t:i:n:d::a::");
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
 elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
 elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
-elseif ($options['h']) {
+elseif ($options['h'])
+{
   if (is_numeric($options['h']))
   {
     $where = "AND `device_id` = '".$options['h']."'";
@@ -31,12 +32,14 @@ elseif ($options['h']) {
   }
 }
 
-if (isset($options['i']) && $options['i'] && isset($options['n'])) {
+if (isset($options['i']) && $options['i'] && isset($options['n']))
+{
   $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
   $doing = $options['n'] ."/".$options['i'];
 }
 
-if (isset($options['d'])) {
+if (isset($options['d']))
+{
   echo("DEBUG!\n");
   $debug = TRUE;
   ini_set('display_errors', 1);
@@ -52,7 +55,8 @@ if (isset($options['d'])) {
 }
 
 
-if(!$where) {
+if(!$where)
+{
   echo("-h <device id> | <device hostname>  Poll single device\n");
   echo("-h odd                              Poll odd numbered devices  (same as -i 2 -n 0)\n");
   echo("-h even                             Poll even numbered devices (same as -i 2 -n 1)\n");
@@ -79,26 +83,31 @@ if (file_exists('.svn'))
     $db_rev = 0;
   }
 
-  if ($db_rev+0 < 1223) {
+  if ($db_rev+0 < 1223)
+  {
     include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
   }
 
-  if ($db_rev+0 < 1656) {
+  if ($db_rev+0 < 1656)
+  {
      include('fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
   }
 
-  if ($db_rev+0 < 1757) {
+  if ($db_rev+0 < 1757)
+  {
      include('fix-sensor-rrd.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
   }
 
   if ($dbu_rev+0 > $db_rev)
   {
     echo("SVN revision changed.\n");
-    if ($db_rev+0 < "1000") {
+    if ($db_rev+0 < "1000")
+    {
       echo("Running pre-revision 1000 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1000.sql");
     }
-    if ($db_rev+0 < "1435") {
+    if ($db_rev+0 < "1435")
+    {
       echo("Running pre-revision 1435 SQL update script...\n");
       shell_exec("scripts/update-sql.php database-update-pre1435.sql");
     }
@@ -124,11 +133,17 @@ while ($device = mysql_fetch_array($device_query))
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($device['os'] != strtolower($device['os'])) {
+  if($device['os'] != strtolower($device['os']))
+  {
     mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
-    $device['os'] = strtolower($device['os']); echo("OS lowercased.");
+    $device['os'] = strtolower($device['os']);
+    echo("OS lowercased.");
   }
-  if($config['os'][$device['os']]['group']) {$device['os_group'] = $config['os'][$device['os']]['group']; echo("(".$device['os_group'].")");}
+  if($config['os'][$device['os']]['group'])
+  {
+    $device['os_group'] = $config['os'][$device['os']]['group'];
+    echo("(".$device['os_group'].")");
+  }
 
   echo("\n");
 
@@ -180,7 +195,8 @@ while ($device = mysql_fetch_array($device_query))
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-if($discovered_devices) {
+if($discovered_devices)
+{
   mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
                                VALUES ('discover', '$doing', '$start', '$proctime', '$discovered_devices')");
 }
