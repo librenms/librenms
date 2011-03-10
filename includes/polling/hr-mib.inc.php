@@ -12,8 +12,7 @@ if(is_numeric($hrSystem[0]['hrSystemProcesses']))
 {
   $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_processes.rrd";
   if (!is_file($rrd_file)) {
-    shell_exec($config['rrdtool'] . " create $rrd_file \
-    --step 300 \
+    rrdtool_create($rrd_file,"--step 300 \
     DS:procs:GAUGE:600:0:U \
     RRA:AVERAGE:0.5:1:800 \
     RRA:AVERAGE:0.5:6:800 \
@@ -33,8 +32,7 @@ if(is_numeric($hrSystem[0]['hrSystemNumUsers']))
 {
   $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/hr_users.rrd";
   if (!is_file($rrd_file)) {
-    shell_exec($config['rrdtool'] . " create $rrd_file \
-    --step 300 \
+    rrdtool_create($rrd_file, "--step 300 \
     DS:users:GAUGE:600:0:U \
     RRA:AVERAGE:0.5:1:800 \
     RRA:AVERAGE:0.5:6:800 \

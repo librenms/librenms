@@ -28,11 +28,11 @@ if(is_array($hrDevices))
          $update_query .= ", `hrProcessorLoad` = '".mres($hrDevice[hrProcessorLoad])."'";
        }
        $update_query .= " WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrDevice['hrDeviceIndex']."'";
-       @mysql_query($update_query); $mysql++; echo(".");
+       @mysql_query($update_query); echo(".");
      } else {
        $insert_query = "INSERT INTO `hrDevice` (`hrDeviceIndex`,`device_id`,`hrDeviceType`,`hrDeviceDescr`,`hrDeviceStatus`,`hrDeviceErrors`) ";
        $insert_query .= " VALUES ('".mres($hrDevice[hrDeviceIndex])."','".mres($device[device_id])."','".mres($hrDevice[hrDeviceType])."','".mres($hrDevice[hrDeviceDescr])."','".mres($hrDevice[hrDeviceStatus])."','".mres($hrDevice[hrDeviceErrors])."')";
-       @mysql_query($insert_query); $mysql++; echo("+");
+       @mysql_query($insert_query); echo("+");
        if($debug) { print_r($hrDevice); echo("$insert_query" . mysql_affected_rows() . " row inserted"); }
      }
      $valid_hrDevice[$hrDevice[hrDeviceIndex]] = 1;

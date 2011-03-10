@@ -72,8 +72,7 @@
 
     $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ipSystemStats-".$af.".rrd");
 
-    $rrd_create = $config['rrdtool'] . " create $rrdfile ";
-    $rrd_create .= "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
+    $rrd_create = "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
     
     $rrdupdate = "N";
 
@@ -84,7 +83,7 @@
       if(strstr($stats[$oid], "No") || strstr($stats[$oid], "d") || strstr($stats[$oid], "s")) { $stats[$oid] = "0"; }
       $rrdupdate  .= ":".$stats[$oid]; 
     }
-    if(!file_exists($rrdfile)) { shell_exec($rrd_create); }
+    if(!file_exists($rrdfile)) { rrdtool_create($rrdfile,$rrd_create); }
     rrdtool_update($rrdfile, $rrdupdate);
     unset($rrdupdate, $rrd_create);
 

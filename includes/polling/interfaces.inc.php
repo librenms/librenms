@@ -66,8 +66,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd"); 
 
    if(!is_file($rrdfile)) {
-     $woo = shell_exec($config['rrdtool'] . " create $rrdfile \
-      DS:INOCTETS:COUNTER:600:0:12500000000 \
+     rrdtool_create($rrdfile,"DS:INOCTETS:COUNTER:600:0:12500000000 \
       DS:OUTOCTETS:COUNTER:600:0:12500000000 \
       DS:INERRORS:COUNTER:600:0:12500000000 \
       DS:OUTERRORS:COUNTER:600:0:12500000000 \

@@ -58,9 +58,9 @@ while ($acc = mysql_fetch_assoc($mac_accounting_query)) {
     if($debug) {echo("\n" . $acc['hostname']." ".$acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");}
     $rrdfile = $host_rrd . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
 
-    if(!is_file($rrdfile)) {
-      $woo = shell_exec($config['rrdtool'] ." create $rrdfile \
-        DS:IN:COUNTER:600:0:12500000000 \
+    if(!is_file($rrdfile))
+    {
+      rrdtool_create($rrdfile,"DS:IN:COUNTER:600:0:12500000000 \
         DS:OUT:COUNTER:600:0:12500000000 \
         DS:PIN:COUNTER:600:0:12500000000 \
         DS:POUT:COUNTER:600:0:12500000000 \
@@ -76,9 +76,10 @@ while ($acc = mysql_fetch_assoc($mac_accounting_query)) {
     $woo = "N:".($b_in+0).":".($b_out+0).":".($p_in+0).":".($p_out+0);
     $ret = rrdtool_update("$rrdfile", $woo);
 
-      if ($update) { /// Do Updates
+      if ($update)
+      { /// Do Updates
         $update_query  = "UPDATE `mac_accounting` SET ".$update." WHERE `ma_id` = '" . $acc['ma_id'] . "'";
-        @mysql_query($update_query); $mysql++;
+        @mysql_query($update_query);
         if($debug) {echo("\nMYSQL : [ $update_query ]");}
       } /// End Updates
      unset($update_query); unset($update);

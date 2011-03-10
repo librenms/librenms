@@ -22,9 +22,11 @@ if($dataHandle)
                 list($cur, $tag) = explode("-", $config['version']);
 	        list($cur_major, $cur_minor, $cur_release) = explode(".", $cur);
 
-     	     if($argv[1] == "--cron") {
-             
-		shell_exec("echo $major.$minor.$release > rrd/version.txt ");
+     	     if($argv[1] == "--cron")
+     	     {
+     	       $fd = fopen('vrrd/version.txt','w');
+     	       fputs($fd, "$major.$minor.$release");
+     	       fclose($fd);
     
              } else {
 
