@@ -71,6 +71,12 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
 
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
   if (is_numeric($device['retries'])) { $retries = $device['retries']; } elseif (isset($config['snmp']['retries'])) { $retries =  $config['snmp']['retries']; }
+  
+  if (strstr($oid,' '))
+  {
+    echo "BUG: snmp_get called for multiple OIDs: $oid\n";
+    echo "Please report this to the Observium team.";
+  }
 
   if ($config['snmp']['internal'] == true)
   {

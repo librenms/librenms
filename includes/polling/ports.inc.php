@@ -192,8 +192,9 @@
 
       /// Update RRDs
       $rrdfile = $host_rrd . "/port-" . safename($port['ifIndex'] . ".rrd");
-      if(!is_file($rrdfile)) {
-        $woo = shell_exec($config['rrdtool'] . " create $rrdfile -s 300 \
+      if(!is_file($rrdfile))
+      {
+        rrdtool_create($rrdfile," --step 300 \
         DS:INOCTETS:DERIVE:600:0:12500000000 \
         DS:OUTOCTETS:DERIVE:600:0:12500000000 \
         DS:INERRORS:DERIVE:600:0:12500000000 \
