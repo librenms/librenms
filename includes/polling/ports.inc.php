@@ -261,7 +261,7 @@
      // Update MySQL
      if ($update) { 
         $update_query  = "UPDATE `ports` SET ".$update." WHERE `interface_id` = '" . $port['interface_id'] . "'";
-        @mysql_query($update_query); $mysql++;
+        @mysql_query($update_query);
         if($debug) {echo("\nMYSQL : [ $update_query ]");}
       }
       // End Update MySQL

@@ -16,8 +16,7 @@ while($processor = mysql_fetch_array($proc_data)) {
   $procrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("processor-" . $processor['processor_type'] . "-" . $processor['processor_index'] . ".rrd");
 
   if (!is_file($procrrd)) {
-   shell_exec("rrdtool create $procrrd \
-     --step 300 \
+   rrdtool_create($procrrd, "--step 300 \
      DS:usage:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:1200 \
      RRA:MIN:0.5:12:2400 \
