@@ -48,6 +48,13 @@ if ($hardware == " ")
   $hardware .= ' ' . trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.4.1.1.0", "-OQv", "", ""),'"');
 }
 
+if ($hardware == " ")
+{
+  # InRow chiller
+  $hardware = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.13.3.2.2.1.4.0", "-OQv", "", ""),'"');
+  $hardware .= ' ' . trim(snmp_get($device, ".1.3.6.1.4.1.318.1.1.13.3.2.2.1.7.0", "-OQv", "", ""),'"');
+}
+
 ######################
 
 $AOSrev = trim(snmp_get($device, "1.3.6.1.4.1.318.1.4.2.4.1.4.1", "-OQv", "", ""),'"'); 
