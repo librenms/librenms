@@ -124,12 +124,8 @@
        RRA:MAX:0.5:24:800 \
        RRA:MAX:0.5:288:800";
 
-  $mem_cmd  = $config['snmpget'] . " -M ".$config['mibdir']. " -m UCD-SNMP-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
-  $mem_cmd .= " memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0";
-
-  $mem_raw = shell_exec($mem_cmd);
-  
-  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = explode("\n", str_replace(" kB", "", $mem_raw)); 
+  $mem_raw = snmp_get_multi($device, "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0", "-OQUS", "UCD-SNMP-MIB");
+  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $mem_raw; 
 
   ## Check to see that the OIDs are actually populated before we make the rrd
   if(is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
@@ -164,8 +160,8 @@
   RRA:MAX:0.5:288:800";
 
   $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
-  $load_raw = snmp_get($device, $load_get, "-Oqv", "UCD-SNMP-MIB");
-  list ($load1, $load5, $load10) = explode ("\n", $load_raw);
+  $load_raw = snmp_get_multi($device, $load_get, "-OQUs", "UCD-SNMP-MIB");
+  list ($load1, $load5, $load10) = $load_raw;
 
   ## Check to see that the OIDs are actually populated before we make the rrd
   if(is_numeric($load1) && is_numeric($load5) && is_numeric($load10))
