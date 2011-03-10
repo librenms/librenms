@@ -122,7 +122,7 @@ while ($device = mysql_fetch_assoc($device_query))
     $snmp_cmd .= " sysUpTime.0 sysLocation.0 sysContact.0 sysName.0";
     $snmpdata = str_replace('"','',trim(shell_exec($snmp_cmd)));
     list($sysUptime, $sysLocation, $sysContact, $sysName) = explode("\n", $snmpdata);
-    $sysDescr = trim(shell_exec($config['snmpget'] . " -m SNMPv2-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " .  $device['hostname'].":".$device['port'] . " sysDescr.0"));
+    $sysDescr = trim(snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB"));
     $sysName = strtolower($sysName);
 
     $hrSystemUptime = snmp_get($device, "HOST-RESOURCES-MIB::hrSystemUptime.0", "-Oqv");
