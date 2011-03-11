@@ -1,12 +1,13 @@
 <?php
 
-function formatMac($mac) {
+function formatMac($mac)
+{
   $mac = preg_replace("/(..)(..)(..)(..)(..)(..)/", "\\1:\\2:\\3:\\4:\\5:\\6", $mac);
   return $mac;
 }
 
-function rewrite_entity_descr ($descr) {
-
+function rewrite_entity_descr ($descr)
+{
   $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
   $descr = preg_replace("/7600 Series SPA Interface Processor-/", "7600 SIP-", $descr);
   $descr = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $descr);
@@ -24,34 +25,42 @@ function rewrite_entity_descr ($descr) {
   $descr = str_replace("/Voltage Sensor/", "Voltage", $descr);
   $descr = preg_replace("/^temperatures /", "", $descr);
   $descr = preg_replace("/^voltages /", "", $descr);
-  
+
   return $descr;
 }
 
-function ifNameDescr($interface, $device = NULL) {
+function ifNameDescr($interface, $device = NULL)
+{
   return ifLabel($interface, $device);
 }
 
-function ifLabel ($interface, $device = NULL) {
+function ifLabel ($interface, $device = NULL)
+{
   global $config;
-  if(!$device) { $device = device_by_id_cache($interface['device_id']); }
+
+  if (!$device) { $device = device_by_id_cache($interface['device_id']); }
   $os = strtolower($device['os']);
 
-  if (isset($config['os'][$os]['ifname'])) {
+  if (isset($config['os'][$os]['ifname']))
+  {
     $interface['label'] = $interface['ifName'];
-  } elseif (isset($config['os'][$os]['ifalias'])) {
+  } elseif (isset($config['os'][$os]['ifalias']))
+  {
     $interface['label'] = $interface['ifAlias'];
   } else {
     $interface['label'] = $interface['ifDescr'];
-    if (isset($config['os'][$os]['ifindex'])) { $interface['label'] = $interface['label'] . " " . $interface['ifIndex']; }
+    if (isset($config['os'][$os]['ifindex']))
+    {
+      $interface['label'] = $interface['label'] . " " . $interface['ifIndex'];
+    }
   }
 
-  if ($device['os'] == "speedtouch") {
+  if ($device['os'] == "speedtouch")
+  {
     list($interface['label']) = explode("thomson", $interface['label']);
   }
 
   return $interface;
-
 }
 
 $rewrite_entSensorType = array (
@@ -72,11 +81,15 @@ $translate_ifOperStatus = array(
   "7" => "lowerLayerDown",
 );
 
-function translate_ifOperStatus ($ifOperStatus) {
+function translate_ifOperStatus ($ifOperStatus)
+{
   global $translate_ifOperStatus;
-  if($translate_ifOperStatus['$ifOperStatus']) {
+
+  if ($translate_ifOperStatus['$ifOperStatus'])
+  {
     $ifOperStatus = $translate_ifOperStatus['$ifOperStatus'];
   }
+
   return $ifOperStatus;
 }
 
@@ -86,11 +99,15 @@ $translate_ifAdminStatus = array(
   "3" => "testing",
 );
 
-function translate_ifAdminStatus ($ifAdminStatus) {
+function translate_ifAdminStatus ($ifAdminStatus)
+{
   global $translate_ifAdminStatus;
-  if($translate_ifAdminStatus[$ifAdminStatus]) {
+
+  if ($translate_ifAdminStatus[$ifAdminStatus])
+  {
     $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
   }
+
   return $ifAdminStatus;
 }
 
@@ -277,7 +294,6 @@ $rewrite_extreme_hardware = array (
 '.1.3.6.1.4.1.1916.2.72' => 'Summit X450e-24p',
 '.1.3.6.1.4.1.1916.2.79' => 'Summit X450e-48p'
 );
-
 
 $rewrite_ironware_hardware = array(
     'snFIWGSwitch' => 'Stackable FastIron workgroup',
@@ -702,38 +718,36 @@ $rewrite_ironware_hardware = array(
 );
 
 $rewrite_ios_features = array(
-  "PK9S" => "IP w/SSH LAN Only",
-  "LANBASEK9" => "Lan Base Crypto",
-  "LANBASE" => "Lan Base",
-  "ADVENTERPRISEK9_IVS" => "Advanced Enterprise Crypto Voice",
-  "ADVENTERPRISEK9" => "Advanced Enterprise Crypto",
-  "ADVSECURITYK9" => "Advanced Security Crypto",
-  "K91P" => "Provider Crypto",
-  "K4P" => "Provider Crypto",
-  "ADVIPSERVICESK9" => "Adv IP Services Crypto",
-  "ADVIPSERVICES" => "Adv IP Services",
-  "IK9P" => "IP Plus Crypto",
-  "K9O3SY7" => "IP ADSL FW IDS Plus IPSEC 3DES",
-  "SPSERVICESK9" => "SP Services Crypto",
-  "PK9SV" => "IP MPLS/IPV6 W/SSH + BGP",
-  "IS" => "IP Plus",
-  "IPSERVICESK9" => "IP Services Crypto",
-  "BROADBAND" => "Broadband",
-  "IPBASE" => "IP Base",
-  "IPSERVICE" => "IP Services",
-  "P" => "Service Provider",
-  "P11" => "Broadband Router",
-  "G4P5" => "NRP",
-  "JK9S" => "Enterprise Plus Crypto",
-  "IK9S" => "IP Plus Crypto",
-  "JK" => "Enterprise Plus",
-  "I6Q4L2" => "Layer 2",
-  "I6K2L2Q4" => "Layer 2 Crypto",
-  "C3H2S" => "Layer 2 SI/EI",
-  "_WAN" => " + WAN",
+  'PK9S' => 'IP w/SSH LAN Only',
+  'LANBASEK9' => 'Lan Base Crypto',
+  'LANBASE' => 'Lan Base',
+  'ADVENTERPRISEK9_IVS' => 'Advanced Enterprise Crypto Voice',
+  'ADVENTERPRISEK9' => 'Advanced Enterprise Crypto',
+  'ADVSECURITYK9' => 'Advanced Security Crypto',
+  'K91P' => 'Provider Crypto',
+  'K4P' => 'Provider Crypto',
+  'ADVIPSERVICESK9' => 'Adv IP Services Crypto',
+  'ADVIPSERVICES' => 'Adv IP Services',
+  'IK9P' => 'IP Plus Crypto',
+  'K9O3SY7' => 'IP ADSL FW IDS Plus IPSEC 3DES',
+  'SPSERVICESK9' => 'SP Services Crypto',
+  'PK9SV' => 'IP MPLS/IPV6 W/SSH + BGP',
+  'IS' => 'IP Plus',
+  'IPSERVICESK9' => 'IP Services Crypto',
+  'BROADBAND' => 'Broadband',
+  'IPBASE' => 'IP Base',
+  'IPSERVICE' => 'IP Services',
+  'P' => 'Service Provider',
+  'P11' => 'Broadband Router',
+  'G4P5' => 'NRP',
+  'JK9S' => 'Enterprise Plus Crypto',
+  'IK9S' => 'IP Plus Crypto',
+  'JK' => 'Enterprise Plus',
+  'I6Q4L2' => 'Layer 2',
+  'I6K2L2Q4' => 'Layer 2 Crypto',
+  'C3H2S' => 'Layer 2 SI/EI',
+  '_WAN' => ' + WAN',
   );
-
-
 
   $rewrite_shortif = array (
     'tengigabitethernet' => 'Te',
@@ -805,26 +819,32 @@ $rewrite_ios_features = array(
 
 // Specific rewrite functions
 
-function makeshortif($if)
+function makeshortif ($if)
 {
   global $rewrite_shortif;
+
   $if = fixifName ($if);
   $if = strtolower($if);
   $if = array_str_replace($rewrite_shortif, $if);
+
   return $if;
 }
 
 function rewrite_ios_features ($features)
 {
   global $rewrite_ios_features;
+
   $type = array_preg_replace($rewrite_ios_features, $features);
+
   return ($features);
 }
 
 function rewrite_fortinet_hardware ($hardware)
 {
   global $rewrite_fortinet_hardware;
+
   $hardware = $rewrite_fortinet_hardware[$hardware];
+
   return ($hardware);
 }
 
@@ -832,15 +852,19 @@ function rewrite_fortinet_hardware ($hardware)
 function rewrite_extreme_hardware ($hardware)
 {
   global $rewrite_extreme_hardware;
+
   #$hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
   $hardware = $rewrite_extreme_hardware[$hardware];
+
   return ($hardware);
 }
 
 function rewrite_ftos_hardware ($hardware)
 {
   global $rewrite_ftos_hardware;
+
   $hardware = $rewrite_ftos_hardware[$hardware];
+
   return ($hardware);
 }
 
@@ -848,43 +872,53 @@ function rewrite_ftos_hardware ($hardware)
 function rewrite_ironware_hardware ($hardware)
 {
   global $rewrite_ironware_hardware;
+
   $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
+
   return ($hardware);
 }
 
 function rewrite_junose_hardware ($hardware)
 {
   global $rewrite_junose_hardware;
+
   $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
+
   return ($hardware);
 }
 
 function fixiftype ($type)
 {
   global $rewrite_iftype;
+
   $type = array_preg_replace($rewrite_iftype, $type);
+
   return ($type);
 }
 
 function fixifName ($inf)
 {
   global $rewrite_ifname;
+
   $inf = strtolower($inf);
   $inf = array_str_replace($rewrite_ifname, $inf);
+
   return $inf;
 }
 
 function short_hrDeviceDescr($dev)
 {
   global $rewrite_hrDevice;
+
   $dev = array_str_replace($rewrite_hrDevice, $dev);
   $dev = preg_replace("/\ +/"," ", $dev);
   $dev = trim($dev);
+
   return $dev;
 }
 
-function short_port_descr ($desc) {
-
+function short_port_descr ($desc)
+{
   list($desc) = explode("(", $desc);
   list($desc) = explode("[", $desc);
   list($desc) = explode("{", $desc);
@@ -893,29 +927,27 @@ function short_port_descr ($desc) {
   $desc = trim($desc);
 
   return $desc;
-
 }
 
-
 // Underlying rewrite functions
-
-
-  function array_str_replace($array, $string) 
+function array_str_replace($array, $string)
+{
+  foreach ($array as $search => $replace)
   {
-    foreach ($array as $search => $replace) {
-      $string = str_replace($search, $replace, $string);
-    }
-    return $string;
+    $string = str_replace($search, $replace, $string);
   }
 
-  function array_preg_replace($array, $string) 
+  return $string;
+}
+
+function array_preg_replace($array, $string)
+{
+  foreach ($array as $search => $replace)
   {
-    foreach ($array as $search => $replace) {
-      $string = preg_replace($search, $replace, $string);
-    }
-    return $string;
+    $string = preg_replace($search, $replace, $string);
   }
 
-
+  return $string;
+}
 
 ?>
