@@ -53,7 +53,7 @@
   ### and because it is per-host and no big performance hit. See new format below
   ### FIXME REMOVE
 
-  if(is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) 
+  if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) 
   {
     if (!is_file($cpu_rrd)) 
     {
@@ -69,11 +69,11 @@
 
   foreach($collect_oids as $oid)
   {
-    if(is_numeric($ss[$oid])) 
+    if (is_numeric($ss[$oid])) 
     {
       $value = $ss[$oid];
       $filename = $host_rrd . "/ucd_".$oid.".rrd";
-      if(!is_file($filename)) 
+      if (!is_file($filename)) 
       {
         rrdtool_create($filename, " --step 300 DS:value:COUNTER:600:0:U RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
       }
@@ -84,10 +84,10 @@
 
   ### Set various graphs if we've seen the right OIDs.
 
-  if(is_numeric($ss['ssRawSwapIn'])) { $graphs['ucd_swap_io'] = TRUE; }
-  if(is_numeric($ss['ssIORawSent'])) { $graphs['ucd_io'] = TRUE; }
-  if(is_numeric($ss['ssRawContexts'])) { $graphs['ucd_contexts'] = TRUE; }
-  if(is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
+  if (is_numeric($ss['ssRawSwapIn'])) { $graphs['ucd_swap_io'] = TRUE; }
+  if (is_numeric($ss['ssIORawSent'])) { $graphs['ucd_io'] = TRUE; }
+  if (is_numeric($ss['ssRawContexts'])) { $graphs['ucd_contexts'] = TRUE; }
+  if (is_numeric($ss['ssRawInterrupts'])) { $graphs['ucd_interrupts'] = TRUE; }
 
 
   ############################################################################################################################################
@@ -124,13 +124,14 @@
        RRA:MAX:0.5:24:800 \
        RRA:MAX:0.5:288:800";
 
-  $mem_raw = snmp_get_multi($device, "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0", "-OQUS", "UCD-SNMP-MIB");
-  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $mem_raw; 
+  $snmpdata = snmp_get_multi($device, "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0", "-OQUs", "UCD-SNMP-MIB");
+  list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0]; 
+  foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
 
   ## Check to see that the OIDs are actually populated before we make the rrd
-  if(is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
+  if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
   {
-    if(!is_file($mem_rrd)) 
+    if (!is_file($mem_rrd)) 
     {
       ## Create the rrd file if it doesn't exist
       rrdtool_create($mem_rrd, $mem_rrd_create);
@@ -161,12 +162,14 @@
 
   $load_get = "laLoadInt.1 laLoadInt.2 laLoadInt.3";
   $load_raw = snmp_get_multi($device, $load_get, "-OQUs", "UCD-SNMP-MIB");
-  list ($load1, $load5, $load10) = $load_raw;
+  $load1 = $load_raw[1]['laLoadInt'];
+  $load5 = $load_raw[2]['laLoadInt'];
+  $load10 = $load_raw[3]['laLoadInt'];
 
   ## Check to see that the OIDs are actually populated before we make the rrd
-  if(is_numeric($load1) && is_numeric($load5) && is_numeric($load10))
+  if (is_numeric($load1) && is_numeric($load5) && is_numeric($load10))
   {
-    if(!is_file($load_rrd)) {
+    if (!is_file($load_rrd)) {
       rrdtool_create($load_rrd, $la_load_create);
     }
     rrdtool_update($load_rrd, "N:$load1:$load5:$load10");
