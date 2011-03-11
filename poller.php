@@ -117,17 +117,18 @@ while ($device = mysql_fetch_assoc($device_query))
 
     $graphs = array();
     $oldgraphs = array();
-    $snmpdata = snmp_get_multi($device, "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0", "-OQUS", "SNMPv2-MIB");
-
-    list($sysUptime, $sysLocation, $sysContact, $sysName) = $snmpdata;
+    
+    $snmpdata = snmp_get_multi($device, "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0", "-OQUs", "SNMPv2-MIB");
+    foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
+    
     $sysDescr = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
 
     $sysName = strtolower($sysName);
 
-    $hrSystemUptime = snmp_get($device, "HOST-RESOURCES-MIB::hrSystemUptime.0", "-Oqv");
+    $hrSystemUptime = snmp_get($device, "hrSystemUptime.0", "-Oqv", "HOST-RESOURCES-MIB");
     $sysObjectID = snmp_get($device, "sysObjectID.0", "-Oqvn");
 
-#    echo("UPTIMES: ".$hrSystemUptime."|".$sysUptime."]");
+#    echo("UPTIMES: ".$hrSystemUptime."|".$sysUpTime."]");
 
     if ($hrSystemUptime != "" && !strpos($hrSystemUptime, "No") && ($device['os'] != "windows"))
     {
@@ -145,9 +146,9 @@ while ($device = mysql_fetch_assoc($device_query))
     } else {
       echo("Using Agent Uptime\n");
       #SNMPv2-MIB::sysUpTime.0 = Timeticks: (2542831) 7:03:48.31
-      $sysUptime = str_replace("(", "", $sysUptime);
-      $sysUptime = str_replace(")", "", $sysUptime);
-      list($days, $hours, $mins, $secs) = explode(":", $sysUptime);
+      $sysUpTime = str_replace("(", "", $sysUpTime);
+      $sysUpTime = str_replace(")", "", $sysUpTime);
+      list($days, $hours, $mins, $secs) = explode(":", $sysUpTime);
       list($secs, $microsecs) = explode(".", $secs);
       $hours = $hours + ($days * 24);
       $mins = $mins + ($hours * 60);
