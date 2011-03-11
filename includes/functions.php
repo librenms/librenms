@@ -137,7 +137,8 @@ function getHostOS($device)
   if ($os) { return $os; } else { return "generic"; }
 }
 
-function formatRates($rate) {
+function formatRates($rate)
+{
    $rate = format_si($rate) . "bps";
    return $rate;
 }
@@ -150,12 +151,15 @@ function formatstorage($rate, $round = '2')
 
 function format_si($rate)
 {
-  if ($rate >= "0.1") {
+  if ($rate >= "0.1")
+  {
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
     $round = Array('2','2','2','2','2','2','2','2','2');
     $ext = $sizes[0];
     for ($i=1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
-  } else {
+  }
+  else
+  {
     $sizes = Array('', 'm', 'u', 'n');
     $round = Array('2','2','2','2');
     $ext = $sizes[0];
@@ -217,7 +221,8 @@ function getImage($host)
   } else {
     if (file_exists($config['html_dir'] . "/images/os/$type" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.png" />';
     } elseif (file_exists($config['html_dir'] . "/images/os/$type" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$type.'.gif" />'; }
-    if ($type == "linux") {
+    if ($type == "linux")
+    {
       $features = strtolower(trim($data['features']));
       list($distro) = split(" ", $features);
       if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
@@ -227,10 +232,11 @@ function getImage($host)
   return $image;
 }
 
-function renamehost($id, $new) {
+function renamehost($id, $new)
+{
   global $config;
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
-  shell_exec("mv ".$config['rrd_dir']."/$host ".$config['rrd_dir']."/$new");
+  rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
   eventlog("Hostname changed -> $new (console)", $id);
 }
@@ -248,7 +254,7 @@ function delete_port($int_id)
     mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
     mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
     mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
-    shell_exec("rm -rf ".trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
+    unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
 }
 
 function delete_device($id)
@@ -257,7 +263,8 @@ function delete_device($id)
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while($int_data = mysql_fetch_array($int_query)) {
+  while($int_data = mysql_fetch_array($int_query))
+  {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
     delete_port($int_id);
@@ -295,6 +302,7 @@ function addHost($host, $community, $snmpver, $port = 161)
     {
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' )
       {
+        # FIXME internalize
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host)
         {
@@ -308,8 +316,6 @@ function addHost($host, $community, $snmpver, $port = 161)
 function scanUDP ($host, $port, $timeout)
 {
   $handle = fsockopen($host, $port, $errno, $errstr, 2);
-  if (!$handle) {
-  }
   socket_set_timeout ($handle, $timeout);
   $write = fwrite($handle,"\x00");
   if (!$write) { next; }
@@ -317,7 +323,8 @@ function scanUDP ($host, $port, $timeout)
   $header = fread($handle, 1);
   $endTime = time();
   $timeDiff = $endTime - $startTime;
-  if ($timeDiff >= $timeout) {
+  if ($timeDiff >= $timeout)
+  {
     fclose($handle); return 1;
   } else { fclose($handle); return 0; }
 }
@@ -347,13 +354,16 @@ function formatUptime($diff, $format="long")
 
   $uptime = "";
 
-  if ($format == "short") {
+  if ($format == "short")
+  {
     if ($yearsDiff > '0') { $uptime .= $yearsDiff . "y "; }
     if ($daysDiff > '0') { $uptime .= $daysDiff . "d "; }
     if ($hrsDiff > '0') { $uptime .= $hrsDiff . "h "; }
     if ($minsDiff > '0') { $uptime .= $minsDiff . "m "; }
     if ($secsDiff > '0') { $uptime .= $secsDiff . "s "; }
-  } else {
+  }
+  else
+  {
     if ($yearsDiff > '0') { $uptime .= $yearsDiff . " years, "; }
     if ($daysDiff > '0') { $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
     if ($hrsDiff > '0') { $uptime .= $hrsDiff     . "h "; }
@@ -366,43 +376,54 @@ function formatUptime($diff, $format="long")
 function isSNMPable($hostname, $community, $snmpver, $port)
 {
      global $config;
+     # FIXME internalize
      $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysObjectID.0");
-     if ($pos == '') {
+     if ($pos == '')
+     {
        return false;
      } else {
        return true;
      }
 }
 
-function isPingable($hostname) {
+function isPingable($hostname)
+{
    global $config;
    $status = shell_exec($config['fping'] . " $hostname");
-   if (strstr($status, "alive")) {
+   if (strstr($status, "alive"))
+   {
      return TRUE;
    } else {
      return FALSE;
    }
 }
 
-function is_odd($number) {
+function is_odd($number)
+{
   return $number & 1; // 0 = even, 1 = odd
 }
 
-function isValidInterface($if) {
+function isValidInterface($if)
+{
       global $config;
       $if = strtolower($if);
       $nullintf = 0;
-      foreach($config['bad_if'] as $bi) {
-         $pos = strpos($if, $bi);
-         if ($pos !== FALSE) {
-            $nullintf = 1;
-            echo("$if matched $bi \n");
-         }
+      foreach($config['bad_if'] as $bi)
+      {
+        $pos = strpos($if, $bi);
+        if ($pos !== FALSE)
+        {
+          $nullintf = 1;
+          echo("$if matched $bi \n");
+        }
       }
       if (preg_match('/serial[0-9]:/', $if)) { $nullintf = '1'; }
-      if ($nullintf != '1') {
-         return 1;
-      }  else { return 0; }
+      if ($nullintf != '1')
+      {
+        return 1;
+      } else {
+        return 0;
+      }
 }
 
 function utime()
@@ -505,27 +526,29 @@ function hoststatus($id)
   return $result;
 }
 
-function match_network ($nets, $ip, $first=false)
+function match_network($nets, $ip, $first=false)
 {
-   $return = false;
-   if (!is_array ($nets)) $nets = array ($nets);
-   foreach ($nets as $net) {
-       $rev = (preg_match ("/^\!/", $net)) ? true : false;
-       $net = preg_replace ("/^\!/", "", $net);
-       $ip_arr  = explode('/', $net);
-       $net_long = ip2long($ip_arr[0]);
-       $x        = ip2long($ip_arr[1]);
-       $mask    = long2ip($x) == $ip_arr[1] ? $x : 0xffffffff << (32 - $ip_arr[1]);
-       $ip_long  = ip2long($ip);
-       if ($rev) {
-           if (($ip_long & $mask) == ($net_long & $mask)) return false;
-       } else {
-           if (($ip_long & $mask) == ($net_long & $mask)) $return = true;
-           if ($first && $return) return true;
-       }
-   }
+  $return = false;
+  if (!is_array ($nets)) $nets = array ($nets);
+  foreach ($nets as $net)
+  {
+    $rev = (preg_match ("/^\!/", $net)) ? true : false;
+    $net = preg_replace ("/^\!/", "", $net);
+    $ip_arr  = explode('/', $net);
+    $net_long = ip2long($ip_arr[0]);
+    $x        = ip2long($ip_arr[1]);
+    $mask    = long2ip($x) == $ip_arr[1] ? $x : 0xffffffff << (32 - $ip_arr[1]);
+    $ip_long  = ip2long($ip);
+    if ($rev)
+    {
+      if (($ip_long & $mask) == ($net_long & $mask)) return false;
+    } else {
+      if (($ip_long & $mask) == ($net_long & $mask)) $return = true;
+      if ($first && $return) return true;
+    }
+  }
 
-   return $return;
+  return $return;
 }
 
 function snmp2ipv6($ipv6_snmp)
@@ -565,19 +588,22 @@ function discover_process_ipv6($ifIndex,$ipv6_address,$ipv6_prefixlen,$ipv6_orig
   {
     $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
     $interface_id = mysql_result(mysql_query($i_query), 0);
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1') {
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
+    {
       mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
       echo("N");
     }
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1') {
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0) < '1')
+    {
       mysql_query("INSERT INTO `ipv6_networks` (`ipv6_network`) VALUES ('$ipv6_network')");
       echo("N");
     }
 
     $ipv6_network_id = @mysql_result(mysql_query("SELECT `ipv6_network_id` from `ipv6_networks` WHERE `ipv6_network` = '$ipv6_network'"), 0);
 
-    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `interface_id` = '$interface_id'"), 0) == '0') {
+    if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = '$ipv6_address' AND `ipv6_prefixlen` = '$ipv6_prefixlen' AND `interface_id` = '$interface_id'"), 0) == '0')
+    {
      mysql_query("INSERT INTO `ipv6_addresses` (`ipv6_address`, `ipv6_compressed`, `ipv6_prefixlen`, `ipv6_origin`, `ipv6_network_id`, `interface_id`)
                                    VALUES ('$ipv6_address', '$ipv6_compressed', '$ipv6_prefixlen', '$ipv6_origin', '$ipv6_network_id', '$interface_id')");
      echo("+");
@@ -664,37 +690,51 @@ function notify($device,$title,$message)
 
 function formatCiscoHardware(&$device, $short = false)
 {
-
-    if ($device['os'] == "ios") {
-        if ($device['hardware']) {
-            if (preg_match("/^WS-C([A-Za-z0-9]+).*/", $device['hardware'], $matches)) {
-                if (!$short) {
-                    $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
-                } else {
-                    $device['hardware'] = "Cisco " . $matches[1];
-                }
-            } elseif (preg_match("/^CISCO([0-9]+)$/", $device['hardware'], $matches)) {
-                 $device['hardware'] = "Cisco " . $matches[1];
-            }
-        } else {
-            if (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Cisco " . $matches[1];
-            } elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches)) {
-                $device['hardware'] = "Cisco " . $matches[1];
-            }
+  if ($device['os'] == "ios")
+  {
+    if ($device['hardware'])
+    {
+      if (preg_match("/^WS-C([A-Za-z0-9]+).*/", $device['hardware'], $matches))
+      {
+        if (!$short)
+        {
+           $device['hardware'] = "Cisco " . $matches[1] . " (" . $device['hardware'] . ")";
         }
+        else
+        {
+           $device['hardware'] = "Cisco " . $matches[1];
+        }
+      }
+      elseif (preg_match("/^CISCO([0-9]+)$/", $device['hardware'], $matches))
+      {
+        $device['hardware'] = "Cisco " . $matches[1];
+      }
     }
+    else
+    {
+      if (preg_match("/Cisco IOS Software, C([A-Za-z0-9]+) Software.*/", $device['sysDescr'], $matches))
+      {
+        $device['hardware'] = "Cisco " . $matches[1];
+      }
+      elseif (preg_match("/Cisco IOS Software, ([0-9]+) Software.*/", $device['sysDescr'], $matches))
+      {
+        $device['hardware'] = "Cisco " . $matches[1];
+      }
+    }
+  }
 }
 
 # from http://ditio.net/2008/11/04/php-string-to-hex-and-hex-to-string-functions/
 function hex2str($hex)
 {
-    $string='';
-    for ($i=0; $i < strlen($hex)-1; $i+=2)
-    {
-        $string .= chr(hexdec($hex[$i].$hex[$i+1]));
-    }
-    return $string;
+  $string='';
+
+  for ($i=0; $i < strlen($hex)-1; $i+=2)
+  {
+    $string .= chr(hexdec($hex[$i].$hex[$i+1]));
+  }
+
+  return $string;
 }
 
 # Convert an SNMP hex string to regular string

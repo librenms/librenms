@@ -477,7 +477,8 @@ function snmp_cache_oid($oid, $device, $array, $mib = 0)
   return $array;
 }
 
-function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
+function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
+{
   global $config;
 
   if (is_numeric($device['timeout'])) { $timeout = $device['timeout']; } elseif (isset($config['snmp']['timeout'])) { $timeout =  $config['snmp']['timeout']; }
@@ -510,7 +511,7 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0) {
   return $array;
 }
 
-function snmp_cache_portIfIndex ($device, $array)
+function snmp_cache_portIfIndex($device, $array)
 {
   global $config;
 
@@ -538,7 +539,7 @@ function snmp_cache_portIfIndex ($device, $array)
   return $array;
 }
 
-function snmp_cache_portName ($device, $array)
+function snmp_cache_portName($device, $array)
 {
   global $config;
 
