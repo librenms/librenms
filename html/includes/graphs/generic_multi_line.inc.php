@@ -27,7 +27,13 @@
       $rrd_options .= " DEF:".$id."=$filename:$rra:AVERAGE";
       $rrd_options .= " DEF:".$id."min=$filename:$rra:MIN";
       $rrd_options .= " DEF:".$id."max=$filename:$rra:MAX";
-      $rrd_options .= " LINE1.25:".$id."#".$colour.":'$descr'";
+      if($rrd['invert'] == "1") {
+        $rrd_options .= " CDEF:".$id."graph=".$id.",-1,*";
+        $rrd_options .= " LINE1.25:".$id."graph#".$colour.":'$descr'";
+      } else {
+        $rrd_options .= " LINE1.25:".$id."#".$colour.":'$descr'";
+      }
+
       $rrd_options .= " GPRINT:".$id.":LAST:%5.2lf%s GPRINT:".$id."min:MIN:%5.2lf%s";
       $rrd_options .= " GPRINT:".$id."max:MAX:%5.2lf%s GPRINT:".$id.":AVERAGE:%5.2lf%s\\\\n";
 

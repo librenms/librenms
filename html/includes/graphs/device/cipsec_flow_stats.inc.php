@@ -13,7 +13,7 @@ $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "OutAuths";
 $rrd_list[$i]['rra'] = "OutAuths";
-$rra_list[$i]['invert'] = 1;
+$rra_list[$i]['invert'] = "1";
 
 $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
@@ -23,7 +23,7 @@ $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "OutEncrypts";
 $rrd_list[$i]['rra'] = "OutEncrypts";
-$rra_list[$i]['invert'] = 1;
+$rra_list[$i]['invert'] = "1";
 
 $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
@@ -37,7 +37,7 @@ $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "OutDrops";
 $rrd_list[$i]['rra'] = "OutDrops";
-$rra_list[$i]['invert'] = 1;
+$rra_list[$i]['invert'] = "1";
 
 
 
@@ -49,7 +49,7 @@ $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "OutAuthFail";
 $rrd_list[$i]['rra'] = "OutAuthFails";
-$rra_list[$i]['invert'] = 1;
+$rra_list[$i]['invert'] = "1";
 
 $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
@@ -59,7 +59,7 @@ $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "OutEncryptFails";
 $rrd_list[$i]['rra'] = "OutEncryptFails";
-$rra_list[$i]['invert'] = 1;
+$rra_list[$i]['invert'] = "1";
 
 $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
