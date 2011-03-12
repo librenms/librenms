@@ -8,37 +8,37 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
-while($current = mysql_fetch_array($sql)) 
+while($current = mysql_fetch_array($sql))
 {
   switch ($iter)
   {
     case "1":
-      $colour= "CC0000"; 
-      break; 
+      $colour= "CC0000";
+      break;
     case "2":
-      $colour= "008C00"; 
-      break; 
+      $colour= "008C00";
+      break;
     case "3":
-      $colour= "4096EE"; 
-      break; 
+      $colour= "4096EE";
+      break;
     case "4":
-      $colour= "73880A"; 
+      $colour= "73880A";
       break;
     case "5":
-      $colour= "D01F3C"; 
+      $colour= "D01F3C";
       break;
     case "6":
-      $colour= "36393D"; 
-      break; 
-    case "7": 
+      $colour= "36393D";
+      break;
+    case "7":
     default:
-      $colour= "FF0084"; 
+      $colour= "FF0084";
       unset($iter);
       break;
   }
 
   $hostname = gethostbyid($current['device_id']);
-  
+
   $descr = substr(str_pad($current['sensor_descr'], 15),0,15);
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("current-" . $current['sensor_descr'] . ".rrd");
 

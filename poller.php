@@ -117,10 +117,10 @@ while ($device = mysql_fetch_assoc($device_query))
 
     $graphs = array();
     $oldgraphs = array();
-    
+
     $snmpdata = snmp_get_multi($device, "sysUpTime.0 sysLocation.0 sysContact.0 sysName.0", "-OQUs", "SNMPv2-MIB");
     foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
-    
+
     $sysDescr = snmp_get($device, "sysDescr.0", "-Oqv", "SNMPv2-MIB");
 
     $sysName = strtolower($sysName);
