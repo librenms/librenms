@@ -12,6 +12,10 @@ function process_syslog ($entry, $update)
     }
   }
 
+  if(strstr($entry['msg'], "diskio.c: don't know how to handle") !== FALSE) {
+    $delete = 1;
+  }
+
   $device_id_host = @mysql_result(mysql_query("SELECT device_id FROM devices WHERE `hostname` = '".$entry['host']."' OR `sysName` = '".$entry['host']."'"),0);
 
   if($device_id_host)
