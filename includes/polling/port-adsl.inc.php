@@ -40,9 +40,9 @@
 # adslAturPerfValidIntervals.1 = 0
 # adslAturPerfInvalidIntervals.1 = 0
 
-    if(isset($port_stats[$device['device_id']][$port['ifIndex']]['adslLineCoding'])) { // Check to make sure Port data is cached.
+    if(isset($port_stats[$port['ifIndex']]['adslLineCoding'])) { // Check to make sure Port data is cached.
 
-      $this_port = &$port_stats[$device['device_id']][$port['ifIndex']];
+      $this_port = &$port_stats[$port['ifIndex']];
 
       $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-adsl.rrd");
 
@@ -113,5 +113,4 @@
       echo("ADSL ");
 
     }
-
 ?>
