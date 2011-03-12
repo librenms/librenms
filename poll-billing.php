@@ -106,7 +106,7 @@ function CollectData($bill_id)
     $prev_in_delta =  '0';
     $prev_out_delta =  '0';
   }
-  
+
   if ($delta < '0' )
   {
     $delta = $prev_delta;

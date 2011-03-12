@@ -20,7 +20,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
     if ($this_alert) {
      $device_alerts++;
      $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'";
-    } 
+    }
   }
 ?>
 
@@ -272,7 +272,7 @@ echo('        <li><hr /></li>
     <?php if ($_SESSION['userlevel'] >= '10') {
       echo('
         <li><hr width="140" /></li>');
-     
+
       if (auth_usermanagement())
       {
       echo('

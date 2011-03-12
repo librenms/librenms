@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION['userlevel'] == 10) 
+if($_SESSION['userlevel'] == 10)
 {
   $devices['count'] = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
   $devices['up'] = mysql_result(mysql_query("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"),0);
@@ -20,8 +20,8 @@ if($_SESSION['userlevel'] == 10)
   $services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND service_ignore = '0'"),0);
   $services['ignored'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_ignore = '1'"),0);
   $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_disabled = '1'"),0);
-} 
-else 
+}
+else
 {
   $devices['count']       = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id"),0);
   $devices['up']          = mysql_result(mysql_query("SELECT count(D.device_id) FROM devices AS D, devices_perms AS P WHERE P.user_id = '" . $_SESSION['user_id'] . "' AND P.device_id = D.device_id AND D.status = '1' AND D.ignore = '0'"),0);

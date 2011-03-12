@@ -122,7 +122,7 @@ echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
 $device_query = mysql_query($sql);
 while ($device = mysql_fetch_array($device_query)) {
   if ( device_permitted($device['device_id']) ) {
-    include("includes/hostbox.inc");
+    include("includes/hostbox.inc.php");
   }
 }
 

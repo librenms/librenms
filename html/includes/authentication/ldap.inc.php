@@ -58,12 +58,12 @@ function adduser($username, $password, $level, $email = "", $realname = "")
   # Not supported
   return 0;
 }
-  
+
 function user_exists($username)
 {
   return 0; # FIXME to be implemented
 }
-  
+
 function get_userlevel($username)
 {
   # FIXME should come from LDAP

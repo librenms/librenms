@@ -16,7 +16,7 @@ print_optionbar_end();
    $i = "1";
    $vlan_query = mysql_query("select * from vlans WHERE device_id = '".$_GET['id']."' ORDER BY 'vlan_vlan'");
    while($vlan = mysql_fetch_array($vlan_query)) {
-     include("includes/print-vlan.inc");
+     include("includes/print-vlan.inc.php");
      $i++;
    }
    echo("</table>");
