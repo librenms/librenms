@@ -5,7 +5,8 @@ include("includes/defaults.inc.php");
 include("config.php"); 
 include("includes/functions.php");
 
-if($argv[1]) { 
+if (isset($argv[1]) && $argv[1])
+{ 
   $host      = strtolower($argv[1]);
   $community = $argv[2];
   $snmpver   = strtolower($argv[3]);
@@ -18,16 +19,16 @@ if($argv[1]) {
   if ($community) { unset($config['snmp']['community']); $config['snmp']['community'][] = $community; }
 
   list($hostshort) 	= explode(".", $host);
-  if ( mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
-    if ( isDomainResolves($argv[1])){
-      if ( isPingable($argv[1])) {
+  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' ) {
+    if (isDomainResolves($argv[1])){
+      if (isPingable($argv[1])) {
         # FIXME should be a foreach $config['snmp']['community'][0] as $community
         $community = $config['snmp']['community'][0];
-       if ( isSNMPable($argv[1], $community, $snmpver, $port)) {
+       if (isSNMPable($argv[1], $community, $snmpver, $port)) {
         $snmphost = trim(str_replace("\"", "", shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c ".$config['snmp']['community'][0]." $host:$port sysName.0")));
         if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host))) {
           $return = createHost ($host, $community, $snmpver, $port);
-	  if($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
+	  if ($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
         } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
        } else { echo("Could not reach $host with SNMP\n"); }
       } else { echo("Could not ping $host\n"); }
