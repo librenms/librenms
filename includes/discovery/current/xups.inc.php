@@ -6,14 +6,14 @@ global $valid_sensor;
 if ($device['os'] == "powerware")
 {
   echo("XUPS-MIB ");
-  
+
   $oids = snmp_walk($device, "xupsBatCurrent", "-Osqn", "XUPS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
@@ -24,6 +24,7 @@ if ($device['os'] == "powerware")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
       $type = "xups";
       $index = "1.2.3.".$current_id;
+
       echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
     }
   }
@@ -39,6 +40,7 @@ if ($device['os'] == "powerware")
     $type       = "xups";
     $divisor    = 1;
     $index      = "4.4.1.3.".$i;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 
@@ -53,6 +55,7 @@ if ($device['os'] == "powerware")
     $type       = "xups";
     $divisor    = 1;
     $index      = "3.4.1.3.".$i;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
   }
 }
