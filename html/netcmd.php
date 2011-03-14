@@ -3,7 +3,8 @@
 ini_set('allow_url_fopen', 0);
 ini_set('display_errors', 0);
 
-if($_GET[debug]) {
+if ($_GET[debug])
+{
   ini_set('display_errors', 1);
   ini_set('display_startup_errors', 1);
   ini_set('log_errors', 1);
@@ -12,14 +13,15 @@ if($_GET[debug]) {
 
 include("../includes/defaults.inc.php");
 include("../config.php");
+include("includes/functions.inc.php");
 include("../includes/functions.php");
 include("includes/authenticate.inc.php");
-if(!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
+if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 
-if($_GET['query'] && $_GET['cmd']) {
+if ($_GET['query'] && $_GET['cmd']) {
   $host = $_GET['query'];
-  if(Net_IPv6::checkIPv6($host)||Net_IPv4::validateip($host)||preg_match("/^[a-zA-Z0-9.-]*$/", $host)) {
+  if (Net_IPv6::checkIPv6($host)||Net_IPv4::validateip($host)||preg_match("/^[a-zA-Z0-9.-]*$/", $host)) {
     switch ($_GET['cmd']) {
       case 'whois':
 	$cmd = $config['whois'] . " $host | grep -v \%";
@@ -31,14 +33,17 @@ if($_GET['query'] && $_GET['cmd']) {
         $cmd = $config['mtr'] . " -r -c 5 $host";
         break;
       case 'nmap':
-        if ($_SESSION['userlevel'] != '10') {
+        if ($_SESSION['userlevel'] != '10')
+        {
             echo("insufficient privileges");
         } else {
             $cmd = $config['nmap'] . " $host";
         }
         break; 
     }
-    if (!empty($cmd)) {
+    
+    if (!empty($cmd))
+    {
         $output = `$cmd`;
     }
   }
