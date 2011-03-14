@@ -1,7 +1,8 @@
 <?php
 
-if(!$os) {
-  if(preg_match("/^OpenBSD/", $sysDescr)) { $os = "openbsd"; }
+if (!$os)
+{
+  if (preg_match("/^OpenBSD/", $sysDescr)) { $os = "openbsd"; }
 }
 
 ?>
