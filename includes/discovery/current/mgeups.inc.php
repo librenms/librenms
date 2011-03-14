@@ -3,7 +3,7 @@
 global $valid_sensor;
 
 ## MGE UPS
-if ($device['os'] == "mgeups") 
+if ($device['os'] == "mgeups")
 {
   echo("MGE ");
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.7.1", "-OsqnU"));
@@ -28,9 +28,10 @@ if ($device['os'] == "mgeups")
     $lowlimit   = 0;
     $limit      = NULL;
     $lowwarnlimit = NULL;
-    echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current));
 
+    echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current));
   }
+
   $oids = trim(snmp_walk($device, "1.3.6.1.4.1.705.1.6.1", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
   $numPhase = count(explode("\n",$oids));
@@ -53,7 +54,9 @@ if ($device['os'] == "mgeups")
     $lowlimit   = 0;
     $limit      = NULL;
     $lowwarnlimit = NULL;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, $lowwarnlimit, $warnlimit, $limit, $current));
   }
 }
+
 ?>

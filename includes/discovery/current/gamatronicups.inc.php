@@ -2,9 +2,9 @@
 
 global $valid_sensor;
 
-if ($device['os'] == "gamatronicups") 
+if ($device['os'] == "gamatronicups")
 {
-  for ($i = 1; $i <= 3; $i++) 
+  for ($i = 1; $i <= 3; $i++)
   {
     $current_oid = "GAMATRONIC-MIB::gamatronicLTD.5.4.1.1.3.$i";
     $descr = "Input Phase $i";
@@ -19,7 +19,7 @@ if ($device['os'] == "gamatronicups")
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current));
   }
 
-  for ($i = 1; $i <= 3; $i++) 
+  for ($i = 1; $i <= 3; $i++)
   {
     $current_oid = "GAMATRONIC-MIB::gamatronicLTD.5.5.1.1.3.$i";
     $descr = "Output Phase $i";
@@ -34,4 +34,5 @@ if ($device['os'] == "gamatronicups")
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', $lowlimit, NULL, NULL, NULL, $current));
   }
 }
+
 ?>

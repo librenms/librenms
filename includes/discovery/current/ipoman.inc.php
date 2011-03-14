@@ -7,8 +7,8 @@ if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
 
-  if(!is_array($cache['ipoman']))
-  { 
+  if (!is_array($cache['ipoman']))
+  {
     echo("outletConfigDesc ");
     $cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, "outletConfigDesc", $cache['ipoman']['out'], "IPOMANII-MIB");
     echo("outletConfigLocation ");
@@ -31,9 +31,9 @@ if ($device['os'] == "ipoman")
   $oids_out = snmpwalk_cache_multi_oid($device, "outletStatusCurrent", $oids_out, "IPOMANII-MIB");
 //  $oids_out = snmpwalk_cache_multi_oid($device, "outletStatusKwatt", $oids_out, "IPOMANII-MIB"); // See above
 
-  if(is_array($oids_in))
+  if (is_array($oids_in))
   {
-    foreach($oids_in as $index => $entry)
+    foreach ($oids_in as $index => $entry)
     {
       $cur_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.3.' . $index;
       $divisor = 1000;
@@ -45,9 +45,9 @@ if ($device['os'] == "ipoman")
     }
   }
 
-  if(is_array($oids_out))
+  if (is_array($oids_out))
   {
-    foreach($oids_out as $index => $entry)
+    foreach ($oids_out as $index => $entry)
     {
       $cur_oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.2.3.1.3.' . $index;
       $divisor = 1000;
@@ -58,4 +58,5 @@ if ($device['os'] == "ipoman")
     }
   }
 }
+
 ?>

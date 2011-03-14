@@ -3,17 +3,17 @@
 global $valid_sensor;
 
 ## RFC1628 UPS
-if ($device['os'] == "netmanplus" || $device['os'] == "deltaups") 
+if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
 {
   echo("RFC1628 ");
-  
+
   $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.6", "-Osqn", "UPS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
@@ -24,6 +24,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($current_id+1));
       $type = "rfc1628";
       $index = 500+$current_id;
+
       echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '10', '1', NULL, NULL, NULL, NULL, $current));
     }
   }
@@ -39,6 +40,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $type       = "rfc1628";
     $precision  = 1;
     $index      = $i;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current));
   }
 
@@ -53,6 +55,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $type       = "rfc1628";
     $precision  = 1;
     $index      = 100+$i;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current));
   }
 
@@ -67,6 +70,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $type       = "rfc1628";
     $precision  = 1;
     $index      = 200+$i;
+
     echo(discover_sensor($valid_sensor, 'current', $device, $current_oid, $index, $type, $descr, '1', '1', NULL, NULL, NULL, NULL, $current));
   }
 }
