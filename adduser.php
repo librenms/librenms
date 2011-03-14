@@ -17,9 +17,9 @@ else
         
 if (auth_usermanagement())
 {
-  if($argv[1] && $argv[2] && $argv[3]) 
+  if ($argv[1] && $argv[2] && $argv[3]) 
   {
-    if(adduser($argv[1],$argv[2],$argv[3],$argv[4]))
+    if (adduser($argv[1],$argv[2],$argv[3],$argv[4]))
     {
       echo("User ".$argv[1]." added successfully\n");
     }
