@@ -1,8 +1,6 @@
 <?php
 
-echo("Fortinet Fortigate Poller\n");
-
-## FIX ME - find some fortigate hardware to test this on, and to update and generify it
+## FIXME - find some fortigate hardware to test this on, and to update and generify it
 
 $fnSysVersion = snmp_get($device, "FORTINET-MIB-280::fnSysVersion.0", "-Ovq");
 $serial       = snmp_get($device, "FORTINET-MIB-280::fnSysSerial.0", "-Ovq");
@@ -10,7 +8,8 @@ $serial       = snmp_get($device, "FORTINET-MIB-280::fnSysSerial.0", "-Ovq");
 $version = preg_replace("/(.+),(.+),(.+)/", "\\1||\\2||\\3", $fnSysVersion);
 list($version,$features) = explode("||", $version);
 
-if(isset($rewrite_fortinet_hardware[$sysObjectID])) {
+if (isset($rewrite_fortinet_hardware[$sysObjectID]))
+{
   $hardware = $rewrite_fortinet_hardware[$sysObjectID];
 }
 
@@ -23,15 +22,15 @@ $sessrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/fortigate_session
 
 $sessions = snmp_get($device, "fnSysSesCount.0", "FORTINET-MIB-280");
 
-if(is_numeric($sessions))
+if (is_numeric($sessions))
 {
-  if (!is_file($sessrrd)) 
+  if (!is_file($sessrrd))
   {
-   `rrdtool create $sessrrd --step 300 DS:sessions:GAUGE:600:0:3000000 \
+    rrdtool_create($sessrrd," --step 300 DS:sessions:GAUGE:600:0:3000000 \
      RRA:AVERAGE:0.5:1:800 RRA:AVERAGE:0.5:6:800 RRA:AVERAGE:0.5:24:800 RRA:AVERAGE:0.5:288:800 \
-     RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800`;  
+     RRA:MAX:0.5:1:800 RRA:MAX:0.5:6:800 RRA:MAX:0.5:24:800 RRA:MAX:0.5:288:800");
   }
-  shell_exec($config['rrdtool'] . " update $sessrrd N:$ses");
+  rrdtool_update($sessrrd,"N:".$ses);
   $graphs['fortigate_sessions'] = TRUE;
 }
 

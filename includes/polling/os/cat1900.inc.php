@@ -1,7 +1,6 @@
 <?php
 
-   list(,$version) = split(',',$sysDescr,2);
-   
-   $hardware = "1900";
+list(,$version) = split(',',$sysDescr,2);
+$hardware = "1900";
 
 ?>

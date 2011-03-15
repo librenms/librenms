@@ -1,7 +1,5 @@
 <?php
 
-echo("Doing Juniper Netscreen (ScreenOS)");
-
 $version = preg_replace("/(.+)\ version\ (.+)\ \(SN:\ (.+)\,\ (.+)\)/", "\\1||\\2||\\3||\\4", $sysDescr);
 list($hardware,$version,$serial,$features) = explode("||", $version);
 
@@ -11,7 +9,8 @@ $sess_cmd .= " .1.3.6.1.4.1.3224.16.3.2.0 .1.3.6.1.4.1.3224.16.3.3.0 .1.3.6.1.4.
 $sess_data = shell_exec($sess_cmd);
 list ($sessalloc, $sessmax, $sessfailed) = explode("\n", $sess_data);
 
-if (!is_file($sessrrd)) {
+if (!is_file($sessrrd))
+{
    rrdtool_create($sessrrd, " --step 300 \
      DS:allocate:GAUGE:600:0:3000000 \
      DS:max:GAUGE:600:0:3000000 \

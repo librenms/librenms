@@ -41,5 +41,5 @@ if (isHexString($serial))
   # Sometimes firmware outputs serial as hex-string
   $serial = snmp_hexstring($serial);
 }
-    
+
 ?>

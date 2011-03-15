@@ -1,7 +1,5 @@
 <?php
 
-echo("Cisco Catalyst OS\n");
-
 #Cisco Systems, Inc. WS-C2948 Cisco Catalyst Operating System Software, Version 4.5(9) Copyright (c) 1995-2000 by Cisco Systems, Inc.
 #Cisco Systems WS-C5509 Cisco Catalyst Operating System Software, Version 5.5(19) Copyright (c) 1995-2003 by Cisco Systems
 #Cisco Systems WS-C5500 Cisco Catalyst Operating System Software, Version 5.5(18) Copyright (c) 1995-2002 by Cisco Systems
@@ -10,17 +8,17 @@ echo("Cisco Catalyst OS\n");
 #Cisco Systems, Inc. WS-C4003 Cisco Catalyst Operating System Software, Version 6.4(13) Copyright (c) 1995-2004 by Cisco Systems, Inc.
 #Cisco Systems, Inc. WS-C4006 Cisco Catalyst Operating System Software, Version 6.3(9) Copyright (c) 1995-2002 by Cisco Systems, Inc.
 
+if (strstr($ciscomodel, "OID")){ unset($ciscomodel); }
 
-   if(strstr($ciscomodel, "OID")){ unset($ciscomodel); }
-   if(!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3') {
-     $hardware = $ciscomodel;
-   }
+if (!strstr($ciscomodel, " ") && strlen($ciscomodel) >= '3')
+{
+  $hardware = $ciscomodel;
+}
 
-   $sysDescr = str_replace(", Inc.", "", $sysDescr); ## Make the two formats the same
-   $sysDescr = str_replace("\n", " ", $sysDescr);
+$sysDescr = str_replace(", Inc.", "", $sysDescr); ## Make the two formats the same
+$sysDescr = str_replace("\n", " ", $sysDescr);
 
-   list(,,$hardware,,,,,,,$version,,,$features) = explode(" ", $sysDescr);
-   list(,$features) = explode("-", $features);
-
+list(,,$hardware,,,,,,,$version,,,$features) = explode(" ", $sysDescr);
+list(,$features) = explode("-", $features);
 
 ?>
