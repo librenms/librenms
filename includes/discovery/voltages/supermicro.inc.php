@@ -3,7 +3,7 @@
 global $valid_sensor;
 
 ## Supermicro Voltages
-if ($device['os'] == "linux") 
+if ($device['os'] == "linux")
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.10876.2.1.1.1.1.3", "-OsqnU", "SUPERMICRO-HEALTH-MIB");
   if ($debug) { echo($oids."\n"); }
@@ -11,10 +11,10 @@ if ($device['os'] == "linux")
   if ($oids) echo("Supermicro ");
   $type = "supermicro";
   $divisor = "1000";
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$kind) = explode(" ", $data);
       $split_oid = explode('.',$oid);
@@ -36,10 +36,11 @@ if ($device['os'] == "linux")
 
         if ($monitor == 'true')
         {
-          echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, NULL, $limit, $current));
+          discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', $lowlimit, NULL, NULL, $limit, $current);
         }
       }
     }
   }
 }
+
 ?>

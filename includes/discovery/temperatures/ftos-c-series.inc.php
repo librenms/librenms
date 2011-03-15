@@ -9,26 +9,25 @@ global $valid_sensor;
 #F10-C-SERIES-CHASSIS-MIB::chSysCardTemp.1 = Gauge32: 25
 #F10-C-SERIES-CHASSIS-MIB::chSysCardTemp.2 = Gauge32: 26
 
-if ($device['os'] == "ftos" || $device['os_group'] == "ftos") 
+if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
 {
   echo("FTOS C-Series ");
 
   $oids = snmpwalk_cache_oid($device, "chSysCardTemp", array(), "F10-C-SERIES-CHASSIS-MIB", $config['mib_dir'].":".$config['mib_dir']."/ftos" );
 
-  if(is_array($oids))
+  if (is_array($oids))
   {
-    foreach($oids as $index => $entry)
+    foreach ($oids as $index => $entry)
     {
       $descr = "Slot ".$index;
       $oid = ".1.3.6.1.4.1.6027.3.8.1.2.1.1.5.".$index;
       $current = $entry['chSysCardTemp'];
+
       discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'ftos-cseries', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
     }
   }
 
   unset($oids);
-
 }
-
 
 ?>

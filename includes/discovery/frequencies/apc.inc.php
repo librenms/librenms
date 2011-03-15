@@ -3,17 +3,17 @@
 global $valid_sensor;
 
 ## APC
-if ($device['os'] == "apc") 
+if ($device['os'] == "apc")
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.318.1.1.8.5.3.2.1.4", "-OsqnU", "");
   if ($debug) { echo($oids."\n"); }
   if ($oids) echo("APC In ");
   $divisor = 1;
   $type = "apc";
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$current) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
@@ -29,10 +29,10 @@ if ($device['os'] == "apc")
   if ($oids) echo(" APC Out ");
   $divisor = 1;
   $type = "apc";
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$current) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
@@ -69,4 +69,5 @@ if ($device['os'] == "apc")
     discover_sensor($valid_sensor, 'freq', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
+
 ?>

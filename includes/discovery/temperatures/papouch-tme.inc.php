@@ -2,7 +2,7 @@
 
 global $valid_sensor;
 
-if ($device['os'] == "papouch-tme") 
+if ($device['os'] == "papouch-tme")
 {
   echo("Papouch TME ");
 

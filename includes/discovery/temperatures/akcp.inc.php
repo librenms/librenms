@@ -8,7 +8,7 @@ if ($device['os'] == "akcp" || $device['os'] == "minkelsrms")
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("AKCP ");
-  foreach(explode("\n", $oids) as $data)
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
     if ($data)
