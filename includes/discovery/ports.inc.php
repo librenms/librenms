@@ -8,7 +8,7 @@ $ports = snmp_walk($device, "ifDescr", "-Onsq", "IF-MIB");
 
 $ports = str_replace("\"", "", $ports);
 $ports = str_replace("ifDescr.", "", $ports);
-$ports = str_replace(" ", "||", $ports);
+#$ports = str_replace(" ", "||", $ports);
 
 $interface_ignored = 0;
 $interface_added   = 0;
@@ -16,7 +16,7 @@ $interface_added   = 0;
 foreach (explode("\n", $ports) as $entry){
 
   $entry = trim($entry);
-  list($ifIndex, $ifDescr) = explode("||", $entry, 2);
+  list($ifIndex, $ifDescr) = explode(" ", $entry, 2);
   if (!strstr($entry, "irtual")) {
     $if = trim(strtolower($ifDescr));
     $nullintf = 0;
@@ -39,7 +39,7 @@ foreach (explode("\n", $ports) as $entry){
     if ($debug) echo("\n $if ");
     if ($nullintf == 0) {
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
-	mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','$ifDescr')");
+	mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($ifDescr)."')");
         # Add Interface
 	echo("+");
       } else {

@@ -31,6 +31,8 @@ if($argv[1] == "--device" && $argv[2]) {
   exit;
 }
 
+$debug = 1;
+
 if ($argv[2] == "--type" && $argv[3]) {
   $discovery_type = $argv[3];
 } elseif ($argv[3] == "--type" && $argv[4]) {
