@@ -19,12 +19,16 @@ if ($device['os'] == "ftos" || $device['os_group'] == "ftos")
   {
     foreach ($oids as $index => $entry)
     {
-      $descr = "Slot ".$index;
-      $oid = ".1.3.6.1.4.1.6027.3.8.1.2.1.1.5.".$index;
-      $current = $entry['chSysCardTemp'];
+      $entry['descr'] = "Slot ".$index;
+      $entry['oid'] = ".1.3.6.1.4.1.6027.3.8.1.2.1.1.5.".$index;
+      $entry['current'] = $entry['chSysCardTemp'];
 
-      discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'ftos-cseries', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
+      discover_sensor($valid_sensor, 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', NULL, NULL, NULL, NULL, $entry['current']);
+
     }
+
+    unset($entry);
+
   }
 
   unset($oids);
