@@ -1,6 +1,6 @@
 <?php
 
-if($_SESSION['userlevel'] == 10)
+if($_SESSION['userlevel'] >= 5)
 {
   $devices['count'] = mysql_result(mysql_query("SELECT count(*) FROM devices"),0);
   $devices['up'] = mysql_result(mysql_query("SELECT count(*) FROM devices  WHERE status = '1' AND `ignore` = '0'"),0);
