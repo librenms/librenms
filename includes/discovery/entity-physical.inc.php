@@ -4,7 +4,7 @@
 
  unset($valid);
 
- if($config['enable_inventory']) {
+ if ($config['enable_inventory']) {
 
 
   echo("\nCaching OIDs:");
@@ -15,7 +15,7 @@
   echo(" entAliasMappingIdentifier");
   $entity_array = snmpwalk_cache_twopart_oid($device, "entAliasMappingIdentifier", $entity_array, "ENTITY-MIB:IF-MIB");
 
-  foreach($entity_array as $entPhysicalIndex => $entry) {
+  foreach ($entity_array as $entPhysicalIndex => $entry) {
 
     $entPhysicalDescr		= $entry['entPhysicalDescr'];
     $entPhysicalContainedIn	= $entry['entPhysicalContainedIn'];
@@ -33,14 +33,14 @@
     $entPhysicalAlias     	= $entry['entPhysicalAlias'];
     $entPhysicalAssetID         = $entry['entPhysicalAssetID'];
 
-    if(isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }
+    if (isset($entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier'])) { $ifIndex = $entity_array['$entPhysicalIndex']['0']['entAliasMappingIdentifier']; }
 
 #    $ent_data  = $config['snmpget'] . " -M ".$config['mibdir']." -m ENTITY-MIB:IF-MIB -Ovqs -";
 #    $ent_data  .= $device['snmpver'] . " -M ".$config['mibdir']." -c " . $device['community'] . " " . $device['hostname'] .":".$device['port'];
 #    $ent_data .= " entAliasMappingIdentifier." . $entPhysicalIndex. ".0";
 #    $ifIndex = shell_exec($ent_data);
 
-    if(!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
+    if (!strpos($ifIndex, "fIndex") || $ifIndex == "") { unset($ifIndex);  }
     list(,$ifIndex) = explode(".", $ifIndex);
 
     if ($entPhysicalVendorTypes[$entPhysicalVendorType] && !$entPhysicalModelName)
@@ -52,7 +52,7 @@
     {
       $entPhysical_id = @mysql_result(mysql_query("SELECT entPhysical_id FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalIndex = '$entPhysicalIndex'"),0);
 
-      if($entPhysical_id) {
+      if ($entPhysical_id) {
         $sql =  "UPDATE `entPhysical` SET `ifIndex` = '$ifIndex'";
         $sql .= ", entPhysicalIndex = '$entPhysicalIndex', entPhysicalDescr = '$entPhysicalDescr', entPhysicalClass = '$entPhysicalClass', entPhysicalName = '$entPhysicalName'";
         $sql .= ", entPhysicalModelName = '$entPhysicalModelName', entPhysicalSerialNum = '$entPhysicalSerialNum', entPhysicalContainedIn = '$entPhysicalContainedIn'";
@@ -80,7 +80,7 @@
   $query = mysql_query($sql);
   while ($test = mysql_fetch_array($query)) {
     $id = $test['entPhysicalIndex'];
-    if(!$valid[$id]) {
+    if (!$valid[$id]) {
       echo("-");
       mysql_query("DELETE FROM `entPhysical` WHERE entPhysical_id = '".$test['entPhysical_id']."'");
     }
