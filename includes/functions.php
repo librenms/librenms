@@ -291,7 +291,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community, $snmpver, $port = 161)
+function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp') 
 {
   global $config;
   list($hostshort)      = explode(".", $host);
@@ -305,7 +305,7 @@ function addHost($host, $community, $snmpver, $port = 161)
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host)
         {
-          createHost ($host, $community, $snmpver, $port);
+          createHost ($host, $community, $snmpver, $port, $transport);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
       } else { echo("Already got host $host\n"); }
     } else { echo("Could not ping $host\n"); }
@@ -326,6 +326,18 @@ function scanUDP ($host, $port, $timeout)
   {
     fclose($handle); return 1;
   } else { fclose($handle); return 0; }
+}
+
+function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp')
+{
+  $device = array();
+  $device['hostname'] = $host;
+  $device['port'] = $port;
+  $device['community'] = $community;
+  $device['snmpver'] = $snmpver;
+  $device['transport'] = $transport;
+
+  return $device;
 }
 
 function netmask2cidr($netmask)
@@ -372,17 +384,17 @@ function formatUptime($diff, $format="long")
   return trim($uptime);
 }
 
-function isSNMPable($hostname, $community, $snmpver, $port)
+function isSNMPable($device)
 {
-     global $config;
-     # FIXME internalize
-     $pos = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -$snmpver -c $community -t 1 $hostname:$port sysObjectID.0");
-     if ($pos == '')
-     {
-       return false;
-     } else {
-       return true;
-     }
+  global $config;
+
+  $pos = snmp_get($device, "sysObjectID.0", "-Oqv", "SNMPv2-MIB");
+  if ($pos === '' || $pos === false)
+  {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 function isPingable($hostname)
@@ -486,14 +498,15 @@ function fixIOSHardware($hardware)
 
 }
 
-function createHost ($host, $community, $snmpver, $port = 161)
+function createHost ($host, $community, $snmpver, $port = 161, $proto = 'udp')
 {
   $host = trim(strtolower($host));
-  $device = array('hostname' => $host, 'community' => $community, 'snmpver' => $snmpver, 'port' => $port);
-  $host_os = getHostOS($device);
+  $device = deviceArray($host, $community, $snmpver, $port, $proto);
+  $host_os = getHostOS($device); 
+
   if ($host_os)
   {
-    $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$host_os', '1','$snmpver')");
+    $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `transport`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$transport', '$host_os', '1','$snmpver')");
     if (mysql_affected_rows())
     {
       $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
@@ -514,7 +527,7 @@ function createHost ($host, $community, $snmpver, $port = 161)
 
 function isDomainResolves($domain)
 {
-  return gethostbyname($domain) != $domain;
+  return count(dns_get_record($domain)) != 0;
 }
 
 function hoststatus($id)

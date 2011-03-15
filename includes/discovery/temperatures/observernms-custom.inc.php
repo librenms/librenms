@@ -6,7 +6,7 @@ if ($device['os_group'] == "unix")
 {
   # FIXME snmp_walk
   # ObserverNMS-style temperature
-  $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -M " . $config['mibdir'] . " -".$device['snmpver']." -m SNMPv2-SMI -Osqn -CI -c ".$device['community']." ".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep '.1.1 ' | grep -v '.101.' | cut -d'.' -f 1");
+  $oids = shell_exec($config['snmpwalk'] . " -M " . $config['mibdir'] . " -M " . $config['mibdir'] . " -".$device['snmpver']." -m SNMPv2-SMI -Osqn -CI -c ".$device['community']." ".$device['transport'].":".$device['hostname'].":".$device['port']." .1.3.6.1.4.1.2021.7891 | sed s/.1.3.6.1.4.1.2021.7891.// | grep '.1.1 ' | grep -v '.101.' | cut -d'.' -f 1");
   $oids = trim($oids);
   if ($oids) echo("Observer-Style ");
   foreach (explode("\n",$oids) as $oid)

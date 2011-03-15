@@ -62,6 +62,7 @@ $config['ports_page_default']      = "details/"; ## eg "details/" "graphs/bits/"
 #$config['snmp']['retries'] = 5;            # how many times to retry the query
 $config['snmp']['community'][] = "public"; # Communities to try during discovery (dangerous)
 $config['snmp']['internal'] = false;	   # Enable php_snmp functions to make gets faster
+$config['snmp']['transports'] = array('udp', 'udp6', 'tcp', 'tcp6');
 
 ### Autodiscovery Settings
 

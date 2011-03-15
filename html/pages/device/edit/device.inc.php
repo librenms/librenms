@@ -50,6 +50,18 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
       </td>
     </tr>
     <tr>
+      <td width='300'><div align='right'>SNMP Transport</div></td>
+      <td colspan='3'>
+        <select name='transport'>");
+foreach ($config['snmp']['transports'] as $transport) {
+  echo ("<option value='".$transport."'");
+  if ($transport == $device['transport']) { echo (" selected='selected'"); }
+  echo (">".$transport."</option>");
+}
+echo("  </select>
+      </td>
+    </tr>
+    <tr>
       <td width='300'><div align='right'>SNMP Timeout</div></td>
       <td colspan='3'><input name='timeout' size='20' value='" . $device['timeout'] . "'></input>&nbsp;
       <em>seconds</em>

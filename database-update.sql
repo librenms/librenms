@@ -15,3 +15,5 @@ ALTER TABLE  `devices` ADD  `timeout` INT NULL DEFAULT NULL AFTER  `port`;
 ALTER TABLE `devices` ADD `retries` INT NULL DEFAULT NULL AFTER `timeout`;
 ALTER TABLE  `perf_times` CHANGE  `duration`  `duration` DOUBLE( 8, 2 ) NOT NULL
 ALTER TABLE `sensors` ADD `poller_type` VARCHAR(16) NOT NULL DEFAULT 'snmp' AFTER `device_id`;
+## Add transport
+ALTER TABLE `devices` ADD `transport` VARCHAR(16) NOT NULL DEFAULT 'udp' AFTER `port`;

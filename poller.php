@@ -106,7 +106,7 @@ while ($device = mysql_fetch_assoc($device_query))
   $device['pingable'] = isPingable($device['hostname']);
   if ($device['pingable'])
   {
-    $device['snmpable'] = isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
+    $device['snmpable'] = isSNMPable($device);
     if ($device['snmpable'])
     {
       $status = "1";
