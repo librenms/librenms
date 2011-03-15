@@ -17,6 +17,27 @@ if ($device['os'] == "apc")
 
     discover_sensor($valid_sensor, 'temperature', $device, $oid, $index, 'apc', $descr, '1', '1', NULL, NULL, NULL, NULL, $current);
   }
+  # InRow Chiller.
+  # A silly check to find out if it's the right hardware.
+  $oids = snmp_get($device, "airIRRCGroupSetpointsCoolMetric.0", "-OsqnU", "PowerNet-MIB");
+  if ($oids)
+  {
+    echo("APC InRow Chiller ");
+    $temps = array();
+    $temps['airIRRCUnitStatusRackInletTempMetric'] = "Rack Inlet";
+    $temps['airIRRCUnitStatusSupplyAirTempMetric'] = "Supply Air";
+    $temps['airIRRCUnitStatusReturnAirTempMetric'] = "Return Air";
+    $temps['airIRRCUnitStatusEnteringFluidTemperatureMetric'] = "Entering Fluid";
+    $temps['airIRRCUnitStatusLeavingFluidTemperatureMetric'] = "Leaving Fluid";
+    foreach($temps as $obj => $descr)
+    {
+      $oids = snmp_get($device, $obj . ".0", "-OsqnU", "PowerNet-MIB");
+      list($oid,$current) = explode(' ',$oids);
+      $divisor = 10;
+      $sensorType = substr($descr, 0, 2);
+      echo(discover_sensor($valid_sensor, 'temperature', $device, $oid, '0', $sensorType, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
+    }
+  }
 }
 
 ?>
