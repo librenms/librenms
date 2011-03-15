@@ -2,7 +2,7 @@
 
 global $valid_sensor;
 
-if($device['os'] == "powerware") 
+if ($device['os'] == "powerware")
 {
   # XUPS-MIB::xupsEnvAmbientTemp.0 = INTEGER: 52
   # XUPS-MIB::xupsEnvAmbientLowerLimit.0 = INTEGER: 0
@@ -11,7 +11,7 @@ if($device['os'] == "powerware")
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Powerware Ambient Temperature ");
-  foreach(explode("\n", $oids) as $data)
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
     if ($data)
@@ -24,6 +24,7 @@ if($device['os'] == "powerware")
       $highlimit = snmp_get($device,"upsEnvAmbientUpperLimit.$temperature_id", "-Ovq", "XUPS-MIB");
       $temperature = snmp_get($device, $temperature_oid, "-Ovq");
       $descr = "Ambient" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($temperature_id+1));
+
       discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, '1.6.1.'.$temperature_id, 'powerware', $descr, '1', '1', $lowlimit, NULL, NULL, $highlimit, $temperature);
     }
   }

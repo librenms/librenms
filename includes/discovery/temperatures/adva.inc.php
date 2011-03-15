@@ -21,9 +21,9 @@ Disabled needing rewrite
     $temperature_hss1 = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss1"));
     $temperature_hss2 = trim(shell_exec($config['snmpget'] . " -M " . $config['mibdir'] . " -O qv -$snmpver -c $community $hostname:$port $oid_hss2"));
     echo("Adva Chassis ");
-    if($temperature_chassis != "0")
+    if ($temperature_chassis != "0")
     {
-      if(mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_chassis' AND temperature_host = '$id'"),0) == '0') 
+      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_chassis' AND temperature_host = '$id'"),0) == '0') 
       {
         $query = "INSERT INTO temperature (`temperature_host`, `temperature_oid`, `temperature_descr`, `temperature_precision`, `temperature_limit`, `temperature_current`) values ('$id', '$oid_chassis', '$descr_chassis',1," . ($config['defaults']['temperature_limit'] ? $config['defaults']['temperature_limit'] : '60') . ", '$temperature_chassis')";
         mysql_query($query);
@@ -37,9 +37,9 @@ Disabled needing rewrite
       $temperature_exists[] = "$id $oid_chassis";
     }
     echo("STM16 ");
-    if($temperature_stm16 != "0")
+    if ($temperature_stm16 != "0")
     {
-      if(mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_stm16' AND temperature_host = '$id'"),0) == '0')
+      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_stm16' AND temperature_host = '$id'"),0) == '0')
       {
        $query = "INSERT INTO temperature (`temperature_host`, `temperature_oid`, `temperature_descr`, `temperature_precision`, `temperature_limit`, `temperature_current`) values ('$id', '$oid_stm16', '$descr_stm16',1," . ($config['defaults']['temperature_limit'] ? $config['defaults']['temperature_limit'] : '60') . ", '$temperature_stm16')";
        mysql_query($query);
@@ -53,9 +53,9 @@ Disabled needing rewrite
       $temperature_exists[] = "$id $oid_stm16";
     }
     echo("HSS1 ");
-    if($temperature_hss1 != "0")
+    if ($temperature_hss1 != "0")
     {
-      if(mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_hss1' AND temperature_host = '$id'"),0) == '0')
+      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_hss1' AND temperature_host = '$id'"),0) == '0')
       {
        $query = "INSERT INTO temperature (`temperature_host`, `temperature_oid`, `temperature_descr`, `temperature_precision`, `temperature_limit`, `temperature_current`) values ('$id', '$oid_hss1', '$descr_hss1',1," . ($config['defaults']['temperature_limit'] ? $config['defaults']['temperature_limit'] : '60') . ", '$temperature_hss1')";
        mysql_query($query);
@@ -69,9 +69,9 @@ Disabled needing rewrite
       $temperature_exists[] = "$id $oid_hss1";
     }
     echo("HSS2 ");
-    if($temperature_hss2 != "0")
+    if ($temperature_hss2 != "0")
     {
-      if(mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_hss2' AND temperature_host = '$id'"),0) == '0')
+      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_hss2' AND temperature_host = '$id'"),0) == '0')
       {
        $query = "INSERT INTO temperature (`temperature_host`, `temperature_oid`, `temperature_descr`, `temperature_precision`, `temperature_limit`, `temperature_current`) values ('$id', '$oid_hss2', '$descr_hss2',1," . ($config['defaults']['temperature_limit'] ? $config['defaults']['temperature_limit'] : '60') . ", '$temperature_hss2')";
        mysql_query($query);

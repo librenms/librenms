@@ -1,5 +1,5 @@
 <?php
-  
+ 
 global $valid_sensor;
 
 if (strstr($device['hardware'], "dell"))
@@ -7,7 +7,7 @@ if (strstr($device['hardware'], "dell"))
   $oids = snmp_walk($device, "coolingDeviceDiscreteReading", "-Osqn", "MIB-Dell-10892");
   $oids = trim($oids);
   if ($oids) echo("Dell OMSA ");
-  foreach(explode("\n",$oids) as $oid)
+  foreach (explode("\n",$oids) as $oid)
   {
     $oid = substr(trim($oid), 36);
     list($oid) = explode(" ", $oid);
@@ -17,6 +17,7 @@ if (strstr($device['hardware'], "dell"))
       $descr = trim(str_replace("\"", "", shell_exec($descr_query)));
       $fulloid = ".1.3.6.1.4.1.674.10892.1.700.20.1.6.$oid";
       $temp = snmp_get($device, $fulloid, "-Oqv");
+
       discover_sensor($valid_sensor, 'temperature', $device, $fulloid, $oid, 'dell', $descr, '10', '1', NULL, NULL, NULL, NULL, $temp);
     }
   }

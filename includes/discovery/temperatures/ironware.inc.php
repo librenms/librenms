@@ -2,13 +2,13 @@
 
 global $valid_sensor;
 
-if($device['os'] == "ironware") 
+if ($device['os'] == "ironware")
 {
   echo("IronWare ");
   $oids = snmp_walk($device,"snAgentTempSensorDescr","-Osqn","FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-ROOT-MIB");
   $oids = trim($oids);
   $oids = str_replace(".1.3.6.1.4.1.1991.1.1.2.13.1.1.3.", "", $oids);
-  foreach(explode("\n", $oids) as $data)
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
     if ($data != "")
@@ -29,7 +29,7 @@ if($device['os'] == "ironware")
         $descr = str_replace("Active management module", "Mgmt Module", $descr);
         $descr = str_replace("  ", " ", $descr);
         $descr = trim($descr);
-        
+      
         $current = $temperature / 2;
 
         discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $oid, 'ironware', $descr, '2', '1', NULL, NULL, NULL, NULL, $current);

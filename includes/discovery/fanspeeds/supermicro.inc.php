@@ -3,16 +3,16 @@
 global $valid_sensor;
 
 ## Supermicro Fanspeeds
-if ($device['os'] == "linux") 
+if ($device['os'] == "linux")
 {
   $oids = snmp_walk($device, "1.3.6.1.4.1.10876.2.1.1.1.1.3", "-OsqnU", "SUPERMICRO-HEALTH-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("Supermicro ");
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$kind) = explode(" ", $data);
       $split_oid = explode('.',$oid);
@@ -32,7 +32,7 @@ if ($device['os'] == "linux")
         $divisor       = "1";
         $monitor       = snmp_get($device, $monitor_oid, "-Oqv", "SUPERMICRO-HEALTH-MIB");
         $descr         = str_replace(' Fan Speed','',$descr);
-        $descr         = str_replace(' Speed','',$descr);      
+        $descr         = str_replace(' Speed','',$descr);
         if ($monitor == 'true')
         {
           discover_sensor($valid_sensor, 'fanspeed', $device, $fan_oid, $index, 'supermicro', $descr, $divisor, '1', $low_limit, NULL, NULL, NULL, $current);

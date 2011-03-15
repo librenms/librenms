@@ -8,7 +8,7 @@ if ($device['os'] == "linux")
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
   if ($oids) echo("LM-SENSORS ");
-  foreach(explode("\n", $oids) as $data)
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
     if ($data)
@@ -21,7 +21,7 @@ if ($device['os'] == "linux")
       $descr = str_ireplace("temperature-", "", $descr);
       $descr = str_ireplace("temp-", "", $descr);
       $descr = trim($descr);
-      if($temperature != "0" && $temperature <= "1000")
+      if ($temperature != "0" && $temperature <= "1000")
       {
         discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $temperature_id, 'lmsensors', $descr, '1000', '1', NULL, NULL, NULL, NULL, $temperature);
       }

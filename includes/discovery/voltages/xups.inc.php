@@ -11,10 +11,10 @@ if ($device['os'] == "powerware")
   $oids = snmp_walk($device, "xupsBatVoltage", "-Osqn", "XUPS-MIB");
   if ($debug) { echo($oids."\n"); }
   $oids = trim($oids);
-  foreach(explode("\n", $oids) as $data) 
+  foreach (explode("\n", $oids) as $data)
   {
     $data = trim($data);
-    if ($data) 
+    if ($data)
     {
       list($oid,$descr) = explode(" ", $data,2);
       $split_oid = explode('.',$oid);
@@ -25,7 +25,8 @@ if ($device['os'] == "powerware")
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "xups";
       $index = '1.2.5.'.$volt_id;
-      echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt));
+
+      discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $volt);
     }
   }
 
@@ -42,7 +43,8 @@ if ($device['os'] == "powerware")
     $divisor  = 1;
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '3.4.1.2.'.$i;
-    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
+
+    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   # XUPS-MIB::xupsOutputNumPhases.0 = INTEGER: 1
@@ -58,7 +60,8 @@ if ($device['os'] == "powerware")
     $divisor  = 1;
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '4.4.1.2.'.$i;
-    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
+
+    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 
   # XUPS-MIB::xupsBypassNumPhases.0 = INTEGER: 1
@@ -73,7 +76,9 @@ if ($device['os'] == "powerware")
     $divisor  = 1;
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = '5.3.1.2.'.$i;
-    echo(discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current));
+
+    discover_sensor($valid_sensor, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
 }
+
 ?>
