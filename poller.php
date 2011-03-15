@@ -1,6 +1,17 @@
 #!/usr/bin/env php
 <?php
 
+/* Observium Network Management and Monitoring System
+ * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * See COPYING for more details.
+ */
+
 ### Observium Device Poller
 
 include("includes/defaults.inc.php");
@@ -15,7 +26,8 @@ $options = getopt("h:t:i:n:d::a::");
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
 elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
 elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
-elseif ($options['h']) {
+elseif ($options['h'])
+{
   if (is_numeric($options['h']))
   {
     $where = "AND `device_id` = '".$options['h']."'";
@@ -28,12 +40,14 @@ elseif ($options['h']) {
   }
 }
 
-if (isset($options['i']) && $options['i'] && isset($options['n'])) {
+if (isset($options['i']) && $options['i'] && isset($options['n']))
+{
   $where = "AND MOD(device_id,".$options['i'].") = '" . $options['n'] . "'";
   $doing = $options['n'] ."/".$options['i'];
 }
 
-if (!$where) {
+if (!$where)
+{
   echo("-h <device id> | <device hostname>  Poll single device\n");
   echo("-h odd                              Poll odd numbered devices  (same as -i 2 -n 0)\n");
   echo("-h even                             Poll even numbered devices (same as -i 2 -n 1)\n");
@@ -46,7 +60,8 @@ if (!$where) {
   exit;
  }
 
-if (isset($options['d'])) {
+if (isset($options['d']))
+{
   echo("DEBUG!\n");
   $debug = TRUE;
   ini_set('display_errors', 1);
@@ -74,7 +89,7 @@ while ($device = mysql_fetch_assoc($device_query))
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($config['os'][$device['os']]['group'])
+  if ($config['os'][$device['os']]['group'])
   {
     $device['os_group'] = $config['os'][$device['os']]['group'];
     echo("(".$device['os_group'].")");
@@ -89,9 +104,11 @@ while ($device = mysql_fetch_assoc($device_query))
 
 
   $device['pingable'] = isPingable($device['hostname']);
-  if($device['pingable']) {
+  if ($device['pingable'])
+  {
     $device['snmpable'] = isSNMPable($device['hostname'], $device['community'], $device['snmpver'], $device['port']);
-    if($device['snmpable']) {
+    if ($device['snmpable'])
+    {
       $status = "1";
     } else {
       echo("SNMP Unreachable");
@@ -102,7 +119,7 @@ while ($device = mysql_fetch_assoc($device_query))
     $status = "0";
   }
 
-  if ( $device['status'] != $status )
+  if ($device['status'] != $status )
   {
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
@@ -159,7 +176,7 @@ while ($device = mysql_fetch_assoc($device_query))
     if (is_numeric($uptime))
     {
 
-      if ( $uptime < $device['uptime'] ) {
+      if ($uptime < $device['uptime'] ) {
         notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device['device_id'], 'reboot', $device['uptime']);
       }
@@ -226,52 +243,60 @@ while ($device = mysql_fetch_assoc($device_query))
     include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
     include("includes/polling/cisco-remote-access-monitor.inc.php");
 
-    unset( $update ) ;
-    unset( $seperator) ;
+    unset($update);
+    unset($seperator);
 
-    if ( $serial && $serial != $device['serial'] ) {
+    if ($serial && $serial != $device['serial'])
+    {
       $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
       $poll_separator = ", ";
       log_event("Serial -> $serial", $device['device_id'], 'system');
     }
 
-    if ( $sysContact && $sysContact != $device['sysContact'] ) {
+    if ($sysContact && $sysContact != $device['sysContact'])
+    {
       $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
       $poll_separator = ", ";
       log_event("Contact -> $sysContact", $device['device_id'], 'system');
     }
 
-    if ( $sysName && $sysName != $device['sysName'] ) {
+    if ($sysName && $sysName != $device['sysName'])
+    {
       $poll_update .= $poll_separator . "`sysName` = '$sysName'";
       $poll_separator = ", ";
       log_event("sysName -> $sysName", $device['device_id'], 'system');
     }
 
-    if ( $sysDescr && $sysDescr != $device['sysDescr'] ) {
+    if ($sysDescr && $sysDescr != $device['sysDescr'])
+    {
       $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
       $poll_separator = ", ";
       log_event("sysDescr -> $sysDescr", $device['device_id'], 'system');
     }
 
-    if ( $sysLocation && $device['location'] != $sysLocation ) {
+    if ($sysLocation && $device['location'] != $sysLocation)
+    {
       $poll_update .= $poll_separator . "`location` = '$sysLocation'";
       $poll_separator = ", ";
       log_event("Location -> $sysLocation", $device['device_id'], 'system');
     }
 
-    if ( $version && $device['version'] != $version ) {
+    if ($version && $device['version'] != $version)
+    {
       $poll_update .= $poll_separator . "`version` = '$version'";
       $poll_separator = ", ";
       log_event("OS Version -> $version", $device['device_id'], 'system');
     }
 
-    if ( $features != $device['features'] ) {
+    if ($features != $device['features'])
+    {
       $poll_update .= $poll_separator . "`features` = '$features'";
       $poll_separator = ", ";
       log_event("OS Features -> $features", $device['device_id'], 'system');
     }
 
-    if ( $hardware && $hardware != $device['hardware'] ) {
+    if ($hardware && $hardware != $device['hardware'])
+    {
       $poll_update .= $poll_separator . "`hardware` = '$hardware'";
       $poll_separator = ", ";
       log_event("Hardware -> $hardware", $device['device_id'], 'system');
@@ -290,17 +315,19 @@ while ($device = mysql_fetch_assoc($device_query))
   ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
 
   $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
-  while($graph = mysql_fetch_array($query)){
-    if(!isset($graphs[$graph[0]]))
+  while ($graph = mysql_fetch_array($query))
+  {
+    if (!isset($graphs[$graph[0]]))
     {
       mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph[0]."'");
     } else {
       $oldgraphs[$graph[0]] = TRUE;
     }
   }
-  foreach($graphs as $graph => $value)
+
+  foreach ($graphs as $graph => $value)
   {
-    if(!isset($oldgraphs[$graph]))
+    if (!isset($oldgraphs[$graph]))
     {
       mysql_query("INSERT INTO `device_graphs` (`device_id`, `graph`) VALUES ('".$device['device_id']."','".$graph."')");
     }
@@ -315,9 +342,9 @@ while ($device = mysql_fetch_assoc($device_query))
   $poll_update_query  = "UPDATE `devices` SET ";
   $poll_update_query .= $poll_update;
   $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
-  if($debug) {echo("Updating " . $device['hostname'] . " - $poll_update_query \n");}
+  if ($debug) { echo("Updating " . $device['hostname'] . " - $poll_update_query \n"); }
   $poll_update_result = mysql_query($poll_update_query);
-  if(mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
+  if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
 
   unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
   unset($cache); // Clear cache (unify all things here?)
@@ -326,7 +353,8 @@ while ($device = mysql_fetch_assoc($device_query))
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);
 
-if($polled_devices) {
+if ($polled_devices)
+{
   mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
                                VALUES ('poll', '$doing', '$poller_start', '$poller_time', '$polled_devices')");
 }
