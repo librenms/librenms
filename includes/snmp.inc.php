@@ -30,15 +30,16 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
     $oids = explode(" ",trim($oids));
     // s->ms - php snmp extension requires the timeout in microseconds.
     if (isset($timeout)) { $timeout = $timeout*1000*1000; }
+
     foreach ($oids as $oid)
     {
       if ($device['snmpver'] == "v2c")
       {
-	$data = @snmp2_get($device['transport'].":".$device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
+        $data = @snmp2_get($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
       }
       elseif ($device['snmpver'] == "v1")
       {
-	$data = @snmpget($device['transport'].":".$device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
+        $data = @snmpget($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
       }
 
       list($oid, $index) = explode(".", $oid);
@@ -112,11 +113,11 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     if (isset($timeout)) { $timeout = $timeout*1000*1000; }
     if ($device['snmpver'] == "v2c")
     {
-       $data = @snmp2_get($device['transport'].":".$device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
+       $data = @snmp2_get($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
     } elseif ( $device['snmpver'] == "v1") {
-       $data = @snmpget($device['transport'].":".$device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
+       $data = @snmpget($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
     }
-    if ($debug)  { print "DEBUG: $oid: $data\n"; }
+    if ($debug)  { print "DEBUG: $oid: $data\nDEBUG: cmd: ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$device['community']." ".$oid." ".$timeout." ".$retries."\n"; }
   }
   else
   {
