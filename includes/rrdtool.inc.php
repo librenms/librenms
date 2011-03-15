@@ -42,7 +42,7 @@ function rrdtool($command, $file, $options)
   global $config; global $debug;
 
   $command = $config['rrdtool'] . " $command $file $options";
-  if($config['rrdcached']) 
+  if ($config['rrdcached']) 
   {
     $command .= " --daemon " . $config['rrdcached'];
   }

@@ -819,7 +819,7 @@ $rewrite_ios_features = array(
 
 // Specific rewrite functions
 
-function makeshortif ($if)
+function makeshortif($if)
 {
   global $rewrite_shortif;
 
