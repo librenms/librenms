@@ -23,7 +23,7 @@ if (is_array($hrDevice_array))
       if ($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
 
       ### Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
-      if ($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor";}
+      if ($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor"; }
 
       $descr = str_replace("CPU ", "", $descr);
       $descr = str_replace("(TM)", "", $descr);

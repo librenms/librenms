@@ -25,7 +25,7 @@ foreach (explode("\n", $oids) as $data)
       $sep = ".";
       $ipv6_address = $ipv6_address . "$adsep" . $part;
       $do++;
-      if ($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
+      if ($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = ""; }
     }
 
     $ipv6_prefixlen = snmp_get($device, ".1.3.6.1.2.1.4.34.1.5.2.16.$oid", "", "IP-MIB");
