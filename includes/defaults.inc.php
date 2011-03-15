@@ -28,7 +28,8 @@ $config['ipmitool']       = "/usr/bin/ipmitool";
 
 ### Web Interface Settings
 
-if(isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"])) {
+if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
+{
   $config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"];
 }
 $config['title_image']      = "images/observium-logo.png";
@@ -66,6 +67,7 @@ $config['snmp']['internal'] = false;	   # Enable php_snmp functions to make gets
 
 $config['cdp_autocreate']         = false; ## Autodiscover unknown hosts seen via CDP
 $config['snmp_autodiscovery']     = false; ## Autodiscover hosts on new subnets
+$config['discover_services']      = false; ## Autodiscover services via SNMP on devices of type "server"
 
 ### Alerting Settings
 
