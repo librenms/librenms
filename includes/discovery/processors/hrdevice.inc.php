@@ -3,14 +3,14 @@
 global $valid_processor;
 
 echo("hrDevice ");
-$hrDevice_oids = array('hrDevice','hrProcessorLoad'); 
+$hrDevice_oids = array('hrDevice','hrProcessorLoad');
 unset($hrDevice_array);
 foreach ($hrDevice_oids as $oid) { $hrDevice_array = snmpwalk_cache_oid($device, $oid, $hrDevice_array, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
-if(is_array($hrDevice_array))
+if (is_array($hrDevice_array))
 {
-  foreach($hrDevice_array as $index => $entry)
+  foreach ($hrDevice_array as $index => $entry)
   {
-    if ($entry['hrDeviceType'] == "hrDeviceProcessor") 
+    if ($entry['hrDeviceType'] == "hrDeviceProcessor")
     {
       $hrDeviceIndex = $entry['hrDeviceIndex'];
 
@@ -20,10 +20,10 @@ if(is_array($hrDevice_array))
       #### What is this for? I have forgotten. What has : in its hrDeviceDescr?
       #### Set description to that found in hrDeviceDescr, first part only if containing a :
       $descr_array = explode(":",$entry['hrDeviceDescr']);
-      if($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
+      if ($descr_array['1']) { $descr = $descr_array['1']; } else { $descr = $descr_array['0']; }
 
       ### Workaround to set fake description for Mikrotik who don't populate hrDeviceDescr
-      if($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor";}
+      if ($device['os'] == "routeros" && !isset($entry['hrDeviceDescr'])) { $descr = "Processor";}
 
       $descr = str_replace("CPU ", "", $descr);
       $descr = str_replace("(TM)", "", $descr);
@@ -32,12 +32,13 @@ if(is_array($hrDevice_array))
       $old_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("hrProcessor-" . $index . ".rrd");
       $new_rrd  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-hr-" . $index . ".rrd");
 
-      if($debug) { echo("$old_rrd $new_rrd"); }
-      if (is_file($old_rrd)) {
+      if ($debug) { echo("$old_rrd $new_rrd"); }
+      if (is_file($old_rrd))
+      {
         rename($old_rrd,$new_rrd);
         echo("Moved RRD ");
       }
-      if(isset($descr) && $descr != "An electronic chip that makes the computer work.") 
+      if (isset($descr) && $descr != "An electronic chip that makes the computer work.")
       {
         discover_processor($valid_processor, $device, $usage_oid, $index, "hr", $descr, "1", $usage, NULL, $hrDeviceIndex);
       }
@@ -46,7 +47,7 @@ if(is_array($hrDevice_array))
     unset($entry);
   }
   unset($hrDevice_oids, $hrDevice_array, $oid);
-} 
+}
 
 ## End hrDevice Processors
 
