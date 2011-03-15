@@ -57,20 +57,20 @@ if ($hardware == " ")
 
 ######################
 
-$AOSrev = trim(snmp_get($device, "1.3.6.1.4.1.318.1.4.2.4.1.4.1", "-OQv", "", ""),'"'); 
+$AOSrev = trim(snmp_get($device, "1.3.6.1.4.1.318.1.4.2.4.1.4.1", "-OQv", "", ""),'"');
 $APPrev = trim(snmp_get($device, "1.3.6.1.4.1.318.1.4.2.4.1.4.2", "-OQv", "", ""),'"');
 
 if ($AOSrev == '')
 {
   # PDU
   $version = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.3.0", "-OQv", "", ""),'"');
-  
+
   if ($version == "")
   {
     # ATS
     $version = trim(snmp_get($device, "1.3.6.1.4.1.318.1.1.8.1.2.0", "-OQv", "", ""),'"');
   }
-  
+
   if ($version == "")
   {
     # Masterswitch/AP9606

@@ -1,7 +1,5 @@
 <?php
 
-echo("Doing Juniper JWOS ");
-
 #JUNIPER-WX-COMMON-MIB::jnxWxSysSwVersion.0 = STRING: 5.6.2.0
 #JUNIPER-WX-COMMON-MIB::jnxWxSysHwVersion.0 = STRING: 1.0
 #JUNIPER-WX-COMMON-MIB::jnxWxSysSerialNumber.0 = STRING: 0060000604

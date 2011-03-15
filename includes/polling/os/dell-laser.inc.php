@@ -10,9 +10,9 @@ foreach ($dellinfo as $dellinf)
   list($key,$value) = explode(':',$dellinf);
   $dell_laser[$key] = $value;
 }
-    
+
 $hardware = $dell_laser['MDL'];
-    
+
 list(,$version) = split('Engine ',$sysDescr);
 
 $version = "Engine " . trim($version,')');

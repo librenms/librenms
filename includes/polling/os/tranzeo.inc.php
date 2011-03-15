@@ -1,6 +1,6 @@
 <?php
 
-# Tranzeo sysDescr is quite uniform : 
+# Tranzeo sysDescr is quite uniform :
 #
 # Tranzeo TR6SL5, OS 6.8.0(1024), FW TR6-5.0.2SL5, 5.xGHz, 0dBi int. antenna
 # Tranzeo TR6Rt, OS 6.8.0(1024), FW TR6-3.6.0Rt, 5.xGHz, 19dBi int. antenna

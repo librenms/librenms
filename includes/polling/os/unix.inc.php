@@ -34,19 +34,19 @@ elseif ($device['os'] == "monowall" || $device['os'] == "Voswall")
 elseif ($device['os'] == "linux")
 {
   list(,,$version) = explode (" ", $sysDescr);
-  if(strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
-  else if(strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
-  else if(strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
-  else if(strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
-  else if(strstr($sysDescr, "armv5")) { $hardware = "Generic ARMv5"; }
-  else if(strstr($sysDescr, "armv6")) { $hardware = "Generic ARMv6"; }
-  else if(strstr($sysDescr, "armv7")) { $hardware = "Generic ARMv7"; }
-  else if(strstr($sysDescr, "armv")) { $hardware = "Generic ARM"; }
-  
+  if (strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
+  else if (strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
+  else if (strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
+  else if (strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
+  else if (strstr($sysDescr, "armv5")) { $hardware = "Generic ARMv5"; }
+  else if (strstr($sysDescr, "armv6")) { $hardware = "Generic ARMv6"; }
+  else if (strstr($sysDescr, "armv7")) { $hardware = "Generic ARMv7"; }
+  else if (strstr($sysDescr, "armv")) { $hardware = "Generic ARM"; }
+
   # Distro "extend" support
   $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
   $features = str_replace("\"", "", $features);
-  
+
   if (!$features) // No "extend" support, try "exec" support
     {
       $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");

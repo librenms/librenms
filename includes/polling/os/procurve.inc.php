@@ -7,10 +7,9 @@ $fdb_rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/fdb_count.rrd
 
 $FdbAddressCount = snmp_get ($device, "hpSwitchFdbAddressCount.0", "-Ovqn", "STATISTICS-MIB");
 
-if(is_numeric($FdbAddressCount)) 
+if (is_numeric($FdbAddressCount))
 {
-
-  if (!is_file($fdb_rrd_file)) 
+  if (!is_file($fdb_rrd_file))
   {
     rrdtool_create($fdb_rrd_file, " --step 300 \
                     DS:value:GAUGE:600:-1:100000 \
@@ -34,7 +33,6 @@ if(is_numeric($FdbAddressCount))
   $graphs['fdb_count'] = TRUE;
 
   echo("FDB Count ");
-
 }
 
 ?>
