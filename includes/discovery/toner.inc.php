@@ -11,7 +11,7 @@ if ($config['enable_printers'])
     $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
     if ($debug) { echo($oids."\n"); }
     if ($oids) echo("Jetdirect ");
-    foreach(explode("\n", $oids) as $data) 
+    foreach (explode("\n", $oids) as $data) 
     {
       $data = trim($data);
       if ($data) 
@@ -32,7 +32,7 @@ if ($config['enable_printers'])
             $current       = $current / $capacity * 100;
             $type          = "jetdirect";
             if (isHexString($descr)) { $descr = snmp_hexstring($descr); }
-            echo(discover_toner($valid_toner,$device, $toner_oid, $index, $type, $descr, $capacity, $current));
+            discover_toner($valid_toner,$device, $toner_oid, $index, $type, $descr, $capacity, $current);
           }
         }
       }
@@ -40,7 +40,7 @@ if ($config['enable_printers'])
   }
   
   ## Delete removed toners  
-  if($debug) { echo("\n Checking ... \n"); print_r($valid_toner); }
+  if ($debug) { echo("\n Checking ... \n"); print_r($valid_toner); }
   
   $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
   if ($query = mysql_query($sql))
@@ -49,7 +49,7 @@ if ($config['enable_printers'])
     {
       $toner_index = $test_toner['toner_index'];
       $toner_type = $test_toner['toner_type'];
-      if(!$valid_toner[$toner_type][$toner_index]) {
+      if (!$valid_toner[$toner_type][$toner_index]) {
         echo("-");
         mysql_query("DELETE FROM `toner` WHERE toner_id = '" . $test_toner['toner_id'] . "'");
       }

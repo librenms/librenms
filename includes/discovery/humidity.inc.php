@@ -9,7 +9,7 @@ echo("Humidity : ");
 
 include_dir("includes/discovery/humidity");
 
-if($debug) { print_r($valid['humidity']); }
+if ($debug) { print_r($valid['humidity']); }
 
 check_valid_sensors($device, 'humidity', $valid_sensor);
 

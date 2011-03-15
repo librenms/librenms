@@ -5,7 +5,7 @@
 
 global $valid_sensor;
 
-if ($device['os'] == "ipoman") 
+if ($device['os'] == "ipoman")
 {
   echo(" IPOMANII-MIB ");
   $emd_installed = snmp_get($device, "IPOMANII-MIB::ipmEnvEmdStatusEmdType.0"," -Oqv");
@@ -21,6 +21,7 @@ if ($device['os'] == "ipoman")
     {
       $current_oid = ".1.3.6.1.4.1.2468.1.4.2.1.5.1.1.3.0";
       $descr = trim(str_replace("\"", "", $descr));
+
       discover_sensor($valid_sensor, 'humidity', $device, $current_oid, "1", 'ipoman', $descr, '10', '1', $low_limit, NULL, NULL, $high_limit, $current);
     }
   }
