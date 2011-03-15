@@ -34,7 +34,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
       if (is_file($old_rrd))
       {
-	shell_exec("mv -f $old_rrd $new_rrd");
+	rename($old_rrd,$new_rrd);
         if ($debug) { echo("$old_rrd $new_rrd"); }
 	echo("Moved RRD ");
       }
