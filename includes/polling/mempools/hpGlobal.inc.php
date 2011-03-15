@@ -8,10 +8,15 @@
 # NETSWITCH-MIB::hpGlobalMemFreeBytes.1 = INTEGER: 9669104
 # NETSWITCH-MIB::hpGlobalMemAllocBytes.1 = INTEGER: 1668728
 
-if(!is_array($mempool_cache['hpGlobal'])) {
+if (!is_array($mempool_cache['hpGlobal']))
+{
   $mempool_cache['hpGlobal'] = snmpwalk_cache_oid($device, "hpGlobal", NULL, "NETSWITCH-MIB", $config['mibdir'].":".$config['mibdir']."/hp");
   if ($debug) { print_r($mempool_cache); }
-} else { if($debug) { echo("Cached!"); } }
+} 
+else
+{
+  if ($debug) { echo("Cached!"); }
+}
 
 $entry = $mempool_cache['hpGlobal'][$mempool[mempool_index]];
 
