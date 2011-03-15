@@ -8,9 +8,9 @@ $oids = str_replace("\"", "", $oids);
 $oids = str_replace("IP-MIB::", "", $oids);
 $oids = trim($oids);
 
-foreach(explode("\n", $oids) as $data)
+foreach (explode("\n", $oids) as $data)
 {
-  if($data)
+  if ($data)
   {
     $data = trim($data);
     list($ipv6addr,$ifIndex) = explode(" ", $data);
@@ -18,15 +18,16 @@ foreach(explode("\n", $oids) as $data)
     $sep = ''; $adsep = '';
     unset($ipv6_address);
     $do = '0';
-    foreach(explode(":", $ipv6addr) as $part)
+    foreach (explode(":", $ipv6addr) as $part)
     {
       $n = hexdec($part);
       $oid = "$oid" . "$sep" . "$n";
       $sep = ".";
       $ipv6_address = $ipv6_address . "$adsep" . $part;
       $do++;
-      if($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
+      if ($do == 2) { $adsep = ":"; $do = '0'; } else { $adsep = "";}
     }
+
     $ipv6_prefixlen = snmp_get($device, ".1.3.6.1.2.1.4.34.1.5.2.16.$oid", "", "IP-MIB");
     $ipv6_prefixlen = explode(".", $ipv6_prefixlen);
     $ipv6_prefixlen = str_replace("\"", "", end($ipv6_prefixlen));
@@ -43,9 +44,9 @@ if (!$oids)
   $oids = str_replace(".1.3.6.1.2.1.55.1.8.1.2.", "", $oids);
   $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
 
-  foreach(explode("\n", $oids) as $data)
+  foreach (explode("\n", $oids) as $data)
   {
-    if($data)
+    if ($data)
     {
       $data = trim($data);
       list($if_ipv6addr,$ipv6_prefixlen) = explode(" ", $data);
@@ -60,16 +61,16 @@ if (!$oids)
 $sql   = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
 $data = mysql_query($sql);
 
-while($row = mysql_fetch_array($data))
+while ($row = mysql_fetch_array($data))
 {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
   $interface_id = $row['interface_id'];
   $valid = $full_address  . "-" . $interface_id;
-  if(!$valid_v6[$valid])
+  if (!$valid_v6[$valid])
   {
     echo("-");
     $query = @mysql_query("DELETE FROM `ipv6_addresses` WHERE `ipv6_address_id` = '".$row['ipv6_address_id']."'");
-    if(!mysql_result(mysql_query("SELECT count(*) FROM ipv6_addresses WHERE ipv6_network_id = '".$row['ipv6_network_id']."'"),0))
+    if (!mysql_result(mysql_query("SELECT count(*) FROM ipv6_addresses WHERE ipv6_network_id = '".$row['ipv6_network_id']."'"),0))
     {
       $query = @mysql_query("DELETE FROM `ipv6_networks` WHERE `ipv6_network_id` = '".$row['ipv6_network_id']."'");
     }
