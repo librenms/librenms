@@ -40,7 +40,7 @@ if ($config['enable_bgp'])
 
       # FIXME: is .0.ipv6 the only possible value here?
       $result = snmp_walk($device, "jnxBgpM2PeerRemoteAs.0.ipv6", "-Onq", "BGP4-V2-MIB-JUNIPER", $config['install_dir']."/mibs/junos");
-      $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", $result));  
+      $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", $result));
       foreach (explode("\n", $peers) as $peer)
       {
         list($peer_ip_snmp, $peer_as) = split(" ",  $peer);
@@ -57,7 +57,8 @@ if ($config['enable_bgp'])
     } # OS junos
   } else {
     echo("No BGP on host");
-    if ($device['bgpLocalAs']) {
+    if ($device['bgpLocalAs'])
+    {
      mysql_query("UPDATE devices SET bgpLocalAs = NULL WHERE device_id = '".$device['device_id']."'"); echo(" (Removed ASN) ");
     } # End if
   } # End if
@@ -86,10 +87,10 @@ if ($config['enable_bgp'])
         {
           ## Get afi/safi and populate cbgp on cisco ios (xe/xr)
           unset($af_list);
-          
+
           $af_data = snmp_walk($device, "cbgpPeerAddrFamilyName." . $peer['ip'], "-OsQ", "CISCO-BGP4-MIB", $config['mibdir']);
           if ($debug) { echo("afi data :: $af_data \n"); }
-          
+
           $afs = trim(str_replace("cbgpPeerAddrFamilyName.".$peer['ip'].".", "", $af_data));
           foreach (explode("\n", $afs) as $af)
           {
@@ -205,5 +206,4 @@ if ($config['enable_bgp'])
   echo("\n");
 }
 
-?>
-  
+?>  
