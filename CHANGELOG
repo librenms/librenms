@@ -1,4 +1,4 @@
-For more granular updates check http://twitter.com/observium or 
+For more granular updates check http://twitter.com/observium or
 http://www.observium.org/websvn/listing.php?repname=observer
 
 Release 0.10.7.1 ( 19th July 2010 )
@@ -11,7 +11,7 @@ Release 0.10.7 ( 18th July 2010 )
 * rrdcached support
 * Support of ADSL-LINE-MIB and new ports display mode designed
   for service providers with DSLAMs and MSANs
-* Discovery of new device/os types : 
+* Discovery of new device/os types :
   Apple Airport, Axis Camera, Motorola Netopia, APC Switched PDU,
   Extreme Extremeware, Redback, ZyXEL ZyWALL, DELL DRAC,
   Dell PowerVault, Allied Telesis, Cisco NX-OS, MGE Evolution UPS
@@ -108,14 +108,14 @@ Release 0.3.2.1 ( 27th March 2008 )
 
 Minor bugfix to interface discovery engine.
 
-Release 0.3.2 ( 26th March 2008 ) 
+Release 0.3.2 ( 26th March 2008 )
 
 Added BGP peer detection and watching
 Cleaned up the front page and made it more useful
 Added better syslog support
-Added some Juniper Netscreen support 
+Added some Juniper Netscreen support
 Wrote a better OS detection system
-Added some billing features 
+Added some billing features
 Rewrote and restructured a lot of the discovery
 Rewrote some polling stuff
 
@@ -125,7 +125,7 @@ Rewrote some polling stuff
 Release 0.3.1 ( 30th November 2007 )
 Fixed a great many things and made it prettier!
 
-.. This release took so long that I've largely forgotten 
+.. This release took so long that I've largely forgotten
  what's been changed. Again!
 
 Release 0.3.0-pre1 ( 24th June 2007 )
