@@ -9,7 +9,6 @@ include_once("Net/IPv6.php");
 
 include_once($config['install_dir'] . "/includes/common.php");
 include_once($config['install_dir'] . "/includes/rrdtool.inc.php");
-include_once($config['install_dir'] . "/includes/print-functions.php");
 include_once($config['install_dir'] . "/includes/billing.php");
 include_once($config['install_dir'] . "/includes/cisco-entities.php");
 include_once($config['install_dir'] . "/includes/syslog.php");
@@ -263,7 +262,7 @@ function delete_device($id)
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while($int_data = mysql_fetch_array($int_query))
+  while ($int_data = mysql_fetch_array($int_query))
   {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];
@@ -408,7 +407,7 @@ function isValidInterface($if)
       global $config;
       $if = strtolower($if);
       $nullintf = 0;
-      foreach($config['bad_if'] as $bi)
+      foreach ($config['bad_if'] as $bi)
       {
         $pos = strpos($if, $bi);
         if ($pos !== FALSE)
