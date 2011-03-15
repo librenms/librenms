@@ -1,5 +1,25 @@
-For more granular updates check http://twitter.com/observium or
+For more granular updates check:
+
 http://www.observium.org/websvn/listing.php?repname=observer
+
+SVN 0.10-current
+
+* Add support for UDP6 transport for SNMP.
+* Improved Microsoft Windows detection.
+* Juniper ScreenOS CPU/Memory.
+* Click to zoom for graphs.
+* Force10 support (hardware, os, version, temp).
+* Mikrotik RouterOS fixes.
+* Fixes to port type and customer detection.
+* Improved base URL detection. (*REMOVE* $config['base_url'] from your config.php).
+* Add graphing of VPN statistics on Cisco IOS/ASA.
+* Migrate entire graphing system to new graphing structure with per-graphtype authentication.
+* Add more UNIX statistics graphing from UCD-MIB.
+* Add support for XUPS-MIB for Eaton devices
+* Add support for JunOS BGP prefix counters
+* Add support for Ingrasys iPoMan 1200 series PDUs
+* MySQL and nginx application pollers
+* Add support for IPMI polling on servers
 
 Release 0.10.7.1 ( 19th July 2010 )
 
