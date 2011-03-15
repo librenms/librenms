@@ -1,6 +1,17 @@
 #!/usr/bin/env php
 <?php
 
+/* Observium Network Management and Monitoring System
+ * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * See COPYING for more details.
+ */
+
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
@@ -55,7 +66,7 @@ if (isset($options['d']))
 }
 
 
-if(!$where)
+if (!$where)
 {
   echo("-h <device id> | <device hostname>  Poll single device\n");
   echo("-h odd                              Poll odd numbered devices  (same as -i 2 -n 0)\n");
@@ -133,13 +144,13 @@ while ($device = mysql_fetch_array($device_query))
   $device_start = utime();  // Start counting device poll time
 
   echo($device['hostname'] . " ".$device['device_id']." ".$device['os']." ");
-  if($device['os'] != strtolower($device['os']))
+  if ($device['os'] != strtolower($device['os']))
   {
     mysql_query("UPDATE `devices` SET `os` = '".strtolower($device['os'])."' WHERE device_id = '".$device['device_id']."'");
     $device['os'] = strtolower($device['os']);
     echo("OS lowercased.");
   }
-  if($config['os'][$device['os']]['group'])
+  if ($config['os'][$device['os']]['group'])
   {
     $device['os_group'] = $config['os'][$device['os']]['group'];
     echo("(".$device['os_group'].")");
@@ -195,7 +206,7 @@ while ($device = mysql_fetch_array($device_query))
 $end = utime(); $run = $end - $start;
 $proctime = substr($run, 0, 5);
 
-if($discovered_devices)
+if ($discovered_devices)
 {
   mysql_query("INSERT INTO `perf_times` (`type`, `doing`, `start`, `duration`, `devices`)
                                VALUES ('discover', '$doing', '$start', '$proctime', '$discovered_devices')");
