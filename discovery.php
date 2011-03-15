@@ -96,17 +96,17 @@ if (file_exists('.svn'))
 
   if ($db_rev+0 < 1223)
   {
-    include("fix-events.php"); ## Fix events table (needs to copy some data around, so needs script)
+    include('upgrade-scripts/fix-events.php'); ## Fix events table (needs to copy some data around, so needs script)
   }
 
   if ($db_rev+0 < 1656)
   {
-     include('fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
+     include('upgrade-scripts/fix-port-rrd.php'); ## Rewrites all port RRDs. Nothing will work without this after 1656
   }
 
   if ($db_rev+0 < 1757)
   {
-     include('fix-sensor-rrd.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
+     include('upgrade-scripts/fix-sensor-rrd.php'); ## Rewrites all sensor RRDs. Nothing will work without this after 1757
   }
 
   if ($dbu_rev+0 > $db_rev)
