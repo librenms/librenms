@@ -2,22 +2,23 @@
 
 global $valid_processor;
 
-if($device['os'] == "ironware" || $device['os_group'] == "ironware")
+if ($device['os'] == "ironware" || $device['os_group'] == "ironware")
 {
   echo("IronWare : ");
   $processors_array = snmpwalk_cache_triple_oid($device, "snAgentCpuUtilEntry", $processors_array, "FOUNDRY-SN-AGENT-MIB");
-  if($debug) { print_r($processors_array); }
-  foreach($processors_array as $index => $entry) 
+  if ($debug) { print_r($processors_array); }
+  foreach ($processors_array as $index => $entry)
   {
-    if (($entry['snAgentCpuUtilValue'] || $entry['snAgentCpuUtil100thPercent']) && $entry['snAgentCpuUtilInterval'] == "300") 
+    if (($entry['snAgentCpuUtilValue'] || $entry['snAgentCpuUtil100thPercent']) && $entry['snAgentCpuUtilInterval'] == "300")
     {
       #$entPhysicalIndex = $entry['cpmCPUTotalPhysicalIndex'];
 
-      if($entry['snAgentCpuUtil100thPercent']) {
+      if ($entry['snAgentCpuUtil100thPercent'])
+      {
         $usage_oid = ".1.3.6.1.4.1.1991.1.1.2.11.1.1.6." . $index;
         $usage = $entry['snAgentCpuUtil100thPercent'];
 	  $precision = 100;
-      } elseif($entry['snAgentCpuUtilValue']) {
+      } elseif ($entry['snAgentCpuUtilValue']) {
         $usage_oid = ".1.3.6.1.4.1.1991.1.1.2.11.1.1.4." . $index;
         $usage = $entry['snAgentCpuUtilValue'];
         $precision = 100;
@@ -39,8 +40,7 @@ if($device['os'] == "ironware" || $device['os_group'] == "ironware")
       }
     }
   }
-} 
-## End Ironware Processors
+}
 
 unset ($processors_array);
 

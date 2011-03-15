@@ -3,13 +3,13 @@
 global $valid_processor;
 
 ## JUNOSe Processors
-if($device['os'] == "junose")
+if ($device['os'] == "junose")
 {
   echo("JUNOSe : ");
   $processors_array = snmpwalk_cache_double_oid($device, "juniSystemModule", $processors_array, "Juniper-System-MIB" , $config['install_dir']."/mibs/junose");
-  if($debug) { print_r($processors_array); }
+  if ($debug) { print_r($processors_array); }
 
-  foreach ($processors_array as $index => $entry) 
+  foreach ($processors_array as $index => $entry)
   {
     if ($entry['juniSystemModuleCpuUtilPct'] && $entry['juniSystemModuleCpuUtilPct'] != "-1")
     {
@@ -19,12 +19,12 @@ if($device['os'] == "junose")
       $descr = $entry['juniSystemModuleDescr'];
       $usage = $entry['juniSystemModuleCpuFiveMinAvgPct'];
 
-      if(!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" )
+      if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" )
       {
         discover_processor($valid_processor, $device, $usage_oid, $index, "junose", $descr, "1", $usage, $entPhysicalIndex, NULL);
       }
     }
-  } 
+  }
 } ## End JUNOSe Processors
 
 unset ($processors_array);

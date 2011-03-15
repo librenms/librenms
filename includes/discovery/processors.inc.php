@@ -13,13 +13,15 @@ include("processors-ucd-old.inc.php");
 $sql = "SELECT * FROM `processors` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);
 
-if($debug) { print_r ($valid_processor); }
+if ($debug) { print_r ($valid_processor); }
 
-while ($test_processor = mysql_fetch_array($query)) {
+while ($test_processor = mysql_fetch_array($query))
+{
   $processor_index = $test_processor['processor_index'];
   $processor_type = $test_processor['processor_type'];
-  if($debug) { echo($processor_index . " -> " . $processor_type . "\n"); }
-  if(!$valid_processor[$processor_type][$processor_index]) {
+  if ($debug) { echo($processor_index . " -> " . $processor_type . "\n"); }
+  if (!$valid_processor[$processor_type][$processor_index])
+  {
     echo("-");
     mysql_query("DELETE FROM `processors` WHERE processor_id = '" . $test_processor['processor_id'] . "'");
   }
