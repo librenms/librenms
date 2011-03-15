@@ -197,7 +197,7 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
     {
       $sql = "UPDATE `links` SET `remote_interface_id` = $remote_interface_id, `remote_platform` = '$remote_platform', `remote_version` = '$remote_version' WHERE `id` = '".$data['id']."'";
       mysql_query($sql);
-      echo("U"); if ($debug) {echo("$sql");}
+      echo("U"); if ($debug) {echo("$sql"); }
     }
   }
 

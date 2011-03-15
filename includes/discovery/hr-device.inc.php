@@ -3,11 +3,11 @@
 echo("hrDevice : ");
 
 $hrDevice_oids = array('hrDeviceEntry','hrProcessorEntry');
-if ($debug) {print_r($hrDevices);}
+if ($debug) { print_r($hrDevices); }
 
 $hrDevices = array();
 foreach ($hrDevice_oids as $oid) { $hrDevices = snmpwalk_cache_oid($device, $oid, $hrDevices, "HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES"); }
-if ($debug) {print_r($hrDevices);}
+if ($debug) { print_r($hrDevices); }
 
 if (is_array($hrDevices))
 {
@@ -37,7 +37,7 @@ if (is_array($hrDevices))
         @mysql_query($insert_query); echo("+");
         if ($debug) { print_r($hrDevice); echo("$insert_query" . mysql_affected_rows() . " row inserted"); }
       }
-      $valid_hrDevice[$hrDevice[hrDeviceIndex]] = 1;
+      $valid_hrDevice[$hrDevice['hrDeviceIndex']] = 1;
     }
   }
 }
@@ -47,7 +47,7 @@ $query = mysql_query($sql);
 
 while ($test_hrDevice = mysql_fetch_array($query))
 {
-  if (!$valid_hrDevice[$test_hrDevice[hrDeviceIndex]])
+  if (!$valid_hrDevice[$test_hrDevice['hrDeviceIndex']])
   {
     echo("-");
     mysql_query("DELETE FROM `hrDevice` WHERE hrDevice_id = '" . $test_hrDevice['hrDevice_id'] . "'");
