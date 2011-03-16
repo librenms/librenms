@@ -484,6 +484,12 @@ $config['os'][$os]['type']		= "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 
+$os = "netvision";
+$config['os'][$os]['text']             = "Socomec Net Vision";
+$config['os'][$os]['type']             = "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+
 $os = "areca";
 $config['os'][$os]['text']          	= "Areca RAID Subsystem";
 $config['os'][$os]['over'][0]['graph']  = "";
