@@ -3,18 +3,18 @@
 if ($config['enable_printers'])
 {
   $valid_toner = array();
-  
+
   echo("Toner : ");
 
-  if ($device['os_group'] == 'printer') 
+  if ($device['os_group'] == 'printer')
   {
     $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
     if ($debug) { echo($oids."\n"); }
     if ($oids) echo("Jetdirect ");
-    foreach (explode("\n", $oids) as $data) 
+    foreach (explode("\n", $oids) as $data)
     {
       $data = trim($data);
-      if ($data) 
+      if ($data)
       {
         list($oid,$kind) = explode(" ", $data);
         $split_oid = explode('.',$oid);
@@ -38,10 +38,10 @@ if ($config['enable_printers'])
       }
     }
   }
-  
-  ## Delete removed toners  
+
+  ## Delete removed toners
   if ($debug) { echo("\n Checking ... \n"); print_r($valid_toner); }
-  
+
   $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
   if ($query = mysql_query($sql))
   {
@@ -55,8 +55,8 @@ if ($config['enable_printers'])
       }
     }
   }
-                                        
+
   unset($valid_toner); echo("\n");
-  
+
 } # if ($config['enable_printers'])
 ?>

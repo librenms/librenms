@@ -6,9 +6,9 @@ global $valid_sensor;
 if ($device['os'] == "powerware")
 {
   echo("XUPS-MIB ");
- 
+
   # I'm not sure if there is provision for frequency of multiple phases in this MIB -TL
- 
+
   # XUPS-MIB::xupsInputFrequency.0 = INTEGER: 500
   $freq_oid = ".1.3.6.1.4.1.534.1.3.1.0";
   $descr    = "Input";

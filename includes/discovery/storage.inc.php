@@ -22,7 +22,7 @@ while ($test_storage = mysql_fetch_array($query))
     echo("-");
     mysql_query("DELETE FROM `storage` WHERE storage_id = '" . $test_storage['storage_id'] . "'");
   }
-  
+
   unset($storage_index); unset($storage_mib);
 }
 

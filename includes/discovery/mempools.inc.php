@@ -22,7 +22,7 @@ while ($test_mempool = mysql_fetch_array($query))
     echo("-");
     mysql_query("DELETE FROM `mempools` WHERE mempool_id = '" . $test_mempool['mempool_id'] . "'");
   }
-  
+
   unset($mempool_oid); unset($mempool_type);
 }
 

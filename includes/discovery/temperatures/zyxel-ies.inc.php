@@ -5,12 +5,12 @@ global $valid_sensor;
 if ($device['os'] == 'ies')
 {
   echo("ZyXEL IES ");
- 
-  $oids = array(); 
- 
+
+  $oids = array();
+
   $oids = snmpwalk_cache_multi_oid($device, "accessSwitchSysTempCurValue", $oids, "ZYXEL-AS-MIB");
   $oids = snmpwalk_cache_multi_oid($device, "accessSwitchSysTempHighThresh", $oids, "ZYXEL-AS-MIB");
- 
+
   if (is_array($oids))
   {
     foreach ($oids as $index => $entry)
