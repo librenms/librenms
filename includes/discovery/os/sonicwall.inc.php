@@ -1,6 +1,6 @@
 <?php
 
-if (!$os) 
+if (!$os)
 {
   if (strstr($sysDescr, "SonicWALL")) { $os = "sonicwall"; }
 }
