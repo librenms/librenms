@@ -8,7 +8,7 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='humidity' AND device_id = '$id' ORDER BY sensor_index");
 $rrd_options .= " COMMENT:'                           Cur   Min   Max\\n'";
-while($humidity = mysql_fetch_array($sql))
+while ($humidity = mysql_fetch_array($sql))
 {
   switch ($iter)
   {
@@ -38,7 +38,7 @@ while($humidity = mysql_fetch_array($sql))
   }
 
   $humidity['sensor_descr_fixed'] = substr(str_pad($humidity['sensor_descr'], 22),0,22);
-  $humidityrrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("humidity-" . safename($humidity['sensor_type']."-".$humidity['sensor_index']) . ".rrd");
+  $humidityrrd  = $config['rrd_dir'] . "/".$device['hostname']."/".safename("humidity-" . safename($humidity['sensor_descr']) . ".rrd");
   $rrd_options .= " DEF:sensor" . $humidity['sensor_id'] . "=$humidityrrd:sensor:AVERAGE ";
   $rrd_options .= " LINE1:sensor" . $humidity['sensor_id'] . "#" . $colour . ":'" . str_replace(':','\:',str_replace('\*','*',quotemeta($humidity['sensor_descr_fixed']))) . "' ";
   $rrd_options .= " GPRINT:sensor" . $humidity['sensor_id'] . ":LAST:%3.0lf%% ";
@@ -46,6 +46,5 @@ while($humidity = mysql_fetch_array($sql))
   $rrd_options .= " GPRINT:sensor" . $humidity['sensor_id'] . ":MAX:%3.0lf%%\\\l ";
   $iter++;
 }
-
 
 ?>
