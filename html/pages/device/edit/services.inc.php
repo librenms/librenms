@@ -32,8 +32,6 @@ while($device = mysql_fetch_array($query)) {
 if($updated) { print_message("Device Settings Saved"); }
 
 
-echo('<div style="float: left;">');
-
 if(mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` = '".$device['device_id']."'"), 0) > '0') {
    $i = "1";
    $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
@@ -44,7 +42,12 @@ if(mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` =
 
 }
 
+if($existform){
+echo('<div style="float: left;">');
 echo("
+
+<h1>Remove Service</h1>
+
 <form id='delsrv' name='delsrv' method='post' action=''>
   <input type=hidden name='delsrv' value='yes'>
   <table width='200' border='0'>
@@ -67,10 +70,13 @@ echo("
 
 
 echo('</div>');
+}
 
 echo('<div style="width: 45%; float: right;">');
 
 echo("
+<h1>Add Service</h1>
+
 <form id='addsrv' name='addsrv' method='post' action=''>
   <input type=hidden name='addsrv' value='yes'>
   <table width='200' border='0'>
