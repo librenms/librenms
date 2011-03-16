@@ -5,12 +5,12 @@ $device = device_by_id_cache($id);
 
 $rrd_options .= " -l 0 -E ";
 
-if($_GET['width'] > "300") { $descr_len = "38"; } else { $descr_len = "18"; }
+if ($_GET['width'] > "300") { $descr_len = "38"; } else { $descr_len = "18"; }
 $rrd_options .= " COMMENT:'".str_pad('',$descr_len)."     Cur      Min     Max\\n'";
 
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '$id'");
-while($sensor = mysql_fetch_array($sql))
+while ($sensor = mysql_fetch_array($sql))
 {
   switch ($iter)
   {
@@ -39,7 +39,6 @@ while($sensor = mysql_fetch_array($sql))
       break;
   }
 
-
   $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], $descr_len),0,$descr_len);
   $sensor['sensor_descr_fixed'] = str_replace(':','\:',str_replace('\*','*',$sensor['sensor_descr_fixed']));
 
@@ -53,6 +52,5 @@ while($sensor = mysql_fetch_array($sql))
 
   $iter++;
 }
-
 
 ?>
