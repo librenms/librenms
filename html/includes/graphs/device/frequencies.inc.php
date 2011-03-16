@@ -8,7 +8,7 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='freq' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
-while($frequency = mysql_fetch_array($sql))
+while ($frequency = mysql_fetch_array($sql))
 {
   switch ($iter)
   {
@@ -40,10 +40,10 @@ while($frequency = mysql_fetch_array($sql))
   $hostname = gethostbyid($frequency['device_id']);
 
   $descr = substr(str_pad($frequency['sensor_descr'], 15),0,15);
-  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("freq-" . $frequency['sensor_descr'] . ".rrd");
+  $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("frequency-" . $frequency['sensor_descr'] . ".rrd");
   $sensor_id = $frequency['sensor_id'];
 
-  $rrd_options .= " DEF:freq$sensor_id=$rrd_filename:freq:AVERAGE";
+  $rrd_options .= " DEF:freq$sensor_id=$rrd_filename:sensor:AVERAGE";
   $rrd_options .= " LINE1:freq$sensor_id#".$colour.":'" . $descr . "'";
   $rrd_options .= " GPRINT:freq$sensor_id:AVERAGE:%5.2lfHz";
   $rrd_options .= " GPRINT:freq$sensor_id:MIN:%5.2lfHz";
@@ -51,6 +51,5 @@ while($frequency = mysql_fetch_array($sql))
 
   $iter++;
 }
-
 
 ?>
