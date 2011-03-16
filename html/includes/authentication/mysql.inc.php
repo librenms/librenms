@@ -6,7 +6,7 @@ function authenticate($username,$password)
   $sql = "SELECT username FROM `users` WHERE `username`='".$username."' AND `password`='".$encrypted."'";
   $query = mysql_query($sql);
   $row = @mysql_fetch_array($query);
-  if($row['username'] && $row['username'] == $username)
+  if ($row['username'] && $row['username'] == $username)
   {
     return 1;
   }

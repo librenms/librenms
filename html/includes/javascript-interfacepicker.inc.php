@@ -1,14 +1,13 @@
 <script type="text/javascript" src="<?php echo($config['base_url']); ?>/js/tw-sack.js"></script>
 <script type="text/javascript">
 
-
 var ajax = new Array();
 
 function getInterfaceList(sel)
 {
         var deviceId = sel.options[sel.selectedIndex].value;
         document.getElementById('interface_id').options.length = 0;     // Empty city select box
-        if(deviceId.length>0){
+        if (deviceId.length>0){
                 var index = ajax.length;
                 ajax[index] = new sack();
 

@@ -1,6 +1,6 @@
 <?php
 
-if(is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+if (is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
 echo("<tr bgcolor='$bg_colour'>");
 
@@ -11,8 +11,8 @@ echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "<
 
 echo("<td class=list-bold>");
 $ports_query = mysql_query("SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND `ifVrf` = '" . $vrf['vrf_id'] . "' ");
-while($port = mysql_fetch_array($ports_query)) {
-  if($_GET['opta']) {
+while ($port = mysql_fetch_array($ports_query)) {
+  if ($_GET['opta']) {
    $graph_type = "port_" . $_GET['opta'];
    echo("<div style='display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($port['ifDescr'])."</div>
