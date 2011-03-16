@@ -4,10 +4,18 @@
 include("config.php");
 include("includes/functions.php");
 
-$data = trim(shell_exec("cat ".$argv[1]));
+$fd = fopen($argv[1],'r');
+$data = fread($fd,4096);
+while (!feof($fd))
+{
+  $data .= fread($fd,4096);
+}
 
-foreach( explode("\n", $data) as $line) {
+foreach (explode("\n", $data) as $line)
+{
   $update = mysql_query($line);
+  # FIXME check query success?
   echo("$line \n");
 }
+
 ?>
