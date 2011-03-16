@@ -81,10 +81,10 @@ if ($device['os_group'] == "ios")
 
   if (is_file($rrd_filename) || $data['cipSecGlobalActiveTunnels'])
   {
-    if (!file_exists($rrd_filename))  
+    if (!file_exists($rrd_filename))
     {
       rrdtool_create($rrd_filename, $rrd_create);
-    } 
+    }
 
     $rrd_update  = "N";
     $rrd_update .= ":".$data['cipSecGlobalActiveTunnels'];
