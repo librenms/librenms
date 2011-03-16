@@ -4,7 +4,9 @@ if ($device['os'] == "freebsd")
 {
   $sysDescr = str_replace(" 0 ", " ", $sysDescr);
   list(,,$version) = explode (" ", $sysDescr);
-  $hardware = "i386";
+  if(strstr($sysDescr, "i386")) { $hardware = "i386"; }
+  else if(strstr($sysDescr, "amd64")) { $hardware = "amd64"; }
+  else { $hardware = "i386"; }
   $features = "GENERIC";
 }
 elseif ($device['os'] == "dragonfly")
