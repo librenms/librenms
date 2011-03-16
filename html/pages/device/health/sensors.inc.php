@@ -7,9 +7,9 @@ echo("<table cellspacing=0 cellpadding=5 width=100%>");
 
 $row = 1;
 
-while($temp = mysql_fetch_array($query)) {
-
-  if(!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+while ($temp = mysql_fetch_array($query))
+{
+  if (!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   echo("<tr class=list-large style=\"background-color: $row_colour; padding: 5px;\">
           <td width=500>" . $temp['sensor_descr'] . "</td>
@@ -27,12 +27,9 @@ while($temp = mysql_fetch_array($query)) {
 
   echo("</td></tr>");
 
-
   $row++;
-
 }
 
 echo("</table>");
-
 
 ?>

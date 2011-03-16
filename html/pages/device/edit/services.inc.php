@@ -2,49 +2,53 @@
 
 echo('<div style="padding: 10px;">');
 
-if($_POST['addsrv']) {
-  if($_SESSION['userlevel'] == '10') {
+if ($_POST['addsrv']) {
+  if ($_SESSION['userlevel'] == '10') {
     include("includes/service-add.inc.php");
   }
 }
 
-if($_POST['delsrv']) {
-  if($_SESSION['userlevel'] == '10') {
+if ($_POST['delsrv']) {
+  if ($_SESSION['userlevel'] == '10') {
     include("includes/service-delete.inc.php");
   }
 }
 
-
-if ($handle = opendir($config['install_dir'] . "/includes/services/")) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != ".." && !strstr($file, ".")) {
-            $servicesform .= "<option value='$file'>$file</option>";
-        }
+if ($handle = opendir($config['install_dir'] . "/includes/services/"))
+{
+  while (false !== ($file = readdir($handle)))
+  {
+    if ($file != "." && $file != ".." && !strstr($file, "."))
+    {
+      $servicesform .= "<option value='$file'>$file</option>";
     }
-    closedir($handle);
+  }
+  
+  closedir($handle);
 }
 
 $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-while($device = mysql_fetch_array($query)) {
+while ($device = mysql_fetch_array($query))
+{
   $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
 }
 
-if($updated) { print_message("Device Settings Saved"); }
+if ($updated) { print_message("Device Settings Saved"); }
 
-
-if(mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` = '".$device['device_id']."'"), 0) > '0') {
-   $i = "1";
-   $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
-   while($service = mysql_fetch_array($service_query)) {
-     $existform .= "<option value='" . $service['service_id'] . "'>" . $service['service_type'] . "</option>";
-     
-   }
-
+if (mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` = '".$device['device_id']."'"), 0) > '0')
+{
+  $i = "1";
+  $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
+  while ($service = mysql_fetch_array($service_query))
+  {
+    $existform .= "<option value='" . $service['service_id'] . "'>" . $service['service_type'] . "</option>";
+  }
 }
 
-if($existform){
-echo('<div style="float: left;">');
-echo("
+if($existform
+{
+  echo('<div style="float: left;">');
+  echo("
 
 <h1>Remove Service</h1>
 
@@ -64,12 +68,10 @@ echo("
     </tr>
   </table>
   <input type='submit' name='Submit' value='Delete' />
-  <label><br />
   </label>
 </form>");
 
-
-echo('</div>');
+  echo('</div>');
 }
 
 echo('<div style="width: 45%; float: right;">');
@@ -95,10 +97,7 @@ echo("
   <input type='submit' name='Submit' value='Add' />
   <label><br />
   </label>
-</form>");
-
-echo('</div>');
-
-echo('</div>');
+</form>
+</div>");
 
 ?>

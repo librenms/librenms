@@ -2,13 +2,14 @@
 
 include("includes/geshi/geshi.php");
 
-if($_SESSION['userlevel'] >= "7") {
+if ($_SESSION['userlevel'] >= "7")
+{
+  if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
 
-  if(!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
-  
-  foreach($config['rancid_configs'] as $configs) {
+  foreach ($config['rancid_configs'] as $configs) 
+  {
     if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
-    if(is_file($configs . $device['hostname'])) { $file = $configs . $device['hostname']; }
+    if (is_file($configs . $device['hostname'])) { $file = $configs . $device['hostname']; }
   }
 
   $fh = fopen($file, 'r') or die("Can't open file");
@@ -24,11 +25,12 @@ if($_SESSION['userlevel'] >= "7") {
     }
     $text = join("\n",$lines);
   }
+  
   $language = "ios";
   $geshi = new GeSHi($text, $language);
   $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
   $geshi->set_overall_style('color: black;');
-  #$geshi->set_line_style('color: #999999'); 
+  #$geshi->set_line_style('color: #999999');
   echo($geshi->parse_code());
 }
 

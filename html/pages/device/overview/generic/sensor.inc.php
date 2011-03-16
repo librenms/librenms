@@ -2,16 +2,16 @@
 
 $results = mysql_query("SELECT * FROM sensors WHERE sensor_class='" . $sensor_class . "' AND device_id = '" . $device['device_id'] . "' ORDER BY sensor_index");
 
-if(mysql_num_rows($results))
+if (mysql_num_rows($results))
 {
   $rows = round(mysql_num_rows($results) / 2,0);
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
   echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/'.$device['device_id'].'/health/' . strtolower($sensor_type) . '/"><img align="absmiddle" src="'.$config['base_url'].'/images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</p>');
   $i = '1';
   echo('<table width="100%" valign="top">');
-  while($sensor = mysql_fetch_array($results)) 
+  while ($sensor = mysql_fetch_array($results))
   {
-    if(is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+    if (is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
     $graph_colour = str_replace("#", "", $row_colour);
 
@@ -33,6 +33,7 @@ if(mysql_num_rows($results))
     echo("<tr bgcolor='$row_colour'><td class=tablehead><strong>$sensor_link_a</strong></td><td width=80 align=right class=tablehead>$sensor_link_b<td width=80 align=right class=tablehead>$sensor_link_c</td></tr>");
     $i++;
   }
+
   echo("</table>");
   echo("</div>");
 }

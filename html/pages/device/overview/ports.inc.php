@@ -1,6 +1,7 @@
 <?php
 
-if($ports['total']) {
+if ($ports['total'])
+{
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
   #      ' . device_traffic_image($device['device_id'], 490, 100, $day, '-300s'));
 
@@ -12,7 +13,6 @@ if($ports['total']) {
   $graph_array['from']   = $day;
   $graph_array['legend'] = "no";
   $graph = generate_graph_tag($graph_array);
-
 
   $content = "<div class=list-large>".$device['hostname']." - Device Traffic</div>";
   $content .= "<div style=\'width: 850px\'>";
@@ -30,9 +30,7 @@ if($ports['total']) {
 
   $link = $config['base_url'] . "/graphs/" . $graph_array['id'] . "/" . $graph_array['type'] . "/" . $day . "/" . $config['now'] . "/";
 
-
   echo(overlib_link($link, $graph, $content, NULL));
-
 
   echo('  <div style="height: 5px;"></div>');
 
@@ -50,14 +48,18 @@ if($ports['total']) {
   $sql = "SELECT * FROM ports WHERE `device_id` = '" . $device['device_id'] . "' AND deleted != '1'";
   $query = mysql_query($sql);
   $ifsep = "";
-  while($data = mysql_fetch_array($query)) {
+
+  while ($data = mysql_fetch_array($query))
+  {
     $data = ifNameDescr($data);
     $data = array_merge($data, $device);
     echo("$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label']))));
     $ifsep = ", ";
   }
+  
   unset($ifsep);
   echo("  </div>");
   echo("</div>");
 }
+
 ?>
