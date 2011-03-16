@@ -31,10 +31,10 @@
 #CISCO-REMOTE-ACCESS-MONITOR-MIB::crasWebvpnCumulateSessions.0 = Counter32: 29 Sessions
 #CISCO-REMOTE-ACCESS-MONITOR-MIB::crasWebvpnPeakConcurrentSessions.0 = Gauge32: 9 Sessions
 
-if($device['os_group'] == "ios") {
-
+if ($device['os_group'] == "ios")
+{
   $oid_list = "crasEmailNumSessions.0 crasIPSecNumSessions.0 crasL2LNumSessions.0 crasLBNumSessions.0 crasSVCNumSessions.0 crasWebvpnNumSessions.0";
-  $data = snmp_get_multi ($device, $oid_list, "-OUQs", "CISCO-REMOTE-ACCESS-MONITOR-MIB");
+  $data = snmp_get_multi($device, $oid_list, "-OUQs", "CISCO-REMOTE-ACCESS-MONITOR-MIB");
   $data = $data[0];
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cras_sessions.rrd");
@@ -61,9 +61,9 @@ if($device['os_group'] == "ios") {
   $rrd_create .= " RRA:MIN:0.5:24:2000";
   $rrd_create .= " RRA:MIN:0.5:288:2000";
 
-  if(is_file($rrd_filename) || $data['crasEmailNumSessions'] || $data['crasIPSecNumSessions'] || $data['crasL2LNumSessions'] || $data['crasLBNumSessions'] || $data['crasSVCNumSessions'] || $data['crasWebvpnSessions'])
+  if (is_file($rrd_filename) || $data['crasEmailNumSessions'] || $data['crasIPSecNumSessions'] || $data['crasL2LNumSessions'] || $data['crasLBNumSessions'] || $data['crasSVCNumSessions'] || $data['crasWebvpnSessions'])
   {
-    if(!file_exists($rrd_filename))  
+    if (!file_exists($rrd_filename))  
     {
       rrdtool_create($rrd_filename, $rrd_create);
     } 
@@ -80,8 +80,8 @@ if($device['os_group'] == "ios") {
 
     $graphs['cras_sessions'] = TRUE;
     echo(" CRAS Sessions");
-
   }
+
   unset($data, $$rrd_filename, $rrd_create, $rrd_update);
 }
 

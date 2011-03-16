@@ -2,8 +2,8 @@
 
 $query = "SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $temp_data = mysql_query($query);
-while($temperature = mysql_fetch_array($temp_data)) {
-
+while ($temperature = mysql_fetch_array($temp_data))
+{
   echo("Checking temp " . $temperature['sensor_descr'] . "... ");
 
   for ($i = 0;$i < 5;$i++) # Try 5 times to get a valid temp reading
@@ -22,11 +22,11 @@ while($temperature = mysql_fetch_array($temp_data)) {
   $old_rrd_file  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("temperature-" . $temperature['sensor_descr'] . ".rrd");
   $rrd_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/temperature-" . safename($temperature['sensor_type']."-".$temperature['sensor_index']) . ".rrd";
 
-  if(is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
+  if (is_file($old_rrd_file)) { rename($old_rrd_file, $rrd_file); }
 
-  if (!is_file($rrd_file)) {
-    `rrdtool create $rrd_file \
-     --step 300 \
+  if (!is_file($rrd_file))
+  {
+    rrdtool_create($rrd_file,"--step 300 \
      DS:sensor:GAUGE:600:-273:1000 \
      RRA:AVERAGE:0.5:1:600 \
      RRA:AVERAGE:0.5:6:700 \
@@ -39,14 +39,14 @@ while($temperature = mysql_fetch_array($temp_data)) {
      RRA:MIN:0.5:1:600 \
      RRA:MIN:0.5:6:700 \
      RRA:MIN:0.5:24:775 \
-     RRA:MIN:0.5:288:797`;
+     RRA:MIN:0.5:288:797");
   }
 
   echo($temp . "C\n");
 
   rrdtool_update($rrd_file,"N:$temp");
 
-  if($temperature['sensor_current'] < $temperature['sensor_limit'] && $temp >= $temperature['sensor_limit']) 
+  if ($temperature['sensor_current'] < $temperature['sensor_limit'] && $temp >= $temperature['sensor_limit'])
   {
     $msg  = "Temp Alarm: " . $device['hostname'] . " " . $temperature['sensor_descr'] . " is " . $temp . " (Limit " . $temperature['sensor_limit'];
     $msg .= ") at " . date($config['timestamp_format']);

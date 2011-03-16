@@ -32,17 +32,16 @@
 #CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalNoSaFails.0 = Counter32: 5 Failures
 #CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalSysCapFails.0 = Counter32: 0 Failures
 
-if($device['os_group'] == "ios") {
-
+if ($device['os_group'] == "ios")
+{
   $data = snmpwalk_cache_oid($device, "cipSecGlobalStats", NULL, "CISCO-IPSEC-FLOW-MONITOR-MIB");
   $data = $data[0];
 
   ## Use HC Counters if they exist
-  if(is_numeric($data['cipSecGlobalHcInOctets'])) { $data['cipSecGlobalInOctets']= $data['cipSecGlobalHcInOctets']; }
-  if(is_numeric($data['cipSecGlobalHcOutOctets'])) { $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets']; }
-  if(is_numeric($data['cipSecGlobalHcInDecompOctets'])) { $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets']; }
-  if(is_numeric($data['cipSecGlobalHcOutUncompOctets'])) { $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets']; }
-
+  if (is_numeric($data['cipSecGlobalHcInOctets'])) { $data['cipSecGlobalInOctets']= $data['cipSecGlobalHcInOctets']; }
+  if (is_numeric($data['cipSecGlobalHcOutOctets'])) { $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets']; }
+  if (is_numeric($data['cipSecGlobalHcInDecompOctets'])) { $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets']; }
+  if (is_numeric($data['cipSecGlobalHcOutUncompOctets'])) { $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets']; }
 
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cipsec_flow.rrd");
   $rrd_create = " DS:Tunnels:GAUGE:600:0:U";
@@ -80,9 +79,9 @@ if($device['os_group'] == "ios") {
   $rrd_create .= " RRA:MIN:0.5:24:2000";
   $rrd_create .= " RRA:MIN:0.5:288:2000";
 
-  if(is_file($rrd_filename) || $data['cipSecGlobalActiveTunnels'])
+  if (is_file($rrd_filename) || $data['cipSecGlobalActiveTunnels'])
   {
-    if(!file_exists($rrd_filename))  
+    if (!file_exists($rrd_filename))  
     {
       rrdtool_create($rrd_filename, $rrd_create);
     } 
@@ -118,8 +117,8 @@ if($device['os_group'] == "ios") {
     $graphs['cipsec_flow_stats']   = TRUE;
 
     echo(" cipsec_flow");
-
   }
+
   unset($data, $$rrd_filename, $rrd_create, $rrd_update);
 }
 

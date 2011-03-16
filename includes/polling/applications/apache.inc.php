@@ -7,11 +7,12 @@ $apache_cmd  = $config['snmpget'] ." -m NET-SNMP-EXTEND-MIB -O qv -" . $device['
 $apache_cmd .= " nsExtendOutputFull.6.97.112.97.99.104.101";
 $apache  = shell_exec($apache_cmd);
 echo(" apache");
-list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec, $bytesperreq, $busyworkers, $idleworkers, 
+list ($total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec, $bytesperreq, $busyworkers, $idleworkers,
       $score_wait, $score_start, $score_reading, $score_writing, $score_keepalive, $score_dns, $score_closing, $score_logging, $score_graceful, $score_idle, $score_open) = explode("\n", $apache);
 
-if (!is_file($apache_rrd)) {
-      rrdtool_create ($apache_rrd, "--step 300 \
+if (!is_file($apache_rrd))
+{
+  rrdtool_create($apache_rrd, "--step 300 \
       DS:access:DERIVE:600:0:125000000000 \
       DS:kbyte:DERIVE:600:0:125000000000 \
       DS:cpu:GAUGE:600:0:125000000000 \
@@ -47,6 +48,5 @@ if (!is_file($apache_rrd)) {
 }
 
 rrdtool_update($apache_rrd,  "N:$total_access:$total_kbyte:$cpuload:$uptime:$reqpersec:$bytespersec:$bytesperreq:$busyworkers:$idleworkers:$score_wait:$score_start:$score_reading:$score_writing:$score_keepalive:$score_dns:$score_closing:$score_logging:$score_graceful:$score_idle:$score_open");
-
 
 ?>

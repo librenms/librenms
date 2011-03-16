@@ -1,15 +1,15 @@
 <?php
 
-
 $query = "SELECT * FROM mempools WHERE device_id = '" . $device['device_id'] . "'";
 $mempool_data = mysql_query($query);
-while($mempool = mysql_fetch_array($mempool_data)) {
-
+while ($mempool = mysql_fetch_array($mempool_data))
+{
   echo("Mempool ". $mempool['mempool_descr'] . ": ");
 
   $mempoolrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("mempool-" . $mempool['mempool_type'] . "-" . $mempool['mempool_index'] . ".rrd");
 
-  if (!is_file($mempoolrrd)) {
+  if (!is_file($mempoolrrd))
+  {
    rrdtool_create($mempoolrrd, "--step 300 \
      DS:used:GAUGE:600:-273:100000000000 \
      DS:free:GAUGE:600:-273:100000000000 \
@@ -28,7 +28,8 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   }
 
   $file = $config['install_dir']."/includes/polling/mempools/".$mempool['mempool_type'].".inc.php";
-  if(is_file($file)) {
+  if (is_file($file))
+  {
     include($file);
   } else {
     ### Do we need a generic mempool poller?
@@ -55,13 +56,11 @@ while($mempool = mysql_fetch_array($mempool_data)) {
   $update_query .= " WHERE `mempool_id` = '".$mempool['mempool_id']."'";
 
   mysql_query($update_query);
-  if($debug) { echo($update_query); }
+  if ($debug) { echo($update_query); }
 
   echo("\n");
-
 }
 
 unset($mempool_cache);
-
 
 ?>

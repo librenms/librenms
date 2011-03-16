@@ -40,77 +40,84 @@
 # adslAturPerfValidIntervals.1 = 0
 # adslAturPerfInvalidIntervals.1 = 0
 
-    if(isset($port_stats[$port['ifIndex']]['adslLineCoding'])) { // Check to make sure Port data is cached.
+if (isset($port_stats[$port['ifIndex']]['adslLineCoding']))
+{ // Check to make sure Port data is cached.
 
-      $this_port = &$port_stats[$port['ifIndex']];
+  $this_port = &$port_stats[$port['ifIndex']];
 
-      $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-adsl.rrd");
+  $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("port-".$port['ifIndex']."-adsl.rrd");
 
-      $rrd_create  = " --step 300";
-      $rrd_create .= " DS:AtucCurrSnrMgn:GAUGE:600:0:U";
-      $rrd_create .= " DS:AtucCurrAtn:GAUGE:600:0:U";
-      $rrd_create .= " DS:AtucCurrOutputPwr:GAUGE:600:0:U";
-      $rrd_create .= " DS:AtucCurrAttainableR:GAUGE:600:0:U";
-      $rrd_create .= " DS:AtucChanCurrTxRate:GAUGE:600:0:U";
-      $rrd_create .= " DS:AturCurrSnrMgn:GAUGE:600:0:U";
-      $rrd_create .= " DS:AturCurrAtn:GAUGE:600:0:U";
-      $rrd_create .= " DS:AturCurrOutputPwr:GAUGE:600:0:U";
-      $rrd_create .= " DS:AturCurrAttainableR:GAUGE:600:0:U";
-      $rrd_create .= " DS:AturChanCurrTxRate:GAUGE:600:0:U";
-      $rrd_create .= " DS:AtucPerfLofs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucPerfLoss:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucPerfLprs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucPerfESs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucPerfInits:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturPerfLofs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturPerfLoss:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturPerfLprs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturPerfESs:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucChanCorrectedBl:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturChanCorrectedBl:COUNTER:600:U:100000000000";
-      $rrd_create .= " DS:AturChanUncorrectBl:COUNTER:600:U:100000000000";
-      $rrd_create .= " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797";
-      $rrd_create .= " RRA:MIN:0.5:1:600 RRA:MIN:0.5:6:700 RRA:MIN:0.5:24:775 RRA:MIN:0.5:288:797 ";
-      $rrd_create .= " RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797 ";
+  $rrd_create  = " --step 300";
+  $rrd_create .= " DS:AtucCurrSnrMgn:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucCurrAtn:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucCurrOutputPwr:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucCurrAttainableR:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucChanCurrTxRate:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturCurrSnrMgn:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturCurrAtn:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturCurrOutputPwr:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturCurrAttainableR:GAUGE:600:0:U";
+  $rrd_create .= " DS:AturChanCurrTxRate:GAUGE:600:0:U";
+  $rrd_create .= " DS:AtucPerfLofs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucPerfLoss:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucPerfLprs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucPerfESs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucPerfInits:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturPerfLofs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturPerfLoss:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturPerfLprs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturPerfESs:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucChanCorrectedBl:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AtucChanUncorrectBl:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturChanCorrectedBl:COUNTER:600:U:100000000000";
+  $rrd_create .= " DS:AturChanUncorrectBl:COUNTER:600:U:100000000000";
+  $rrd_create .= " RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797";
+  $rrd_create .= " RRA:MIN:0.5:1:600 RRA:MIN:0.5:6:700 RRA:MIN:0.5:24:775 RRA:MIN:0.5:288:797 ";
+  $rrd_create .= " RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797 ";
 
-      $adsl_oids = array('AtucCurrSnrMgn','AtucCurrAtn','AtucCurrOutputPwr','AtucCurrAttainableRate','AtucChanCurrTxRate','AturCurrSnrMgn','AturCurrAtn','AturCurrOutputPwr','AturCurrAttainableRate','AturChanCurrTxRate','AtucPerfLofs','AtucPerfLoss','AtucPerfLprs','AtucPerfESs','AtucPerfInits','AturPerfLofs','AturPerfLoss','AturPerfLprs','AturPerfESs','AtucChanCorrectedBlks','AtucChanUncorrectBlks','AturChanCorrectedBlks','AturChanUncorrectBlks');
+  $adsl_oids = array('AtucCurrSnrMgn','AtucCurrAtn','AtucCurrOutputPwr','AtucCurrAttainableRate','AtucChanCurrTxRate','AturCurrSnrMgn','AturCurrAtn','AturCurrOutputPwr','AturCurrAttainableRate','AturChanCurrTxRate','AtucPerfLofs','AtucPerfLoss','AtucPerfLprs','AtucPerfESs','AtucPerfInits','AturPerfLofs','AturPerfLoss','AturPerfLprs','AturPerfESs','AtucChanCorrectedBlks','AtucChanUncorrectBlks','AturChanCorrectedBlks','AturChanUncorrectBlks');
 
-      $adsl_db_oids = array('adslLineCoding','adslLineType','adslAtucInvVendorID','adslAtucInvVersionNumber','adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr',
-                            'adslAtucCurrAttainableRate','adslAturInvSerialNumber','adslAturInvVendorID','adslAturInvVersionNumber', 'adslAtucChanCurrTxRate', 
-                            'adslAturChanCurrTxRate', 'adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr', 'adslAturCurrAttainableRate');
+  $adsl_db_oids = array('adslLineCoding','adslLineType','adslAtucInvVendorID','adslAtucInvVersionNumber','adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr',
+                        'adslAtucCurrAttainableRate','adslAturInvSerialNumber','adslAturInvVendorID','adslAturInvVersionNumber', 'adslAtucChanCurrTxRate',
+                        'adslAturChanCurrTxRate', 'adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr', 'adslAturCurrAttainableRate');
 
-      $adsl_tenth_oids = array('adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr','adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr');
+  $adsl_tenth_oids = array('adslAtucCurrSnrMgn','adslAtucCurrAtn','adslAtucCurrOutputPwr','adslAturCurrSnrMgn', 'adslAturCurrAtn', 'adslAturCurrOutputPwr');
 
-      foreach($adsl_tenth_oids as $oid) {
-        $this_port[$oid] = $this_port[$oid] / 10;
-      }
- 
-      if(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'"),0) == "0") { mysql_query("INSERT INTO `ports_adsl` (`interface_id`) VALUES ('".$port['interface_id']."')"); }
-      $mysql_update = "UPDATE `ports_adsl` SET `port_adsl_updated` = NOW()";
-      foreach($adsl_db_oids as $oid) {
-        $data = str_replace("\"", "", $this_port[$oid]);
-        $mysql_update .= ",`".$oid."` = '".$data."'";
-      }      
-      $mysql_update .= "WHERE `interface_id` = '".$port['interface_id']."'";
-      mysql_query($mysql_update);
+  foreach ($adsl_tenth_oids as $oid)
+  {
+    $this_port[$oid] = $this_port[$oid] / 10;
+  }
 
-      if($debug) { echo($mysql_update); echo(mysql_affected_rows()); echo(mysql_error()); }
+  if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports_adsl` WHERE `interface_id` = '".$port['interface_id']."'"),0) == "0")
+  {
+    mysql_query("INSERT INTO `ports_adsl` (`interface_id`) VALUES ('".$port['interface_id']."')");
+  }
 
+  $mysql_update = "UPDATE `ports_adsl` SET `port_adsl_updated` = NOW()";
+  foreach ($adsl_db_oids as $oid)
+  {
+    $data = str_replace("\"", "", $this_port[$oid]);
+    $mysql_update .= ",`".$oid."` = '".$data."'";
+  }
+  $mysql_update .= "WHERE `interface_id` = '".$port['interface_id']."'";
+  mysql_query($mysql_update);
 
-      $rrdupdate = "N";
-      foreach($adsl_oids as $oid) {
-        $oid = "adsl".$oid;
-        $data = str_replace("\"", "", $this_port[$oid]);
-        ## Set data to be "unknown" if it's garbled, unexistant or zero
-        if(!is_numeric($data)) { $data = "0"; }
-        $rrdupdate .= ":$data";
-      }
+  if ($debug) { echo($mysql_update); echo(mysql_affected_rows()); echo(mysql_error()); }
 
-      if (!is_file($rrdfile)) { rrdtool_create ($rrdfile, $rrd_create); }
-      rrdtool_update ($rrdfile, $rrdupdate);
+  $rrdupdate = "N";
+  foreach ($adsl_oids as $oid)
+  {
+    $oid = "adsl".$oid;
+    $data = str_replace("\"", "", $this_port[$oid]);
+    ## Set data to be "unknown" if it's garbled, unexistant or zero
+    if (!is_numeric($data)) { $data = "0"; }
+    $rrdupdate .= ":$data";
+  }
 
-      echo("ADSL ");
+  if (!is_file($rrdfile)) { rrdtool_create ($rrdfile, $rrd_create); }
+  rrdtool_update ($rrdfile, $rrdupdate);
 
-    }
+  echo("ADSL ");
+}
+
 ?>
