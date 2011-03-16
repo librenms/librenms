@@ -18,7 +18,7 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
     $retries =  $config['snmp']['retries'];
   }
 
-  if (!isset($device['transport'])) 
+  if (!isset($device['transport']))
   {
     $device['transport'] = "udp";
   }
@@ -255,7 +255,7 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
-  
+
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }

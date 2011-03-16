@@ -13,21 +13,21 @@ else
 {
   echo("ERROR: no valid auth_mechanism defined.\n");
   exit();
-}        
-        
+}       
+       
 if (auth_usermanagement())
 {
-  if ($argv[1] && $argv[2] && $argv[3]) 
+  if ($argv[1] && $argv[2] && $argv[3])
   {
     if (adduser($argv[1],$argv[2],$argv[3],$argv[4]))
     {
       echo("User ".$argv[1]." added successfully\n");
     }
-  } 
-  else 
+  }
+  else
   {
     echo("Add User Tool\nUsage: ./adduser.php <username> <password> <level 1-10> [email]\n");
-  } 
+  }
 }
 else
 {

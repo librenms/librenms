@@ -29,7 +29,7 @@ if ($errored)
 { ## If there are errored ports
   $i=0;
   $msg = "Interfaces with errors : \n\n";
-  
+ 
   foreach ($errored as $int)
   {
     $msg .= "$int\n";  ## Add a line to the report email warning about them

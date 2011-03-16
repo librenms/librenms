@@ -7,7 +7,7 @@ include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
 
-$query = "SELECT *,A.id as id FROM ipv4_addresses AS A, ports as I, devices as D 
+$query = "SELECT *,A.id as id FROM ipv4_addresses AS A, ports as I, devices as D
           WHERE A.interface_id = I.interface_id AND I.device_id = D.device_id AND D.status = '1'";
 
 $data = mysql_query($query);
@@ -33,7 +33,7 @@ $query = mysql_query($sql);
 while ($device = mysql_fetch_array($query))
 {
   echo($device['hostname'] . " \n\n");
-  
+ 
   $oids = snmp_walk($device, "ipAddressIfIndex.ipv6", "-Osq");
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);
   $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
@@ -87,7 +87,7 @@ while ($interface = mysql_fetch_array($interface_query))
   {
     mysql_query("delete from ports where `interface_id` = '$interface_id'");
     echo("Deleting if $interface_id \n");
-  } 
+  }
 }
 
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"), 0) . " ports at end\n");
@@ -134,7 +134,7 @@ while ($link = mysql_fetch_array($link_query))
     mysql_query("delete from adjacencies where `adj_id` = '$id'");
     echo("Deleting link $id (".$link['cidr']." - ". $link['hostname'] ." - ". $link['ifDescr']  .")\n");
   }
-  
+ 
   unset($remove);
 }
 
