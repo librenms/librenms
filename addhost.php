@@ -20,7 +20,14 @@ if (isset($argv[1]) && $argv[1])
     $port = 161;
   }
 
-  $transport = $argv[5];
+  if (@!$argv[5])
+  {
+    $transport = 'udp';
+  }
+  else
+  {
+    $transport = $argv[5];
+  }
 
   if (!$snmpver) $snmpver = "v2c";
   if ($community)
@@ -40,7 +47,7 @@ if (isset($argv[1]) && $argv[1])
       {
         # FIXME should be a foreach $config['snmp']['community'][0] as $community
         $community = $config['snmp']['community'][0];
-	if ( isSNMPable($device))
+	if (isSNMPable($device))
 	{
 	  $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
 	  if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
