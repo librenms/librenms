@@ -2,11 +2,11 @@
 <?php
 
 include("includes/defaults.inc.php");
-include("config.php"); 
+include("config.php");
 include("includes/functions.php");
 
 if (isset($argv[1]) && $argv[1])
-{ 
+{
   $host      = strtolower($argv[1]);
   $community = $argv[2];
   $snmpver   = strtolower($argv[3]);
