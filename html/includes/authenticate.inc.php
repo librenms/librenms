@@ -1,20 +1,20 @@
-<?php 
+<?php
 
-@ini_set("session.gc_maxlifetime","0"); 
+@ini_set("session.gc_maxlifetime","0");
 
 session_start();
 
 // Preflight checks
-if(!is_dir($config['rrd_dir']))
+if (!is_dir($config['rrd_dir']))
   echo("<div class='errorbox'>RRD Log Directory is missing ({$config['rrd_dir']}).  Graphing may fail.</div>");
 
-if(!is_dir($config['temp_dir']))
+if (!is_dir($config['temp_dir']))
   echo("<div class='errorbox'>Temp Directory is missing ({$config['tmp_dir']}).  Graphing may fail.</div>");
 
-if(!is_writable($config['temp_dir']))
+if (!is_writable($config['temp_dir']))
   echo("<div class='errorbox'>Temp Directory is not writable ({$config['tmp_dir']}).  Graphing may fail.</div>");
 
-if(isset($_GET['logout']) && $_SESSION['authenticated']) {
+if (isset($_GET['logout']) && $_SESSION['authenticated']) {
   mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('" . $_SESSION['username'] . "', '".$_SERVER["REMOTE_ADDR"]."', 'logged out')");
   unset($_SESSION);
   session_destroy();
@@ -24,13 +24,13 @@ if(isset($_GET['logout']) && $_SESSION['authenticated']) {
   $auth_message = "Logged Out";
 }
 
-if(isset($_GET['username']) && isset($_GET['password'])){
+if (isset($_GET['username']) && isset($_GET['password'])){
   $_SESSION['username'] = mres($_GET['username']);
   $_SESSION['password'] = mres($_GET['password']);
-} elseif(isset($_POST['username']) && isset($_POST['password'])){
+} elseif (isset($_POST['username']) && isset($_POST['password'])){
   $_SESSION['username'] = mres($_POST['username']);
   $_SESSION['password'] = mres($_POST['password']);
-} elseif(isset($_COOKIE['username']) && isset($_COOKIE['password'])){
+} elseif (isset($_COOKIE['username']) && isset($_COOKIE['password'])){
   $_SESSION['username'] = mres($_COOKIE['username']);
   $_SESSION['password'] = mres($_COOKIE['password']);
 }
@@ -58,25 +58,25 @@ if (isset($_SESSION['username']))
   {
     $_SESSION['userlevel'] = get_userlevel($_SESSION['username']);
     $_SESSION['user_id'] = get_userid($_SESSION['username']);
-    if(!$_SESSION['authenticated']) 
+    if (!$_SESSION['authenticated'])
     {
       $_SESSION['authenticated'] = true;
       mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'logged in')");
       header("Location: ".$_SERVER['REQUEST_URI']);
     }
-    if(isset($_POST['remember'])) 
+    if (isset($_POST['remember']))
     {
       setcookie("username", $_SESSION['username'], time()+60*60*24*100, "/");
       setcookie("password", $_SESSION['password'], time()+60*60*24*100, "/");
     }
     $permissions = permissions_cache($_SESSION['user_id']);
 
-  } 
-  elseif (isset($_SESSION['username'])) 
-  { 
-    $auth_message = "Authentication Failed"; 
+  }
+  elseif (isset($_SESSION['username']))
+  {
+    $auth_message = "Authentication Failed";
     unset ($_SESSION['authenticated']);
     mysql_query("INSERT INTO authlog (`user`,`address`,`result`) VALUES ('".$_SESSION['username']."', '".$_SERVER["REMOTE_ADDR"]."', 'authentication failure')");
   }
-} 
+}
 ?>

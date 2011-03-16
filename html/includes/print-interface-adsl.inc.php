@@ -4,8 +4,8 @@
 #print_r($interface);
 #echo("</pre>");
 
-#  This file prints a table row for each interface 
- 
+#  This file prints a table row for each interface
+
   $interface['device_id'] = $device['device_id'];
   $interface['hostname'] = $device['hostname'];
 
@@ -13,11 +13,11 @@
 
   $interface = ifLabel($interface);
 
-  if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+  if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
 
-  if($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) { 
-    $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors"); 
+  if ($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0) {
+    $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors");
   } else { $error_img = ""; }
 
   echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
@@ -29,17 +29,17 @@
              </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
 
-  if($interface['ifAlias']) { echo("<br />"); }
+  if ($interface['ifAlias']) { echo("<br />"); }
 
   unset ($break);
-  if($port_details) {
+  if ($port_details) {
     $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-    while($ip = mysql_fetch_Array($ipdata)) {
+    while ($ip = mysql_fetch_Array($ipdata)) {
       echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
       $break = ",";
     }
     $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
-    while($ip6 = mysql_fetch_Array($ip6data)) {
+    while ($ip6 = mysql_fetch_Array($ip6data)) {
       echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
       $break = ",";
     }
@@ -70,7 +70,7 @@
   $interface['graph_type'] = "port_adsl_attainable";
   echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
-  
+
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrAtn'] . "dB/". $interface['adslAtucCurrAtn'] . "dB");
   echo("<br />");
@@ -93,7 +93,7 @@
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
 
-#  if($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
+#  if ($interface[ifDuplex] != unknown) { echo("<span class=box-desc>Duplex " . $interface['ifDuplex'] . "</span>"); } else { echo("-"); }
 
 
 #    echo("</td><td width=150>");
@@ -111,15 +111,15 @@
 
 echo("</td>");
 
-    if($graph_type == "etherlike")
-    { 
-      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-". safename($interface['ifIndex']) . ".rrd"; 
+    if ($graph_type == "etherlike")
+    {
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/etherlike-". safename($interface['ifIndex']) . ".rrd";
     } else {
-      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex']) . ".rrd";  
+      $graph_file = $config['rrd_dir'] . "/" . $device['hostname'] . "/". safename($interface['ifIndex']) . ".rrd";
     }
 
-     if($graph_type && is_file($graph_file)) {
- 
+     if ($graph_type && is_file($graph_file)) {
+
           $type = $graph_type;
 
           $daily_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$from&to=$now&width=210&height=100";
@@ -136,7 +136,7 @@ echo("</td>");
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 
-  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" 
+  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
   echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
         onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");

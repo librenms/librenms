@@ -11,11 +11,11 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 }
 
   $query_a = mysql_query("SELECT * FROM `devices`");
-  while($device = mysql_fetch_array($query_a)) {
+  while ($device = mysql_fetch_array($query_a)) {
     $this_alert = 0;
     if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0') {
       if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
-      if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1";}
+      if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1"; }
     }
     if ($this_alert) {
      $device_alerts++;
@@ -151,11 +151,11 @@ if ($ports['ignored'])
   echo('<li><a href="ports/ignored/"><img src="images/16/chart_curve_link.png" border="0" align="absmiddle" /> Ignored ('.$ports['ignored'].')</a></li>');
 }
 
-if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money_pound.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1;}
+if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/money_pound.png" border="0" align="absmiddle" /> Traffic Bills</a></li>'); $ifbreak = 1; }
 
-if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Pseudowires</a></li>'); $ifbreak = 1;}
+if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Pseudowires</a></li>'); $ifbreak = 1; }
 
-if ($config['enable_pseudowires']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1;}
+if ($config['enable_pseudowires']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1; }
 
 ?>
 <li><a href="ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
@@ -166,12 +166,12 @@ if ($config['enable_pseudowires']) { echo('<li><a href="vrfs/"><img src="images/
 if ($_SESSION['userlevel'] >= '5')
 {
   echo('<li><hr width="140" /></li>');
-  if ($config['int_customers']) { echo('<li><a href="customers/"><img src="images/16/group_link.png" border="0" align="absmiddle" /> Customers</a></li>'); $ifbreak = 1;}
+  if ($config['int_customers']) { echo('<li><a href="customers/"><img src="images/16/group_link.png" border="0" align="absmiddle" /> Customers</a></li>'); $ifbreak = 1; }
   if ($config['int_l2tp']) { echo('<li><a href="iftype/l2tp/"><img src="images/16/user.png" border="0" align="absmiddle" /> L2TP</a></li>'); $ifbreak = 1; }
   if ($config['int_transit']) { echo('<li><a href="iftype/transit/"><img src="images/16/lorry_link.png" border="0" align="absmiddle" /> Transit</a></li>');  $ifbreak = 1; }
   if ($config['int_peering']) { echo('<li><a href="iftype/peering/"><img src="images/16/bug_link.png" border="0" align="absmiddle" /> Peering</a></li>'); $ifbreak = 1; }
   if ($config['int_peering'] && $config['int_transit']) { echo('<li><a href="iftype/peering,transit/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> Peering + Transit</a></li>'); $ifbreak = 1; }
-  if ($config['int_core']) { echo('<li><a href="iftype/core/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> Core</a></li>'); $ifbreak = 1;}
+  if ($config['int_core']) { echo('<li><a href="iftype/core/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> Core</a></li>'); $ifbreak = 1; }
 }
 
 if ($ifbreak) { echo('<li><hr width="140" /></li>'); }
@@ -184,9 +184,9 @@ if (isset($interface_alerts))
 $sql = "SELECT * FROM `ports` AS P, `devices` as D WHERE P.`deleted` = '1' AND D.device_id = P.device_id";
 $query = mysql_query($sql);
 $deleted_ports = 0;
-while($interface = mysql_fetch_assoc($query))
+while ($interface = mysql_fetch_assoc($query))
 {
-  if(port_permitted($interface['interface_id'], $interface['device_id']))
+  if (port_permitted($interface['interface_id'], $interface['device_id']))
   {
     $deleted_ports++;
   }
@@ -197,7 +197,7 @@ while($interface = mysql_fetch_assoc($query))
 <li><a href="ports/admindown/"><img src="images/16/if-disable.png" border="0" align="absmiddle" /> Disabled</a></li>
 <?php
 
-if($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
+if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cross.png" border="0" align="absmiddle" /> Deleted ('.$deleted_ports.')</a></li>'); }
 
 ?>
 </ul></td></tr></table>
