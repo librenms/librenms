@@ -30,13 +30,12 @@ if (isset($argv[1]) && $argv[1])
   }
 
   if (!$snmpver) $snmpver = "v2c";
+
   if ($community)
   {
     unset($config['snmp']['community']);
     $config['snmp']['community'][] = $community;
   }
-
-  $device = deviceArray($host, $community, $snmpver, $port, $transport);
 
   list($hostshort) = explode(".", $host);
   if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '".mres($host)."'"), 0) == '0' )
@@ -47,6 +46,9 @@ if (isset($argv[1]) && $argv[1])
       {
         # FIXME should be a foreach $config['snmp']['community'][0] as $community
         $community = $config['snmp']['community'][0];
+
+        $device = deviceArray($host, $community, $snmpver, $port, $transport);
+
 	if (isSNMPable($device))
 	{
 	  $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
