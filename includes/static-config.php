@@ -604,6 +604,13 @@ $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 $config['os'][$os]['type']              = "network";
 
+$os = "sentry3";
+$config['os'][$os]['text']            	= "ServerTech Sentry3";
+$config['os'][$os]['type']		= "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+$config['os'][$os]['icon']  		= "servertech";
+
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
 ### Graph Types
