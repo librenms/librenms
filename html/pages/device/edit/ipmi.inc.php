@@ -1,7 +1,9 @@
 <?php
 
-if($_POST['editing']) {
-  if($_SESSION['userlevel'] > "7") {
+if ($_POST['editing'])
+{
+  if ($_SESSION['userlevel'] > "7")
+  {
     include("includes/device-ipmi-edit.inc.php");
   }
 }
@@ -9,7 +11,8 @@ if($_POST['editing']) {
 $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
 $descr  = $device['purpose'];
 
-if($updated && $update_message) {
+if ($updated && $update_message)
+{
   print_message($update_message);
 } elseif ($update_message) {
   print_error($update_message);

@@ -5,10 +5,12 @@ $query = mysql_query("SELECT * FROM `applications` WHERE `device_id` = '".$devic
 print_optionbar_start();
 
 unset($sep);
-while($app = mysql_fetch_array($query)) {
+
+while ($app = mysql_fetch_array($query))
+{
   echo($sep);
 
-  if(!$_GET['opta']) { $_GET['opta'] = $app['app_type']; }
+  if (!$_GET['opta']) { $_GET['opta'] = $app['app_type']; }
 
   if ($_GET['opta'] == $app['app_type'])
   {

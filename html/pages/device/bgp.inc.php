@@ -9,7 +9,7 @@ echo("
   <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/updates/'>Updates</a>");
-  
+
 echo(" | Prefixes:
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
   <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
@@ -30,6 +30,7 @@ print_optionbar_end();
 <?php
 $i = "1";
 $peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");
+
 while ($peer = mysql_fetch_assoc($peer_query))
 {
   $has_macaccounting = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0);
@@ -106,10 +107,10 @@ while ($peer = mysql_fetch_assoc($peer_query))
 
   if (isset($_GET['opta']) && $_GET['opta'] != "macaccounting")
   {
-    foreach(explode(" ", $_GET['opta']) as $graph_type)
-    {  
+    foreach (explode(" ", $_GET['opta']) as $graph_type)
+    {
       if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
-      if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi]) 
+      if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi])
       {
         $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
         $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
@@ -129,12 +130,12 @@ while ($peer = mysql_fetch_assoc($peer_query))
     }
   }
 
-  if ($_GET['opta'] == "macaccounting" && $has_macaccounting) 
+  if ($_GET['opta'] == "macaccounting" && $has_macaccounting)
   {
     $acc = mysql_fetch_assoc(mysql_query("SELECT * FROM `ipv4_mac` AS I, mac_accounting AS M, ports AS P WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address AND P.interface_id = M.interface_id"));
     $graph_type = "mac_acc_bits";
     $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
-    if (is_file($database)) 
+    if (is_file($database))
     {
       $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
       $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";

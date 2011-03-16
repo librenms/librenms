@@ -24,7 +24,6 @@ if ($volts) { $datas[] = 'voltages'; }
 if ($freqs) { $datas[] = 'frequencies'; }
 if ($current) { $datas[] = 'current'; }
 
-
 $type_text['overview'] = "Overview";
 $type_text['temperatures'] = "Temperatures";
 $type_text['humidity'] = "Humidity";
@@ -39,14 +38,14 @@ $type_text['current'] = "Current";
 
 print_optionbar_start();
 
-if(!$_GET['opta']) { $_GET['opta'] = "overview"; }
+if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
 
 unset($sep);
-foreach ($datas as $type) {
-
+foreach ($datas as $type)
+{
   echo($sep);
 
-  if ($_GET['opta'] == $type) 
+  if ($_GET['opta'] == $type)
   {
     echo("<strong>");
     echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
@@ -60,18 +59,19 @@ foreach ($datas as $type) {
 
 print_optionbar_end();
 
-if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php")) 
-{ 
-   include("pages/device/health/".mres($_GET['opta']).".inc.php"); 
-} else { 
-  foreach ($datas as $type) {
-    if($type != "overview") {
+if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php"))
+{
+   include("pages/device/health/".mres($_GET['opta']).".inc.php");
+} else {
+  foreach ($datas as $type) 
+  {
+    if ($type != "overview")
+    {
       $graph_title = $type_text[$type];
       $graph_type = "device_".$type;
-      include ("includes/print-device-graph.php"); 
+      include ("includes/print-device-graph.php");
     }
   }
 }
-
 
 ?>

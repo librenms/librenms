@@ -2,10 +2,6 @@
 
 $overview = 1;
 
-#$id = $_GET['id'];
-
-#$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '$_GET[id]'"));
-
 $ports['total'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "'"),0);
 $ports['up'] = mysql_result(mysql_query("SELECT count(*) FROM ports  WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'up'"),0);
 $ports['down'] = mysql_result(mysql_query("SELECT count(*) FROM ports WHERE device_id = '" . $device['device_id'] . "' AND ifOperStatus = 'down' AND ifAdminStatus = 'up'"),0);
@@ -16,12 +12,12 @@ $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM servic
 $services['down'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_status = '0' AND service_ignore = '0'"),0);
 $services['disabled'] = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE device_id = '" . $device['device_id'] . "' AND service_ignore = '1'"),0);
 
-if($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
-if($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
+if ($services['down']) { $services_colour = $warn_colour_a; } else { $services_colour = $list_colour_a; }
+if ($ports['down']) { $ports_colour = $warn_colour_a; } else { $ports_colour = $list_colour_a; }
 
 echo("<div style='width: 50%; float: left;'>");
 
-#if(file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
+#if (file_exists("includes/dev-data-" . strtolower($device[os]) . ".inc.php")) {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
 #  echo("<p class=sectionhead>Device Data</p><div style='height: 5px;'></div>");
 #  include("includes/dev-data-" . strtolower($device[os]) . ".inc.php");
@@ -29,15 +25,14 @@ echo("<div style='width: 50%; float: left;'>");
   echo("</div>");
 #}
 
-
 include("overview/ports.inc.php");
 
-if($services['total']) {
-
+if ($services['total'])
+{
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/cog.png'> Services</p><div style='height: 5px;'></div>");
 
-echo("
+  echo("
 <table class=tablehead cellpadding=2 cellspacing=0 width=100%>
 <tr bgcolor=$services_colour align=center><td></td>
 <td width=25%><img src='images/16/cog.png' align=absmiddle> $services[total]</td>
@@ -50,7 +45,8 @@ echo("
 
   $sql = "SELECT * FROM services WHERE device_id = '" . $device['device_id'] . "' ORDER BY service_type";
   $query = mysql_query($sql);
-  while($data = mysql_fetch_array($query)) {
+  while ($data = mysql_fetch_array($query))
+  {
     if ($data[service_status] == "0" && $data[service_ignore] == "1") { $status = "grey"; }
     if ($data[service_status] == "1" && $data[service_ignore] == "1") { $status = "green"; }
     if ($data[service_status] == "0" && $data[service_ignore] == "0") { $status = "red"; }
@@ -60,20 +56,19 @@ echo("
   }
 
   echo("</div>");
-
   echo("</div>");
-
 }
 
 $sql =  "SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 20";
 $query = mysql_query($sql);
 
-if(mysql_affected_rows() > "0"){
+if (mysql_affected_rows() > "0")
+{
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/printer.png'> Recent Syslog</p>");
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
-  while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
+  while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
   echo("</table>");
   echo("</div>");
 }
@@ -81,7 +76,6 @@ if(mysql_affected_rows() > "0"){
 echo("</div>");
 
 echo("<div style='float:right; width: 50%;'>");
-
 
 ### Right Pane
 include("overview/processors.inc.php");
@@ -105,11 +99,12 @@ $data = mysql_query($query);
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
 
-while($entry = mysql_fetch_array($data)) {
+while ($entry = mysql_fetch_array($data))
+{
   include("includes/print-event-short.inc");
 }
 
 echo("</table>");
-
 echo("</div>");
+
 ?>

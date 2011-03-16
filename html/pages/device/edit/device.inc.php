@@ -1,7 +1,9 @@
 <?php
 
-if($_POST['editing']) {
-  if($_SESSION['userlevel'] > "7") {
+if ($_POST['editing'])
+{
+  if ($_SESSION['userlevel'] > "7")
+  {
     include("includes/device-edit.inc.php");
   }
 }
@@ -9,7 +11,8 @@ if($_POST['editing']) {
 $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
 $descr  = $device['purpose'];
 
-if($updated && $update_message) {
+if ($updated && $update_message)
+{
   print_message($update_message);
 } elseif ($update_message) {
   print_error($update_message);
@@ -53,11 +56,14 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
       <td width='300'><div align='right'>SNMP Transport</div></td>
       <td colspan='3'>
         <select name='transport'>");
-foreach ($config['snmp']['transports'] as $transport) {
+
+foreach ($config['snmp']['transports'] as $transport)
+{
   echo ("<option value='".$transport."'");
   if ($transport == $device['transport']) { echo (" selected='selected'"); }
   echo (">".$transport."</option>");
 }
+
 echo("  </select>
       </td>
     </tr>
@@ -102,11 +108,11 @@ echo("
     <tr>
       <td><div align='right'>Disable</div></td>
       <td><input name='disabled' type='checkbox' id='disabled' value='1'");
-if($device['disabled']) { echo("checked=checked"); }
+if ($device['disabled']) { echo("checked=checked"); }
 echo("/></td>
       <td><div align='right'>Ignore</div></td>
       <td><input name='ignore' type='checkbox' id='disable' value='1'");
-      if($device['ignore']) { echo("checked=checked"); }
+      if ($device['ignore']) { echo("checked=checked"); }
 echo("/></td>
     </tr>");
 
@@ -119,6 +125,5 @@ echo('
 
 </td>
 <td width="50"></td><td></td></tr></table>');
-
 
 ?>

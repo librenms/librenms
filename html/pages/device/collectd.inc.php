@@ -50,11 +50,11 @@ print_optionbar_start();
 
     $plugins = collectd_list_plugins($device['hostname']);
     foreach ($plugins as &$plugin) {
-       if(!$_GET['opta']) { $_GET['opta'] = $plugin; }
+       if (!$_GET['opta']) { $_GET['opta'] = $plugin; }
        echo($sep);
-       if($_GET['opta'] == $plugin) { echo("<strong>"); }
+       if ($_GET['opta'] == $plugin) { echo("<strong>"); }
        echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/collectd/" . $plugin . "/'>" . htmlspecialchars($plugin) ."</a>\n");
-       if($_GET['opta'] == $plugin) { echo("</strong>"); }
+       if ($_GET['opta'] == $plugin) { echo("</strong>"); }
        $sep = ' | ';
     }
     unset ($sep);
@@ -70,18 +70,18 @@ print_optionbar_end();
      foreach ($types as &$type) {
 
      $typeinstances = collectd_list_tinsts($device['hostname'], $_GET['opta'], $instance, $type);
- 
-     if($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
 
-     
+     if ($MetaGraphDefs[$type]) { $typeinstances = array($MetaGraphDefs[$type]); }
+
+
 
      foreach ($typeinstances as &$tinst) {
        $i++;
-       if(!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
- 
+       if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+
        echo('<div style="background-color: '.$row_colour.';">');
        echo('<div class="graphhead" style="padding:4px 0px 0px 8px;">');
-       if($tinst) {
+       if ($tinst) {
        echo($_GET['opta']." $instance - $type - $tinst");
        } else {
         echo($_GET['opta']." $instance - $type");
@@ -96,7 +96,7 @@ print_optionbar_end();
        $weekly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$week&to=$now&width=215&height=100";
        $weekly_traffic  .= $args;
        $weekly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$week&to=$now&width=400&height=150";
-       $weekly_url      .= $args; 
+       $weekly_url      .= $args;
 
        $monthly_traffic   = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$month&to=$now&width=215&height=100";
        $monthly_traffic  .= $args;
@@ -107,7 +107,7 @@ print_optionbar_end();
        $yearly_traffic  .= $args;
        $yearly_url       = $config['base_url'] . "/collectd-graph.php?host=" . $device['hostname'] . "&plugin=".$_GET['opta']."&type=".$_GET['opta']."&plugin_instance=".$instance."&type=".$type."&type_instance=".$tinst."&from=$year&to=$now&width=400&height=150";
        $yearly_url      .= $args;
- 
+
 
        echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
          <img src='$daily_traffic' border=0></a> ");
@@ -117,9 +117,9 @@ print_optionbar_end();
          <img src='$monthly_traffic' border=0></a> ");
        echo("<a onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
          <img src='$yearly_traffic' border=0></a>");
- 
+
        echo("</div>");
- 
+
       }
      }
 

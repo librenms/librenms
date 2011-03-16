@@ -1,42 +1,44 @@
 <?php
 
-if($_GET['opta'] == graphs ) {
-  if($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
+if ($_GET['opta'] == graphs )
+{
+  if ($_GET['optb']) { $graph_type = "port_" . $_GET['optb']; } else { $graph_type = "port_bits"; }
 }
 
 print_optionbar_start();
 
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> | 
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> | 
+echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> |
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> |
+<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> |
 <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/adsl/'>ADSL</a> |
 Graphs: ");
 
 $graph_types = array("bits" => "Bits",
                      "upkts" => "Unicast Packets",
-                     "nupkts" => "Non-Unicast Packets", 
-                     "errors" => "Errors", 
+                     "nupkts" => "Non-Unicast Packets",
+                     "errors" => "Errors",
                      "etherlike" => "Etherlike");
 
-foreach ($graph_types as $type => $descr) {
-  echo("$type_sep 
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/'>$descr</a> 
+foreach ($graph_types as $type => $descr)
+{
+  echo("$type_sep
+  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/'>$descr</a>
   (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/thumbs/'>Mini</a>) ");
   $type_sep = " | ";
 }
 
-
 print_optionbar_end();
 
-if($_GET['optc'] == thumbs) {
-
+if ($_GET['optc'] == thumbs)
+{
   $timeperiods = array('-1day','-1week','-1month','-1year');
   $from = '-1day';
   echo("<div style='display: block; clear: both; margin: auto;'>");
   $sql  = "select * from ports WHERE device_id = '".$device['device_id']."' ORDER BY ifIndex";
   $query = mysql_query($sql);
   unset ($seperator);
-  while($interface = mysql_fetch_assoc($query)) {
+  while ($interface = mysql_fetch_assoc($query))
+  {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($interface['ifDescr'])."</div>
     <a href='device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('\
@@ -51,28 +53,31 @@ if($_GET['optc'] == thumbs) {
   }
   echo("</div>");
 } else {
-  if($_GET['opta'] == "arp" ) { 
+  if ($_GET['opta'] == "arp" )
+  {
     include("arp.inc.php");
-  } elseif($_GET['opta'] == "adsl") {
+  } elseif ($_GET['opta'] == "adsl") {
     echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 
     echo("<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>");
     $i = "0";
     $interface_query = mysql_query("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = '".$device['device_id']."' AND A.interface_id = P.interface_id AND P.deleted = '0' ORDER BY `ifIndex` ASC");
-    while($interface = mysql_fetch_assoc($interface_query)) {
+    while ($interface = mysql_fetch_assoc($interface_query))
+    {
       include("includes/print-interface-adsl.inc.php");
       $i++;
     }
     echo("</table></div>");
     echo("<div style='min-height: 150px;'></div>");
   } else {
-    if($_GET['opta'] == "details" ) { $port_details = 1; }
+    if ($_GET['opta'] == "details" ) { $port_details = 1; }
     echo("<div style='margin: 0px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $i = "1";
     $interface_query = mysql_query("select * from ports WHERE device_id = '".$device['device_id']."' AND deleted = '0' ORDER BY `ifIndex` ASC");
-    while($interface = mysql_fetch_assoc($interface_query)) {
+    while ($interface = mysql_fetch_assoc($interface_query))
+    {
       include("includes/print-interface.inc.php");
-      $i++; 
+      $i++;
     }
     echo("</table></div>");
     echo("<div style='min-height: 150px;'></div>");
