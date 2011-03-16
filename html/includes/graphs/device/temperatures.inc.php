@@ -3,13 +3,13 @@
 include("includes/graphs/common.inc.php");
 $device = device_by_id_cache($id);
 
-if($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
+if ($_GET['width'] > "300") { $descr_len = "40"; } else { $descr_len = "22"; }
 
 $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '$id' ORDER BY sensor_index");
 $rrd_options .= " COMMENT:'".str_pad('',$descr_len)."    Cur     Min    Max\\n'";
-while($temperature = mysql_fetch_array($sql))
+while ($temperature = mysql_fetch_array($sql))
 {
   switch ($iter)
   {
@@ -47,6 +47,5 @@ while($temperature = mysql_fetch_array($sql))
   $rrd_options .= " GPRINT:sensor" . $temperature['sensor_id'] . ":MAX:%4.1lfC\\\l ";
   $iter++;
 }
-
 
 ?>
