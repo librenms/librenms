@@ -18,6 +18,11 @@ function snmp_get_multi($device, $oids, $options = "-OQUs", $mib = NULL, $mibdir
     $retries =  $config['snmp']['retries'];
   }
 
+  if (!isset($device['transport'])) 
+  {
+    $device['transport'] = "udp";
+  }
+
   if ($config['snmp']['internal'] == true)
   {
     if ($mib && $mibdir && !$mibs_loaded[$mib])
@@ -95,6 +100,12 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     $retries =  $config['snmp']['retries'];
   }
 
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
+
   if (strstr($oid,' '))
   {
     echo "BUG: snmp_get called for multiple OIDs: $oid\n";
@@ -162,6 +173,11 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
   }
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
 
   // php has no bulkwalk functionality, so use binary for this.
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
@@ -179,6 +195,7 @@ function snmp_walk($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
   if ($mibdir) { $cmd .= " -M " . $mibdir; } else { $cmd .= " -M ".$config['mibdir']; }
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
   if (isset($retries)) { $cmd .= " -r " . $retries; }
+
   $cmd .= " ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$oid;
 
   if (!$debug) { $cmd .= " 2>/dev/null"; }
@@ -221,6 +238,8 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
   }
+
+  if (!isset($device['transport'])) { $device['transport'] = "udp"; }
 
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
@@ -286,6 +305,8 @@ function snmp_cache_ifIndex($device)
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
   }
+
+  if (!isset($device['transport'])) { $device['transport'] = "udp"; }
 
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
@@ -428,6 +449,11 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array, $mib = 0)
     $retries =  $config['snmp']['retries'];
   }
 
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
     $snmpcommand = $config['snmpwalk'];
@@ -476,6 +502,12 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
   }
+
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
 
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
   {
@@ -527,6 +559,11 @@ function snmp_cache_slotport_oid($oid, $device, $array, $mib = 0)
     $retries = $device['retries'];
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
+  }
+
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
   }
 
   if ($device['snmpver'] == 'v1' || $config['os'][$device['os']]['nobulk'])
@@ -587,6 +624,11 @@ function snmp_cache_port_oids($oids, $port, $device, $array, $mib=0)
     $retries =  $config['snmp']['retries'];
   }
 
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
   foreach ($oids as $oid)
   {
     $string .= " $oid.$port";
@@ -633,6 +675,11 @@ function snmp_cache_portIfIndex($device, $array)
     $retries =  $config['snmp']['retries'];
   }
 
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
+  }
+
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " ";
   $cmd .= " -M ".$config['install_dir']."/mibs/";
   if (isset($timeout)) { $cmd .= " -t " . $timeout; }
@@ -670,6 +717,11 @@ function snmp_cache_portName($device, $array)
     $retries = $device['retries'];
   } elseif (isset($config['snmp']['retries'])) {
     $retries =  $config['snmp']['retries'];
+  }
+
+  if (!isset($device['transport']))
+  {
+    $device['transport'] = "udp";
   }
 
   $cmd = $config['snmpwalk'] . " -CI -m CISCO-STACK-MIB -O Qs -" . $device['snmpver'] . " -c " . $device['community'] . " ";
