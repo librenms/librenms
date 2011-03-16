@@ -6,7 +6,7 @@ while ($sensor = mysql_fetch_array($sensors))
 {
   echo("Checking Entity Sensor " . $sensor['entPhysicalName'] . " - " . $sensor['cempsensorName']);
 
-  $oid = $sensor['entPhysicalIndex']; 
+  $oid = $sensor['entPhysicalIndex'];
 
   $sensor_cmd  = $config['snmpget'] . " -M ".$config['mibdir']." -m CISCO-ENTITY-SENSOR-MIB -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
   $sensor_cmd .= " entSensorValue.$oid entSensorStatus.$oid";

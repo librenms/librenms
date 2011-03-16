@@ -83,14 +83,14 @@ if ($ipSystemStats)
       if (strstr($stats[$oid], "No") || strstr($stats[$oid], "d") || strstr($stats[$oid], "s")) { $stats[$oid] = "0"; }
       $rrdupdate  .= ":".$stats[$oid];
     }
-    
+
     if (!file_exists($rrdfile)) { rrdtool_create($rrdfile,$rrd_create); }
     rrdtool_update($rrdfile, $rrdupdate);
-    
+
     unset($rrdupdate, $rrd_create);
 
     ## FIXME per-AF?
-   
+
     $graphs['ipsystemstats_'.$af] = TRUE;
     $graphs['ipsystemstats_'.$af.'_frag'] = TRUE;
   }

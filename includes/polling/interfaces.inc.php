@@ -2,9 +2,9 @@
 
 /* FIXME: dead file */
 
-if ($device['os_group'] == "ios") { 
+if ($device['os_group'] == "ios") {
   $portifIndex = array();
-  $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -M ".$config['mibdir']. " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
+  $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -M ".$config['mibdir']. " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex";
   #echo("$cmd");
   $portifIndex_output = trim(shell_exec($cmd));
   foreach (explode("\n", $portifIndex_output) as $entry){
@@ -54,7 +54,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifDescr = trim($ifDescr);
 
    $ifIndex = $interface['ifIndex'];
-   if ($portifIndex[$ifIndex]) { 
+   if ($portifIndex[$ifIndex]) {
      if ($device['os'] == "CatOS") {
        $cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-STACK-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName." . $portifIndex[$ifIndex];
        $ifAlias = trim(shell_exec($cmd));
@@ -63,7 +63,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 
    if ($config['os'][$device[os]]['ifname']) { $ifDescr = $ifName; }
 
-   $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd"); 
+   $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd");
 
    if (!is_file($rrdfile)) {
      rrdtool_create($rrdfile,"DS:INOCTETS:COUNTER:600:0:12500000000 \
@@ -97,7 +97,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
      $seperator = ", ";
      eventlog("ifName -> $ifName", $interface['device_id'], $interface['interface_id']);
    }
- 
+
    if ($interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
      $update .= $seperator . "`ifAlias` = '".mres($ifAlias)."'";
      $seperator = ", ";

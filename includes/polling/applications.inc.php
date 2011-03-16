@@ -10,7 +10,7 @@ if (mysql_affected_rows())
   while ($app = mysql_fetch_array($app_data))
   {
     $app_include = $config['install_dir'].'/includes/polling/applications/'.$app['app_type'].'.inc.php';
-    if (is_file($app_include)) 
+    if (is_file($app_include))
     {
       include($app_include);
     }

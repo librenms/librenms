@@ -4,10 +4,10 @@ $cip_oids = array('cipMacHCSwitchedBytes', 'cipMacHCSwitchedPkts');
 echo("Caching OID: ");
 $cip_array = array();
 
-foreach ($cip_oids as $oid) 
-{ 
-  echo("$oid "); 
-  $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, "CISCO-IP-STAT-MIB"); 
+foreach ($cip_oids as $oid)
+{
+  echo("$oid ");
+  $cip_array = snmpwalk_cache_cip($device, $oid, $cip_array, "CISCO-IP-STAT-MIB");
 }
 
 $polled = time();
@@ -37,7 +37,7 @@ while ($acc = mysql_fetch_assoc($mac_accounting_query))
     $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
     $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
 
-    $this_ma = &$cip_array[$ifIndex][$mac]; 
+    $this_ma = &$cip_array[$ifIndex][$mac];
 
     /// Update metrics
     foreach ($cip_oids as $oid)

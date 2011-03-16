@@ -24,7 +24,7 @@ if (is_numeric($hrSystem[0]['hrSystemProcesses']))
     RRA:MAX:0.5:24:800 \
     RRA:MAX:0.5:288:800");
   }
-  
+
   rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemProcesses']);
   $graphs['hr_processes'] = TRUE;
   echo(" Processes");
@@ -46,7 +46,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers']))
     RRA:MAX:0.5:24:800 \
     RRA:MAX:0.5:288:800");
   }
-  
+
   rrdtool_update($rrd_file,  "N:".$hrSystem[0]['hrSystemNumUsers']);
   $graphs['hr_users'] = TRUE;
   echo(" Users");
