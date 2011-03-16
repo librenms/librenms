@@ -100,7 +100,7 @@ ALTER TABLE `links` ADD `remote_hostname` VARCHAR( 128 ) NOT NULL ,ADD `remote_p
 ALTER TABLE `links` CHANGE `src_if` `local_interface_id` INT( 11 ) NULL DEFAULT NULL ,CHANGE `dst_if` `remote_interface_id` INT( 11 ) NULL DEFAULT NULL ;
 ALTER TABLE `links` CHANGE `vendor` `protocol` VARCHAR( 11 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;
 ALTER TABLE `processors` CHANGE `processor_type` `processor_type` varchar(16) NOT NULL;
-ALTER TABLE `bgpPeers_cbgp` CHANGE `afi` `afi` VARCHAR( 16 ) NOT NULL , CHANGE `safi` `safi` VARCHAR( 16 ) NOT NULL; 
+ALTER TABLE `bgpPeers_cbgp` CHANGE `afi` `afi` VARCHAR( 16 ) NOT NULL , CHANGE `safi` `safi` VARCHAR( 16 ) NOT NULL;
 ALTER TABLE  `eventlog` ADD  `reference` VARCHAR( 64 ) NOT NULL AFTER  `type`;
 ALTER TABLE `syslog` CHANGE `datetime` `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE `syslog`  DROP `host`,  DROP `processed`;

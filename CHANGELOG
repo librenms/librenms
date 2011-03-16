@@ -18,10 +18,12 @@ SVN 0.10-current
 * Add support for XUPS-MIB for Eaton devices
 * Add support for JunOS BGP prefix counters
 * Add support for Ingrasys iPoMan 1200 series PDUs
+* Add support for Socomec Net Vision UPS systems
+* Add support for ServerTech Sentry3 power systems
 * MySQL and nginx application pollers
 * Add support for IPMI polling on servers
-* Add a new discovery parameter to only discover new devices, this can be run every 5 minutes 
-  to speed up discovery of added devices through the webinterface 
+* Add a new discovery parameter to only discover new devices, this can be run every 5 minutes
+  to speed up discovery of added devices through the webinterface
 
 Release 0.10.7.1 ( 19th July 2010 )
 
