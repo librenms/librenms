@@ -1,6 +1,6 @@
 <?php
 
-if (!$os) 
+if (!$os)
 {
   if (strstr($sysDescr, "Pulsar M")) { $os = "mgeups"; }
   else if (preg_match("/^Galaxy /", $sysDescr)) { $os = "mgeups"; }

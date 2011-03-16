@@ -1,6 +1,6 @@
 <?php
 
-if (!$os) 
+if (!$os)
 {
   if ($sysDescr == 'NETOS 6.0')
   {
