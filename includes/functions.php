@@ -527,7 +527,9 @@ function createHost ($host, $community, $snmpver, $port = 161, $transport = 'udp
 
 function isDomainResolves($domain)
 {
-  return count(dns_get_record($domain)) != 0;
+  # duh.
+  #return count(dns_get_record($domain)) != 0;
+  return gethostbyname($domain) != $domain;
 }
 
 function hoststatus($id)
