@@ -7,7 +7,7 @@ $diskio_data = mysql_query($sql);
 if (mysql_affected_rows())
 {
   $diskio_cache = array();
-  $diskio_cache = snmpwalk_cache_oid($device, "diskIOEntry", $diskio_cache);
+  $diskio_cache = snmpwalk_cache_oid($device, "diskIOEntry", $diskio_cache, "UCD-DISKIO-MIB");
 
   echo("Checking UCD DiskIO MIB: ");
 
