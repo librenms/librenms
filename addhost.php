@@ -23,7 +23,8 @@ if (isset($argv[1]) && $argv[1])
   $transport = $argv[5];
 
   if (!$snmpver) $snmpver = "v2c";
-  if ($community) {
+  if ($community)
+  {
     unset($config['snmp']['community']);
     $config['snmp']['community'][] = $community;
   }
@@ -51,6 +52,6 @@ if (isset($argv[1]) && $argv[1])
       } else { echo("Could not ping $host\n"); }
     } else { echo("Could not resolve $host\n"); }
   } else { echo("Already got host $host\n"); }
-} else { echo("Add Host Tool\nUsage: ./addhost.php <hostname> [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]\n"); }
+} else { echo("Add Host Tool\nUsage: ./addhost.php <hostname> [community] [v1|v2c] [port] [" . join("|",$config['snmp']['transports']) . "]\n"); }
 
 ?>
