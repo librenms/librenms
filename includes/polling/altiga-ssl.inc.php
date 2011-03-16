@@ -1,7 +1,7 @@
 <?php
 
-if($device['os'] == "asa" || $device['os'] == "pix") {
-
+if ($device['os'] == "asa" || $device['os'] == "pix")
+{
   echo("ALTIGA-MIB SSL VPN Statistics \n");
 
   $oids =   array('alSslStatsTotalSessions','alSslStatsActiveSessions','alSslStatsMaxSessions','alSslStatsPreDecryptOctets',
@@ -17,32 +17,32 @@ if($device['os'] == "asa" || $device['os'] == "pix") {
   $rrd_create .= " DS:PreDecryptOctets:COUNTER:600:U:100000000000 DS:PostDecryptOctets:COUNTER:600:U:100000000000 DS:PreEncryptOctets:COUNTER:600:U:100000000000";
   $rrd_create .= " DS:PostEncryptOctets:COUNTER:600:U:100000000000";
 
-  if(!file_exists($rrdfile)) 
-  { 
-    rrdtool_create($rrdfile, $rrd_create); 
+  if (!file_exists($rrdfile))
+  {
+    rrdtool_create($rrdfile, $rrd_create);
   }
 
   $data_array = snmpwalk_cache_oid($device, $proto, array(), "ALTIGA-SSL-STATS-MIB");
 
   $rrdupdate = "N";
 
-  foreach($oids as $oid)
+  foreach ($oids as $oid)
   {
-    if(is_numeric($data_array[0][$oid])) {
+    if (is_numeric($data_array[0][$oid]))
+    {
        $value = $data_array[0][$oid];
-    } else { 
-      $value = "0"; 
+    } else {
+      $value = "0";
     }
     $rrdupdate .= ":$value";
   }
 
-  if($data_array[0]['alSslStatsTotalSessions'] || is_file($rrdfile))
+  if ($data_array[0]['alSslStatsTotalSessions'] || is_file($rrdfile))
   {
     rrdtool_update($rrdfile, $rrdupdate);
   }
 
   unset($rrdfile, $rrdupdate, $data_array);
-
 }
 
 ?>

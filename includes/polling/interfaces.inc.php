@@ -2,30 +2,30 @@
 
 /* FIXME: dead file */
 
-if($device['os_group'] == "ios") { 
+if ($device['os_group'] == "ios") { 
   $portifIndex = array();
   $cmd = ($device['snmpver'] == 'v1' ? $config['snmpwalk'] : $config['snmpbulkwalk']) . " -M ".$config['mibdir']. " -CI -m CISCO-STACK-MIB -O q -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portIfIndex"; 
   #echo("$cmd");
   $portifIndex_output = trim(shell_exec($cmd));
-  foreach(explode("\n", $portifIndex_output) as $entry){
+  foreach (explode("\n", $portifIndex_output) as $entry){
     $entry = str_replace("CISCO-STACK-MIB::portIfIndex.", "", $entry);
     list($slotport, $ifIndex) = explode(" ", $entry);
     $portifIndex[$ifIndex] = $slotport;
   }
-  if($debug) { print_r($portifIndex); }
+  if ($debug) { print_r($portifIndex); }
 }
 
 $interface_query = mysql_query("SELECT * FROM `ports` $where");
 while ($interface = mysql_fetch_array($interface_query)) {
 
- if(!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
+ if (!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
 
  unset($ifAdminStatus, $ifOperStatus, $ifAlias, $ifDescr);
 
  $interface['hostname'] = $device['hostname'];
  $interface['device_id'] = $device['device_id'];
 
- if($device['status'] == '1') {
+ if ($device['status'] == '1') {
 
    unset($update);
    unset($update_query);
@@ -54,18 +54,18 @@ while ($interface = mysql_fetch_array($interface_query)) {
    $ifDescr = trim($ifDescr);
 
    $ifIndex = $interface['ifIndex'];
-   if($portifIndex[$ifIndex]) { 
-     if($device['os'] == "CatOS") {
+   if ($portifIndex[$ifIndex]) { 
+     if ($device['os'] == "CatOS") {
        $cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -m CISCO-STACK-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " portName." . $portifIndex[$ifIndex];
        $ifAlias = trim(shell_exec($cmd));
      }
    }
 
-   if($config['os'][$device[os]]['ifname']) { $ifDescr = $ifName; }
+   if ($config['os'][$device[os]]['ifname']) { $ifDescr = $ifName; }
 
    $rrdfile = $host_rrd . "/" . safename($interface['ifIndex'] . ".rrd"); 
 
-   if(!is_file($rrdfile)) {
+   if (!is_file($rrdfile)) {
      rrdtool_create($rrdfile,"DS:INOCTETS:COUNTER:600:0:12500000000 \
       DS:OUTOCTETS:COUNTER:600:0:12500000000 \
       DS:INERRORS:COUNTER:600:0:12500000000 \
@@ -84,34 +84,34 @@ while ($interface = mysql_fetch_array($interface_query)) {
       RRA:MAX:0.5:288:797");
    }
 
-   if( file_exists("includes/polling/interface-" . $device['os'] . ".php") ) { include("includes/polling/interface-" . $device['os'] . ".php"); }
+   if (file_exists("includes/polling/interface-" . $device['os'] . ".php") ) { include("includes/polling/interface-" . $device['os'] . ".php"); }
 
-   if ( $interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
+   if ($interface['ifDescr'] != $ifDescr && $ifDescr != "" ) {
      $update .= $seperator . "`ifDescr` = '$ifDescr'";
      $seperator = ", ";
      eventlog("ifDescr -> $ifDescr", $interface['device_id'], $interface['interface_id']);
    }
 
-   if ( $interface['ifName'] != $ifName && $ifName != "" ) {
+   if ($interface['ifName'] != $ifName && $ifName != "" ) {
      $update .= $seperator . "`ifName` = '$ifName'";
      $seperator = ", ";
      eventlog("ifName -> $ifName", $interface['device_id'], $interface['interface_id']);
    }
  
-   if ( $interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
+   if ($interface['ifAlias'] != $ifAlias && $ifAlias != "" ) {
      $update .= $seperator . "`ifAlias` = '".mres($ifAlias)."'";
      $seperator = ", ";
      eventlog("ifAlias -> $ifAlias", $interface['device_id'], $interface['interface_id']);
    }
-   if ( $interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
+   if ($interface['ifOperStatus'] != $ifOperStatus && $ifOperStatus != "" ) {
      $update .= $seperator . "`ifOperStatus` = '$ifOperStatus'";
      $seperator = ", ";
      eventlog("Interface went $ifOperStatus", $interface['device_id'], $interface['interface_id']);
    }
-   if ( $interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
+   if ($interface['ifAdminStatus'] != $ifAdminStatus && $ifAdminStatus != "" ) {
      $update .= $seperator . "`ifAdminStatus` = '$ifAdminStatus'";
      $seperator = ", ";
-     if($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
+     if ($ifAdminStatus == "up") { $admin = "enabled"; } else { $admin = "disabled"; }
      eventlog("Interface $admin", $interface['device_id'], $interface['interface_id']);
    }
 
@@ -125,7 +125,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
 #     echo("Not Updating : " . $device['hostname'] ." $ifDescr ( " . $interface['ifDescr'] . " )\n\n");
    }
 
-   if($ifOperStatus == "up") {
+   if ($ifOperStatus == "up") {
 
     $snmp_data_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
     $snmp_data_cmd .= " ifHCInOctets." . $interface['ifIndex'] . " ifHCOutOctets." . $interface['ifIndex'] . " ifInErrors." . $interface['ifIndex'];
@@ -137,7 +137,7 @@ while ($interface = mysql_fetch_array($interface_query)) {
     $snmp_data = str_replace("Wrong Type (should be Counter32): ","", $snmp_data);
     $snmp_data = str_replace("No Such Instance currently exists at this OID","", $snmp_data);
     list($ifHCInOctets, $ifHCOutOctets, $ifInErrors, $ifOutErrors, $ifInUcastPkts, $ifOutUcastPkts, $ifInNUcastPkts, $ifOutNUcastPkts) = explode("\n", $snmp_data);
-    if($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
+    if ($ifHCInOctets == "" || strpos($ifHCInOctets, "No") !== FALSE ) {
 
       $octets_cmd  = $config['snmpget'] . " -M ".$config['mibdir'] . " -m IF-MIB -O qv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'];
       $octets_cmd .= " ifInOctets." . $interface['ifIndex'] . " ifOutOctets." . $interface['ifIndex'];

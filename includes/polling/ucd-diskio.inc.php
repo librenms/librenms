@@ -1,35 +1,35 @@
 <?php
 
 $sql = "SELECT * FROM `ucd_diskio` WHERE `device_id`  = '".$device['device_id']."'";
-if($debug) { echo("$sql"); }
+if ($debug) { echo("$sql"); }
 $diskio_data = mysql_query($sql);
 
-if(mysql_affected_rows()) {
-
-
+if (mysql_affected_rows())
+{
   $diskio_cache = array();
   $diskio_cache = snmpwalk_cache_oid($device, "diskIOEntry", $diskio_cache);
 
   echo("Checking UCD DiskIO MIB: ");
 
-  while($diskio = mysql_fetch_array($diskio_data)) {
-
+  while ($diskio = mysql_fetch_array($diskio_data))
+  {
     $index = $diskio['diskio_index'];
 
     $entry = $diskio_cache[$index];
 
     echo($diskio['diskio_descr'] . " ");
 
-    if($debug) { print_r($entry); }
+    if ($debug) { print_r($entry); }
 
     $rrd_update = $entry['diskIONReadX'].":".$entry['diskIONWrittenX'];
     $rrd_update .= ":".$entry['diskIOReads'].":".$entry['diskIOWrites'];
 
     $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ucd_diskio-" . $diskio['diskio_descr'] .".rrd");
 
-    if($debug) { echo("$rrd "); }
+    if ($debug) { echo("$rrd "); }
 
-    if (!is_file($rrd)) {
+    if (!is_file($rrd))
+    {
       rrdtool_create ($rrd, "--step 300 \
       DS:read:DERIVE:600:0:125000000000 \
       DS:written:DERIVE:600:0:125000000000 \
@@ -51,11 +51,9 @@ if(mysql_affected_rows()) {
 
     rrdtool_update($rrd,"N:$rrd_update");
     unset($rrd_update);
-
   }
 
   echo("\n");
-
 }
 
 unset($diskio_data);

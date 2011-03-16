@@ -3,9 +3,8 @@
 $sql = "SELECT * FROM `ports` AS P, `juniAtmVp` AS J WHERE P.`device_id`  = '".$device['device_id']."' AND J.interface_id = P.interface_id";
 $vp_data = mysql_query($sql);
 
-if(mysql_affected_rows()) {
-
-
+if (mysql_affected_rows())
+{
   $vp_cache = array();
   $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInCells", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
   $vp_cache = snmpwalk_cache_multi_oid($device, "juniAtmVpStatsInPackets", $vp_cache, "Juniper-UNI-ATM-MIB" , $config['install_dir']."/mibs/junose");
@@ -18,13 +17,13 @@ if(mysql_affected_rows()) {
 
   echo("Checking JunOSe ATM vps: ");
 
-  while($vp=mysql_fetch_array($vp_data)) {
-
+  while ($vp=mysql_fetch_array($vp_data))
+  {
     echo(".");
 
     $oid = $vp['ifIndex'].".".$vp['vp_id'];
 
-    if($debug) { echo("$oid "); }
+    if ($debug) { echo("$oid "); }
 
     $t_vp = $vp_cache[$oid];
 
@@ -35,11 +34,11 @@ if(mysql_affected_rows()) {
 
     $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("vp-" . $vp['ifIndex'] . "-".$vp['vp_id'].".rrd");
 
-   if($debug) { echo("$rrd "); }
+    if ($debug) { echo("$rrd "); }
 
-    if (!is_file($rrd)) {
-    
-    rrdtool_create ($rrd, "--step 300 \
+    if (!is_file($rrd))
+    {
+      rrdtool_create ($rrd, "--step 300 \
       DS:incells:DERIVE:600:0:125000000000 \
       DS:outcells:DERIVE:600:0:125000000000 \
       DS:inpackets:DERIVE:600:0:125000000000 \
@@ -63,13 +62,11 @@ if(mysql_affected_rows()) {
     }
 
     rrdtool_update($rrd,"N:$vp_update");
-
   }
 
   echo("\n");
 
   unset($vp_cache);
-
 }
 
 ?>

@@ -2,8 +2,8 @@
 
 $query = "SELECT * FROM entPhysical WHERE device_id = '" . $device['device_id'] . "' AND entPhysicalClass = 'sensor'";
 $sensors = mysql_query($query);
-while($sensor = mysql_fetch_array($sensors)) {
-
+while ($sensor = mysql_fetch_array($sensors))
+{
   echo("Checking Entity Sensor " . $sensor['entPhysicalName'] . " - " . $sensor['cempsensorName']);
 
   $oid = $sensor['entPhysicalIndex']; 
@@ -19,9 +19,9 @@ while($sensor = mysql_fetch_array($sensors)) {
 
   $rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ces-" . $oid . ".rrd");
 
-  if (!is_file($rrd)) {
-    `rrdtool create $rrd \
-     --step 300 \
+  if (!is_file($rrd))
+  {
+    rrdtool_create($rrd,"--step 300 \
       DS:value:GAUGE:600:-1000:U \
       RRA:AVERAGE:0.5:1:2304 \
       RRA:AVERAGE:0.5:6:1536 \
@@ -34,7 +34,7 @@ while($sensor = mysql_fetch_array($sensors)) {
       RRA:MIN:0.5:1:2304 \
       RRA:MIN:0.5:6:1536 \
       RRA:MIN:0.5:24:2268 \
-      RRA:MIN:0.5:288:1890`;
+      RRA:MIN:0.5:288:1890");
   }
 
   $entSensorValue = entPhysical_scale($entSensorValue, $sensor['entSensorScale']);
@@ -46,7 +46,6 @@ while($sensor = mysql_fetch_array($sensors)) {
   mysql_query($update_query);
 
   echo($entSensorValue . " - " . $entSensorStatus . "\n");
-
 }
 
 ?>

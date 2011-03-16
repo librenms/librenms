@@ -47,54 +47,55 @@
 #IP-MIB::ipSystemStatsRefreshRate.ipv4 = Gauge32: 30000 milli-seconds
 #IP-MIB::ipSystemStatsRefreshRate.ipv6 = Gauge32: 30000 milli-seconds
 
-  echo("Polling IP-MIB ipSystemStats ");
+echo("Polling IP-MIB ipSystemStats ");
 
-  $ipSystemStats = snmpwalk_cache_oid($device, "ipSystemStats", NULL, "IP-MIB");
+$ipSystemStats = snmpwalk_cache_oid($device, "ipSystemStats", NULL, "IP-MIB");
 
- if($ipSystemStats) {
-
-  foreach($ipSystemStats as $af => $stats) {
-
-   echo("$af ");
+if ($ipSystemStats)
+{
+  foreach ($ipSystemStats as $af => $stats)
+  {
+    echo("$af ");
 
     $oids = array('ipSystemStatsInReceives','ipSystemStatsInHdrErrors','ipSystemStatsInAddrErrors','ipSystemStatsInUnknownProtos','ipSystemStatsInForwDatagrams','ipSystemStatsReasmReqds',
                   'ipSystemStatsReasmOKs','ipSystemStatsReasmFails','ipSystemStatsInDiscards','ipSystemStatsInDelivers','ipSystemStatsOutRequests','ipSystemStatsOutNoRoutes','ipSystemStatsOutDiscards',
                   'ipSystemStatsOutFragFails','ipSystemStatsOutFragCreates','ipSystemStatsOutForwDatagrams');
 
     ### Use HC counters instead if they're available.
-    if(isset($stats['ipSystemStatsHCInReceives']))       { $stats['ipSystemStatsInReceives']       = $stats['ipSystemStatsHCInReceives']; }
-    if(isset($stats['ipSystemStatsHCInForwDatagrams']))  { $stats['ipSystemStatsInForwDatagrams']  = $stats['ipSystemStatsHCInForwDatagrams']; }
-    if(isset($stats['ipSystemStatsHCInDelivers']))       { $stats['ipSystemStatsInDelivers']       = $stats['ipSystemStatsHCInDelivers']; }
-    if(isset($stats['ipSystemStatsHCOutRequests']))      { $stats['ipSystemStatsOutRequests']      = $stats['ipSystemStatsHCOutRequests']; }
-    if(isset($stats['ipSystemStatsHCOutForwDatagrams'])) { $stats['ipSystemStatsOutForwDatagrams'] = $stats['ipSystemStatsHCOutForwDatagrams']; }
+    if (isset($stats['ipSystemStatsHCInReceives']))       { $stats['ipSystemStatsInReceives']       = $stats['ipSystemStatsHCInReceives']; }
+    if (isset($stats['ipSystemStatsHCInForwDatagrams']))  { $stats['ipSystemStatsInForwDatagrams']  = $stats['ipSystemStatsHCInForwDatagrams']; }
+    if (isset($stats['ipSystemStatsHCInDelivers']))       { $stats['ipSystemStatsInDelivers']       = $stats['ipSystemStatsHCInDelivers']; }
+    if (isset($stats['ipSystemStatsHCOutRequests']))      { $stats['ipSystemStatsOutRequests']      = $stats['ipSystemStatsHCOutRequests']; }
+    if (isset($stats['ipSystemStatsHCOutForwDatagrams'])) { $stats['ipSystemStatsOutForwDatagrams'] = $stats['ipSystemStatsHCOutForwDatagrams']; }
 
     unset($snmpstring, $rrdupdate, $snmpdata, $snmpdata_cmd, $rrd_create);
 
     $rrdfile = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("ipSystemStats-".$af.".rrd");
 
     $rrd_create = "RRA:AVERAGE:0.5:1:600 RRA:AVERAGE:0.5:6:700 RRA:AVERAGE:0.5:24:775 RRA:AVERAGE:0.5:288:797 RRA:MAX:0.5:1:600 RRA:MAX:0.5:6:700 RRA:MAX:0.5:24:775 RRA:MAX:0.5:288:797";
-    
     $rrdupdate = "N";
 
-    foreach($oids as $oid){
+    foreach ($oids as $oid)
+    {
       $oid_ds = str_replace("ipSystemStats", "", $oid);
       $oid_ds = truncate($oid_ds, 19, '');
       $rrd_create .= " DS:$oid_ds:COUNTER:600:U:100000000000";
-      if(strstr($stats[$oid], "No") || strstr($stats[$oid], "d") || strstr($stats[$oid], "s")) { $stats[$oid] = "0"; }
-      $rrdupdate  .= ":".$stats[$oid]; 
+      if (strstr($stats[$oid], "No") || strstr($stats[$oid], "d") || strstr($stats[$oid], "s")) { $stats[$oid] = "0"; }
+      $rrdupdate  .= ":".$stats[$oid];
     }
-    if(!file_exists($rrdfile)) { rrdtool_create($rrdfile,$rrd_create); }
+    
+    if (!file_exists($rrdfile)) { rrdtool_create($rrdfile,$rrd_create); }
     rrdtool_update($rrdfile, $rrdupdate);
+    
     unset($rrdupdate, $rrd_create);
 
     ## FIXME per-AF?
-    
+   
     $graphs['ipsystemstats_'.$af] = TRUE;
     $graphs['ipsystemstats_'.$af.'_frag'] = TRUE;
   }
- }
+}
 
 echo("\n");
-
 
 ?>

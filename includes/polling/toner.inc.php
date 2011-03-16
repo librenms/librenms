@@ -4,8 +4,8 @@ if ($config['enable_printers'])
 {
   $query = "SELECT * FROM toner WHERE device_id = '" . $device['device_id'] . "'";
   $toner_data = mysql_query($query);
-  
-  while($toner = mysql_fetch_array($toner_data)) 
+
+  while ($toner = mysql_fetch_array($toner_data))
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
@@ -16,15 +16,14 @@ if ($config['enable_printers'])
 
     $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
 
-    if (!is_file($tonerrrd)) 
+    if (!is_file($tonerrrd))
     {
-      `rrdtool create $tonerrrd \
-      --step 300 \
+      rrdtool_create($tonerrrd,"--step 300 \
       DS:toner:GAUGE:600:0:20000 \
       RRA:AVERAGE:0.5:1:1200 \
       RRA:MIN:0.5:12:2400 \
       RRA:MAX:0.5:12:2400 \
-      RRA:AVERAGE:0.5:12:2400`;
+      RRA:AVERAGE:0.5:12:2400");
     }
 
     echo($tonerperc . " %\n");

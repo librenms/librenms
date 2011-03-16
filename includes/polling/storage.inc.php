@@ -6,13 +6,14 @@ $storage_cache = array();
 
 $query = "SELECT * FROM storage WHERE device_id = '" . $device['device_id'] . "'";
 $storage_data = mysql_query($query);
-while($storage = mysql_fetch_array($storage_data)) {
-
+while ($storage = mysql_fetch_array($storage_data))
+{
   echo("Storage ".$storage['storage_descr'] . ": ");
 
   $storage_rrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("storage-" . $storage['storage_mib'] . "-" . safename($storage['storage_descr']) . ".rrd");
 
-  if (!is_file($storage_rrd)) {
+  if (!is_file($storage_rrd))
+  {
    rrdtool_create($storage_rrd, "--step 300 \
      DS:used:GAUGE:600:0:U \
      DS:free:GAUGE:600:0:U \
@@ -31,13 +32,14 @@ while($storage = mysql_fetch_array($storage_data)) {
   }
 
   $file = $config['install_dir']."/includes/polling/storage-".$storage['storage_mib'].".inc.php";
-  if(is_file($file)) {
+  if (is_file($file))
+  {
     include($file);
   } else {
     ### Generic poller goes here if we ever have a discovery module which uses it.
   }
 
-  if($debug) {print_r($storage);}
+  if ($debug) {print_r($storage); }
 
   if ($storage['size'])
   {
@@ -56,11 +58,10 @@ while($storage = mysql_fetch_array($storage_data)) {
   $update_query .= ", `storage_free` = '".$storage['free']."', `storage_size` = '".$storage['size']."'";
   $update_query .= ", `storage_units` = '".$storage['units']."', `storage_perc` = '".$percent."'";
   $update_query .= " WHERE `storage_id` = '".$storage['storage_id']."'";
-  if($debug) { echo("$update_query\n"); }
+  if ($debug) { echo("$update_query\n"); }
   mysql_query($update_query);
 
   echo("\n");
-
 }
 
 unset($storage);
