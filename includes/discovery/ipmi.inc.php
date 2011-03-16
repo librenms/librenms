@@ -9,14 +9,14 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
 
   $ipmi['user'] = get_dev_attrib($device,'ipmi_username');
   $ipmi['password'] = get_dev_attrib($device,'ipmi_password');
-  
+
   $results = shell_exec($config['ipmitool'] . " -H " . $ipmi['host'] . " -U " . $ipmi['user'] . " -P " . $ipmi['password'] . " sensor|sort");
-  
+
   $index = 0;
 
   foreach (explode("\n",$results) as $sensor)
   {
-    # BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na        
+    # BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
     list($desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable) = explode('|',$sensor);
     $index++;
     if (trim($current) != "na" && $ipmi_unit[trim($unit)])
@@ -27,7 +27,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
         $current, 'ipmi');
     }
   }
-  
+
   echo("\n");
 }
 

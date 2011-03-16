@@ -6,7 +6,7 @@ global $valid_sensor;
 if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
 {
   echo("RFC1628 ");
- 
+
   $oids = trim(snmp_walk($device, "1.3.6.1.2.1.33.1.3.2.0", "-OsqnU"));
   if ($debug) { echo($oids."\n"); }
   list($unused,$numPhase) = explode(' ',$oids);

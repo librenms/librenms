@@ -30,7 +30,7 @@ foreach (explode("\n", $ports) as $entry){
     }
 
     if (empty($ifDescr)) { $nullintf = 1; }
-    if ($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; } 
+    if ($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; }
     $ifDescr = fixifName($ifDescr);
     if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
     if (isset($config['allow_ng']) && !$config['allow_ng']) {
@@ -43,11 +43,11 @@ foreach (explode("\n", $ports) as $entry){
         # Add Interface
 	echo("+");
       } else {
-	mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"); 
+	mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
 	echo(".");
       }
       $int_exists[] = "$ifIndex";
-    } else { 
+    } else {
       # Ignored Interface
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
 	mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
@@ -57,7 +57,7 @@ foreach (explode("\n", $ports) as $entry){
 	echo("X"); ## Ignored Interface
       }
     }
-  } 
+  }
 }
 
 

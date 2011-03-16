@@ -49,7 +49,7 @@ if ($device['os_group'] == "ios")
       {
         if ($test_vlan == $dev_vlan['vlan_vlan']) { $vlan_exists = 1; }
       }
-      
+
       if (!$vlan_exists)
       {
         mysql_query("DELETE FROM `vlans` WHERE `vlan_id` = '" . $dev_vlan['vlan_id'] . "'");

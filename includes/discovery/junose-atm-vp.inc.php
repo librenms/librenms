@@ -45,7 +45,7 @@ if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
       echo("-");
       mysql_query("DELETE FROM `juniAtmvp` WHERE `juniAtmVp` = '" . $test['juniAtmvp'] . "'");
     }
-    
+
     unset($interface_id); unset($vp_id);
   }
 

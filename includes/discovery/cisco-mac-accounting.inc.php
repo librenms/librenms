@@ -38,7 +38,7 @@ if ($device['os_group'] == "ios")
         #echo("      Not Exists!");
         mysql_query("INSERT INTO `mac_accounting` (interface_id,  mac) VALUES ('".$interface['interface_id']."','$clean_mac')");
         echo("+");
-      }      
+      }
       #echo("\n");
     }
   }

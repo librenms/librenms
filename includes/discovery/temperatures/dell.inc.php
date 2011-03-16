@@ -1,5 +1,5 @@
 <?php
- 
+
 global $valid_sensor;
 
 if (strstr($device['hardware'], "dell"))

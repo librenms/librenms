@@ -23,7 +23,7 @@ Disabled needing rewrite
     echo("Adva Chassis ");
     if ($temperature_chassis != "0")
     {
-      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_chassis' AND temperature_host = '$id'"),0) == '0') 
+      if (mysql_result(mysql_query("SELECT count(temperature_id) FROM `temperature` WHERE temperature_oid = '$oid_chassis' AND temperature_host = '$id'"),0) == '0')
       {
         $query = "INSERT INTO temperature (`temperature_host`, `temperature_oid`, `temperature_descr`, `temperature_precision`, `temperature_limit`, `temperature_current`) values ('$id', '$oid_chassis', '$descr_chassis',1," . ($config['defaults']['temperature_limit'] ? $config['defaults']['temperature_limit'] : '60') . ", '$temperature_chassis')";
         mysql_query($query);

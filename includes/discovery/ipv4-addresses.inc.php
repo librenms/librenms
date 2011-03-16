@@ -12,7 +12,7 @@ foreach (explode("\n", $oids) as $data)
   $addr = Net_IPv4::parseAddress("$oid/$mask");
   $network = $addr->network . "/" . $addr->bitmask;
   $cidr = $addr->bitmask;
-  
+
   if (mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0' && $oid != "0.0.0.0")
   {
     $i_query = "SELECT interface_id FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'";
