@@ -498,10 +498,10 @@ function fixIOSHardware($hardware)
 
 }
 
-function createHost ($host, $community, $snmpver, $port = 161, $proto = 'udp')
+function createHost ($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   $host = trim(strtolower($host));
-  $device = deviceArray($host, $community, $snmpver, $port, $proto);
+  $device = deviceArray($host, $community, $snmpver, $port, $transport);
   $host_os = getHostOS($device); 
 
   if ($host_os)
