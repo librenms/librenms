@@ -26,21 +26,24 @@ echo("Observium v".$config['version']." Discovery\n\n");
 
 $options = getopt("h:t:i:n:d::a::");
 
-if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
-elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
-elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
-elseif ($options['h'] == "new")  { $where = "AND `last_discovered` = NULL"; $doing = "new"; }
-elseif ($options['h'])
+if (isset($options['h']))
 {
-  if (is_numeric($options['h']))
+  if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
+  elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
+  elseif ($options['h'] == "all")  { $where = " "; $doing = "all"; }
+  elseif ($options['h'] == "new")  { $where = "AND `last_discovered` IS NULL"; $doing = "new"; }
+  elseif ($options['h'])
   {
-    $where = "AND `device_id` = '".$options['h']."'";
-    $doing = $options['h'];
-  }
-  else
-  {
-    $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";
-    $doing = $options['h'];
+    if (is_numeric($options['h']))
+    {
+      $where = "AND `device_id` = '".$options['h']."'";
+      $doing = $options['h'];
+    }
+    else
+    {
+      $where = "AND `hostname` LIKE '".str_replace('*','%',mres($options['h']))."'";
+      $doing = $options['h'];
+    }
   }
 }
 
