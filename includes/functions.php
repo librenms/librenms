@@ -28,12 +28,7 @@ function mac_clean_to_readable($mac)
   return($r);
 }
 
-function zeropad($num)
-{
-  return (strlen($num) == 1) ? '0'.$num : $num;
-}
-
-function zeropad_lineno($num, $length)
+function zeropad($num, $length = 2)
 {
   while (strlen($num) < $length)
   {
@@ -183,7 +178,7 @@ function percent_colour($perc)
  return sprintf('#%02x%02x%02x', $r, $b, $b);
 }
 
-function interface_errors ($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
+function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
@@ -291,7 +286,7 @@ function delete_device($id)
   return $ret;
 }
 
-function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp') 
+function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   global $config;
   list($hostshort)      = explode(".", $host);
@@ -305,14 +300,14 @@ function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host)
         {
-          createHost ($host, $community, $snmpver, $port, $transport);
+          createHost($host, $community, $snmpver, $port, $transport);
         } else { echo("Given hostname does not match SNMP-read hostname!\n"); }
       } else { echo("Already got host $host\n"); }
     } else { echo("Could not ping $host\n"); }
   } else { echo("Could not resolve $host\n"); }
 }
 
-function scanUDP ($host, $port, $timeout)
+function scanUDP($host, $port, $timeout)
 {
   $handle = fsockopen($host, $port, $errno, $errstr, 2);
   socket_set_timeout ($handle, $timeout);
@@ -445,6 +440,7 @@ function utime()
   return $sec + $usec;
 }
 
+# FIXME function unused, superseded by rewrites?
 function fixIOSFeatures($features)
 {
 	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);
@@ -478,9 +474,9 @@ function fixIOSFeatures($features)
 	return $features;
 }
 
+# FIXME function unused, superseded by rewrites?
 function fixIOSHardware($hardware)
 {
-
         $hardware = preg_replace("/C([0-9]+)/", "Cisco \\1", $hardware);
 	$hardware = preg_replace("/CISCO([0-9]+)/", "Cisco \\1", $hardware);
         $hardware = str_replace("cat4000","Cisco Catalyst 4000", $hardware);
@@ -495,14 +491,13 @@ function fixIOSHardware($hardware)
 	$hardware = str_replace("C7301", "Cisco 7301", $hardware);
         $hardware = str_replace("CE500", "Catalyst Express 500", $hardware);
 	return $hardware;
-
 }
 
-function createHost ($host, $community, $snmpver, $port = 161, $transport = 'udp')
+function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   $host = trim(strtolower($host));
   $device = deviceArray($host, $community, $snmpver, $port, $transport);
-  $host_os = getHostOS($device); 
+  $host_os = getHostOS($device);
 
   if ($host_os)
   {
@@ -527,9 +522,7 @@ function createHost ($host, $community, $snmpver, $port = 161, $transport = 'udp
 
 function isDomainResolves($domain)
 {
-  # duh.
-  #return count(dns_get_record($domain)) != 0;
-  return gethostbyname($domain) != $domain;
+  return (gethostbyname($domain) != $domain | count(dns_get_record($domain)) != 0);
 }
 
 function hoststatus($id)
