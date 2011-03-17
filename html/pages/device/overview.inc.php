@@ -68,7 +68,7 @@ if (mysql_affected_rows() > "0")
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/printer.png'> Recent Syslog</p>");
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
-  while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
+  while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc.php"); }
   echo("</table>");
   echo("</div>");
 }
@@ -101,7 +101,7 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 
 while ($entry = mysql_fetch_array($data))
 {
-  include("includes/print-event-short.inc");
+  include("includes/print-event-short.inc.php");
 }
 
 echo("</table>");

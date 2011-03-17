@@ -102,7 +102,7 @@ if ($config['enable_syslog'])
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
   while ($entry = mysql_fetch_array($query)) {
     $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
-    include("includes/print-syslog.inc");
+    include("includes/print-syslog.inc.php");
   }
   echo("</table>");
 
@@ -128,7 +128,7 @@ $data = mysql_query($query);
 echo("<table cellspacing=0 cellpadding=1 width=100%>");
 
 while ($entry = mysql_fetch_array($data)) {
-  include("includes/print-event.inc");
+  include("includes/print-event.inc.php");
 }
 
 echo("</table>");

@@ -47,19 +47,23 @@
 
 print_optionbar_end();
 
-if ($_POST['string']) {
+if ($_POST['string'])
+{
   $where = " AND S.msg LIKE '%".$_POST['string']."%'";
 }
 
-if ($_POST['program']) {
+if ($_POST['program'])
+{
   $where .= " AND S.program = '".$_POST['program']."'";
 }
 
-if ($_POST['device']) {
+if ($_POST['device'])
+{
   $where .= " AND D.device_id = '".$_POST['device']."'";
 }
 
-if ($_SESSION['userlevel'] >= '5') {
+if ($_SESSION['userlevel'] >= '5')
+{
   $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog
           WHERE 1 $where ORDER BY timestamp DESC LIMIT 1000";
 } else {
@@ -69,9 +73,10 @@ if ($_SESSION['userlevel'] >= '5') {
 
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_array($query)) {
+while ($entry = mysql_fetch_array($query))
+{
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
-  include("includes/print-syslog.inc");
+  include("includes/print-syslog.inc.php");
 }
 echo("</table>");
 

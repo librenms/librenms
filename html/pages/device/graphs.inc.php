@@ -52,7 +52,7 @@ foreach ($config['graph_types']['device'] as $graph => $entry)
   {
     $graph_title = $config['graph_types']['device'][$graph]['descr'];
     $graph_type = "device_" . $graph;
-    include ("includes/print-device-graph.php");
+    include("includes/print-device-graph.php");
   }
 }
 

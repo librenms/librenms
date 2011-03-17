@@ -26,7 +26,7 @@ if ($_SESSION['userlevel'] >= '5')
     $service_query = mysql_query("SELECT * FROM `services` WHERE `device_id` = '" . $host_data['device_id'] . "' $where");
     while ($service = mysql_fetch_array($service_query))
     {
-       include("includes/print-service.inc");
+       include("includes/print-service.inc.php");
 #       $samehost = 1;
        if ($_GET['opta'] == "details")
        {
