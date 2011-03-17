@@ -2,7 +2,7 @@
 
 ### Authorises bill viewing and sets $ports as reference to mysql query containing ports for this bill
 
-if(is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
+if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
 {
 
   $ports = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D
@@ -10,7 +10,6 @@ if(is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted(
                         AND D.device_id = P.device_id");
 
   $auth = TRUE;
-
 }
 
 ?>

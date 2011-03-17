@@ -1,6 +1,5 @@
 <?php
 
-
 include("includes/graphs/common.inc.php");
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
@@ -17,7 +16,5 @@ $scale_min = 0;
 $unit_text = "Active Tunnels";
 
 include("includes/graphs/generic_simplex.inc.php");
-
-
 
 ?>
