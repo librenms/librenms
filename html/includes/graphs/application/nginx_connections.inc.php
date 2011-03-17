@@ -2,10 +2,11 @@
 
 include("includes/graphs/common.inc.php");
 
-$nginx_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-nginx-".$app['app_id'].".rrd";
+$nginx_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-nginx-".$app['app_id'].".rrd";
 
-if(is_file($nginx_rrd)) {
-    $rrd_filename = $nginx_rrd;
+if (is_file($nginx_rrd))
+{
+  $rrd_filename = $nginx_rrd;
 }
 
 $rrd_options .= ' DEF:a='.$rrd_filename.':Active:AVERAGE ';

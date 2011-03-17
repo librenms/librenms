@@ -4,7 +4,8 @@ include("includes/graphs/common.inc.php");
 
 $apache_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-apache-".$app['app_id'].".rrd";
 
-if(is_file($apache_rrd)) {
+if (is_file($apache_rrd))
+{
   $rrd_filename = $apache_rrd;
 }
 

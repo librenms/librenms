@@ -2,11 +2,13 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
 
-if(is_file($mysql_rrd)) {
-    $rrd_filename = $mysql_rrd;
+if (is_file($mysql_rrd))
+{
+  $rrd_filename = $mysql_rrd;
 }
+
 $rrd_options .= ' -b 1024 ';
 $rrd_options .= ' DEF:a='.$rrd_filename.':IBPse:AVERAGE ';
 $rrd_options .= ' DEF:b='.$rrd_filename.':IBPDBp:AVERAGE ';
@@ -34,6 +36,5 @@ $rrd_options .= 'LINE2:d#0022FF:"Modified Pages"\ \    ';
 $rrd_options .= 'GPRINT:d:LAST:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:d:AVERAGE:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:d:MAX:"%6.2lf %s\n"  ';
-
 
 ?>
