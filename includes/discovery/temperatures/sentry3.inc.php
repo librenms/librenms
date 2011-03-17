@@ -22,9 +22,9 @@ if ($device['os'] == "sentry3")
       #tempHumidSensorTempValue
       $temperature_oid = "1.3.6.1.4.1.1718.3.2.5.1.6.1.".$index;
       $descr = "Removable Sensor " . $index;
-      $low_warn_limit  = "0";
+      $low_warn_limit  = NULL;
       $low_limit       = snmp_get($device,"tempHumidSensorTempLowThresh.1.$index", "-Ovq", "Sentry3-MIB") / $divisor;
-      $high_warn_limit = "0";
+      $high_warn_limit = NULL;
       $high_limit      = snmp_get($device,"tempHumidSensorTempHighThresh.1.$index", "-Ovq", "Sentry3-MIB") / $divisor;
       $current         = snmp_get($device,"$temperature_oid", "-Ovq", "Sentry3-MIB") / $divisor;
 
