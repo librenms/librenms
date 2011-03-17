@@ -104,7 +104,11 @@ if ($_SESSION['userlevel'] >= '10') {
 ## Display Locations entry if $config['show_locations']
 if ($config['show_locations'])
 {
-  $locations = mysql_query("SELECT DISTINCT location FROM devices ORDER BY location");
+	if($_SESSION['userlevel'] >= '5') {
+		$locations = mysql_query("SELECT DISTINCT location FROM devices GROUP BY location ORDER BY location");
+	} else {
+		$locations = mysql_query("SELECT DISTINCT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' GROUP BY location ORDER BY location");
+	}
 ?>
 <li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
 <?php

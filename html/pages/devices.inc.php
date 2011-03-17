@@ -89,7 +89,13 @@ print_optionbar_start(62);
         <select name="location" id="location">
           <option value="">All Locations</option>
           <?php
-            $query = mysql_query("SELECT `location` FROM `devices` WHERE 1 $where GROUP BY `location` ORDER BY `location`");
+
+		if($_SESSION['userlevel'] >= '5') {
+			$query = mysql_query("SELECT location FROM devices WHERE 1 $where GROUP BY location ORDER BY location");
+		} else {
+			$query = mysql_query("SELECT location FROM devices AS D, devices_perms AS P WHERE  1 $where AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' GROUP BY location ORDER BY location");
+		}
+
             while ($data = mysql_fetch_array($query))
             {
               if ($data['location'])
