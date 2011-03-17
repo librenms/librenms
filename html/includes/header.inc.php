@@ -29,7 +29,7 @@ if ($_SESSION['authenticated'])
 <?php
 if (isset($_SESSION['authenticated']) && $_SESSION['authenticated'])
 {
-  include("includes/topnav.inc");
+  include("includes/topnav.inc.php");
 }
 ?>
             </div>
