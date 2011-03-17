@@ -23,7 +23,7 @@ $nototal = 1;
 
 if ($rrd_list)
 {
-  include ("includes/graphs/generic_multi_line.inc.php");
+  include("includes/graphs/generic_multi_line.inc.php");
 }
 
 ?>

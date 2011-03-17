@@ -25,6 +25,6 @@ $nototal   = 1;
 $unit_text = "Sessions";
 $scale_min = "0";
 
-include ("generic_multi_simplex_seperated.inc.php");
+include("generic_multi_simplex_seperated.inc.php");
 
 ?>

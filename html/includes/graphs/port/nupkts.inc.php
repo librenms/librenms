@@ -36,7 +36,7 @@ if (1)
 
   $nototal = 1;
 
-  include ("includes/graphs/generic_multi_seperated.inc.php");
+  include("includes/graphs/generic_multi_seperated.inc.php");
 }
 elseif (is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
 {

@@ -6,7 +6,7 @@ echo('<table cellspacing="0" cellpadding="2" width="100%">');
 
 while ($entry = mysql_fetch_array($data))
 {
-  include("includes/print-event.inc");
+  include("includes/print-event.inc.php");
 }
 
 echo('</table>');

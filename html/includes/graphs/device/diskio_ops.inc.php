@@ -29,6 +29,6 @@ $colours_out = 'blues';
 
 $nototal = 1;
 
-include ("includes/graphs/generic_multi_seperated.inc.php");
+include("includes/graphs/generic_multi_seperated.inc.php");
 
 ?>

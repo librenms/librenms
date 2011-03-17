@@ -16,7 +16,7 @@ $i = "0";
 $vrf_query = mysql_query("select * from vrfs WHERE device_id = '".$_GET['id']."' ORDER BY 'vrf_name'");
 while ($vrf = mysql_fetch_array($vrf_query))
 {
-  include("includes/print-vrf.inc");
+  include("includes/print-vrf.inc.php");
   $i++;
 }
 

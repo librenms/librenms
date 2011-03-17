@@ -69,7 +69,7 @@ if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php"))
     {
       $graph_title = $type_text[$type];
       $graph_type = "device_".$type;
-      include ("includes/print-device-graph.php");
+      include("includes/print-device-graph.php");
     }
   }
 }
