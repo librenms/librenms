@@ -2,16 +2,17 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
 
-if(is_file($mysql_rrd)) {
-    $rrd_filename = $mysql_rrd;
+if (is_file($mysql_rrd))
+{
+  $rrd_filename = $mysql_rrd;
 }
+
 $rrd_options .= ' DEF:a='.$rrd_filename.':KRRs:AVERAGE ';
 $rrd_options .= ' DEF:b='.$rrd_filename.':KRs:AVERAGE ';
 $rrd_options .= ' DEF:c='.$rrd_filename.':KWR:AVERAGE ';
 $rrd_options .= ' DEF:d='.$rrd_filename.':KWs:AVERAGE ';
-
 
 $rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
 

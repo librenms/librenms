@@ -2,11 +2,13 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
 
-if(is_file($mysql_rrd)) {
+if (is_file($mysql_rrd))
+{
     $rrd_filename = $mysql_rrd;
 }
+
 $rrd_options .= ' -b 1000 ';
 $rrd_options .= ' DEF:a='.$rrd_filename.':TOC:AVERAGE ';
 $rrd_options .= ' DEF:b='.$rrd_filename.':OFs:AVERAGE ';
@@ -34,6 +36,5 @@ $rrd_options .= 'LINE1:d#0022FF:"Opened Tables"\ \    ';
 $rrd_options .= 'GPRINT:d:LAST:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:d:AVERAGE:"%6.2lf %s"  ';
 $rrd_options .= 'GPRINT:d:MAX:"%6.2lf %s\n"  ';
-
 
 ?>

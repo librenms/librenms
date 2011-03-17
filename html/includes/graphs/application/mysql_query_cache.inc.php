@@ -2,10 +2,11 @@
 
 include("includes/graphs/common.inc.php");
 
-$mysql_rrd   = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
+$mysql_rrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/app-mysql-".$app['app_id'].".rrd";
 
-if(is_file($mysql_rrd)) {
-    $rrd_filename = $mysql_rrd;
+if (is_file($mysql_rrd))
+{
+  $rrd_filename = $mysql_rrd;
 }
 
 $rrd_options .= ' -b 1024 ';
@@ -14,7 +15,6 @@ $rrd_options .= ' DEF:b='.$rrd_filename.':QCHs:AVERAGE ';
 $rrd_options .= ' DEF:c='.$rrd_filename.':QCIs:AVERAGE ';
 $rrd_options .= ' DEF:d='.$rrd_filename.':QCNCd:AVERAGE ';
 $rrd_options .= ' DEF:e='.$rrd_filename.':QCLMPs:AVERAGE ';
-
 
 $rrd_options .= 'COMMENT:"    Current    Average   Maximum\n" ';
 

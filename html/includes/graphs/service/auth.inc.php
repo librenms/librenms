@@ -1,10 +1,10 @@
 <?php
 
-if(is_numeric($id))
+if (is_numeric($id))
 {
   $service = mysql_fetch_assoc(mysql_query("SELECT * FROM services WHERE service_id = '".mres($id)."'"));
 
-  if(is_numeric($service['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($service['device_id'])))
+  if (is_numeric($service['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($service['device_id'])))
   {
     $device = device_by_id_cache($service['device_id']);
 
