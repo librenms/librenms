@@ -39,9 +39,9 @@ if ($_GET['query'] && $_GET['cmd']) {
         } else {
             $cmd = $config['nmap'] . " $host";
         }
-        break; 
+        break;
     }
-    
+
     if (!empty($cmd))
     {
         $output = `$cmd`;
