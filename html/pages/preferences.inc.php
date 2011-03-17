@@ -2,20 +2,20 @@
 echo("<div style='margin: 10px'>");
 echo("<h3>User Preferences</h3>");
 
-
-if($_POST['action'] == "changepass") {
-
-  if(authenticate($_SESSION['username'],$_POST['old_pass'])) {
-    if($_POST['new_pass'] == "" || $_POST['new_pass2'] == "")
+if ($_POST['action'] == "changepass")
+{
+  if (authenticate($_SESSION['username'],$_POST['old_pass']))
+  {
+    if ($_POST['new_pass'] == "" || $_POST['new_pass2'] == "")
     {
       $changepass_message = "Password must not be blank.";
     }
-    elseif($_POST['new_pass'] == $_POST['new_pass2']) 
+    elseif ($_POST['new_pass'] == $_POST['new_pass2'])
     {
       changepassword($_SESSION['username'],$_POST['new_pass']);
-      $changepass_message = "Password Changed.";      
-    } 
-    else 
+      $changepass_message = "Password Changed.";
+    }
+    else
     {
       $changepass_message = "Passwords don't match.";
     }
@@ -49,26 +49,23 @@ if (passwordscanchange())
 echo("<div style='background-color: #e5e5e5; border: solid #e5e5e5 10px;  margin-bottom:10px;'>");
 echo("<div style='font-size: 18px; font-weight: bold; margin-bottom: 5px;'>Device Permissions</div>");
 
-if($_SESSION['userlevel'] == '10') { echo("<strong class='blue'>Global Administrative Access</strong>"); }
-if($_SESSION['userlevel'] == '5')  { echo("<strong class='green'>Global Viewing Access</strong>"); }
-if($_SESSION['userlevel'] == '1') {
+if ($_SESSION['userlevel'] == '10') { echo("<strong class='blue'>Global Administrative Access</strong>"); }
+if ($_SESSION['userlevel'] == '5')  { echo("<strong class='green'>Global Viewing Access</strong>"); }
+if ($_SESSION['userlevel'] == '1') {
 
   $perms = mysql_query("SELECT * FROM `devices_perms` AS P, `devices` AS D WHERE `user_id` = '" . $user_id . "' AND P.device_id = D.device_id");
 
-
-  while($perm = mysql_fetch_array($perms)) {
+  while ($perm = mysql_fetch_array($perms))
+  {
     echo("<a href='?page=device&id=" . $perm['device_id'] . "'>" . $perm['hostname'] . "</a><br />");
     $dev_access = 1;
   }
-  if(!$dev_access) { echo("No access!"); }
 
- }
+  if (!$dev_access) { echo("No access!"); }
+}
 
-
+echo("</div>");
 echo("</div>");
 echo("</div>");
 
-
-echo("</div>");
 ?>
-

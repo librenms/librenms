@@ -2,14 +2,14 @@
   <h3>Observium <?php
 
 echo($config['version']);
-  
+
 if (file_exists('.svn/entries'))
 {
   $svn = File('.svn/entries');
   echo('-SVN r' . trim($svn[3]));
   unset($svn);
 }
-                                
+
   ?></h3>
   <div style="float: right; padding: 0px; width: 49%">
 <?php print_optionbar_start(NULL); ?>

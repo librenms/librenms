@@ -63,7 +63,7 @@ if (is_file("pages/device/health/".mres($_GET['opta']).".inc.php"))
 {
    include("pages/device/health/".mres($_GET['opta']).".inc.php");
 } else {
-  foreach ($datas as $type) 
+  foreach ($datas as $type)
   {
     if ($type != "overview")
     {

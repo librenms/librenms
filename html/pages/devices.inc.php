@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 if ($_POST['hostname']) { $where = " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
 if ($_POST['os'])       { $where = " AND os = '".mres($_POST['os'])."'"; }
@@ -10,11 +10,11 @@ if ($_GET['location'] && !isset($_POST['location']))  { $where .= " AND location
 if ($_GET['type'])      { $where = "AND type = '" .mres($_GET[type]). "'"; }
 if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
 
-print_optionbar_start(62); 
+print_optionbar_start(62);
 ?>
 <table cellpadding="4" cellspacing="0" class="devicetable" width="100%">
   <form method="post" action="">
-    <tr> 
+    <tr>
       <td width="30" align="center" valign="middle"></td>
       <td width="300"><span style="font-weight: bold; font-size: 14px;"></span>
         <input type="text" name="hostname" id="hostname" size="40" value="<?php  echo($_POST['hostname']); ?>" />
@@ -24,7 +24,7 @@ print_optionbar_start(62);
           <option value=''>All OSes</option>
           <?php
             $query = mysql_query("SELECT `os` FROM `devices` WHERE 1 $where GROUP BY `os` ORDER BY `os`");
-            while ($data = mysql_fetch_array($query)) 
+            while ($data = mysql_fetch_array($query))
             {
               if ($data['os'])
               {
@@ -40,7 +40,7 @@ print_optionbar_start(62);
           <option value=''>All Versions</option>
           <?php
             $query = mysql_query("SELECT `version` FROM `devices` WHERE 1 $where GROUP BY `version` ORDER BY `version`");
-            while ($data = mysql_fetch_array($query)) 
+            while ($data = mysql_fetch_array($query))
             {
               if ($data['version'])
               {
@@ -57,7 +57,7 @@ print_optionbar_start(62);
           <option value="">All Platforms</option>
           <?php
             $query = mysql_query("SELECT `hardware` FROM `devices` WHERE 1 $where GROUP BY `hardware` ORDER BY `hardware`");
-            while ($data = mysql_fetch_array($query)) 
+            while ($data = mysql_fetch_array($query))
             {
               if ($data['hardware'])
               {
@@ -73,7 +73,7 @@ print_optionbar_start(62);
           <option value="">All Featuresets</option>
           <?php
             $query = mysql_query("SELECT `features` FROM `devices` WHERE 1 $where GROUP BY `features` ORDER BY `features`");
-            while ($data = mysql_fetch_array($query)) 
+            while ($data = mysql_fetch_array($query))
             {
               if ($data['features'])
               {
@@ -90,7 +90,7 @@ print_optionbar_start(62);
           <option value="">All Locations</option>
           <?php
             $query = mysql_query("SELECT `location` FROM `devices` WHERE 1 $where GROUP BY `location` ORDER BY `location`");
-            while ($data = mysql_fetch_array($query)) 
+            while ($data = mysql_fetch_array($query))
             {
               if ($data['location'])
               {
@@ -112,16 +112,19 @@ print_optionbar_start(62);
 print_optionbar_end();
 
 $sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostname`";
-if ($_GET['status'] == "alerted") { 
-  $sql = "SELECT * FROM devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";  
+if ($_GET['status'] == "alerted")
+{
+  $sql = "SELECT * FROM devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";
 }
 
 echo('<table cellpadding="7" cellspacing="0" class="devicetable" width="100%">
 <tr class="tablehead"><th></th><th>Device</th><th></th><th>Operating System</th><th>Platform</th><th>Uptime</th></tr>');
 
 $device_query = mysql_query($sql);
-while ($device = mysql_fetch_array($device_query)) {
-  if ( device_permitted($device['device_id']) ) {
+while ($device = mysql_fetch_array($device_query))
+{
+  if (device_permitted($device['device_id']))
+  {
     include("includes/hostbox.inc.php");
   }
 }

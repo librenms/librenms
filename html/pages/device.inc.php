@@ -22,7 +22,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   $select[$section] = "selected";
 
   $device_query = mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $_GET['id'] . "'");
-  while($device = mysql_fetch_array($device_query))
+  while ($device = mysql_fetch_array($device_query))
   {
     if ($config['os'][$device['os']]['group']) { $device['os_group'] = $config['os'][$device['os']]['group']; }
 
@@ -140,7 +140,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
     }
-    elseif ( device_permitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$_GET['id']."'"), 0) > '0')
+    elseif (device_permitted($_GET['id']) && $config['enable_inventory'] && @mysql_result(mysql_query("SELECT * FROM `hrDevice` WHERE device_id = '".$_GET['id']."'"), 0) > '0')
     {
       echo('<li class="' . $select['hrdevice'] . '">
     <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/hrdevice/">
@@ -148,7 +148,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     </a>
   </li>');
     }
-  
+
     if (mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
     {
       echo('<li class="' . $select['srv'] . '">
@@ -190,7 +190,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
 
   if ($_SESSION['userlevel'] >= "7") {
     if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
-    foreach($config['rancid_configs'] as $configs) {
+    foreach ($config['rancid_configs'] as $configs) {
       if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
       if (is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
     }
@@ -227,4 +227,3 @@ else
   include("includes/error-no-perm.inc.php");
 }
 ?>
-  

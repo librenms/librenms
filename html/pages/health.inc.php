@@ -2,23 +2,22 @@
 
 $datas = array('Processors','Memory','Storage','Temperatures', 'Humidity', 'Fanspeeds', 'Voltages', 'Frequencies', 'Current');
 
-if(!$_GET['opta']) { $_GET['opta'] = "processors"; }
-if(!$_GET['optb']) { $_GET['optb'] = "nographs"; }
-
+if (!$_GET['opta']) { $_GET['opta'] = "processors"; }
+if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
 
 print_optionbar_start('', '');
 
 $sep = "";
-foreach ($datas as $texttype) 
+foreach ($datas as $texttype)
 {
   $type = strtolower($texttype);
   echo($sep);
-  if ($_GET['opta'] == $type) 
-  { 
+  if ($_GET['opta'] == $type)
+  {
     echo("<strong>");
     echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
-  } 
-  else 
+  }
+  else
   {
     echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
@@ -26,26 +25,39 @@ foreach ($datas as $texttype)
   if ($_GET['opta'] == $type) { echo("</strong>"); }
   $sep = ' | ';
 }
+
 unset ($sep);
 
 echo('<div style="float: right;">');
 
-if($_GET['optb'] == "graphs") { echo('<strong>');
+if ($_GET['optb'] == "graphs")
+{
+  echo('<strong>');
   echo('<img src="images/icons/graphs.png" class="optionicon" />');
 } else {
   echo('<img src="images/icons/greyscale/graphs.png" class="optionicon" />');
 }
+
 echo('<a href="health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
-if($_GET['optb'] == "graphs") { echo('</strong>'); }
+
+if ($_GET['optb'] == "graphs")
+{
+  echo('</strong>');
+}
+
 echo(' | ');
-if($_GET['optb'] == "nographs") { echo('<strong>');
+
+if ($_GET['optb'] == "nographs")
+{
+  echo('<strong>');
   echo('<img src="images/icons/nographs.png" class="optionicon" />');
 } else {
   echo('<img src="images/icons/greyscale/nographs.png" class="optionicon" />');
 }
-echo('<a href="health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
-if($_GET['optb'] == "nographs") { echo('</strong>'); }
 
+echo('<a href="health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+
+if ($_GET['optb'] == "nographs") { echo('</strong>'); }
 
 echo('</div>');
 

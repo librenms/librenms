@@ -64,7 +64,7 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
           </tr>");
     $drive_rows++;
   }
-  
+
   echo("</table>");
   echo("</div>");
 }
