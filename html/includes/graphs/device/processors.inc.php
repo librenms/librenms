@@ -22,8 +22,8 @@ while ($proc = mysql_fetch_array($query))
 
 $unit_text = "Load %";
 
-$units ='%';
-$total_units ='%';
+$units = '%';
+$total_units = '%';
 $colours ='mixed';
 
 $scale_min = "0";
@@ -31,6 +31,6 @@ $scale_max = "100";
 
 $nototal = 1;
 
-include ("includes/graphs/generic_multi_line.inc.php");
+include("includes/graphs/generic_multi_line.inc.php");
 
 ?>

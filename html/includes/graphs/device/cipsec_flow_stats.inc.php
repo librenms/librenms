@@ -1,6 +1,5 @@
 <?php
 
-
 include("includes/graphs/common.inc.php");
 
 $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/cipsec_flow.rrd";
@@ -39,8 +38,6 @@ $rrd_list[$i]['descr'] = "OutDrops";
 $rrd_list[$i]['rra'] = "OutDrops";
 $rra_list[$i]['invert'] = "1";
 
-
-
 $i++;
 $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "InAuthFail";
@@ -74,7 +71,6 @@ $rrd_list[$i]['filename'] = $rrd_filename;
 $rrd_list[$i]['descr'] = "SysCapFails";
 $rrd_list[$i]['rra'] = "SysCapFails";
 
-
 #$units='%';
 #$total_units='%';
 $colours='mixed';
@@ -84,7 +80,6 @@ $scale_min = "0";
 
 $nototal = 1;
 
-include ("includes/graphs/generic_multi_line.inc.php");
-
+include("includes/graphs/generic_multi_line.inc.php");
 
 ?>

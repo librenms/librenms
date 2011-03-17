@@ -1,12 +1,11 @@
 <?php
 
-if(is_numeric($id))
+if (is_numeric($id))
 {
-
   $query = mysql_query("SELECT * FROM `ucd_diskio` AS U, `devices` AS D WHERE U.diskio_id = '".$id."' AND U.device_id = D.device_id");
   $disk = mysql_fetch_array($query);
 
-  if(is_numeric($disk['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($disk['device_id'])))
+  if (is_numeric($disk['device_id']) && ($config['allow_unauth_graphs'] || device_permitted($disk['device_id'])))
   {
     $device = device_by_id_cache($disk['device_id']);
 
@@ -17,8 +16,5 @@ if(is_numeric($id))
     $auth = TRUE;
   }
 }
-
-
-
 
 ?>
