@@ -160,4 +160,3 @@ while ($interface = mysql_fetch_array($interface_query)) {
 unset($portifIndex);
 
 ?>
-

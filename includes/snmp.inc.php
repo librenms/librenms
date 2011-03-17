@@ -125,7 +125,7 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     if ($device['snmpver'] == "v2c")
     {
        $data = @snmp2_get($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
-    } elseif ( $device['snmpver'] == "v1") {
+    } elseif ($device['snmpver'] == "v1") {
        $data = @snmpget($device['hostname'].":".$device['port'], $device['community'], $oid, $timeout, $retries);
     }
     if ($debug)  { print "DEBUG: $oid: $data\nDEBUG: cmd: ".$device['transport'].":".$device['hostname'].":".$device['port']." ".$device['community']." ".$oid." ".$timeout." ".$retries."\n"; }
