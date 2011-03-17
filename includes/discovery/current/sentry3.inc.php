@@ -10,8 +10,8 @@ if ($device['os'] == 'sentry3')
   $towers=1;
   while($towers <= $tower_count) {
 
-    $divisor = "10";
-    $outlet_divisor = "100";
+    $divisor = "100";
+    $outlet_divisor = $divisor;
     $multiplier = "1";
     if ($debug) { echo($oids."\n"); }
     $oids = trim($oids);
@@ -31,8 +31,8 @@ if ($device['os'] == 'sentry3')
         $descr_string    = snmp_get($device,"infeedID.$towers.$index", "-Ovq", "Sentry3-MIB");
         #$descr           = "Infeed " . $towers . " " . $descr_string;
         $descr           = "Infeed $descr_string";
-        $low_warn_limit  = "0";
-        $low_limit       = "0";
+        $low_warn_limit  = NULL;
+        $low_limit       = NULL;
         $high_warn_limit = snmp_get($device,"infeedLoadHighThresh.$towers.$index", "-Ovq", "Sentry3-MIB");
         $high_limit      = snmp_get($device,"infeedCapacity.$towers.$index", "-Ovq", "Sentry3-MIB");
         $current         = snmp_get($device,"$infeed_oid", "-Ovq", "Sentry3-MIB") / $divisor;
@@ -42,7 +42,7 @@ if ($device['os'] == 'sentry3')
         # Check for per-outlet polling
         $outlet_oids = snmp_walk($device, "outletLoadValue.$towers.$index", "-Osqn", "Sentry3-MIB");
         $outlet_oids = trim($outlet_oids);
-        if ($outletoids) echo("ServerTech Sentry Outlet ");
+        if ($outlet_oids) echo("ServerTech Sentry Outlet ");
         foreach (explode("\n", $outlet_oids) as $outlet_data)
         {
           $data = trim($outlet_data);
@@ -55,24 +55,34 @@ if ($device['os'] == 'sentry3')
             $outletsuffix = "$towers.$index.$outlet_index";
             $outlet_insert_index=$index . $outlet_index;
 
-            #outletLoadValue
+            #outletLoadValue: "A non-negative value indicates the measured load in hundredths of Amps"
             $outlet_oid             = "1.3.6.1.4.1.1718.3.2.3.1.7.$outletsuffix";
             $outlet_descr_string    = snmp_get($device,"outletID.$outletsuffix", "-Ovq", "Sentry3-MIB");
             $outlet_descr           = "Outlet $outlet_descr_string";
-            $outlet_low_warn_limit  = "0";
-            $outlet_low_limit       = "0";
-            $outlet_high_warn_limit = snmp_get($device,"outletLoadHighThresh.$outletsuffix", "-Ovq", "Sentry3-MIB");
-            $outlet_high_limit      = snmp_get($device,"outletCapacity.$outletsuffix", "-Ovq", "Sentry3-MIB");
+            $outlet_low_warn_limit  = NULL;
+            $outlet_low_limit       = NULL;
+            $outlet_high_warn_limit = NULL;
+            # Should be "outletCapacity" but is always -1. According to MIB: "A negative value indicates that the capacity was not available."
+            $outlet_high_limit = snmp_get($device,"outletLoadHighThresh.$outletsuffix", "-Ovq", "Sentry3-MIB");
             $outlet_current         = snmp_get($device,"$outlet_oid", "-Ovq", "Sentry3-MIB") / $outlet_divisor;
 
             discover_sensor($valid_sensor, 'current', $device, $outlet_oid, $outlet_insert_index, 'sentry3', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
 
           } // if ($outlet_data)
 
+          unset($outlet_data);
+
         } // foreach (explode("\n", $outlet_oids) as $outlet_data)
 
         unset($outlet_oids);
-        unset($outlet_data);
+        unset($outlet_oid);
+        unset($outlet_descr_string);
+        unset($outlet_descr);
+        unset($outlet_low_warn_limit);
+        unset($outlet_low_limit);
+        unset($outlet_high_warn_limit);
+        unset($outlet_high_limit);
+        unset($outlet_current);
 
       } //if($data)
 
@@ -81,6 +91,15 @@ if ($device['os'] == 'sentry3')
     } //foreach (explode("\n", $oids) as $data)
 
     unset($oids);
+    unset($oid);
+    unset($descr_string);
+    unset($descr);
+    unset($low_warn_limit);
+    unset($low_limit);
+    unset($high_warn_limit);
+    unset($high_limit);
+    unset($current);
+
     $towers++;
 
   } // while($towers <= $tower_count)
