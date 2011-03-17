@@ -13,8 +13,8 @@ else
 {
   echo("ERROR: no valid auth_mechanism defined.\n");
   exit();
-}       
-       
+}
+
 if (auth_usermanagement())
 {
   if ($argv[1] && $argv[2] && $argv[3])

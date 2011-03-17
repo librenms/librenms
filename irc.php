@@ -49,13 +49,13 @@ $chan = "#observium";
 
 $bot = &new observiumbot();
 $irc = &new Net_SmartIRC();
-$irc->setUseSockets( TRUE );
+$irc->setUseSockets(TRUE);
 
-$irc->registerActionhandler( SMARTIRC_TYPE_CHANNEL, '!device', $bot, 'device_info' );
-$irc->registerActionhandler( SMARTIRC_TYPE_CHANNEL, '!port', $bot, 'port_info' );
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!device', $bot, 'device_info');
+$irc->registerActionhandler(SMARTIRC_TYPE_CHANNEL, '!port', $bot, 'port_info');
 
 $irc->connect($host, $port));
-$irc->login($nick, 'Observium Bot', 0, $nick );
+$irc->login($nick, 'Observium Bot', 0, $nick);
 $irc->join(array($chan))));
 $irc->listen();
 $irc->disconnect();
