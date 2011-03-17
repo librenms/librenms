@@ -2,13 +2,14 @@
 
 $sensor = mysql_fetch_array(mysql_query("SELECT * FROM entPhysical as E, devices as D WHERE entPhysical_id = '".mres($_GET['a'])."' and D.device_id = E.device_id"));
 
-switch ($sensor['entSensorType']) {
-case 'celsius':
-case 'watts':
-case 'voltsDC':
-case 'amperes':
-  $scale_min = "0";
-  break;
+switch ($sensor['entSensorType'])
+{
+  case 'celsius':
+  case 'watts':
+  case 'voltsDC':
+  case 'amperes':
+    $scale_min = "0";
+    break;
 }
 
 include("includes/graphs/common.inc.php");
@@ -29,6 +30,5 @@ $rrd_options .= " GPRINT:avg:AVERAGE:%5.2lf%s";
 $rrd_options .= " GPRINT:max:MAX:%5.2lf%s";
 $rrd_options .= " GPRINT:max:MAX:%5.2lf%s";
 $rrd_options .= " GPRINT:avg:LAST:%5.2lf%s";
-
 
 ?>

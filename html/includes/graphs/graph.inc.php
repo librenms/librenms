@@ -47,7 +47,7 @@ preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', mres($_GET['type']), $gr
 $type = $graphtype['type'];
 $subtype = $graphtype['subtype'];
 
-if ($debug) {print_r($graphtype);}
+if ($debug) {print_r($graphtype); }
 
 $graphfile = $config['temp_dir'] . "/"  . strgen() . ".png";
 
@@ -79,8 +79,9 @@ else
 
 function graph_error($string)
 {
-  global $width, $height;
-  header('Content-type: image/png');
+  global $width, $height, $debug;
+
+  if (!$debug) { header('Content-type: image/png'); }
   if ($height > "99")  { $width +=75; }
   $im     = imagecreate($width, $height);
   $orange = imagecolorallocate($im, 255, 225, 225);
@@ -115,8 +116,8 @@ if (!$auth)
       if ($config['rrdcached']) { $rrd_switches = " --daemon ".$config['rrdcached'] . " "; }
       $rrd_cmd = $config['rrdtool'] . " graph $graphfile $rrd_options" . $rrd_switches;
       $woo = shell_exec($rrd_cmd);
-      if ($_GET['debug']) { echo("<pre>".$rrd_cmd."</pre>"); }   
-      if (is_file($graphfile)) 
+      if ($debug) { echo("<pre>".$rrd_cmd."</pre>"); }
+      if (is_file($graphfile))
       {
         header('Content-type: image/png');
         $fd = fopen($graphfile,'r');fpassthru($fd);fclose($fd);
