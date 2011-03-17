@@ -19,32 +19,31 @@ echo("
 
 $i = 1;
 
-while($customer = mysql_fetch_array($cust_query)) {
-
+while ($customer = mysql_fetch_array($cust_query))
+{
   $i++;
-  
+
   $port_sql = "SELECT * FROM `ports` WHERE `port_descr_type` = 'cust' AND `port_descr_descr` = '".$customer['port_descr_descr']."'";
   $port_query = mysql_query($port_sql);
 
   $customer_name = $customer['port_descr_descr'];
 
-  if(!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
+  if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  while($port = mysql_fetch_array($port_query)) {
-    $device    = device_by_id_cache($port['device_id']);
+  while ($port = mysql_fetch_array($port_query))
+  {
+    $device = device_by_id_cache($port['device_id']);
 
     unset($class);
 
     $ifname = fixifname($device['ifDescr']);
-
     $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
 
-    if($device['os'] == "ios") {
-
-      if($port['ifTrunk']) { $vlan = "<span class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></span>";
-      } elseif ($port['ifVlan']) { $vlan = "<span class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></span>"; 
-      } else { $vlan = ""; }
-
+    if ($device['os'] == "ios")
+    {
+      if ($port['ifTrunk']) { $vlan = "<span class=box-desc><span class=red>" . $port['ifTrunk'] . "</span></span>"; }
+      elseif ($port['ifVlan']) { $vlan = "<span class=box-desc><span class=blue>VLAN " . $port['ifVlan'] . "</span></span>"; }
+      else { $vlan = ""; }
     }
 
     echo("
@@ -61,19 +60,16 @@ while($customer = mysql_fetch_array($cust_query)) {
 
 
     unset($customer_name);
-
   }
 
-     echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
+  echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
        <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
        <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
        <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
        <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
        </td></tr>");
-
-
 }
 
-  echo("</table>");
+echo("</table>");
 
 ?>

@@ -2,26 +2,26 @@
 
 echo("<div style='margin: 10px;'>");
 
-if($_SESSION['userlevel'] != '10') 
+if ($_SESSION['userlevel'] != '10')
 {
   include("includes/error-no-perm.inc.php");
-} 
-else 
+}
+else
 {
   echo("<h3>Add User</h3>");
 
   if (auth_usermanagement())
   {
-    if($_POST['action'] == "add") 
-    { 
-      if($_POST['new_username'])
+    if ($_POST['action'] == "add")
+    {
+      if ($_POST['new_username'])
       {
         if (!user_exists($_POST['new_username']))
         {
           # FIXME: missing email field here on the form
           if (adduser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], '', $_POST['realname']))
-          { 
-            echo("<span class=info>User " . $_POST['username'] . " added!</span>"); 
+          {
+            echo("<span class=info>User " . $_POST['username'] . " added!</span>");
           }
         }
         else
@@ -40,7 +40,7 @@ else
   ?>
   Password <input style='margin: 1px;' name='new_password' id='new_password' type=password  /><br />
   <?php
-    if($_POST['action'] == "add" && !$_POST['new_password']) 
+    if ($_POST['action'] == "add" && !$_POST['new_password'])
     {
       echo("<span class=red>Please enter a password!</span><br />");
     }

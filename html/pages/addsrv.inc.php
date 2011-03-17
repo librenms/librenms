@@ -1,32 +1,41 @@
 <?php
 
-if($_SESSION['userlevel'] < '10') { 
+if ($_SESSION['userlevel'] < '10')
+{
+## FIXME generic "box" include?
   echo("<span class='alert'>Insufficient privileges to perform this function.</span>");
-} else {
-
-if($_POST['addsrv']) {
-  if($_SESSION['userlevel'] == '10') {
-    include("includes/service-add.inc.php");
-  }
 }
+else
+{
+  if ($_POST['addsrv'])
+  {
+    if ($_SESSION['userlevel'] == '10')
+    {
+      include("includes/service-add.inc.php");
+    }
+  }
 
-if ($handle = opendir($config['install_dir'] . "/includes/services/")) {
-    while (false !== ($file = readdir($handle))) {
-        if ($file != "." && $file != ".." && !strstr($file, ".")) {
-            $servicesform .= "<option value='$file'>$file</option>";
-        }
+  if ($handle = opendir($config['install_dir'] . "/includes/services/"))
+  {
+    while (false !== ($file = readdir($handle)))
+    {
+      if ($file != "." && $file != ".." && !strstr($file, "."))
+      {
+        $servicesform .= "<option value='$file'>$file</option>";
+      }
     }
     closedir($handle);
-}
+  }
 
-$query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-while($device = mysql_fetch_array($query)) {
-  $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
-}
+  $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
+  while ($device = mysql_fetch_array($query))
+  {
+    $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
+  }
 
-if($updated) { print_message("Device Settings Saved"); }
+  if ($updated) { print_message("Device Settings Saved"); }
 
-echo("
+  echo("
 <h4>Add Service</h4>
 <form id='addsrv' name='addsrv' method='post' action=''>
   <input type=hidden name='addsrv' value='yes'>
@@ -44,7 +53,7 @@ echo("
     <tr>
       <td>
         Type
-      </td> 
+      </td>
       <td>
         <select name='type'>
           $servicesform
@@ -70,6 +79,6 @@ echo("
   </label>
 </form>");
 
-
 }
 
+?>

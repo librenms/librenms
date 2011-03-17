@@ -25,9 +25,9 @@ while ($drive = mysql_fetch_array($query))
   $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
 
   if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
-  elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; } 
-  elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; } 
-  elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; } 
+  elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }
+  elseif ($perc > '50') { $left_background='bf875b'; $right_background='d3ae92'; }
+  elseif ($perc > '25') { $left_background='5b93bf'; $right_background='92b7d3'; }
   else { $left_background='9abf5b'; $right_background='bbd392'; }
 
   echo("<tr bgcolor='$row_colour'><th><a href='$fs_url' $fs_popup>" . $drive['diskio_descr'] . "</a></td></tr>");

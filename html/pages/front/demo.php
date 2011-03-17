@@ -8,7 +8,7 @@ $nodes = array();
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
 
-while($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql)){
   unset($already);
   $i = 0;
   while ($i <= count($nodes)) {
@@ -18,13 +18,13 @@ while($device = mysql_fetch_array($sql)){
     }
     $i++;
   }
-  if(!$already) { $nodes[] = $device['device_id']; }
+  if (!$already) { $nodes[] = $device['device_id']; }
 }
 
 
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while($device = mysql_fetch_array($sql)){
-   if(device_permitted($device['device_id'])) {
+while ($device = mysql_fetch_array($sql)){
+   if (device_permitted($device['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #d0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffbbbb;'>
        <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span><br />
@@ -33,11 +33,11 @@ while($device = mysql_fetch_array($sql)){
    }
 }
 
-if($config['warn']['ifdown']) {
+if ($config['warn']['ifdown']) {
 
 $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-while($interface = mysql_fetch_array($sql)){
-   if(port_permitted($interface['interface_id'])) {
+while ($interface = mysql_fetch_array($sql)){
+   if (port_permitted($interface['interface_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
        <strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
@@ -50,8 +50,8 @@ while($interface = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while($service = mysql_fetch_array($sql)){
-   if(device_permitted($service['device_id'])) {
+while ($service = mysql_fetch_array($sql)){
+   if (device_permitted($service['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
       <strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span><br />
@@ -62,11 +62,11 @@ while($service = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerAdminStatus = 'start' AND bgpPeerState != 'established' AND B.device_id = D.device_id");
-while($peer = mysql_fetch_array($sql)){
-   if(device_permitted($peer['device_id'])) {
+while ($peer = mysql_fetch_array($sql)){
+   if (device_permitted($peer['device_id'])) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ffddaa;'>
       <strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span><br /> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span><br />
       <strong>".$peer['bgpPeerIdentifier']."</strong><br />
       <span class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
       </div>");
@@ -74,8 +74,8 @@ while($peer = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_value < '84600' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'");
-while($device = mysql_fetch_array($sql)){
-   if(device_permitted($device['device_id']) && $device['attrib_value'] < "84600" && $device['attrib_type'] == "uptime" ) {
+while ($device = mysql_fetch_array($sql)){
+   if (device_permitted($device['device_id']) && $device['attrib_value'] < "84600" && $device['attrib_type'] == "uptime" ) {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ddffdd;'>
       <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
@@ -87,7 +87,7 @@ while($device = mysql_fetch_array($sql)){
 
 echo("
 
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>  
+	<div style='clear: both;'>$errorboxes</div> <div style='margin: 0px; clear: both;'>
 
 <h3>Recent Syslog Messages</h3>
 
@@ -96,10 +96,10 @@ echo("
 $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from `syslog` ORDER BY seq DESC LIMIT 20";
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while($entry = mysql_fetch_array($query)) 
+while ($entry = mysql_fetch_array($query))
 {
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
-  include("includes/print-syslog.inc"); 
+  include("includes/print-syslog.inc");
 }
 echo("</table>");
 
@@ -119,7 +119,7 @@ echo("</div>
 
   echo("<div style=' margin-bottom: 5px;'>");
 
-  if($ports['fileserver']) {
+  if ($ports['fileserver']) {
 
     echo("<div style='width: 470px;'>");
     echo("<div style='font-size: 16px; font-weight: bold; color: #555555;'>Central Fileserver</div>");

@@ -23,7 +23,7 @@ if ($handle = opendir($config['install_dir'] . "/includes/services/"))
       $servicesform .= "<option value='$file'>$file</option>";
     }
   }
-  
+
   closedir($handle);
 }
 

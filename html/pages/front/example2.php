@@ -11,37 +11,39 @@ $nodes = array();
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, `devices_attribs` AS A WHERE D.status = '1' AND A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value > '0' AND A.attrib_value < '86400'");
 
-while($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql))
+{
   unset($already);
   $i = 0;
-  while ($i <= count($nodes)) {
+  while ($i <= count($nodes))
+  {
     $thisnode = $device['device_id'];
-    if ($nodes[$i] == $thisnode) {
+    if ($nodes[$i] == $thisnode)
+    {
      $already = "yes";
     }
     $i++;
   }
-  if(!$already) { $nodes[] = $device['device_id']; }
+  if (!$already) { $nodes[] = $device['device_id']; }
 }
 
-
 $sql = mysql_query("SELECT * FROM `devices` WHERE `status` = '0' AND `ignore` = '0'");
-while($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffbbbb; margin: 4px;'>
       <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Device Down</span>
       <span class=body-date-1>".truncate($device['location'], 20)."</span>
       </center></div>");
 
 }
 
 $sql = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id AND ifOperStatus = 'down' AND ifAdminStatus = 'up' AND D.ignore = '0' AND I.ignore = '0'");
-while($interface = mysql_fetch_array($sql)){
+while ($interface = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span>
       <strong>".generate_port_link($interface, makeshortif($interface['ifDescr']))."</strong> <br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
       </center></div>");
@@ -49,11 +51,11 @@ while($interface = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id AND service_status = 'down' AND D.ignore = '0' AND S.service_ignore = '0'");
-while($service = mysql_fetch_array($sql)){
+while ($service = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #D0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($service, shorthost($service['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Service Down</span>
       <strong>".$service['service_type']."</strong><br />
       <span class=body-date-1>".truncate($interface['ifAlias'], 20)."</span>
       </center></div>");
@@ -61,11 +63,11 @@ while($service = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, bgpPeers AS B WHERE bgpPeerState != 'established' AND B.device_id = D.device_id");
-while($peer = mysql_fetch_array($sql)){
+while ($peer = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ffddaa; margin: 4px;'>
       <center><strong>".generate_device_link($peer, shorthost($peer['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>BGP Down</span>
       <strong>".$peer['bgpPeerIdentifier']."</strong> <br />
       <span class=body-date-1>AS".$peer['bgpPeerRemoteAs']." ".truncate($peer['astext'], 10)."</span>
       </center></div>");
@@ -73,21 +75,19 @@ while($peer = mysql_fetch_array($sql)){
 }
 
 $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '84600'");
-while($device = mysql_fetch_array($sql)){
+while ($device = mysql_fetch_array($sql)){
 
       echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
       <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br /> 
+      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
       <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
       </center></div>");
 
 }
 
-
-
 echo("
 
-	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>  
+	<div style='clear: both;'>$errorboxes</div> <div style='margin: 4px; clear: both;'>
 
 <h3>Recent Syslog Messages</h3>
 
@@ -96,7 +96,7 @@ echo("
 $sql = "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog ORDER BY timestamp DESC LIMIT 20";
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
+while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc"); }
 echo("</table>");
 
 
@@ -108,13 +108,13 @@ echo("</div>
 
 /// this stuff can be customised to show whatever you want....
 
-if($_SESSION['userlevel'] >= '5') {
+if ($_SESSION['userlevel'] >= '5') {
 
   $sql  = "select * from ports as I, devices as D WHERE `ifAlias` like 'L2TP: %' AND I.device_id = D.device_id AND D.hostname LIKE '%";
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
+  while ($interface = mysql_fetch_array($query)) {
     $ports['l2tp'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
@@ -123,7 +123,7 @@ if($_SESSION['userlevel'] >= '5') {
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
+  while ($interface = mysql_fetch_array($query)) {
     $ports['transit'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
@@ -132,12 +132,12 @@ if($_SESSION['userlevel'] >= '5') {
   $sql .= $config['mydomain'] . "' ORDER BY I.ifAlias";
   $query = mysql_query($sql);
   unset ($seperator);
-  while($interface = mysql_fetch_array($query)) {
+  while ($interface = mysql_fetch_array($query)) {
     $ports['voip'] .= $seperator . $interface['interface_id'];
     $seperator = ",";
   }
 
-  if($ports['transit']) {
+  if ($ports['transit']) {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['transit'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>Internet Transit</div>".
@@ -145,7 +145,7 @@ if($_SESSION['userlevel'] >= '5') {
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($ports['l2tp']) {
+  if ($ports['l2tp']) {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['l2tp'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>L2TP ADSL</div>".
@@ -153,7 +153,7 @@ if($_SESSION['userlevel'] >= '5') {
     "&from=".$day."&to=".$now."&width=200&height=100'></a>");
   }
 
-  if($ports['voip']) {
+  if ($ports['voip']) {
     echo("<a onmouseover=\"return overlib('<img src=\'graph.php?type=multi_bits&ports=".$ports['voip'].
     "&from=".$day."&to=".$now."&width=400&height=150\'>', LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 250);\" onmouseout=\"return nd();\"  >".
     "<div style='font-size: 18px; font-weight: bold;'>VoIP to PSTN</div>".

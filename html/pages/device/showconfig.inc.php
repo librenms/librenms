@@ -6,7 +6,7 @@ if ($_SESSION['userlevel'] >= "7")
 {
   if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
 
-  foreach ($config['rancid_configs'] as $configs) 
+  foreach ($config['rancid_configs'] as $configs)
   {
     if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
     if (is_file($configs . $device['hostname'])) { $file = $configs . $device['hostname']; }
@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] >= "7")
     }
     $text = join("\n",$lines);
   }
-  
+
   $language = "ios";
   $geshi = new GeSHi($text, $language);
   $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);

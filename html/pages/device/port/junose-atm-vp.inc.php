@@ -24,14 +24,14 @@ while ($vp = mysql_fetch_array($vps))
   $periods = array('day', 'week', 'month', 'year');
 
   echo('<tr bgcolor="'.$row_colour.'"><td>');
-  
+
   foreach ($periods as $period)
   {
     $graph_array['from'] = $$period;
     $graph_array_zoom   = $graph_array; $graph_array_zoom['height'] = "150"; $graph_array_zoom['width'] = "400";
     echo(overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL));
   }
-  
+
   echo('</td></tr>');
 
   $row++;

@@ -45,7 +45,7 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
          </tr>");
     $processor_rows++;
   }
-  
+
   echo("</table>");
   echo("</div>");
 }

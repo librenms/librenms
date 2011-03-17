@@ -67,25 +67,25 @@ $ports_array = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devi
                             WHERE B.bill_id = '".$bill_data['bill_id']."' AND P.interface_id = B.port_id
                             AND D.device_id = P.device_id");
 
-if(mysql_affected_rows()) 
+if (mysql_affected_rows())
 {
 
   echo("<h3>Billed Ports</h3>");
 
   echo("<table cellpadding=5 cellspacing=0>");
-  while($port = mysql_fetch_array($ports_array)) 
+  while ($port = mysql_fetch_array($ports_array))
   {
-    if($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
+    if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     echo("<tr style=\"background-color: $bg\">");
     echo("<td>");
     echo(generate_device_link($port) . " - " . generate_port_link($port));
-    if($port['ifAlias']) { echo(" - " . $port['ifAlias']); } 
+    if ($port['ifAlias']) { echo(" - " . $port['ifAlias']); }
     echo("</td><td>");
     echo("<form action='' method='post'><input type='hidden' name='action' value='delete_bill_port'>
           <input type=hidden name=interface_id value='".$port['interface_id']."'>
           <input type=submit value=' Delete ' name='Delete'></form>");
     echo("</td>");
-  } 
+  }
   echo("</table>");
 }
 
@@ -100,10 +100,10 @@ if(mysql_affected_rows())
         <option value=''>Select a device</option>");
 
   $device_list = mysql_query("SELECT * FROM `devices` ORDER BY hostname");
-  while($device = mysql_fetch_array($device_list)) {
+  while ($device = mysql_fetch_array($device_list)) {
     unset($done);
-    foreach($access_list as $ac) { if($ac == $device['device_id']) { $done = 1; } }
-    if(!$done) { echo("<option value='" . $device['device_id']  . "'>" . $device['hostname'] . "</option>"); }
+    foreach ($access_list as $ac) { if ($ac == $device['device_id']) { $done = 1; } }
+    if (!$done) { echo("<option value='" . $device['device_id']  . "'>" . $device['hostname'] . "</option>"); }
   }
 
   echo("</select></td></tr><tr>

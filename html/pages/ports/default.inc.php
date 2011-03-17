@@ -7,9 +7,9 @@
       <option value=''>All Devices</option>
       <?php
         $query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-        while($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_array($query)) {
           echo("<option value='".$data['device_id']."'");
-          if($data['device_id'] == $_POST['device_id']) { echo("selected"); }
+          if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
           echo(">".$data['hostname']."</option>");
         }
       ?>
@@ -18,17 +18,17 @@
     <td width='150'>
       <select name='state' id='state'>
         <option value=''>All States</option>
-        <option value='up' <?php if($_POST['state'] == "up") { echo("selected"); } ?>>Up</option>
-        <option value='down'<?php if($_POST['state'] == "down") { echo("selected"); } ?>>Down</option>
-        <option value='admindown' <?php if($_POST['state'] == "admindown") { echo("selected"); } ?>>Shutdown</option>
-        <option value='errors' <?php if($_POST['state'] == "errors") { echo("selected"); } ?>>Errors</option>
-        <option value='ignored' <?php if($_POST['state'] == "ignored") { echo("selected"); } ?>>Ignored</option>
-        <option value='ethernet' <?php if($_POST['state'] == "ethernet") { echo("selected"); } ?>>Ethernet</option>
-        <option value='l2vlan' <?php if($_POST['state'] == "l2vlan") { echo("selected"); } ?>>L2 VLAN</option>
-        <option value='sonet' <?php if($_POST['state'] == "sonet") { echo("selected"); } ?>>SONET</option>
-        <option value='propvirtual' <?php if($_POST['state'] == "propvirtual") { echo("selected"); } ?>>Virtual</option>
-        <option value='ppp' <?php if($_POST['state'] == "ppp") { echo("selected"); } ?>>PPP</option>
-        <option value='loopback' <?php if($_POST['state'] == "loopback") { echo("selected"); } ?>>Loopback</option>
+        <option value='up' <?php if ($_POST['state'] == "up") { echo("selected"); } ?>>Up</option>
+        <option value='down'<?php if ($_POST['state'] == "down") { echo("selected"); } ?>>Down</option>
+        <option value='admindown' <?php if ($_POST['state'] == "admindown") { echo("selected"); } ?>>Shutdown</option>
+        <option value='errors' <?php if ($_POST['state'] == "errors") { echo("selected"); } ?>>Errors</option>
+        <option value='ignored' <?php if ($_POST['state'] == "ignored") { echo("selected"); } ?>>Ignored</option>
+        <option value='ethernet' <?php if ($_POST['state'] == "ethernet") { echo("selected"); } ?>>Ethernet</option>
+        <option value='l2vlan' <?php if ($_POST['state'] == "l2vlan") { echo("selected"); } ?>>L2 VLAN</option>
+        <option value='sonet' <?php if ($_POST['state'] == "sonet") { echo("selected"); } ?>>SONET</option>
+        <option value='propvirtual' <?php if ($_POST['state'] == "propvirtual") { echo("selected"); } ?>>Virtual</option>
+        <option value='ppp' <?php if ($_POST['state'] == "ppp") { echo("selected"); } ?>>PPP</option>
+        <option value='loopback' <?php if ($_POST['state'] == "loopback") { echo("selected"); } ?>>Loopback</option>
       </select>
     </td>
     <td width=110>
@@ -36,11 +36,11 @@
       <option value=''>All Speeds</option>
       <?php
         $query = mysql_query("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
-        while($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_array($query)) {
           if ($data['ifSpeed'])
           {
             echo("<option value='".$data['ifSpeed']."'");
-            if($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
+            if ($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
             echo(">".humanspeed($data['ifSpeed'])."</option>");
           }
         }
@@ -52,11 +52,11 @@
       <option value=''>All Media</option>
       <?php
         $query = mysql_query("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`");
-        while($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_array($query)) {
           if ($data['ifType'])
           {
             echo("<option value='".$data['ifType']."'");
-            if($data['ifType'] == $_POST['ifType']) { echo("selected"); }
+            if ($data['ifType'] == $_POST['ifType']) { echo("selected"); }
             echo(">".$data['ifType']."</option>");
           }
         }
@@ -65,7 +65,7 @@
              </td>
              <td>
         <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php  echo($_POST['ifAlias']); ?>" />
-        Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if($_POST['deleted']) { echo("checked"); } ?> ></input>
+        Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if ($_POST['deleted']) { echo("checked"); } ?> ></input>
         </td>
         <td style="text-align: right;">
         <input style="align:right;" type=submit class=submit value=Search></div>
@@ -77,7 +77,6 @@
 
 <table cellpadding=3 cellspacing=0 class=devicetable width=100%>
 
-
 <?php
 
 #if ($_SESSION['userlevel'] >= '5') {
@@ -86,9 +85,9 @@
 #  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
 #}
 
-
-if($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "down") {
-  $where .= "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down' AND I.ignore = '0'";  
+if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "down")
+{
+  $where .= "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down' AND I.ignore = '0'";
 } elseif ($_GET['opta'] == "admindown" || $_GET['type'] == "admindown" || $_POST['state'] == "admindown") {
   $where .= "AND I.ifAdminStatus = 'down'";
 } elseif ($_GET['opta'] == "errors" || $_GET['type'] == "errors" || $_POST['state'] == "errors") {
@@ -111,34 +110,33 @@ if($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "dow
   $where .= " AND I.ifType = 'ppp'";
 }
 
-
-
-if($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if($_POST['ifType']) { $where .= " AND I.ifType = '".$_POST['ifType']."'"; }
-if($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
-if($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
-if($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
+# FIXME SQL Injection!
+if ($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
+if ($_POST['ifType']) { $where .= " AND I.ifType = '".$_POST['ifType']."'"; }
+if ($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
+if ($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
+if ($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
 $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
-
 $query = mysql_query($sql);
 
 echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Speed</th><th>Media</th><th>Description</th></tr>");
 
 $row = 1;
 
-while($interface = mysql_fetch_array($query)) {
-
-  if(is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
+while ($interface = mysql_fetch_array($query))
+{
+  if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
   $speed = humanspeed($interface['ifSpeed']);
   $type = humanmedia($interface['ifType']);
 
-    if($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
+  if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0)
+  {
     $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
   } else { $error_img = ""; }
 
-  if( port_permitted($interface['interface_id'], $interface['device_id']) ) 
+  if (port_permitted($interface['interface_id'], $interface['device_id']))
   {
     $interface = ifLabel($interface, $device);
     echo("<tr bgcolor=$row_colour>
@@ -151,13 +149,9 @@ while($interface = mysql_fetch_array($query)) {
         </tr>\n");
 
     $row++;
-
   }
-
 }
 
 echo("</table>");
 
-
 ?>
-

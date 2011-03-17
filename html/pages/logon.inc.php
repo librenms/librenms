@@ -1,5 +1,4 @@
 <div style="width: 470px; margin: auto; margin-top: 30px;">
-
     <div style="margin: auto; width:650px; padding:5px;">
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
@@ -25,7 +24,8 @@
                   <td colspan="2" align="right"><input class="submit" name="submit" type="submit" value="Login" /></td>
                 </tr>
 <?php
-if(isset($auth_message)) {
+if (isset($auth_message))
+{
   echo('<tr><td colspan="2" style="font-weight: bold; color: #cc0000;">' . $auth_message . '</td></tr>');
 }
 ?>
@@ -35,9 +35,8 @@ if(isset($auth_message)) {
         </tr>
       </table>
 <?php
-
-
-if(isset($config['login_message'])) {
+if (isset($config['login_message']))
+{
   echo('<div style="margin-top: 10px;text-align: center; font-weight: bold; color: #cc0000; width: 470px;">'.$config['login_message'].'</div>');
 }
 ?>

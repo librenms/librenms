@@ -56,7 +56,7 @@ if ($ports['total'])
     echo("$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label']))));
     $ifsep = ", ";
   }
-  
+
   unset($ifsep);
   echo("  </div>");
   echo("</div>");

@@ -65,7 +65,7 @@ function printEntPhysical($ent, $level, $class)
       printEntPhysical($ent['entPhysicalIndex'], $level+1, '');
       echo("</ul>");
     }
-    
+
     echo("</li>");
   }
 }
