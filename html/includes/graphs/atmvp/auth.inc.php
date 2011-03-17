@@ -1,7 +1,7 @@
 <?php
 
 
-if($_GET['id'] && is_numeric($_GET['id'])) { $atm_vp_id = $_GET['id']; }
+if ($_GET['id'] && is_numeric($_GET['id'])) { $atm_vp_id = $_GET['id']; }
 
 $sql =  "SELECT * FROM `juniAtmVp` as J, `ports` AS I, `devices` AS D";
 $sql .= " WHERE J.juniAtmVp_id = '".$atm_vp_id."' AND I.interface_id = J.interface_id AND I.device_id = D.device_id";
@@ -9,7 +9,7 @@ $sql .= " WHERE J.juniAtmVp_id = '".$atm_vp_id."' AND I.interface_id = J.interfa
 $query = mysql_query($sql);
 $vp = mysql_fetch_array($query);
 
-if($config['allow_unauth_graphs'] || port_permitted($vp['interface_id'])) {
+if ($config['allow_unauth_graphs'] || port_permitted($vp['interface_id'])) {
 
   $port   = $vp;
   $device = device_by_id_cache($port['device_id']);

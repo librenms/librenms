@@ -5,12 +5,12 @@
 
 include("includes/graphs/common.inc.php");
 
-if($rrd_filename) { $rrd_filename_out = $rrd_filename; $rrd_filename_in = $rrd_filename; }
+if ($rrd_filename) { $rrd_filename_out = $rrd_filename; $rrd_filename_in = $rrd_filename; }
 
-if($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+if ($inverse) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
 
 
-if($multiplier) 
+if ($multiplier)
 {
   $rrd_options .= " DEF:p".$out."octets=".$rrd_filename_out.":".$rra_out.":AVERAGE";
   $rrd_options .= " DEF:p".$in."octets=".$rrd_filename_in.":".$rra_in.":AVERAGE";
@@ -26,9 +26,6 @@ if($multiplier)
   $rrd_options .= " DEF:".$out."octets_max=".$rrd_filename_out.":".$rra_out.":MAX";
   $rrd_options .= " DEF:".$in."octets_max=".$rrd_filename_in.":".$rra_in.":MAX";
 }
-
-## No?
-#print $multiplier;
 
 $rrd_options .= " CDEF:octets=inoctets,outoctets,+";
 $rrd_options .= " CDEF:doutoctets=outoctets,-1,*";
