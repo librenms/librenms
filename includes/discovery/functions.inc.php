@@ -96,7 +96,7 @@ function sensor_low_limit($class, $current)
       $limit = $current * 0.95;
       break;
     case 'current':
-      $limit = $current * 0.80;
+      $limit = 0;
       break;
     case 'fanspeed':
       $limit = $current * 0.80;
