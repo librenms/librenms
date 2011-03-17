@@ -1,8 +1,8 @@
 <?php
 
-if(1)
+# FIXME uhh..
+if (1)
 {
-
   $rrd_list[1]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[1]['descr'] = $int['ifDescr'];
   $rrd_list[1]['rra_in'] = "INNUCASTPKTS";
@@ -10,7 +10,6 @@ if(1)
   $rrd_list[1]['descr']   = "NonUnicast";
   $rrd_list[1]['colour_area_in'] = "BB77BB";
   $rrd_list[1]['colour_area_out'] = "FFDD88";
-
 
   $rrd_list[2]['filename'] = $config['rrd_dir'] . "/" . $device['hostname'] . "/port-" . safename($port['ifIndex'] . ".rrd");
   $rrd_list[2]['descr'] = $int['ifDescr'];
@@ -38,9 +37,8 @@ if(1)
   $nototal = 1;
 
   include ("includes/graphs/generic_multi_seperated.inc.php");
-
 }
-elseif(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
+elseif (is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd"))) 
 {
   $rrd_filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($port['ifIndex'] . ".rrd");
 
@@ -60,7 +58,6 @@ elseif(is_file($config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename($
   $graph_max = 1;
 
   include("includes/graphs/generic_duplex.inc.php");
-
 }
 
 ?>
