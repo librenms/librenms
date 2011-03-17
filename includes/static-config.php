@@ -81,6 +81,20 @@ $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "OpenIndiana";
 
+$os = "aos";
+$config['os'][$os]['group']             = "aos";
+$config['os'][$os]['text']              = "Alcatel-Lucent OS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifXmcbc']           = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+#$config['os'][$os]['over'][1]['graph']  = "device_processors";
+#$config['os'][$os]['over'][1]['text']   = "CPU Usage";
+#$config['os'][$os]['over'][2]['graph']  = "device_mempools";
+#$config['os'][$os]['over'][2]['text']   = "Memory Usage";
+#$config['os'][$os]['icon']              = "cisco";
+
+
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
 $config['os'][$os]['text']		= "Cisco IOS";
@@ -93,7 +107,6 @@ $config['os'][$os]['over'][1]['text']	= "CPU Usage";
 $config['os'][$os]['over'][2]['graph']	= "device_mempools";
 $config['os'][$os]['over'][2]['text']	= "Memory Usage";
 $config['os'][$os]['icon']              = "cisco";
-
 
 $os = "cat1900";
 $config['os'][$os]['group']		= "cat1900";
@@ -430,7 +443,7 @@ $config['os'][$os]['type']     		= "network";
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Traffic";
 
-$os = "sonicwal";
+$os = "sonicwall";
 $config['os'][$os]['text']     		= "SonicWALL";
 $config['os'][$os]['type']     		= "firewall";
 $config['os'][$os]['over'][0]['graph'] 	= "device_bits";
