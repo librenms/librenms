@@ -23,7 +23,7 @@ foreach ($_POST as $key => $val)
     {
       continue;
     }
-    
+
     if (!mysql_query('UPDATE `ports` SET `ignore`='.$newval.' WHERE `device_id`='.$device_id.' AND `interface_id`='.$interface_id))
     {
       $n = -1;
@@ -38,7 +38,7 @@ foreach ($_POST as $key => $val)
       $rows_updated = -1;
       break;
     }
-    
+
     $rows_updated += $n;
   }
 }
