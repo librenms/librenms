@@ -33,7 +33,7 @@ $query = mysql_query($sql);
 while ($device = mysql_fetch_array($query))
 {
   echo($device['hostname'] . " \n\n");
- 
+
   $oids = snmp_walk($device, "ipAddressIfIndex.ipv6", "-Osq");
   $oids = str_replace("ipAddressIfIndex.ipv6.", "", $oids);
   $oids = str_replace("\"", "", $oids);  $oids = trim($oids);
@@ -134,7 +134,7 @@ while ($link = mysql_fetch_array($link_query))
     mysql_query("delete from adjacencies where `adj_id` = '$id'");
     echo("Deleting link $id (".$link['cidr']." - ". $link['hostname'] ." - ". $link['ifDescr']  .")\n");
   }
- 
+
   unset($remove);
 }
 
