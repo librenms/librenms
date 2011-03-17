@@ -1,40 +1,37 @@
-
 <?php
 
-if(isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
+if (isset($bg) && $bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
-  $hostname = gethostbyid($entry['host']);
+$hostname = gethostbyid($entry['host']);
 
-  unset($icon);
+unset($icon);
 
-  $icon = geteventicon($entry['message']);
-  if($icon) {$icon = '<img src="images/16/' . $icon . '" />'; }
+$icon = geteventicon($entry['message']);
+if ($icon) { $icon = '<img src="images/16/' . $icon . '" />'; }
 
+echo('<tr style="background-color: ' . $bg . '">
+  <td width="0"></td>
+  <td class="syslog" width="160">
+    ' . $entry['datetime'] . '
+  </td>');
 
-  echo('<tr style="background-color: ' . $bg . '">
-    <td width="0"></td>
-    <td class="syslog" width="160">
-      ' . $entry['datetime'] . '
-    </td>');
-  if(!isset($_GET['id']) && (!isset($overview) || $overview == 0)) {
-    $dev = device_by_id_cache($entry['host']);
-    echo("<td class=list-bold width=150>
-      " . generate_device_link($dev, shorthost($dev['hostname'])) . "
-    </td>");
-  }
+if (!isset($_GET['id']) && (!isset($overview) || $overview == 0)) {
+  $dev = device_by_id_cache($entry['host']);
+  echo("<td class=list-bold width=150>
+    " . generate_device_link($dev, shorthost($dev['hostname'])) . "
+  </td>");
+}
 
-  if($entry['type'] == "interface") {
-    $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
-  } else {
-    $entry['link'] = "System";
-  }
-  
-  echo("<td>".$entry['link']."</td>");
+if ($entry['type'] == "interface")
+{
+  $entry['link'] = "<b>".generate_port_link(getifbyid($entry['reference']))."</b>";
+} else {
+  $entry['link'] = "System";
+}
 
-  echo("<td>".htmlspecialchars($entry['message']) . "</td>
-  </tr>");
+echo("<td>".$entry['link']."</td>");
 
-
-
+echo("<td>".htmlspecialchars($entry['message']) . "</td>
+</tr>");
 
 ?>
