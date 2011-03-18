@@ -32,7 +32,10 @@ function auth_usermanagement()
 
 function adduser($username, $password, $level, $email = "", $realname = "")
 {
-  mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`) VALUES ('".mres($username)."',MD5('".mres($password)."'),'".mres($level)."','".mres($email)."','".mres($realname)."')");
+  if (!user_exists($username))
+  {
+    mysql_query("INSERT INTO `users` (`username`,`password`,`level`, `email`, `realname`) VALUES ('".mres($username)."',MD5('".mres($password)."'),'".mres($level)."','".mres($email)."','".mres($realname)."')");
+  }
 
   return mysql_affected_rows();
 }
