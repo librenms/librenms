@@ -6,8 +6,11 @@
 include("includes/graphs/common.inc.php");
 
 $i=0;
-foreach($rrd_filenames as $key => $rrd_filename) {
-  if($rrd_inverted[$key]) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+
+foreach ($rrd_filenames as $key => $rrd_filename)
+{
+  if ($rrd_inverted[$key]) { $in = 'out'; $out = 'in'; } else { $in = 'in'; $out = 'out'; }
+
   $rrd_options .= " DEF:".$in."octets" . $i . "=".$rrd_filename.":".$rra_in.":AVERAGE";
   $rrd_options .= " DEF:".$out."octets" . $i . "=".$rrd_filename.":".$rra_out.":AVERAGE";
   $in_thing .= $seperator . "inoctets" . $i . ",UN,0," . "inoctets" . $i . ",IF";
