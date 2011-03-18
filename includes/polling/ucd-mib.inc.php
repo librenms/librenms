@@ -124,8 +124,10 @@ $mem_rrd_create = " --step 300 \
      RRA:MAX:0.5:288:800";
 
 $snmpdata = snmp_get_multi($device, "memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0", "-OQUs", "UCD-SNMP-MIB");
-list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
-foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
+if (is_array($snmpdata[0])) {
+   list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
+   foreach (array_keys($snmpdata[0]) as $key) { $$key = $snmpdata[0][$key]; }
+}
 
 ## Check to see that the OIDs are actually populated before we make the rrd
 if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTotalFree))
