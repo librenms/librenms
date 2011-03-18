@@ -5,11 +5,17 @@ if ($_SESSION['userlevel'] < '7')
   print_error("Insufficient Privileges");
 } else {
 
-  $panes =  array('device'   => 'Device Settings',
-                  'ports'    => 'Port Settings',
-                  'apps'     => 'Applications',
-                  'services' => 'Services',
-                  'ipmi'     => 'IPMI');
+  $panes['device']   = 'Device Settings';
+  $panes['snmp']     = 'SNMP';
+  $panes['ports']    = 'Port Settings';
+  $panes['apps']     = 'Applications';
+  
+  if ($config['enable_services'])
+  {
+    $panes['services'] = 'Services';
+  }
+  
+  $panes['ipmi']     = 'IPMI';
 
   print_optionbar_start();
 
