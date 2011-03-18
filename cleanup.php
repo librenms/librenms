@@ -67,7 +67,8 @@ while ($row = mysql_fetch_array($data))
   $response = explode(" ", snmp_get($row, "ifIndex.$index", "-Osq"));
   $response = $response[1];
 
-  if ($response != $index) {
+  if ($response != $index)
+  {
     mysql_query("DELETE from ports where interface_id = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '" . $row['interface_id'] . "'");
     mysql_query("DELETE from `links` WHERE `local_interface_id` = '" . $row['interface_id'] . "'");

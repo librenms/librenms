@@ -12,8 +12,8 @@ if($_SESSION['userlevel'] >= 5)
   $ports['up'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D  WHERE I.ifOperStatus = 'up' AND I.ignore = '0' AND I.device_id = D.device_id AND D.ignore = '0'"),0);
   $ports['down'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifOperStatus = 'down' AND I.ifAdminStatus = 'up' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
   $ports['shutdown'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE I.ifAdminStatus = 'down' AND I.ignore = '0' AND D.device_id = I.device_id AND D.ignore = '0'"),0);
-  $ports['ignored'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '1' OR D.ignore = '1')"),0);
-  $ports['errored'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND ( I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')"),0);
+  $ports['ignored'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '1' OR D.ignore = '1')"),0);
+  $ports['errored'] = mysql_result(mysql_query("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')"),0);
 
   $services['count'] = mysql_result(mysql_query("SELECT count(service_id) FROM services"),0);
   $services['up'] = mysql_result(mysql_query("SELECT count(service_id) FROM services  WHERE service_status = '1' AND service_ignore ='0'"),0);

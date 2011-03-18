@@ -91,7 +91,7 @@ if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "do
 } elseif ($_GET['opta'] == "admindown" || $_GET['type'] == "admindown" || $_POST['state'] == "admindown") {
   $where .= "AND I.ifAdminStatus = 'down'";
 } elseif ($_GET['opta'] == "errors" || $_GET['type'] == "errors" || $_POST['state'] == "errors") {
-  $where .= "AND ( I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0' )";
+  $where .= "AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
 } elseif ($_GET['type'] == "up" || $_POST['state'] == "up") {
   $where .= "AND I.ifOperStatus = 'up'";
 } elseif ($_GET['opta'] == "ignored" || $_GET['type'] == "ignored" || $_POST['state'] == "ignored") {
