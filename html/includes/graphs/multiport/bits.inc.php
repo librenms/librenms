@@ -4,11 +4,17 @@ $i = 1;
 
 foreach (explode(",", $id) as $ifid)
 {
+  if(strstr($ifid, "!")) 
+  { 
+    $rrd_inverted[$i] = TRUE; 
+    $ifid = str_replace("!", "", $ifid); 
+  }
+
   $query = mysql_query("SELECT `ifIndex`, `hostname` FROM `ports` AS I, devices as D WHERE I.interface_id = '" . $ifid . "' AND I.device_id = D.device_id");
   $int = mysql_fetch_row($query);
   if (is_file($config['rrd_dir'] . "/" . $int[1] . "/port-" . safename($int[0] . ".rrd")))
   {
-    $rrd_filenames[] = $config['rrd_dir'] . "/" . $int[1] . "/port-" . safename($int[0] . ".rrd");
+    $rrd_filenames[$i] = $config['rrd_dir'] . "/" . $int[1] . "/port-" . safename($int[0] . ".rrd");
     $i++;
   }
 }
