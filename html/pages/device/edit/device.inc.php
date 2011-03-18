@@ -4,7 +4,37 @@ if ($_POST['editing'])
 {
   if ($_SESSION['userlevel'] > "7")
   {
-    include("includes/device-edit.inc.php");
+    $descr = mres($_POST['descr']);
+    $ignore = mres($_POST['ignore']);
+    $type = mres($_POST['type']);
+    $disabled = mres($_POST['disabled']);
+    $community = mres($_POST['community']);
+    $snmpver = mres($_POST['snmpver']);
+    $port = mres($_POST['port']);
+    $timeout = mres($_POST['timeout']);
+    $retries = mres($_POST['retries']);
+
+    #FIXME needs more sanity checking! and better feedback
+    $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `community` = '" . $community . "', `type` = '$type'";
+    $sql .= ", `snmpver` = '" . $snmpver . "', `ignore` = '$ignore',  `disabled` = '$disabled', `port` = '$port', ";
+    if ($timeout) { $sql .= "`timeout` = '$timeout', "; } else { $sql .= "`timeout` = NULL, "; }
+    if ($retries) { $sql .= "`retries` = '$retries'"; } else { $sql .= "`retries` = NULL"; }
+    $sql .= " WHERE `device_id` = '".$device['device_id']."'";
+    $query = mysql_query($sql);
+
+    $rows_updated = mysql_affected_rows();
+
+    if ($rows_updated > 0)
+    {
+      $update_message = mysql_affected_rows() . " Device record updated.";
+      $updated = 1;
+    } elseif ($rows_updated = '-1') {
+      $update_message = "Device record unchanged. No update necessary.";
+      $updated = -1;
+    } else {
+      $update_message = "Device record update error.";
+      $updated = 0;
+    }
   }
 }
 
@@ -69,13 +99,13 @@ echo("  </select>
     </tr>
     <tr>
       <td width='300'><div align='right'>SNMP Timeout</div></td>
-      <td colspan='3'><input name='timeout' size='20' value='" . $device['timeout'] . "'></input>&nbsp;
+      <td colspan='3'><input name='timeout' size='20' value='" . ($device['timeout'] ? $device['timeout'] : '') . "'></input>&nbsp;
       <em>seconds</em>
       </td>
     </tr>
     <tr>
       <td width='300'><div align='right'>SNMP Retries</div></td>
-      <td colspan='3'><input name='retries' size='20' value='" . $device['retries'] . "'></input>
+      <td colspan='3'><input name='retries' size='20' value='" . ($device['timeout'] ? $device['retries'] : '') . "'></input>
       </td>
     </tr>
 
