@@ -24,10 +24,10 @@ if ($dataHandle)
 
      	     if ($argv[1] == "--cron")
      	     {
-               if (is_file('vrrd')) { echo("ERROR: 'vrrd' is not a directory!\n"); exit; }
-               if (is_dir('vrrd') && !is_writable('vrrd')) { echo("ERROR: I can not write in the 'vrrd' directory!\n"); exit; }
-               if (!is_dir('vrrd')) { mkdir('vrrd'); }
-     	       $fd = fopen('vrrd/version.txt','w');
+               if (is_file('rrd')) { echo("ERROR: 'rrd' is not a directory!\n"); exit; }
+               if (is_dir('rrd') && !is_writable('rrd')) { echo("ERROR: I can not write in the 'rrd' directory!\n"); exit; }
+               if (!is_dir('rrd')) { mkdir('rrd'); }
+     	       $fd = fopen('rrd/version.txt','w');
      	       fputs($fd, "$major.$minor.$release");
      	       fclose($fd);
              } else {
