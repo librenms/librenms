@@ -37,7 +37,7 @@ if ($updated && $update_message)
           </tr>
           <tr>
             <td><div align="right">IPMI/BMC Password</div></td>
-            <td colspan="3"><input name="ipmi_password" size="32" value="<?php echo get_dev_attrib($device,'ipmi_password'); ?>"></input></td>
+            <td colspan="3"><input name="ipmi_password" type="password" size="32" value="<?php echo get_dev_attrib($device,'ipmi_password'); ?>"></input></td>
             </td>
           </tr>
           <tr>
