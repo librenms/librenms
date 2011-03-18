@@ -2,8 +2,8 @@
 
 if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
 {
-  unset( $cpw_count );
-  unset( $cpw_exists );
+  unset($cpw_count);
+  unset($cpw_exists);
 
   echo("Cisco Pseudowires : ");
 

@@ -400,7 +400,13 @@ function isPingable($hostname)
    {
      return TRUE;
    } else {
-     return FALSE;
+     $status = shell_exec($config['fping6'] . " $hostname");
+     if (strstr($status, "alive"))
+     {
+       return TRUE;
+     } else {
+       return FALSE;
+     }
    }
 }
 

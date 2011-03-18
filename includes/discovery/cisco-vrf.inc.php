@@ -2,7 +2,7 @@
 
 if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['os'] == "ironware")
 {
-  unset( $vrf_count );
+  unset($vrf_count);
 
   echo("VRFs : ");
 
@@ -16,7 +16,7 @@ if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['o
   $oids = str_replace("\"", "", $oids);
 
   $oids = trim($oids);
-  foreach ( explode("\n", $oids) as $oid )
+  foreach (explode("\n", $oids) as $oid)
   {
     if ($oid)
     {
