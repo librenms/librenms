@@ -21,3 +21,4 @@ ALTER TABLE `devices` ADD `transport` VARCHAR(16) NOT NULL DEFAULT 'udp' AFTER `
 ALTER TABLE ports MODIFY port_descr_circuit VARCHAR(255);
 ALTER TABLE ports MODIFY port_descr_descr VARCHAR(255);
 ALTER TABLE ports MODIFY port_descr_notes VARCHAR(255);
+ALTER TABLE devices MODIFY community VARCHAR(255);
