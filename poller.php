@@ -215,6 +215,7 @@ while ($device = mysql_fetch_assoc($device_query))
     echo("Hardware: ".$hardware." Version: ".$version." Features: ".$features."\n");
 
     $sysLocation = str_replace("\"","", $sysLocation);
+    $sysContact  = str_replace("\"","", $sysContact);
 
     include("includes/polling/ipmi.inc.php");
     include("includes/polling/temperatures.inc.php");
