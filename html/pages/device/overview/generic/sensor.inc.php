@@ -6,7 +6,7 @@ if (mysql_num_rows($results))
 {
   $rows = round(mysql_num_rows($results) / 2,0);
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
-  echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/'.$device['device_id'].'/health/' . strtolower($sensor_type) . '/"><img align="absmiddle" src="'.$config['base_url'].'/images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</p>');
+  echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/'.$device['device_id'].'/health/' . strtolower($sensor_type) . '/"><img align="absmiddle" src="'.$config['base_url'].'/images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a></p>');
   $i = '1';
   echo('<table width="100%" valign="top">');
   while ($sensor = mysql_fetch_array($results))
