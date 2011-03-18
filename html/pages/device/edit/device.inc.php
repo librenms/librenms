@@ -8,17 +8,10 @@ if ($_POST['editing'])
     $ignore = mres($_POST['ignore']);
     $type = mres($_POST['type']);
     $disabled = mres($_POST['disabled']);
-    $community = mres($_POST['community']);
-    $snmpver = mres($_POST['snmpver']);
-    $port = mres($_POST['port']);
-    $timeout = mres($_POST['timeout']);
-    $retries = mres($_POST['retries']);
 
     #FIXME needs more sanity checking! and better feedback
-    $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `community` = '" . $community . "', `type` = '$type'";
-    $sql .= ", `snmpver` = '" . $snmpver . "', `ignore` = '$ignore',  `disabled` = '$disabled', `port` = '$port', ";
-    if ($timeout) { $sql .= "`timeout` = '$timeout', "; } else { $sql .= "`timeout` = NULL, "; }
-    if ($retries) { $sql .= "`retries` = '$retries'"; } else { $sql .= "`retries` = NULL"; }
+    $sql = "UPDATE `devices` SET `purpose` = '" . $descr . "', `type` = '$type'";
+    $sql .= ", `ignore` = '$ignore',  `disabled` = '$disabled'";
     $sql .= " WHERE `device_id` = '".$device['device_id']."'";
     $query = mysql_query($sql);
 
@@ -38,7 +31,7 @@ if ($_POST['editing'])
   }
 }
 
-$device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
+$device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
 $descr  = $device['purpose'];
 
 if ($updated && $update_message)
@@ -64,51 +57,6 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
       <td><div align='right'>Description</div></td>
       <td colspan='3'><input name='descr' size='32' value='" . $device['purpose'] . "'></input></td>
     </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Community</div></td>
-      <td colspan='3'><input name='community' size='20' value='" . $device['community'] . "'></input>
-      </td>
-    </tr>
-    <tr>
-    <td><div align=right>SNMP Version</div></td>
-    <td><select name='snmpver'>
-          <option value='v1'>v1</option>
-          <option value='v2c'" . ($device['snmpver'] == 'v2c' ? 'selected=selected' : '') . ">v2c</option>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Port</div></td>
-      <td colspan='3'><input name='port' size='20' value='" . $device['port'] . "'></input>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Transport</div></td>
-      <td colspan='3'>
-        <select name='transport'>");
-
-foreach ($config['snmp']['transports'] as $transport)
-{
-  echo ("<option value='".$transport."'");
-  if ($transport == $device['transport']) { echo (" selected='selected'"); }
-  echo (">".$transport."</option>");
-}
-
-echo("  </select>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Timeout</div></td>
-      <td colspan='3'><input name='timeout' size='20' value='" . ($device['timeout'] ? $device['timeout'] : '') . "'></input>&nbsp;
-      <em>seconds</em>
-      </td>
-    </tr>
-    <tr>
-      <td width='300'><div align='right'>SNMP Retries</div></td>
-      <td colspan='3'><input name='retries' size='20' value='" . ($device['timeout'] ? $device['retries'] : '') . "'></input>
-      </td>
-    </tr>
-
    <tr>
       <td align='right'>
         Type
