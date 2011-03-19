@@ -296,7 +296,8 @@ function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
     {
       if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' )
       {
-        # FIXME internalize
+        # FIXME internalize -- but we don't have $device yet!
+        # FIXME this needs to be addhost.php's content instead, kindof, also use this function there then.
         $snmphost = shell_exec($config['snmpget'] ." -m SNMPv2-MIB -Oqv -$snmpver -c $community $host:$port sysName.0");
         if ($snmphost == $host || $hostshort = $host)
         {
@@ -510,10 +511,7 @@ function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp'
     $sql = mysql_query("INSERT INTO `devices` (`hostname`, `sysName`, `community`, `port`, `transport`, `os`, `status`,`snmpver`) VALUES ('$host', '$host', '$community', '$port', '$transport', '$host_os', '1','$snmpver')");
     if (mysql_affected_rows())
     {
-      $device_id = mysql_result(mysql_query("SELECT device_id FROM devices WHERE hostname = '$host'"),0);
-      # vv FIXME set_dev_attrib()
-      mysql_query("INSERT INTO devices_attribs (attrib_type, attrib_value, device_id) VALUES ('discover','1','$device_id')");
-      return("Created host : $host (id:$device_id) (os:$host_os)");
+      return("Created host : $host (id:".mysql_insert_id().") (os:$host_os)");
     }
     else
     {
