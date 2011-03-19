@@ -44,20 +44,23 @@ if (isset($argv[1]) && $argv[1])
     {
       if (isPingable($argv[1]))
       {
-        # FIXME should be a foreach $config['snmp']['community'][0] as $community
-        $community = $config['snmp']['community'][0];
+        $added = 0;
+        
+        foreach ($config['snmp']['community'] as $community)
+        {
+          $device = deviceArray($host, $community, $snmpver, $port, $transport);
 
-        $device = deviceArray($host, $community, $snmpver, $port, $transport);
+          if (isSNMPable($device))
+          {
+            $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
+            if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
+            {
+              $added = createHost ($host, $community, $snmpver, $port, $transport);
+              if($added) { echo($added . "\n"); break; }
 
-	if (isSNMPable($device))
-	{
-	  $snmphost = snmp_get($device, "sysName.0", "-Oqv", "SNMPv2-MIB");
-	  if ($snmphost == "" || ($snmphost && ($snmphost == $host || $hostshort = $host)))
-	  {
-	    $return = createHost ($host, $community, $snmpver, $port, $transport);
-	    if($return) { echo($return . "\n"); } else { echo("Adding $host failed\n"); }
-	  } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
-	} else { echo("Could not reach $host with SNMP\n"); }
+            } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
+          }
+        }
       } else { echo("Could not ping $host\n"); }
     } else { echo("Could not resolve $host\n"); }
   } else { echo("Already got host $host\n"); }
