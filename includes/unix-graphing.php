@@ -1,7 +1,6 @@
 <?php 
 
 ## FIXME not used, do we still need this?
-## included from includes/unix.php, which is also unused
 
 function mailerrorgraphUnix ($rrd, $graph, $from, $to, $width, $height, $title, $vertical) {
   global $config, $installdir;
