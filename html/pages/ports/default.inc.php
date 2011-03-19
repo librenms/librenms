@@ -75,7 +75,7 @@
 </table>
 <?php print_optionbar_end(); ?>
 
-<table cellpadding=3 cellspacing=0 class=devicetable width=100%>
+<table cellpadding=3 cellspacing=0 class="devicetable sortable" width=100%>
 
 <?php
 

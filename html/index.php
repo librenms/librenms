@@ -66,6 +66,7 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
 </head>
 <body topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0">
   <script type="text/javascript" src="js/mktree.js"></script>
+  <script type="text/javascript" src="js/sorttable.js"></script>
   <script type="text/javascript">
 <!-- Begin
 function popUp(URL)
