@@ -61,6 +61,8 @@ if (isset($argv[1]) && $argv[1])
             } else { echo("Given hostname does not match SNMP-read hostname ($snmphost)!\n"); }
           }
         }
+        
+        if (!$added) { echo("Could not reach $host with given SNMP community\n"); }
       } else { echo("Could not ping $host\n"); }
     } else { echo("Could not resolve $host\n"); }
   } else { echo("Already got host $host\n"); }
