@@ -7,7 +7,7 @@ $sql  = "SELECT * FROM `storage` AS S, `devices` AS D WHERE S.device_id = D.devi
 $query = mysql_query($sql);
 
 echo("<div style='padding: 5px;'>
-        <table width=100% cellspacing=0 cellpadding=6>");
+        <table width=100% cellspacing=0 cellpadding=6 class='sortable'>");
 
 echo("<tr class=tablehead>
         <th width=280>Device</th>
