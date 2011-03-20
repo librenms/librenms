@@ -11,7 +11,12 @@ function authenticate($username,$password)
     // Migrate from old, unhashed password
     if ($row['password'] == $encrypted_old)
     {
-      changepassword($username,$password);
+      $query = mysql_query("DESCRIBE users password");
+      $row = mysql_fetch_assoc($query);
+      if ($row['Type'] == 'varchar(34)')
+      {
+        changepassword($username,$password);
+      }
       return 1;
     }
     if ($row['password'] == crypt($password,$row['password']))
