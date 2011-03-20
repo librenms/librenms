@@ -74,10 +74,11 @@ if ($device['os'] == "apc")
 
         $index = $split_oid[count($split_oid)-1];
 
-        $descr = "Bank ".$index;
+        $banknum = $index -1;
+        $descr = "Bank ".$banknum;
         if ($baseversion == "3")
         {
-          if ($index == "3") { $descr = "Bank Total"; }
+          if ($index == "1") { $descr = "Bank Total"; }
         }
         if ($baseversion == "2")
         {
