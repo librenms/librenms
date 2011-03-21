@@ -102,7 +102,7 @@ $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device[
 while ($port = mysql_fetch_array($port_query))
 {
   echo("Port " . $port['ifDescr'] . " ");
-  if ($port_stats[$port['ifIndex']] && $port['ignore'] == "0")
+  if ($port_stats[$port['ifIndex']] && $port['disabled'] == "0")
   { // Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
 
@@ -282,7 +282,7 @@ while ($port = mysql_fetch_array($port_query))
     unset($update_query); unset($update);
 
     // Send alerts for interface flaps.
-    if ($config['warn']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']))
+    if ($config['warn']['ifdown'] && ($port['ifOperStatus'] != $this_port['ifOperStatus']) && $port['ignore'] == 0)
     {
       if ($this_port['ifAlias'])
       {
@@ -301,12 +301,12 @@ while ($port = mysql_fetch_array($port_query))
       }
     }
   }
-  elseif ($port['ignore'] == "0")
+  elseif ($port['disabled'] == "0")
   {
     echo("Port Deleted"); // Port missing from SNMP cache.
     mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$this_port['ifIndex']."'");
   } else {
-    echo("Port Ignored.");
+    echo("Port Disabled.");
   }
 
   echo("\n");

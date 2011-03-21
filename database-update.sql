@@ -13,6 +13,7 @@ ALTER TABLE `vrfs` CHANGE `mplsVpnVrfRouteDistinguisher` `mplsVpnVrfRouteDisting
 ## Change port rrds
 ALTER TABLE  `devices` ADD  `timeout` INT NULL DEFAULT NULL AFTER  `port`;
 ALTER TABLE `devices` ADD `retries` INT NULL DEFAULT NULL AFTER `timeout`;
+ALTER TABLE `ports` ADD `disabled` tinyint(1) NOT NULL DEFAULT '0' AFTER `ignore`;
 ALTER TABLE  `perf_times` CHANGE  `duration`  `duration` DOUBLE( 8, 2 ) NOT NULL
 ALTER TABLE `sensors` ADD `poller_type` VARCHAR(16) NOT NULL DEFAULT 'snmp' AFTER `device_id`;
 ## Add transport
