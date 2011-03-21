@@ -22,7 +22,8 @@ echo("<div style='float: left;'>
   <input type=hidden name='ignoreport' value='yes'>
   <input type=hidden name=device value='".$device['device_id']."'>
 <table>
-<tr><th>Port</th><th>ifDescr</th><th>ifAdminStatus</th><th>ifOperStatus</th><th>Ignore</th></tr>");
+<tr><th>Port</th><th>ifDescr</th><th>ifAdminStatus</th><th>ifOperStatus</th><th>Disable</th><th>Ignore</th></tr>
+");
 
 $query = mysql_query("SELECT * FROM `ports` WHERE device_id='".$device['device_id']."' ORDER BY `ifIndex` ");
 while ($device = mysql_fetch_array($query))
@@ -32,18 +33,26 @@ while ($device = mysql_fetch_array($query))
   echo("<td align=left>".$device['ifDescr'] . "</td>");
   echo("<td align=right>". $device['ifAdminStatus']."</td>");
 
-  # Mark interfaces which are OperDown (but not AdminDown) yet not ignored, or up - yet ignored - as to draw the attention
-  # to a possible problem.
-  #
-  $outofsync =  ($device['ignore'] == ($device['ifOperStatus'] == 'down' && $device['ifAdminStatus'] != 'down' ? 1 : 0))  ? "" : "class=red";
+  # Mark interfaces which are OperDown (but not AdminDown) yet not ignored or disabled, or up yet ignored or disabled
+  # - as to draw the attention to a possible problem.
+  $isportbad = ($device['ifOperStatus'] == 'down' && $device['ifAdminStatus'] != 'down') ? 1 : 0;
+  $dowecare  = ($device['ignore'] == 0 && $device['disabled'] == 0) ? 1 : 0;
+  $outofsync = ($isportbad && $dowecare) ? "class=red" : "";
 
   echo("<td align=right><span ".$outofsync.">". $device['ifOperStatus']."</span></td>");
 
   echo("<td>");
-  echo("<input type=checkbox name='ignore_".$device['interface_id']."'".($device['ignore'] ? 'checked' : '').">");
-  echo("<input type=hidden name='oldval_".$device['interface_id']."' value=".($device['ignore'] ? 1 : 0).">");
+  echo("<input type=checkbox name='disabled_".$device['interface_id']."'".($device['disabled'] ? 'checked' : '').">");
+  echo("<input type=hidden name='olddis_".$device['interface_id']."' value=".($device['disabled'] ? 1 : 0).">");
   echo("</td>");
-  echo("</tr>");
+
+  echo("<td>");
+  echo("<input type=checkbox name='ignore_".$device['interface_id']."'".($device['ignore'] ? 'checked' : '').">");
+  echo("<input type=hidden name='oldign_".$device['interface_id']."' value=".($device['ignore'] ? 1 : 0).">");
+  echo("</td>");
+
+  echo("</tr>
+");
 }
 
 echo('<tr><td></td><td></td><td></td><td></td><td><input type="submit" value="Save"></td></tr>');
