@@ -31,7 +31,7 @@ if ($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd"
       $rrd_create .= " DS:PortConsumption:DERIVE:600:0:U";
       $rrd_create .= " DS:PortMaxPwrDrawn:GAUGE:600:0:U ";
 
-      rrd_create($rrdfile, $rrd_create);
+      rrdtool_create($rrdfile, $rrd_create);
     }
 
     $upd = "$polled:".$port['cpeExtPsePortPwrAllocated'].":".$port['cpeExtPsePortPwrAvailable'].":".$port['cpeExtPsePortPwrConsumption'].":".$port['cpeExtPsePortMaxPwrDrawn'];
