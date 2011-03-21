@@ -25,7 +25,7 @@ if ($port_stats[$port['ifIndex']] && $port['ifType'] == "ethernetCsmacd"
         $oid = truncate(str_replace("dot3Stats", "", $oid), 19, '');
         $rrd_create .= " DS:$oid:COUNTER:600:U:100000000000";
       }
-      rrd_create($rrdfile, $rrd_create);
+      rrdtool_create($rrdfile, $rrd_create);
     }
   }
 
