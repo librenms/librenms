@@ -89,6 +89,18 @@ $config['os'][$os]['ifXmcbc']           = 1;
 $config['os'][$os]['ifname']           = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "alcatellucent";
+
+
+$os = "timos";
+$config['os'][$os]['group']             = "timos";
+$config['os'][$os]['text']              = "Alcatel-Lucent TimOS";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['ifXmcbc']           = 1;
+#$config['os'][$os]['ifname']            = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+$config['os'][$os]['icon']              = "alcatellucent";
 
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
