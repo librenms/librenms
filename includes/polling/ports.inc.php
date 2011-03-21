@@ -102,7 +102,7 @@ $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device[
 while ($port = mysql_fetch_array($port_query))
 {
   echo("Port " . $port['ifDescr'] . " ");
-  if ($port_stats[$port['ifIndex']] && $port['disabled'] == "0")
+  if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")
   { // Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
 
@@ -301,7 +301,7 @@ while ($port = mysql_fetch_array($port_query))
       }
     }
   }
-  elseif ($port['disabled'] == "0")
+  elseif ($port['disabled'] != "1")
   {
     echo("Port Deleted"); // Port missing from SNMP cache.
     mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '".$this_port['ifIndex']."'");
