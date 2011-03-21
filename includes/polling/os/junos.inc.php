@@ -27,7 +27,7 @@ if (is_numeric($cpu_usage))
 {
   if (!is_file($cpurrd))
   {
-    rrd_create($cpurrd," --step 300 DS:LOAD:GAUGE:600:-1:100 RRA:AVERAGE:0.5:1:1200                  RRA:AVERAGE:0.5:1:2000 \
+    rrdtool_create($cpurrd," --step 300 DS:LOAD:GAUGE:600:-1:100 RRA:AVERAGE:0.5:1:1200                  RRA:AVERAGE:0.5:1:2000 \
                     RRA:AVERAGE:0.5:6:2000 \
                     RRA:AVERAGE:0.5:24:2000 \
                     RRA:AVERAGE:0.5:288:2000 \
