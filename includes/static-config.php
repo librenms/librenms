@@ -88,12 +88,6 @@ $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifXmcbc']           = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
-#$config['os'][$os]['over'][1]['graph']  = "device_processors";
-#$config['os'][$os]['over'][1]['text']   = "CPU Usage";
-#$config['os'][$os]['over'][2]['graph']  = "device_mempools";
-#$config['os'][$os]['over'][2]['text']   = "Memory Usage";
-#$config['os'][$os]['icon']              = "cisco";
-
 
 $os = "ios";
 $config['os'][$os]['group']		= "ios";
@@ -248,7 +242,6 @@ $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 #$config['os'][$os]['over'][2]['graph']  = "device_mempools";
 #$config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
-
 $os = "routeros";
 $config['os'][$os]['text']		= "Mikrotik RouterOS";
 $config['os'][$os]['type']		= "network";
@@ -331,7 +324,6 @@ $config['os'][$os]['over'][1]['graph']  = "device_processors";
 $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
-
 
 $os = "powerconnect";
 $config['os'][$os]['text']   		= "Dell PowerConnect";
@@ -425,6 +417,11 @@ $os = "windows";
 $config['os'][$os]['text']        	= "Microsoft Windows";
 $config['os'][$os]['ifname']		= 1;
 
+$os = "bnt";
+$config['os'][$os]['text']              = "Blade Network Technologies";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "bnt";
+
 $os = "procurve";
 $config['os'][$os]['text']       	= "HP ProCurve";
 $config['os'][$os]['type']       	= "network";
@@ -463,6 +460,11 @@ $config['os'][$os]['icon']       	= "zyxel";
 
 $os = "zyxeles";
 $config['os'][$os]['text']     		= "ZyXEL Ethernet Switch";
+$config['os'][$os]['type']     		= "network";
+$config['os'][$os]['icon']        	= "zyxel";
+
+$os = "zyxelnwa";
+$config['os'][$os]['text']     		= "ZyXEL NWA";
 $config['os'][$os]['type']     		= "network";
 $config['os'][$os]['icon']        	= "zyxel";
 
@@ -544,6 +546,13 @@ $config['os'][$os]['over'][0]['text']   = "Temperatures";
 $os = "papouch-tme";
 $config['os'][$os]['text']       	= "Papouch TME";
 $config['os'][$os]['type']       	= "environment";
+$config['os'][$os]['over'][0]['graph']  = "device_temperatures";
+$config['os'][$os]['over'][0]['text']   = "Temperatures";
+
+$os = "cometsystem-p85xx";
+$config['os'][$os]['text']       	= "Comet System P85xx";
+$config['os'][$os]['type']       	= "environment";
+$config['os'][$os]['icon']        	= "comet";
 $config['os'][$os]['over'][0]['graph']  = "device_temperatures";
 $config['os'][$os]['over'][0]['text']   = "Temperatures";
 

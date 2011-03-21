@@ -24,6 +24,7 @@ SVN 0.10-current
 * Add support for IPMI polling on servers
 * Add a new discovery parameter to only discover new devices, this can be run every 5 minutes
   to speed up discovery of added devices through the webinterface
+* Make a distinction between 'ignore' and 'disable' for ports, like for devices
 
 Release 0.10.7.1 ( 19th July 2010 )
 
