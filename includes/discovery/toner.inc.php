@@ -19,10 +19,10 @@ if ($config['enable_printers'])
       $data = trim($data);
       if ($data)
       {
-        list($oid,$kind) = explode(" ", $data);
+        list($oid,$role) = explode(" ", $data);
         $split_oid = explode('.',$oid);
         $index = $split_oid[count($split_oid)-1];
-        if ($kind == 1)
+        if (is_numeric($role))
         {
           $toner_oid     = ".1.3.6.1.2.1.43.11.1.1.9.1.$index";
           $descr_oid     = ".1.3.6.1.2.1.43.11.1.1.6.1.$index";
