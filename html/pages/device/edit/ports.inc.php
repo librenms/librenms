@@ -20,7 +20,7 @@ if ($updated && $update_message)
 echo("<div style='float: left; width: 100%'>
 <form id='ignoreport' name='ignoreport' method='post' action=''>
   <input type=hidden name='ignoreport' value='yes'>
-  <input type=hidden name=device value='".$port['device_id']."'>");
+  <input type=hidden name=device value='".$device['device_id']."'>");
 
 echo("<table cellpadding=3 cellspacing=0 width=100%>
   <tr align=center>
