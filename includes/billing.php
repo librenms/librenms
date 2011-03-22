@@ -18,7 +18,7 @@ function getDates($dayofmonth)
 
     $date_from = $year . $month . $dayofmonth;
     $date_to   = $newyear . $newmonth . $dayofmonth;
-    $dt_q = mysql_query("SELECT DATE_ADD(DATE_SUB('$date_from', INTERVAL 1 DAY), INTERVAL 1 MONTH);");
+    $dt_q = mysql_query("SELECT DATE_SUB(DATE_ADD('$date_from', INTERVAL 1 MONTH), INTERVAL 1 DAY);");
     $date_to = mysql_result($dt_q,0);
     $date_to = str_replace("-","",$date_to);
   }
@@ -35,7 +35,7 @@ function getDates($dayofmonth)
 
     $date_from = $newyear . $newmonth . $dayofmonth;
     $date_to   = $year . $month . $dayofmonth;
-    $dt_q = mysql_query("SELECT DATE_ADD(DATE_SUB('$date_to', INTERVAL 1 MONTH), INTERVAL 1 DAY);");
+    $dt_q = mysql_query("SELECT DATE_SUB(DATE_ADD('$date_to', INTERVAL 1 MONTH, INTERVAL 1 DAY);");
     $date_from = mysql_result($dt_q,0);
     $date_from = str_replace("-","",$date_from);
   }
@@ -57,17 +57,18 @@ function getDates($dayofmonth)
 }
 
 
-function getValue($host, $community, $snmpver, $port, $id, $inout)
+function getValue($host, $port, $id, $inout)
 {
   global $config;
 
   $oid  = "IF-MIB::ifHC" . $inout . "Octets." . $id;
-  $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -$snmpver -O qv $host:$port $oid");
+  $device = mysql_fetch_assoc(mysql_query("SELECT * from `devices` WHERE `hostname` = '" . $host . "' LIMIT 1"));
+  $value = snmp_get($device, $oid, "-O qv");
 
   if (!is_numeric($value))
   {
     $oid  = "IF-MIB::if" . $inout . "Octets." . $id;
-    $value = shell_exec($config['snmpget'] ." -m IF-MIB -c $community -$snmpver -O qv $host:$port $oid");
+    $value = snmp_get($device, $oid, "-Oqv");
   }
 
   return $value;
@@ -121,12 +122,12 @@ function get95thin($bill_id,$datefrom,$dateto)
   $measurements = mysql_result($m_query,0);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_text = "SELECT in_delta FROM bill_data  WHERE bill_id = $bill_id";
+  $q_95_text = "SELECT (in_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = $bill_id";
   $q_95_text .= " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY in_delta ASC";
   $q_95th = mysql_query($q_95_text);
   $m_95th = mysql_result($q_95th,$measurement_95th);
 
-  return(round($m_95th / 1000 / 300 * 8, 2));
+  return(round($m_95th, 2));
 }
 
 function get95thout($bill_id,$datefrom,$dateto)
@@ -137,12 +138,12 @@ function get95thout($bill_id,$datefrom,$dateto)
   $measurements = mysql_result($m_query,0);
   $measurement_95th = round($measurements /100 * 95) - 1;
 
-  $q_95_text = "SELECT out_delta FROM bill_data  WHERE bill_id = $bill_id";
+  $q_95_text = "SELECT (out_delta / period / 1000 * 8) AS rate FROM bill_data  WHERE bill_id = $bill_id";
   $q_95_text .= " AND timestamp > $datefrom AND timestamp <= $dateto ORDER BY out_delta ASC";
   $q_95th = mysql_query($q_95_text);
   $m_95th = mysql_result($q_95th,$measurement_95th);
 
-  return(round($m_95th / 1000 / 300 * 8, 2));
+  return(round($m_95th, 2));
 }
 
 function getRates($bill_id,$datefrom,$dateto)
