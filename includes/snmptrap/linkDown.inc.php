@@ -15,8 +15,8 @@ log_event("SNMP Trap: linkDown " . $interface['ifDescr'], $device, "interface", 
 #}
 if ($ifOperStatus != $interface['ifOperStatus'])
 {
-  log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
-  mysql_query("UPDATE `ports` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
+    log_event("Interface went Down : " . $interface['ifDescr'] . " (TRAP)", $device, "interface", $interface['interface_id']);
+    mysql_query("UPDATE `ports` SET ifOperStatus = 'down' WHERE `interface_id` = '".$interface['interface_id']."'");
 }
 
 ?>

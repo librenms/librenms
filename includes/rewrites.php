@@ -2,297 +2,297 @@
 
 function formatMac($mac)
 {
-  $mac = preg_replace("/(..)(..)(..)(..)(..)(..)/", "\\1:\\2:\\3:\\4:\\5:\\6", $mac);
-  return $mac;
+    $mac = preg_replace("/(..)(..)(..)(..)(..)(..)/", "\\1:\\2:\\3:\\4:\\5:\\6", $mac);
+    return $mac;
 }
 
 function rewrite_entity_descr ($descr)
 {
-  $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
-  $descr = preg_replace("/7600 Series SPA Interface Processor-/", "7600 SIP-", $descr);
-  $descr = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $descr);
-  $descr = preg_replace("/12000 Series Performance Route Processor/", "12000 PRP", $descr);
-  $descr = preg_replace("/^12000/", "", $descr);
-  $descr = preg_replace("/Gigabit Ethernet/", "GigE", $descr);
-  $descr = preg_replace("/^ASR1000\ /", "", $descr);
-  $descr = str_replace("Routing Processor", "RP", $descr);
-  $descr = str_replace("Route Processor", "RP", $descr);
-  $descr = str_replace("Switching Processor", "SP", $descr);
-  $descr = str_replace("Sub-Module", "Module ", $descr);
-  $descr = str_replace("DFC Card", "DFC", $descr);
-  $descr = str_replace("Centralized Forwarding Card", "CFC", $descr);
-  $descr = str_replace("Power Supply Module", "PSU ", $descr);
-  $descr = str_replace("/Voltage Sensor/", "Voltage", $descr);
-  $descr = preg_replace("/^temperatures /", "", $descr);
-  $descr = preg_replace("/^voltages /", "", $descr);
+    $descr = str_replace("Distributed Forwarding Card", "DFC", $descr);
+    $descr = preg_replace("/7600 Series SPA Interface Processor-/", "7600 SIP-", $descr);
+    $descr = preg_replace("/Rev\.\ [0-9\.]+\ /", "", $descr);
+    $descr = preg_replace("/12000 Series Performance Route Processor/", "12000 PRP", $descr);
+    $descr = preg_replace("/^12000/", "", $descr);
+    $descr = preg_replace("/Gigabit Ethernet/", "GigE", $descr);
+    $descr = preg_replace("/^ASR1000\ /", "", $descr);
+    $descr = str_replace("Routing Processor", "RP", $descr);
+    $descr = str_replace("Route Processor", "RP", $descr);
+    $descr = str_replace("Switching Processor", "SP", $descr);
+    $descr = str_replace("Sub-Module", "Module ", $descr);
+    $descr = str_replace("DFC Card", "DFC", $descr);
+    $descr = str_replace("Centralized Forwarding Card", "CFC", $descr);
+    $descr = str_replace("Power Supply Module", "PSU ", $descr);
+    $descr = str_replace("/Voltage Sensor/", "Voltage", $descr);
+    $descr = preg_replace("/^temperatures /", "", $descr);
+    $descr = preg_replace("/^voltages /", "", $descr);
 
-  return $descr;
+    return $descr;
 }
 
 function ifNameDescr($interface, $device = NULL)
 {
-  return ifLabel($interface, $device);
+    return ifLabel($interface, $device);
 }
 
 function ifLabel ($interface, $device = NULL)
 {
-  global $config;
+    global $config;
 
-  if (!$device) { $device = device_by_id_cache($interface['device_id']); }
-  $os = strtolower($device['os']);
+    if (!$device) { $device = device_by_id_cache($interface['device_id']); }
+    $os = strtolower($device['os']);
 
-  if (isset($config['os'][$os]['ifname']))
-  {
-    $interface['label'] = $interface['ifName'];
-  } elseif (isset($config['os'][$os]['ifalias']))
-  {
-    $interface['label'] = $interface['ifAlias'];
-  } else {
-    $interface['label'] = $interface['ifDescr'];
-    if (isset($config['os'][$os]['ifindex']))
+    if (isset($config['os'][$os]['ifname']))
     {
-      $interface['label'] = $interface['label'] . " " . $interface['ifIndex'];
+        $interface['label'] = $interface['ifName'];
+    } elseif (isset($config['os'][$os]['ifalias']))
+    {
+        $interface['label'] = $interface['ifAlias'];
+    } else {
+        $interface['label'] = $interface['ifDescr'];
+        if (isset($config['os'][$os]['ifindex']))
+        {
+            $interface['label'] = $interface['label'] . " " . $interface['ifIndex'];
+        }
     }
-  }
 
-  if ($device['os'] == "speedtouch")
-  {
-    list($interface['label']) = explode("thomson", $interface['label']);
-  }
+    if ($device['os'] == "speedtouch")
+    {
+        list($interface['label']) = explode("thomson", $interface['label']);
+    }
 
-  return $interface;
+    return $interface;
 }
 
 $rewrite_entSensorType = array (
-  'celsius' => 'C',
-  'unknown' => '',
-  'specialEnum' => 'C',
-  'watts' => 'W',
-  'truthvalue' => '',
+    'celsius' => 'C',
+    'unknown' => '',
+    'specialEnum' => 'C',
+    'watts' => 'W',
+    'truthvalue' => '',
 );
 
 $translate_ifOperStatus = array(
-  "1" => "up",
-  "2" => "down",
-  "3" => "testing",
-  "4" => "unknown",
-  "5" => "dormant",
-  "6" => "notPresent",
-  "7" => "lowerLayerDown",
+    "1" => "up",
+    "2" => "down",
+    "3" => "testing",
+    "4" => "unknown",
+    "5" => "dormant",
+    "6" => "notPresent",
+    "7" => "lowerLayerDown",
 );
 
 function translate_ifOperStatus ($ifOperStatus)
 {
-  global $translate_ifOperStatus;
+    global $translate_ifOperStatus;
 
-  if ($translate_ifOperStatus['$ifOperStatus'])
-  {
-    $ifOperStatus = $translate_ifOperStatus['$ifOperStatus'];
-  }
+    if ($translate_ifOperStatus['$ifOperStatus'])
+    {
+        $ifOperStatus = $translate_ifOperStatus['$ifOperStatus'];
+    }
 
-  return $ifOperStatus;
+    return $ifOperStatus;
 }
 
 $translate_ifAdminStatus = array(
-  "1" => "up",
-  "2" => "down",
-  "3" => "testing",
+    "1" => "up",
+    "2" => "down",
+    "3" => "testing",
 );
 
 function translate_ifAdminStatus ($ifAdminStatus)
 {
-  global $translate_ifAdminStatus;
+    global $translate_ifAdminStatus;
 
-  if ($translate_ifAdminStatus[$ifAdminStatus])
-  {
-    $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
-  }
+    if ($translate_ifAdminStatus[$ifAdminStatus])
+    {
+        $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
+    }
 
-  return $ifAdminStatus;
+    return $ifAdminStatus;
 }
 
 $rewrite_junose_hardware = array(
-  'juniErx1400' => 'ERX-1400',
-  'juniErx700' => 'ERX-700',
-  'juniErx1440' => 'ERX-1440',
-  'juniErx705' => 'ERX-705',
-  'juniErx310' => 'ERX-310',
-  'juniE320' => 'E320',
-  'juniE120' => 'E120',
-  'juniSsx1400' => 'SSX-1400',
-  'juniSsx700' => 'SSX-700',
-  'juniSsx1440' => 'SSX-1440',
+    'juniErx1400' => 'ERX-1400',
+    'juniErx700' => 'ERX-700',
+    'juniErx1440' => 'ERX-1440',
+    'juniErx705' => 'ERX-705',
+    'juniErx310' => 'ERX-310',
+    'juniE320' => 'E320',
+    'juniE120' => 'E120',
+    'juniSsx1400' => 'SSX-1400',
+    'juniSsx700' => 'SSX-700',
+    'juniSsx1440' => 'SSX-1440',
 );
 
 $rewrite_ftos_hardware = array (
-'.1.3.6.1.4.1.6027.1.1.1'=> 'E1200',
-'.1.3.6.1.4.1.6027.1.1.2'=> 'E600',
-'.1.3.6.1.4.1.6027.1.1.3'=> 'E300',
-'.1.3.6.1.4.1.6027.1.1.4'=> 'E610',
-'.1.3.6.1.4.1.6027.1.1.5'=> 'E1200i',
-'.1.3.6.1.4.1.6027.1.2.1'=> 'C300',
-'.1.3.6.1.4.1.6027.1.2.2'=> 'C150',
-'.1.3.6.1.4.1.6027.1.3.1'=> 'S50',
-'.1.3.6.1.4.1.6027.1.3.2'=> 'S50E',
-'.1.3.6.1.4.1.6027.1.3.3'=> 'S50V',
-'.1.3.6.1.4.1.6027.1.3.4'=> 'S25P-AC',
-'.1.3.6.1.4.1.6027.1.3.5'=> 'S2410CP',
-'.1.3.6.1.4.1.6027.1.3.6'=> 'S2410P',
-'.1.3.6.1.4.1.6027.1.3.7'=> 'S50N-AC',
-'.1.3.6.1.4.1.6027.1.3.8'=> 'S50N-DC',
-'.1.3.6.1.4.1.6027.1.3.9'=> 'S25P-DC',
-'.1.3.6.1.4.1.6027.1.3.10'=> 'S25V',
-'.1.3.6.1.4.1.6027.1.3.11'=> 'S25N'
+    '.1.3.6.1.4.1.6027.1.1.1'=> 'E1200',
+    '.1.3.6.1.4.1.6027.1.1.2'=> 'E600',
+    '.1.3.6.1.4.1.6027.1.1.3'=> 'E300',
+    '.1.3.6.1.4.1.6027.1.1.4'=> 'E610',
+    '.1.3.6.1.4.1.6027.1.1.5'=> 'E1200i',
+    '.1.3.6.1.4.1.6027.1.2.1'=> 'C300',
+    '.1.3.6.1.4.1.6027.1.2.2'=> 'C150',
+    '.1.3.6.1.4.1.6027.1.3.1'=> 'S50',
+    '.1.3.6.1.4.1.6027.1.3.2'=> 'S50E',
+    '.1.3.6.1.4.1.6027.1.3.3'=> 'S50V',
+    '.1.3.6.1.4.1.6027.1.3.4'=> 'S25P-AC',
+    '.1.3.6.1.4.1.6027.1.3.5'=> 'S2410CP',
+    '.1.3.6.1.4.1.6027.1.3.6'=> 'S2410P',
+    '.1.3.6.1.4.1.6027.1.3.7'=> 'S50N-AC',
+    '.1.3.6.1.4.1.6027.1.3.8'=> 'S50N-DC',
+    '.1.3.6.1.4.1.6027.1.3.9'=> 'S25P-DC',
+    '.1.3.6.1.4.1.6027.1.3.10'=> 'S25V',
+    '.1.3.6.1.4.1.6027.1.3.11'=> 'S25N'
 );
 
 $rewrite_fortinet_hardware = array(
-'.1.3.6.1.4.1.12356.102.1.1000' => 'FortiAnalyzer 100',
-'.1.3.6.1.4.1.12356.102.1.10002' => 'FortiAnalyzer 1000B',
-'.1.3.6.1.4.1.12356.102.1.1001' => 'FortiAnalyzer 100A',
-'.1.3.6.1.4.1.12356.102.1.1002' => 'FortiAnalyzer 100B',
-'.1.3.6.1.4.1.12356.102.1.20000' => 'FortiAnalyzer 2000',
-'.1.3.6.1.4.1.12356.102.1.20001' => 'FortiAnalyzer 2000A',
-'.1.3.6.1.4.1.12356.102.1.4000' => 'FortiAnalyzer 400',
-'.1.3.6.1.4.1.12356.102.1.40000' => 'FortiAnalyzer 4000',
-'.1.3.6.1.4.1.12356.102.1.40001' => 'FortiAnalyzer 4000A',
-'.1.3.6.1.4.1.12356.102.1.4002' => 'FortiAnalyzer 400B',
-'.1.3.6.1.4.1.12356.102.1.8000' => 'FortiAnalyzer 800',
-'.1.3.6.1.4.1.12356.102.1.8002' => 'FortiAnalyzer 800B',
-'.1.3.6.1.4.1.12356.101.1.1000' => 'FortiGate 100',
-'.1.3.6.1.4.1.12356.101.1.10000' => 'FortiGate 1000',
-'.1.3.6.1.4.1.12356.101.1.10001' => 'FortiGate 1000A',
-'.1.3.6.1.4.1.12356.101.1.10002' => 'FortiGate 1000AFA2',
-'.1.3.6.1.4.1.12356.101.1.10003' => 'FortiGate 1000ALENC',
-'.1.3.6.1.4.1.12356.101.1.1001' => 'FortiGate 100A',
-'.1.3.6.1.4.1.12356.101.1.1002' => 'FortiGate 110C',
-'.1.3.6.1.4.1.12356.101.1.1003' => 'FortiGate 111C',
-'.1.3.6.1.4.1.12356.101.1.2000' => 'FortiGate 200',
-'.1.3.6.1.4.1.12356.101.1.20000' => 'FortiGate 2000',
-'.1.3.6.1.4.1.12356.101.1.2001' => 'FortiGate 200A',
-'.1.3.6.1.4.1.12356.101.1.2002' => 'FortiGate 224B',
-'.1.3.6.1.4.1.12356.101.1.2003' => 'FortiGate 200A',
-'.1.3.6.1.4.1.12356.101.1.3000' => 'FortiGate 300',
-'.1.3.6.1.4.1.12356.101.1.30000' => 'FortiGate 3000',
-'.1.3.6.1.4.1.12356.101.1.3001' => 'FortiGate 300A',
-'.1.3.6.1.4.1.12356.101.1.30160' => 'FortiGate 3016B',
-'.1.3.6.1.4.1.12356.101.1.302' => 'FortiGate 30B',
-'.1.3.6.1.4.1.12356.101.1.3002' => 'FortiGate 310B',
-'.1.3.6.1.4.1.12356.101.1.36000' => 'FortiGate 3600',
-'.1.3.6.1.4.1.12356.101.1.36003' => 'FortiGate 3600A',
-'.1.3.6.1.4.1.12356.101.1.38100' => 'FortiGate 3810A',
-'.1.3.6.1.4.1.12356.101.1.4000' => 'FortiGate 400',
-'.1.3.6.1.4.1.12356.101.1.40000' => 'FortiGate 4000',
-'.1.3.6.1.4.1.12356.101.1.4001' => 'FortiGate 400A',
-'.1.3.6.1.4.1.12356.101.1.5000' => 'FortiGate 500',
-'.1.3.6.1.4.1.12356.101.1.50000' => 'FortiGate 5000',
-'.1.3.6.1.4.1.12356.101.1.50010' => 'FortiGate 5001',
-'.1.3.6.1.4.1.12356.101.1.50011' => 'FortiGate 5001A',
-'.1.3.6.1.4.1.12356.101.1.50012' => 'FortiGate 5001FA2',
-'.1.3.6.1.4.1.12356.101.1.50021' => 'FortiGate 5002A',
-'.1.3.6.1.4.1.12356.101.1.50001' => 'FortiGate 5002FB2',
-'.1.3.6.1.4.1.12356.101.1.50040' => 'FortiGate 5004',
-'.1.3.6.1.4.1.12356.101.1.50050' => 'FortiGate 5005',
-'.1.3.6.1.4.1.12356.101.1.50051' => 'FortiGate 5005FA2',
-'.1.3.6.1.4.1.12356.101.1.5001' => 'FortiGate 500A',
-'.1.3.6.1.4.1.12356.101.1.500' => 'FortiGate 50A',
-'.1.3.6.1.4.1.12356.101.1.501' => 'FortiGate 50AM',
-'.1.3.6.1.4.1.12356.101.1.502' => 'FortiGate 50B',
-'.1.3.6.1.4.1.12356.101.1.504' => 'FortiGate 51B',
-'.1.3.6.1.4.1.12356.101.1.600' => 'FortiGate 60',
-'.1.3.6.1.4.1.12356.101.1.6201' => 'FortiGate 600D',
-'.1.3.6.1.4.1.12356.101.1.602' => 'FortiGate 60ADSL',
-'.1.3.6.1.4.1.12356.101.1.603' => 'FortiGate 60B',
-'.1.3.6.1.4.1.12356.101.1.601' => 'FortiGate 60M',
-'.1.3.6.1.4.1.12356.101.1.6200' => 'FortiGate 620B',
-'.1.3.6.1.4.1.12356.101.1.8000' => 'FortiGate 800',
-'.1.3.6.1.4.1.12356.101.1.8001' => 'FortiGate 800F',
-'.1.3.6.1.4.1.12356.101.1.800' => 'FortiGate 80C',
-'.1.3.6.1.4.1.12356.1688' => 'FortiMail 2000A',
-'.1.3.6.1.4.1.12356.103.1.1000' => 'FortiManager 100',
-'.1.3.6.1.4.1.12356.103.1.20000' => 'FortiManager 2000XL',
-'.1.3.6.1.4.1.12356.103.1.30000' => 'FortiManager 3000',
-'.1.3.6.1.4.1.12356.103.1.30002' => 'FortiManager 3000B',
-'.1.3.6.1.4.1.12356.103.1.4000' => 'FortiManager 400',
-'.1.3.6.1.4.1.12356.103.1.4001' => 'FortiManager 400A',
-'.1.3.6.1.4.1.12356.106.1.50030' => 'FortiSwitch 5003A',
-'.1.3.6.1.4.1.12356.101.1.510' => 'FortiWiFi 50B',
-'.1.3.6.1.4.1.12356.101.1.610' => 'FortiWiFi 60',
-'.1.3.6.1.4.1.12356.101.1.611' => 'FortiWiFi 60A',
-'.1.3.6.1.4.1.12356.101.1.612' => 'FortiWiFi 60AM',
-'.1.3.6.1.4.1.12356.101.1.613' => 'FortiWiFi 60B');
+    '.1.3.6.1.4.1.12356.102.1.1000' => 'FortiAnalyzer 100',
+    '.1.3.6.1.4.1.12356.102.1.10002' => 'FortiAnalyzer 1000B',
+    '.1.3.6.1.4.1.12356.102.1.1001' => 'FortiAnalyzer 100A',
+    '.1.3.6.1.4.1.12356.102.1.1002' => 'FortiAnalyzer 100B',
+    '.1.3.6.1.4.1.12356.102.1.20000' => 'FortiAnalyzer 2000',
+    '.1.3.6.1.4.1.12356.102.1.20001' => 'FortiAnalyzer 2000A',
+    '.1.3.6.1.4.1.12356.102.1.4000' => 'FortiAnalyzer 400',
+    '.1.3.6.1.4.1.12356.102.1.40000' => 'FortiAnalyzer 4000',
+    '.1.3.6.1.4.1.12356.102.1.40001' => 'FortiAnalyzer 4000A',
+    '.1.3.6.1.4.1.12356.102.1.4002' => 'FortiAnalyzer 400B',
+    '.1.3.6.1.4.1.12356.102.1.8000' => 'FortiAnalyzer 800',
+    '.1.3.6.1.4.1.12356.102.1.8002' => 'FortiAnalyzer 800B',
+    '.1.3.6.1.4.1.12356.101.1.1000' => 'FortiGate 100',
+    '.1.3.6.1.4.1.12356.101.1.10000' => 'FortiGate 1000',
+    '.1.3.6.1.4.1.12356.101.1.10001' => 'FortiGate 1000A',
+    '.1.3.6.1.4.1.12356.101.1.10002' => 'FortiGate 1000AFA2',
+    '.1.3.6.1.4.1.12356.101.1.10003' => 'FortiGate 1000ALENC',
+    '.1.3.6.1.4.1.12356.101.1.1001' => 'FortiGate 100A',
+    '.1.3.6.1.4.1.12356.101.1.1002' => 'FortiGate 110C',
+    '.1.3.6.1.4.1.12356.101.1.1003' => 'FortiGate 111C',
+    '.1.3.6.1.4.1.12356.101.1.2000' => 'FortiGate 200',
+    '.1.3.6.1.4.1.12356.101.1.20000' => 'FortiGate 2000',
+    '.1.3.6.1.4.1.12356.101.1.2001' => 'FortiGate 200A',
+    '.1.3.6.1.4.1.12356.101.1.2002' => 'FortiGate 224B',
+    '.1.3.6.1.4.1.12356.101.1.2003' => 'FortiGate 200A',
+    '.1.3.6.1.4.1.12356.101.1.3000' => 'FortiGate 300',
+    '.1.3.6.1.4.1.12356.101.1.30000' => 'FortiGate 3000',
+    '.1.3.6.1.4.1.12356.101.1.3001' => 'FortiGate 300A',
+    '.1.3.6.1.4.1.12356.101.1.30160' => 'FortiGate 3016B',
+    '.1.3.6.1.4.1.12356.101.1.302' => 'FortiGate 30B',
+    '.1.3.6.1.4.1.12356.101.1.3002' => 'FortiGate 310B',
+    '.1.3.6.1.4.1.12356.101.1.36000' => 'FortiGate 3600',
+    '.1.3.6.1.4.1.12356.101.1.36003' => 'FortiGate 3600A',
+    '.1.3.6.1.4.1.12356.101.1.38100' => 'FortiGate 3810A',
+    '.1.3.6.1.4.1.12356.101.1.4000' => 'FortiGate 400',
+    '.1.3.6.1.4.1.12356.101.1.40000' => 'FortiGate 4000',
+    '.1.3.6.1.4.1.12356.101.1.4001' => 'FortiGate 400A',
+    '.1.3.6.1.4.1.12356.101.1.5000' => 'FortiGate 500',
+    '.1.3.6.1.4.1.12356.101.1.50000' => 'FortiGate 5000',
+    '.1.3.6.1.4.1.12356.101.1.50010' => 'FortiGate 5001',
+    '.1.3.6.1.4.1.12356.101.1.50011' => 'FortiGate 5001A',
+    '.1.3.6.1.4.1.12356.101.1.50012' => 'FortiGate 5001FA2',
+    '.1.3.6.1.4.1.12356.101.1.50021' => 'FortiGate 5002A',
+    '.1.3.6.1.4.1.12356.101.1.50001' => 'FortiGate 5002FB2',
+    '.1.3.6.1.4.1.12356.101.1.50040' => 'FortiGate 5004',
+    '.1.3.6.1.4.1.12356.101.1.50050' => 'FortiGate 5005',
+    '.1.3.6.1.4.1.12356.101.1.50051' => 'FortiGate 5005FA2',
+    '.1.3.6.1.4.1.12356.101.1.5001' => 'FortiGate 500A',
+    '.1.3.6.1.4.1.12356.101.1.500' => 'FortiGate 50A',
+    '.1.3.6.1.4.1.12356.101.1.501' => 'FortiGate 50AM',
+    '.1.3.6.1.4.1.12356.101.1.502' => 'FortiGate 50B',
+    '.1.3.6.1.4.1.12356.101.1.504' => 'FortiGate 51B',
+    '.1.3.6.1.4.1.12356.101.1.600' => 'FortiGate 60',
+    '.1.3.6.1.4.1.12356.101.1.6201' => 'FortiGate 600D',
+    '.1.3.6.1.4.1.12356.101.1.602' => 'FortiGate 60ADSL',
+    '.1.3.6.1.4.1.12356.101.1.603' => 'FortiGate 60B',
+    '.1.3.6.1.4.1.12356.101.1.601' => 'FortiGate 60M',
+    '.1.3.6.1.4.1.12356.101.1.6200' => 'FortiGate 620B',
+    '.1.3.6.1.4.1.12356.101.1.8000' => 'FortiGate 800',
+    '.1.3.6.1.4.1.12356.101.1.8001' => 'FortiGate 800F',
+    '.1.3.6.1.4.1.12356.101.1.800' => 'FortiGate 80C',
+    '.1.3.6.1.4.1.12356.1688' => 'FortiMail 2000A',
+    '.1.3.6.1.4.1.12356.103.1.1000' => 'FortiManager 100',
+    '.1.3.6.1.4.1.12356.103.1.20000' => 'FortiManager 2000XL',
+    '.1.3.6.1.4.1.12356.103.1.30000' => 'FortiManager 3000',
+    '.1.3.6.1.4.1.12356.103.1.30002' => 'FortiManager 3000B',
+    '.1.3.6.1.4.1.12356.103.1.4000' => 'FortiManager 400',
+    '.1.3.6.1.4.1.12356.103.1.4001' => 'FortiManager 400A',
+    '.1.3.6.1.4.1.12356.106.1.50030' => 'FortiSwitch 5003A',
+    '.1.3.6.1.4.1.12356.101.1.510' => 'FortiWiFi 50B',
+    '.1.3.6.1.4.1.12356.101.1.610' => 'FortiWiFi 60',
+    '.1.3.6.1.4.1.12356.101.1.611' => 'FortiWiFi 60A',
+    '.1.3.6.1.4.1.12356.101.1.612' => 'FortiWiFi 60AM',
+    '.1.3.6.1.4.1.12356.101.1.613' => 'FortiWiFi 60B');
 
 $rewrite_extreme_hardware = array (
-'.1.3.6.1.4.1.1916.2.26' => 'Alpine 3802',
-'.1.3.6.1.4.1.1916.2.20' => 'Alpine 3804',
-'.1.3.6.1.4.1.1916.2.17' => 'Alpine 3808',
-'.1.3.6.1.4.1.1916.2.86' => 'Altitude 300',
-'.1.3.6.1.4.1.1916.2.75' => 'Altitude 350',
-'.1.3.6.1.4.1.1916.2.56' => 'BlackDiamond 10808',
-'.1.3.6.1.4.1.1916.2.85' => 'BlackDiamond 12802',
-'.1.3.6.1.4.1.1916.2.77' => 'BlackDiamond 12804',
-'.1.3.6.1.4.1.1916.2.8' => 'BlackDiamond 6800',
-'.1.3.6.1.4.1.1916.2.27' => 'BlackDiamond 6804',
-'.1.3.6.1.4.1.1916.2.11' => 'BlackDiamond 6808',
-'.1.3.6.1.4.1.1916.2.24' => 'BlackDiamond 6816',
-'.1.3.6.1.4.1.1916.2.74' => 'BlackDiamond 8806',
-'.1.3.6.1.4.1.1916.2.62' => 'BlackDiamond 8810',
-'.1.3.6.1.4.1.1916.2.23' => 'EnetSwitch 24Port',
-'.1.3.6.1.4.1.1916.2.83' => 'Sentriant CE150',
-'.1.3.6.1.4.1.1916.2.58' => 'Summit 400-48t',
-'.1.3.6.1.4.1.1916.2.59' => 'Summit 400-48t',
-'.1.3.6.1.4.1.1916.2.71' => 'Summit X450a-24t',
-'.1.3.6.1.4.1.1916.2.81' => 'Summit X450a-24t',
-'.1.3.6.1.4.1.1916.2.1' => 'Summit 1',
-'.1.3.6.1.4.1.1916.2.19' => 'Summit 1iSX',
-'.1.3.6.1.4.1.1916.2.14' => 'Summit 1iTX',
-'.1.3.6.1.4.1.1916.2.2' => 'Summit 2',
-'.1.3.6.1.4.1.1916.2.53' => 'Summit 200-24',
-'.1.3.6.1.4.1.1916.2.70' => 'Summit 200-24fx',
-'.1.3.6.1.4.1.1916.2.54' => 'Summit 200-48',
-'.1.3.6.1.4.1.1916.2.7' => 'Summit 24',
-'.1.3.6.1.4.1.1916.2.41' => 'Summit 24e2SX',
-'.1.3.6.1.4.1.1916.2.40' => 'Summit 24e2TX',
-'.1.3.6.1.4.1.1916.2.25' => 'Summit 24e3',
-'.1.3.6.1.4.1.1916.2.3' => 'Summit 3',
-'.1.3.6.1.4.1.1916.2.61' => 'Summit 300-24',
-'.1.3.6.1.4.1.1916.2.55' => 'Summit 300-48',
-'.1.3.6.1.4.1.1916.2.4' => 'Summit 4',
-'.1.3.6.1.4.1.1916.2.58' => 'Summit 400-24',
-'.1.3.6.1.4.1.1916.2.64' => 'Summit 400-24p',
-'.1.3.6.1.4.1.1916.2.63' => 'Summit 400-24t',
-'.1.3.6.1.4.1.1916.2.59' => 'Summit 400-24x',
-'.1.3.6.1.4.1.1916.2.6' => 'Summit 48',
-'.1.3.6.1.4.1.1916.2.16' => 'Summit 48i',
-'.1.3.6.1.4.1.1916.2.28' => 'Summit 48i1u',
-'.1.3.6.1.4.1.1916.2.5' => 'Summit 4FX',
-'.1.3.6.1.4.1.1916.2.15' => 'Summit 5i',
-'.1.3.6.1.4.1.1916.2.21' => 'Summit 5iLX',
-'.1.3.6.1.4.1.1916.2.22' => 'Summit 5iTX',
-'.1.3.6.1.4.1.1916.2.12' => 'Summit 7iSX',
-'.1.3.6.1.4.1.1916.2.13' => 'Summit 7iTX',
-'.1.3.6.1.4.1.1916.2.30' => 'Summit Px1',
-'.1.3.6.1.4.1.1916.2.67' => 'SummitStack',
-'.1.3.6.1.4.1.1916.2.93' => 'Summit Ver2Stack',
-'.1.3.6.1.4.1.1916.2.68' => 'SummitWM 100',
-'.1.3.6.1.4.1.1916.2.69' => 'SummitWM 1000',
-'.1.3.6.1.4.1.1916.2.94' => 'SummitWM 200',
-'.1.3.6.1.4.1.1916.2.95' => 'SummitWM 2000',
-'.1.3.6.1.4.1.1916.2.89' => 'Summit X250-24p',
-'.1.3.6.1.4.1.1916.2.88' => 'Summit X250-24t',
-'.1.3.6.1.4.1.1916.2.90' => 'Summit X250-24x',
-'.1.3.6.1.4.1.1916.2.92' => 'Summit X250-48p',
-'.1.3.6.1.4.1.1916.2.91' => 'Summit X250-48t',
-'.1.3.6.1.4.1.1916.2.93' => 'Summit X250e-24t (3-Stack)',
-'.1.3.6.1.4.1.1916.2.88' => 'Summit X250e-24t (Single)',
-'.1.3.6.1.4.1.1916.2.66' => 'Summit X450-24t',
-'.1.3.6.1.4.1.1916.2.65' => 'Summit X450-24x',
-'.1.3.6.1.4.1.1916.2.80' => 'Summit X450a-24tDC',
-'.1.3.6.1.4.1.1916.2.84' => 'Summit X450a-24x',
-'.1.3.6.1.4.1.1916.2.82' => 'Summit X450a-24xDC',
-'.1.3.6.1.4.1.1916.2.76' => 'Summit X450a-48t',
-'.1.3.6.1.4.1.1916.2.87' => 'Summit X450a-48tDC',
-'.1.3.6.1.4.1.1916.2.72' => 'Summit X450e-24p',
-'.1.3.6.1.4.1.1916.2.79' => 'Summit X450e-48p'
+    '.1.3.6.1.4.1.1916.2.26' => 'Alpine 3802',
+    '.1.3.6.1.4.1.1916.2.20' => 'Alpine 3804',
+    '.1.3.6.1.4.1.1916.2.17' => 'Alpine 3808',
+    '.1.3.6.1.4.1.1916.2.86' => 'Altitude 300',
+    '.1.3.6.1.4.1.1916.2.75' => 'Altitude 350',
+    '.1.3.6.1.4.1.1916.2.56' => 'BlackDiamond 10808',
+    '.1.3.6.1.4.1.1916.2.85' => 'BlackDiamond 12802',
+    '.1.3.6.1.4.1.1916.2.77' => 'BlackDiamond 12804',
+    '.1.3.6.1.4.1.1916.2.8' => 'BlackDiamond 6800',
+    '.1.3.6.1.4.1.1916.2.27' => 'BlackDiamond 6804',
+    '.1.3.6.1.4.1.1916.2.11' => 'BlackDiamond 6808',
+    '.1.3.6.1.4.1.1916.2.24' => 'BlackDiamond 6816',
+    '.1.3.6.1.4.1.1916.2.74' => 'BlackDiamond 8806',
+    '.1.3.6.1.4.1.1916.2.62' => 'BlackDiamond 8810',
+    '.1.3.6.1.4.1.1916.2.23' => 'EnetSwitch 24Port',
+    '.1.3.6.1.4.1.1916.2.83' => 'Sentriant CE150',
+    '.1.3.6.1.4.1.1916.2.58' => 'Summit 400-48t',
+    '.1.3.6.1.4.1.1916.2.59' => 'Summit 400-48t',
+    '.1.3.6.1.4.1.1916.2.71' => 'Summit X450a-24t',
+    '.1.3.6.1.4.1.1916.2.81' => 'Summit X450a-24t',
+    '.1.3.6.1.4.1.1916.2.1' => 'Summit 1',
+    '.1.3.6.1.4.1.1916.2.19' => 'Summit 1iSX',
+    '.1.3.6.1.4.1.1916.2.14' => 'Summit 1iTX',
+    '.1.3.6.1.4.1.1916.2.2' => 'Summit 2',
+    '.1.3.6.1.4.1.1916.2.53' => 'Summit 200-24',
+    '.1.3.6.1.4.1.1916.2.70' => 'Summit 200-24fx',
+    '.1.3.6.1.4.1.1916.2.54' => 'Summit 200-48',
+    '.1.3.6.1.4.1.1916.2.7' => 'Summit 24',
+    '.1.3.6.1.4.1.1916.2.41' => 'Summit 24e2SX',
+    '.1.3.6.1.4.1.1916.2.40' => 'Summit 24e2TX',
+    '.1.3.6.1.4.1.1916.2.25' => 'Summit 24e3',
+    '.1.3.6.1.4.1.1916.2.3' => 'Summit 3',
+    '.1.3.6.1.4.1.1916.2.61' => 'Summit 300-24',
+    '.1.3.6.1.4.1.1916.2.55' => 'Summit 300-48',
+    '.1.3.6.1.4.1.1916.2.4' => 'Summit 4',
+    '.1.3.6.1.4.1.1916.2.58' => 'Summit 400-24',
+    '.1.3.6.1.4.1.1916.2.64' => 'Summit 400-24p',
+    '.1.3.6.1.4.1.1916.2.63' => 'Summit 400-24t',
+    '.1.3.6.1.4.1.1916.2.59' => 'Summit 400-24x',
+    '.1.3.6.1.4.1.1916.2.6' => 'Summit 48',
+    '.1.3.6.1.4.1.1916.2.16' => 'Summit 48i',
+    '.1.3.6.1.4.1.1916.2.28' => 'Summit 48i1u',
+    '.1.3.6.1.4.1.1916.2.5' => 'Summit 4FX',
+    '.1.3.6.1.4.1.1916.2.15' => 'Summit 5i',
+    '.1.3.6.1.4.1.1916.2.21' => 'Summit 5iLX',
+    '.1.3.6.1.4.1.1916.2.22' => 'Summit 5iTX',
+    '.1.3.6.1.4.1.1916.2.12' => 'Summit 7iSX',
+    '.1.3.6.1.4.1.1916.2.13' => 'Summit 7iTX',
+    '.1.3.6.1.4.1.1916.2.30' => 'Summit Px1',
+    '.1.3.6.1.4.1.1916.2.67' => 'SummitStack',
+    '.1.3.6.1.4.1.1916.2.93' => 'Summit Ver2Stack',
+    '.1.3.6.1.4.1.1916.2.68' => 'SummitWM 100',
+    '.1.3.6.1.4.1.1916.2.69' => 'SummitWM 1000',
+    '.1.3.6.1.4.1.1916.2.94' => 'SummitWM 200',
+    '.1.3.6.1.4.1.1916.2.95' => 'SummitWM 2000',
+    '.1.3.6.1.4.1.1916.2.89' => 'Summit X250-24p',
+    '.1.3.6.1.4.1.1916.2.88' => 'Summit X250-24t',
+    '.1.3.6.1.4.1.1916.2.90' => 'Summit X250-24x',
+    '.1.3.6.1.4.1.1916.2.92' => 'Summit X250-48p',
+    '.1.3.6.1.4.1.1916.2.91' => 'Summit X250-48t',
+    '.1.3.6.1.4.1.1916.2.93' => 'Summit X250e-24t (3-Stack)',
+    '.1.3.6.1.4.1.1916.2.88' => 'Summit X250e-24t (Single)',
+    '.1.3.6.1.4.1.1916.2.66' => 'Summit X450-24t',
+    '.1.3.6.1.4.1.1916.2.65' => 'Summit X450-24x',
+    '.1.3.6.1.4.1.1916.2.80' => 'Summit X450a-24tDC',
+    '.1.3.6.1.4.1.1916.2.84' => 'Summit X450a-24x',
+    '.1.3.6.1.4.1.1916.2.82' => 'Summit X450a-24xDC',
+    '.1.3.6.1.4.1.1916.2.76' => 'Summit X450a-48t',
+    '.1.3.6.1.4.1.1916.2.87' => 'Summit X450a-48tDC',
+    '.1.3.6.1.4.1.1916.2.72' => 'Summit X450e-24p',
+    '.1.3.6.1.4.1.1916.2.79' => 'Summit X450e-48p'
 );
 
 $rewrite_ironware_hardware = array(
@@ -718,38 +718,38 @@ $rewrite_ironware_hardware = array(
 );
 
 $rewrite_ios_features = array(
-  'PK9S' => 'IP w/SSH LAN Only',
-  'LANBASEK9' => 'Lan Base Crypto',
-  'LANBASE' => 'Lan Base',
-  'ADVENTERPRISEK9_IVS' => 'Advanced Enterprise Crypto Voice',
-  'ADVENTERPRISEK9' => 'Advanced Enterprise Crypto',
-  'ADVSECURITYK9' => 'Advanced Security Crypto',
-  'K91P' => 'Provider Crypto',
-  'K4P' => 'Provider Crypto',
-  'ADVIPSERVICESK9' => 'Adv IP Services Crypto',
-  'ADVIPSERVICES' => 'Adv IP Services',
-  'IK9P' => 'IP Plus Crypto',
-  'K9O3SY7' => 'IP ADSL FW IDS Plus IPSEC 3DES',
-  'SPSERVICESK9' => 'SP Services Crypto',
-  'PK9SV' => 'IP MPLS/IPV6 W/SSH + BGP',
-  'IS' => 'IP Plus',
-  'IPSERVICESK9' => 'IP Services Crypto',
-  'BROADBAND' => 'Broadband',
-  'IPBASE' => 'IP Base',
-  'IPSERVICE' => 'IP Services',
-  'P' => 'Service Provider',
-  'P11' => 'Broadband Router',
-  'G4P5' => 'NRP',
-  'JK9S' => 'Enterprise Plus Crypto',
-  'IK9S' => 'IP Plus Crypto',
-  'JK' => 'Enterprise Plus',
-  'I6Q4L2' => 'Layer 2',
-  'I6K2L2Q4' => 'Layer 2 Crypto',
-  'C3H2S' => 'Layer 2 SI/EI',
-  '_WAN' => ' + WAN',
-  );
+    'PK9S' => 'IP w/SSH LAN Only',
+    'LANBASEK9' => 'Lan Base Crypto',
+    'LANBASE' => 'Lan Base',
+    'ADVENTERPRISEK9_IVS' => 'Advanced Enterprise Crypto Voice',
+    'ADVENTERPRISEK9' => 'Advanced Enterprise Crypto',
+    'ADVSECURITYK9' => 'Advanced Security Crypto',
+    'K91P' => 'Provider Crypto',
+    'K4P' => 'Provider Crypto',
+    'ADVIPSERVICESK9' => 'Adv IP Services Crypto',
+    'ADVIPSERVICES' => 'Adv IP Services',
+    'IK9P' => 'IP Plus Crypto',
+    'K9O3SY7' => 'IP ADSL FW IDS Plus IPSEC 3DES',
+    'SPSERVICESK9' => 'SP Services Crypto',
+    'PK9SV' => 'IP MPLS/IPV6 W/SSH + BGP',
+    'IS' => 'IP Plus',
+    'IPSERVICESK9' => 'IP Services Crypto',
+    'BROADBAND' => 'Broadband',
+    'IPBASE' => 'IP Base',
+    'IPSERVICE' => 'IP Services',
+    'P' => 'Service Provider',
+    'P11' => 'Broadband Router',
+    'G4P5' => 'NRP',
+    'JK9S' => 'Enterprise Plus Crypto',
+    'IK9S' => 'IP Plus Crypto',
+    'JK' => 'Enterprise Plus',
+    'I6Q4L2' => 'Layer 2',
+    'I6K2L2Q4' => 'Layer 2 Crypto',
+    'C3H2S' => 'Layer 2 SI/EI',
+    '_WAN' => ' + WAN',
+);
 
-  $rewrite_shortif = array (
+$rewrite_shortif = array (
     'tengigabitethernet' => 'Te',
     'gigabitethernet' => 'Gi',
     'fastethernet' => 'Fa',
@@ -764,9 +764,9 @@ $rewrite_ios_features = array(
     'vlan' => 'Vlan',
     'tunnel' => 'Tunnel',
     'serviceinstance' => 'SI',
-  );
+);
 
-  $rewrite_iftype = array (
+$rewrite_iftype = array (
     '/^frameRelay$/' => 'Frame Relay',
     '/^ethernetCsmacd$/' => 'Ethernet',
     '/^softwareLoopback$/' => 'Loopback',
@@ -783,9 +783,9 @@ $rewrite_ios_features = array(
     '/^aal5$/' => 'ATM AAL5',
     '/^atmSubInterface$/' => 'ATM Subif',
     '/^propPointToPointSerial$/' => 'PtP Serial',
-  );
+);
 
-  $rewrite_ifname = array (
+$rewrite_ifname = array (
     'ether' => 'Ether',
     'gig' => 'Gig',
     'fast' => 'Fast',
@@ -805,149 +805,149 @@ $rewrite_ios_features = array(
     'hp procurve switch software loopback interface' => 'Loopback Interface',
     'control plane interface' => 'Control Plane',
     'loop' => 'Loop',
-  );
+);
 
-  $rewrite_hrDevice = array (
+$rewrite_hrDevice = array (
     'GenuineIntel:' => '',
     'AuthenticAMD:' => '',
     'Intel(R)' => '',
     'CPU' => '',
     '(R)' => '',
     '  ' => ' ',
-  );
+);
 
 
 // Specific rewrite functions
 
 function makeshortif($if)
 {
-  global $rewrite_shortif;
+    global $rewrite_shortif;
 
-  $if = fixifName ($if);
-  $if = strtolower($if);
-  $if = array_str_replace($rewrite_shortif, $if);
+    $if = fixifName ($if);
+    $if = strtolower($if);
+    $if = array_str_replace($rewrite_shortif, $if);
 
-  return $if;
+    return $if;
 }
 
 function rewrite_ios_features ($features)
 {
-  global $rewrite_ios_features;
+    global $rewrite_ios_features;
 
-  $type = array_preg_replace($rewrite_ios_features, $features);
+    $type = array_preg_replace($rewrite_ios_features, $features);
 
-  return ($features);
+    return ($features);
 }
 
 function rewrite_fortinet_hardware ($hardware)
 {
-  global $rewrite_fortinet_hardware;
+    global $rewrite_fortinet_hardware;
 
-  $hardware = $rewrite_fortinet_hardware[$hardware];
+    $hardware = $rewrite_fortinet_hardware[$hardware];
 
-  return ($hardware);
+    return ($hardware);
 }
 
 
 function rewrite_extreme_hardware ($hardware)
 {
-  global $rewrite_extreme_hardware;
+    global $rewrite_extreme_hardware;
 
-  #$hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
-  $hardware = $rewrite_extreme_hardware[$hardware];
+    #$hardware = array_str_replace($rewrite_extreme_hardware, $hardware);
+    $hardware = $rewrite_extreme_hardware[$hardware];
 
-  return ($hardware);
+    return ($hardware);
 }
 
 function rewrite_ftos_hardware ($hardware)
 {
-  global $rewrite_ftos_hardware;
+    global $rewrite_ftos_hardware;
 
-  $hardware = $rewrite_ftos_hardware[$hardware];
+    $hardware = $rewrite_ftos_hardware[$hardware];
 
-  return ($hardware);
+    return ($hardware);
 }
 
 
 function rewrite_ironware_hardware ($hardware)
 {
-  global $rewrite_ironware_hardware;
+    global $rewrite_ironware_hardware;
 
-  $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
+    $hardware = array_str_replace($rewrite_ironware_hardware, $hardware);
 
-  return ($hardware);
+    return ($hardware);
 }
 
 function rewrite_junose_hardware ($hardware)
 {
-  global $rewrite_junose_hardware;
+    global $rewrite_junose_hardware;
 
-  $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
+    $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
 
-  return ($hardware);
+    return ($hardware);
 }
 
 function fixiftype ($type)
 {
-  global $rewrite_iftype;
+    global $rewrite_iftype;
 
-  $type = array_preg_replace($rewrite_iftype, $type);
+    $type = array_preg_replace($rewrite_iftype, $type);
 
-  return ($type);
+    return ($type);
 }
 
 function fixifName ($inf)
 {
-  global $rewrite_ifname;
+    global $rewrite_ifname;
 
-  $inf = strtolower($inf);
-  $inf = array_str_replace($rewrite_ifname, $inf);
+    $inf = strtolower($inf);
+    $inf = array_str_replace($rewrite_ifname, $inf);
 
-  return $inf;
+    return $inf;
 }
 
 function short_hrDeviceDescr($dev)
 {
-  global $rewrite_hrDevice;
+    global $rewrite_hrDevice;
 
-  $dev = array_str_replace($rewrite_hrDevice, $dev);
-  $dev = preg_replace("/\ +/"," ", $dev);
-  $dev = trim($dev);
+    $dev = array_str_replace($rewrite_hrDevice, $dev);
+    $dev = preg_replace("/\ +/"," ", $dev);
+    $dev = trim($dev);
 
-  return $dev;
+    return $dev;
 }
 
 function short_port_descr ($desc)
 {
-  list($desc) = explode("(", $desc);
-  list($desc) = explode("[", $desc);
-  list($desc) = explode("{", $desc);
-  list($desc) = explode("|", $desc);
-  list($desc) = explode("<", $desc);
-  $desc = trim($desc);
+    list($desc) = explode("(", $desc);
+    list($desc) = explode("[", $desc);
+    list($desc) = explode("{", $desc);
+    list($desc) = explode("|", $desc);
+    list($desc) = explode("<", $desc);
+    $desc = trim($desc);
 
-  return $desc;
+    return $desc;
 }
 
 // Underlying rewrite functions
 function array_str_replace($array, $string)
 {
-  foreach ($array as $search => $replace)
-  {
-    $string = str_replace($search, $replace, $string);
-  }
+    foreach ($array as $search => $replace)
+    {
+        $string = str_replace($search, $replace, $string);
+    }
 
-  return $string;
+    return $string;
 }
 
 function array_preg_replace($array, $string)
 {
-  foreach ($array as $search => $replace)
-  {
-    $string = preg_replace($search, $replace, $string);
-  }
+    foreach ($array as $search => $replace)
+    {
+        $string = preg_replace($search, $replace, $string);
+    }
 
-  return $string;
+    return $string;
 }
 
 ?>
