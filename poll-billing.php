@@ -40,10 +40,8 @@ function CollectData($bill_id)
 
     echo("\nPolling ".$port_data['ifDescr']." on ".$port_data['hostname']."\n");
 
-    $port_in_measurement = trim(getValue($host, $port_data['community'], $port_data['snmpver'], $port, $port_data['ifIndex'], "In"));
-    $port_out_measurement = trim(getValue($host, $port_data['community'], $port_data['snmpver'], $port,  $port_data['ifIndex'], "Out"));
-
-    echo("$port_in_measurement and $port_out_measurement \n");
+    $port_in_measurement = getValue($host, $port, $port_data['ifIndex'], "In");
+    $port_out_measurement = getValue($host, $port, $port_data['ifIndex'], "Out");
 
     $now = mysql_result(mysql_query("SELECT NOW()"), 0);
 

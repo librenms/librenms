@@ -338,6 +338,13 @@ $config['os'][$os]['over'][1]['text']   = "CPU Usage";
 $config['os'][$os]['over'][2]['graph']  = "device_mempools";
 $config['os'][$os]['over'][2]['text']   = "Memory Usage";
 
+$os = "proxim";
+$config['os'][$os]['text']              = "Proxim";
+$config['os'][$os]['type']              = "network";
+$config['os'][$os]['icon']              = "proxim";
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $os = "powerconnect";
 $config['os'][$os]['text']   		= "Dell PowerConnect";
 $config['os'][$os]['ifname'] 		= 1;
