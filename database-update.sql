@@ -25,3 +25,7 @@ ALTER TABLE ports MODIFY port_descr_notes VARCHAR(255);
 ALTER TABLE devices MODIFY community VARCHAR(255);
 ALTER TABLE users MODIFY password VARCHAR(34);
 ALTER TABLE sensors MODIFY sensor_descr VARCHAR(255);
+ALTER TABLE `vrfs` MODIFY  `mplsVpnVrfRouteDistinguisher` VARCHAR(128);
+ALTER TABLE `vrfs` MODIFY  `vrf_name` VARCHAR(128);
+ALTER TABLE `ports` MODIFY  `ifDescr` VARCHAR(255);
+
