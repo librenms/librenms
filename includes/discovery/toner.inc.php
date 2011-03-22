@@ -9,6 +9,9 @@ if ($config['enable_printers'])
   if ($device['os_group'] == 'printer')
   {
     $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
+    if (!$oids) {
+      $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.11.1.1.2.1 ", "-OsqnU"));
+    }
     if ($debug) { echo($oids."\n"); }
     if ($oids) echo("Jetdirect ");
     foreach (explode("\n", $oids) as $data)
