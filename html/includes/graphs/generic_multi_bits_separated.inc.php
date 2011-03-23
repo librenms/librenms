@@ -54,6 +54,8 @@ foreach ($rrd_list as $rrd)
   $i++; $iter++;
 }
 
+if ($custom_graph) { $rrd_options .= $custom_graph; }
+
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= " HRULE:0#999999";
 

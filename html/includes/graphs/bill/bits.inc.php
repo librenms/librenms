@@ -24,6 +24,19 @@ $nototal = 1;
 $rra_in  = "INOCTETS";
 $rra_out = "OUTOCTETS";
 
+#print_r($rates);
+
+if($bill['bill_type'] == "cdr") {
+   $custom_graph = " COMMENT:'\\r' ";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 . "#cc0000:'95th %ile \: ".formatRates($rates['rate_95th']*1000)." (".$rates['dir_95th'].") (CDR\: ".formatRates($rates['bill_cdr']*1000).")'";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 * -1 . "#cc0000";
+} elseif($bill['bill_type'] == "quota") {
+   $custom_graph = " COMMENT:'\\r' ";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 . "#cc0000:'Usage \: ".formatStorage($rates['total_data']*1024*1024)." (".formatRates($rates['rate_average']*1000).")'";
+   $custom_graph .= " HRULE:" . $rates['rate_average'] * 1000 * -1 . "#cc0000";
+}
+
+
 include("includes/graphs/generic_multi_bits_separated.inc.php");
 
 ?>
