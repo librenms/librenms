@@ -35,7 +35,7 @@ if (bill_permitted($bill_id))
   $dateto       = $day_data['1'];
   $rate_data    = getRates($bill_id,$datefrom,$dateto);
   $rate_95th    = $rate_data['rate_95th'];
-  $dir_95th     =	$rate_data['dir_95th'];
+  $dir_95th     = $rate_data['dir_95th'];
   $total_data   = $rate_data['total_data'];
   $rate_average = $rate_data['rate_average'];
 
