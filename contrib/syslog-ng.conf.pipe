@@ -24,9 +24,9 @@ source s_net {
 };
 
 destination d_mysql {
-	pipe("/var/log/observer-mysql.pipe"
+	pipe("/var/log/mysql-observium.pipe"
 	template("INSERT INTO syslog
-	(host, facility, priority, level, tag, datetime, program, msg)
+	(host, facility, priority, level, tag, timestamp, program, msg)
 	VALUES ( '$HOST', '$FACILITY', '$PRIORITY', '$LEVEL', '$TAG', '$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC','$PROGRAM', '$MSG' );\n") template-escape(yes));
 }; 
 
