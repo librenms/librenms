@@ -2,11 +2,11 @@
 
 if ($_GET['debug'])
 {
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('allow_url_fopen', 0);
-    ini_set('error_reporting', E_ALL);
+  ini_set('display_errors', 1);
+  ini_set('display_startup_errors', 0);
+  ini_set('log_errors', 0);
+  ini_set('allow_url_fopen', 0);
+  ini_set('error_reporting', E_ALL);
 } else { ini_set('display_errors', 0); }
 
 include("../includes/defaults.inc.php");
@@ -21,16 +21,16 @@ include("includes/jpgraph/src/jpgraph_utils.inc.php");
 
 if (is_numeric($_GET['bill_id']))
 {
-    if (bill_permitted($_GET['bill_id']))
-    {
-        $bill_id = $_GET['bill_id'];
-    } else {
-        echo("Unauthorised Access Prohibited.");
-        exit;
-    }
-} else {
+  if (bill_permitted($_GET['bill_id']))
+  {
+    $bill_id = $_GET['bill_id'];
+  } else {
     echo("Unauthorised Access Prohibited.");
     exit;
+  }
+} else {
+  echo("Unauthorised Access Prohibited.");
+  exit;
 }
 
 $start = $_GET[from];
@@ -86,68 +86,68 @@ $data = mysql_query($sql);
 
 while ($row = mysql_fetch_array($data))
 {
-    @$timestamp = $row['formatted_date'];
-    if (!$first) { $first = $timestamp; }
-    @$delta = $row['delta'];
-    @$period = $row['period'];
-    @$in_delta = $row['in_delta'];
-    @$out_delta = $row['out_delta'];
-    @$in_value = round($in_delta * 8 / $period / $div, 2);
-    @$out_value = round($out_delta * 8 / $period / $div, 2);
+  @$timestamp = $row['formatted_date'];
+  if (!$first) { $first = $timestamp; }
+  @$delta = $row['delta'];
+  @$period = $row['period'];
+  @$in_delta = $row['in_delta'];
+  @$out_delta = $row['out_delta'];
+  @$in_value = round($in_delta * 8 / $period / $div, 2);
+  @$out_value = round($out_delta * 8 / $period / $div, 2);
 
-    #@$data[] = $in_value + $out_value;
-    #@$in_data[] = $in_value;
-    #@$out_data[] = $out_value;
-    #  @$ticks[] = $timestamp;
-    #@$per_data[] = $rate_95th / 1000;
-    #@$ave_data[] = $rate_average / 1000;
+  #@$data[] = $in_value + $out_value;
+  #@$in_data[] = $in_value;
+  #@$out_data[] = $out_value;
+  #  @$ticks[] = $timestamp;
+  #@$per_data[] = $rate_95th / 1000;
+  #@$ave_data[] = $rate_average / 1000;
 
-    @$last = $timestamp;
+  @$last = $timestamp;
 
-    $iter_in        = $iter_in + $in_delta;
-    $iter_out       = $iter_out + $out_delta;
-    $iter_period    = $iter_period + $period;
+  $iter_in    = $iter_in + $in_delta;
+  $iter_out     = $iter_out + $out_delta;
+  $iter_period  = $iter_period + $period;
 
-    if ($iter == $count)
+  if ($iter == $count)
+  {
+    $out_data[$i]   = round($iter_out * 8 / $iter_period / $div, 2);
+    $in_data[$i]   = round($iter_in * 8 / $iter_period / $div, 2);
+    $tot_data[$i]   = $out_data[$i] + $in_data[$i];
+    $ticks[$i]   = date('M j g:ia', $timestamp);
+    $ticks[$i]  = $timestamp;
+
+    if ($dur < 172800)
     {
-        $out_data[$i]   = round($iter_out * 8 / $iter_period / $div, 2);
-        $in_data[$i]   = round($iter_in * 8 / $iter_period / $div, 2);
-        $tot_data[$i]   = $out_data[$i] + $in_data[$i];
-        $ticks[$i]   = date('M j g:ia', $timestamp);
-        $ticks[$i]  = $timestamp;
+      $hour = date('h', $timestamp);
+      if ($hour != $lasthour) { $tickPositions[] = $i; $tickLabels[] = date('ga', $timestamp); }
+      $lasthour = $hour;
+    } elseif ($dur < 604800) {
+      $day = date('d', $timestamp);
+      if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('D', $timestamp); $h = 0; }
+      $lastday = $day;
 
-        if ($dur < 172800)
-        {
-            $hour = date('h', $timestamp);
-            if ($hour != $lasthour) { $tickPositions[] = $i; $tickLabels[] = date('ga', $timestamp); }
-            $lasthour = $hour;
-        } elseif ($dur < 604800) {
-            $day = date('d', $timestamp);
-            if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('D', $timestamp); $h = 0; }
-            $lastday = $day;
+      $hour = trim(date('g', $timestamp));
+      if ($hour != $lasthour)
+      {
+        if ($hour == '12') { $tickMinPositions[] = $i; $h = 0;  } $h++;
+      }
 
-            $hour = trim(date('g', $timestamp));
-            if ($hour != $lasthour)
-            {
-                if ($hour == '12') { $tickMinPositions[] = $i; $h = 0;  } $h++;
-            }
-
-            $lasthour = $hour;
-        } else {
-            $day = date('d', $timestamp);
-            if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('dS', $timestamp); }
-            $lastday = $day;
-        }
-
-        $per_data[$i]   = $rate_95th / $div;
-        $ave_data[$i]   = $rate_average / $div;
-        $timestamps[$i] = $timestamp;
-        $iter           = "1";
-        $i++;
-        unset($iter_out, $iter_in, $iter_period);
+      $lasthour = $hour;
+    } else {
+      $day = date('d', $timestamp);
+      if ($day != $lastday) { $tickPositions[] = $i; $tickLabels[] = date('dS', $timestamp); }
+      $lastday = $day;
     }
 
-    $iter++;
+    $per_data[$i]   = $rate_95th / $div;
+    $ave_data[$i]   = $rate_average / $div;
+    $timestamps[$i] = $timestamp;
+    $iter       = "1";
+    $i++;
+    unset($iter_out, $iter_in, $iter_period);
+  }
+
+  $iter++;
 }
 
 #print_r($ticks);
@@ -175,9 +175,9 @@ $graph->xaxis->SetFont(FF_FONT1,FS_BOLD);
 
 if (count($tickPositions) > 24)
 {
-    $graph->xaxis->SetTextLabelInterval(6);
+  $graph->xaxis->SetTextLabelInterval(6);
 } elseif (count($tickPositions) > 12) {
-    $graph->xaxis->SetTextLabelInterval(2);
+  $graph->xaxis->SetTextLabelInterval(2);
 }
 
 $graph->xaxis->SetPos('min');
@@ -219,14 +219,14 @@ $lineplot_out->SetColor("blue");
 
 if ($_GET['95th'])
 {
-    $lineplot_95th = new LinePlot($per_data);
-    $lineplot_95th ->SetColor("red");
+  $lineplot_95th = new LinePlot($per_data);
+  $lineplot_95th ->SetColor("red");
 }
 
 if ($_GET['ave'])
 {
-    $lineplot_ave = new LinePlot($ave_data);
-    $lineplot_ave ->SetColor("red");
+  $lineplot_ave = new LinePlot($ave_data);
+  $lineplot_ave ->SetColor("red");
 }
 
 #$graph->legend->SetLayout(LEGEND_HOR);
@@ -238,12 +238,12 @@ $graph->Add($lineplot_out);
 
 if ($_GET['95th'])
 {
-    $graph->Add($lineplot_95th);
+  $graph->Add($lineplot_95th);
 }
 
 if ($_GET['ave'])
 {
-    $graph->Add($lineplot_ave);
+  $graph->Add($lineplot_ave);
 }
 
 $graph->stroke();

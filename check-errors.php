@@ -15,28 +15,28 @@ $interface_query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE
 
 while ($interface = mysql_fetch_array($interface_query))
 {
-    $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
-    if ($errors > '1')
-    {
-        $errored[] = $interface['hostname'] . " - " . $interface['ifDescr'] . " - " . $interface['ifAlias'] . " - " . $interface['ifInErrors_delta'] . " - " . $interface['ifOutErrors_delta'];
-    }
-    $i++;
+  $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
+  if ($errors > '1')
+  {
+    $errored[] = $interface['hostname'] . " - " . $interface['ifDescr'] . " - " . $interface['ifAlias'] . " - " . $interface['ifInErrors_delta'] . " - " . $interface['ifOutErrors_delta'];
+  }
+  $i++;
 }
 
 echo("Checked $i Interfaces\n");
 
 if ($errored)
 { ## If there are errored ports
-    $i=0;
-    $msg = "Interfaces with errors : \n\n";
+  $i = 0;
+  $msg = "Interfaces with errors : \n\n";
 
-    foreach ($errored as $int)
-    {
-        $msg .= "$int\n";  ## Add a line to the report email warning about them
-        $i++;
-    }
-    ## Send the alert email
-    notify($device, "Observium detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
+  foreach ($errored as $int)
+  {
+    $msg .= "$int\n";  ## Add a line to the report email warning about them
+    $i++;
+  }
+  ## Send the alert email
+  notify($device, "Observium detected errors on $i interface" . ($i != 1 ? 's' : ''), $msg);
 }
 
 ?>
