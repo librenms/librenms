@@ -14,7 +14,7 @@ if ($device['os'] == "aos")
 
   if (is_numeric($total) && is_numeric($used))
   {
-    discover_mempool($valid_mempool, $device, 0, "aos-device", "Memory", "1", NULL, NULL);
+    discover_mempool($valid_mempool, $device, 0, "aos-device", "Device Memory", "1", NULL, NULL);
   }
 }
 ?>
