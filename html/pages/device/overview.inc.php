@@ -92,7 +92,9 @@ include("overview/sensors/frequencies.inc.php");
 include("overview/sensors/current.inc.php");
 
 echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</p>");
+echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
+echo('<a class="sectionhead" href="device/'.$device['device_id'].'/events/">');
+echo("<img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</a></p>");
 
 $query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,10";
 $data = mysql_query($query);

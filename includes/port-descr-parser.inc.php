@@ -15,17 +15,17 @@ $descr = trim($descr);
 
 if ($type && $descr)
 {
-    $type = strtolower($type);
-    $port_ifAlias['type']  = $type;
-    $port_ifAlias['descr'] = $descr;
-    $port_ifAlias['circuit'] = $circuit;
-    $port_ifAlias['speed'] = $speed;
-    $port_ifAlias['notes'] = $notes;
+  $type = strtolower($type);
+  $port_ifAlias['type']  = $type;
+  $port_ifAlias['descr'] = $descr;
+  $port_ifAlias['circuit'] = $circuit;
+  $port_ifAlias['speed'] = $speed;
+  $port_ifAlias['notes'] = $notes;
 
-    if ($debug)
-    {
-        print_r($port_ifAlias);
-    }
+  if ($debug)
+  {
+    print_r($port_ifAlias);
+  }
 }
 
 unset ($port_type, $port_descr, $port_circuit, $port_notes, $port_speed);

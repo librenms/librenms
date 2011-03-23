@@ -31,7 +31,7 @@ $config['ipmitool']       = "/usr/bin/ipmitool";
 
 if (isset($_SERVER["SERVER_NAME"]) && isset($_SERVER["SERVER_PORT"]))
 {
-    $config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"];
+  $config['base_url'] 	    = "http://" . $_SERVER["SERVER_NAME"] .":".$_SERVER["SERVER_PORT"];
 }
 $config['title_image']      = "images/observium-logo.png";
 $config['stylesheet']       = "css/styles.css";
@@ -155,10 +155,10 @@ $config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
 ### Ignores & Allows
 
 $config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
-    "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
-    "async", "plip", "-physical", "-signalling", "container", "unrouted",
-    "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
-    "span rp", "span sp", "sslvpn");
+             "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
+             "async", "plip", "-physical", "-signalling", "container", "unrouted",
+             "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
+             "span rp", "span sp", "sslvpn");
 
 $config['bad_if_regexp'] = array("/serial[0-9]:/");
 
@@ -195,9 +195,9 @@ $config['ignore_mount'] = array("/kern", "/mnt/cdrom", "/proc", "/dev");
 $config['ignore_mount_string'] = array("packages", "devfs", "procfs", "UMA", "MALLOC");
 
 $config['ignore_mount_regexp'] = array("/on: \/packages/", "/on: \/dev/", "/on: \/proc/", "/on: \/junos^/",           ## JunOS Drives
-    "/on: \/junos\/dev/", "/on: \/jail\/dev/", "/^(dev|proc)fs/", "/^\/dev\/md0/", ## JunOS Drives
-    "/^\/var\/dhcpd\/dev,/", "/UMA/"                                  	      ## BSD Drives
-);
+                                       "/on: \/junos\/dev/", "/on: \/jail\/dev/", "/^(dev|proc)fs/", "/^\/dev\/md0/", ## JunOS Drives
+                                       "/^\/var\/dhcpd\/dev,/", "/UMA/"                                  	      ## BSD Drives
+                                       );
 
 $config['ignore_mount_removable'] = 1; # Ignore removable disk storage
 $config['ignore_mount_network']   = 1; # Ignore network mounted storage
@@ -206,8 +206,8 @@ $config['ignore_mount_network']   = 1; # Ignore network mounted storage
 
 $config['syslog_age']       = "1 month";        ## Entries older than this will be removed
 $config['syslog_filter'] = array("last message repeated", "Connection from UDP: [",
-    "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
-    "diskio.c: don't know how to handle");  ## Ignore some crappy stuff from SNMP daemon
+                                 "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
+                                 "diskio.c: don't know how to handle");  ## Ignore some crappy stuff from SNMP daemon
 
 ### LDAP Authentication
 
