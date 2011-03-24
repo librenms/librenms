@@ -72,6 +72,22 @@ if ($device['os'] == "apc")
 
     discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
   }
+
+  #PDU
+  #$oids = snmp_get($device, "1.3.6.1.4.1.318.1.1.12.1.15.0", "-OsqnU", "");
+  $oids = snmp_walk($device, "rPDUIdentDeviceLinetoLineVoltage.0", "-OsqnU", "PowerNet-MIB");
+  if ($debug) { echo($oids."\n"); }
+  if ($oids)
+  {
+    echo(" Voltage In ");
+    list($oid,$current) = explode(" ",$oids);
+    $divisor = 1;
+    $type = "apc";
+    $index = "1";
+    $descr = "Input";
+
+    discover_sensor($valid_sensor, 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', NULL, NULL, NULL, NULL, $current);
+  }
 }
 
 ?>

@@ -28,7 +28,9 @@ if ($device['os'] == "sentry3")
       $high_limit      = snmp_get($device,"tempHumidSensorTempHighThresh.1.$index", "-Ovq", "Sentry3-MIB") / $divisor;
       $current         = snmp_get($device,"$temperature_oid", "-Ovq", "Sentry3-MIB") / $divisor;
 
-      discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+      if ($current >= 0) {
+        discover_sensor($valid_sensor, 'temperature', $device, $temperature_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+      }
     }
     unset($data);
   }

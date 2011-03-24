@@ -165,6 +165,7 @@ function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
      $sql = "INSERT INTO `juniAtmVp` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
      mysql_query($sql); echo("+");
      if ($debug) { echo($sql . " - " . mysql_affected_rows() . "inserted "); }
+     log_event("Juniper ATM VP Added: port ".mres($interface_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
   }
   else
   {
@@ -200,7 +201,6 @@ function discover_link($local_interface_id, $protocol, $remote_interface_id, $re
       echo("U"); if ($debug) {echo("$sql"); }
     }
   }
-
   $link_exists[$local_interface_id][$remote_hostname][$remote_port] = 1;
 }
 
@@ -227,7 +227,6 @@ function discover_storage(&$valid, $device, $index, $type, $mib, $descr, $size, 
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-
     $valid[$mib][$index] = 1;
   }
 }
@@ -248,6 +247,8 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
       echo("+");
+      log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), 'processor', mysql_insert_id());
+
     }
     else
     {
@@ -257,7 +258,6 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-
     $valid[$type][$index] = 1;
   }
 }
@@ -287,7 +287,6 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
     }
-
     $valid[$type][$index] = 1;
   }
 }
@@ -318,7 +317,6 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
       echo("U");
     }
   }
-
   $valid[$type][$index] = 1;
 }
 
