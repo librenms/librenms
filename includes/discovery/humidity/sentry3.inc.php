@@ -28,7 +28,9 @@ if ($device['os'] == 'sentry3')
       $high_limit      = snmp_get($device,"tempHumidSensorHumidHighThresh.1.$index", "-Ovq", "Sentry3-MIB");
       $current         = snmp_get($device,"$humidity_oid", "-Ovq", "Sentry3-MIB");
 
-      discover_sensor($valid_sensor, 'humidity', $device, $humidity_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+      if ($current >= 0) {
+        discover_sensor($valid_sensor, 'humidity', $device, $humidity_oid, $index, 'sentry3', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+      }
     }
     unset($data);
   }
