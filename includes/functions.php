@@ -237,23 +237,26 @@ function renamehost($id, $new)
 
 function delete_port($int_id)
 {
-    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = '".$int_id."' AND D.device_id = P.device_id"));
-    mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
-    mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
-    mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE from `mac_accounting` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
-    mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
-    mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
-    unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
+  global $config;
+
+  $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.interface_id = '".$int_id."' AND D.device_id = P.device_id"));
+  mysql_query("DELETE from `adjacencies` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE from `links` WHERE `local_interface_id` = '$int_id'");
+  mysql_query("DELETE from `links` WHERE `remote_interface_id` = '$int_id'");
+  mysql_query("DELETE from `ipaddr` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE from `ip6adjacencies` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE from `ip6addr` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE from `mac_accounting` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE FROM `bill_ports` WHERE `port_id` = '$int_id'");
+  mysql_query("DELETE from `pseudowires` WHERE `interface_id` = '$int_id'");
+  mysql_query("DELETE FROM `ports` WHERE `interface_id` = '$int_id'");
+  unlink(trim($config['rrd_dir'])."/".trim($interface['hostname'])."/".$interface['ifIndex'].".rrd");
 }
 
 function delete_device($id)
 {
   global $config;
+  
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
@@ -264,6 +267,7 @@ function delete_device($id)
     delete_port($int_id);
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
+  
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
@@ -282,6 +286,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
+  
   $ret = "Removed Device $host\n";
   return $ret;
 }
@@ -289,7 +294,8 @@ function delete_device($id)
 function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   global $config;
-  list($hostshort)      = explode(".", $host);
+  
+  list($hostshort) = explode(".", $host);
   if (isDomainResolves($host))
   {
     if (isPingable($host))
