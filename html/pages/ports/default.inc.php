@@ -85,6 +85,7 @@
 #  $sql = "SELECT * FROM `ports` AS I, `devices` AS D, `devices_perms` AS P WHERE I.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, I.ifDescr";
 #}
 
+# FIXME block below is not totally used, at least the iftype stuff is bogus?
 if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "down")
 {
   $where .= "AND I.ifAdminStatus = 'up' AND I.ifOperStatus = 'down' AND I.ignore = '0'";
@@ -110,11 +111,10 @@ if ($_GET['opta'] == "down" || $_GET['type'] == "down" || $_POST['state'] == "do
   $where .= " AND I.ifType = 'ppp'";
 }
 
-# FIXME SQL Injection!
-if ($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if ($_POST['ifType']) { $where .= " AND I.ifType = '".$_POST['ifType']."'"; }
-if ($_POST['ifSpeed']) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
-if ($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".$_POST['ifAlias']."%'"; }
+if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
+if ($_POST['ifType']) { $where .= " AND I.ifType = '".mres($_POST['ifType'])."'"; }
+if (is_numeric($_POST['ifSpeed'])) { $where .= " AND I.ifSpeed = '".$_POST['ifSpeed']."'"; }
+if ($_POST['ifAlias']) { $where .= " AND I.ifAlias LIKE '%".mres($_POST['ifAlias'])."%'"; }
 if ($_POST['deleted'] || $_GET['type'] == "deleted") { $where .= " AND I.deleted = '1'";  }
 
 $sql = "SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where ORDER BY D.hostname, I.ifIndex";
