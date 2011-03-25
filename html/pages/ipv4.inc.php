@@ -40,9 +40,8 @@ print_optionbar_end();
 
 echo('<table width="100%" cellspacing="0" cellpadding="2">');
 
-# FIXME SQL INJECTION!!
-if ($_POST['device_id']) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
-if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".$_POST['interface']."'"; }
+if (is_numeric($_POST['device_id'])) { $where .= " AND I.device_id = '".$_POST['device_id']."'"; }
+if ($_POST['interface']) { $where .= " AND I.ifDescr LIKE '".mres($_POST['interface'])."'"; }
 
 $sql = "SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D, `ipv4_networks` AS N WHERE I.interface_id = A.interface_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ORDER BY A.ipv4_address";
 
