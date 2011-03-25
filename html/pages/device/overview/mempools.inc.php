@@ -5,7 +5,9 @@ $graph_type = "mempool_usage";
 if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '" . $device['device_id'] . "'"),0))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
+  echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/mempools/">');
+  echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $mempool_rows = '1';
   $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
@@ -17,7 +19,7 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
-    $mempool_url   = $config['base_url'] . "/device/".$device['device_id']."/health/memory/";
+    $mempool_url   = $config['base_url'] . "/graphs/".$mempool['mempool_id']."/mempool_usage/";
     $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;

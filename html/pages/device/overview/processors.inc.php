@@ -6,7 +6,9 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
 {
   $processor_rows = 0;
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/processors.png'> Processors</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
+  echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/processors/">');
+  echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/processors.png'> Processors</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $i = '1';
   $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "' ORDER BY processor_descr ASC");
@@ -14,7 +16,7 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
   {
     if (is_integer($processor_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 
-    $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
+    $proc_url   = $config['base_url'] . "/graphs/".$proc['processor_id']."/processor_usage/";
 
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$proc['processor_descr'];
     $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";

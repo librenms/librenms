@@ -59,14 +59,14 @@ if ($services['total'])
   echo("</div>");
 }
 
-$sql =  "SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = '" . $_GET['id'] . "' $where";
+$sql =  "SELECT *, DATE_FORMAT(timestamp, '%d/%b/%y %T') AS date from syslog WHERE device_id = '" . $device['device_id'] . "' $where";
 $sql .= " ORDER BY timestamp DESC LIMIT 20";
 $query = mysql_query($sql);
 
 if (mysql_affected_rows() > "0")
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/16/printer.png'> Recent Syslog</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$device['base_url']."/images/16/printer.png'> Recent Syslog</p>");
   echo("<table cellspacing=0 cellpadding=2 width=100%>");
   while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc.php"); }
   echo("</table>");
@@ -96,7 +96,7 @@ echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
 echo('<a class="sectionhead" href="device/'.$device['device_id'].'/events/">');
 echo("<img align='absmiddle' src='".$config['base_url']."/images/16/report.png'> Recent Events</a></p>");
 
-$query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate  FROM `eventlog` WHERE `host` = '$_GET[id]' ORDER BY `datetime` DESC LIMIT 0,10";
+$query = "SELECT *,DATE_FORMAT(datetime, '%d/%b/%y %T') as humandate FROM `eventlog` WHERE `host` = '" . $device['device_id'] . "' ORDER BY `datetime` DESC LIMIT 0,10";
 $data = mysql_query($query);
 
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
