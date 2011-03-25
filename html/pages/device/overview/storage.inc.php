@@ -5,7 +5,9 @@ $graph_type = "storage_usage";
 if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device_id = '" . $device['device_id'] . "'"),0))
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
-  echo("<p style='padding: 0px 5px 5px;' class=sectionhead><img align='absmiddle' src='".$config['base_url']."/images/icons/storage.png'> Storage</p>");
+  echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
+  echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/storage/">');
+  echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/storage.png'> Storage</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $drive_rows = '0';
 
@@ -44,7 +46,7 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
     $free = formatStorage($drive['storage_free']);
     $used = formatStorage($drive['storage_used']);
 
-    $fs_url   = $config['base_url'] . "/device/".$device['device_id']."/health/storage/";
+    $fs_url   = $config['base_url'] . "/graphs/".$drive['storage_id']."/storage_usage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
     $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
