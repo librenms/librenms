@@ -8,7 +8,6 @@ if ($_POST['editing'])
   }
 }
 
-$device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '".$device['device_id']."'"));
 $descr  = $device['purpose'];
 
 if ($updated && $update_message)
