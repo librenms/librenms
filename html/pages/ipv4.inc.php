@@ -27,7 +27,7 @@ while ($data = mysql_fetch_array($query))
     <td>
     </td>
     <td width=400>
-     <input type="text" name="address" id="address" size=40 value="<?php  echo($_POST['address']); ?>" />
+     <input type="text" name="address" id="address" size=40 value="<?php echo($_POST['address']); ?>" />
      <input style="align:right;" type=submit class=submit value=Search></div>
     </td>
   </form>

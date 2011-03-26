@@ -6,7 +6,7 @@
 
 <form method="post" action="">
   <label><strong>Search</strong>
-    <input type="text" name="string" id="string" value="<?php  echo($_POST['string']); ?>" />
+    <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" />
   </label>
   <label>
     <strong>Program</strong>

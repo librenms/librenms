@@ -23,7 +23,6 @@ include("../includes/defaults.inc.php");
 include("../config.php");
 include("../includes/functions.php");
 include("includes/functions.inc.php");
-include("includes/authenticate.inc.php");
 
 $start = utime();
 $now = time();
@@ -61,8 +60,8 @@ if (is_array($config['branding']))
 <?php
 if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$config['page_refresh']."'>"); }
 ?>
-  <link href="<?php  echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
-  <link rel="shortcut icon" href="<?php  echo($config['favicon']);  ?>" />
+  <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+  <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css" />
 </head>
 <body topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0">
@@ -81,13 +80,15 @@ function popUp(URL)
   <script type="text/javascript" src="js/overlib.js"></script>
   <div id="center">
 
+<?php
 
-  <?php include("includes/".$config['web_header']); ?>
+include("includes/authenticate.inc.php");
+include("includes/".$config['web_header']);
 
-<?php if ($_SESSION['authenticated']) {include("includes/print-menubar.php"); } else {echo('<hr color="#444444" />'); } ?>
+if ($_SESSION['authenticated']) { include("includes/print-menubar.php"); } else { echo('<hr color="#444444" />'); }
 
+?>
     <div class="clearer"></div>
-
     <div class="content-mat" style="border: 1px none #fcc;">
       <div id="content" style="border: 1px none #ccc; min-height:650px;">
         <div style="margin: 7px;"></div>
