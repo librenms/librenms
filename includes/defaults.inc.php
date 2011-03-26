@@ -224,4 +224,6 @@ $config['astext'][65333] = "Cymru Bogon Feed";
 ### What should we warn about?
 $config['warn']['ifdown'] = false;
 
+## INCLUDE THE VMWARE DEFINITION FILE.
+require_once("vmware_guestid.inc.php");
 ?>

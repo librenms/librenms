@@ -1,0 +1,231 @@
+-- **********************************************************
+-- Copyright 2008 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-ENV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks,
+    MODULE-IDENTITY, OBJECT-IDENTITY
+    FROM SNMPv2-SMI
+    DisplayString
+    FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+    vmwProductSpecific, vmwNotifications
+    FROM VMWARE-ROOT-MIB
+    vmwESX
+    FROM VMWARE-PRODUCTS-MIB
+    VmwSubsystemStatus, VmwSubsystemTypes
+    FROM VMWARE-TC-MIB;
+
+    vmwEnvironmentalMIB MODULE-IDENTITY
+    LAST-UPDATED "200810300000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module identifies hardware components of a machine as provided by IPMI."
+
+REVISION   "200810300000Z"
+DESCRIPTION
+    "Introduce vmwESXNotification to match ESX 3.5 agent."
+
+REVISION      "200712270000Z"
+DESCRIPTION
+    "This is the first revision of this MIB module."
+::= { vmwEnv 10 }
+
+vmwEnv OBJECT IDENTIFIER
+    ::= { vmwProductSpecific 20 }
+
+vmwESXNotifications OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Parent of all ESX specific notifications (traps, informs)."
+ ::= { vmwESX 0 }
+
+vmwEnvNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Count of number of conceptual rows in vmwEnvTable"
+    ::= { vmwEnv 1 }
+
+vmwEnvLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUptime when a conceptual row was added
+         or deleted from this table"
+    ::= { vmwEnv 2 }
+
+vmwEnvTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwEnvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table is populated from monitoring subsystems such as IPMI
+         One conceptual row is maintained for each reporting component.
+         Conceptual rows are not persistent across device resets"
+    ::= { vmwEnv 3 }
+
+vmwEnvEntry OBJECT-TYPE
+    SYNTAX      VmwEnvEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "One entry for each physical component reporting its
+         status to ESX Operating System"
+    INDEX       { vmwEnvIndex }
+    ::= { vmwEnvTable 1 }
+
+VmwEnvEntry ::= SEQUENCE {
+    vmwEnvIndex             Integer32,
+    vmwSubsystemType        VmwSubsystemTypes,
+    vmwHardwareStatus       VmwSubsystemStatus,
+    vmwEventDescription     DisplayString,
+    vmwEnvHardwareTime      TimeTicks
+}
+
+vmwEnvIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A unique identifier that does not persist across management restarts"
+    ::= { vmwEnvEntry 1 }
+
+vmwSubsystemType OBJECT-TYPE
+    SYNTAX      VmwSubsystemTypes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Hardware component reporting environmental state"
+    ::= { vmwEnvEntry 2 }
+
+vmwHardwareStatus OBJECT-TYPE
+    SYNTAX      VmwSubsystemStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Last reported state of this component"
+    ::= { vmwEnvEntry 3 }
+
+vmwEventDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Human readable description of this event"
+    ::= { vmwEnvEntry 4 }
+
+vmwEnvHardwareTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Value of sysUptime when vmwHardwareStatus was obtained"
+    ::= { vmwEnvEntry 5 }
+
+vmwEnvHardwareEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSubsystemType, vmwHardwareStatus, 
+                  vmwEventDescription, vmwEnvHardwareTime }
+    STATUS      current
+    DESCRIPTION 
+        "This notification, if the agent is so configured, may be sent when the
+         system has detected a material change in physical condition of the
+         hardware"
+    ::= { vmwNotifications 301 }
+
+vmwESXEnvHardwareEvent NOTIFICATION-TYPE
+    OBJECTS     { vmwSubsystemType, vmwHardwareStatus, 
+                  vmwEventDescription, vmwEnvHardwareTime }
+    STATUS      current
+    DESCRIPTION 
+        "ESX Specific version of this notification, 
+         if the agent is so configured, may be sent when 
+         the ESX Operating System has detected a material change in 
+         physical condition of the hardware"
+    ::= { vmwESXNotifications 301 }
+
+
+-- conformance information
+vmwEnvironmentalMIBConformance
+OBJECT IDENTIFIER ::= { vmwEnvironmentalMIB 2 }
+vmwEnvironmentMIBCompliances
+OBJECT IDENTIFIER ::= { vmwEnvironmentalMIBConformance 1 }
+vmwEnvMIBGroups  OBJECT IDENTIFIER ::= { vmwEnvironmentalMIBConformance 2 }
+
+-- compliance statements
+
+vmwEnvMIBBasicCompliance2 MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+    "The compliance statement for entities which implement the 
+    VMWARE-RESOURCE-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvironmentGroup }
+
+
+GROUP  vmwESXEnvNotificationGroup
+DESCRIPTION
+    "This group is mandatory for ESX based systems agents."
+
+GROUP  vmwEnvNotificationGroup
+DESCRIPTION
+    "This group is mandatory for vmware based systems agents."
+::= { vmwEnvironmentMIBCompliances 3 }
+
+vmwEnvMIBBasicCompliance MODULE-COMPLIANCE
+STATUS  obsolete
+DESCRIPTION
+    "The compliance statement for entities which implement the 
+    VMWARE-RESOURCE-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwEnvironmentGroup, vmwEnvNotificationGroup }
+::= { vmwEnvironmentMIBCompliances 2 }
+
+
+vmwEnvironmentGroup OBJECT-GROUP
+    OBJECTS { 
+    vmwEnvNumber,
+    vmwEnvLastChange,
+    vmwSubsystemType,
+    vmwHardwareStatus,
+    vmwEventDescription,
+    vmwEnvHardwareTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "These objects provide physical hardware environmental details."
+    ::= { vmwEnvMIBGroups 1 }
+
+vmwEnvNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwEnvHardwareEvent
+       }
+       STATUS      current
+       DESCRIPTION
+           "Notifications related to physical subsystems."
+       ::= { vmwEnvMIBGroups 2 }
+
+vmwESXEnvNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwESXEnvHardwareEvent
+       }
+       STATUS      current
+       DESCRIPTION
+           "ESX System specific notifications about physical subsystems."
+       ::= { vmwEnvMIBGroups 3 }
+
+
+END -- end of module VMWARE-ENV-MIB.
