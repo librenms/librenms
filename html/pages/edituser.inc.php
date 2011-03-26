@@ -14,37 +14,43 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     if ($_GET['action'] == "deldevperm")
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("DELETE FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
       }
     }
     if ($_GET['action'] == "adddevperm")
     {
-      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM devices_perms WHERE `device_id` = '" . $_GET['device_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("INSERT INTO devices_perms (`device_id`, `user_id`) VALUES ('" . $_GET['device_id'] . "', '" . $_GET['user_id'] . "')");
       }
     }
     if ($_GET['action'] == "delifperm")
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("DELETE FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
       }
     }
     if ($_GET['action'] == "addifperm")
     {
-      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM ports_perms WHERE `interface_id` = '" . $_GET['interface_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("INSERT INTO ports_perms (`interface_id`, `user_id`) VALUES ('" . $_GET['interface_id'] . "', '" . $_GET['user_id'] . "')");
       }
     }
     if ($_GET['action'] == "delbillperm")
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("DELETE FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'");
       }
     }
     if ($_GET['action'] == "addbillperm")
     {
-      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0)) {
+      if (!mysql_result(mysql_query("SELECT COUNT(*) FROM bill_perms WHERE `bill_id` = '" . $_GET['bill_id'] . "' AND `user_id` = '" . $_GET['user_id'] . "'"),0))
+      {
         mysql_query("INSERT INTO bill_perms (`bill_id`, `user_id`) VALUES ('" . $_GET['bill_id'] . "', '" . $_GET['user_id'] . "')");
       }
     }

@@ -80,7 +80,8 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/")) {
+    if (is_dir($config['collectd_dir'] . "/" . $device['hostname'] ."/"))
+    {
       echo('<li class="' . $select['collectd'] . '">
     <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/collectd/">
       <img src="images/16/chart_line.png" align="absmiddle" border="0" /> CollectD
@@ -88,7 +89,8 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0') {
+    if (@mysql_result(mysql_query("select count(interface_id) from ports WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
+    {
       echo('<li class="' . $select['ports'] . '">
     <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' .$config['ports_page_default']. '">
       <img src="images/16/connect.png" align="absmiddle" border="0" /> Ports
@@ -197,14 +199,17 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   }
 
 
-  if ($_SESSION['userlevel'] >= "7") {
+  if ($_SESSION['userlevel'] >= "7")
+  {
     if (!is_array($config['rancid_configs'])) { $config['rancid_configs'] = array($config['rancid_configs']); }
-    foreach ($config['rancid_configs'] as $configs) {
+    foreach ($config['rancid_configs'] as $configs)
+    {
       if ($configs[strlen($configs)-1] != '/') { $configs .= '/'; }
       if (is_file($configs . $device['hostname'])) { $device_config_file = $configs . $device['hostname']; }
     }
   }
-  if ($device_config_file) {
+  if ($device_config_file)
+  {
     echo('<li class="' . $select['showconfig'] . '">
     <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/showconfig/">
       <img src="images/16/page_white_text.png" align="absmiddle" border="0" /> Config
@@ -213,7 +218,8 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   ');
     }
 
-    if ($_SESSION['userlevel'] >= "7") {
+    if ($_SESSION['userlevel'] >= "7")
+    {
       echo('<li class="' . $select['edit'] . '">
     <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/edit/">
       <img src="images/16/server_edit.png" align="absmiddle" border="0" /> Settings

@@ -7,8 +7,7 @@ include("../includes/functions.php"); ## FIXME zeropad()
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
 {
-
-  $bill_query   = mysql_query("SELECT * FROM `bills` WHERE bill_id = '".mres($_GET['id'])."'");  
+  $bill_query   = mysql_query("SELECT * FROM `bills` WHERE bill_id = '".mres($_GET['id'])."'");
   $bill         = mysql_fetch_assoc($bill_query);
 
   $day_data     = getDates($bill['bill_day']);
@@ -22,9 +21,6 @@ if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted
                         AND D.device_id = P.device_id");
 
   $auth = TRUE;
-
-
-
 }
 
 ?>

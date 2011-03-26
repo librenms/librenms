@@ -41,7 +41,8 @@ while ($device = mysql_fetch_array($query))
 
   unset($valid_ips);
 
-  foreach (explode("\n", $oids) as $data) {
+  foreach (explode("\n", $oids) as $data)
+  {
     $data = trim($data);
     list($ipv6addr,$ifIndex) = explode(" ", $data);
     $valid_ips[] = $ipv6addr;

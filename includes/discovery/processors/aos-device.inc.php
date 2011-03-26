@@ -3,8 +3,6 @@
 global $valid_processor;
 
 ##  Hardcoded discovery of device CPU usage on Alcatel-Lucent Omniswitches.
-##  
-
 
 if ($device['os'] == "aos")
 {
