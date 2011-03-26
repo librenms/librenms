@@ -898,4 +898,6 @@ $ipmi_unit['RPM']       = 'fanspeed';
 $ipmi_unit['Watts']     = '';
 $ipmi_unit['discrete']  = '';
 
+## INCLUDE THE VMWARE DEFINITION FILE.
+require_once("vmware_guestid.inc.php");
 ?>
