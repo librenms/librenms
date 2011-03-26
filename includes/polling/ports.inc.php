@@ -105,7 +105,7 @@ while ($port = mysql_fetch_array($port_query))
   if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")
   { // Check to make sure Port data is cached.
     $this_port = &$port_stats[$port['ifIndex']];
-
+    if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $this_port['ifDescr'], $matches)) { $this_port['ifDescr'] = $matches[1]; }
     $polled_period = $polled - $port['poll_time'];
 
     $update .= "`poll_time` = '".$polled."'";

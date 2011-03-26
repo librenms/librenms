@@ -660,6 +660,13 @@ $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
 $config['os'][$os]['icon']  		= "servertech";
 
+$os = "vmware";
+$config['os'][$os]['type']              = "server";
+$config['os'][$os]['text']              = "VMware";
+$config['os'][$os]['ifXmcbc']           = 1;
+$config['os'][$os]['over'][0]['graph']  = "device_bits";
+$config['os'][$os]['over'][0]['text']   = "Device Traffic";
+
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
 ### Graph Types
