@@ -17,7 +17,7 @@ print_optionbar_start(62);
     <tr>
       <td width="30" align="center" valign="middle"></td>
       <td width="300"><span style="font-weight: bold; font-size: 14px;"></span>
-        <input type="text" name="hostname" id="hostname" size="40" value="<?php  echo($_POST['hostname']); ?>" />
+        <input type="text" name="hostname" id="hostname" size="40" value="<?php echo($_POST['hostname']); ?>" />
       </td>
       <td width="200">
         <select name='os' id='os'>

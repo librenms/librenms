@@ -334,12 +334,12 @@ function humanspeed($speed)
 
 function print_error($text)
 {
-  echo('<table class="errorbox" cellpadding="3"><tr><td><img src="/images/15/exclamation.png" align="absmiddle"> '.$text.'</td></tr></table>');
+  echo('<div class="errorbox"><img src="/images/15/exclamation.png" align="absmiddle"> '.$text.'</div>');
 }
 
 function print_message($text)
 {
-  echo('<table class="messagebox" cellpadding="3"><tr><td><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</td></tr></table>');
+  echo('<div class="messagebox"><img src="/images/16/tick.png" align="absmiddle"> '.$text.'</div>');
 }
 
 function devclass($device)

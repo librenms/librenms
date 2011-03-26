@@ -83,7 +83,7 @@ if ($_GET['opta'] == "add")
 <tr>
              <td width='40' align=center valign=middle><div style='font-weight: bold; font-size: 16px;'>Bills</div></td>
              <td width='240'><span style='font-weight: bold; font-size: 14px;'></span>
-             <input type="text" name="hostname" id="hostname" size=40 value="<?php  echo($_POST['hostname']); ?>" />
+             <input type="text" name="hostname" id="hostname" size=40 value="<?php echo($_POST['hostname']); ?>" />
              </td>
              <td width='100'>
       <select name='os' id='os'>

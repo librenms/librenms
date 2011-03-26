@@ -3,7 +3,7 @@
 
 <form method="post" action="">
   <label><strong>Descr</strong>
-    <input type="text" name="string" id="string" value="<?php  echo($_POST['string']); ?>" />
+    <input type="text" name="string" id="string" value="<?php echo($_POST['string']); ?>" />
   </label>
   <label>
     <strong>Part No</strong>
@@ -40,7 +40,7 @@
       ?>
     </select>
   </label>
-  <input type="text" size=24 name="device_string" id="device_string" value="<?php  echo($_POST['device_string']); ?>" />
+  <input type="text" size=24 name="device_string" id="device_string" value="<?php echo($_POST['device_string']); ?>" />
   <input style type=submit class=submit value=Search>
 
 <?php

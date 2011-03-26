@@ -64,7 +64,7 @@
        </select>
              </td>
              <td>
-        <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php  echo($_POST['ifAlias']); ?>" />
+        <input type="text" name="ifAlias" id="ifAlias" size=40 value="<?php echo($_POST['ifAlias']); ?>" />
         Deleted <input type=checkbox id="deleted" name="deleted" value=1 <?php if ($_POST['deleted']) { echo("checked"); } ?> ></input>
         </td>
         <td style="text-align: right;">
