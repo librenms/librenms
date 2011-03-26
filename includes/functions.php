@@ -92,7 +92,7 @@ function shorthost($hostname, $len=16)
 {
   $parts = explode(".", $hostname);
   $shorthost = $parts[0];
-  $i=1;
+  $i = 1;
   while ($i < count($parts) && strlen($shorthost.'.'.$parts[$i]) < $len)
   {
     $shorthost = $shorthost.'.'.$parts[$i];
@@ -150,14 +150,14 @@ function format_si($rate)
     $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
     $round = Array('2','2','2','2','2','2','2','2','2');
     $ext = $sizes[0];
-    for ($i=1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
+    for ($i = 1; (($i < count($sizes)) && ($rate >= 1000)); $i++) { $rate = $rate / 1000; $ext  = $sizes[$i]; }
   }
   else
   {
     $sizes = Array('', 'm', 'u', 'n');
     $round = Array('2','2','2','2');
     $ext = $sizes[0];
-    for ($i=1; (($i < count($sizes)) && ($rate != 0) && ($rate <= 0.1)); $i++) { $rate = $rate * 1000; $ext  = $sizes[$i]; }
+    for ($i = 1; (($i < count($sizes)) && ($rate != 0) && ($rate <= 0.1)); $i++) { $rate = $rate * 1000; $ext  = $sizes[$i]; }
   }
 
   return round($rate, $round[$i]).$ext;
@@ -167,7 +167,7 @@ function format_bi($size, $round = '2')
 {
   $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
-  for ($i=1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
+  for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
   return round($size, $round).$ext;
 }
 
@@ -256,7 +256,7 @@ function delete_port($int_id)
 function delete_device($id)
 {
   global $config;
-  
+
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
@@ -267,7 +267,7 @@ function delete_device($id)
     delete_port($int_id);
     $ret .= "Removed interface $int_id ($int_if)\n";
   }
-  
+
   mysql_query("DELETE FROM `entPhysical` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_attribs` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `devices_perms` WHERE `device_id` = '$id'");
@@ -286,7 +286,7 @@ function delete_device($id)
   mysql_query("DELETE FROM `current` WHERE `device_id` = '$id'");
   mysql_query("DELETE FROM `sensors` WHERE `device_id` = '$id'");
   shell_exec("rm -rf ".trim($config['rrd_dir'])."/$host");
-  
+
   $ret = "Removed Device $host\n";
   return $ret;
 }
@@ -294,7 +294,7 @@ function delete_device($id)
 function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   global $config;
-  
+
   list($hostshort) = explode(".", $host);
   if (isDomainResolves($host))
   {
@@ -746,7 +746,7 @@ function hex2str($hex)
 {
   $string='';
 
-  for ($i=0; $i < strlen($hex)-1; $i+=2)
+  for ($i = 0; $i < strlen($hex)-1; $i+=2)
   {
     $string .= chr(hexdec($hex[$i].$hex[$i+1]));
   }

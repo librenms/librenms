@@ -26,22 +26,22 @@ if ($device['os'] == "cometsystem-p85xx")
       preg_match($regexp, $line, $match);
       if ($match['name'])
       {
-        $out[$match['id']]['name'] = $match['name'];   
+        $out[$match['id']]['name'] = $match['name'];
       }
 
       if ($match['temp_intval'])
       {
-        $out[$match['id']]['temp_intval'] = $match['temp_intval'];   
+        $out[$match['id']]['temp_intval'] = $match['temp_intval'];
       }
 
       if ($match['limit_high'])
       {
-        $out[$match['id']]['limit_high'] = $match['limit_high'];   
+        $out[$match['id']]['limit_high'] = $match['limit_high'];
       }
 
       if ($match['limit_low'])
       {
-        $out[$match['id']]['limit_low'] = $match['limit_low'];   
+        $out[$match['id']]['limit_low'] = $match['limit_low'];
       }
     }
 

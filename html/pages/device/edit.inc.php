@@ -9,12 +9,12 @@ if ($_SESSION['userlevel'] < '7')
   $panes['snmp']     = 'SNMP';
   $panes['ports']    = 'Port Settings';
   $panes['apps']     = 'Applications';
-  
+
   if ($config['enable_services'])
   {
     $panes['services'] = 'Services';
   }
-  
+
   $panes['ipmi']     = 'IPMI';
 
   print_optionbar_start();

@@ -51,6 +51,7 @@ while ($acc = mysql_fetch_array($query))
     $mac = formatmac($acc['mac']);
     $name = $mac;
     $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."' AND interface_id = '".$acc['interface_id']."'"));
+
     if ($addy)
     {
       $name = $addy['ipv4_address'] . " (".$mac.")";
@@ -69,8 +70,9 @@ while ($acc = mysql_fetch_array($query))
         $peer_info = mysql_fetch_array($peer_query);
         $name .= " - AS".$peer_info['bgpPeerRemoteAs'];
       }
-       
-      if ($peer_info) {
+
+      if ($peer_info)
+      {
         $asn = "AS".$peer_info['bgpPeerRemoteAs']; $astext = $peer_info['astext'];
       } else {
         unset ($as); unset ($astext); unset($asn);

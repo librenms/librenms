@@ -25,7 +25,7 @@ if ($_POST['device'])
       $enabled[] = "'" . substr($key,4) . "'";
     }
   }
-  
+
   $sql = "DELETE FROM applications WHERE device_id=" . $device['device_id'];
   if ($enabled)
   {
@@ -33,7 +33,7 @@ if ($_POST['device'])
   }
   mysql_query($sql);
   $updated += mysql_affected_rows();
-  
+
   $sql = "SELECT app_type FROM applications WHERE device_id=" . $device['device_id'];
   $result = mysql_query($sql);
   while ($row = mysql_fetch_assoc($result))
