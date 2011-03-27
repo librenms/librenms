@@ -121,7 +121,7 @@ function getHostOS($device)
   $dir_handle = @opendir($config['install_dir'] . "/includes/discovery/os") or die("Unable to open $path");
   while ($file = readdir($dir_handle))
   {
-    if (preg_match("/.php$/", $file) )
+    if (preg_match("/.php$/", $file))
     {
       include($config['install_dir'] . "/includes/discovery/os/" . $file);
     }
@@ -167,20 +167,22 @@ function format_bi($size, $round = '2')
 {
   $sizes = Array('', 'k', 'M', 'G', 'T', 'P', 'E');
   $ext = $sizes[0];
-  for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i];  }
+  for ($i = 1; (($i < count($sizes)) && ($size >= 1024)); $i++) { $size = $size / 1024; $ext  = $sizes[$i]; }
   return round($size, $round).$ext;
 }
 
 function percent_colour($perc)
 {
- $r = min(255, 5 * ($perc - 25));
- $b = max(0, 255 - (5 * ($perc + 25)));
- return sprintf('#%02x%02x%02x', $r, $b, $b);
+  $r = min(255, 5 * ($perc - 25));
+  $b = max(0, 255 - (5 * ($perc + 25)));
+
+  return sprintf('#%02x%02x%02x', $r, $b, $b);
 }
 
 function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out errors value in RRD
 {
   global $config;
+
   $cmd = $config['rrdtool']." fetch -s $period -e -300s $rrd_file AVERAGE | grep : | cut -d\" \" -f 4,5";
   $data = trim(shell_exec($cmd));
   foreach (explode("\n", $data) as $entry)
@@ -191,6 +193,7 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
   }
   $errors['in'] = round($in_errors);
   $errors['out'] = round($out_errors);
+
   return $errors;
 }
 
@@ -223,16 +226,19 @@ function getImage($host)
       } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
     }
   }
+
   return $image;
 }
 
-function renamehost($id, $new)
+function renamehost($id, $new, $source = 'console')
 {
   global $config;
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
+
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0); # FIXME getdevicebyid?
+
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
-  eventlog("Hostname changed -> $new (console)", $id);
+  eventlog("Hostname changed -> $new ($source)", $id);
 }
 
 function delete_port($int_id)
@@ -300,7 +306,7 @@ function addHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
   {
     if (isPingable($host))
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0' )
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `devices` WHERE `hostname` = '$host'"), 0) == '0')
       {
         # FIXME internalize -- but we don't have $device yet!
         # FIXME this needs to be addhost.php's content instead, kindof, also use this function there then.
@@ -378,7 +384,7 @@ function formatUptime($diff, $format="long")
   else
   {
     if ($yearsDiff > '0') { $uptime .= $yearsDiff . " years, "; }
-    if ($daysDiff > '0') { $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '' ) . ", "; }
+    if ($daysDiff > '0') { $uptime .= $daysDiff . " day" . ($daysDiff != 1 ? 's' : '') . ", "; }
     if ($hrsDiff > '0') { $uptime .= $hrsDiff     . "h "; }
     if ($minsDiff > '0') { $uptime .= $minsDiff   . "m "; }
     if ($secsDiff > '0') { $uptime .= $secsDiff   . "s "; }
@@ -402,12 +408,12 @@ function isSNMPable($device)
 function isPingable($hostname)
 {
    global $config;
-   $status = shell_exec($config['fping'] . " $hostname");
+   $status = shell_exec($config['fping'] . " $hostname 2>/dev/null");
    if (strstr($status, "alive"))
    {
      return TRUE;
    } else {
-     $status = shell_exec($config['fping6'] . " $hostname");
+     $status = shell_exec($config['fping6'] . " $hostname 2>/dev/null");
      if (strstr($status, "alive"))
      {
        return TRUE;

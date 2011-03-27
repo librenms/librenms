@@ -19,7 +19,7 @@ if ($device['os'] == "junose")
       $descr = $entry['juniSystemModuleDescr'];
       $usage = $entry['juniSystemModuleCpuFiveMinAvgPct'];
 
-      if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" )
+      if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
         discover_processor($valid_processor, $device, $usage_oid, $index, "junose", $descr, "1", $usage, $entPhysicalIndex, NULL);
       }

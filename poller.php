@@ -12,8 +12,6 @@
  * See COPYING for more details.
  */
 
-### Observium Device Poller
-
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
@@ -48,17 +46,17 @@ if (isset($options['i']) && $options['i'] && isset($options['n']))
 
 if (!$where)
 {
-  echo("-h <device id> | <device hostname>  Poll single device\n");
-  echo("-h odd                              Poll odd numbered devices  (same as -i 2 -n 0)\n");
-  echo("-h even                             Poll even numbered devices (same as -i 2 -n 1)\n");
-  echo("-h all                              Poll all devices\n\n");
-  echo("-i <instances> -n <number>          Poll as instance <number> of <instances>\n");
-  echo("                                    Instances start at 0. 0-3 for -n 4\n\n");
-  echo("-d                                  Enable some debugging output\n");
+  echo("-h <device id> | <device hostname wildcard>  Poll single device\n");
+  echo("-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)\n");
+  echo("-h even                                      Poll even numbered devices (same as -i 2 -n 1)\n");
+  echo("-h all                                       Poll all devices\n\n");
+  echo("-i <instances> -n <number>                   Poll as instance <number> of <instances>\n");
+  echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
+  echo("-d                                           Enable some debugging output\n");
   echo("\n");
   echo("No polling type specified!\n");
   exit;
- }
+}
 
 if (isset($options['d']))
 {
@@ -75,7 +73,6 @@ if (isset($options['d']))
   ini_set('log_errors', 0);
 #  ini_set('error_reporting', 0);
 }
-
 
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
@@ -102,7 +99,6 @@ while ($device = mysql_fetch_assoc($device_query))
   $host_rrd = $config['rrd_dir'] . "/" . $device['hostname'];
   if (!is_dir($host_rrd)) { mkdir($host_rrd); echo("Created directory : $host_rrd\n"); }
 
-
   $device['pingable'] = isPingable($device['hostname']);
   if ($device['pingable'])
   {
@@ -119,7 +115,7 @@ while ($device = mysql_fetch_assoc($device_query))
     $status = "0";
   }
 
-  if ($device['status'] != $status )
+  if ($device['status'] != $status)
   {
     $poll_update .= $poll_separator . "`status` = '$status'";
     $poll_separator = ", ";
@@ -131,7 +127,6 @@ while ($device = mysql_fetch_assoc($device_query))
 
   if ($status == "1")
   {
-
     $graphs = array();
     $oldgraphs = array();
 
@@ -175,8 +170,8 @@ while ($device = mysql_fetch_assoc($device_query))
 
     if (is_numeric($uptime))
     {
-
-      if ($uptime < $device['uptime'] ) {
+      if ($uptime < $device['uptime'])
+      {
         notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
         log_event('Device rebooted after '.formatUptime($device['uptime']), $device['device_id'], 'reboot', $device['uptime']);
       }
@@ -334,7 +329,6 @@ while ($device = mysql_fetch_assoc($device_query))
     }
   }
 
-
   $device_end = utime(); $device_run = $device_end - $device_start; $device_time = substr($device_run, 0, 5);
   $poll_update .= $poll_separator . "`last_polled_timetaken` = '$device_time'";
   #echo("$device_end - $device_start; $device_time $device_run");
@@ -349,7 +343,6 @@ while ($device = mysql_fetch_assoc($device_query))
 
   unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
   unset($cache); // Clear cache (unify all things here?)
-
 }
 
 $poller_end = utime(); $poller_run = $poller_end - $poller_start; $poller_time = substr($poller_run, 0, 5);

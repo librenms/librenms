@@ -34,7 +34,7 @@ foreach (explode("\n", $ports) as $entry)
     }
 
     if (empty($ifDescr)) { $nullintf = 1; }
-    if ($device['os'] == "catos" && strstr($if, "vlan") ) { $nullintf = 1; }
+    if ($device['os'] == "catos" && strstr($if, "vlan")) { $nullintf = 1; }
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $ifDescr, $matches)) { $ifDescr = $matches[1]; }
     $ifDescr = fixifName($ifDescr);
     if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }

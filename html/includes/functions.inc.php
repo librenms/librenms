@@ -187,7 +187,7 @@ function device_permitted($device_id)
   if ($_SESSION['userlevel'] >= "5")
   {
     $allowed = true;
-  } elseif ($permissions['device'][$device_id] ) {
+  } elseif ($permissions['device'][$device_id]) {
     $allowed = true;
   } else {
     $allowed = false;
@@ -307,8 +307,8 @@ function geteventicon($message)
 {
   if ($message == "Device status changed to Down") { $icon = "server_connect.png"; }
   if ($message == "Device status changed to Up") { $icon = "server_go.png"; }
-  if ($message == "Interface went down" || $message == "Interface changed state to Down" ) { $icon = "if-disconnect.png"; }
-  if ($message == "Interface went up" || $message == "Interface changed state to Up" ) { $icon = "if-connect.png"; }
+  if ($message == "Interface went down" || $message == "Interface changed state to Down") { $icon = "if-disconnect.png"; }
+  if ($message == "Interface went up" || $message == "Interface changed state to Up") { $icon = "if-connect.png"; }
   if ($message == "Interface disabled") { $icon = "if-disable.png"; }
   if ($message == "Interface enabled") { $icon = "if-enable.png"; }
   if (isset($icon)) { return $icon; } else { return false; }

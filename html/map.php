@@ -113,7 +113,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
 
-            if ($dst_host == $device['device_id'] || $where == '') {
+            if ($dst_host == $device['device_id'] || $where == '')
+            {
               $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
             } else {
               $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
@@ -156,7 +157,8 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   if ($where == '') { $maptool = 'neato -Gpack'; }
 
   $img = shell_exec("echo \"".addslashes($map)."\" | $maptool -T".$_GET['format']."");
-  if ($_GET['format'] == "png") {
+  if ($_GET['format'] == "png")
+  {
     header("Content-type: image/".$_GET['format']);
   } elseif ($_GET['format'] == "svg") {
     header("Content-type: image/svg+xml");

@@ -192,7 +192,7 @@ if (strpos($interface['label'], "oopback") === false && !$graph_type)
     if ($int_links_phys[$int_link]) { echo("<img align=absmiddle src='images/16/connect.png'> "); } else {
                                       echo("<img align=absmiddle src='images/16/bullet_go.png'> "); }
 
-    echo("<b>" . generate_port_link($link_if, makeshortif($link_if['label'])) . " on " . generate_device_link($link_if, shorthost($link_if['hostname'])) );
+    echo("<b>" . generate_port_link($link_if, makeshortif($link_if['label'])) . " on " . generate_device_link($link_if, shorthost($link_if['hostname'])));
 
     if ($int_links_v6[$int_link]) { echo(" <b style='color: #a10000;'>v6</b>"); }
     if ($int_links_v4[$int_link]) { echo(" <b style='color: #00a100'>v4</b>"); }

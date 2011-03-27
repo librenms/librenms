@@ -57,7 +57,7 @@ while ($interface = mysql_fetch_array($query))
   {
     list($addy, $mask) = explode("/", $_POST['address']);
     if (!$mask) { $mask = "32"; }
-    if (!match_network($addy . "/" . $mask, $interface['ipv4_address'] )) { $ignore = 1; }
+    if (!match_network($addy . "/" . $mask, $interface['ipv4_address'])) { $ignore = 1; }
   }
 
   if (!$ignore)

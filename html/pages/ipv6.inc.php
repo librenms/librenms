@@ -1,6 +1,6 @@
 <?php print_optionbar_start(28); ?>
 
-<table cellpadding=0 cellspacing=0 class=devicetable width=100%>
+<table cellpadding="0" cellspacing="0" class="devicetable" width="100%">
   <tr>
   <form method="post" action="">
     <td width="200">
@@ -74,7 +74,7 @@ while ($interface = mysql_fetch_array($query))
       $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>",errors);
     } else { $error_img = ""; }
 
-    if (port_permitted($interface['interface_id']) )
+    if (port_permitted($interface['interface_id']))
     {
       echo('<tr bgcolor="' . $row_colour . '">
           <td class="list-bold">' . generate_device_link($interface) . '</td>
