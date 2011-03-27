@@ -154,7 +154,7 @@ while ($port = mysql_fetch_array($port_query))
         $update .= ", `$oid` = NULL";
         log_event($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
-      } elseif ($port[$oid] != $this_port[$oid] ) {
+      } elseif ($port[$oid] != $this_port[$oid]) {
         $update .= ", `$oid` = '".mres($this_port[$oid])."'";
 	  log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
@@ -251,7 +251,7 @@ while ($port = mysql_fetch_array($port_query))
     {
       foreach ($pagp_oids as $oid)
       { // Loop the OIDs
-        if ($this_port[$oid] != $port[$oid] )
+        if ($this_port[$oid] != $port[$oid])
         { // If data has changed, build a query
           $update .= ", `$oid` = '".mres($this_port[$oid])."'";
           echo("PAgP ");

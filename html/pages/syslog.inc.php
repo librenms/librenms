@@ -14,7 +14,8 @@
       <option value="">All Programs</option>
       <?php
         $query = mysql_query("SELECT `program` FROM `syslog` GROUP BY `program` ORDER BY `program`");
-        while ($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_array($query))
+        {
           echo("<option value='".$data['program']."'");
 	  if ($data['program'] == $_POST['program']) { echo("selected"); }
           echo(">".$data['program']."</option>");
@@ -28,7 +29,8 @@
       <option value="">All Devices</option>
       <?php
         $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-        while ($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_array($query))
+        {
           echo("<option value='".$data['device_id']."'");
 
 	  if ($data['device_id'] == $_POST['device']) { echo("selected"); }
@@ -81,4 +83,3 @@ while ($entry = mysql_fetch_array($query))
 echo("</table>");
 
 ?>
-</table>

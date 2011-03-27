@@ -21,7 +21,7 @@ if ($device['os'] == "junos")
         $usage_oid = ".1.3.6.1.4.1.2636.3.1.13.1.8." . $index;
         $descr = $entry['jnxOperatingDescr'];
         $usage = $entry['jnxOperatingBuffer'];
-        if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" )
+        if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
         {
           discover_mempool($valid_mempool, $device, $index, "junos", $descr, "1", NULL, NULL);
         }

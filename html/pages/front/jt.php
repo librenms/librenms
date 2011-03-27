@@ -75,7 +75,7 @@ while ($peer = mysql_fetch_array($sql)){
 
 $sql = mysql_query("SELECT * FROM devices_attribs AS A, `devices` AS D WHERE A.attrib_value < '84600' AND A.attrib_type = 'uptime' AND A.device_id = D.device_id AND ignore = '0' AND disabled = '0'");
 while ($device = mysql_fetch_array($sql)){
-   if (device_permitted($device['device_id']) && $device['attrib_value'] < "84600" && $device['attrib_type'] == "uptime" ) {
+   if (device_permitted($device['device_id']) && $device['attrib_value'] < "84600" && $device['attrib_type'] == "uptime") {
       echo("<div style='text-align: center; margin: 2px; border: solid 2px #D0D0D0; float: left; margin-right: 2px; padding: 3px; width: 118px; height: 85px; background: #ddffdd;'>
       <strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />

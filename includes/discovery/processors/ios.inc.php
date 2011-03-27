@@ -41,7 +41,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
 
       #echo("|".$descr."|");
 
-      if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "" )
+      if (!strstr($descr, "No") && !strstr($usage, "No") && $descr != "")
       {
 	discover_processor($valid_processor, $device, $usage_oid, $index, "cpm", $descr, "1", $entry['juniSystemModuleCpuUtilPct'], $entPhysicalIndex, NULL);
       }

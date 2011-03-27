@@ -73,13 +73,13 @@ if (isset($options['d']))
 if (!$where)
 {
   echo("-h <device id> | <device hostname wildcard>  Poll single device\n");
-  echo("-h odd                     Poll odd numbered devices  (same as -i 2 -n 0)\n");
-  echo("-h even                    Poll even numbered devices (same as -i 2 -n 1)\n");
-  echo("-h all                     Poll all devices\n");
-  echo("-h new                     Poll all devices that have not had a discovery run before\n\n");
-  echo("-i <instances> -n <number>           Poll as instance <number> of <instances>\n");
-  echo("                       Instances start at 0. 0-3 for -n 4\n\n");
-  echo("-d                       Enable debugging output\n");
+  echo("-h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)\n");
+  echo("-h even                                      Poll even numbered devices (same as -i 2 -n 1)\n");
+  echo("-h all                                       Poll all devices\n");
+  echo("-h new                                       Poll all devices that have not had a discovery run before\n\n");
+  echo("-i <instances> -n <number>                   Poll as instance <number> of <instances>\n");
+  echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
+  echo("-d                                           Enable debugging output\n");
   echo("\n");
   echo("No polling type specified!\n");
   exit;
