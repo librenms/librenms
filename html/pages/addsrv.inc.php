@@ -2,8 +2,7 @@
 
 if ($_SESSION['userlevel'] < '10')
 {
-## FIXME generic "box" include?
-  echo("<span class='alert'>Insufficient privileges to perform this function.</span>");
+  include("includes/error-no-perm.inc.php");
 }
 else
 {

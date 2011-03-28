@@ -237,8 +237,8 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
         width:275px;
 }
 
-.page-h2 { 
-        font-size: 14px; 
+.page-h2 {
+        font-size: 14px;
 	font-weight: bold;
 	vertical-align: top;
 }
@@ -267,7 +267,7 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .tablehead {
-        font-family: Verdana, arial, sans-serif; 
+        font-family: Verdana, arial, sans-serif;
         font-weight: bold;
         font-size: 13px;
         font-style: normal;
@@ -472,7 +472,7 @@ a.list-device-disabled {
 }
 
 body {
-    margin: 0px; padding: 0px 0px 0px 0px; 
+    margin: 0px; padding: 0px 0px 0px 0px;
     background-color: #fff; color: #666;
     font: 10pt Verdana;
     line-height: 20px;
@@ -608,7 +608,7 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
         color: #cc0000;
 }
 
-.interface-upup, a.interface-upup {        
+.interface-upup, a.interface-upup {
 	color: #0000cc;
 }
 
@@ -784,7 +784,7 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
  margin-left: 0;
  margin-top: 1px;
  margin-bottom: 0px;
- font-family: Verdana, arial, sans-serif; 
+ font-family: Verdana, arial, sans-serif;
  font-weight: none;
  font-size: 12px;
  list-style-type: none;
@@ -835,7 +835,7 @@ color: #cc0000;
   float: left;
 }
 
-.optionicon { 
+.optionicon {
   vertical-align:middle;
   margin-top: -4px
 }

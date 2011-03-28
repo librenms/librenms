@@ -2,8 +2,7 @@
 
 if ($_SESSION['userlevel'] < 10)
 {
-  # FIXME generic box?
-  echo("<span class='alert'>You are not permitted to perform this function</span>");
+  include("includes/error-no-perm.inc.php");
   exit;
 }
 
@@ -17,17 +16,15 @@ if ($_POST['hostname'] && $_POST['community'])
     $community = mres($_POST['community']);
     $snmpver = mres($_POST['snmpver']);
     if ($_POST['port']) { $port = mres($_POST['port']); } else { $port = "161"; }
-    echo("<p class='messagebox'>");
-    echo("Adding host $hostname community $community port $port</p>");
+    print_message("Adding host $hostname community $community port $port");
     $result = addHost($hostname, $community, $snmpver, $port);
-    echo("</p>");
   } else {
-    echo("<p class='errorbox'><b>Error:</b> You don't have the necessary privileges to add hosts.</p>");
+    print_error("You don't have the necessary privileges to add hosts.");
   }
 } elseif ($_POST['hostname'] && !$_POST['community']) {
-  echo("<p class='errorbox'><b>Error:</b> A community string is required.</p>");
+  print_error("A community string is required.");
 } elseif (!$_POST['hostname'] && $_POST['community']) {
-  echo("<p class='errorbox'><b>Error:</b> A hostname is required.</p>");
+  print_error("A hostname is required.");
 }
 
 ?>

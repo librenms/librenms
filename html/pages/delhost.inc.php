@@ -2,7 +2,7 @@
 
 if ($_SESSION['userlevel'] < 10)
 {
-  echo("<span class='alert'>You are not permitted to perform this function</span>");
+  include("includes/error-no-perm.inc.php");
   exit;
 }
 
