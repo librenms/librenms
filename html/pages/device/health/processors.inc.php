@@ -11,14 +11,14 @@ while ($proc = mysql_fetch_array($procs))
 {
   $proc_url   = "device/".$device['device_id']."/health/processors/";
 
-  $mini_url = "graph.php?id=".$proc['processor_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+  $mini_url = "graph.php?id=".$proc['processor_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
   $text_descr = $proc['processor_descr'];
 
   $text_descr = rewrite_entity_descr($text_descr);
 
   $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-  $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
+  $proc_popup .= "</div><img src=\'graph.php?id=" . $proc['processor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
   $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
   $perc = round($proc['processor_usage']);

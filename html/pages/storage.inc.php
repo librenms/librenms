@@ -60,10 +60,10 @@ while ($drive = mysql_fetch_array($query))
   $free = formatStorage($drive['storage_free']);
   $used = formatStorage($drive['storage_used']);
 
-  $store_url    = "graph.php?id=" . $drive['storage_id'] . "&type=storage&from=$month&to=$now&width=400&height=125";
+  $store_url    = "graph.php?id=" . $drive['storage_id'] . "&amp;type=storage&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125";
   $store_popup = "onmouseover=\"return overlib('<img src=\'$store_url\'>', LEFT);\" onmouseout=\"return nd();\"";
 
-  $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&type=storage&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+  $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&amp;type=storage&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
   if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
   elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }

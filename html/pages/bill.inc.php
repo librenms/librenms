@@ -131,7 +131,7 @@ if (bill_permitted($bill_id))
 
     echo("<p>".print_percentage_bar (350, 20, $perc, NULL, "ffffff", $left_background, $percent . "%", "ffffff", $right_background)."</p>");
 
-    $type="&ave=yes";
+    $type="&amp;ave=yes";
   }
   elseif ($bill_data['bill_type'] == "cdr")
   {
@@ -147,7 +147,7 @@ if (bill_permitted($bill_id))
 
     $percent = round(($rate_95th) / $cdr * 100, 2);
 
-    $type="&95th=yes";
+    $type="&amp;95th=yes";
 
     echo("<strong>" . $fromtext . " to " . $totext . "</strong>
     <br />Measured ".$rate_95th."$unit of ".$cdr."$unit (".$percent."%)");
@@ -173,35 +173,35 @@ if (bill_permitted($bill_id))
 
 #  echo("</td><td><img src='images/billing-key.png'></td></tr></table>");
 
-#  $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-#  $bi = $bi . "&from=" . $unixfrom .  "&to=" . $unixto;
-#  $bi = $bi . "&x=715&y=250";
+#  $bi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+#  $bi = $bi . "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
+#  $bi = $bi . "&amp;x=715&amp;y=250";
 #  $bi = $bi . "$type'>";
 
-  $bi = "<img src='graph.php?type=bill_bits&id=" . $bill_id;
-  $bi .= "&from=" . $unixfrom .  "&to=" . $unixto;
-  $bi .= "&width=715&height=200&total=1'>";
+  $bi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+  $bi .= "&amp;from=" . $unixfrom .  "&amp;to=" . $unixto;
+  $bi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
   $lastmonth = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH))"), 0);
   $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
   $rightnow = date(U);
 
-#  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-#  $di = $di . "&from=" . $yesterday .  "&to=" . $rightnow . "&x=715&y=250";
+#  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+#  $di = $di . "&amp;from=" . $yesterday .  "&amp;to=" . $rightnow . "&amp;x=715&amp;y=250";
 #  $di = $di . "$type'>";
 
-  $di = "<img src='graph.php?type=bill_bits&id=" . $bill_id;
-  $di .= "&from=" . $config['day'] .  "&to=" . $config['now'];
-  $di .= "&width=715&height=200&total=1'>";
+  $di = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+  $di .= "&amp;from=" . $config['day'] .  "&amp;to=" . $config['now'];
+  $di .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
 
-#  $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-#  $mi = $mi . "&from=" . $lastmonth .  "&to=" . $rightnow . "&x=715&y=250";
+#  $mi =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+#  $mi = $mi . "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow . "&amp;x=715&amp;y=250";
 #  $mi = $mi . "$type'>";
 
-  $mi = "<img src='graph.php?type=bill_bits&id=" . $bill_id;
-  $mi .= "&from=" . $lastmonth .  "&to=" . $rightnow;
-  $mi .= "&width=715&height=200&total=1'>";
+  $mi = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+  $mi .= "&amp;from=" . $lastmonth .  "&amp;to=" . $rightnow;
+  $mi .= "&amp;width=715&amp;height=200&amp;total=1'>";
 
 
   if ($null)
@@ -231,25 +231,25 @@ if (bill_permitted($bill_id))
 
   if ($_GET['all'])
   {
-    $ai = "<img src=\"billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-    $ai .= "&from=0&to=" . $rightnow;
-    $ai .= "&x=715&y=250";
-    $ai .= "&count=60\">";
+    $ai = "<img src=\"billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $ai .= "&amp;from=0&amp;to=" . $rightnow;
+    $ai .= "&amp;x=715&amp;y=250";
+    $ai .= "&amp;count=60\">";
     echo("<h3>Entire Data View</h3>$ai");
    }
    elseif ($_GET['custom'])
    {
-    $cg = "<img src=\"billing-graph.php?bill_id=" . $bill_id . "&bill_code=" . $_GET['bill_code'];
-    $cg .= "&from=" . $_GET['fromdate'] . "000000&to=" . $_GET['todate'] . "235959";
-    $cg .= "&x=715&y=250";
-    $cg .= "&count=60\">";
+    $cg = "<img src=\"billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
+    $cg .= "&amp;from=" . $_GET['fromdate'] . "000000&amp;to=" . $_GET['todate'] . "235959";
+    $cg .= "&amp;x=715&amp;y=250";
+    $cg .= "&amp;count=60\">";
     echo("<h3>Custom Graph</h3>$cg");
    }
    else
    {
      echo("<h3>Billing View</h3>$bi<h3>24 Hour View</h3>$di");
      echo("<h3>Monthly View</h3>$mi");
-#     echo("<br /><a href=\"rate.php?" . $_SERVER['QUERY_STRING'] . "&all=yes\">Graph All Data (SLOW)</a>");
+#     echo("<br /><a href=\"rate.php?" . $_SERVER['QUERY_STRING'] . "&amp;all=yes\">Graph All Data (SLOW)</a>");
    }
   } # End if details
 }

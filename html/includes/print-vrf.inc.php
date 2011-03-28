@@ -19,9 +19,9 @@ while ($port = mysql_fetch_array($ports_query)) {
     <a href='device/".$device['device_id']."/interface/".$port['interface_id']."/' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$port['ifDescr']."</div>\
     ".$port['ifAlias']." \
-    <img src=\'graph.php?type=$graph_type&if=".$port['interface_id']."&from=-2day&to=".$now."&width=450&height=150\'>\
+    <img src=\'graph.php?type=$graph_type&amp;if=".$port['interface_id']."&amp;from=-2day&amp;to=".$now."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=$graph_type&if=".$port['interface_id']."&from=-2day&to=".$now."&width=132&height=40&legend=no'>
+    "<img src='graph.php?type=$graph_type&amp;if=".$port['interface_id']."&amp;from=-2day&amp;to=".$now."&amp;width=132&amp;height=40&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($port['ifAlias']), 22, '')."</div>
    </div>");

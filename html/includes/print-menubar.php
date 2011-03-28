@@ -122,7 +122,7 @@ if ($config['show_locations'])
     {
       if ($row['location'] != '')
       {
-        echo('        <li><a href="?page=devices&location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>');
+        echo('        <li><a href="?page=devices&amp;location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>');
       }
     }
 ?>

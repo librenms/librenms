@@ -20,10 +20,10 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
     $mempool_url   = $config['base_url'] . "/graphs/".$mempool['mempool_id']."/mempool_usage/";
-    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_url = $config['base_url'] . "/graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
+    $mempool_popup .= "</div><img src=\'graph.php?id=" . $mempool['mempool_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
     $mempool_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
     $total = formatStorage($mempool['mempool_total']);

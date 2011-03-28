@@ -44,9 +44,9 @@ if ($_GET['optc'] == thumbs)
     <a href='device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$interface['ifDescr']."</div>\
     ".$interface['ifAlias']." \
-    <img src=\'graph.php?type=$graph_type&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=450&height=150\'>\
+    <img src=\'graph.php?type=$graph_type&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=450&amp;height=150\'>\
     ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >".
-    "<img src='graph.php?type=$graph_type&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=180&height=45&legend=no'>
+    "<img src='graph.php?type=$graph_type&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=180&amp;height=45&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>".truncate(short_port_descr($interface['ifAlias']), 32, '')."</div>
     </div>");

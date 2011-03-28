@@ -13,7 +13,7 @@ while ($hrdevice = mysql_fetch_array($hrdevices))
     $proc_id = mysql_result(mysql_query("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'"),0);
     $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
-    $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&type=processor_usage&from=$month&to=$now&width=400&height=125\'>";
+    $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&amp;type=processor_usage&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
     echo("<td><a href='$proc_url' $proc_popup>".$hrdevice['hrDeviceDescr']."</a></td>");
 

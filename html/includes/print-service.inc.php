@@ -23,10 +23,10 @@ if ($service['service_checked'])
   $checked = formatUptime($checked);
 } else { $checked = "Never"; }
 
-$mini_url = $config['base_url'] . "/graph.php?id=".$service['service_id']."&type=service_availability&from=".$day."&to=".$now."&width=80&height=20&bg=efefef";
+$mini_url = $config['base_url'] . "/graph.php?id=".$service['service_id']."&amp;type=service_availability&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=efefef";
 
 $popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$service['service_type'];
-$popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $service['service_id'] . "&type=service_availability&from=$day&to=$now&width=400&height=125\'>";
+$popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $service['service_id'] . "&amp;type=service_availability&amp;from=$day&amp;to=$now&amp;width=400&amp;height=125\'>";
 $popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
 echo("

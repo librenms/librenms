@@ -63,10 +63,10 @@ while ($customer = mysql_fetch_array($cust_query))
   }
 
   echo("<tr bgcolor='$bg_colour'><td></td><td colspan=6>
-       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$day&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$week&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$month&to=$now&width=215&height=100'>
-       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&type=customer_bits&from=$year&to=$now&width=215&height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$day&amp;to=$now&amp;width=215&amp;height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$week&amp;to=$now&amp;width=215&amp;height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$month&amp;to=$now&amp;width=215&amp;height=100'>
+       <img src='".$config['base_url']."/graph.php?id=".rawurlencode($customer['port_descr_descr'])."&amp;type=customer_bits&amp;from=$year&amp;to=$now&amp;width=215&amp;height=100'>
        </td></tr>");
 }
 

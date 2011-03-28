@@ -12,8 +12,8 @@ if ($_GET['location'] == "Unset") { $where .= " AND location = ''"; }
 
 print_optionbar_start(62);
 ?>
-<table cellpadding="4" cellspacing="0" class="devicetable" width="100%">
-  <form method="post" action="">
+<form method="post" action="">
+  <table cellpadding="4" cellspacing="0" class="devicetable" width="100%">
     <tr>
       <td width="30" align="center" valign="middle"></td>
       <td width="300"><span style="font-weight: bold; font-size: 14px;"></span>
@@ -112,8 +112,8 @@ print_optionbar_start(62);
       </td>
       <td width="10"></td>
     </tr>
-  </form>
-</table>
+  </table>
+</form>
 
 <?php
 print_optionbar_end();

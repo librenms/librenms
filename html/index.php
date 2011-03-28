@@ -64,7 +64,7 @@ if ($config['page_refresh']) { echo("<meta http-equiv='refresh' content='".$conf
   <link rel="shortcut icon" href="<?php echo($config['favicon']);  ?>" />
   <link rel="stylesheet" href="css/mktree.css" type="text/css" />
 </head>
-<body topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0">
+<body>
   <script type="text/javascript" src="js/mktree.js"></script>
   <script type="text/javascript" src="js/sorttable.js"></script>
   <script type="text/javascript">

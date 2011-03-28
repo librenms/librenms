@@ -17,7 +17,7 @@ function printEntPhysical($ent, $level, $class)
     if ($ent['entPhysicalClass'] == "sensor")
     {
       echo("<img src='images/16/contrast.png' style='vertical-align:middle'/> ");
-      $link = " href='".$config['base_url'] . "/device/".$device['device_id']."/ciscosensors/".$ent['entSensorType']."/' onmouseover=\"return overlib('<img src=\'graph.php?host=49&type=cisco_entity_sensor&from=-2d&to=now&width=400&height=150&a=".$ent['entPhysical_id']."\'><img src=\'graph.php?host=49&type=cisco_entity_sensor&from=-2w&to=now&width=400&height=150&a=".$ent['entPhysical_id']."\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"";
+      $link = " href='".$config['base_url'] . "/device/".$device['device_id']."/ciscosensors/".$ent['entSensorType']."/' onmouseover=\"return overlib('<img src=\'graph.php?host=49&amp;type=cisco_entity_sensor&amp;from=-2d&amp;to=now&amp;width=400&amp;height=150&amp;a=".$ent['entPhysical_id']."\'><img src=\'graph.php?host=49&amp;type=cisco_entity_sensor&amp;from=-2w&amp;to=now&amp;width=400&amp;height=150&amp;a=".$ent['entPhysical_id']."\'>', LEFT,FGCOLOR,'#e5e5e5', BGCOLOR, '#c0c0c0', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#050505');\" onmouseout=\"return nd();\"";
     } else { unset ($link); }
 
     if ($ent['entPhysicalClass'] == "backplane") { echo("<img src='images/16/brick.png' style='vertical-align:middle'/> "); }

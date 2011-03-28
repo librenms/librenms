@@ -19,7 +19,7 @@ if (mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` =
       $descr_oid = ".1.3.6.1.4.1.9.9.13.1.3.1.2.$index";
       $descr = snmp_get($device, $descr_oid, "-Oqv", "CISCO-ENVMON-MIB");
       $temperature = snmp_get($device, $oid, "-Oqv", "CISCO-ENVMON-MIB");
-      if (!strstr($descr, "No") && !strstr($temperature, "No") && $descr != "" )
+      if (!strstr($descr, "No") && !strstr($temperature, "No") && $descr != "")
       {
         $descr = str_replace("\"", "", $descr);
         $descr = str_replace("temperature", "", $descr);
