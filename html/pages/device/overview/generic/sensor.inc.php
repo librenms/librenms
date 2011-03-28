@@ -15,11 +15,11 @@ if (mysql_num_rows($results))
 
     $graph_colour = str_replace("#", "", $row_colour);
 
-    $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=300&height=100";
-    $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=300&height=100";
-    $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=300&height=100";
-    $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=300&height=100";
-    $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=80&height=20&bg=$graph_colour' align='absmiddle'>";
+    $sensor_day    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=300&amp;height=100";
+    $sensor_week   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=300&amp;height=100";
+    $sensor_month  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=300&amp;height=100";
+    $sensor_year   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=300&amp;height=100";
+    $sensor_minigraph = "<img src='graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=80&amp;height=20&amp;bg=$graph_colour' align='absmiddle'>";
 
     $sensor_link  = "<a href='graphs/".$sensor['sensor_id']."/" . $graph_type . "/' onmouseover=\"return ";
     $sensor_link .= "overlib('<div class=list-large>".$device['hostname']." - ".$sensor['sensor_descr'];

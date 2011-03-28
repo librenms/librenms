@@ -45,7 +45,7 @@ if ($_GET['optd'] == "top10")
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
                     "/macaccounting/$stat/top10/1day/$sort/'>
              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&stat=$stat&type=port_mac_acc_total&sort=$sort&from=-1day&to=now&width=150&height=50' />
+                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=-1day&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
@@ -53,42 +53,42 @@ if ($_GET['optd'] == "top10")
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
                     "/macaccounting/$stat/top10/2day/$sort/'>
              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&stat=$stat&type=port_mac_acc_total&sort=$sort&from=-2day&to=now&width=150&height=50' />
+                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=-2day&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Week</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1week/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&type=port_mac_acc_total&sort=$sort&stat=$stat&from=-1week&to=now&width=150&height=50' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1week&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Month</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1month/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&type=port_mac_acc_total&sort=$sort&stat=$stat&from=-1month&to=now&width=150&height=50' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1month&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
             <div style='margin: 0px 10px 5px 0px; padding:5px; background: #e5e5e5;'>
             <span class=device-head>Year</span><br />
             <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/$stat/top10/1year/$sort/'>
-            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&type=port_mac_acc_total&sort=$sort&stat=$stat&from=-1year&to=now&width=150&height=50' />
+            <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=-1year&amp;to=now&amp;width=150&amp;height=50' />
             </a>
             </div>
        </div>
        <div style='float: left;'>
-         <img src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&type=port_mac_acc_total&sort=$sort&stat=$stat&from=$from&to=now&width=745&height=300' />
+         <img src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;type=port_mac_acc_total&amp;sort=$sort&amp;stat=$stat&amp;from=$from&amp;to=now&amp;width=745&amp;height=300' />
        </div>
        <div style=' margin:0px; float: left;';>
             <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Traffic</span><br />
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/bits/top10/$period/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&stat=bits&type=port_mac_acc_total&sort=$sort&from=$from&to=now&width=150&height=50' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;stat=bits&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
            <span class=device-head>Packets</span><br />
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id']."/macaccounting/pkts/top10/$period/$sort/'>
-             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&stat=pkts&type=port_mac_acc_total&sort=$sort&from=$from&to=now&width=150&height=50' />
+             <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id']."&amp;stat=pkts&amp;type=port_mac_acc_total&amp;sort=$sort&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
@@ -96,7 +96,7 @@ if ($_GET['optd'] == "top10")
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
                     "/macaccounting/$stat/top10/$period/in/'>
              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&stat=$stat&type=port_mac_acc_total&sort=in&from=$from&to=now&width=150&height=50' />
+                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=in&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
@@ -104,7 +104,7 @@ if ($_GET['optd'] == "top10")
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
                     "/macaccounting/$stat/top10/$period/out/'>
              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&stat=$stat&type=port_mac_acc_total&sort=out&from=$from&to=now&width=150&height=50' />
+                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=out&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
            <div style='margin: 0px 0px 5px 10px; padding:5px; background: #e5e5e5;'>
@@ -112,7 +112,7 @@ if ($_GET['optd'] == "top10")
            <a href='".$config['base_url']."/device/" . $device['device_id'] . "/interface/".$interface['interface_id'].
                     "/macaccounting/$stat/top10/$period/both/'>
              <img style='border: #5e5e5e 2px;' valign=middle src='".$config['base_url']."/graph.php?id=".$interface['interface_id'].
-                    "&stat=$stat&type=port_mac_acc_total&sort=both&from=$from&to=now&width=150&height=50' />
+                    "&amp;stat=$stat&amp;type=port_mac_acc_total&amp;sort=both&amp;from=$from&amp;to=now&amp;width=150&amp;height=50' />
            </a>
            </div>
        </div>
@@ -165,9 +165,9 @@ if ($_GET['optd'] == "top10")
       ".$addy['ipv4_address']." - ".$asn."
           <a href='#' onmouseover=\"return overlib('\
      <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>".$name." - ".$addy['ipv4_address']." - ".$asn."</div>\
-     <img src=\'graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=450&height=150\'>\
+     <img src=\'graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=$now&amp;width=450&amp;height=150\'>\
      ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
-          <img src='graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=-2day&to=$now&width=213&height=45'></a>
+          <img src='graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=-2day&amp;to=$now&amp;width=213&amp;height=45'></a>
 
           <span style='font-size: 10px;'>".$name."</span>
          </div>");
@@ -191,14 +191,14 @@ if ($_GET['optd'] == "top10")
 
      $peer_info['astext'];
 
-     $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
-     $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
-     $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100";
-     $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
-     $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100";
-     $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
-     $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100";
-     $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
+     $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100";
+     $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
+     $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
+     $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
+     $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
+     $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
+     $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
+     $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
 
      echo("<a href='device/" . $acc['device_id'] . "/interface/" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
          <img src='$daily_traffic' border=0></a> ");

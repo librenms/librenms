@@ -109,17 +109,17 @@ while ($peer = mysql_fetch_assoc($peer_query))
   {
     foreach (explode(" ", $_GET['opta']) as $graph_type)
     {
-      if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&afi=$afi&safi=$safi"; }
+      if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&amp;afi=$afi&amp;safi=$safi"; }
       if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi])
       {
-        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=210&height=100$afisafi";
-        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$day&to=$now&width=500&height=150$afisafi";
-        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$week&to=$now&width=210&height=100$afisafi";
-        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$week&to=$now&width=500&height=150$afisafi";
-        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$month&to=$now&width=210&height=100$afisafi";
-        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$month&to=$now&width=500&height=150$afisafi";
-        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$year&to=$now&width=210&height=100$afisafi";
-        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&type=bgp_$graph_type&from=$year&to=$now&width=500&height=150$afisafi";
+        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100$afisafi";
+        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150$afisafi";
+        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100$afisafi";
+        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150$afisafi";
+        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100$afisafi";
+        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150$afisafi";
+        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100$afisafi";
+        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150$afisafi";
         echo("<tr bgcolor=$bg_colour><td colspan=7>");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$daily_traffic' border=0></a> ");
         echo("<a href='' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$weekly_traffic' border=0></a> ");
@@ -137,22 +137,22 @@ while ($peer = mysql_fetch_assoc($peer_query))
     $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
     if (is_file($database))
     {
-      $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=210&height=100";
-      $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$day&to=$now&width=500&height=150";
-      $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=210&height=100";
-      $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$week&to=$now&width=500&height=150";
-      $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=210&height=100";
-      $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$month&to=$now&width=500&height=150";
-      $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=210&height=100";
-      $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&type=$graph_type&from=$year&to=$now&width=500&height=150";
+      $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100";
+      $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
+      $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
+      $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
+      $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
+      $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
+      $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
+      $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
       echo("<tr bgcolor=$bg_colour><td colspan=7>");
-      echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
+      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$daily_traffic' border=0></a> ");
-      echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
+      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
         <img src='$weekly_traffic' border=0></a> ");
-      echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
+      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
         <img src='$monthly_traffic' border=0></a> ");
-      echo("<a href='?page=interface&id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
+      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
         <img src='$yearly_traffic' border=0></a>");
       echo("</td></tr>");
     }

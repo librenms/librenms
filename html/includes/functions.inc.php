@@ -210,7 +210,7 @@ function generate_graph_tag ($args)
   foreach ($args as $key => $arg)
   {
     $url .= $sep.$key."=".$arg;
-    $sep="&";
+    $sep="&amp;";
   }
   return "<img src=\"".$url."\" border=0>";
 }
@@ -271,7 +271,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 function generate_port_thumbnail($args)
 {
     if (!$args['bg']) { $args['bg'] = "FFFFF"; }
-    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&id=".$args['interface_id']."&from=".$args['from']."&to=".$args['to']."&width=".$args['width']."&height=".$args['height']."&legend=no&bg=".$args['bg']."'>";
+    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;legend=no&amp;bg=".$args['bg']."'>";
     echo generate_port_link($args, $args['content']);
 }
 

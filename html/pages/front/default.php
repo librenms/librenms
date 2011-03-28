@@ -40,7 +40,7 @@ while ($interface = mysql_fetch_array($sql))
    $interface = ifNameDescr($interface);
    generate_front_box("#ffdd99", "<center><strong>".generate_device_link($interface, shorthost($interface['hostname']))."</strong><br />
       <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #c00;'>Port Down</span><br />
-<!--      <img src='graph.php?type=bits&if=".$interface['interface_id']."&from=$day&to=$now&width=100&height=32' /> -->
+<!--      <img src='graph.php?type=bits&amp;if=".$interface['interface_id']."&amp;from=$day&amp;to=$now&amp;width=100&amp;height=32' /> -->
       <strong>".generate_port_link($interface, truncate(makeshortif($interface['label']),13,''))."</strong> <br />
       " . ($interface['ifAlias'] ? '<span class="body-date-1">'.truncate($interface['ifAlias'], 20, '').'</span>' : '') . "
       </center>");

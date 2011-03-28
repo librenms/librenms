@@ -31,7 +31,7 @@ while ($drive = mysql_fetch_array($query))
   $fs_url   = "device/".$device['device_id']."/health/storage/";
 
   $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
-  $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
+  $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
   $fs_popup .= "', RIGHT, FGCOLOR, '#e5e5e5');\" onmouseout=\"return nd();\"";
 
   if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }

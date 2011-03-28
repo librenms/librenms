@@ -49,10 +49,10 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
     $fs_url   = $config['base_url'] . "/graphs/".$drive['storage_id']."/storage_usage/";
 
     $fs_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$drive['storage_descr'];
-    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=125\'>";
+    $fs_popup .= "</div><img src=\'graph.php?id=" . $drive['storage_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
     $fs_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
 
-    $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&type=".$graph_type."&from=".$day."&to=".$now."&width=80&height=20&bg=f4f4f4";
+    $mini_graph = $config['base_url'] . "/graph.php?id=".$drive['storage_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
     if ($perc > '90') { $left_background='c4323f'; $right_background='C96A73'; }
     elseif ($perc > '75') { $left_background='bf5d5b'; $right_background='d39392'; }

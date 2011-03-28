@@ -24,10 +24,9 @@
              <br />' . $device['sysName'] . '</td>
 	     <td width=55>');
 
-    if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle> '.$port_count); }
+    if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
     echo('<br />');
-    if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle> '.$sensor_count); }
-
+    if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
 
     echo('   </td>
              <td width="200">' . $device['os_text'] . '<br />

@@ -64,17 +64,17 @@ while ($sensor = mysql_fetch_array($query))
   {
     echo("<tr bgcolor='$row_colour'><td colspan=7>");
 
-    $daily_graph   = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=211&height=100";
-    $daily_url       = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$day&to=$now&width=400&height=150";
+    $daily_graph   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=211&amp;height=100";
+    $daily_url     = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$day&amp;to=$now&amp;width=400&amp;height=150";
 
-    $weekly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=211&height=100";
-    $weekly_url      = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$week&to=$now&width=400&height=150";
+    $weekly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=211&amp;height=100";
+    $weekly_url    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$week&amp;to=$now&amp;width=400&amp;height=150";
 
-    $monthly_graph = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=211&height=100";
-    $monthly_url     = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$month&to=$now&width=400&height=150";
+    $monthly_graph = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=211&amp;height=100";
+    $monthly_url   = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$month&amp;to=$now&amp;width=400&amp;height=150";
 
-    $yearly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=211&height=100";
-    $yearly_url  = "graph.php?id=" . $sensor['sensor_id'] . "&type=".$graph_type."&from=$year&to=$now&width=400&height=150";
+    $yearly_graph  = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=211&amp;height=100";
+    $yearly_url    = "graph.php?id=" . $sensor['sensor_id'] . "&amp;type=".$graph_type."&amp;from=$year&amp;to=$now&amp;width=400&amp;height=150";
 
     echo("<a onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT);\" onmouseout=\"return nd();\">
         <img src='$daily_graph' border=0></a> ");

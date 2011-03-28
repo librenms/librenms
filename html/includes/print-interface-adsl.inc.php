@@ -35,12 +35,12 @@
   if ($port_details) {
     $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
     while ($ip = mysql_fetch_Array($ipdata)) {
-      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
+      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
       $break = ",";
     }
     $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
     while ($ip6 = mysql_fetch_Array($ip6data)) {
-      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
+      echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
       $break = ",";
     }
   }
@@ -53,7 +53,7 @@
   echo(formatRates($interface['ifInOctets_rate'] * 8)." <img class='optionicon' src='images/icons/arrow_updown.png' /> ".formatRates($interface['ifOutOctets_rate'] * 8));
   echo("<br />");
   $interface['graph_type'] = "port_bits";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
 
@@ -61,35 +61,35 @@
   echo("".formatRates($interface['adslAturChanCurrTxRate']) . "/". formatRates($interface['adslAtucChanCurrTxRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_speed";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".formatRates($interface['adslAturCurrAttainableRate']) . "/". formatRates($interface['adslAtucCurrAttainableRate']));
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attainable";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrAtn'] . "dB/". $interface['adslAtucCurrAtn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_attenuation";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrSnrMgn'] . "dB/". $interface['adslAtucCurrSnrMgn'] . "dB");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_snr";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
   echo("</td><td width=135>");
   echo("".$interface['adslAturCurrOutputPwr'] . "dBm/". $interface['adslAtucCurrOutputPwr'] . "dBm");
   echo("<br />");
   $interface['graph_type'] = "port_adsl_power";
-  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&id=".$interface['interface_id']."&from=".$from."&to=".$now."&width=".$width."&height=".$height."&legend=no&bg=".
+  echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
   str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
 
@@ -122,17 +122,17 @@ echo("</td>");
 
           $type = $graph_type;
 
-          $daily_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$from&to=$now&width=210&height=100";
-          $daily_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$from&to=$now&width=500&height=150";
+          $daily_traffic = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$from&amp;to=$now&amp;width=210&amp;height=100";
+          $daily_url = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$from&amp;to=$now&amp;width=500&amp;height=150";
 
-          $weekly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
-          $weekly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
+          $weekly_traffic = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
+          $weekly_url = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
 
-          $monthly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
-          $monthly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
+          $monthly_traffic = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
+          $monthly_url = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
 
-          $yearly_traffic = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
-          $yearly_url = "graph.php?port=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
+          $yearly_traffic = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
+          $yearly_url = "graph.php?port=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 

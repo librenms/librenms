@@ -42,12 +42,12 @@ if ($port_details)
 {
   $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
   while ($ip = mysql_fetch_Array($ipdata)) {
-    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
+    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
     $break = "<br />";
   }
   $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
   while ($ip6 = mysql_fetch_Array($ip6data)) {
-    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
+    echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
     $break = "<br />";
   }
 }
@@ -59,11 +59,11 @@ echo("</td><td width=100>");
 if ($port_details)
 {
   $interface['graph_type'] = "port_bits";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_bits&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
   $interface['graph_type'] = "port_upkts";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_upkts&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
   $interface['graph_type'] = "port_errors";
-  echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&id=".$interface['interface_id']."&from=".$day."&to=".$now."&width=100&height=20&legend=no&bg=".str_replace("#","", $row_colour)."'>"));
+  echo(generate_port_link($interface, "<img src='graph.php?type=port_errors&amp;id=".$interface['interface_id']."&amp;from=".$day."&amp;to=".$now."&amp;width=100&amp;height=20&amp;legend=no&amp;bg=".str_replace("#","", $row_colour)."'>"));
 }
 
 echo("</td><td width=120>");
@@ -245,17 +245,17 @@ if ($graph_type && is_file($graph_file))
 {
   $type = $graph_type;
 
-  $daily_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=210&height=100";
-  $daily_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$day&to=$now&width=500&height=150";
+  $daily_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100";
+  $daily_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
 
-  $weekly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=210&height=100";
-  $weekly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$week&to=$now&width=500&height=150";
+  $weekly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
+  $weekly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
 
-  $monthly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=210&height=100";
-  $monthly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$month&to=$now&width=500&height=150";
+  $monthly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
+  $monthly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
 
-  $yearly_traffic = "graph.php?id=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=210&height=100";
-  $yearly_url = "graph.php?id=$if_id&type=" . $graph_type . "&from=$year&to=$now&width=500&height=150";
+  $yearly_traffic = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
+  $yearly_url = "graph.php?id=$if_id&amp;type=" . $graph_type . "&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
 
   echo("<tr style='background-color: $bg; padding: 5px;'><td colspan=7>");
 
