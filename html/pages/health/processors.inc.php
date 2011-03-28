@@ -41,7 +41,7 @@ while ($proc = mysql_fetch_array($procs))
                <td class=\"tablehead\"><a href='".$proc_url."' $proc_popup>" . $text_descr . "</a></td>
                <td width=\"90\"><a href=\"".$proc_url."\"  $proc_popup><img src=\"$mini_url\" /></a></td>
                <td width=\"200\"><a href=\"".$proc_url."\" $proc_popup>
-           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background);
+           ".print_percentage_bar (400, 20, $perc, $perc."%", "ffffff", $left_background, (100 - $perc)."%" , "ffffff", $right_background));
     echo('</a></td>
              </tr>');
 
