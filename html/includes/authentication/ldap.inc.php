@@ -80,4 +80,10 @@ function get_userid($username)
   return $row['user_id'];
 }
 
+function deluser($username)
+{
+  # Not supported
+  return 0;
+}
+
 ?>

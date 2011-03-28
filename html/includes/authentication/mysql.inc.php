@@ -95,4 +95,10 @@ function get_userid($username)
   return $row['user_id'];
 }
 
+function deluser($username)
+{
+  mysql_query("DELETE FROM `users` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
+  return mysql_affected_rows();
+}
+
 ?>
