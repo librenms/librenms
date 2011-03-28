@@ -1,14 +1,13 @@
 <?php
 
-echo("<div style='margin: 10px;'>");
+echo('<div style="margin: 10px;">');
 
-if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php"); } else
+if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); } else
 {
   echo("<h3>Delete User</h3>");
 
   if (auth_usermanagement())
   {
-
     if ($_GET['action'] == "del")
     {
       $delete_username = mysql_result(mysql_query("SELECT username FROM users WHERE user_id = '" . mres($_GET['user_id']) . "'"),0);
@@ -16,11 +15,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
       if ($_GET['confirm'] == "yes")
       {
         mysql_query("DELETE FROM `devices_perms` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
-        # FIXME v sql query should be replaced by authmodule
-        mysql_query("DELETE FROM `users` WHERE `user_id` = '" . mres($_GET['user_id']) . "'");
-
-        if (mysql_affected_rows()) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
-
+        if (deluser($_GET['user_id'])) { echo("<span class=info>User '$delete_username' deleted!</span>"); }
       }
       else
       {
@@ -30,7 +25,6 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
 
     # FIXME v mysql query should be replaced by authmodule
     $userlist = mysql_query("SELECT * FROM `users`");
-
     while ($userentry = mysql_fetch_array($userlist))
     {
       $i++;
@@ -40,7 +34,7 @@ if ($_SESSION['userlevel'] != '10') { include("includes/error-no-perm.inc.php");
   }
   else
   {
-    echo("<span class=red>Auth module does not allow user management!</span><br />");
+    print_error("Authentication module does not allow user management!");
   }
 }
 

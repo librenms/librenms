@@ -2,7 +2,7 @@
 
 echo("<div style='margin: 10px;'>");
 
-if ($_SESSION['userlevel'] != '10')
+if ($_SESSION['userlevel'] < '10')
 {
   include("includes/error-no-perm.inc.php");
 }
