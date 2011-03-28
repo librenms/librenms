@@ -3,7 +3,6 @@
 if ($ports['total'])
 {
   echo('<div style="background-color: #eeeeee; margin: 5px; padding: 5px;">');
-  #      ' . device_traffic_image($device['device_id'], 490, 100, $day, '-300s'));
 
   $graph_array['height'] = "100";
   $graph_array['width']  = "490";

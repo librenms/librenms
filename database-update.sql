@@ -29,3 +29,4 @@ ALTER TABLE `vrfs` MODIFY  `mplsVpnVrfRouteDistinguisher` VARCHAR(128);
 ALTER TABLE `vrfs` MODIFY  `vrf_name` VARCHAR(128);
 ALTER TABLE `ports` MODIFY  `ifDescr` VARCHAR(255);
 CREATE TABLE IF NOT EXISTS `vmware_vminfo` (`id` int(11) NOT NULL AUTO_INCREMENT, `device_id` int(11) NOT NULL, `vmwVmVMID` int(11) NOT NULL, `vmwVmDisplayName` varchar(128) NOT NULL, `vmwVmGuestOS` varchar(128) NOT NULL, `vmwVmMemSize` int(11) NOT NULL, `vmwVmCpus` int(11) NOT NULL, `vmwVmState` varchar(128) NOT NULL, PRIMARY KEY  (`id`), KEY `device_id` (`device_id`), KEY `vmwVmVMID` (`vmwVmVMID`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+ALTER TABLE `ports` MODIFY  `port_descr_type` VARCHAR(255);

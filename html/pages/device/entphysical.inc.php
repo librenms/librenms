@@ -4,7 +4,7 @@ function printEntPhysical($ent, $level, $class)
 {
   global $device;
 
-  $query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$_GET['id']."' AND entPhysicalContainedIn = '".$ent."' ORDER BY entPhysicalContainedIn,entPhysicalIndex");
+  $query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent."' ORDER BY entPhysicalContainedIn,entPhysicalIndex");
   while ($ent = mysql_fetch_array($query))
   {
     echo("
@@ -58,7 +58,7 @@ function printEntPhysical($ent, $level, $class)
 
     echo("</div>");
 
-    $count = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$_GET['id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'"),0);
+    $count = mysql_result(mysql_query("SELECT COUNT(*) FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent['entPhysicalIndex']."'"),0);
     if ($count)
     {
       echo("<ul>");

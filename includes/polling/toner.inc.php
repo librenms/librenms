@@ -9,10 +9,7 @@ if ($config['enable_printers'])
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 
-    # FIXME needs snmp_get
-    $toner_cmd = $config['snmpget'] . " -M ".$config['mibdir'] . " -O Uqnv -" . $device['snmpver'] . " -c " . $device['community'] . " " . $device['hostname'].":".$device['port'] . " " . $toner['toner_oid'] . "|grep -v \"No Such Instance\"";
-    $tonerperc = trim(str_replace("\"", "", shell_exec($toner_cmd)));
-    $tonerperc = $tonerperc / $toner['toner_capacity'] * 100;
+    $tonerperc = snmp_get($device, $toner['toner_oid'], "-OUqnv") / $toner['toner_capacity'] * 100;
 
     $tonerrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("toner-" . $toner['toner_descr'] . ".rrd");
 

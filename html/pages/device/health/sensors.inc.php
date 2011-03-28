@@ -1,6 +1,6 @@
 <?php
 
-$sql = "SELECT * FROM `sensors` WHERE sensor_class='".$class."' AND device_id = '" . mres($_GET['id']) . "' ORDER BY sensor_descr";
+$sql = "SELECT * FROM `sensors` WHERE sensor_class='".$class."' AND device_id = '" . $device['device_id'] . "' ORDER BY sensor_descr";
 $query = mysql_query($sql);
 
 echo("<table cellspacing=0 cellpadding=5 width=100%>");

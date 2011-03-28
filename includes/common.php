@@ -182,4 +182,15 @@ function safename($name)
   return preg_replace('/[^a-zA-Z0-9,._\-]/', '_', $name);
 }
 
+function zeropad($num, $length = 2)
+{
+  while (strlen($num) < $length)
+  {
+    $num = '0'.$num;
+  }
+
+  return $num;
+}
+
+
 ?>

@@ -7,17 +7,17 @@ print_optionbar_start();
 
 echo("
   <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/'>No Graphs</a> |
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/updates/'>Updates</a>");
+  <a href='/device/" . $device['device_id'] . "/bgp/'>No Graphs</a> |
+  <a href='/device/" . $device['device_id'] . "/bgp/updates/'>Updates</a>");
 
 echo(" | Prefixes:
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/prefixes/ipv6.unicast/'>IPv6</a>
+  <a href='/device/" . $device['device_id'] . "/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
+  <a href='/device/" . $device['device_id'] . "/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
+  <a href='/device/" . $device['device_id'] . "/bgp/prefixes/ipv6.unicast/'>IPv6</a>
   ");
 
 echo("| Traffic:
-  <a href='".$config['base_url']."/device/" . $_GET['id'] . "/bgp/macaccounting/'>Mac Accounting</a>");
+  <a href='/device/" . $device['device_id'] . "/bgp/macaccounting/'>Mac Accounting</a>");
 
 echo("</div>
 ");
