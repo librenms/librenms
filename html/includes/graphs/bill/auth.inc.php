@@ -3,7 +3,6 @@
 ### Authorises bill viewing and sets $ports as reference to mysql query containing ports for this bill
 
 include("../includes/billing.php");
-include("../includes/functions.php"); ## FIXME zeropad()
 
 if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted($_GET['id'])))
 {

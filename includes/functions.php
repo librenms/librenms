@@ -28,16 +28,6 @@ function mac_clean_to_readable($mac)
   return($r);
 }
 
-function zeropad($num, $length = 2)
-{
-  while (strlen($num) < $length)
-  {
-    $num = '0'.$num;
-  }
-
-  return $num;
-}
-
 function only_alphanumeric($string)
 {
   return preg_replace('/[^a-zA-Z0-9]/', '', $string);
@@ -195,12 +185,6 @@ function interface_errors($rrd_file, $period = '-1d') // Returns the last in/out
   $errors['out'] = round($out_errors);
 
   return $errors;
-}
-
-# FIXME: below function is unused, only commented out in html/pages/device/overview/ports.inc.php - do we still need it?
-function device_traffic_image($device, $width, $height, $from, $to)
-{
-  return "<img src='graph.php?device=" . $device . "&amp;type=device_bits&amp;from=" . $from . "&amp;to=" . $to . "&amp;width=" . $width . "&amp;height=" . $height . "&amp;legend=no' />";
 }
 
 function getImage($host)
@@ -679,7 +663,7 @@ function log_event($text, $device = NULL, $type = NULL, $reference = NULL)
 {
   global $debug;
 
-  if (!is_array($device)) {  $device = device_by_id_cache($device); }
+  if (!is_array($device)) { $device = device_by_id_cache($device); }
 
   $event_query = "INSERT INTO eventlog (host, reference, type, datetime, message) VALUES (" . ($device['device_id'] ? $device['device_id'] : "NULL");
   $event_query .= ", '" . ($reference ? $reference : "NULL") . "', '" . ($type ? $type : "NULL") . "', NOW(), '" . mres($text) . "')";

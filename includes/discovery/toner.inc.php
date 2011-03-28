@@ -9,7 +9,8 @@ if ($config['enable_printers'])
   if ($device['os_group'] == 'printer')
   {
     $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.12.1.1.2.1 ", "-OsqnU"));
-    if (!$oids) {
+    if (!$oids)
+    {
       $oids = trim(snmp_walk($device, "SNMPv2-SMI::mib-2.43.11.1.1.2.1 ", "-OsqnU"));
     }
     if ($debug) { echo($oids."\n"); }
@@ -52,7 +53,8 @@ if ($config['enable_printers'])
     {
       $toner_index = $test_toner['toner_index'];
       $toner_type = $test_toner['toner_type'];
-      if (!$valid_toner[$toner_type][$toner_index]) {
+      if (!$valid_toner[$toner_type][$toner_index])
+      {
         echo("-");
         mysql_query("DELETE FROM `toner` WHERE toner_id = '" . $test_toner['toner_id'] . "'");
       }
@@ -60,6 +62,6 @@ if ($config['enable_printers'])
   }
 
   unset($valid_toner); echo("\n");
-
 } # if ($config['enable_printers'])
+
 ?>
