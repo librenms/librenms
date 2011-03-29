@@ -34,7 +34,7 @@ $config['os'][$os]['group']             = "unix";
 $config['os'][$os]['text']              = "QNAP TurboNAS";
 $config['os'][$os]['ifXmcbc']           = 1;
 
-### Othre Unix-based OSes here please.
+### Other Unix-based OSes here please.
 
 $os = "freebsd";
 $config['os'][$os]['type']              = "server";
