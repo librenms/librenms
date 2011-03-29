@@ -1,6 +1,34 @@
 <?php
 
-if ($device['os'] == "freebsd")
+if ($device['os'] == "linux")
+{
+  list(,,$version) = explode (" ", $sysDescr);
+  if (strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
+  else if (strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
+  else if (strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
+  else if (strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
+  else if (strstr($sysDescr, "armv5")) { $hardware = "Generic ARMv5"; }
+  else if (strstr($sysDescr, "armv6")) { $hardware = "Generic ARMv6"; }
+  else if (strstr($sysDescr, "armv7")) { $hardware = "Generic ARMv7"; }
+  else if (strstr($sysDescr, "armv")) { $hardware = "Generic ARM"; }
+
+  # Distro "extend" support
+  $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
+  $features = str_replace("\"", "", $features);
+
+  if (!$features) // No "extend" support, try "exec" support
+    {
+      $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
+      $features = str_replace("\"", "", $features);
+    }
+
+  // Detect Dell hardware via OpenManage SNMP
+  $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
+  $hw = trim(str_replace("\"", "", $hw));
+  if ($hw) { $hardware = "Dell " . $hw; }
+
+}
+elseif ($device['os'] == "freebsd")
 {
   $sysDescr = str_replace(" 0 ", " ", $sysDescr);
   list(,,$version) = explode (" ", $sysDescr);
@@ -33,32 +61,14 @@ elseif ($device['os'] == "monowall" || $device['os'] == "Voswall")
   $hardware = "$hardware ($arch)";
   $hardware = str_replace("\"", "", $hardware);
 }
-elseif ($device['os'] == "linux")
+elseif ($device['os'] == "qnap")
 {
-  list(,,$version) = explode (" ", $sysDescr);
-  if (strstr($sysDescr, "386")|| strstr($sysDescr, "486")||strstr($sysDescr, "586")||strstr($sysDescr, "686")) { $hardware = "Generic x86"; }
-  else if (strstr($sysDescr, "x86_64")) { $hardware = "Generic x86 64-bit"; }
-  else if (strstr($sysDescr, "sparc32")) { $hardware = "Generic SPARC 32-bit"; }
-  else if (strstr($sysDescr, "sparc64")) { $hardware = "Generic SPARC 64-bit"; }
-  else if (strstr($sysDescr, "armv5")) { $hardware = "Generic ARMv5"; }
-  else if (strstr($sysDescr, "armv6")) { $hardware = "Generic ARMv6"; }
-  else if (strstr($sysDescr, "armv7")) { $hardware = "Generic ARMv7"; }
-  else if (strstr($sysDescr, "armv")) { $hardware = "Generic ARM"; }
 
-  # Distro "extend" support
-  $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111", "-Oqv", "UCD-SNMP-MIB");
-  $features = str_replace("\"", "", $features);
+  $hardware = snmp_get($device, "ENTITY-MIB::entPhysicalName.1", "-Osqnv");
+  $version  = snmp_get($device, "ENTITY-MIB::entPhysicalFirmwareRev.1", "-Osqnv");
+  $serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerial.1", "-Osqnv");
 
-  if (!$features) // No "extend" support, try "exec" support
-    {
-      $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
-      $features = str_replace("\"", "", $features);
-    }
 
-  // Detect Dell hardware via OpenManage SNMP
-  $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
-  $hw = trim(str_replace("\"", "", $hw));
-  if ($hw) { $hardware = "Dell " . $hw; }
 }
 
 ?>

@@ -20,11 +20,21 @@ $config['os'][$os]['text']              = "Vyatta";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['ifname']            = 1;
 
+### Linux-based OSes here please.
+
 $os = "linux";
 $config['os'][$os]['type']              = "server";
 $config['os'][$os]['group'] 		= "unix";
 $config['os'][$os]['text']  		= "Linux";
 $config['os'][$os]['ifXmcbc']		= 1;
+
+$os = "qnap";
+$config['os'][$os]['type']              = "server";
+$config['os'][$os]['group']             = "unix";
+$config['os'][$os]['text']              = "QNAP TurboNAS";
+$config['os'][$os]['ifXmcbc']           = 1;
+
+### Othre Unix-based OSes here please.
 
 $os = "freebsd";
 $config['os'][$os]['type']              = "server";
