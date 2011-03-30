@@ -785,7 +785,7 @@ visibility:visible; position:absolute; top:-69px; t\op:-70px; color:#000; left:1
  margin-top: 1px;
  margin-bottom: 0px;
  font-family: Verdana, arial, sans-serif;
- font-weight: none;
+ font-weight: normal;
  font-size: 12px;
  list-style-type: none;
  text-align: left; /*set to left, center, or right to align the menu as desired*/
