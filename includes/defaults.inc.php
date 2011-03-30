@@ -154,13 +154,13 @@ $config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
 
 ### Ignores & Allows
 
-$config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "sl0", "lp0", "faith0",
+$config['bad_if'] = array("voip-null", "virtual-", "unrouted", "eobc", "mpls", "lp0", "faith0",
              "-atm layer", "-atm subif", "-shdsl", "-aal5", "-atm", "container",
              "async", "plip", "-physical", "-signalling", "container", "unrouted",
              "bri", "-bearer", "bluetooth", "isatap", "ras", "qos", "miniport", "sonet/sdh",
              "span rp", "span sp", "sslvpn");
 
-$config['bad_if_regexp'] = array("/serial[0-9]:/");
+$config['bad_if_regexp'] = array("/serial[0-9]:/", "/^ng[0-9]+$/", "/^sl[0-9]/");
 
 $config['processor_filter'][] = "An electronic chip that makes the computer work.";
 

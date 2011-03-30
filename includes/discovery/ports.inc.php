@@ -21,7 +21,14 @@ foreach (explode("\n", $ports) as $entry)
   {
     $if = trim(strtolower($ifDescr));
     $nullintf = 0;
-    foreach ($config['bad_if'] as $bi) { if (strstr($if, $bi)) { $nullintf = 1; } }
+    foreach ($config['bad_if'] as $bi) 
+    { 
+      if (strstr($if, $bi)) 
+      { 
+        $nullintf = 1; 
+        if($debug) { echo("ignored : $bi : $if"); }
+      } 
+    }
     if (is_array($config['bad_if_regexp']))
     {
       foreach ($config['bad_if_regexp'] as $bi)
@@ -29,6 +36,7 @@ foreach (explode("\n", $ports) as $entry)
 	if (preg_match($bi ."i", $if))
 	{
 	  $nullintf = 1;
+          if($debug) { echo("ignored : $bi : $if"); }
 	}
       }
     }
@@ -37,11 +45,6 @@ foreach (explode("\n", $ports) as $entry)
     if ($device['os'] == "catos" && strstr($if, "vlan")) { $nullintf = 1; }
     if ($device['os'] == "vmware" && preg_match("/Device ([a-z0-9]+) at .*/", $ifDescr, $matches)) { $ifDescr = $matches[1]; }
     $ifDescr = fixifName($ifDescr);
-    if (preg_match('/serial[0-9]:/', $if)) { $nullintf = 1; }
-    if (isset($config['allow_ng']) && !$config['allow_ng'])
-    {
-      if (preg_match('/ng[0-9]+$/', $if)) { $nullintf = 1; }
-    }
     if ($debug) echo("\n $if ");
     if ($nullintf == 0)
     {
