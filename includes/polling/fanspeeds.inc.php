@@ -39,7 +39,7 @@ while ($fanspeed = mysql_fetch_array($fan_data))
     echo("Alerting for " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . "\n");
     log_event('Fan speed ' . $fanspeed['sensor_descr'] . " under threshold: " . $fanspeed['sensor_current'] . " rpm (<= " . $fanspeed['sensor_limit_low'] . " rpm)", $device['device_id'], 'fanspeed', $fanspeed['sensor_id']);
   }
-  else if ($fanspeed['sensor_current'] > $fanspeed['sensor_limit_warn'] && $fan <= $fanspeed['sensor_limit_low_warn'])
+  else if ($fanspeed['sensor_limit_low_warn'] && $fanspeed['sensor_current'] > $fanspeed['sensor_limit_warn'] && $fan <= $fanspeed['sensor_limit_low_warn'])
   {
     $msg  = "Fan Warning: " . $device['hostname'] . " " . $fanspeed['sensor_descr'] . " is " . $fan . "rpm (Warning limit " . $fanspeed['sensor_limit_low_warn'];
     $msg .= "rpm) at " . date($config['timestamp_format']);
