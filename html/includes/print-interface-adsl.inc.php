@@ -53,7 +53,6 @@ $interface['graph_type'] = "port_bits";
 echo(generate_port_link($interface, "<img src='graph.php?type=".$interface['graph_type']."&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=".$width."&amp;height=".$height."&amp;legend=no&amp;bg=".
 str_replace("#","", $row_colour)."'>", $interface['graph_type']));
 
-
 echo("</td><td width=135>");
 echo("".formatRates($interface['adslAturChanCurrTxRate']) . "/". formatRates($interface['adslAtucChanCurrTxRate']));
 echo("<br />");

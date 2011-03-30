@@ -222,7 +222,7 @@ function renamehost($id, $new, $source = 'console')
 
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
-  eventlog("Hostname changed -> $new ($source)", $id);
+  log_event("Hostname changed -> $new ($source)", $id, 'system');
 }
 
 function delete_port($int_id)
@@ -650,7 +650,7 @@ function get_astext($asn)
   }
 }
 
-# DEPRECATED
+# FIXME DEPRECATED -- only used in dead file includes/polling/interfaces.inc.php - if we no longer need that one, this can go too.
 function eventlog($eventtext,$device_id = "", $interface_id = "")
 {
   $event_query = "INSERT INTO eventlog (host, interface, datetime, message) VALUES (" . ($device_id ? $device_id : "NULL");
@@ -677,20 +677,27 @@ function notify($device,$title,$message)
 
   if ($config['alerts']['email']['enable'])
   {
-    if ($config['alerts']['email']['default_only'])
+    if (!get_dev_attrib($device,'disable_notify'))
     {
-      $email = $config['alerts']['email']['default'];
-    } else {
-      if ($device['sysContact'])
+      if ($config['alerts']['email']['default_only'])
       {
-        $email = $device['sysContact'];
-      } else {
         $email = $config['alerts']['email']['default'];
+      } else {
+        if (get_dev_attrib($device,'override_sysContact_bool'))
+        {
+          $email = get_dev_attrib($device,'override_sysContact_string');
+        }
+        elseif ($device['sysContact'])
+        {
+          $email = $device['sysContact'];
+        } else {
+          $email = $config['alerts']['email']['default'];
+        }
       }
-    }
-    if ($email)
-    {
-      mail($email, $title, $message, $config['email_headers']);
+      if ($email)
+      {
+        mail($email, $title, $message, $config['email_headers']);
+      }
     }
   }
 }

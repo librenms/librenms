@@ -26,24 +26,26 @@ if ($updated && $update_message)
 
 ?>
 
-<table cellpadding=0 cellspacing=0>
+<h3>IPMI settings</h3>
+
+<table cellpadding="0" cellspacing="0">
   <tr>
     <td>
       <form id="edit" name="edit" method="post" action="">
-        <input type=hidden name="editing" value="yes">
+        <input type="hidden" name="editing" value="yes">
         <table width="500" border="0">
           <tr>
             <td width="150"><div align="right">IPMI/BMC Hostname</div></td>
-            <td colspan="3"><input name="ipmi_hostname" size="32" value="<?php echo get_dev_attrib($device,'ipmi_hostname'); ?>"></input></td>
+            <td colspan="3"><input name="ipmi_hostname" size="32" value="<?php echo get_dev_attrib($device,'ipmi_hostname'); ?>" /></td>
           </tr>
           <tr>
             <td><div align="right">IPMI/BMC Username</div></td>
-            <td colspan="3"><input name="ipmi_username" size="32" value="<?php echo get_dev_attrib($device,'ipmi_username'); ?>"></input></td>
+            <td colspan="3"><input name="ipmi_username" size="32" value="<?php echo get_dev_attrib($device,'ipmi_username'); ?>" /></td>
             </td>
           </tr>
           <tr>
             <td><div align="right">IPMI/BMC Password</div></td>
-            <td colspan="3"><input name="ipmi_password" type="password" size="32" value="<?php echo get_dev_attrib($device,'ipmi_password'); ?>"></input></td>
+            <td colspan="3"><input name="ipmi_password" type="password" size="32" value="<?php echo get_dev_attrib($device,'ipmi_password'); ?>" /></td>
             </td>
           </tr>
           <tr>

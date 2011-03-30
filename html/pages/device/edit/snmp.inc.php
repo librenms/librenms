@@ -50,7 +50,7 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
   <table width='400' border='0'>
     <tr>
       <td width='150'><div align='right'>SNMP Community</div></td>
-      <td><input name='community' size='20' value='" . $device['community'] . "'></input>
+      <td><input name='community' size='20' value='" . $device['community'] . "' />
       </td>
     </tr>
     <tr>
@@ -63,7 +63,7 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
     </tr>
     <tr>
       <td><div align='right'>SNMP Port</div></td>
-      <td><input name='port' size='20' value='" . $device['port'] . "'></input>
+      <td><input name='port' size='20' value='" . $device['port'] . "' />
       </td>
     </tr>
     <tr>
@@ -83,13 +83,13 @@ echo("  </select>
     </tr>
     <tr>
       <td><div align='right'>SNMP Timeout</div></td>
-      <td><input name='timeout' size='20' value='" . ($device['timeout'] ? $device['timeout'] : '') . "'></input>&nbsp;
+      <td><input name='timeout' size='20' value='" . ($device['timeout'] ? $device['timeout'] : '') . "' />&nbsp;
       <em>seconds</em>
       </td>
     </tr>
     <tr>
       <td><div align='right'>SNMP Retries</div></td>
-      <td colspan='3'><input name='retries' size='20' value='" . ($device['timeout'] ? $device['retries'] : '') . "'></input>
+      <td colspan='3'><input name='retries' size='20' value='" . ($device['timeout'] ? $device['retries'] : '') . "' />
       </td>
     </tr>");
 
