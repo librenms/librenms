@@ -950,4 +950,24 @@ function array_preg_replace($array, $string)
   return $string;
 }
 
+
+
+function rewrite_adslLineType($adslLineType)
+{
+  $adslLineTypes = array ('noChannel'          => 'No Channel',
+                          'fastOnly'           => 'Fastpath', 
+                          'interleavedOnly'    => 'Interleaved',
+                          'fastOrInterleaved'  => 'Fast/Interleaved',
+                          'fastAndInterleaved' => 'Fast+Interleaved');
+
+  foreach($adslLineTypes as $type => $text)
+  {
+    if($adslLineType == $type)
+    {
+      $adslLineType = $text;
+    }
+  }
+  return($adslLineType);
+}
+
 ?>
