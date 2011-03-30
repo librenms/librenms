@@ -29,7 +29,7 @@ if ($_POST['hostname'] && $_POST['community'])
 
 ?>
 
-<form name="form1" method="post" action="<?php echo($config['base_url']);  ?>/addhost/">
+<form name="form1" method="post" action="">
   <p>Devices will be checked for Ping and SNMP reachability before being probed. Only devices with recognised OSes will be added.</p>
 
   <div style="padding: 10px; background: #f0f0f0;">

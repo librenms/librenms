@@ -950,8 +950,6 @@ function array_preg_replace($array, $string)
   return $string;
 }
 
-
-
 function rewrite_adslLineType($adslLineType)
 {
   $adslLineTypes = array ('noChannel'          => 'No Channel',
@@ -967,6 +965,7 @@ function rewrite_adslLineType($adslLineType)
       $adslLineType = $text;
     }
   }
+
   return($adslLineType);
 }
 

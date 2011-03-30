@@ -9,6 +9,7 @@ if ($_SESSION['userlevel'] < '7')
   $panes['snmp']     = 'SNMP';
   $panes['ports']    = 'Port Settings';
   $panes['apps']     = 'Applications';
+  $panes['alerts']   = 'Alerts';
 
   if ($config['enable_services'])
   {

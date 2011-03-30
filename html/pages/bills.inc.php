@@ -1,4 +1,4 @@
-<?php
+[B<?php
 
 if ($_POST['addbill'] == "yes")
 {
@@ -146,7 +146,7 @@ if ($_GET['opta'] == "add")
          $allowed = formatRates($bill['bill_cdr'] * 1000);
          $used    = formatRates($rate_data['rate_95th'] * 1000);
          $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100,2);
-      } elseif ($bill['bill_type'] == "quota") { 
+      } elseif ($bill['bill_type'] == "quota") {
          $type = "Quota"; 
          $allowed = formatStorage($bill['bill_gb']* 1024 * 1024 * 1024);
          $used    = formatStorage($rate_data['total_data'] * 1024 * 1024);

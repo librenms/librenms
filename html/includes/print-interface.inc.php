@@ -1,9 +1,5 @@
 <?php
 
-#echo("<pre>");
-#print_r($interface);
-#echo("</pre>");
-
 #  This file prints a table row for each interface
 
 $interface['device_id'] = $device['device_id'];
@@ -32,12 +28,12 @@ echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this
          <td valign=top width=350>");
 echo("        <span class=list-large>
               " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
-
            </span><br /><span class=interface-desc>".$interface['ifAlias']."</span>");
 
 if ($interface['ifAlias']) { echo("<br />"); }
 
 unset ($break);
+
 if ($port_details)
 {
   $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
@@ -271,7 +267,6 @@ if ($graph_type && is_file($graph_file))
 #        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
 
   echo("</td></tr>");
-
 }
 
 ?>

@@ -33,11 +33,11 @@ foreach (explode("\n", $ports) as $entry)
     {
       foreach ($config['bad_if_regexp'] as $bi)
       {
-	if (preg_match($bi ."i", $if))
-	{
-	  $nullintf = 1;
+        if (preg_match($bi ."i", $if))
+        {
+          $nullintf = 1;
           if($debug) { echo("ignored : $bi : $if"); }
-	}
+        }
       }
     }
 
@@ -48,23 +48,25 @@ foreach (explode("\n", $ports) as $entry)
     if ($debug) echo("\n $if ");
     if ($nullintf == 0)
     {
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0') {
-	mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($ifDescr)."')");
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) == '0')
+      {
+        mysql_query("INSERT INTO `ports` (`device_id`,`ifIndex`,`ifDescr`) VALUES ('".$device['device_id']."','$ifIndex','".mres($ifDescr)."')");
         # Add Interface
-	echo("+");
+        echo("+");
       } else {
-	mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
-	echo(".");
+        mysql_query("UPDATE `ports` SET `deleted` = '0' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+        echo(".");
       }
       $int_exists[] = "$ifIndex";
     } else {
       # Ignored Interface
-      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0') {
-	mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
+      if (mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'"), 0) != '0')
+      {
+        mysql_query("UPDATE `ports` SET `deleted` = '1' WHERE `device_id` = '".$device['device_id']."' AND `ifIndex` = '$ifIndex'");
         # Delete Interface
-	echo("-"); ## Deleted Interface
+        echo("-"); ## Deleted Interface
       } else {
-	echo("X"); ## Ignored Interface
+        echo("X"); ## Ignored Interface
       }
     }
   }

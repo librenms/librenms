@@ -17,10 +17,10 @@ if ($device['os'] == "linux")
   $features = str_replace("\"", "", $features);
 
   if (!$features) // No "extend" support, try "exec" support
-    {
-      $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
-      $features = str_replace("\"", "", $features);
-    }
+  {
+    $features = snmp_get($device, ".1.3.6.1.4.1.2021.7890.1.101.1", "-Oqv", "UCD-SNMP-MIB");
+    $features = str_replace("\"", "", $features);
+  }
 
   // Detect Dell hardware via OpenManage SNMP
   $hw = snmp_get($device, ".1.3.6.1.4.1.674.10892.1.300.10.1.9.1", "-Oqv", "MIB-Dell-10892");
@@ -63,12 +63,9 @@ elseif ($device['os'] == "monowall" || $device['os'] == "Voswall")
 }
 elseif ($device['os'] == "qnap")
 {
-
   $hardware = snmp_get($device, "ENTITY-MIB::entPhysicalName.1", "-Osqnv");
   $version  = snmp_get($device, "ENTITY-MIB::entPhysicalFirmwareRev.1", "-Osqnv");
   $serial   = snmp_get($device, "ENTITY-MIB::entPhysicalSerial.1", "-Osqnv");
-
-
 }
 
 ?>

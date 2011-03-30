@@ -54,7 +54,7 @@ while ($device = mysql_fetch_array($device_query))
                 notify($device, "Device Down: " . $device['hostname'], "Device Down: " . $device['hostname'] . " at " . date($config['timestamp_format']));
             }
         }
-        eventlog("Device status changed to $stat", $device['device_id']);
+        log_event("Device status changed to $stat", $device, strtolower($stat)));
         echo("Status Changed!\n");
     }
 }
