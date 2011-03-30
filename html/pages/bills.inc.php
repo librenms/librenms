@@ -1,4 +1,4 @@
-[B<?php
+<?php
 
 if ($_POST['addbill'] == "yes")
 {
