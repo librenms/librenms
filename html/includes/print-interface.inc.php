@@ -101,7 +101,7 @@ if ($device['os'] == "ios" || $device['os'] == "iosxe")
 if ($port_adsl['adslLineCoding'])
 {
   echo("</td><td width=150>");
-  echo($port_adsl['adslLineCoding']."/".$port_adsl['adslLineType']);
+  echo($port_adsl['adslLineCoding']."/" . rewrite_adslLineType($port_adsl['adslLineType']));
   echo("<br />");
   echo("Sync:".formatRates($port_adsl['adslAtucChanCurrTxRate']) . "/". formatRates($port_adsl['adslAturChanCurrTxRate']));
   echo("<br />");
