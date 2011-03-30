@@ -73,6 +73,7 @@ if ($device['adsl_count'] > "0")
 
 echo("\n");
 
+/// FIXME This probably needs re-enabled. We need to clear these things when they get unset, too.
 #foreach ($etherlike_oids as $oid) { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "EtherLike-MIB"); }
 #foreach ($cisco_oids as $oid)     { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "OLD-CISCO-INTERFACES-MIB"); }
 #foreach ($pagp_oids as $oid)      { $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, "CISCO-PAGP-MIB"); }
@@ -82,6 +83,8 @@ if ($device['os_group'] == "ios")
   $port_stats = snmp_cache_portIfIndex ($device, $port_stats);
   $port_stats = snmp_cache_portName ($device, $port_stats);
   $data_oids[] = "portName";
+
+  /// FIXME Why is this commented out?
   #$port_stats = snmpwalk_cache_oid($device, "vmVlan", $port_stats, "CISCO-VLAN-MEMBERSHIP-MIB");
   #$port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortEncapsulationOperType", $port_stats, "CISCO-VTP-MIB");
   #$port_stats = snmpwalk_cache_oid($device, "vlanTrunkPortNativeVlan", $port_stats, "CISCO-VTP-MIB");
@@ -94,7 +97,7 @@ $polled = time();
 if ($debug) { print_r($port_stats); }
 
 /// New interface detection
-///// TO DO
+///// FIXME
 /// End New interface detection
 
 /// Loop ports in the DB and update where necessary
@@ -111,9 +114,6 @@ while ($port = mysql_fetch_array($port_query))
     $update .= "`poll_time` = '".$polled."'";
     $update .= ", `poll_prev` = '".$port['poll_time']."'";
     $update .= ", `poll_period` = '".$polled_period."'";
-
-    #echo("\n32bit - In: ".$this_port['ifInOctets']." Out: ".$this_port['ifOutOctets']);
-    #echo("\n64bit - In: ".$this_port['ifHCInOctets']." Out: ".$this_port['ifHCOutOctets']."\n");
 
     ### Copy ifHC[In|Out]Octets values to non-HC if they exist
     if ($this_port['ifHCInOctets'] > 0 && is_numeric($this_port['ifHCInOctets']) && $this_port['ifHCOutOctets'] > 0 && is_numeric($this_port['ifHCOutOctets']))
@@ -247,7 +247,7 @@ while ($port = mysql_fetch_array($port_query))
     /// End Update IF-MIB
 
     /// Update PAgP
-    if ($this_port['pagpOperationMode'])
+    if ($this_port['pagpOperationMode'] || $port['pagpOperationMode'])
     {
       foreach ($pagp_oids as $oid)
       { // Loop the OIDs
