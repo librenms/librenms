@@ -1,5 +1,5 @@
 <div style='padding: 10px; height: 20px; clear: both; display: block;'>
-  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : <?php echo $device['bgpLocalAs'] ?></div>
+  <div style='float: left; font-size: 22px; font-weight: bold;'>Local AS : <?php echo($device['bgpLocalAs']); ?></div>
 </div>
 
 <?php

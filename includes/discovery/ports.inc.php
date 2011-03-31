@@ -21,13 +21,13 @@ foreach (explode("\n", $ports) as $entry)
   {
     $if = trim(strtolower($ifDescr));
     $nullintf = 0;
-    foreach ($config['bad_if'] as $bi) 
-    { 
-      if (strstr($if, $bi)) 
-      { 
-        $nullintf = 1; 
+    foreach ($config['bad_if'] as $bi)
+    {
+      if (strstr($if, $bi))
+      {
+        $nullintf = 1;
         if($debug) { echo("ignored : $bi : $if"); }
-      } 
+      }
     }
     if (is_array($config['bad_if_regexp']))
     {

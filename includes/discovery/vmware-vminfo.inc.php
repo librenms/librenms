@@ -73,7 +73,7 @@ if ($device['os'] == "vmware")
       mysql_query("INSERT INTO vmware_vminfo (device_id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ", " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
       echo("+");
     } else {
-      echo ".";
+      echo(".");
     }
 
     /*

@@ -7,14 +7,13 @@ function rrdtool_update($rrdfile, $rrdupdate)
 
 function rrdtool_create($rrdfile, $rrdupdate)
 {
-  global $config; global $debug;
+  global $config, $debug;
 
   $command = $config['rrdtool'] . " create $rrdfile $rrdupdate";
 
   if ($debug) { echo($command."\n"); }
 
   return shell_exec($command);
-
 }
 
 function rrdtool_fetch($rrdfile, $rrdupdate)
@@ -39,7 +38,7 @@ function rrdtool_lastupdate($rrdfile, $rrdupdate)
 
 function rrdtool($command, $file, $options)
 {
-  global $config; global $debug;
+  global $config, $debug;
 
   $command = $config['rrdtool'] . " $command $file $options";
   if ($config['rrdcached']) 
@@ -48,6 +47,7 @@ function rrdtool($command, $file, $options)
   }
 
   if ($debug) { echo($command."\n"); }
+
   return shell_exec($command);
 }
 

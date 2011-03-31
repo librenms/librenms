@@ -4,9 +4,9 @@ $scale_min = "0";
 
 include("includes/graphs/common.inc.php");
 
-$rrd_options .= " COMMENT:'                         Last     Max\\n'";
-
 $rrd_filename  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("fanspeed-" . $sensor['sensor_type'] .'-'. $sensor['sensor_index'] . ".rrd");
+
+$rrd_options .= " COMMENT:'                         Last     Max\\n'";
 
 $sensor['sensor_descr_fixed'] = substr(str_pad($sensor['sensor_descr'], 20),0,20);
 
