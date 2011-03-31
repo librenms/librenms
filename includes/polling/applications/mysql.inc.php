@@ -10,9 +10,17 @@ $mysql  = shell_exec($mysql_cmd);
 
 echo(" mysql...");
 
-
 $data = explode("\n", $mysql);
-$nstring = trim(implode(':',$data),':');
+
+for ($a=0,$n=count($data);$a<$n;$a++)
+{
+        $elements = explode(":",$data[$a]);
+        $nstring .= (float)trim($elements[1]).":";
+        unset($elements);
+}
+
+#$data = explode("\n", $mysql);
+#$nstring = trim(implode(':',$data),':');
 
 if (!is_file($mysql_rrd)) {
     rrdtool_create ($mysql_rrd, "--step 300 \
