@@ -368,7 +368,7 @@ function getlocations()
     # We can do this because of the ORDER BY, "bool" will be handled before "string"
     elseif ($row['attrib_type'] == 'override_sysLocation_string' && $ignore_dev_location[$row['device_id']] == 1)
     {
-      if (!in_array($row['location'],$locations)) { $locations[] = $row['attrib_value']; }
+      if (!in_array($row['attrib_value'],$locations)) { $locations[] = $row['attrib_value']; }
     }
   }
 
