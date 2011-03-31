@@ -272,8 +272,11 @@ while ($device = mysql_fetch_assoc($device_query))
 
     if ($sysLocation && $device['location'] != $sysLocation)
     {
-      $poll_update .= $poll_separator . "`location` = '$sysLocation'";
-      $poll_separator = ", ";
+      if (!get_dev_attrib($device,'override_sysLocation_bool'))
+      {
+        $poll_update .= $poll_separator . "`location` = '$sysLocation'";
+        $poll_separator = ", ";
+      }
       log_event("Location -> $sysLocation", $device['device_id'], 'system');
     }
 

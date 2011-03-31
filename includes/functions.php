@@ -42,42 +42,6 @@ function logfile($string)
   fclose($fd);
 }
 
-function set_dev_attrib($device, $attrib_type, $attrib_value)
-{
-  $count_sql = "SELECT COUNT(*) FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if (mysql_result(mysql_query($count_sql),0))
-  {
-    $update_sql = "UPDATE devices_attribs SET attrib_value = '$attrib_value' WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-    mysql_query($update_sql);
-  }
-  else
-  {
-    $insert_sql = "INSERT INTO devices_attribs (`device_id`, `attrib_type`, `attrib_value`) VALUES ('" . mres($device['device_id'])."', '$attrib_type', '$attrib_value')";
-    mysql_query($insert_sql);
-  }
-
-  return mysql_affected_rows();
-}
-
-function get_dev_attrib($device, $attrib_type)
-{
-  $sql = "SELECT attrib_value FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  if ($row = mysql_fetch_assoc(mysql_query($sql)))
-  {
-    return $row['attrib_value'];
-  }
-  else
-  {
-    return NULL;
-  }
-}
-
-function del_dev_attrib($device, $attrib_type)
-{
-  $sql = "DELETE FROM devices_attribs WHERE `device_id` = '" . mres($device['device_id']) . "' AND `attrib_type` = '$attrib_type'";
-  return mysql_query($sql);
-}
-
 function shorthost($hostname, $len=16)
 {
   $parts = explode(".", $hostname);
@@ -218,8 +182,7 @@ function renamehost($id, $new, $source = 'console')
 {
   global $config;
 
-  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0); # FIXME getdevicebyid?
-
+  $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   rename($config['rrd_dir']."/$host",$config['rrd_dir']."/$new");
   mysql_query("UPDATE devices SET hostname = '$new' WHERE device_id = '$id'");
   log_event("Hostname changed -> $new ($source)", $id, 'system');

@@ -15,6 +15,10 @@ if ($_POST['editing'])
     $update_message = "Device alert settings updated.";
     $updated = 1;
   }
+  else
+  {
+    include("includes/error-no-perm.inc.php"); 
+  }
 }
 
 if ($updated && $update_message)
