@@ -48,6 +48,13 @@ if ($device['location'])
         <td class="list-bold">Location</td>
         <td>' . $device['location']. '</td>
       </tr>');
+  if (get_dev_attrib($device,'override_sysLocation_bool'))
+  {
+    echo('<tr>
+        <td class="list-bold">SNMP Location</td>
+        <td>' . $device['real_location']. '</td>
+      </tr>');
+  }
 }
 
 if ($uptime)
