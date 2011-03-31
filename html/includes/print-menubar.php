@@ -1,27 +1,30 @@
 <?php
 
-  $service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
-  $if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
-  $device_alerts = "0";
-  $device_alert_sql = "WHERE 0";
+$service_alerts = mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0'"),0);
+$if_alerts = mysql_result(mysql_query("SELECT count(*) FROM `ports` WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND `ignore` = '0'"),0);
+$device_alerts = "0";
+$device_alert_sql = "WHERE 0";
 
 if (isset($config['enable_bgp']) && $config['enable_bgp'])
 {
   $bgp_alerts = mysql_result(mysql_query("SELECT COUNT(*) FROM bgpPeers AS B where (bgpPeerAdminStatus = 'start' OR bgpPeerAdminStatus = 'running') AND bgpPeerState != 'established'"), 0);
 }
 
-  $query_a = mysql_query("SELECT * FROM `devices`");
-  while ($device = mysql_fetch_array($query_a)) {
-    $this_alert = 0;
-    if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0') {
-      if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
-      if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1"; }
-    }
-    if ($this_alert) {
-     $device_alerts++;
-     $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'";
-    }
+$query_a = mysql_query("SELECT * FROM `devices`");
+while ($device = mysql_fetch_array($query_a))
+{
+  $this_alert = 0;
+  if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0')
+  {
+    if (mysql_result(mysql_query("SELECT count(service_id) FROM services WHERE service_status = '0' AND device_id = '".$device['device_id']."'"),0)) { $this_alert = "1"; }
+    if (mysql_result(mysql_query("SELECT count(*) FROM ports WHERE `ifOperStatus` = 'down' AND `ifAdminStatus` = 'up' AND device_id = '" . $device['device_id'] . "' AND `ignore` = '0'"),0)) { $this_alert = "1"; }
   }
+  if ($this_alert)
+  {
+   $device_alerts++;
+   $device_alert_sql .= " OR `device_id` = '" . $device['device_id'] . "'";
+  }
+}
 ?>
 
 <div class="menu2">
@@ -33,9 +36,9 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
           echo('<li><a href="map/"><img src="images/16/map.png" border="0" align="absmiddle" /> Network Map</a></li>');
         } ?>
         <li><a href="eventlog/"><img src="images/16/report.png" border="0" align="absmiddle" /> Eventlog</a></li>
-	<?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
-  	  echo('<li><a href="syslog/"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
-	} ?>
+  <?php if (isset($config['enable_syslog']) && $config['enable_syslog']) {
+      echo('<li><a href="syslog/"><img src="images/16/page.png" border="0" align="absmiddle" /> Syslog</a></li>');
+  } ?>
 <!--        <li><a href="alerts/"><img src="images/16/exclamation.png" border="0" align="absmiddle" /> Alerts</a></li> -->
         <li><a href="inventory/"><img src="images/16/bricks.png" border="0" align="absmiddle" /> Inventory</a></li>
         </ul>
@@ -59,7 +62,7 @@ foreach ($config['device_types'] as $devtype)
 
 ?>
         <li><hr width="140" /></li>
-        <li><a href="devices/alerted/"><img src="images/16/server_error.png" border="0" align="absmiddle" /> Alerts (<?php echo($device_alerts) ?>)</a></li>
+        <li><a href="devices/alerted/"><img src="images/icons/alerts.png" border="0" align="absmiddle" /> Alerts (<?php echo($device_alerts) ?>)</a></li>
 <?php
 if ($_SESSION['userlevel'] >= '10') {
   echo('
@@ -104,11 +107,6 @@ if ($_SESSION['userlevel'] >= '10') {
 ## Display Locations entry if $config['show_locations']
 if ($config['show_locations'])
 {
-	if($_SESSION['userlevel'] >= '5') {
-		$locations = mysql_query("SELECT DISTINCT location FROM devices GROUP BY location ORDER BY location");
-	} else {
-		$locations = mysql_query("SELECT DISTINCT location FROM devices AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' GROUP BY location ORDER BY location");
-	}
 ?>
 <li><a class="menu2four" href="locations/"><img src="images/16/building.png" border="0" align="absmiddle" /> Locations</a>
 <?php
@@ -118,12 +116,9 @@ if ($config['show_locations'])
         <table><tr><td>
         <ul>
 <?php
-    while ($row = mysql_fetch_array($locations))
+    foreach (getlocations() as $location)
     {
-      if ($row['location'] != '')
-      {
-        echo('        <li><a href="?page=devices&amp;location=' . urlencode($row['location']) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $row['location'] . ' </a></li>');
-      }
+      echo('        <li><a href="?page=devices&amp;location=' . urlencode($location) . '"><img src="images/16/building.png" border="0" align="absmiddle" /> ' . $location . ' </a></li>');
     }
 ?>
         </ul>
@@ -135,7 +130,6 @@ if ($config['show_locations'])
 <?php
 }
 ?>
-
 
 <li><a class="menu2four" href="ports/"><img src="images/16/connect.png" border="0" align="absmiddle" /> Ports</a>
 
@@ -212,7 +206,7 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-	<li><a href="health/processors/"><img src="images/icons/processors.png" border="0" align="absmiddle" /> Processors</a></li>
+  <li><a href="health/processors/"><img src="images/icons/processors.png" border="0" align="absmiddle" /> Processors</a></li>
         <li><a href="health/memory/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
         <li><hr width=140 /></li>
@@ -233,7 +227,8 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 
 <?php
 
-if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp'])) {
+if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp']))
+{
 echo('
 <li><a class="menu2four" href="bgp/"><img src="images/16/link.png" border="0" align="absmiddle" /> BGP Sessions</a>
         <table><tr><td>
@@ -244,14 +239,15 @@ echo('
         <li><a href="bgp/external/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> External BGP</a></li>
         <li><a href="bgp/internal/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> Internal BGP</a></li>');
 
-if ($bgp_alerts) { echo('
+if ($bgp_alerts)
+{
+  echo('
         <li><hr width="140" /></li>
         <li><a href="bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted (' . $bgp_alerts . ')</a></li>
-'); }
+');
+}
 
 echo('        <li><hr /></li>
-
-
         </ul>
         </td></tr></table>
 </li>
@@ -280,7 +276,7 @@ echo('        <li><hr /></li>
       if (auth_usermanagement())
       {
       echo('
-	<li><a href="adduser/"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
+        <li><a href="adduser/"><img src="images/16/user_add.png" border="0" align="absmiddle" /> Add User</a></li>
         <li><a href="deluser/"><img src="images/16/user_delete.png" border="0" align="absmiddle" /> Remove User</a></li>
         <li><a href="?page=edituser"><img src="images/16/user_edit.png" border="0" align="absmiddle" /> Edit User</a></li>
         <li><hr width="140" /></li>');
