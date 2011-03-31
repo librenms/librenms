@@ -953,7 +953,7 @@ function array_preg_replace($array, $string)
 function rewrite_adslLineType($adslLineType)
 {
   $adslLineTypes = array ('noChannel'          => 'No Channel',
-                          'fastOnly'           => 'Fastpath', 
+                          'fastOnly'           => 'Fastpath',
                           'interleavedOnly'    => 'Interleaved',
                           'fastOrInterleaved'  => 'Fast/Interleaved',
                           'fastAndInterleaved' => 'Fast+Interleaved');

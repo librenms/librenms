@@ -105,11 +105,10 @@ function snmp_get($device, $oid, $options = NULL, $mib = NULL, $mibdir = NULL)
     $device['transport'] = "udp";
   }
 
-
   if (strstr($oid,' '))
   {
-    echo "BUG: snmp_get called for multiple OIDs: $oid\n";
-    echo "Please report this to the Observium team.";
+    echo("BUG: snmp_get called for multiple OIDs: $oid\n");
+    echo("Please report this to the Observium team.");
   }
 
   if ($config['snmp']['internal'] == true)

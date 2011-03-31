@@ -40,7 +40,7 @@ $disable_notify = get_dev_attrib($device,'disable_notify');
           <tr>
             <td width="50"><div style="padding-right: 5px; text-align: right"><input onclick="edit.sysContact.disabled=!edit.override_sysContact.checked" type="checkbox" name="override_sysContact"<?php if ($override_sysContact_bool) { echo(' checked="1"'); } ?> /></div></td>
             <td width="150">Override sysContact:</td>
-            <td><input name="sysContact" size="32"<?php if (!$override_sysContact_bool) { echo(' disabled="1"'); } ?> value="<?php echo $override_sysContact_string; ?>" /></td>
+            <td><input name="sysContact" size="32"<?php if (!$override_sysContact_bool) { echo(' disabled="1"'); } ?> value="<?php echo($override_sysContact_string); ?>" /></td>
           </tr>
           <tr>
             <td width="50"><div style="padding-right: 5px; text-align: right"><input type="checkbox" name="disable_notify"<?php if ($disable_notify) { echo(' checked="1"'); } ?> /></div></td>

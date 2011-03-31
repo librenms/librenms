@@ -188,6 +188,4 @@ function getTotal($bill_id,$datefrom,$dateto)
   return($mtot);
 }
 
-$dayofmonth     = date("j"); //FIXME is this used anywhere?
-
 ?>

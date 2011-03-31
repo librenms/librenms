@@ -79,6 +79,6 @@ while ($row = mysql_fetch_array($data))
 
 unset($valid_v6);
 
-echo "\n";
+echo("\n");
 
 ?>

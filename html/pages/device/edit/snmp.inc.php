@@ -73,9 +73,9 @@ echo("<table cellpadding=0 cellspacing=0><tr><td>
 
 foreach ($config['snmp']['transports'] as $transport)
 {
-  echo ("<option value='".$transport."'");
-  if ($transport == $device['transport']) { echo (" selected='selected'"); }
-  echo (">".$transport."</option>");
+  echo("<option value='".$transport."'");
+  if ($transport == $device['transport']) { echo(" selected='selected'"); }
+  echo(">".$transport."</option>");
 }
 
 echo("  </select>

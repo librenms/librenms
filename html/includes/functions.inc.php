@@ -2,7 +2,7 @@
 
 function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0)
 {
-  global $twoday; global $day; global $now; global $config;
+  global $twoday, $day, $now, $config;
 
   if (!$start) { $start = $day; }
   if (!$end) { $end = $now; }
@@ -56,7 +56,6 @@ function generate_device_link($device, $text=0, $linksuffix="", $start=0, $end=0
     return $device['hostname'];
   }
 
-
   return $link;
 }
 
@@ -92,16 +91,14 @@ function generate_graph_popup($graph_array)
   $graph_array['from']     = $config['year'];
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
-  return overlib_link($graph_array['link'], $graph, $content, NULL);
 
+  return overlib_link($graph_array['link'], $graph, $content, NULL);
 }
 
 function print_graph_popup($graph_array)
 {
   echo(generate_graph_popup($graph_array));
 }
-
-
 
 function permissions_cache($user_id)
 {
@@ -121,12 +118,13 @@ function permissions_cache($user_id)
   {
     $permissions['bill'][$bill['bill_id']] = 1;
   }
+
   return $permissions;
 }
 
 function bill_permitted($bill_id)
 {
-  global $_SESSION; global $permissions;
+  global $_SESSION, $permissions;
 
   if ($_SESSION['userlevel'] >= "5") {
     $allowed = TRUE;
@@ -141,7 +139,7 @@ function bill_permitted($bill_id)
 
 function port_permitted($interface_id, $device_id = NULL)
 {
-  global $_SESSION; global $permissions;
+  global $_SESSION, $permissions;
 
   if (!is_numeric($device_id)) { $device_id = get_device_id_by_interface_id($interface_id); }
 
@@ -161,7 +159,7 @@ function port_permitted($interface_id, $device_id = NULL)
 
 function application_permitted($app_id, $device_id = NULL)
 {
-  global $_SESSION; global $permissions;
+  global $_SESSION, $permissions;
   if (is_numeric($app_id))
   {
     if (!$device_id) { $device_id = device_by_id_cache ($app_id); }
@@ -177,12 +175,13 @@ function application_permitted($app_id, $device_id = NULL)
   } else {
     $allowed = FALSE;
   }
+
   return $allowed;
 }
 
 function device_permitted($device_id)
 {
-  global $_SESSION; global $permissions;
+  global $_SESSION, $permissions;
 
   if ($_SESSION['userlevel'] >= "5")
   {
@@ -212,9 +211,9 @@ function generate_graph_tag ($args)
     $url .= $sep.$key."=".$arg;
     $sep="&amp;";
   }
+
   return "<img src=\"".$url."\" border=0>";
 }
-
 
 function print_percentage_bar ($width, $height, $percent, $left_text, $left_colour, $left_background, $right_text, $right_colour, $right_background)
 {
@@ -226,12 +225,14 @@ function print_percentage_bar ($width, $height, $percent, $left_text, $left_colo
     <div style="vertical-align: middle;height: '.$height.'px;margin-top:-'.($height).'px; color:#'.$right_colour.'; padding-right:4px;text-align:right;"><b>'.$right_text.'</b></div>
   </div>
 </div>';
+
   return $output;
 }
 
 function generate_port_link($args, $text = NULL, $type = NULL)
 {
-  global $twoday; global $now; global $config; global $day; global $month;
+  global $twoday, $now, $config, $day, $month;
+
   $args = ifNameDescr($args);
   if (!$text) { $text = fixIfName($args['label']); }
   if ($type) { $args['graph_type'] = $type; }
@@ -270,9 +271,9 @@ function generate_port_link($args, $text = NULL, $type = NULL)
 
 function generate_port_thumbnail($args)
 {
-    if (!$args['bg']) { $args['bg'] = "FFFFF"; }
-    $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;legend=no&amp;bg=".$args['bg']."'>";
-    echo generate_port_link($args, $args['content']);
+  if (!$args['bg']) { $args['bg'] = "FFFFF"; }
+  $args['content'] = "<img src='graph.php?type=".$args['graph_type']."&amp;id=".$args['interface_id']."&amp;from=".$args['from']."&amp;to=".$args['to']."&amp;width=".$args['width']."&amp;height=".$args['height']."&amp;legend=no&amp;bg=".$args['bg']."'>";
+  echo(generate_port_link($args, $args['content']));
 }
 
 function print_optionbar_start ($height = 20, $width = 0, $marginbottom = 5)
@@ -288,7 +289,6 @@ function print_optionbar_start ($height = 20, $width = 0, $marginbottom = 5)
     <div class='roundedfg' style='padding: 0px 5px;'>
     <div style='margin: auto; text-align: left; padding: 2px 5px; padding-left: 11px; clear: both; display:block; " . ($height ? 'height:' . $height . 'px;' : '') . "'>");
 }
-
 
 function print_optionbar_end()
 {
