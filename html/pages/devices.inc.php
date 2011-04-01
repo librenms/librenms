@@ -1,12 +1,12 @@
 <?php
 
-if ($_POST['hostname']) { $where = " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
-if ($_POST['os'])       { $where = " AND os = '".mres($_POST['os'])."'"; }
+if ($_POST['hostname']) { $where .= " AND hostname LIKE '%".mres($_POST['hostname'])."%'"; }
+if ($_POST['os'])       { $where .= " AND os = '".mres($_POST['os'])."'"; }
 if ($_POST['version'])  { $where .= " AND version = '".mres($_POST['version'])."'"; }
 if ($_POST['hardware']) { $where .= " AND hardware = '".mres($_POST['hardware'])."'"; }
 if ($_POST['features']) { $where .= " AND features = '".mres($_POST['features'])."'"; }
+if ($_GET['type'])      { $where .= " AND type = '" .mres($_GET[type]). "'"; }
 
-# FIXME override
 if (isset($_REQUEST['location']))
 {
   if ($_GET['location'] == "Unset") { $location_filter = ''; }
