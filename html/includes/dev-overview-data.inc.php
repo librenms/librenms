@@ -37,7 +37,16 @@ echo('<tr>
 if ($device['sysContact'])
 {
   echo('<tr>
-        <td class="list-bold">Contact</td>
+        <td class="list-bold">Contact</td>');
+  if (get_dev_attrib($device,'override_sysContact_bool'))
+  {
+    echo('
+        <td>' . htmlspecialchars(get_dev_attrib($device,'override_sysContact_string')) . '</td>
+      </tr>
+      <tr>
+        <td class="list-bold">SNMP Contact</td>');
+  }
+  echo('
         <td>' . htmlspecialchars($device['sysContact']). '</td>
       </tr>');
 }
