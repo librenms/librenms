@@ -152,11 +152,11 @@ while ($port = mysql_fetch_array($port_query))
       if ($port[$oid] != $this_port[$oid] && !isset($this_port[$oid]))
       {
         $update .= ", `$oid` = NULL";
-        log_event($oid . ": ".$port[$oid]." -> NULL", $device['device_id'], 'interface', $port['interface_id']);
+        log_event($oid . ": ".$port[$oid]." -> NULL", $device, 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> NULL "); } else { echo($oid . " "); }
       } elseif ($port[$oid] != $this_port[$oid]) {
         $update .= ", `$oid` = '".mres($this_port[$oid])."'";
-	  log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device['device_id'], 'interface', $port['interface_id']);
+	  log_event($oid . ": ".$port[$oid]." -> " . $this_port[$oid], $device, 'interface', $port['interface_id']);
         if ($debug) { echo($oid . ": ".$port[$oid]." -> " . $this_port[$oid]." "); } else { echo($oid . " "); }
       }
     }
@@ -174,7 +174,7 @@ while ($port = mysql_fetch_array($port_query))
         if ($port_ifAlias[$attrib] != $port[$attrib_key])
         {
           $update .= ", `".$attrib_key."` = '".$port_ifAlias[$attrib]."'";
-          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device['device_id'], 'interface', $port['interface_id']);
+          log_event($attrib . ": ".$port[$attrib_key]." -> " . $port_ifAlias[$attrib], $device, 'interface', $port['interface_id']);
         }
       }
     }
@@ -255,7 +255,7 @@ while ($port = mysql_fetch_array($port_query))
         { // If data has changed, build a query
           $update .= ", `$oid` = '".mres($this_port[$oid])."'";
           echo("PAgP ");
-	  log_event("$oid -> ".$this_port[$oid], $device['device_id'], 'interface', $port['interface_id']);
+	  log_event("$oid -> ".$this_port[$oid], $device, 'interface', $port['interface_id']);
         }
       }
     }

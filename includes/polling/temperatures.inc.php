@@ -52,7 +52,7 @@ while ($temperature = mysql_fetch_array($temp_data))
     $msg .= ") at " . date($config['timestamp_format']);
     notify($device, "Temp Alarm: " . $device['hostname'] . " " . $temperature['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $temperature['sensor_descr'] . "\n");
-    log_event('Temperature ' . $temperature['sensor_descr'] . " over threshold: " . $temp . " " . html_entity_decode('&deg;') . "C (>= " . $temperature['sensor_limit'] . " " . html_entity_decode('&deg;') . 'C)', $device['device_id'], 'temperature', $temperature['sensor_id']);
+    log_event('Temperature ' . $temperature['sensor_descr'] . " over threshold: " . $temp . " " . html_entity_decode('&deg;') . "C (>= " . $temperature['sensor_limit'] . " " . html_entity_decode('&deg;') . 'C)', $device, 'temperature', $temperature['sensor_id']);
   }
 
   mysql_query("UPDATE sensors SET sensor_current = '$temp' WHERE sensor_class='temperature' AND sensor_id = '" . $temperature['sensor_id'] . "'");

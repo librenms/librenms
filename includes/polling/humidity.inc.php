@@ -33,7 +33,7 @@ while ($humidity = mysql_fetch_array($hum_data))
     $msg .= "%) at " . date($config['timestamp_format']);
     notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
-    log_event('Frequency ' . $humidity['sensor_descr'] . " under threshold: " . $hum . " % (< " . $humidity['sensor_limit_low'] . " %)", $device['device_id'] , 'humidity', $humidity['sensor_id']);
+    log_event('Frequency ' . $humidity['sensor_descr'] . " under threshold: " . $hum . " % (< " . $humidity['sensor_limit_low'] . " %)", $device, 'humidity', $humidity['sensor_id']);
   }
   else if ($humidity['sensor_current'] < $humidity['sensor_limit'] && $hum >= $humidity['sensor_limit'])
   {
@@ -41,7 +41,7 @@ while ($humidity = mysql_fetch_array($hum_data))
     $msg .= "%) at " . date($config['timestamp_format']);
     notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
-    log_event('Humidity ' . $humidity['sensor_descr'] . " above threshold: " . $hum . " % (> " . $humidity['sensor_limit'] . " %)", $device['device_id'], 'humidity', $humidity['sensor_id']);
+    log_event('Humidity ' . $humidity['sensor_descr'] . " above threshold: " . $hum . " % (> " . $humidity['sensor_limit'] . " %)", $device, 'humidity', $humidity['sensor_id']);
   }
 
   mysql_query("UPDATE sensors SET sensor_current = '$hum' WHERE sensor_class='humidity' AND sensor_id = '" . $humidity['sensor_id'] . "'");

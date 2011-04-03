@@ -14,16 +14,17 @@ $data = explode("\n", $mysql);
 
 for ($a=0,$n=count($data);$a<$n;$a++)
 {
-        $elements = explode(":",$data[$a]);
-        $nstring .= (float)trim($elements[1]).":";
-        unset($elements);
+  $elements = explode(":",$data[$a]);
+  $nstring .= (float)trim($elements[1]).":";
+  unset($elements);
 }
 
 #$data = explode("\n", $mysql);
 #$nstring = trim(implode(':',$data),':');
 
-if (!is_file($mysql_rrd)) {
-    rrdtool_create ($mysql_rrd, "--step 300 \
+if (!is_file($mysql_rrd))
+{
+  rrdtool_create ($mysql_rrd, "--step 300 \
 	DS:IDBLBSe:GAUGE:600:0:125000000000 \
 	DS:IBLFh:DERIVE:600:0:125000000000 \
 	DS:IBLWn:DERIVE:600:0:125000000000 \
@@ -119,4 +120,5 @@ if (!is_file($mysql_rrd)) {
 
 rrdtool_update($mysql_rrd, "N:$nstring");
 echo("done ");
+
 ?>

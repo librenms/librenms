@@ -37,7 +37,7 @@ while ($sensor = mysql_fetch_array($volt_data))
     $msg .= "V) at " . date($config['timestamp_format']);
     notify($device, "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
-    log_event('Voltage ' . $sensor['sensor_descr'] . " under threshold: " . $volt . " V (< " . $sensor['sensor_limit_low'] . " V)", $device['device_id'], 'voltage', $sensor['sensor_id']);
+    log_event('Voltage ' . $sensor['sensor_descr'] . " under threshold: " . $volt . " V (< " . $sensor['sensor_limit_low'] . " V)", $device, 'voltage', $sensor['sensor_id']);
   }
   else if ($sensor['sensor_current'] < $sensor['sensor_limit'] && $volt >= $sensor['sensor_limit'])
   {
@@ -45,7 +45,7 @@ while ($sensor = mysql_fetch_array($volt_data))
     $msg .= "V) at " . date($config['timestamp_format']);
     notify($device, "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
-    log_event('Voltage ' . $sensor['sensor_descr'] . " above threshold: " . $volt . " V (> " . $sensor['sensor_limit'] . " V)", $device['device_id'], 'voltage', $sensor['sensor_id']);
+    log_event('Voltage ' . $sensor['sensor_descr'] . " above threshold: " . $volt . " V (> " . $sensor['sensor_limit'] . " V)", $device, 'voltage', $sensor['sensor_id']);
   }
   mysql_query("UPDATE sensors SET sensor_current = '$volt' WHERE sensor_class='voltage' AND sensor_id = '" . $sensor['sensor_id'] . "'");
 }

@@ -85,7 +85,7 @@ while ($db_info = mysql_fetch_array($db_info_list))
     if ($vm_info[$property] != $db_info[$property])
     {
       mysql_query("UPDATE vmware_vminfo SET " . $property ." = '" . mres($vm_info[$property]) ."' WHERE id = '" . $db_info["id"] . "'");
-      log_event($db_info["vmwVmDisplayName"] . " (" . preg_replace("/^vmwVm/", "", $property) . ") -> " . $vm_info[$property], $device['device_id']);
+      log_event($db_info["vmwVmDisplayName"] . " (" . preg_replace("/^vmwVm/", "", $property) . ") -> " . $vm_info[$property], $device);
     }
   }
 }
