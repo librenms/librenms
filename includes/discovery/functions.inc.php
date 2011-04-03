@@ -17,7 +17,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
     mysql_query($query);
     if ($debug) { echo("$query\n". mysql_affected_rows() . " inserted\n"); }
     echo("+");
-    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', mysql_insert_id());
+    log_event("Sensor Added: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', mysql_insert_id());
   }
   else
   {
@@ -39,7 +39,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       mysql_query($query);
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("H");
-      log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device['device_id'], 'sensor', $sensor_id);
+      log_event("Sensor High Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$high_limit.")", $device, 'sensor', $sensor_id);
     }
 
     if (!$low_limit)
@@ -58,7 +58,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       mysql_query($query);
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("L");
-      log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device['device_id'], 'sensor', $sensor_id);
+      log_event("Sensor Low Limit Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr)." (".$low_limit.")", $device, 'sensor', $sensor_id);
     }
 
     if ($oid == $sensor_entry['sensor_oid'] && $descr == $sensor_entry['sensor_descr'] && $multiplier == $sensor_entry['sensor_multiplier'] && $divisor == $sensor_entry['sensor_divisor'])
@@ -70,7 +70,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
       $query = "UPDATE sensors SET `sensor_descr` = '$descr', `sensor_oid` = '$oid', `sensor_multiplier` = '$multiplier', `sensor_divisor` = '$divisor' WHERE `sensor_class` = '" . mres($class) . "' AND `device_id` = '" . $device['device_id'] . "' AND sensor_type = '$type' AND `sensor_index` = '$index'";
       mysql_query($query);
       echo("U");
-      log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device['device_id'], 'sensor', $sensor_id);
+      log_event("Sensor Updated: ".mres($class)." ".mres($type)." ". mres($index)." ".mres($descr), $device, 'sensor', $sensor_id);
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
     }
   }
@@ -148,7 +148,7 @@ function check_valid_sensors($device, $class, $valid)
       {
         echo("-");
         mysql_query("DELETE FROM `sensors` WHERE sensor_class='".$class."' AND sensor_id = '" . $test['sensor_id'] . "'");
-        log_event("Sensor Deleted: ".$test['sensor_class']." ".$test['sensor_type']." ". $test['sensor_index']." ".$test['sensor_descr'], $device['device_id'], 'sensor', $sensor_id);
+        log_event("Sensor Deleted: ".$test['sensor_class']." ".$test['sensor_type']." ". $test['sensor_index']." ".$test['sensor_descr'], $device, 'sensor', $sensor_id);
       }
       unset($oid); unset($type);
     }
@@ -165,6 +165,7 @@ function discover_juniAtmVp(&$valid, $interface_id, $vp_id, $vp_descr)
      $sql = "INSERT INTO `juniAtmVp` (`interface_id`,`vp_id`,`vp_descr`) VALUES ('".$interface_id."','".$vp_id."','".$vp_descr."')";
      mysql_query($sql); echo("+");
      if ($debug) { echo($sql . " - " . mysql_affected_rows() . "inserted "); }
+     #FIXME vv no $device!
      log_event("Juniper ATM VP Added: port ".mres($interface_id)." vp ".mres($vp_id)." descr". mres($vp_descr), 'juniAtmVp', mysql_insert_id());
   }
   else
@@ -247,8 +248,7 @@ function discover_processor(&$valid, $device, $oid, $index, $type, $descr, $prec
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
       echo("+");
-      log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), 'processor', mysql_insert_id());
-
+      log_event("Processor added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'processor', mysql_insert_id());
     }
     else
     {
@@ -277,6 +277,7 @@ function discover_mempool(&$valid, $device, $index, $type, $descr, $precision = 
       mysql_query($query);
       if ($debug) { print $query . "\n"; }
       echo("+");
+      log_event("Memory pool added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'mempool', mysql_insert_id());
     }
     else
     {
@@ -303,6 +304,7 @@ function discover_toner(&$valid, $device, $oid, $index, $type, $descr, $capacity
     $query .= " VALUES ('".$device['device_id']."', '$oid', '$index', '$type', '$descr', '$capacity', '$current')";
     mysql_query($query);
     echo("+");
+    log_event("Toner added: type ".mres($type)." index ".mres($index)." descr ". mres($descr), $device, 'toner', mysql_insert_id());
   }
   else
   {

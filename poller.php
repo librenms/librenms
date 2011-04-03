@@ -121,7 +121,7 @@ while ($device = mysql_fetch_assoc($device_query))
     $poll_separator = ", ";
     mysql_query("UPDATE `devices` SET `status` = '".$status."' WHERE `device_id` = '".$device['device_id']."'");
     mysql_query("INSERT INTO alerts (importance, device_id, message) VALUES ('0', '" . $device['device_id'] . "', 'Device is " .($status == '1' ? 'up' : 'down') . "')");
-    log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device['device_id'], ($status == '1' ? 'up' : 'down'));
+    log_event('Device status changed to ' . ($status == '1' ? 'Up' : 'Down'), $device, ($status == '1' ? 'up' : 'down'));
     notify($device, "Device ".($status == '1' ? 'Up' : 'Down').": " . $device['hostname'], "Device ".($status == '1' ? 'up' : 'down').": " . $device['hostname'] . " at " . date($config['timestamp_format']));
   }
 
@@ -173,7 +173,7 @@ while ($device = mysql_fetch_assoc($device_query))
       if ($uptime < $device['uptime'])
       {
         notify($device,"Device rebooted: " . $device['hostname'],  "Device Rebooted : " . $device['hostname'] . " " . formatUptime($uptime) . " ago.");
-        log_event('Device rebooted after '.formatUptime($device['uptime']), $device['device_id'], 'reboot', $device['uptime']);
+        log_event('Device rebooted after '.formatUptime($device['uptime']), $device, 'reboot', $device['uptime']);
       }
 
       $uptimerrd = $config['rrd_dir'] . "/" . $device['hostname'] . "/uptime.rrd";
@@ -246,28 +246,28 @@ while ($device = mysql_fetch_assoc($device_query))
     {
       $poll_update .= $poll_separator . "`serial` = '".mres($serial)."'";
       $poll_separator = ", ";
-      log_event("Serial -> $serial", $device['device_id'], 'system');
+      log_event("Serial -> $serial", $device, 'system');
     }
 
     if ($sysContact && $sysContact != $device['sysContact'])
     {
       $poll_update .= $poll_separator . "`sysContact` = '".mres($sysContact)."'";
       $poll_separator = ", ";
-      log_event("Contact -> $sysContact", $device['device_id'], 'system');
+      log_event("Contact -> $sysContact", $device, 'system');
     }
 
     if ($sysName && $sysName != $device['sysName'])
     {
       $poll_update .= $poll_separator . "`sysName` = '$sysName'";
       $poll_separator = ", ";
-      log_event("sysName -> $sysName", $device['device_id'], 'system');
+      log_event("sysName -> $sysName", $device, 'system');
     }
 
     if ($sysDescr && $sysDescr != $device['sysDescr'])
     {
       $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
       $poll_separator = ", ";
-      log_event("sysDescr -> $sysDescr", $device['device_id'], 'system');
+      log_event("sysDescr -> $sysDescr", $device, 'system');
     }
 
     if ($sysLocation && $device['location'] != $sysLocation)
@@ -277,28 +277,28 @@ while ($device = mysql_fetch_assoc($device_query))
         $poll_update .= $poll_separator . "`location` = '$sysLocation'";
         $poll_separator = ", ";
       }
-      log_event("Location -> $sysLocation", $device['device_id'], 'system');
+      log_event("Location -> $sysLocation", $device, 'system');
     }
 
     if ($version && $device['version'] != $version)
     {
       $poll_update .= $poll_separator . "`version` = '$version'";
       $poll_separator = ", ";
-      log_event("OS Version -> $version", $device['device_id'], 'system');
+      log_event("OS Version -> $version", $device, 'system');
     }
 
     if ($features != $device['features'])
     {
       $poll_update .= $poll_separator . "`features` = '$features'";
       $poll_separator = ", ";
-      log_event("OS Features -> $features", $device['device_id'], 'system');
+      log_event("OS Features -> $features", $device, 'system');
     }
 
     if ($hardware && $hardware != $device['hardware'])
     {
       $poll_update .= $poll_separator . "`hardware` = '$hardware'";
       $poll_separator = ", ";
-      log_event("Hardware -> $hardware", $device['device_id'], 'system');
+      log_event("Hardware -> $hardware", $device, 'system');
     }
 
     $poll_update .= $poll_separator . "`last_polled` = NOW()";

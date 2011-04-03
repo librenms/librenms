@@ -34,7 +34,7 @@ while ($sensor = mysql_fetch_array($sensor_data))
     $msg .= "Hz) at " . date($config['timestamp_format']);
     notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
-    log_event('Frequency ' . $sensor['sensor_descr'] . " under threshold: " . $freq . " Hz (< " . $sensor['sensor_limit_low'] . " Hz)", $device['device_id'] , 'frequency', $sensor['sensor_id']);
+    log_event('Frequency ' . $sensor['sensor_descr'] . " under threshold: " . $freq . " Hz (< " . $sensor['sensor_limit_low'] . " Hz)", $device, 'frequency', $sensor['sensor_id']);
   }
   else if ($sensor['sensor_current'] < $sensor['sensor_limit'] && $freq >= $sensor['sensor_limit'])
   {
@@ -42,7 +42,7 @@ while ($sensor = mysql_fetch_array($sensor_data))
     $msg .= "Hz) at " . date($config['timestamp_format']);
     notify($device, "Frequency Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
-    log_event('Frequency ' . $sensor['sensor_descr'] . " above threshold: " . $freq . " Hz (> " . $sensor['sensor_limit'] . " Hz)", $device['device_id'], 'frequency', $sensor['sensor_id']);
+    log_event('Frequency ' . $sensor['sensor_descr'] . " above threshold: " . $freq . " Hz (> " . $sensor['sensor_limit'] . " Hz)", $device, 'frequency', $sensor['sensor_id']);
   }
 
   mysql_query("UPDATE frequency SET sensor_current = '$freq' WHERE sensor_id = '" . $sensor['sensor_id'] . "'");
