@@ -94,9 +94,13 @@ while ($peer = mysql_fetch_assoc($peer_query))
 
   unset($sep);
 
+  $graph_type       = "bgp_updates";
+  $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
+  $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
+
   echo("<tr bgcolor=$bg_colour background=$bg_image>
            <td width=20><span class=list-large>$i</span></td>
-           <td><span class=list-large>" . $peer['bgpPeerIdentifier'] . "</span><br />".$peername."</td>
+           <td>" . $peeraddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
 	     <td>$peer_type</td>
            <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer_af) ? $peer_af : '') . "</td>
            <td><strong>AS" . $peer['bgpPeerRemoteAs'] . "</strong><br />" . $peer['astext'] . "</td>
