@@ -677,6 +677,13 @@ $config['os'][$os]['ifXmcbc']           = 1;
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 
+$os = "mrvld";
+$config['os'][$os]['group']		= "mrv";
+$config['os'][$os]['text']		= "MRV LambdaDriver";
+$config['os'][$os]['type']		= "network";
+$config['os'][$os]['icon']  		= "mrv";
+
+
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 
 ### Graph Types
