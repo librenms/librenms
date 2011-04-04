@@ -258,14 +258,14 @@ while ($device = mysql_fetch_assoc($device_query))
 
     if ($sysName && $sysName != $device['sysName'])
     {
-      $poll_update .= $poll_separator . "`sysName` = '$sysName'";
+      $poll_update .= $poll_separator . "`sysName` = '".mres($sysName)."'";
       $poll_separator = ", ";
       log_event("sysName -> $sysName", $device, 'system');
     }
 
     if ($sysDescr && $sysDescr != $device['sysDescr'])
     {
-      $poll_update .= $poll_separator . "`sysDescr` = '$sysDescr'";
+      $poll_update .= $poll_separator . "`sysDescr` = '".mres($sysDescr)."'";
       $poll_separator = ", ";
       log_event("sysDescr -> $sysDescr", $device, 'system');
     }
@@ -274,7 +274,7 @@ while ($device = mysql_fetch_assoc($device_query))
     {
       if (!get_dev_attrib($device,'override_sysLocation_bool'))
       {
-        $poll_update .= $poll_separator . "`location` = '$sysLocation'";
+        $poll_update .= $poll_separator . "`location` = '".mres($sysLocation)."'";
         $poll_separator = ", ";
       }
       log_event("Location -> $sysLocation", $device, 'system');
@@ -282,21 +282,21 @@ while ($device = mysql_fetch_assoc($device_query))
 
     if ($version && $device['version'] != $version)
     {
-      $poll_update .= $poll_separator . "`version` = '$version'";
+      $poll_update .= $poll_separator . "`version` = '".mres($version)."'";
       $poll_separator = ", ";
       log_event("OS Version -> $version", $device, 'system');
     }
 
     if ($features != $device['features'])
     {
-      $poll_update .= $poll_separator . "`features` = '$features'";
+      $poll_update .= $poll_separator . "`features` = '".mres($features)."'";
       $poll_separator = ", ";
       log_event("OS Features -> $features", $device, 'system');
     }
 
     if ($hardware && $hardware != $device['hardware'])
     {
-      $poll_update .= $poll_separator . "`hardware` = '$hardware'";
+      $poll_update .= $poll_separator . "`hardware` = '".mres($hardware)."'";
       $poll_separator = ", ";
       log_event("Hardware -> $hardware", $device, 'system');
     }
