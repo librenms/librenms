@@ -24,7 +24,7 @@ $runtime_stats = array();
 
 echo("Observium v".$config['version']." Discovery\n\n");
 
-$options = getopt("h:t:i:n:d::a::");
+$options = getopt("h:m:i:n:d::a::");
 
 if (isset($options['h']))
 {
@@ -79,9 +79,12 @@ if (!$where)
   echo("-h new                                       Poll all devices that have not had a discovery run before\n\n");
   echo("-i <instances> -n <number>                   Poll as instance <number> of <instances>\n");
   echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
-  echo("-d                                           Enable debugging output\n");
   echo("\n");
-  echo("No polling type specified!\n");
+  echo("Debugging and testing options:\n");
+  echo("-d                                           Enable debugging output\n");
+  echo("-m                                           Specify single module to be run\n");
+  echo("\n");
+  echo("Invalid arguments!\n");
   exit;
 }
 
@@ -164,29 +167,37 @@ while ($device = mysql_fetch_array($device_query))
 
   #include("includes/discovery/os.inc.php");
 
-  include("includes/discovery/ports.inc.php");
-  include("includes/discovery/entity-physical.inc.php");
-  include("includes/discovery/processors.inc.php");
-  include("includes/discovery/mempools.inc.php");
-  include("includes/discovery/ipv4-addresses.inc.php");
-  include("includes/discovery/ipv6-addresses.inc.php");
-  include("includes/discovery/sensors.inc.php");
-  include("includes/discovery/storage.inc.php");
-  include("includes/discovery/hr-device.inc.php");
-  include("includes/discovery/discovery-protocols.inc.php");
-  include("includes/discovery/arp-table.inc.php");
-  include("includes/discovery/junose-atm-vp.inc.php");
-  include("includes/discovery/bgp-peers.inc.php");
-  include("includes/discovery/q-bridge-mib.inc.php");
-  include("includes/discovery/cisco-vlans.inc.php");
-  include("includes/discovery/cisco-mac-accounting.inc.php");
-  include("includes/discovery/cisco-pw.inc.php");
-  include("includes/discovery/cisco-vrf.inc.php");
-  include("includes/discovery/vmware-vminfo.inc.php");
-  include("includes/discovery/toner.inc.php");
-  include("includes/discovery/ucd-diskio.inc.php");
-  include("includes/discovery/services.inc.php");
+  if($options['m']) 
+  {
+    if(is_file("includes/discovery/".$options['m'].".inc.php"))
+    {
+      include("includes/discovery/".$options['m'].".inc.php");
+    }
 
+  } else {
+    include("includes/discovery/ports.inc.php");
+    include("includes/discovery/entity-physical.inc.php");
+    include("includes/discovery/processors.inc.php");
+    include("includes/discovery/mempools.inc.php");
+    include("includes/discovery/ipv4-addresses.inc.php");
+    include("includes/discovery/ipv6-addresses.inc.php");
+    include("includes/discovery/sensors.inc.php");
+    include("includes/discovery/storage.inc.php");
+    include("includes/discovery/hr-device.inc.php");
+    include("includes/discovery/discovery-protocols.inc.php");
+    include("includes/discovery/arp-table.inc.php");
+    include("includes/discovery/junose-atm-vp.inc.php");
+    include("includes/discovery/bgp-peers.inc.php");
+    include("includes/discovery/q-bridge-mib.inc.php");
+    include("includes/discovery/cisco-vlans.inc.php");
+    include("includes/discovery/cisco-mac-accounting.inc.php");
+    include("includes/discovery/cisco-pw.inc.php");
+    include("includes/discovery/cisco-vrf.inc.php");
+    include("includes/discovery/vmware-vminfo.inc.php");
+    include("includes/discovery/toner.inc.php");
+    include("includes/discovery/ucd-diskio.inc.php");
+    include("includes/discovery/services.inc.php");
+  }
   if ($device['type'] == "unknown" || $device['type'] == "")
   {
     if ($config['os'][$device['os']]['type'])

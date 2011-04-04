@@ -60,10 +60,10 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
       if ($entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index))
       {
         $entPhysicalIndex = $index;
-	$descr = $entity_array[$index]['entPhysicalName'];
-        if ($descr || $device['os'] == "iosxr")
+        if ($entity_array[$index]['entPhysicalName'] || $device['os'] == "iosxr")
         {
-          $descr = rewrite_entity_descr($descr);
+          $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName']) . " - " . rewrite_entity_descr($entity_array[$index]['entPhysicalDescr']);
+          
         } else {
           $descr = $entity_array[$index]['entPhysicalDescr'];
           $descr = rewrite_entity_descr($descr);
@@ -73,10 +73,13 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         if (is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity'])
         {
           $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
-          if (!measured_descr)
+          if (!$measured_descr)
           {
             $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
           }
+
+          echo("descr: $descr | measured: $measured_descr\n");
+
           $descr = $measured_descr . " - " . $descr;
         }
 
