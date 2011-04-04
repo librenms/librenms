@@ -8,11 +8,6 @@
 
 	$count = count($files);
 
-        if ($config['rrdcached'])
-        {
-          $rrdcached = " --daemon " . $config['rrdcached'];
-        }
-
 	echo($count . " Files \n");
 	$start = date("U");
         $i = 0;
