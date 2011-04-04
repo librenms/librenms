@@ -15,8 +15,9 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
       if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == "true")
       {
         list($entPhysicalIndex) = explode(".", $index);
-        $entPhysicalName = snmp_get($device, "entPhysicalDescr.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");
-        $descr = $entPhysicalDescr." - ".$entry['cempMemPoolName'];
+        $entPhysicalName = snmp_get($device, "entPhysicalName.".$entPhysicalIndex, "-Oqv", "ENTITY-MIB");
+
+        $descr = $entPhysicalName." - ".$entry['cempMemPoolName'];
 
         $descr = str_replace("Cisco ", "", $descr);
         $descr = str_replace("Network Processing Engine", "", $descr);
