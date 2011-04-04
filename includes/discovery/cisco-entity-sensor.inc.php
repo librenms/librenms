@@ -63,7 +63,6 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
         if ($entity_array[$index]['entPhysicalName'] || $device['os'] == "iosxr")
         {
           $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName']) . " - " . rewrite_entity_descr($entity_array[$index]['entPhysicalDescr']);
-          
         } else {
           $descr = $entity_array[$index]['entPhysicalDescr'];
           $descr = rewrite_entity_descr($descr);
@@ -77,8 +76,6 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
           {
             $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
           }
-
-          echo("descr: $descr | measured: $measured_descr\n");
 
           $descr = $measured_descr . " - " . $descr;
         }
