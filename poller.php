@@ -341,7 +341,10 @@ while ($device = mysql_fetch_assoc($device_query))
   $poll_update_query .= $poll_update;
   $poll_update_query .= " WHERE `device_id` = '" . $device['device_id'] . "'";
   if ($debug) { echo("Updating " . $device['hostname'] . " - $poll_update_query \n"); }
-  $poll_update_result = mysql_query($poll_update_query);
+  if (!mysql_query($poll_update_query))
+  {
+    echo "ERROR: " . mysql_error() . "\nSQL: $poll_update_query\n";
+  }
   if (mysql_affected_rows() == "1") { echo("UPDATED!\n"); } else { echo("NOT UPDATED!\n"); }
 
   unset($storage_cache); // Clear cache of hrStorage ** MAYBE FIXME? **
