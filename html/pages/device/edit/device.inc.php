@@ -65,7 +65,7 @@ if ($updated && $update_message)
   <tr>
     <td>
       <h5>
-        <form id="delete_host" name="delete_host" method="post" action="">
+        <form id="delete_host" name="delete_host" method="post" action="<?php echo($config['base_url'].'/delhost/'); ?>">
           <img src="images/16/server_delete.png" align="absmiddle">
           <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
           <input type="submit" class="submit" name="Submit" value="Delete Host">
