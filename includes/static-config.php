@@ -845,7 +845,7 @@ if (isset($config['enable_printers']) && $config['enable_printers'])
 # No changes below this line #
 ##############################
 
-$config['version'] = "0.10";
+$config['version'] = "0.11";
 
 if (isset($config['rrdgraph_def_text']))
 {
