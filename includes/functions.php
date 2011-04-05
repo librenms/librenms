@@ -366,7 +366,7 @@ function utime()
   return $sec + $usec;
 }
 
-# FIXME function unused, superseded by rewrites?
+# FIXME function unused, superceded by rewrites?
 function fixIOSFeatures($features)
 {
 	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);
