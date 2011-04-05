@@ -11,13 +11,11 @@ if ($_REQUEST['id'])
   echo(delete_device(mres($_REQUEST['id'])));
 }
 
-?>
 
-<form name="form1" method="post" action="?page=delhost">
+echo('<form name="form1" method="post" action='.$config['base_url'].'"/delhost/">
   <h1>Delete Host</h1>
   <br />
-  <p><select name="id">
-<?php
+  <p><select name="id">');
 
 $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
 
