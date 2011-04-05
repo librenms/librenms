@@ -2,7 +2,7 @@
 
 echo("Wireless: ");
 
-if ($device['type'] == 'network')
+if ($device['type'] == 'network' || $device['type'] == 'firewall')
 {
   ##### GENERIC FRAMEWORK, FILLING VARIABLES
   if ($device['os'] == 'airport')
@@ -26,8 +26,29 @@ if ($device['type'] == 'network')
     echo(($wificlients1 +0) . " clients on dot11Radio0, " . ($wificlients2 +0) . " clients on dot11Radio1\n");
   }
 
-  ##### RRD Filling Code
+  #MikroTik RouterOS
+  if ($device['os'] == 'routeros')
+  {
+    # Check inventory for wireless card in device. Valid types be here:
+    $wirelesscards = array('Wireless', 'Atheros');
+    foreach ($wirelesscards as $wirelesscheck)
+    {
+      $query = "SELECT COUNT(*) FROM `entPhysical` WHERE `device_id` = '" . $device['device_id'] . "' AND `entPhysicalDescr` LIKE '%" . $wirelesscheck . "%'";
+      if (mysql_result(mysql_query($query),0) >= "1")
+      {
+        echo("Checking RouterOS Wireless clients... ");
 
+        $wificlients1 = snmp_get($device, "mtxrWlApClientCount.10", "-OUqnv", "MIKROTIK-MIB");
+
+        echo(($wificlients1 +0) . " clients\n");
+        break;
+      }
+      unset($wirelesscards);
+    }
+  }
+
+
+  ##### RRD Filling Code
   if (isset($wificlients1) && $wificlients1 != "")
   {
     $wificlientsrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("wificlients-radio1.rrd");
