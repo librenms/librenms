@@ -91,7 +91,7 @@ function formatRates($rate)
    return $rate;
 }
 
-function formatstorage($rate, $round = '2')
+function formatStorage($rate, $round = '2')
 {
    $rate = format_bi($rate, $round) . "B";
    return $rate;
