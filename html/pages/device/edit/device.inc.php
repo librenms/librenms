@@ -65,16 +65,11 @@ if ($updated && $update_message)
   <tr>
     <td>
       <h5>
-<?php
-
-        echo("
-              <form id='delete_host' name='delete_host' method='post' action='".$config['base_url']."/delhost/'>
-                <img src='images/16/server_delete.png' align='absmiddle'>
-                <input type=hidden name=id value='".$device['device_id']."'>
-		<input type=submit class=submit name='Submit' value='Delete Host'>
-              </form>");
-
-?>
+        <form id="delete_host" name="delete_host" method="post" action="">
+          <img src="images/16/server_delete.png" align="absmiddle">
+          <input type="hidden" name="id" value="<?php echo($device['device_id']); ?>">
+          <input type="submit" class="submit" name="Submit" value="Delete Host">
+        </form>
       </h5>
 
 <form id="edit" name="edit" method="post" action="">
