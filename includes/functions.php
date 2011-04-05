@@ -366,59 +366,6 @@ function utime()
   return $sec + $usec;
 }
 
-# FIXME function unused, superceded by rewrites?
-function fixIOSFeatures($features)
-{
-	$features = preg_replace("/^PK9S$/", "IP w/SSH LAN Only", $features);
-        $features = str_replace("LANBASEK9", "Lan Base Crypto", $features);
-	$features = str_replace("LANBASE", "Lan Base", $features);
-	$features = str_replace("ADVENTERPRISEK9", "Advanced Enterprise Crypto", $features);
-	$features = str_replace("ADVSECURITYK9", "Advanced Security Crypto", $features);
-        $features = str_replace("K91P", "Provider Crypto", $features);
-	$features = str_replace("K4P", "Provider Crypto", $features);
-        $features = str_replace("ADVIPSERVICESK9", "Adv IP Services Crypto", $features);
-        $features = str_replace("ADVIPSERVICES", "Adv IP Services", $features);
-        $features = str_replace("IK9P", "IP Plus Crypto", $features);
-	$features = str_replace("K9O3SY7", "IP ADSL FW IDS Plus IPSEC 3DES", $features);
-        $features = str_replace("SPSERVICESK9", "SP Services Crypto", $features);
-        $features = preg_replace("/^PK9SV$/", "IP MPLS/IPV6 W/SSH + BGP", $features);
-        $features = str_replace("IS", "IP Plus", $features);
-        $features = str_replace("IPSERVICESK9", "IP Services Crypto", $features);
-        $features = str_replace("BROADBAND", "Broadband", $features);
-        $features = str_replace("IPBASE", "IP Base", $features);
-        $features = str_replace("IPSERVICE", "IP Services", $features);
-        $features = preg_replace("/^P$/", "Service Provider", $features);
-	$features = preg_replace("/^P11$/", "Broadband Router", $features);
-	$features = preg_replace("/^G4P5$/", "NRP", $features);
-        $features = str_replace("JK9S", "Enterprise Plus Crypto", $features);
-        $features = str_replace("IK9S", "IP Plus Crypto", $features);
-        $features = preg_replace("/^JK$/", "Enterprise Plus", $features);
-	$features = str_replace("I6Q4L2", "Layer 2", $features);
-        $features = str_replace("I6K2L2Q4", "Layer 2 Crypto", $features);
-	$features = str_replace("C3H2S", "Layer 2 SI/EI", $features);
-	$features = str_replace("_WAN", " + WAN", $features);
-	return $features;
-}
-
-# FIXME function unused, superseded by rewrites?
-function fixIOSHardware($hardware)
-{
-        $hardware = preg_replace("/C([0-9]+)/", "Cisco \\1", $hardware);
-	$hardware = preg_replace("/CISCO([0-9]+)/", "Cisco \\1", $hardware);
-        $hardware = str_replace("cat4000","Cisco Catalyst 4000", $hardware);
-        $hardware = str_replace("s3223_rp","Cisco Catalyst 6500 SUP32", $hardware);
-        $hardware = str_replace("s222_rp","Cisco Catalyst 6500 SUP2", $hardware);
-        $hardware = str_replace("c6sup2_rp","Cisco Catalyst 6500 SUP2", $hardware);
-        $hardware = str_replace("s72033_rp","Cisco Catalyst 6500 SUP720 ", $hardware);
-        $hardware = str_replace("RSP","Cisco 7500", $hardware);
-	$hardware = str_replace("C3200XL", "Cisco Catalyst 3200XL", $hardware);
-	$hardware = str_replace("C3550", "Cisco Catalyst 3550", $hardware);
-	$hardware = str_replace("C2950", "Cisco Catalyst 2950", $hardware);
-	$hardware = str_replace("C7301", "Cisco 7301", $hardware);
-        $hardware = str_replace("CE500", "Catalyst Express 500", $hardware);
-	return $hardware;
-}
-
 function createHost($host, $community, $snmpver, $port = 161, $transport = 'udp')
 {
   $host = trim(strtolower($host));
