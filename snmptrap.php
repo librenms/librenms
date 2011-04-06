@@ -14,11 +14,11 @@ $entry = explode(",", $argv[1]);
 
 print_r($entry);
 
-$device = @mysql_fetch_array(mysql_query("SELECT * FROM devices WHERE `hostname` = '".$entry['0']."'"));
+$device = @mysql_fetch_assoc(mysql_query("SELECT * FROM devices WHERE `hostname` = '".$entry['0']."'"));
 
 if (!$device['device_id'])
 {
-  $device = @mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE
+  $device = @mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I WHERE
   A.ipv4_address = '" . $entry['0']."' AND I.interface_id = A.interface_id"));
 }
 

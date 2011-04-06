@@ -42,7 +42,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
   }
   else
   {
-    while ($device = mysql_fetch_array($deviceresult))
+    while ($device = mysql_fetch_assoc($deviceresult))
     {
       if ($device)
       {
@@ -54,7 +54,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
           $map .= "\"".$device['hostname']."\" [fontsize=20 fillcolor=\"lightblue\" URL=\"{$config['base_url']}/device/".$device['device_id']."/map/\" shape=box3d]\n";
         }
 
-        while ($link = mysql_fetch_array($links))
+        while ($link = mysql_fetch_assoc($links))
         {
           $local_interface_id = $link['local_interface_id'];
           $remote_interface_id = $link['remote_interface_id'];
@@ -95,10 +95,10 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dst = $link['remote_hostname'];
             }
 
-            $sif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
+            $sif = ifNameDescr(mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['local_interface_id'])),$device);
             if ($remote_interface_id)
             {
-              $dif = ifNameDescr(mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
+              $dif = ifNameDescr(mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE `interface_id`=" . $link['remote_interface_id'])));
             } else {
               $dif['label'] = $link['remote_port'];
 	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];

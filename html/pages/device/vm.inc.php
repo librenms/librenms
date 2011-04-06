@@ -5,7 +5,7 @@ echo('<table border="0" cellspacing="0" cellpadding="5" width="100%" class="sort
 $i = "1";
 $vm_query = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vmware_vminfo WHERE device_id = '".$device['device_id']."' ORDER BY vmwVmDisplayName");
 
-while ($vm = mysql_fetch_array($vm_query))
+while ($vm = mysql_fetch_assoc($vm_query))
 {
   include("includes/print-vm.inc.php");
   $i++;

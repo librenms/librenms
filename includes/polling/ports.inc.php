@@ -102,7 +102,7 @@ if ($debug) { print_r($port_stats); }
 
 /// Loop ports in the DB and update where necessary
 $port_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$device['device_id']."' AND `deleted` = 0");
-while ($port = mysql_fetch_array($port_query))
+while ($port = mysql_fetch_assoc($port_query))
 {
   echo("Port " . $port['ifDescr'] . " ");
   if ($port_stats[$port['ifIndex']] && $port['disabled'] != "1")

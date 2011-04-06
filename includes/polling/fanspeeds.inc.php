@@ -3,7 +3,7 @@
 $query = "SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $fan_data = mysql_query($query);
 
-while ($fanspeed = mysql_fetch_array($fan_data))
+while ($fanspeed = mysql_fetch_assoc($fan_data))
 {
   echo("Checking fan " . $fanspeed['sensor_descr'] . "... ");
 

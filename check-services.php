@@ -7,7 +7,7 @@ include("includes/functions.php");
 $sql = "SELECT * FROM devices AS D, services AS S WHERE S.device_id = D.device_id ORDER by D.device_id DESC";
 $query = mysql_query($sql);
 
-while ($service = mysql_fetch_array($query))
+while ($service = mysql_fetch_assoc($query))
 {
   if ($service['status'] = "1")
   {

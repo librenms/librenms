@@ -123,7 +123,7 @@ if ($_GET['opta'] == "add")
   $query = mysql_query($sql);
   echo("<table border=0 cellspacing=0 cellpadding=5 class=devicetable width=100%>");
   $i=1;
-  while ($bill = mysql_fetch_array($query))
+  while ($bill = mysql_fetch_assoc($query))
   {
     #echo("<pre>");
     #print_r($permissions);

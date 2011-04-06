@@ -15,7 +15,7 @@ if ($_SESSION['userlevel'] >= '5')
   echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
   $i = "1";
   $vrf_query = mysql_query("SELECT * FROM `vrfs` GROUP BY `mplsVpnVrfRouteDistinguisher`");
-  while ($vrf = mysql_fetch_array($vrf_query))
+  while ($vrf = mysql_fetch_assoc($vrf_query))
   {
     if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
     echo("<tr valign=top bgcolor='$bg_colour'>");
@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] >= '5')
     echo("<td><table border=0 cellspacing=0 cellpadding=5 width=100%>");
     $devices = mysql_query("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = '".$vrf['mplsVpnVrfRouteDistinguisher']."' AND D.device_id = V.device_id");
     $x=1;
-    while ($device = mysql_fetch_array($devices))
+    while ($device = mysql_fetch_assoc($devices))
     {
       if (!is_integer($i/2))
       {
@@ -40,7 +40,7 @@ if ($_SESSION['userlevel'] >= '5')
       $ports = mysql_query("SELECT * FROM `ports` WHERE `ifVrf` = '".$device['vrf_id']."' and device_id = '".$device['device_id']."'");
       unset($seperator);
 
-      while ($port = mysql_fetch_array($ports))
+      while ($port = mysql_fetch_assoc($ports))
       {
         $port = array_merge ($device, $port);
         if ($_GET['opta'])

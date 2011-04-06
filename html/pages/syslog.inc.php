@@ -14,7 +14,7 @@
       <option value="">All Programs</option>
       <?php
         $query = mysql_query("SELECT `program` FROM `syslog` GROUP BY `program` ORDER BY `program`");
-        while ($data = mysql_fetch_array($query))
+        while ($data = mysql_fetch_assoc($query))
         {
           echo("<option value='".$data['program']."'");
 	  if ($data['program'] == $_POST['program']) { echo("selected"); }
@@ -29,7 +29,7 @@
       <option value="">All Devices</option>
       <?php
         $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-        while ($data = mysql_fetch_array($query))
+        while ($data = mysql_fetch_assoc($query))
         {
           echo("<option value='".$data['device_id']."'");
 
@@ -75,7 +75,7 @@ if ($_SESSION['userlevel'] >= '5')
 
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_array($query))
+while ($entry = mysql_fetch_assoc($query))
 {
   $entry = array_merge($entry, device_by_id_cache($entry['device_id']));
   include("includes/print-syslog.inc.php");

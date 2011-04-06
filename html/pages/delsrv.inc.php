@@ -13,7 +13,7 @@ if ($_SESSION['userlevel'] < '5')
   }
 
   $query = mysql_query("SELECT * FROM `services` AS S, `devices` AS D WHERE S.device_id = D.device_id ORDER BY hostname");
-  while ($device = mysql_fetch_array($query))
+  while ($device = mysql_fetch_assoc($query))
   {
     $servicesform .= "<option value='" . $device['service_id'] . "'>" . $device['service_id'] .  "." . $device['hostname'] . " - " . $device['service_type'] .  "</option>";
   }

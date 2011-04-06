@@ -15,7 +15,7 @@ $query = mysql_query($sql);
 
 if ($debug) { print_r ($valid_processor); }
 
-while ($test_processor = mysql_fetch_array($query))
+while ($test_processor = mysql_fetch_assoc($query))
 {
   $processor_index = $test_processor['processor_index'];
   $processor_type = $test_processor['processor_type'];

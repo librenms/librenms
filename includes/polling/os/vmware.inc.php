@@ -41,7 +41,7 @@ echo("VMware VM: ");
 
 $db_info_list = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "'");
 
-while ($db_info = mysql_fetch_array($db_info_list))
+while ($db_info = mysql_fetch_assoc($db_info_list))
 {
   /*
    * Fetch the Virtual Machine information.

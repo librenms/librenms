@@ -6,7 +6,7 @@ echo("<div style='margin-top: 5px; padding: 0px;'>");
 echo("<table width=100% cellpadding=6 cellspacing=0>");
 $i = '1';
 $mempools = mysql_query("SELECT * FROM `mempools` AS M, `devices` as D WHERE D.device_id = M.device_id ORDER BY D.hostname");
-while ($mempool = mysql_fetch_array($mempools))
+while ($mempool = mysql_fetch_assoc($mempools))
 {
   if (device_permitted($mempool['device_id']))
   {

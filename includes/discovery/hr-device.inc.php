@@ -45,7 +45,7 @@ if (is_array($hrDevices))
 $sql = "SELECT * FROM `hrDevice` WHERE `device_id`  = '".$device['device_id']."'";
 $query = mysql_query($sql);
 
-while ($test_hrDevice = mysql_fetch_array($query))
+while ($test_hrDevice = mysql_fetch_assoc($query))
 {
   if (!$valid_hrDevice[$test_hrDevice['hrDeviceIndex']])
   {

@@ -28,7 +28,7 @@ if ($handle = opendir($config['install_dir'] . "/includes/services/"))
 }
 
 $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-while ($device = mysql_fetch_array($query))
+while ($device = mysql_fetch_assoc($query))
 {
   $devicesform .= "<option value='" . $device['device_id'] . "'>" . $device['hostname'] . "</option>";
 }
@@ -39,7 +39,7 @@ if (mysql_result(mysql_query("SELECT COUNT(*) from `services` WHERE `device_id` 
 {
   $i = "1";
   $service_query = mysql_query("select * from services WHERE device_id = '".$device['device_id']."' ORDER BY service_type");
-  while ($service = mysql_fetch_array($service_query))
+  while ($service = mysql_fetch_assoc($service_query))
   {
     $existform .= "<option value='" . $service['service_id'] . "'>" . $service['service_type'] . "</option>";
   }

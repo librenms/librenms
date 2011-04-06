@@ -2,7 +2,7 @@
 
 $query = "SELECT * FROM sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $hum_data = mysql_query($query);
-while ($humidity = mysql_fetch_array($hum_data))
+while ($humidity = mysql_fetch_assoc($hum_data))
 {
   echo("Checking humidity " . $humidity['sensor_descr'] . "... ");
 

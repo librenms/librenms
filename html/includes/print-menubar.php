@@ -11,7 +11,7 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
 }
 
 $query_a = mysql_query("SELECT * FROM `devices`");
-while ($device = mysql_fetch_array($query_a))
+while ($device = mysql_fetch_assoc($query_a))
 {
   $this_alert = 0;
   if ($device['status'] == 0 && $device['ignore'] == '0') { $this_alert = "1"; } elseif ($device['ignore'] == '0')

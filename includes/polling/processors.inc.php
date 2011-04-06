@@ -2,7 +2,7 @@
 
 $query = "SELECT * FROM processors WHERE device_id = '" . $device['device_id'] . "'";
 $proc_data = mysql_query($query);
-while ($processor = mysql_fetch_array($proc_data))
+while ($processor = mysql_fetch_assoc($proc_data))
 {
   echo("Processor " . $processor['processor_descr'] . "... ");
 

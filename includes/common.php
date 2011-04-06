@@ -153,7 +153,7 @@ function getifindexbyid($id)
 function getifbyid($id)
 {
   $sql = mysql_query("SELECT * FROM `ports` WHERE `interface_id` = '$id'");
-  $result = @mysql_fetch_array($sql);
+  $result = @mysql_fetch_assoc($sql);
 
   return $result;
 }

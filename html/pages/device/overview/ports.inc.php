@@ -48,7 +48,7 @@ if ($ports['total'])
   $query = mysql_query($sql);
   $ifsep = "";
 
-  while ($data = mysql_fetch_array($query))
+  while ($data = mysql_fetch_assoc($query))
   {
     $data = ifNameDescr($data);
     $data = array_merge($data, $device);

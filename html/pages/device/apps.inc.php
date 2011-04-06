@@ -6,7 +6,7 @@ print_optionbar_start();
 
 unset($sep);
 
-while ($app = mysql_fetch_array($query))
+while ($app = mysql_fetch_assoc($query))
 {
   echo($sep);
 
@@ -26,7 +26,7 @@ while ($app = mysql_fetch_array($query))
 
 print_optionbar_end();
 
-$app = mysql_fetch_array(mysql_query("SELECT * FROM `applications` WHERE `device_id` = '".$device['device_id']."' AND `app_type` = '".$_GET['opta']."'"));
+$app = mysql_fetch_assoc(mysql_query("SELECT * FROM `applications` WHERE `device_id` = '".$device['device_id']."' AND `app_type` = '".$_GET['opta']."'"));
 
 if (is_file("pages/device/apps/".mres($_GET['opta']).".inc.php"))
 {

@@ -12,7 +12,7 @@ $query = "SELECT *,A.id as id FROM ipv4_addresses AS A, ports as I, devices as D
 
 $data = mysql_query($query);
 
-while ($row = mysql_fetch_array($data))
+while ($row = mysql_fetch_assoc($data))
 {
   $addr = Net_IPv4::parseAddress($row['ipv4_address']."/".$row['ipv4_prefixlen']);
   $mask = $addr->netmask;
@@ -31,7 +31,7 @@ while ($row = mysql_fetch_array($data))
 $sql = "SELECT * FROM devices WHERE status = '1'";
 $query = mysql_query($sql);
 
-while ($device = mysql_fetch_array($query))
+while ($device = mysql_fetch_assoc($query))
 {
   echo($device['hostname'] . " \n\n");
 
@@ -51,7 +51,7 @@ while ($device = mysql_fetch_array($query))
   $sql = "SELECT * FROM ip6addr AS A, ports AS I, devices as D WHERE A.interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'";
   $data = mysql_query($sql);
 
-  while ($row = mysql_fetch_array($data))
+  while ($row = mysql_fetch_assoc($data))
   {
     echo($row['ipv6_address'] . "\n");
     unset($valid);
@@ -66,7 +66,7 @@ while ($device = mysql_fetch_array($query))
 $query = "SELECT * FROM ports AS I, devices as D WHERE I.device_id = D.device_id AND D.status = '1'";
 $data = mysql_query($query);
 
-while ($row = mysql_fetch_array($data))
+while ($row = mysql_fetch_assoc($data))
 {
   $index = $row['ifIndex'];
 
@@ -87,7 +87,7 @@ while ($row = mysql_fetch_array($data))
 echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"), 0) . " ports at start\n");
 $interface_query = mysql_query("SELECT interface_id,device_id FROM `ports`");
 
-while ($interface = mysql_fetch_array($interface_query))
+while ($interface = mysql_fetch_assoc($interface_query))
 {
   $device_id = $interface['device_id'];
   $interface_id = $interface['interface_id'];
@@ -103,7 +103,7 @@ echo(mysql_result(mysql_query("SELECT COUNT(*) FROM `ports`"), 0) . " ports at e
 echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at start\n");
 $link_query = mysql_query("SELECT id,local_interface_id,remote_interface_id FROM `links`");
 
-while ($link = mysql_fetch_array($link_query))
+while ($link = mysql_fetch_assoc($link_query))
 {
   $id = $link['id'];
   $src = $link['local_interface_id'];
@@ -119,7 +119,7 @@ echo(mysql_result(mysql_query("SELECT COUNT(id) FROM `links`"), 0) . " links at 
 echo(mysql_result(mysql_query("SELECT COUNT(adj_id) FROM `adjacencies`"), 0) . " adjacencies at start\n");
 $link_query = mysql_query("SELECT * FROM `adjacencies` AS A, `ports` AS I, `devices` AS D, networks AS N WHERE I.interface_id = A.interface_id AND D.device_id = I.device_id AND N.id = A.network_id");
 
-while ($link = mysql_fetch_array($link_query))
+while ($link = mysql_fetch_assoc($link_query))
 {
   $id = $link['adj_id'];
   $netid = $link['network_id'];

@@ -14,7 +14,7 @@ print_optionbar_start('25');
       <option value="">All Programs</option>
       <?php
         $query = mysql_query("SELECT `program` FROM `syslog` WHERE device_id = '" . $device['device_id'] . "' GROUP BY `program` ORDER BY `program`");
-        while ($data = mysql_fetch_array($query)) {
+        while ($data = mysql_fetch_assoc($query)) {
           echo("<option value='".$data['program']."'");
           if ($data['program'] == $_POST['program']) { echo("selected"); }
           echo(">".$data['program']."</option>");
@@ -43,7 +43,7 @@ $sql =  "SELECT *, DATE_FORMAT(timestamp, '%D %b %T') AS date from syslog WHERE 
 $sql .= " ORDER BY timestamp DESC LIMIT 1000";
 $query = mysql_query($sql);
 echo("<table cellspacing=0 cellpadding=2 width=100%>");
-while ($entry = mysql_fetch_array($query)) { include("includes/print-syslog.inc.php"); }
+while ($entry = mysql_fetch_assoc($query)) { include("includes/print-syslog.inc.php"); }
 echo("</table>");
 
 ?>

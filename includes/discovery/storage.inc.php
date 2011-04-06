@@ -11,7 +11,7 @@ $query = mysql_query($sql);
 
 if ($debug) { print_r ($valid_storage); }
 
-while ($test_storage = mysql_fetch_array($query))
+while ($test_storage = mysql_fetch_assoc($query))
 {
   $storage_index = $test_storage['storage_index'];
   $storage_mib = $test_storage['storage_mib'];

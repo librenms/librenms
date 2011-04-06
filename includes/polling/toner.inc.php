@@ -5,7 +5,7 @@ if ($config['enable_printers'])
   $query = "SELECT * FROM toner WHERE device_id = '" . $device['device_id'] . "'";
   $toner_data = mysql_query($query);
 
-  while ($toner = mysql_fetch_array($toner_data))
+  while ($toner = mysql_fetch_assoc($toner_data))
   {
     echo("Checking toner " . $toner['toner_descr'] . "... ");
 

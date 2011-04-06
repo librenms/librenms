@@ -6,7 +6,7 @@ echo("<div style='margin-top: 5px; padding: 0px;'>");
 echo("  <table width=100% cellpadding=6 cellspacing=0>");
 $i = '1';
 $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname");
-while ($proc = mysql_fetch_array($procs))
+while ($proc = mysql_fetch_assoc($procs))
 {
   if (device_permitted($proc['device_id']))
   {
@@ -14,6 +14,7 @@ while ($proc = mysql_fetch_array($procs))
 
     $device = $proc;
 
+    # FIXME should that really be done here? :-)
     $text_descr = $proc['processor_descr'];
     $text_descr = str_replace("Routing Processor", "RP", $text_descr);
     $text_descr = str_replace("Switching Processor", "SP", $text_descr);

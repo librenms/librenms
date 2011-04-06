@@ -5,7 +5,7 @@ $query = mysql_query("SELECT * FROM `processors` where `device_id` = '".$id."'")
 
 $i = 0;
 
-while ($proc = mysql_fetch_array($query))
+while ($proc = mysql_fetch_assoc($query))
 {
   $rrd_filename  = $config['rrd_dir'] . "/".$device['hostname']."/" . safename("processor-" . $proc['processor_type'] . "-" . $proc['processor_index'] . ".rrd");
 

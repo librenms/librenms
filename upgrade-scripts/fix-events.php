@@ -5,7 +5,7 @@ mysql_query("ALTER TABLE `eventlog` ADD  `event_id` INT NOT NULL AUTO_INCREMENT 
 
 $s = "SELECT * FROM eventlog";
 $q = mysql_query($s);
-while ($event = mysql_fetch_array($q))
+while ($event = mysql_fetch_assoc($q))
 {
   if ($event['interface'])
   {

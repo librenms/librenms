@@ -11,7 +11,7 @@ if (mysql_affected_rows())
 
   echo("Checking UCD DiskIO MIB: ");
 
-  while ($diskio = mysql_fetch_array($diskio_data))
+  while ($diskio = mysql_fetch_assoc($diskio_data))
   {
     $index = $diskio['diskio_index'];
 

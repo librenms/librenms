@@ -5,14 +5,15 @@
     <td width='200'>
       <select name='device_id' id='device_id'>
       <option value=''>All Devices</option>
-      <?php
-        $query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-        while ($data = mysql_fetch_array($query)) {
-          echo("<option value='".$data['device_id']."'");
-          if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
-          echo(">".$data['hostname']."</option>");
-        }
-      ?>
+<?php
+$query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
+while ($data = mysql_fetch_assoc($query))
+{
+  echo("<option value='".$data['device_id']."'");
+  if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
+  echo(">".$data['hostname']."</option>");
+}
+?>
       </select>
     </td>
     <td width='150'>
@@ -34,33 +35,35 @@
     <td width=110>
       <select name='ifSpeed' id='ifSpeed'>
       <option value=''>All Speeds</option>
-      <?php
-        $query = mysql_query("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
-        while ($data = mysql_fetch_array($query)) {
-          if ($data['ifSpeed'])
-          {
-            echo("<option value='".$data['ifSpeed']."'");
-            if ($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
-            echo(">".humanspeed($data['ifSpeed'])."</option>");
-          }
-        }
-      ?>
+<?php
+$query = mysql_query("SELECT `ifSpeed` FROM `ports` GROUP BY `ifSpeed` ORDER BY `ifSpeed`");
+while ($data = mysql_fetch_assoc($query))
+{
+  if ($data['ifSpeed'])
+  {
+    echo("<option value='".$data['ifSpeed']."'");
+    if ($data['ifSpeed'] == $_POST['ifSpeed']) { echo("selected"); }
+    echo(">".humanspeed($data['ifSpeed'])."</option>");
+  }
+}
+?>
        </select>
     </td>
     <td width=200>
       <select name='ifType' id='ifType'>
       <option value=''>All Media</option>
-      <?php
-        $query = mysql_query("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`");
-        while ($data = mysql_fetch_array($query)) {
-          if ($data['ifType'])
-          {
-            echo("<option value='".$data['ifType']."'");
-            if ($data['ifType'] == $_POST['ifType']) { echo("selected"); }
-            echo(">".$data['ifType']."</option>");
-          }
-        }
-      ?>
+<?php
+$query = mysql_query("SELECT `ifType` FROM `ports` GROUP BY `ifType` ORDER BY `ifType`");
+while ($data = mysql_fetch_assoc($query))
+{
+  if ($data['ifType'])
+  {
+    echo("<option value='".$data['ifType']."'");
+    if ($data['ifType'] == $_POST['ifType']) { echo("selected"); }
+    echo(">".$data['ifType']."</option>");
+  }
+}
+?>
        </select>
              </td>
              <td>
@@ -124,7 +127,7 @@ echo("<tr class=tablehead><td></td><th>Device</a></th><th>Interface</th><th>Spee
 
 $row = 1;
 
-while ($interface = mysql_fetch_array($query))
+while ($interface = mysql_fetch_assoc($query))
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

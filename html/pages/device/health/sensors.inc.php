@@ -7,7 +7,7 @@ echo("<table cellspacing=0 cellpadding=5 width=100%>");
 
 $row = 1;
 
-while ($temp = mysql_fetch_array($query))
+while ($temp = mysql_fetch_assoc($query))
 {
   if (!is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

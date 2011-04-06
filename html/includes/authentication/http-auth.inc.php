@@ -10,7 +10,7 @@ function authenticate($username,$password)
 
     $sql = "SELECT username FROM `users` WHERE `username`='".$_SESSION['username'] . "'";;
     $query = mysql_query($sql);
-    $row = @mysql_fetch_array($query);
+    $row = @mysql_fetch_assoc($query);
     if ($row['username'] && $row['username'] == $_SESSION['username'])
     {
       return 1;
@@ -54,14 +54,14 @@ function user_exists($username)
 function get_userlevel($username)
 {
   $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_array(mysql_query($sql));
+  $row = mysql_fetch_assoc(mysql_query($sql));
   return $row['level'];
 }
 
 function get_userid($username)
 {
   $sql = "SELECT user_id FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_array(mysql_query($sql));
+  $row = mysql_fetch_assoc(mysql_query($sql));
   return $row['user_id'];
 }
 

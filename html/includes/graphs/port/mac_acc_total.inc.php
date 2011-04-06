@@ -43,19 +43,19 @@ $query = mysql_query($sql);
 $pluses = ""; $iter = '0';
 $rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
 
-while ($acc = mysql_fetch_array($query))
+while ($acc = mysql_fetch_assoc($query))
 {
   $this_rrd = $config['rrd_dir'] . "/" . $acc['hostname'] . "/" . safename("cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd");
   if (is_file($this_rrd))
   {
     $mac = formatmac($acc['mac']);
     $name = $mac;
-    $addy = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."' AND interface_id = '".$acc['interface_id']."'"));
+    $addy = mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_mac where mac_address = '".$acc['mac']."' AND interface_id = '".$acc['interface_id']."'"));
 
     if ($addy)
     {
       $name = $addy['ipv4_address'] . " (".$mac.")";
-      $peer = mysql_fetch_array(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D
+      $peer = mysql_fetch_assoc(mysql_query("SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D
               WHERE A.ipv4_address = '".$addy['ipv4_address']."'
               AND I.interface_id = A.interface_id AND D.device_id = I.device_id"));
       if ($peer)
@@ -67,7 +67,7 @@ while ($acc = mysql_fetch_array($query))
                   $addy['ipv4_address']."'"),0))
       {
         $peer_query = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '".$acc['device_id']."' AND bgpPeerIdentifier = '".$addy['ipv4_address']."'");
-        $peer_info = mysql_fetch_array($peer_query);
+        $peer_info = mysql_fetch_assoc($peer_query);
         $name .= " - AS".$peer_info['bgpPeerRemoteAs'];
       }
 

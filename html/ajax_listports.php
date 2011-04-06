@@ -21,7 +21,7 @@ if (!$_SESSION['authenticated']) { echo("unauthenticated"); exit; }
 if (is_numeric($_GET['device_id']))
 {
   $ports = mysql_query("SELECT * FROM ports WHERE device_id = '".$_GET['device_id']."'");
-  while ($interface = mysql_fetch_array($ports))
+  while ($interface = mysql_fetch_assoc($ports))
   {
     echo("obj.options[obj.options.length] = new Option('".$interface['ifDescr']." - ".$interface['ifAlias']."','".$interface['interface_id']."');\n");
   }

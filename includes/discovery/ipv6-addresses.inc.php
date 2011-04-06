@@ -61,7 +61,7 @@ if (!$oids)
 $sql   = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.interface_id = I.interface_id";
 $data = mysql_query($sql);
 
-while ($row = mysql_fetch_array($data))
+while ($row = mysql_fetch_assoc($data))
 {
   $full_address = $row['ipv6_address'] . "/" . $row['ipv6_prefixlen'];
   $interface_id = $row['interface_id'];

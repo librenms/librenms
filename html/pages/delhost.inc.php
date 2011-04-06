@@ -22,7 +22,7 @@ if ($_REQUEST['id'])
 
 $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
 
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   echo("<option value='".$data['device_id']."'>".$data['hostname']."</option>");
 }

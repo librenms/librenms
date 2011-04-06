@@ -78,7 +78,7 @@
 
   $sql = "SELECT * FROM `entPhysical` WHERE `device_id`  = '".$device['device_id']."'";
   $query = mysql_query($sql);
-  while ($test = mysql_fetch_array($query)) {
+  while ($test = mysql_fetch_assoc($query)) {
     $id = $test['entPhysicalIndex'];
     if (!$valid[$id]) {
       echo("-");

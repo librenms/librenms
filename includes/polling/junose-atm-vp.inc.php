@@ -17,7 +17,7 @@ if (mysql_affected_rows())
 
   echo("Checking JunOSe ATM vps: ");
 
-  while ($vp=mysql_fetch_array($vp_data))
+  while ($vp = mysql_fetch_assoc($vp_data))
   {
     echo(".");
 

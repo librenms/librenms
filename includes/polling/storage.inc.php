@@ -6,7 +6,7 @@ $storage_cache = array();
 
 $query = "SELECT * FROM storage WHERE device_id = '" . $device['device_id'] . "'";
 $storage_data = mysql_query($query);
-while ($storage = mysql_fetch_array($storage_data))
+while ($storage = mysql_fetch_assoc($storage_data))
 {
   echo("Storage ".$storage['storage_descr'] . ": ");
 

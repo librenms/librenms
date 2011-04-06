@@ -28,7 +28,7 @@ print_optionbar_start(62);
           <option value=''>All OSes</option>
           <?php
 $query = mysql_query("SELECT `os` FROM `devices` AS D WHERE 1 GROUP BY `os` ORDER BY `os`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   if ($data['os'])
   {
@@ -44,7 +44,7 @@ while ($data = mysql_fetch_array($query))
           <option value=''>All Versions</option>
           <?php
 $query = mysql_query("SELECT `version` FROM `devices` AS D WHERE 1 GROUP BY `version` ORDER BY `version`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   if ($data['version'])
   {
@@ -61,7 +61,7 @@ while ($data = mysql_fetch_array($query))
           <option value="">All Platforms</option>
           <?php
 $query = mysql_query("SELECT `hardware` FROM `devices` AS D WHERE 1 GROUP BY `hardware` ORDER BY `hardware`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   if ($data['hardware'])
   {
@@ -77,7 +77,7 @@ while ($data = mysql_fetch_array($query))
           <option value="">All Featuresets</option>
           <?php
 $query = mysql_query("SELECT `features` FROM `devices` AS D WHERE 1 GROUP BY `features` ORDER BY `features`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   if ($data['features'])
   {

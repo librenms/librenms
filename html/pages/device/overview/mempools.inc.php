@@ -12,7 +12,7 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
   $mempool_rows = '1';
   $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
 
-  while ($mempool = mysql_fetch_array($mempools))
+  while ($mempool = mysql_fetch_assoc($mempools))
   {
     if (is_integer($mempool_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
     $perc = round($mempool['mempool_used'] / ($mempool['mempool_total']) * 100,2);

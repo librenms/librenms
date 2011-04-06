@@ -2,7 +2,7 @@
 
 $query = "SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $current_data = mysql_query($query);
-while ($dbcurrent = mysql_fetch_array($current_data))
+while ($dbcurrent = mysql_fetch_assoc($current_data))
 {
   echo("Checking current " . $dbcurrent['sensor_descr'] . "... ");
 

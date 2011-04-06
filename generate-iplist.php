@@ -8,7 +8,7 @@ include("includes/functions.php");
 $handle = fopen("ips.txt", "w");
 
 $query = mysql_query("SELECT * FROM `ipv4_networks`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   $cidr = $data['ipv4_network'];
   list ($network, $bits) = explode("/", $cidr);

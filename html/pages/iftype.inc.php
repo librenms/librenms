@@ -16,7 +16,7 @@ $type_where .= ") ";
 $sql  = "SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
 
 $query = mysql_query($sql);
-while ($interface = mysql_fetch_array($query))
+while ($interface = mysql_fetch_assoc($query))
 {
   $if_list .= $seperator . $interface['interface_id'];
   $seperator = ",";
@@ -40,7 +40,7 @@ if ($if_list)
 
   $sql  = "select * from ports as I, devices as D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias";
   $query = mysql_query($sql);
-  while ($interface = mysql_fetch_array($query))
+  while ($interface = mysql_fetch_assoc($query))
   {
     $done = "yes";
     unset($class);

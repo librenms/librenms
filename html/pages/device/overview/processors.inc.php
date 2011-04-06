@@ -12,7 +12,7 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $i = '1';
   $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "' ORDER BY processor_descr ASC");
-  while ($proc = mysql_fetch_array($procs))
+  while ($proc = mysql_fetch_assoc($procs))
   {
     if (is_integer($processor_rows/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

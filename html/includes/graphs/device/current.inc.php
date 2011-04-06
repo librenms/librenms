@@ -8,7 +8,7 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='current' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
-while ($current = mysql_fetch_array($sql))
+while ($current = mysql_fetch_assoc($sql))
 {
   switch ($iter)
   {

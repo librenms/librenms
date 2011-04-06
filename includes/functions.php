@@ -59,7 +59,7 @@ function device_array($device_id)
 {
   $sql = "SELECT * FROM `devices` WHERE `device_id` = '".$device_id."'";
   $query = mysql_query($sql);
-  $device = mysql_fetch_array($query);
+  $device = mysql_fetch_assoc($query);
   return $device;
 }
 
@@ -115,7 +115,7 @@ function getImage($host)
 {
   global $config;
   $sql = "SELECT * FROM `devices` WHERE `device_id` = '$host'";
-  $data = mysql_fetch_array(mysql_query($sql));
+  $data = mysql_fetch_assoc(mysql_query($sql));
   $type = strtolower($data['os']);
   if ($config['os'][$type]['icon'] && file_exists($config['html_dir'] . "/images/os/" . $config['os'][$type]['icon']  . ".png"))
   {
@@ -173,7 +173,7 @@ function delete_device($id)
   $host = mysql_result(mysql_query("SELECT hostname FROM devices WHERE device_id = '$id'"), 0);
   mysql_query("DELETE FROM `devices` WHERE `device_id` = '$id'");
   $int_query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '$id'");
-  while ($int_data = mysql_fetch_array($int_query))
+  while ($int_data = mysql_fetch_assoc($int_query))
   {
     $int_if = $int_data['ifDescr'];
     $int_id = $int_data['interface_id'];

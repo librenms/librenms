@@ -8,8 +8,10 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='freq' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
-while ($frequency = mysql_fetch_array($sql))
+
+while ($frequency = mysql_fetch_assoc($sql))
 {
+  # FIXME generic colour function
   switch ($iter)
   {
     case "1":

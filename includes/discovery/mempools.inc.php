@@ -11,7 +11,7 @@ $query = mysql_query($sql);
 
 if ($debug) { print_r ($valid_mempool); }
 
-while ($test_mempool = mysql_fetch_array($query))
+while ($test_mempool = mysql_fetch_assoc($query))
 {
   $mempool_index = $test_mempool['mempool_index'];
   $mempool_type = $test_mempool['mempool_type'];

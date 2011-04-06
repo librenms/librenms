@@ -13,7 +13,7 @@ if ($device['os'] == "ironware")
     unset($fdp_links);
     foreach (array_keys($fdp_array) as $key)
     {
-      $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
+      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
       $fdp_if_array = $fdp_array[$key];
       foreach (array_keys($fdp_if_array) as $entry_key)
       {
@@ -40,7 +40,7 @@ if ($cdp_array)
   unset($cdp_links);
   foreach (array_keys($cdp_array) as $key)
   {
-    $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
+    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$key."'"));
     $cdp_if_array = $cdp_array[$key];
     foreach (array_keys($cdp_if_array) as $entry_key)
     {
@@ -81,7 +81,7 @@ if ($lldp_array)
       } else {
         $ifIndex = $entry_key;
       }
-      $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"));
+      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE device_id = '".$device['device_id']."' AND `ifIndex` = '".$ifIndex."'"));
       $lldp_instance = $lldp_if_array[$entry_key];
       foreach (array_keys($lldp_instance) as $entry_instance)
       {
@@ -108,7 +108,7 @@ if ($debug) { print_r($link_exists); }
 $sql = "SELECT * FROM `links` AS L, `ports` AS I WHERE L.local_interface_id = I.interface_id AND I.device_id = '".$device['device_id']."'";
 if ($query = mysql_query($sql))
 {
-  while ($test = mysql_fetch_array($query))
+  while ($test = mysql_fetch_assoc($query))
   {
     $local_interface_id = $test['local_interface_id'];
     $remote_hostname = $test['remote_hostname'];

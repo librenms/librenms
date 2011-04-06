@@ -3,7 +3,7 @@
 $query = "SELECT * FROM `sensors` WHERE device_id = '" . $device['device_id'] . "' AND `sensor_class` = 'freq' AND poller_type='snmp'";
 $sensor_data = mysql_query($query);
 
-while ($sensor = mysql_fetch_array($sensor_data))
+while ($sensor = mysql_fetch_assoc($sensor_data))
 {
   echo("Checking frequency " . $sensor['sensor_descr'] . "... ");
 

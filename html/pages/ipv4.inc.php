@@ -8,7 +8,7 @@
       <option value="">All Devices</option>
 <?php
 $query = mysql_query("SELECT `device_id`,`hostname` FROM `devices` GROUP BY `hostname` ORDER BY `hostname`");
-while ($data = mysql_fetch_array($query))
+while ($data = mysql_fetch_assoc($query))
 {
   echo('<option value="'.$data['device_id'].'"');
   if ($data['device_id'] == $_POST['device_id']) { echo("selected"); }
@@ -51,7 +51,7 @@ echo('<tr class="tablehead"><th>Device</a></th><th>Interface</th><th>Address</th
 
 $row = 1;
 
-while ($interface = mysql_fetch_array($query))
+while ($interface = mysql_fetch_assoc($query))
 {
   if ($_POST['address'])
   {

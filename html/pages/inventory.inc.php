@@ -11,7 +11,7 @@
       <option value="">All Parts</option>
       <?php
         $query = mysql_query("SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY `entPhysicalModelName` ORDER BY `entPhysicalModelName`");
-        while ($data = mysql_fetch_array($query))
+        while ($data = mysql_fetch_assoc($query))
         {
           echo("<option value='".$data['entPhysicalModelName']."'");
           if ($data['entPhysicalModelName'] == $_POST['part']) { echo("selected"); }
@@ -29,7 +29,7 @@
       <option value="">All Devices</option>
       <?php
         $query = mysql_query("SELECT * FROM `devices` ORDER BY `hostname`");
-        while ($data = mysql_fetch_array($query))
+        while ($data = mysql_fetch_assoc($query))
         {
           echo("<option value='".$data['device_id']."'");
 
@@ -85,7 +85,7 @@ echo("<table cellspacing=0 cellpadding=2 width=100%>");
 
 echo("<tr><th>Hostname</th><th>Description</th><th>Name</th><th>Part No</th><th>Serial No</th></tr>");
 
-while ($entry = mysql_fetch_array($query))
+while ($entry = mysql_fetch_assoc($query))
 {
   if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
   echo("<tr style=\"background-color: $bg\"><td>" . generate_device_link($entry, shortHost($entry['hostname'])) . "</td><td>" . $entry['entPhysicalDescr']  .
