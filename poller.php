@@ -316,11 +316,11 @@ while ($device = mysql_fetch_assoc($device_query))
   $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
   while ($graph = mysql_fetch_assoc($query))
   {
-    if (!isset($graphs[$graph[0]]))
+    if (!isset($graphs[$graph["graph"]]))
     {
-      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph[0]."'");
+      mysql_query("DELETE FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."' AND `graph` = '".$graph["graph"]."'");
     } else {
-      $oldgraphs[$graph[0]] = TRUE;
+      $oldgraphs[$graph["graph"]] = TRUE;
     }
   }
 
