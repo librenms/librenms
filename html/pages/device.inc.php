@@ -104,7 +104,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
-    if (@mysql_result(mysql_query("SELECT COUNT(id) FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "'"), 0) > '0')
+    if (@mysql_result(mysql_query("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "'"), 0) > '0')
     {
       echo('<li class="' . $select['vm'] . '">
     <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vm/">

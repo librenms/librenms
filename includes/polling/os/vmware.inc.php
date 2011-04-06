@@ -39,7 +39,7 @@ echo("VMware VM: ");
  * Get a list of all the known Virtual Machines for this host.
  */
 
-$db_info_list = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "'");
+$db_info_list = mysql_query("SELECT id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState FROM vminfo WHERE device_id = '" . $device["device_id"] . "'");
 
 while ($db_info = mysql_fetch_assoc($db_info_list))
 {
@@ -84,7 +84,7 @@ while ($db_info = mysql_fetch_assoc($db_info_list))
 
     if ($vm_info[$property] != $db_info[$property])
     {
-      mysql_query("UPDATE vmware_vminfo SET " . $property ." = '" . mres($vm_info[$property]) ."' WHERE id = '" . $db_info["id"] . "'");
+      mysql_query("UPDATE vminfo SET " . $property ." = '" . mres($vm_info[$property]) ."' WHERE id = '" . $db_info["id"] . "'");
       log_event($db_info["vmwVmDisplayName"] . " (" . preg_replace("/^vmwVm/", "", $property) . ") -> " . $vm_info[$property], $device);
     }
   }

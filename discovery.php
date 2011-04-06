@@ -194,6 +194,7 @@ while ($device = mysql_fetch_assoc($device_query))
     include("includes/discovery/cisco-pw.inc.php");
     include("includes/discovery/cisco-vrf.inc.php");
     include("includes/discovery/vmware-vminfo.inc.php");
+    include("includes/discovery/libvirt-vminfo.inc.php");
     include("includes/discovery/toner.inc.php");
     include("includes/discovery/ucd-diskio.inc.php");
     include("includes/discovery/services.inc.php");

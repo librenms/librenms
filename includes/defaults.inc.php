@@ -22,6 +22,7 @@ $config['mtr']            = "/usr/bin/mtr";
 $config['nmap']           = "/usr/bin/nmap";
 $config['nagios_plugins'] = "/usr/lib/nagios/plugins";
 $config['ipmitool']       = "/usr/bin/ipmitool";
+$config['virsh']          = "/usr/bin/virsh";
 
 ### RRDCacheD - Make sure it can write to your RRD dir!
 
@@ -127,7 +128,8 @@ $config['enable_bgp']           	= 1; # Enable BGP session collection and displa
 $config['enable_syslog']        	= 0; # Enable Syslog
 $config['enable_inventory']     	= 1; # Enable Inventory
 $config['enable_pseudowires']   	= 1; # Enable Pseudowires
-$config['enable_printers']  		= 0;  # Enable Printer support
+$config['enable_printers']  		= 0; # Enable Printer support
+$config['enable_libvirt']  		= 0; # Enable Libvirt VM support
 
 ### Ports extension modules
 

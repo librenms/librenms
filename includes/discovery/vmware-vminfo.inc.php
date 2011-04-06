@@ -1,5 +1,7 @@
 <?php
 
+# FIXME should do the deletion etc in a common file perhaps? like for the sensors
+
 /*
  * Try to discover any Virtual Machines.
  */
@@ -56,7 +58,7 @@ if ($device['os'] == "vmware")
 
     /*
      * VMware does not return an INTEGER but a STRING of the vmwVmMemSize. This bug
-     * might be resolved by VMware in the future making this code absolete.
+     * might be resolved by VMware in the future making this code obsolete.
      */
 
     if (preg_match("/^([0-9]+) .*$/", $vmwVmMemSize, $matches))
@@ -68,13 +70,15 @@ if ($device['os'] == "vmware")
      * Check whether the Virtual Machine is already known for this host.
      */
 
-    if (mysql_result(mysql_query("SELECT COUNT(id) FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "' AND vmwVmVMID = '" . $oid . "'"), 0) == 0)
+    if (mysql_result(mysql_query("SELECT COUNT(id) FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vmwVmVMID = '" . $oid . "' AND vm_type='vmware'"), 0) == 0)
     {
-      mysql_query("INSERT INTO vmware_vminfo (device_id, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ", " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
+      mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ",'vmware', " . $oid . ", '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', " . $vmwVmMemSize . ", " . $vmwVmCpus . ", '" . mres($vmwVmState) . "')");
       echo("+");
+      # FIXME eventlog
     } else {
       echo(".");
     }
+    # FIXME update code!
 
     /*
      * Save the discovered Virtual Machine.
@@ -87,7 +91,7 @@ if ($device['os'] == "vmware")
    * Get a list of all the known Virtual Machines for this host.
    */
 
-  $db_vm_list = mysql_query("SELECT id, vmwVmVMID FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "'");
+  $db_vm_list = mysql_query("SELECT id, vmwVmVMID FROM vminfo WHERE device_id = '" . $device["device_id"] . "' AND vm_type='vmware'");
 
   while ($db_vm = mysql_fetch_assoc($db_vm_list))
   {
@@ -95,9 +99,11 @@ if ($device['os'] == "vmware")
      * Delete the Virtual Machines that are removed from the host.
      */
 
-    if (!in_array($db_vm["vmwVmVMID"], $vmw_vmlist)) {
-      mysql_query("DELETE FROM vmware_vminfo WHERE id = '" . $db_vm["id"] . "'");
+    if (!in_array($db_vm["vmwVmVMID"], $vmw_vmlist))
+    {
+      mysql_query("DELETE FROM vminfo WHERE id = '" . $db_vm["id"] . "'");
       echo("-");
+      # FIXME eventlog
     }
   }
 
