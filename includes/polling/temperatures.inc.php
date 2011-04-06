@@ -2,7 +2,7 @@
 
 $query = "SELECT * FROM sensors WHERE sensor_class='temperature' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $temp_data = mysql_query($query);
-while ($temperature = mysql_fetch_array($temp_data))
+while ($temperature = mysql_fetch_assoc($temp_data))
 {
   echo("Checking temp " . $temperature['sensor_descr'] . "... ");
 

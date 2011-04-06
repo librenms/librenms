@@ -19,7 +19,7 @@ echo("<tr class=tablehead>
 
 $row = 1;
 
-while ($drive = mysql_fetch_array($query))
+while ($drive = mysql_fetch_assoc($query))
 {
   if (device_permitted($drive['device_id']))
   {

@@ -12,7 +12,7 @@ if (mysql_result(mysql_query("SELECT count(storage_id) from storage WHERE device
   $drive_rows = '0';
 
   $drives = mysql_query("SELECT * FROM `storage` WHERE device_id = '" . $device['device_id'] . "' ORDER BY storage_descr ASC");
-  while ($drive = mysql_fetch_array($drives))
+  while ($drive = mysql_fetch_assoc($drives))
   {
     $skipdrive = 0;
 

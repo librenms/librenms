@@ -16,9 +16,9 @@ if ($device['os_group'] == "ios") {
 }
 
 $interface_query = mysql_query("SELECT * FROM `ports` $where");
-while ($interface = mysql_fetch_array($interface_query)) {
+while ($interface = mysql_fetch_assoc($interface_query)) {
 
- if (!$device) { $device = mysql_fetch_array(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
+ if (!$device) { $device = mysql_fetch_assoc(mysql_query("SELECT * FROM `devices` WHERE `device_id` = '" . $interface['device_id'] . "'")); }
 
  unset($ifAdminStatus, $ifOperStatus, $ifAlias, $ifDescr);
 

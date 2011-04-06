@@ -314,7 +314,7 @@ while ($device = mysql_fetch_assoc($device_query))
   ### Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
 
   $query = mysql_query("SELECT `graph` FROM `device_graphs` WHERE `device_id` = '".$device['device_id']."'");
-  while ($graph = mysql_fetch_array($query))
+  while ($graph = mysql_fetch_assoc($query))
   {
     if (!isset($graphs[$graph[0]]))
     {

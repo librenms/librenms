@@ -28,7 +28,7 @@ if ($_GET['opta'] == "details" )
 
 echo("<div style='background: $list_colour_b; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
 $vrf_query = mysql_query("SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = '".$device['device_id']."'");
-$vrf = mysql_fetch_array($vrf_query);
+$vrf = mysql_fetch_assoc($vrf_query);
 echo("<tr valign=top bgcolor='$bg_colour'>");
 echo("<td width=200 class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
 echo("<td width=100 class=box-desc>" . $vrf['mplsVpnVrfRouteDistinguisher'] . "</td>");
@@ -38,7 +38,7 @@ echo("</table></div>");
 $devices = mysql_query("SELECT * FROM `vrfs` AS V, `devices` AS D WHERE `mplsVpnVrfRouteDistinguisher` = '".$vrf['mplsVpnVrfRouteDistinguisher']."' AND D.device_id = V.device_id");
 $x=1;
 
-while ($device = mysql_fetch_array($devices))
+while ($device = mysql_fetch_assoc($devices))
 {
   $hostname = $device['hostname'];
   #if (!is_integer($x/2)) { $device_colour = $list_colour_a; } else { $device_colour = $list_colour_b; }
@@ -49,7 +49,7 @@ while ($device = mysql_fetch_array($devices))
   unset($seperator);
   echo("<table cellspacing=0 cellpadding=7>");
   $i=1;
-  while ($interface = mysql_fetch_array($ports))
+  while ($interface = mysql_fetch_assoc($ports))
   {
     if (!is_integer($x/2))
     {

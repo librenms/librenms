@@ -17,7 +17,7 @@ if ($_POST['editing'])
   }
   else
   {
-    include("includes/error-no-perm.inc.php"); 
+    include("includes/error-no-perm.inc.php");
   }
 }
 

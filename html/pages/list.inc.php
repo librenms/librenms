@@ -18,7 +18,7 @@ echo("<tr class=interface-desc bgcolor=#e5e5e5 style='font-weight:bold;'>
 <td></td>
 </tr>");
 
-while ($device = mysql_fetch_array($device_query))
+while ($device = mysql_fetch_assoc($device_query))
 {
   include("includes/hostbox.inc.php");
 }

@@ -5,7 +5,7 @@
 $query = mysql_query("SELECT * FROM `ports` WHERE `device_id` = '".$port['device_id']."' AND `pagpGroupIfIndex` = '".$port['ifIndex']."'");
 
 $i=0;
-while ($int = mysql_fetch_array($query))
+while ($int = mysql_fetch_assoc($query))
 {
   if (is_file($config['rrd_dir'] . "/" . $hostname . "/port-" . safename($int['ifIndex'] . ".rrd")))
   {

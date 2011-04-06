@@ -10,7 +10,7 @@ if ($_SESSION['userlevel'] == "10")
 if (bill_permitted($bill_id))
 {
   $bi_q = mysql_query("SELECT * FROM bills WHERE bill_id = $bill_id");
-  $bill_data = mysql_fetch_array($bi_q);
+  $bill_data = mysql_fetch_assoc($bi_q);
 
   $today = str_replace("-", "", mysql_result(mysql_query("SELECT CURDATE()"), 0));
   $yesterday = str_replace("-", "", mysql_result(mysql_query("SELECT DATE_SUB(CURDATE(), INTERVAL 1 DAY)"), 0));
@@ -102,7 +102,7 @@ if (bill_permitted($bill_id))
                         WHERE B.bill_id = '".$bill_id."' AND P.interface_id = B.port_id
                         AND D.device_id = P.device_id");
 
-  while ($port = mysql_fetch_array($ports))
+  while ($port = mysql_fetch_assoc($ports))
   {
     echo(generate_port_link($port) . " on " . generate_device_link($port) . "<br />");
   }

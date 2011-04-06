@@ -8,8 +8,9 @@ $rrd_options .= " -l 0 -E ";
 $iter = "1";
 $sql = mysql_query("SELECT * FROM toner where device_id = '$id'");
 $rrd_options .= " COMMENT:'Toner level            Cur     Min      Max\\n'";
-while ($toner = mysql_fetch_array($sql))
+while ($toner = mysql_fetch_assoc($sql))
 {
+  # FIXME generic colour function
   switch ($iter)
   {
     case "1":

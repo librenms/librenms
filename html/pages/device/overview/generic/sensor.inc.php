@@ -9,7 +9,7 @@ if (mysql_num_rows($results))
   echo('<p style="padding: 0px 5px 5px;" class="sectionhead"><a class="sectionhead" href="device/'.$device['device_id'].'/health/' . strtolower($sensor_type) . '/"><img align="absmiddle" src="'.$config['base_url'].'/images/icons/' . strtolower($sensor_type) . '.png"> ' . $sensor_type . '</a></p>');
   $i = '1';
   echo('<table width="100%" valign="top">');
-  while ($sensor = mysql_fetch_array($results))
+  while ($sensor = mysql_fetch_assoc($results))
   {
     if (is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

@@ -49,7 +49,7 @@ if ($config['enable_printers'])
   $sql = "SELECT * FROM toner WHERE device_id = '".$device['device_id']."'";
   if ($query = mysql_query($sql))
   {
-    while ($test_toner = mysql_fetch_array($query))
+    while ($test_toner = mysql_fetch_assoc($query))
     {
       $toner_index = $test_toner['toner_index'];
       $toner_type = $test_toner['toner_type'];

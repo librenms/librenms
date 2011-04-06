@@ -6,7 +6,7 @@ include("config.php");
 include("includes/functions.php");
 
 $alert_query = mysql_query("SELECT *, A.id as id FROM `alerts` as A, `devices` as D where A.device_id = D.device_id AND alerted = '0'");
-while ($alert = mysql_fetch_array($alert_query))
+while ($alert = mysql_fetch_assoc($alert_query))
 {
   $id = $alert['id'];
   $host = $alert['hostname'];

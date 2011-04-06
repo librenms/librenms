@@ -19,12 +19,12 @@ if ($_SESSION['userlevel'] >= '5')
   $host_sql = "SELECT * FROM devices AS D, services AS S, devices_perms AS P WHERE D.device_id = S.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' $where GROUP BY D.hostname ORDER BY D.hostname";
 }
   $host_query = mysql_query($host_sql);
-  while ($host_data = mysql_fetch_array($host_query))
+  while ($host_data = mysql_fetch_assoc($host_query))
   {
     $device_id = $host_data['device_id'];
     $device_hostname = $host_data['hostname'];
     $service_query = mysql_query("SELECT * FROM `services` WHERE `device_id` = '" . $host_data['device_id'] . "' $where");
-    while ($service = mysql_fetch_array($service_query))
+    while ($service = mysql_fetch_assoc($service_query))
     {
        include("includes/print-service.inc.php");
 #       $samehost = 1;

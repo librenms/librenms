@@ -35,10 +35,8 @@ $vertical = mres($_GET['vertical']);
 $legend   = mres($_GET['legend']);
 $id       = mres($_GET['id']);
 
-if ($config['allow_unauth_graphs'])
+if (!$config['allow_unauth_graphs'])
 {
-  $allow_unauth = TRUE;
-} else {
   if (!$_SESSION['authenticated']) { graph_error("Not authenticated"); exit; }
 }
 

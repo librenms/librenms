@@ -8,7 +8,7 @@ echo("<table width=100% cellpadding=6 cellspacing=0>");
 $i = '1';
 $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
 
-while ($mempool = mysql_fetch_array($mempools))
+while ($mempool = mysql_fetch_assoc($mempools))
 {
   if (!is_integer($i/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

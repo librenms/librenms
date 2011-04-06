@@ -27,7 +27,7 @@ echo('<tr class=tablehead>
 
 $row = 1;
 
-while ($sensor = mysql_fetch_array($query))
+while ($sensor = mysql_fetch_assoc($query))
 {
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
 

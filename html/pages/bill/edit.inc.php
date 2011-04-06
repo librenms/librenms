@@ -69,11 +69,10 @@ $ports_array = mysql_query("SELECT * FROM `bill_ports` AS B, `ports` AS P, `devi
 
 if (mysql_affected_rows())
 {
-
   echo("<h3>Billed Ports</h3>");
 
   echo("<table cellpadding=5 cellspacing=0>");
-  while ($port = mysql_fetch_array($ports_array))
+  while ($port = mysql_fetch_assoc($ports_array))
   {
     if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
     echo("<tr style=\"background-color: $bg\">");
@@ -89,9 +88,9 @@ if (mysql_affected_rows())
   echo("</table>");
 }
 
-  echo("<h4>Add Port</h4>");
+echo("<h4>Add Port</h4>");
 
-  echo("<form action='' method='post'>
+echo("<form action='' method='post'>
       <input type='hidden' name='action' value='add_bill_port'>
       <input type='hidden' name='bill_id' value='".$bill_id."'>
 
@@ -99,14 +98,15 @@ if (mysql_affected_rows())
        <td><select id='device' class='selector' name='device' onchange='getInterfaceList(this)'>
         <option value=''>Select a device</option>");
 
-  $device_list = mysql_query("SELECT * FROM `devices` ORDER BY hostname");
-  while ($device = mysql_fetch_array($device_list)) {
-    unset($done);
-    foreach ($access_list as $ac) { if ($ac == $device['device_id']) { $done = 1; } }
-    if (!$done) { echo("<option value='" . $device['device_id']  . "'>" . $device['hostname'] . "</option>"); }
-  }
+$device_list = mysql_query("SELECT * FROM `devices` ORDER BY hostname");
+while ($device = mysql_fetch_assoc($device_list))
+{
+  unset($done);
+  foreach ($access_list as $ac) { if ($ac == $device['device_id']) { $done = 1; } }
+  if (!$done) { echo("<option value='" . $device['device_id']  . "'>" . $device['hostname'] . "</option>"); }
+}
 
-  echo("</select></td></tr><tr>
+echo("</select></td></tr><tr>
      <td>Interface: </td><td><select class=selector id='interface_id' name='interface_id'>
      </select></td>
      </tr><tr></table><input type='submit' name='Submit' value=' Add '></form>");

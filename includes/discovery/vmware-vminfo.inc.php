@@ -89,7 +89,7 @@ if ($device['os'] == "vmware")
 
   $db_vm_list = mysql_query("SELECT id, vmwVmVMID FROM vmware_vminfo WHERE device_id = '" . $device["device_id"] . "'");
 
-  while ($db_vm = mysql_fetch_array($db_vm_list))
+  while ($db_vm = mysql_fetch_assoc($db_vm_list))
   {
     /*
      * Delete the Virtual Machines that are removed from the host.

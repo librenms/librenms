@@ -52,7 +52,7 @@ if ($config['enable_pseudowires'] && $device['os_group'] == "ios")
   $sql = "SELECT * FROM pseudowires AS P, ports AS I, devices as D WHERE P.interface_id = I.interface_id AND I.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
   $query = mysql_query($sql);
 
-  while ($cpw = mysql_fetch_array($query))
+  while ($cpw = mysql_fetch_assoc($query))
   {
     unset($exists);
     $i = 0;

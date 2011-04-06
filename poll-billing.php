@@ -12,7 +12,7 @@ $iter = "0";
 echo("Starting Polling Session ... \n\n");
 
 $bill_query = mysql_query("select * from bills");
-while ($bill_data = mysql_fetch_array($bill_query))
+while ($bill_data = mysql_fetch_assoc($bill_query))
 {
   echo("Bill : ".$bill_data['bill_name']."\n");
   CollectData($bill_data['bill_id']);
@@ -23,7 +23,7 @@ function CollectData($bill_id)
 {
   $port_query = mysql_query("select * from bill_ports as P, ports as I, devices as D where P.bill_id='$bill_id' AND I.interface_id = P.port_id AND D.device_id = I.device_id");
 
-  while ($port_data = mysql_fetch_array($port_query))
+  while ($port_data = mysql_fetch_assoc($port_query))
   {
     unset($port_in_measurement);
     unset($port_in_delta);

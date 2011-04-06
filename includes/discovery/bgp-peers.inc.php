@@ -159,7 +159,7 @@ if ($config['enable_bgp'])
         } # os=junos
 
         $af_query = mysql_query("SELECT * FROM bgpPeers_cbgp WHERE `device_id` = '".$device['device_id']."' AND bgpPeerIdentifier = '".$peer['ip']."'");
-        while ($entry = mysql_fetch_array($af_query))
+        while ($entry = mysql_fetch_assoc($af_query))
         {
           $afi = $entry['afi'];
           $safi = $entry['safi'];
@@ -182,7 +182,7 @@ if ($config['enable_bgp'])
   $sql = "SELECT * FROM bgpPeers AS B, devices AS D WHERE B.device_id = D.device_id AND D.device_id = '".$device['device_id']."'";
   $query = mysql_query($sql);
 
-  while ($entry = mysql_fetch_array($query))
+  while ($entry = mysql_fetch_assoc($query))
   {
     unset($exists);
     $i = 0;

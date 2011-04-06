@@ -37,7 +37,7 @@ $query = mysql_query($sql);
 
 if ($debug) { print_r ($valid_diskio); }
 
-while ($test = mysql_fetch_array($query))
+while ($test = mysql_fetch_assoc($query))
 {
   if ($debug) { echo($test['diskio_index'] . " -> " . $test['diskio_descr'] . "\n"); }
   if (!$valid_diskio[$test['diskio_index']])

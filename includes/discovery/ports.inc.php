@@ -75,7 +75,7 @@ foreach (explode("\n", $ports) as $entry)
 $sql = "SELECT * FROM `ports` WHERE `device_id`  = '".$device['device_id']."' AND `deleted` = '0'";
 $query = mysql_query($sql);
 
-while ($test_if = mysql_fetch_array($query))
+while ($test_if = mysql_fetch_assoc($query))
 {
   unset($exists);
   $i = 0;

@@ -10,7 +10,8 @@ $iter = "1";
 $sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='fanspeed' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'RPM                    Cur     Min      Max\\n'";
 
-while ($fanspeed = mysql_fetch_array($sql))
+# FIXME generic colour function
+while ($fanspeed = mysql_fetch_assoc($sql))
 {
   switch ($iter)
   {

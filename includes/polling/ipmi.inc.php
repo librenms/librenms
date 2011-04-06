@@ -19,7 +19,7 @@ if ($ipmi['host'] = get_dev_attrib($device,'ipmi_hostname'))
     $ipmi_sensor[$desc][$ipmi_unit[$type]]['unit'] = $type;
   }
 
-  while ($ipmisensors = mysql_fetch_array($ipmi_data))
+  while ($ipmisensors = mysql_fetch_assoc($ipmi_data))
   {
     echo("Updating IPMI sensor " . $ipmisensors['sensor_descr'] . "... ");
 

@@ -58,7 +58,7 @@ $rate_95th = $rate_data['rate_95th'] * 1000;
 $rate_average = $rate_data['rate_average'] * 1000;
 
 $bi_q = mysql_query("SELECT * FROM bills WHERE bill_id = $bill_id");
-$bi_a = mysql_fetch_array($bi_q);
+$bi_a = mysql_fetch_assoc($bi_q);
 $bill_name = $bi_a['bill_name'];
 
 $countsql = mysql_query("SELECT count(`delta`) FROM `bill_data` WHERE `bill_id` = '$bill_id' AND `timestamp` >= '$datefrom' AND `timestamp` <= '$dateto'");
@@ -84,7 +84,7 @@ $dur = $end - $start;
 $sql = "SELECT *, UNIX_TIMESTAMP(timestamp) AS formatted_date FROM bill_data WHERE bill_id = $bill_id AND timestamp >= $datefrom AND timestamp <= $dateto ORDER BY timestamp ASC";
 $data = mysql_query($sql);
 
-while ($row = mysql_fetch_array($data))
+while ($row = mysql_fetch_assoc($data))
 {
   @$timestamp = $row['formatted_date'];
   if (!$first) { $first = $timestamp; }

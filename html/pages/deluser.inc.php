@@ -25,7 +25,7 @@ if ($_SESSION['userlevel'] < '10') { include("includes/error-no-perm.inc.php"); 
 
     # FIXME v mysql query should be replaced by authmodule
     $userlist = mysql_query("SELECT * FROM `users`");
-    while ($userentry = mysql_fetch_array($userlist))
+    while ($userentry = mysql_fetch_assoc($userlist))
     {
       $i++;
       echo($i . ". " . $userentry['username'] . "

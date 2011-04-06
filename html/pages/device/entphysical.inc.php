@@ -5,7 +5,7 @@ function printEntPhysical($ent, $level, $class)
   global $device;
 
   $query = mysql_query("SELECT * FROM `entPhysical` WHERE device_id = '".$device['device_id']."' AND entPhysicalContainedIn = '".$ent."' ORDER BY entPhysicalContainedIn,entPhysicalIndex");
-  while ($ent = mysql_fetch_array($query))
+  while ($ent = mysql_fetch_assoc($query))
   {
     echo("
  <li class='$class'>");
@@ -27,7 +27,7 @@ function printEntPhysical($ent, $level, $class)
 
     if ($ent['ifIndex'])
     {
-      $interface = mysql_fetch_array(mysql_query("SELECT * FROM `ports` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
+      $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM `ports` WHERE ifIndex = '".$ent['ifIndex']."' AND device_id = '".$device['device_id']."'"));
       $ent['entPhysicalName'] = generate_port_link($interface);
     }
 

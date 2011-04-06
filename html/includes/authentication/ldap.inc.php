@@ -68,7 +68,7 @@ function get_userlevel($username)
 {
   # FIXME should come from LDAP
   $sql = "SELECT level FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_array(mysql_query($sql));
+  $row = mysql_fetch_assoc(mysql_query($sql));
   return $row['level'];
 }
 
@@ -76,7 +76,7 @@ function get_userid($username)
 {
   # FIXME should come from LDAP
   $sql = "SELECT user_id FROM `users` WHERE `username`='".mres($username)."'";
-  $row = mysql_fetch_array(mysql_query($sql));
+  $row = mysql_fetch_assoc(mysql_query($sql));
   return $row['user_id'];
 }
 

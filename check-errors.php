@@ -13,7 +13,7 @@ $i = '0';
 
 $interface_query = mysql_query("SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id $where");
 
-while ($interface = mysql_fetch_array($interface_query))
+while ($interface = mysql_fetch_assoc($interface_query))
 {
   $errors = $interface['ifInErrors_delta'] + $interface['ifOutErrors_delta'];
   if ($errors > '1')

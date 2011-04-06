@@ -106,9 +106,8 @@ $(document).ready(function(){
 $row=1;
 
 $query = mysql_query("SELECT * FROM `ports` WHERE device_id='".$device['device_id']."' ORDER BY `ifIndex` ");
-while ($port = mysql_fetch_array($query))
+while ($port = mysql_fetch_assoc($query))
 {
-
   $port = ifLabel($port);
 
   if (is_integer($row/2)) { $row_colour = $list_colour_a; } else { $row_colour = $list_colour_b; }
@@ -137,11 +136,9 @@ while ($port = mysql_fetch_array($query))
   echo("</td>");
   echo("<td align=left>".$port['ifAlias'] . "</td>");
 
-  echo("</tr>
-");
+  echo("</tr>\n");
 
   $row++;
-
 }
 
 echo('</table>');

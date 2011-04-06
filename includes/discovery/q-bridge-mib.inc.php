@@ -35,7 +35,7 @@ if ($vlanversion == 'version1')
   }
 
   $device_vlans = mysql_query("SELECT * FROM `vlans` WHERE `device_id` = '" . $device['device_id'] . "'");
-  while ($dev_vlan = mysql_fetch_array($device_vlans))
+  while ($dev_vlan = mysql_fetch_assoc($device_vlans))
   {
     unset($vlan_exists);
     foreach ($this_vlans as $test_vlan)

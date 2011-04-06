@@ -9,7 +9,7 @@ if (!$config['enable_bgp'])
 else
 {
   $peers = mysql_query("SELECT * FROM bgpPeers WHERE device_id = '" . $device['device_id'] . "'");
-  while ($peer = mysql_fetch_array($peers))
+  while ($peer = mysql_fetch_assoc($peers))
   {
     ### Poll BGP Peer
 

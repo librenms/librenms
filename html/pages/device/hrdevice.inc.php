@@ -3,7 +3,7 @@
 echo("<table width=100%>");
 
 $hrdevices = mysql_query("SELECT * FROM `hrDevice` WHERE `device_id` = '".$device['device_id']."' ORDER BY `hrDeviceIndex`");
-while ($hrdevice = mysql_fetch_array($hrdevices))
+while ($hrdevice = mysql_fetch_assoc($hrdevices))
 {
 
   echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
@@ -30,8 +30,9 @@ while ($hrdevice = mysql_fetch_array($hrdevices))
     echo('<td>'.$mini_graph.'</td>');
   } elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork") {
     $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
-    $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'"));
-    if ($interface['ifIndex']) {
+    $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'"));
+    if ($interface['ifIndex'])
+    {
       echo("<td>".generate_port_link($interface)."</td>");
 
       $graph_array['height'] = "20";

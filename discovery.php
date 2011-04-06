@@ -93,7 +93,7 @@ if (file_exists('.svn'))
   list(,$dbu_rev) = preg_split('/: /',@shell_exec('svn info database-update.sql|grep ^Revision'));
 
   $device_query = mysql_query("SELECT revision FROM `dbSchema`");
-  if ($rev = @mysql_fetch_array($device_query))
+  if ($rev = @mysql_fetch_assoc($device_query))
   {
     $db_rev = $rev['revision'];
   }
@@ -146,7 +146,7 @@ if (file_exists('.svn'))
 $discovered_devices = 0;
 
 $device_query = mysql_query("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY device_id DESC");
-while ($device = mysql_fetch_array($device_query))
+while ($device = mysql_fetch_assoc($device_query))
 {
   $device_start = utime();  // Start counting device poll time
 
@@ -167,7 +167,7 @@ while ($device = mysql_fetch_array($device_query))
 
   #include("includes/discovery/os.inc.php");
 
-  if($options['m']) 
+  if($options['m'])
   {
     if(is_file("includes/discovery/".$options['m'].".inc.php"))
     {

@@ -3,7 +3,7 @@
 $query = "SELECT * FROM sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $volt_data = mysql_query($query);
 
-while ($sensor = mysql_fetch_array($volt_data))
+while ($sensor = mysql_fetch_assoc($volt_data))
 {
   echo("Checking voltage " . $sensor['sensor_descr'] . "... ");
 

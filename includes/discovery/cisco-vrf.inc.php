@@ -49,7 +49,7 @@ if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['o
       echo(" ( ");
       foreach (explode("\n", $ports) as $if_id)
       {
-        $interface = mysql_fetch_array(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
+        $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE ifIndex = '$if_id' AND device_id = '" . $device['device_id'] . "'"));
         echo(makeshortif($interface['ifDescr']) . " ");
         mysql_query("UPDATE ports SET ifVrf = '".$vrf_id."' WHERE interface_id = '".$interface['interface_id']."'");
         $if = $interface['interface_id'];
@@ -61,7 +61,7 @@ if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['o
 
   $sql = "SELECT * FROM ports WHERE device_id = '" . $device['device_id'] . "'";
   $data = mysql_query($sql);
-  while ($row = mysql_fetch_array($data))
+  while ($row = mysql_fetch_assoc($data))
   {
     $if = $row['interface_id'];
     $vrf_id = $row['ifVrf'];
@@ -81,7 +81,7 @@ if ($device['os_group'] == "ios" || $device['os_group'] == "junos" || $device['o
 
   $sql = "SELECT * FROM vrfs WHERE device_id = '" . $device['device_id'] . "'";
   $data = mysql_query($sql);
-  while ($row = mysql_fetch_array($data))
+  while ($row = mysql_fetch_assoc($data))
   {
     $vrf_id = $row['vrf_id'];
     if (!$valid_vrf[$vrf_id])

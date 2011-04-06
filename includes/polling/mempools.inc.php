@@ -2,7 +2,7 @@
 
 $query = "SELECT * FROM mempools WHERE device_id = '" . $device['device_id'] . "'";
 $mempool_data = mysql_query($query);
-while ($mempool = mysql_fetch_array($mempool_data))
+while ($mempool = mysql_fetch_assoc($mempool_data))
 {
   echo("Mempool ". $mempool['mempool_descr'] . ": ");
 

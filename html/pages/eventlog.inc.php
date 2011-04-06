@@ -13,7 +13,7 @@ $data = mysql_query($query);
 
 echo('<table cellspacing="0" cellpadding="1" width="100%">');
 
-while ($entry = mysql_fetch_array($data))
+while ($entry = mysql_fetch_assoc($data))
 {
   include("includes/print-event.inc.php");
 }

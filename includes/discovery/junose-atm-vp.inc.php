@@ -35,7 +35,7 @@ if ($device['os'] == "junose" && $config['enable_ports_junoseatmvp'])
 
   if ($debug) { print_r ($valid_vp); }
 
-  while ($test = mysql_fetch_array($query))
+  while ($test = mysql_fetch_assoc($query))
   {
     $interface_id = $test['interface_id'];
     $vp_id = $test['vp_id'];

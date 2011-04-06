@@ -19,7 +19,7 @@ echo("
 
 $i = 1;
 
-while ($customer = mysql_fetch_array($cust_query))
+while ($customer = mysql_fetch_assoc($cust_query))
 {
   $i++;
 
@@ -30,7 +30,7 @@ while ($customer = mysql_fetch_array($cust_query))
 
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
 
-  while ($port = mysql_fetch_array($port_query))
+  while ($port = mysql_fetch_assoc($port_query))
   {
     $device = device_by_id_cache($port['device_id']);
 

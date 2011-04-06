@@ -7,7 +7,7 @@ if ($_SESSION['userlevel'] == '10')
 
   echo("<table cellspacing=0 cellpadding=1 width=100%>");
 
-  while ($entry = mysql_fetch_array($data))
+  while ($entry = mysql_fetch_assoc($data))
   {
     if ($bg == $list_colour_a) { $bg = $list_colour_b; } else { $bg=$list_colour_a; }
 
