@@ -153,6 +153,10 @@ $config['billing']['bill_autoadd']	= 0; # Enable Auto-add bill per bill_id
 $config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
 #$config['collectd_dir']         	= '/var/lib/collectd/rrd';
 
+# NFSen RRD dir.
+$config['nfsen_enable'] = 0;
+#$config['nfsen_split_char']   = "_";
+#$config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
 
 ### Ignores & Allows
 
