@@ -212,6 +212,27 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
+    if ($config['nfsen_enable'])
+    {   
+      if (!is_array($config['nfsen_rrds'])) { $config['nfsen_rrds'] = array($config['nfsen_rrds']); }
+      foreach ($config['nfsen_rrds'] as $nfsenrrds)
+      {
+        if ($configs[strlen($nfsenrrds)-1] != '/') { $nfsenrrds .= '/'; }
+        $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
+        if (is_file($nfsenrrds . $basefilename_underscored . ".rrd")) { $nfsen_rrd_file = $nfsenrrds . $basefilename_underscored . ".rrd"; }
+      }
+    }
+
+    if ($nfsen_rrd_file)
+    {
+      echo('<li class="' . $select['nfsen'] . '">
+    <a href="'.$config['base_url']."/device/" . $device['device_id'] . '/nfsen/">
+      <img src="images/16/rainbow.png" align="absmiddle" border="0" /> Netflow
+    </a>
+  </li>');
+    }
+
+
     if ($_SESSION['userlevel'] >= "7")
     {
       echo('<li class="' . $select['edit'] . '">
