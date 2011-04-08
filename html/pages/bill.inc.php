@@ -33,6 +33,8 @@ if (bill_permitted($bill_id))
   $day_data     = getDates($dayofmonth);
   $datefrom     = $day_data['0'];
   $dateto       = $day_data['1'];
+  $lastfrom	= $day_data['2'];
+  $lastto	= $day_data['3'];
   $rate_data    = getRates($bill_id,$datefrom,$dateto);
   $rate_95th    = $rate_data['rate_95th'];
   $dir_95th     = $rate_data['dir_95th'];
@@ -56,6 +58,9 @@ if (bill_permitted($bill_id))
   $totext   = mysql_result(mysql_query("SELECT DATE_FORMAT($dateto, '%M %D %Y')"), 0);
   $unixfrom = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$datefrom')"), 0);
   $unixto = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$dateto')"), 0);
+
+  $unix_prev_from = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$lastfrom')"), 0); 
+  $unix_prev_to   = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP('$lastto')"), 0);
 
   echo("<font face=\"Verdana, Arial, Sans-Serif\"><h2>
   Bill : " . $bill_name . "</h2>");
@@ -186,6 +191,12 @@ if (bill_permitted($bill_id))
   $yesterday = mysql_result(mysql_query("SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))"), 0);
   $rightnow = date(U);
 
+
+  $li = "<img src='graph.php?type=bill_bits&amp;id=" . $bill_id;
+  $li .= "&amp;from=" . $unix_prev_from .  "&amp;to=" . $unix_prev_to;
+  $li .= "&amp;width=715&amp;height=200&amp;total=1'>";
+
+
 #  $di =       "<img src='billing-graph.php?bill_id=" . $bill_id . "&amp;bill_code=" . $_GET['bill_code'];
 #  $di = $di . "&amp;from=" . $yesterday .  "&amp;to=" . $rightnow . "&amp;x=715&amp;y=250";
 #  $di = $di . "$type'>";
@@ -247,7 +258,9 @@ if (bill_permitted($bill_id))
    }
    else
    {
-     echo("<h3>Billing View</h3>$bi<h3>24 Hour View</h3>$di");
+     echo("<h3>Billing View</h3>$bi");
+     echo("<h3>Previous Bill View</h3>$li");
+     echo("<h3>24 Hour View</h3>$di");
      echo("<h3>Monthly View</h3>$mi");
 #     echo("<br /><a href=\"rate.php?" . $_SERVER['QUERY_STRING'] . "&amp;all=yes\">Graph All Data (SLOW)</a>");
    }
