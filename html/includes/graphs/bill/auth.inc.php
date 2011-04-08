@@ -9,9 +9,18 @@ if (is_numeric($_GET['id']) && ($config['allow_unauth_graphs'] || bill_permitted
   $bill_query   = mysql_query("SELECT * FROM `bills` WHERE bill_id = '".mres($_GET['id'])."'");
   $bill         = mysql_fetch_assoc($bill_query);
 
-  $day_data     = getDates($bill['bill_day']);
-  $datefrom     = $day_data['0'];
-  $dateto       = $day_data['1'];
+#  $day_data     = getDates($bill['bill_day']);
+#  $datefrom     = $day_data['0'];
+#  $dateto       = $day_data['1'];
+
+#print_r($day_data);
+
+
+   $datefrom = date('YmdHis', $_GET['from']);
+   $dateto   = date('YmdHis', $_GET['to']);
+
+
+
 
   $rates = getRates($_GET['id'], $datefrom,  $dateto);
 
