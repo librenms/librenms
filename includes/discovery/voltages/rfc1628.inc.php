@@ -3,7 +3,8 @@
 global $valid_sensor;
 
 ## RFC1628 UPS Voltages
-if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
+#if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
+if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
 {
   echo("RFC1628 ");
 
@@ -20,6 +21,7 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
       $volt_id = $split_oid[count($split_oid)-1];
       $volt_oid  = "1.3.6.1.2.1.33.1.2.5.$volt_id";
       $divisor = 10;
+      if ($device['os'] == "poweralert") { $divisor = 1; };
       $volt = snmp_get($device, $volt_oid, "-O vq") / $divisor;
       $descr = "Battery" . (count(explode("\n",$oids)) == 1 ? '' : ' ' . ($volt_id+1));
       $type = "rfc1628";
@@ -52,7 +54,8 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $volt_oid = "1.3.6.1.2.1.33.1.3.3.1.3.$i";
     $descr    = "Input"; if ($numPhase > 1) $descr .= " Phase $i";
     $type     = "rfc1628";
-    $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
+    $divisor  = 10;
+    if ($device['os'] == "netmanplus" || $device['os'] == "poweralert") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 100+$i;
 
@@ -67,7 +70,8 @@ if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
     $volt_oid = "1.3.6.1.2.1.33.1.5.3.1.2.$i";
     $descr    = "Bypass"; if ($numPhase > 1) $descr .= " Phase $i";
     $type     = "rfc1628";
-    $divisor  = 10; if ($device['os'] == "netmanplus") { $divisor = 1; };
+    $divisor  = 10;
+    if ($device['os'] == "netmanplus" || $device['os'] == "poweralert") { $divisor = 1; };
     $current  = snmp_get($device, $volt_oid, "-Oqv") / $divisor;
     $index    = 200+$i;
 

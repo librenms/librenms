@@ -2,7 +2,7 @@
 
 global $valid_sensor;
 
-if ($device['os'] == "netmanplus" || $device['os'] == 'deltaups')
+if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
 {
   $oids = snmp_walk($device, "1.3.6.1.2.1.33.1.2.7", "-Osqn", "UPS-MIB");
   if ($debug) { echo($oids."\n"); }
