@@ -683,6 +683,13 @@ $config['os'][$os]['text']		= "MRV LambdaDriver";
 $config['os'][$os]['type']		= "network";
 $config['os'][$os]['icon']  		= "mrv";
 
+$os = "poweralert";
+$config['os'][$os]['text']            	= "Tripp Lite PowerAlert";
+$config['os'][$os]['type']		= "power";
+$config['os'][$os]['over'][0]['graph']  = "device_current";
+$config['os'][$os]['over'][0]['text']   = "Current";
+$config['os'][$os]['icon']  		= "poweralert";
+
 
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
 

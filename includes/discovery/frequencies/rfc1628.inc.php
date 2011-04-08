@@ -3,7 +3,7 @@
 global $valid_sensor;
 
 ## RFC1628
-if ($device['os'] == "netmanplus" || $device['os'] == "deltaups")
+if ($device['os'] == "netmanplus" || $device['os'] == "deltaups" || $device['os'] == "poweralert")
 {
   echo("RFC1628 ");
 
