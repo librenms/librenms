@@ -2,13 +2,47 @@
 
 print_optionbar_start();
 
-echo("
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/'>Basic</a> | Graphs :
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/bits/'>Bits</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/upkts/'>Packets</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/nupkts/'>NU Packets</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/vrfs/errors/'>Errors</a>
- ");
+$menu_options = array('basic' => 'Basic',
+                      );
+
+if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
+
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo($sep);
+  if ($_GET['opta'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text
+ . '</a>');
+  if ($_GET['opta'] == $option) { echo("</span>"); }
+  $sep = " | ";
+}
+
+unset($sep);
+
+echo(' Graphs: ');
+
+$graph_types = array("bits" => "Bits",
+                     "upkts" => "Unicast Packets",
+                     "nupkts" => "Non-Unicast Packets",
+                     "errors" => "Errors",
+                     "etherlike" => "Etherlike");
+
+foreach ($graph_types as $type => $descr)
+{
+  echo("$type_sep");
+  if ($_GET['optb'] == $type) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/graphs/'.$type.'/">'.$descr.'</a>');
+  if ($_GET['optb'] == $type) { echo("</span>"); }
+
+#  echo('(');
+#  if ($_GET['optb'] == $type) { echo("<span class='pagemenu-selected'>"); }
+#  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/vrfs/'.$type.'/thumbs/">Mini</a>');
+#  if ($_GET['optb'] == $type) { echo("</span>"); }
+#  echo(')');
+  $type_sep = " | ";
+}
+
 print_optionbar_end();
 
 echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
