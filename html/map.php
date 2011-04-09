@@ -104,7 +104,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 	      $dif['interface_id'] = $link['remote_hostname'] . $link['remote_port'];
 	    }
 
-            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"{$config['base_url']}/device/".$device['device_id']."/interface/$local_interface_id/\"]\n";
+            $map .= "\"" . $sif['interface_id'] . "\" [label=\"" . $sif['label'] . "\", fontsize=12, fillcolor=lightblue URL=\"{$config['base_url']}/device/".$device['device_id']."/port/$local_interface_id/\"]\n";
             if (!$ifdone[$src][$sif['interface_id']])
             {
               $map .= "\"$src\" -> \"" . $sif['interface_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
@@ -115,9 +115,9 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
 
             if ($dst_host == $device['device_id'] || $where == '')
             {
-              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
+              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . "\", fontsize=12, fillcolor=lightblue, URL=\"{$config['base_url']}/device/$dst_host/port/$remote_interface_id/\"]\n";
             } else {
-              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"{$config['base_url']}/device/$dst_host/interface/$remote_interface_id/\"]\n";
+              $map .= "\"" . $dif['interface_id'] . "\" [label=\"" . $dif['label'] . " \", fontsize=12, fillcolor=lightgray, URL=\"{$config['base_url']}/device/$dst_host/port/$remote_interface_id/\"]\n";
             }
 
             if (!$ifdone[$dst][$dif['interface_id']])

@@ -63,7 +63,7 @@ if ($_GET['optc'] == thumbs)
   {
     echo("<div style='display: block; padding: 3px; margin: 3px; min-width: 183px; max-width:183px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e9e9e9;'>
     <div style='font-weight: bold;'>".makeshortif($interface['ifDescr'])."</div>
-    <a href='device/".$device['device_id']."/interface/".$interface['interface_id']."/' onmouseover=\"return overlib('\
+    <a href='device/".$device['device_id']."/port/".$interface['interface_id']."/' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>".$device['hostname']." - ".$interface['ifDescr']."</div>\
     ".$interface['ifAlias']." \
     <img src=\'graph.php?type=$graph_type&amp;id=".$interface['interface_id']."&amp;from=".$from."&amp;to=".$now."&amp;width=450&amp;height=150\'>\

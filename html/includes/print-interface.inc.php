@@ -21,10 +21,10 @@ if ($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0)
 
 if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interface_id = '".$interface['interface_id']."'"),0))
 {
-  $mac = "<a href='device/".$interface['device_id']."/interface/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
+  $mac = "<a href='device/".$interface['device_id']."/port/".$interface['interface_id']."/macaccounting/'><img src='/images/16/chart_curve.png' align='absmiddle'></a>";
 } else { $mac = ""; }
 
-echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/interface/".$interface['interface_id']."/'\" style='cursor: pointer;'>
+echo("<tr style=\"background-color: $row_colour;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" onclick=\"location.href='device/".$device['device_id']."/port/".$interface['interface_id']."/'\" style='cursor: pointer;'>
          <td valign=top width=350>");
 echo("        <span class=list-large>
               " . generate_port_link($interface, $interface['ifIndex'] . ". ".$interface['label']) . " $error_img $mac
@@ -257,13 +257,13 @@ if ($graph_type && is_file($graph_file))
 
   include("includes/print-interface-graphs.inc.php");
 
-#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\"
+#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\"
 #        onmouseout=\"return nd();\"> <img src='$daily_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
+#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\"
 #        onmouseout=\"return nd();\"> <img src='$weekly_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
 #        onmouseout=\"return nd();\"> <img src='$monthly_traffic' border=0></a>");
-#  echo("<a href='device/" . $interface['device_id'] . "/interface/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
+#  echo("<a href='device/" . $interface['device_id'] . "/port/" . $interface['interface_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT, WIDTH, 350".$config['overlib_defaults'].");\"
 #        onmouseout=\"return nd();\"> <img src='$yearly_traffic' border=0></a>");
 
   echo("</td></tr>");
