@@ -1,3 +1,11 @@
+.pagemenu-selected {
+  font-weight: bold; 
+  background-color: #cecece; 
+  -moz-border-radius: 15px; 
+  border-radius: 15px; 
+  padding: 2px 8px 3px 8px;
+}
+
 .submit {
   background-image:url('/images/submitbg.png');
   background-position:0 100%;

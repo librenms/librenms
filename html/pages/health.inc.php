@@ -1,6 +1,6 @@
 <?php
 
-$datas = array('Processors','Memory','Storage','Temperatures', 'Humidity', 'Fanspeeds', 'Voltages', 'Frequencies', 'Current');
+$datas = array('Processor','Memory','Storage','Temperature', 'Humidity', 'Fanspeed', 'Voltage', 'Frequency', 'Current');
 
 if (!$_GET['opta']) { $_GET['opta'] = "processors"; }
 if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
@@ -14,15 +14,18 @@ foreach ($datas as $texttype)
   echo($sep);
   if ($_GET['opta'] == $type)
   {
-    echo("<strong>");
-    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+    echo("<span class='pagemenu-selected'>"); 
+ #'style='font-weight: bold; background-color: #ffffff; -moz-border-radius: 15px; border-radius: 15px; padding: 2px 8px;'>");
+#    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
   }
   else
   {
-    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
+#    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
-  echo('<a href="'.$config['base_url'].'/health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/"> ' . $texttype ."</a>\n");
-  if ($_GET['opta'] == $type) { echo("</strong>"); }
+  echo('<a href="'.$config['base_url'].'/health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $texttype ."</a>");
+ 
+ if ($_GET['opta'] == $type) { echo("</span>"); }
+
   $sep = ' | ';
 }
 
@@ -32,32 +35,29 @@ echo('<div style="float: right;">');
 
 if ($_GET['optb'] == "graphs")
 {
-  echo('<strong>');
-  echo('<img src="images/icons/graphs.png" class="optionicon" />');
-} else {
-  echo('<img src="images/icons/greyscale/graphs.png" class="optionicon" />');
+  echo('<span class="pagemenu-selected">');
 }
 
 echo('<a href="health/'. $_GET['opta'].'/graphs/"> Graphs</a>');
 
 if ($_GET['optb'] == "graphs")
 {
-  echo('</strong>');
+  echo('</span>');
 }
 
 echo(' | ');
 
 if ($_GET['optb'] == "nographs")
 {
-  echo('<strong>');
-  echo('<img src="images/icons/nographs.png" class="optionicon" />');
-} else {
-  echo('<img src="images/icons/greyscale/nographs.png" class="optionicon" />');
+  echo('<span class="pagemenu-selected">');
 }
 
 echo('<a href="health/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
 
-if ($_GET['optb'] == "nographs") { echo('</strong>'); }
+if ($_GET['optb'] == "nographs") 
+{ 
+  echo('</span>'); 
+}
 
 echo('</div>');
 
@@ -65,19 +65,19 @@ print_optionbar_end();
 
 switch ($_GET['opta'])
 {
-  case 'processors':
+  case 'processor':
   case 'memory':
   case 'storage':
-  case 'temperatures':
+  case 'temperature':
   case 'humidity':
-  case 'voltages':
-  case 'fanspeeds':
-  case 'frequencies':
+  case 'voltage':
+  case 'fanspeed':
+  case 'frequency':
   case 'current':
     include('pages/health/'.$_GET['opta'].'.inc.php');
     break;
   default:
-    include('pages/health/temperatures.inc.php');
+    include('pages/health/temperature.inc.php');
     break;
 }
 
