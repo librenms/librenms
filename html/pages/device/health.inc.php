@@ -13,27 +13,27 @@ $current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_c
 $freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='freq' AND device_id = '" . $device['device_id'] . "'"), 0);
 
 $datas[] = 'overview';
-if ($processor) { $datas[] = 'processors'; }
-if ($mempools) { $datas[] = 'mempools'; }
+if ($processor) { $datas[] = 'processor'; }
+if ($mempools) { $datas[] = 'mempool'; }
 if ($storage) { $datas[] = 'storage'; }
 if ($diskio) { $datas[] = 'diskio'; }
-if ($temperatures) { $datas[] = 'temperatures'; }
+if ($temperatures) { $datas[] = 'temperature'; }
 if ($humidity) { $datas[] = 'humidity'; }
-if ($fans) { $datas[] = 'fanspeeds'; }
-if ($volts) { $datas[] = 'voltages'; }
-if ($freqs) { $datas[] = 'frequencies'; }
+if ($fans) { $datas[] = 'fanspeed'; }
+if ($volts) { $datas[] = 'voltage'; }
+if ($freqs) { $datas[] = 'frequency'; }
 if ($current) { $datas[] = 'current'; }
 
 $type_text['overview'] = "Overview";
-$type_text['temperatures'] = "Temperatures";
+$type_text['temperature'] = "Temperature";
 $type_text['humidity'] = "Humidity";
-$type_text['mempools'] = "Memory Pools";
+$type_text['mempool'] = "Memory";
 $type_text['storage'] = "Disk Usage";
 $type_text['diskio'] = "Disk I/O";
-$type_text['processors'] = "Processor Usage";
-$type_text['voltages'] = "Voltages";
-$type_text['fanspeeds'] = "Fan Speeds";
-$type_text['frequencies'] = "Frequencies";
+$type_text['processor'] = "Processor";
+$type_text['voltage'] = "Voltages";
+$type_text['fanspeed'] = "Fanspeed";
+$type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 
 print_optionbar_start();
@@ -47,13 +47,13 @@ foreach ($datas as $type)
 
   if ($_GET['opta'] == $type)
   {
-    echo("<strong>");
-    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
+    echo('<span class="pagemenu-selected">');
+#    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
   } else {
-    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
+#    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>\n");
-  if ($_GET['opta'] == $type) { echo("</strong>"); }
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>");
+  if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
 }
 

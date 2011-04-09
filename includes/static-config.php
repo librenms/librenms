@@ -688,7 +688,7 @@ $config['os'][$os]['text']            	= "Tripp Lite PowerAlert";
 $config['os'][$os]['type']		= "power";
 $config['os'][$os]['over'][0]['graph']  = "device_current";
 $config['os'][$os]['over'][0]['text']   = "Current";
-$config['os'][$os]['icon']  		= "poweralert";
+$config['os'][$os]['icon']  		= "tripplite";
 
 
 $device_types = array('server', 'network', 'firewall', 'workstation', 'printer', 'power', 'environment');
