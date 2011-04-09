@@ -21,7 +21,8 @@ if (is_file($rrd_filename))
     $rrd_list[$i]['rra'] = $oid_rra;
     $i++;
   }
-} else { echo("file missing: $file");  }
+}
+#} else { echo("file missing: $file");  }
 
 $colours   = "mixed";
 $nototal   = 1;
