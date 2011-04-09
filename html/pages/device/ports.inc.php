@@ -7,11 +7,26 @@ if ($_GET['opta'] == 'graphs')
 
 print_optionbar_start();
 
-echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/'>Basic</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/details/'>Details</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/arp/'>ARP Table</a> |
-<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/adsl/'>ADSL</a> |
-Graphs: ");
+$menu_options = array('basic' => 'Basic',
+                      'details' => 'Details',
+                      'arp' => 'ARP Table',
+                      'adsl' => 'ADSL');
+
+if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
+
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo($sep);
+  if ($_GET['opta'] == $option) { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
+  if ($_GET['opta'] == $option) { echo("</span>"); }
+  $sep = " | ";
+}
+
+unset($sep);
+
+echo('Graphs: ');
 
 $graph_types = array("bits" => "Bits",
                      "upkts" => "Unicast Packets",
@@ -21,9 +36,16 @@ $graph_types = array("bits" => "Bits",
 
 foreach ($graph_types as $type => $descr)
 {
-  echo("$type_sep
-  <a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/'>$descr</a>
-  (<a href='".$config['base_url']."/device/" . $device['device_id'] . "/ports/graphs/$type/thumbs/'>Mini</a>) ");
+  echo("$type_sep");
+  if ($_GET['optb'] == $type && $_GET['optc'] != "thumbs") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/graphs/'.$type.'/">'.$descr.'</a>');
+  if ($_GET['optb'] == $type && $_GET['optc'] != "thumbs") { echo("</span>"); }
+
+  echo('(');
+  if ($_GET['optb'] == $type && $_GET['optc'] == "thumbs") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/ports/graphs/'.$type.'/thumbs/">Mini</a>');
+  if ($_GET['optb'] == $type && $_GET['optc'] == "thumbs") { echo("</span>"); }
+  echo(')');
   $type_sep = " | ";
 }
 

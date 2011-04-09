@@ -1,9 +1,27 @@
 <?php print_optionbar_start();
 
+$menu_options = array('basic' => 'Basic',
+                      'details' => 'Details');
+
 if (!$_GET['opta']) { $_GET['opta'] = "basic"; }
 
-echo("<a href='".$config['base_url']."/services/basic/'>Basic</a> | ");
-echo("<a href='".$config['base_url']."/services/details/'>Details</a>");
+$sep = "";
+foreach ($menu_options as $option => $text)
+{
+  echo($sep);
+  if ($_GET['opta'] == $option)
+  {
+    echo("<span class='pagemenu-selected'>");
+  }
+  echo('<a href="'.$config['base_url'].'/services/' . $option . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $text . '</a>');
+  if ($_GET['opta'] == $option)
+  {
+    echo("</span>");
+  }
+  $sep = " | ";
+}
+
+unset($sep);
 
 print_optionbar_end();
 
