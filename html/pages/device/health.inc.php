@@ -31,7 +31,7 @@ $type_text['mempool'] = "Memory";
 $type_text['storage'] = "Disk Usage";
 $type_text['diskio'] = "Disk I/O";
 $type_text['processor'] = "Processor";
-$type_text['voltage'] = "Voltages";
+$type_text['voltage'] = "Voltage";
 $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
@@ -48,10 +48,8 @@ foreach ($datas as $type)
   if ($_GET['opta'] == $type)
   {
     echo('<span class="pagemenu-selected">');
-#    echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
-  } else {
-#    echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
   }
+
   echo("<a href='".$config['base_url']."/device/".$device['device_id']."/health/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type_text[$type] ."</a>");
   if ($_GET['opta'] == $type) { echo("</span>"); }
   $sep = " | ";
