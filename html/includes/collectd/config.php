@@ -63,6 +63,6 @@ $config['error_font']    = '/usr/share/fonts/corefonts/arial.ttf';
 /*
  * Constant defining full path to rrdtool
  */
-define('RRDTOOL', '/usr/bin/rrdtool');
+define('RRDTOOL', $config['rrdtool']);
 
 ?>
