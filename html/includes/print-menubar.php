@@ -206,16 +206,16 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 <!--[if IE 7]><!--></a><!--<![endif]-->
         <table><tr><td>
         <ul>
-  <li><a href="health/processors/"><img src="images/icons/processors.png" border="0" align="absmiddle" /> Processors</a></li>
+  <li><a href="health/processors/"><img src="images/icons/processor.png" border="0" align="absmiddle" /> Processors</a></li>
         <li><a href="health/memory/"><img src="images/icons/memory.png" border="0" align="absmiddle" /> Memory</a></li>
         <li><a href="health/storage/"><img src="images/icons/storage.png" border="0" align="absmiddle" /> Storage</a></li>
         <li><hr width=140 /></li>
-        <li><a href="health/temperatures/"><img src="images/icons/temperatures.png" border="0" align="absmiddle" /> Temperatures</a></li>
+        <li><a href="health/temperatures/"><img src="images/icons/temperature.png" border="0" align="absmiddle" /> Temperatures</a></li>
         <li><a href="health/humidity/"><img src="images/icons/humidity.png" border="0" align="absmiddle" /> Humidity</a></li>
-        <li><a href="health/fanspeeds/"><img src="images/icons/fanspeeds.png" border="0" align="absmiddle" /> Fans</a></li>
+        <li><a href="health/fanspeeds/"><img src="images/icons/fanspeed.png" border="0" align="absmiddle" /> Fans</a></li>
         <li><hr width=140 /></li>
-        <li><a href="health/voltages/"><img src="images/icons/voltages.png" border="0" align="absmiddle" /> Voltages</a></li>
-        <li><a href="health/frequencies/"><img src="images/icons/frequencies.png" border="0" align="absmiddle" /> Frequencies</a></li>
+        <li><a href="health/voltages/"><img src="images/icons/voltage.png" border="0" align="absmiddle" /> Voltages</a></li>
+        <li><a href="health/frequencies/"><img src="images/icons/frequency.png" border="0" align="absmiddle" /> Frequencies</a></li>
         <li><a href="health/current/"><img src="images/icons/current.png" border="0" align="absmiddle" /> Current</a></li>
         </ul>
         </td></tr></table>
