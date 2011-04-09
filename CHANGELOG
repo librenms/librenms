@@ -21,6 +21,7 @@ SVN 0.10-current
 * Add support for Socomec Net Vision UPS systems
 * Add support for ServerTech Sentry3 power systems
 * Add support for VMWare ESX hosts, and listing their virtual machines
+* Add support for listing libvirt virtual machines
 * MySQL and nginx application pollers
 * Add support for IPMI polling on servers
 * Add a new discovery parameter to only discover new devices, this can be run every 5 minutes
