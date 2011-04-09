@@ -27,16 +27,14 @@ foreach ($config['graph_sections'] as $section)
     echo($sep);
     if ($_GET['opta'] == $type)
     {
-      echo("<strong>");
-      echo('<img src="images/icons/'.$type.'.png" class="optionicon" />');
-    }
-    else
-    {
-      echo('<img src="images/icons/greyscale/'.$type.'.png" class="optionicon" />');
+      echo('<span class="pagemenu-selected">');
     }
 
-    echo("<a href='".$config['base_url']."/device/".$device['device_id']."/graphs/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type ."</a>\n");
-    if ($_GET['opta'] == $type) { echo("</strong>"); }
+    echo("<a href='".$config['base_url']."/device/".$device['device_id']."/graphs/" . $type . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $type ."</a>");
+    if ($_GET['opta'] == $type) 
+    { 
+      echo("</span>"); 
+    }
     $sep = " | ";
   }
 }
