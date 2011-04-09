@@ -260,7 +260,7 @@ function generate_port_link($args, $text = NULL, $type = NULL)
   $content .= generate_graph_tag($graph_array);
   $content .= "</div>";
 
-  $url = $config['base_url']."/device/".$args['device_id']."/interface/" . $args['interface_id'] . "/";
+  $url = $config['base_url']."/device/".$args['device_id']."/port/" . $args['interface_id'] . "/";
 
   if (port_permitted($args['interface_id'])) {
     return overlib_link($url, $text, $content, $class);
