@@ -8,7 +8,7 @@ if ($vlanversion == 'version1')
 {
   echo("VLAN $vlanversion ");
 
-  $vlans = snmp_walk($device, "dot1qVlanFdbId", $snmpoptions = "-Oqn", $mib = "Q-BRIDGE-MIB");
+  $vlans = snmp_walk($device, "dot1qVlanFdbId", "-Oqn", "Q-BRIDGE-MIB");
 
   foreach (explode("\n", $vlans) as $vlan_oid)
   {
