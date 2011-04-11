@@ -55,7 +55,7 @@ while ($device = mysql_fetch_assoc($device_query))
       }
     }
 
-    log_event("Device status changed to $stat", $device, strtolower($stat)));
+    log_event("Device status changed to $stat", $device, strtolower($stat));
     echo("Status Changed!\n");
   }
 }

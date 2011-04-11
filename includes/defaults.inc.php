@@ -157,6 +157,7 @@ $config['rancid_ignorecomments'] 	= 0; # Ignore lines starting with #
 $config['nfsen_enable'] = 0;
 #$config['nfsen_split_char']   = "_";
 #$config['nfsen_rrds']   = "/var/nfsen/profiles-stat/live/";
+#$config['nfsen_suffix']   = "_yourdomain_com";
 
 ### Ignores & Allows
 
