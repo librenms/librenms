@@ -69,21 +69,21 @@ if (bill_permitted($bill_id))
 
   if (!$_GET['optb']) { $_GET['optb'] = "details"; }
 
-  if ($_GET['optb'] == "details") { echo("<strong>"); }
+  if ($_GET['optb'] == "details") { echo("<span class='pagemenu-selected'>"); }
   echo("<a href='bill/".$bill_id."/details/'>Details</a>");
-  if ($_GET['optb'] == "details") { echo("</strong>"); }
+  if ($_GET['optb'] == "details") { echo("</span>"); }
 
   if ($_SESSION['userlevel'] == "10")
   {
     echo(" | ");
-    if ($_GET['optb'] == "edit") { echo("<strong>"); }
+    if ($_GET['optb'] == "edit") { echo("<span class='pagemenu-selected'>"); }
     echo("<a href='bill/".$bill_id."/edit/'>Edit</a>");
-    if ($_GET['optb'] == "edit") { echo("</strong>"); }
+    if ($_GET['optb'] == "edit") { echo("</span>"); }
 
     echo(" | ");
-    if ($_GET['optb'] == "delete") { echo("<strong>"); }
+    if ($_GET['optb'] == "delete") { echo("<span class='pagemenu-selected'>"); }
     echo("<a href='bill/".$bill_id."/delete/'>Delete</a>");
-    if ($_GET['optb'] == "delete") { echo("</strong>"); }
+    if ($_GET['optb'] == "delete") { echo("</span>"); }
   }
 
   print_optionbar_end();
