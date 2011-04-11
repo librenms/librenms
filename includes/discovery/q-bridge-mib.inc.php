@@ -12,7 +12,7 @@ if ($vlanversion == 'version1')
 
   foreach (explode("\n", $vlans) as $vlan_oid)
   {
-    list($oid,$vlan_index) = split(' ',$vlan_oid);
+    list($oid,$vlan_index) = explode(' ',$vlan_oid);
     $oid_ex = explode('.',$oid);
     $vlan = $oid_ex[count($oid_ex)-1];
 

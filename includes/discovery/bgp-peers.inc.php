@@ -23,7 +23,7 @@ if ($config['enable_bgp'])
 
     foreach (explode("\n", $peers) as $peer)
     {
-      list($peer_ip, $peer_as) = split(" ",  $peer);
+      list($peer_ip, $peer_as) = explode(" ",  $peer);
 
       if ($peer && $peer_ip != "0.0.0.0")
       {
@@ -43,7 +43,7 @@ if ($config['enable_bgp'])
       $peers = trim(str_replace(".1.3.6.1.4.1.2636.5.1.1.2.1.1.1.13.0.","", $result));
       foreach (explode("\n", $peers) as $peer)
       {
-        list($peer_ip_snmp, $peer_as) = split(" ",  $peer);
+        list($peer_ip_snmp, $peer_as) = explode(" ",  $peer);
 
         # Magic! Basically, takes SNMP form and finds peer IPs from the walk OIDs.
         $peer_ip = Net_IPv6::compress(snmp2ipv6(implode('.',array_slice(explode('.',$peer_ip_snmp),count(explode('.',$peer_ip_snmp))-16))));

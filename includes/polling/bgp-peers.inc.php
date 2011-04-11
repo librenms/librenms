@@ -40,7 +40,7 @@ else
         $peer_cmd .= " jnxBgpM2PeerStatus.0.ipv6";
         foreach (explode("\n",trim(`$peer_cmd`)) as $oid)
         {
-          list($peer_oid) = split(' ',$oid);
+          list($peer_oid) = explode(' ',$oid);
           $peer_id = explode('.',$peer_oid);
           $junos_v6[implode('.',array_slice($peer_id,35))] = implode('.',array_slice($peer_id,18));
         }

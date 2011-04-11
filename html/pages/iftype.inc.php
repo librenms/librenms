@@ -2,10 +2,10 @@
 
 <?php
 
-if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
 
 $type_where = " (";
-foreach (split(",", $_GET['opta']) as $type)
+foreach (explode(",", $_GET['opta']) as $type)
 {
   $type_where .= " $or `port_descr_type` = '" . mres($type) . "' ";
   $or = "OR";
@@ -47,7 +47,7 @@ if ($if_list)
     $interface['ifAlias'] = str_ireplace($type . ": ", "", $interface['ifAlias']);
     $interface['ifAlias'] = str_ireplace("[PNI]", "Private", $interface['ifAlias']);
     $ifclass = ifclass($interface['ifOperStatus'], $interface['ifAdminStatus']);
-    if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg="#ffffff"; }
+    if ($bg == "#ffffff") { $bg = "#e5e5e5"; } else { $bg = "#ffffff"; }
     echo("<tr bgcolor='$bg'>
              <td><span class=list-large>" . generate_port_link($interface,$interface['port_descr_descr']) . "</span><br />
             <span class=interface-desc style='float: left;'>".generate_device_link($interface)." ".generate_port_link($interface)." </span>");

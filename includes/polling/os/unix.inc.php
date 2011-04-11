@@ -56,7 +56,7 @@ elseif ($device['os'] == "openbsd" || $device['os'] == "solaris" || $device['os'
 }
 elseif ($device['os'] == "monowall" || $device['os'] == "Voswall")
 {
-  list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = split(" ", $sysDescr);
+  list(,,$version,$hardware,$freebsda, $freebsdb, $arch) = explode(" ", $sysDescr);
   $features = $freebsda . " " . $freebsdb;
   $hardware = "$hardware ($arch)";
   $hardware = str_replace("\"", "", $hardware);

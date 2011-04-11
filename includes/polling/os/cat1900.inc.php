@@ -1,6 +1,6 @@
 <?php
 
-list(,$version) = split(',',$sysDescr,2);
+list(,$version) = explode(',',$sysDescr,2);
 $hardware = "1900";
 
 ?>
