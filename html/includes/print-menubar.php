@@ -153,7 +153,7 @@ if ($config['enable_billing']) { echo('<li><a href="bills/"><img src="images/16/
 
 if ($config['enable_pseudowires']) { echo('<li><a href="pseudowires/"><img src="images/16/arrow_switch.png" border="0" align="absmiddle" /> Pseudowires</a></li>'); $ifbreak = 1; }
 
-if ($config['enable_pseudowires']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1; }
+if ($config['enable_vrfs']) { echo('<li><a href="vrfs/"><img src="images/16/layers.png" border="0" align="absmiddle" /> VRFs</a></li>'); $ifbreak = 1; }
 
 ?>
 <li><a href="ipv4/"><img src="images/16/email_link.png" border="0" align="absmiddle" /> IPv4 Search</a></li>
