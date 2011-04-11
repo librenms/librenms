@@ -160,7 +160,7 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
     if (mysql_result(mysql_query("select count(service_id) from services WHERE device_id = '" . $device['device_id'] . "'"), 0) > '0')
     {
       echo('<li class="' . $select['srv'] . '">
-    <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/srv/">
+    <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/services/">
       <img src="images/icons/services.png" align="absmiddle" border="0" /> Services
     </a>
   </li>');
