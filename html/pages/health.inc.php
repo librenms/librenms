@@ -14,7 +14,7 @@ $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
 
-if (!$_GET['opta']) { $_GET['opta'] = "processors"; }
+if (!$_GET['opta']) { $_GET['opta'] = "processor"; }
 if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
 
 print_optionbar_start('', '');
