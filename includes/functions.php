@@ -129,7 +129,7 @@ function getImage($host)
     if ($type == "linux")
     {
       $features = strtolower(trim($data['features']));
-      list($distro) = split(" ", $features);
+      list($distro) = explode(" ", $features);
       if (file_exists($config['html_dir'] . "/images/os/$distro" . ".png")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.png" />';
       } elseif (file_exists($config['html_dir'] . "/images/os/$distro" . ".gif")){ $image = '<img src="'.$config['base_url'].'/images/os/'.$distro.'.gif" />'; }
     }

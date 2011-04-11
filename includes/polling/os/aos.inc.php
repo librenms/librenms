@@ -1,5 +1,5 @@
 <?php
 
-list(,$hardware,$version) = split(' ',$sysDescr);
+list(,$hardware,$version) = explode(' ',$sysDescr);
 
 ?>

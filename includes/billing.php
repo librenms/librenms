@@ -3,7 +3,8 @@
 function getDates($dayofmonth)
 {
   $dayofmonth = zeropad($dayofmonth);
-  list($year, $month) = split('-', date('Y-m'));
+  $year = date('Y');
+  $month = date('m');
 
   if (date('d') > $dayofmonth)
   {

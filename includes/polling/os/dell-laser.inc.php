@@ -13,7 +13,7 @@ foreach ($dellinfo as $dellinf)
 
 $hardware = $dell_laser['MDL'];
 
-list(,$version) = split('Engine ',$sysDescr);
+list(,$version) = explode('Engine ',$sysDescr);
 
 $version = "Engine " . trim($version,')');
 

@@ -41,7 +41,7 @@ function process_syslog ($entry, $update)
       if (strstr($entry[msg], "%"))
       {
         $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
-        list(,$entry[msg]) = split(": %", $entry['msg']);
+        list(,$entry[msg]) = explode(": %", $entry['msg']);
         $entry['msg'] = "%" . $entry['msg'];
         $entry['msg'] = preg_replace("/^%(.+?):\ /", "\\1||", $entry['msg']);
       }

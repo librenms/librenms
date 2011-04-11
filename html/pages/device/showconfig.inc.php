@@ -18,7 +18,7 @@ if ($_SESSION['userlevel'] >= "7")
 
   if ($config['rancid_ignorecomments'])
   {
-    $lines = split("\n",$text);
+    $lines = explode("\n",$text);
     for ($i = 0;$i < count($lines);$i++)
     {
       if ($lines[$i][0] == "#") { unset($lines[$i]); }
