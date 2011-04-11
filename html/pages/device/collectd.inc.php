@@ -52,9 +52,9 @@ print_optionbar_start();
     foreach ($plugins as &$plugin) {
        if (!$_GET['opta']) { $_GET['opta'] = $plugin; }
        echo($sep);
-       if ($_GET['opta'] == $plugin) { echo("<strong>"); }
-       echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/collectd/" . $plugin . "/'>" . htmlspecialchars($plugin) ."</a>\n");
-       if ($_GET['opta'] == $plugin) { echo("</strong>"); }
+       if ($_GET['opta'] == $plugin) { echo("<span class='pagemenu-selected'>"); }
+       echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/collectd/" . $plugin . "/'>" . htmlspecialchars($plugin) ."</a>");
+       if ($_GET['opta'] == $plugin) { echo("</span>"); }
        $sep = ' | ';
     }
     unset ($sep);
