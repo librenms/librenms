@@ -9,7 +9,7 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
   echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/mempools/">');
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $mempool_rows = '1';
+  $mempool_rows = '0';
   $mempools = mysql_query("SELECT * FROM `mempools` WHERE device_id = '" . $device['device_id'] . "'");
 
   while ($mempool = mysql_fetch_assoc($mempools))

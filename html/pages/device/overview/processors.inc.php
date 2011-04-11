@@ -10,7 +10,6 @@ if (mysql_result(mysql_query("SELECT count(*) from processors WHERE device_id = 
   echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/processors/">');
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/processor.png'> Processors</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
-  $i = '1';
   $procs = mysql_query("SELECT * FROM `processors` WHERE device_id = '" . $device['device_id'] . "' ORDER BY processor_descr ASC");
   while ($proc = mysql_fetch_assoc($procs))
   {
