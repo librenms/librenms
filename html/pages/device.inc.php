@@ -218,8 +218,11 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
       foreach ($config['nfsen_rrds'] as $nfsenrrds)
       {
         if ($configs[strlen($nfsenrrds)-1] != '/') { $nfsenrrds .= '/'; }
+        $nfsensuffix = "";
+        if ($config['nfsen_suffix']) { $nfsensuffix = $config['nfsen_suffix']; }
         $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
-        if (is_file($nfsenrrds . $basefilename_underscored . ".rrd")) { $nfsen_rrd_file = $nfsenrrds . $basefilename_underscored . ".rrd"; }
+        $nfsen_filename = (strstr($basefilename_underscored, $nfsensuffix, true));
+        if (is_file($nfsenrrds . $nfsen_filename . ".rrd")) { $nfsen_rrd_file = $nfsenrrds . $basefilename_underscored . ".rrd"; }
       }
     }
 

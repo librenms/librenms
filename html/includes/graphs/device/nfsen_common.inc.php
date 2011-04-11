@@ -9,10 +9,14 @@ foreach ( $config['nfsen_rrds'] as $nfsenrrds )
   if ($configs[strlen($nfsenrrds)-1] != '/') { $nfsenrrds .= '/'; }
 
   # convert dots in filename to underscores
+  $nfsensuffix = "";
+  if ($config['nfsen_suffix']) { $nfsensuffix = $config['nfsen_suffix']; }
   $basefilename_underscored = preg_replace('/\./', $config['nfsen_split_char'], $device['hostname']);
-  if (is_file($nfsenrrds . $basefilename_underscored . ".rrd"))
+  $nfsen_filename = (strstr($basefilename_underscored, $nfsensuffix, true));
+
+  if (is_file($nfsenrrds . $nfsen_filename . ".rrd"))
   {
-    $rrd_filename = $nfsenrrds . $basefilename_underscored . ".rrd"; 
+    $rrd_filename = $nfsenrrds . $nfsen_filename . ".rrd"; 
 
     $flowtypes = array('tcp', 'udp', 'icmp', 'other');
 
