@@ -14,13 +14,13 @@ while ($app = mysql_fetch_assoc($query))
 
   if ($_GET['opta'] == $app['app_type'])
   {
-    echo("<strong>");
-    echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
+    echo("<span class='pagemenu-selected'>");
+    #echo('<img src="images/icons/'.$app['app_type'].'.png" class="optionicon" />');
   } else {
-    echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
+    #echo('<img src="images/icons/greyscale/'.$app['app_type'].'.png" class="optionicon" />');
   }
-  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/apps/" . $app['app_type'] . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $app['app_type'] ."</a>\n");
-  if ($_GET['opta'] == $app['app_type']) { echo("</strong>"); }
+  echo("<a href='".$config['base_url']."/device/".$device['device_id']."/apps/" . $app['app_type'] . ($_GET['optb'] ? "/" . $_GET['optb'] : ''). "/'> " . $app['app_type'] ."</a>");
+  if ($_GET['opta'] == $app['app_type']) { echo("</span>"); }
   $sep = " | ";
 }
 
