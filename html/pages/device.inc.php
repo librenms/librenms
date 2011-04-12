@@ -131,6 +131,18 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
+    $cef_query = mysql_query("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = '".$device['device_id']."'");
+    $cef_count = mysql_result($cef_query,0);
+
+    if ($cef_count)
+    {
+      echo('<li class="' . $select['cefswitching'] . '">
+    <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/cefswitching/">
+      <img src="images/16/car.png" align="absmiddle" border="0" /> CEF
+    </a>
+    </li>');
+    }
+
     if ($_SESSION['userlevel'] >= "5" && mysql_result(mysql_query("SELECT count(*) FROM links AS L, ports AS I WHERE I.device_id = '".$device['device_id']."' AND I.interface_id = L.local_interface_id"),0))
     {
       echo('<li class="' . $select['map'] . '">

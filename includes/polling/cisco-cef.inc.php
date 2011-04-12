@@ -4,6 +4,8 @@ echo("Cisco CEF Switching Path: ");
 
 $cefs = array();
 $cefs = snmpwalk_cache_threepart_oid($device, "CISCO-CEF-MIB::cefSwitchingStatsEntry", $cefs);
+$polled = time();
+
 if ($debug) { print_r($cefs); }
 
 if (is_array($cefs))
@@ -26,19 +28,25 @@ if (is_array($cefs))
     foreach($afis as $afi => $paths)
     {
       echo(" |- $afi\n");
-      foreach($paths as $path => $path_name)
+      foreach($paths as $path => $cef_stat)
       {
-        echo(" | |-".$path.": ".$path_name['cefSwitchingPath']);
+        echo(" | |-".$path.": ".$cef_stat['cefSwitchingPath']);
 
 
         if(mysql_result(mysql_query("SELECT COUNT(*) FROM `cef_switching` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."' 
                                      AND `afi` = '".$afi."' AND `cef_index` = '".$path."'"),0) != "1")
         {
 	  $sql = "INSERT INTO `cef_switching` (`device_id`, `entPhysicalIndex`, `afi`, `cef_index`, `cef_path`) 
-                  VALUES ('".$device['device_id']."', '".$entity."', '".$afi."', '".$path."', '".$path_name['cefSwitchingPath']."')";
+                  VALUES ('".$device['device_id']."', '".$entity."', '".$afi."', '".$path."', '".$cef_stat['cefSwitchingPath']."')";
 	  mysql_query($sql);
           echo("+");
         }
+
+        $sql = "SELECT * FROM `cef_switching` WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."'
+                                     AND `afi` = '".$afi."' AND `cef_index` = '".$path."'";
+
+	$query = mysql_query($sql);
+	$cef_entry = mysql_fetch_assoc($query);
 
         $filename = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("cefswitching-".$entity."-".$afi."-".$path.".rrd");
 
@@ -54,20 +62,31 @@ if (is_array($cefs))
           RRA:LAST:0.5:1:600    RRA:LAST:0.5:6:700    RRA:LAST:0.5:24:775    RRA:LAST:0.5:288:797");
         }
 
-        $path_name['cefSwitchingPath'];
-        $path_name['cefSwitchingDrop'];        
-        $path_name['cefSwitchingPunt'];
-        $path_name['cefSwitchingPunt2Host'];
-
         ### Copy HC to non-HC if they exist
-        if (is_numeric($this_port['cefSwitchingPath'])) { $this_port['cefSwitchingPath'] = $this_port['cefSwitchingHCDrop']; }
-        if (is_numeric($this_port['cefSwitchingPunt'])) { $this_port['cefSwitchingPunt'] = $this_port['cefSwitchingHCPunt']; }
-        if (is_numeric($this_port['cefSwitchingPunt2Host'])) { $this_port['cefSwitchingPunt2Host'] = $this_port['cefSwitchingHCPunt2Host']; }
+        if (is_numeric($cef_stat['cefSwitchingHCDrop'])) { $cef_stat['cefSwitchingDrop'] = $cef_stat['cefSwitchingHCDrop']; }
+        if (is_numeric($cef_stat['cefSwitchingHCPunt'])) { $cef_stat['cefSwitchingPunt'] = $cef_stat['cefSwitchingHCPunt']; }
+        if (is_numeric($cef_stat['cefSwitchingHCPunt2Host'])) { $cef_stat['cefSwitchingPunt2Host'] = $cef_stat['cefSwitchingHCPunt2Host']; }
+
+        $update =  " `drop` = '".$cef_stat['cefSwitchingDrop']."'";
+        $update .= ", `punt` = '".$cef_stat['cefSwitchingPunt']."'";
+        $update .= ", `punt2host` = '".$cef_stat['cefSwitchingPunt2Host']."'";
+
+        $update .= ", `drop_prev` = '".$cef_entry['drop']."'";
+        $update .= ", `punt_prev` = '".$cef_entry['punt']."'";
+        $update .= ", `punt2host_prev` = '".$cef_entry['punt2host']."'";
+
+        $update .= ",  `updated` = '".$polled."'";
+        $update .= ", `updated_prev` = '".$cef_entry['updated']."'";
+
+	$update_query  = "UPDATE `cef_switching` SET ".$update." WHERE `device_id` = '".$device['device_id']."' AND `entPhysicalIndex` = '".$entity."'
+                                                                   AND `afi` = '".$afi."' AND `cef_index` = '".$path."'";
+        @mysql_query($update_query);
+        if ($debug) {echo("\nMYSQL : [ $update_query ]"); }
                  
-        $rrd_update  = "N:".$path_name['cefSwitchingDrop'].":".$path_name['cefSwitchingPunt'].":".$path_name['cefSwitchingPunt2Host'];
+        $rrd_update  = "N:".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host'];
         $ret = rrdtool_update("$filename", $rrd_update);
 
-        if($debug) { echo(" Values: ".$path_name['cefSwitchingDrop'].":".$path_name['cefSwitchingPunt'].":".$path_name['cefSwitchingPunt2Host']); }
+        if($debug) { echo(" Values: ".$cef_stat['cefSwitchingDrop'].":".$cef_stat['cefSwitchingPunt'].":".$cef_stat['cefSwitchingPunt2Host']); }
 
         echo("\n");
 
