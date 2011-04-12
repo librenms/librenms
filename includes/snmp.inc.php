@@ -281,9 +281,8 @@ function snmpwalk_cache_cip($device, $oid, $array, $mib = 0)
     {
       $array[$ifIndex][$mac][$oid][$dir] = $this_value;
     }
-
-    return $array;
   }
+  return $array;
 }
 
 function snmp_cache_ifIndex($device)
