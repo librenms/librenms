@@ -19,7 +19,7 @@ include("includes/functions.php");
 $poller_start = utime();
 echo("Observium Poller v".$config['version']."\n\n");
 
-$options = getopt("h:t:i:n:d::a::");
+$options = getopt("h:m:i:n:d::a::");
 
 if ($options['h'] == "odd")      { $options['n'] = "1"; $options['i'] = "2"; }
 elseif ($options['h'] == "even") { $options['n'] = "0"; $options['i'] = "2"; }
@@ -238,6 +238,7 @@ while ($device = mysql_fetch_assoc($device_query))
     #include("includes/polling/altiga-ssl.inc.php");
     include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
     include("includes/polling/cisco-remote-access-monitor.inc.php");
+    include("includes/polling/cisco-cef.inc.php");
 
     unset($update);
     unset($seperator);
