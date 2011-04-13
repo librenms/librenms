@@ -31,7 +31,7 @@ while ($sensor = mysql_fetch_assoc($volt_data))
 
   rrdtool_update($rrd_file,"N:$volt");
 
-  if ($sensor['sensor_current'] > $sensor['sensor_limit_low'] && $volt <= $sensor['sensor_limit_low'])
+  if ($sensor['sensor_limit_low'] != "" && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $volt <= $sensor['sensor_limit_low'])
   {
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $volt . "V (Limit " . $sensor['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
@@ -39,7 +39,7 @@ while ($sensor = mysql_fetch_assoc($volt_data))
     echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
     log_event('Voltage ' . $sensor['sensor_descr'] . " under threshold: " . $volt . " V (< " . $sensor['sensor_limit_low'] . " V)", $device, 'voltage', $sensor['sensor_id']);
   }
-  else if ($sensor['sensor_current'] < $sensor['sensor_limit'] && $volt >= $sensor['sensor_limit'])
+  else if ($sensor['sensor_limit'] != "" && $sensor['sensor_current'] < $sensor['sensor_limit'] && $volt >= $sensor['sensor_limit'])
   {
     $msg  = "Voltage Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $volt . "V (Limit " . $sensor['sensor_limit'];
     $msg .= "V) at " . date($config['timestamp_format']);
