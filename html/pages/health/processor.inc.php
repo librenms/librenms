@@ -4,6 +4,14 @@ $graph_type = "processor_usage";
 
 echo("<div style='margin-top: 5px; padding: 0px;'>");
 echo("  <table width=100% cellpadding=6 cellspacing=0>");
+
+echo("<tr class=tablehead>
+        <th width=280>Device</th>
+        <th>Processor</th>
+        <th width=100></th>
+        <th width=280>Usage</th>
+      </tr>");
+
 $i = '1';
 $procs = mysql_query("SELECT * FROM `processors` AS P, `devices` AS D WHERE D.device_id = P.device_id ORDER BY D.hostname");
 while ($proc = mysql_fetch_assoc($procs))

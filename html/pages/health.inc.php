@@ -73,7 +73,7 @@ print_optionbar_end();
 switch ($_GET['opta'])
 {
   case 'processor':
-  case 'memory':
+  case 'mempool':
   case 'storage':
   case 'temperature':
   case 'humidity':
