@@ -167,13 +167,12 @@ while ($device = mysql_fetch_assoc($device_query))
 
   #include("includes/discovery/os.inc.php");
 
-  if($options['m'])
+  if ($options['m'])
   {
-    if(is_file("includes/discovery/".$options['m'].".inc.php"))
+    if (is_file("includes/discovery/".$options['m'].".inc.php"))
     {
       include("includes/discovery/".$options['m'].".inc.php");
     }
-
   } else {
     include("includes/discovery/ports.inc.php");
     include("includes/discovery/entity-physical.inc.php");

@@ -183,7 +183,7 @@ $config['device_traffic_descr']   = array('/loopback/','/vlan/','/tunnel/','/:\d
 
 $config['allow_unauth_graphs']	  = 0; ## Allow graphs to be viewed by anyone
 $config['allow_unauth_graphs_cidr'] = array(); # Allow graphs to be viewed without authorisation from certain IP ranges
-$config['auth_mechanism']         = "mysql";   # Auth Type.
+$config['auth_mechanism']         = "mysql";   # Available mechanisms: mysql (default), ldap, http-auth
 
 ### Sensors
 
