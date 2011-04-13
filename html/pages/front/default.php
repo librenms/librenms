@@ -76,20 +76,23 @@ if (isset($config['enable_bgp']) && $config['enable_bgp'])
   }
 }
 
-if ($_SESSION['userlevel'] == '10')
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)
 {
-$sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime < '84600' AND D.ignore = 0");
-} else {
-$sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '84600' AND D.ignore = 0");
-}
+  if ($_SESSION['userlevel'] == '10')
+  {
+  $sql = mysql_query("SELECT * FROM `devices` AS D WHERE D.status = '1' AND D.uptime < '" . $config['uptime_warning'] . "' AND D.ignore = 0");
+  } else {
+  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_perms AS P WHERE D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' AND D.status = '1' AND D.uptime < '" . 
+  $config['uptime_warning'] . "' AND D.ignore = 0");
+  }
 
-while ($device = mysql_fetch_assoc($sql))
-{
-   generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
-      <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
-      </center>");
-
+  while ($device = mysql_fetch_assoc($sql))
+  {
+     generate_front_box("#aaffaa", "<center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
+        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #009;'>Device<br />Rebooted</span><br />
+        <span class=body-date-1>".formatUptime($device['uptime'], 'short')."</span>
+        </center>");
+  }
 }
 
 if ($config['enable_syslog'])
