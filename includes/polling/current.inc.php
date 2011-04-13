@@ -28,7 +28,7 @@ while ($dbcurrent = mysql_fetch_assoc($current_data))
   rrdtool_update($currentrrd,"N:$current");
 
 # FIXME also warn when crossing WARN level!!
-  if ($dbcurrent['sensor_current'] > $dbcurrent['sensor_limit_low'] && $current <= $dbcurrent['sensor_limit_low'])
+  if ($dbcurrent['sensor_limit_low'] != "" && $dbcurrent['sensor_current'] > $dbcurrent['sensor_limit_low'] && $current <= $dbcurrent['sensor_limit_low'])
   {
     $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is under threshold: " . $current . "A (< " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
@@ -36,7 +36,7 @@ while ($dbcurrent = mysql_fetch_assoc($current_data))
     echo("Alerting for " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . "\n");
     log_event('Current ' . $dbcurrent['sensor_descr'] . " under threshold: " . $current . " A (< " . $dbcurrent['sensor_limit_low'] . " A)", $device, 'current', $current['sensor_id']);
   }
-  else if ($dbcurrent['sensor_current'] < $dbcurrent['sensor_limit'] && $current >= $dbcurrent['sensor_limit'])
+  else if ($dbcurrent['sensor_limit_low'] != "" && $dbcurrent['sensor_current'] < $dbcurrent['sensor_limit'] && $current >= $dbcurrent['sensor_limit'])
   {
     $msg  = "Current Alarm: " . $device['hostname'] . " " . $dbcurrent['sensor_descr'] . " is over threshold: " . $current . "A (> " . $dbcurrent['sensor_limit'];
     $msg .= "A) at " . date($config['timestamp_format']);
