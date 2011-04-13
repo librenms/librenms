@@ -1,6 +1,6 @@
 <?php
 
-$class = "freq";
+$class = "frequency";
 $unit  = "Hz";
 $graph_type = "sensor_frequency";
 
