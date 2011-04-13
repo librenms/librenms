@@ -35,7 +35,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($high_limit != $sensor_entry['sensor_limit'])
     {
-      $query = "UPDATE sensors SET `sensor_limit` = '".$high_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
+      $query = "UPDATE sensors SET `sensor_limit` = " . ($high_limit == NULL ? 'NULL' : "'".$high_limit."'") . " WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
       mysql_query($query);
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("H");
@@ -54,7 +54,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
 
     if ($sensor_entry['sensor_limit_low'] != $low_limit)
     {
-      $query = "UPDATE sensors SET `sensor_limit_low` = '".$low_limit."' WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
+      $query = "UPDATE sensors SET `sensor_limit_low` = " . ($low_limit == NULL ? 'NULL' : "'".$low_limit."'") . " WHERE `sensor_id` = '".$sensor_entry['sensor_id']."'";
       mysql_query($query);
       if ($debug) { echo("$query\n". mysql_affected_rows() . " updated\n"); }
       echo("L");
