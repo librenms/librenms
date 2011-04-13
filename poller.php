@@ -224,11 +224,11 @@ while ($device = mysql_fetch_assoc($device_query))
     } else {
       include("includes/polling/ipmi.inc.php");
       include("includes/polling/temperatures.inc.php");
-      include("includes/polling/humidity.inc.php");
-      include("includes/polling/fanspeeds.inc.php");
+      #include("includes/polling/humidity.inc.php");
+      #include("includes/polling/fanspeeds.inc.php");
       include("includes/polling/voltages.inc.php");
-      include("includes/polling/frequencies.inc.php");
-      include("includes/polling/current.inc.php");
+      #include("includes/polling/frequencies.inc.php");
+      #include("includes/polling/current.inc.php");
       #include("includes/polling/sensors.inc.php"); FIXMESTOMMEBELGEN
       include("includes/polling/processors.inc.php");
       include("includes/polling/mempools.inc.php");
