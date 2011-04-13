@@ -93,9 +93,9 @@ if (mysql_result(mysql_query("SELECT count(*) FROM mac_accounting WHERE interfac
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "bits" && $_GET['optd'] == "thumbs") { echo("</span>"); }
   echo('|');
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "bits" && $_GET['optd'] == "top10") { echo("<span class='pagemenu-selected'>"); }
-  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/top10/'>Top10</a>)");
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/bits/top10/'>Top10</a>");
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "bits" && $_GET['optd'] == "top10") { echo("</span>"); }
-  echo(" | ");
+  echo(") | ");
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "pkts" && !$_GET['optd']) { echo("<span class='pagemenu-selected'>"); }
   echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/port/".$interface['interface_id']."/macaccounting/pkts/'>Packets</a>");
   if ($_GET['optb'] == "macaccounting" && $_GET['optc'] == "pkts" && !$_GET['optd']) { echo("</span>"); }

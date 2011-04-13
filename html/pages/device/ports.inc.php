@@ -26,7 +26,7 @@ foreach ($menu_options as $option => $text)
 
 unset($sep);
 
-echo('Graphs: ');
+echo(' | Graphs: ');
 
 $graph_types = array("bits" => "Bits",
                      "upkts" => "Unicast Packets",
