@@ -247,8 +247,8 @@ while ($device = mysql_fetch_assoc($device_query))
       #include("includes/polling/altiga-ssl.inc.php");
       include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
       include("includes/polling/cisco-remote-access-monitor.inc.php");
+      include("includes/polling/cisco-cef.inc.php");
     }
-    include("includes/polling/cisco-cef.inc.php");
 
     unset($update);
     unset($seperator);
