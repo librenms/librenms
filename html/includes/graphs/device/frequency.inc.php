@@ -6,7 +6,7 @@ $device = device_by_id_cache($id);
 $rrd_options .= " -l 0 -E ";
 
 $iter = "1";
-$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='freq' AND device_id = '$id'");
+$sql = mysql_query("SELECT * FROM sensors WHERE sensor_class='frequency' AND device_id = '$id'");
 $rrd_options .= " COMMENT:'                       Cur     Min      Max\\n'";
 
 while ($frequency = mysql_fetch_assoc($sql))

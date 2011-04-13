@@ -15,6 +15,7 @@
 include("includes/defaults.inc.php");
 include("config.php");
 include("includes/functions.php");
+include("includes/polling/functions.inc.php");
 
 $poller_start = utime();
 echo("Observium Poller v".$config['version']."\n\n");
@@ -222,12 +223,7 @@ while ($device = mysql_fetch_assoc($device_query))
       }
     } else {
       include("includes/polling/ipmi.inc.php");
-      include("includes/polling/temperatures.inc.php");
-      include("includes/polling/humidity.inc.php");
-      include("includes/polling/fanspeeds.inc.php");
-      include("includes/polling/voltages.inc.php");
-      include("includes/polling/frequencies.inc.php");
-      include("includes/polling/current.inc.php");
+      include("includes/polling/sensors.inc.php");
       include("includes/polling/processors.inc.php");
       include("includes/polling/mempools.inc.php");
       include("includes/polling/storage.inc.php");

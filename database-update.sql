@@ -35,3 +35,4 @@ ALTER TABLE `vminfo` ADD `vm_type` VARCHAR(16) NOT NULL DEFAULT 'vmware' AFTER `
 CREATE TABLE IF NOT EXISTS `cef_switching` (  `device_id` int(11) NOT NULL,  `entPhysicalIndex` int(11) NOT NULL,  `afi` varchar(4) COLLATE utf8_unicode_ci NOT NULL,  `cef_index` int(11) NOT NULL,  `cef_path` varchar(16) COLLATE utf8_unicode_ci NOT NULL,  `drop` int(11) NOT NULL,  `punt` int(11) NOT NULL,  `punt2host` int(11) NOT NULL,  `drop_prev` int(11) NOT NULL,  `punt_prev` int(11) NOT NULL,  `punt2host_prev` int(11) NOT NULL,`updated` INT NOT NULL ,  `updated_prev` INT NOT NULL )  ENGINE=InnoDB DEFAULT CHARSET=utf8;
 ALTER TABLE  `mac_accounting` CHANGE  `peer_mac`  `mac` VARCHAR( 32 ) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL
 ALTER TABLE `mac_accounting`  DROP `peer_ip`,  DROP `peer_desc`,  DROP `peer_asn`;
+UPDATE sensors SET sensor_class='frequency' WHERE sensor_class='freq';

@@ -5,9 +5,9 @@ $unit = "Hz";
 
 if ($_SESSION['userlevel'] >= '5')
 {
-  $sql = "SELECT * FROM `sensors` AS V, `devices` AS D WHERE V.sensor_class='freq' AND V.device_id = D.device_id ORDER BY D.hostname, V.sensor_descr";
+  $sql = "SELECT * FROM `sensors` AS V, `devices` AS D WHERE V.sensor_class='frequency' AND V.device_id = D.device_id ORDER BY D.hostname, V.sensor_descr";
 } else {
-  $sql = "SELECT * FROM `sensors` AS V, `devices` AS D, devices_perms as P WHERE V.sensor_class='freq' V.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, V.sensor_descr";
+  $sql = "SELECT * FROM `sensors` AS V, `devices` AS D, devices_perms as P WHERE V.sensor_class='frequency' V.device_id = D.device_id AND D.device_id = P.device_id AND P.user_id = '" . $_SESSION['user_id'] . "' ORDER BY D.hostname, V.sensor_descr";
 }
 
 $query = mysql_query($sql);
