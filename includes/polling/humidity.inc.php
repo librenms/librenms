@@ -2,16 +2,16 @@
 
 $query = "SELECT * FROM sensors WHERE sensor_class='humidity' AND device_id = '" . $device['device_id'] . "' AND poller_type='snmp'";
 $hum_data = mysql_query($query);
-while ($humidity = mysql_fetch_assoc($hum_data))
+while ($sensor = mysql_fetch_assoc($hum_data))
 {
-  echo("Checking humidity " . $humidity['sensor_descr'] . "... ");
+  echo("Checking humidity " . $sensor['sensor_descr'] . "... ");
 
-  $hum = snmp_get($device, $humidity['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
+  $hum = snmp_get($device, $sensor['sensor_oid'], "-OUqnv", "SNMPv2-MIB");
 
-  if ($humidity['sensor_divisor'])    { $hum = $hum / $humidity['sensor_divisor']; }
-  if ($humidity['sensor_multiplier']) { $hum = $hum / $humidity['sensor_multiplier']; }
+  if ($sensor['sensor_divisor'])    { $hum = $hum / $sensor['sensor_divisor']; }
+  if ($sensor['sensor_multiplier']) { $hum = $hum / $sensor['sensor_multiplier']; }
 
-  $humrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("humidity-" . $humidity['sensor_descr'] . ".rrd");
+  $humrrd  = $config['rrd_dir'] . "/" . $device['hostname'] . "/" . safename("humidity-" . $sensor['sensor_descr'] . ".rrd");
 
   if (!is_file($humrrd))
   {
@@ -27,24 +27,24 @@ while ($humidity = mysql_fetch_assoc($hum_data))
 
   rrdtool_update($humrrd,"N:$hum");
 
-  if ($humidity['sensor_current'] > $humidity['sensor_limit_low'] && $hum <= $humidity['sensor_limit_low'])
+  if ($sensor['sensor_limit_low'] != "" && $sensor['sensor_current'] > $sensor['sensor_limit_low'] && $hum <= $sensor['sensor_limit_low'])
   {
-    $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
+    $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $hum . "% (Limit " . $sensor['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
-    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
-    echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
-    log_event('Frequency ' . $humidity['sensor_descr'] . " under threshold: " . $hum . " % (< " . $humidity['sensor_limit_low'] . " %)", $device, 'humidity', $humidity['sensor_id']);
+    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
+    log_event('Frequency ' . $sensor['sensor_descr'] . " under threshold: " . $hum . " % (< " . $sensor['sensor_limit_low'] . " %)", $device, 'humidity', $sensor['sensor_id']);
   }
-  else if ($humidity['sensor_current'] < $humidity['sensor_limit'] && $hum >= $humidity['sensor_limit'])
+  else if ($sensor['sensor_limit'] != "" && $sensor['sensor_current'] < $sensor['sensor_limit'] && $hum >= $sensor['sensor_limit'])
   {
-    $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'] . " is " . $hum . "% (Limit " . $humidity['sensor_limit'];
+    $msg  = "Humidity Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'] . " is " . $hum . "% (Limit " . $sensor['sensor_limit'];
     $msg .= "%) at " . date($config['timestamp_format']);
-    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $humidity['sensor_descr'], $msg);
-    echo("Alerting for " . $device['hostname'] . " " . $humidity['sensor_descr'] . "\n");
-    log_event('Humidity ' . $humidity['sensor_descr'] . " above threshold: " . $hum . " % (> " . $humidity['sensor_limit'] . " %)", $device, 'humidity', $humidity['sensor_id']);
+    notify($device, "Humidity Alarm: " . $device['hostname'] . " " . $sensor['sensor_descr'], $msg);
+    echo("Alerting for " . $device['hostname'] . " " . $sensor['sensor_descr'] . "\n");
+    log_event('Humidity ' . $sensor['sensor_descr'] . " above threshold: " . $hum . " % (> " . $sensor['sensor_limit'] . " %)", $device, 'humidity', $sensor['sensor_id']);
   }
 
-  mysql_query("UPDATE sensors SET sensor_current = '$hum' WHERE sensor_class='humidity' AND sensor_id = '" . $humidity['sensor_id'] . "'");
+  mysql_query("UPDATE sensors SET sensor_current = '$hum' WHERE sensor_class='humidity' AND sensor_id = '" . $sensor['sensor_id'] . "'");
 }
 
 ?>
