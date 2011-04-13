@@ -52,7 +52,9 @@ if (!$where)
   echo("-h all                                       Poll all devices\n\n");
   echo("-i <instances> -n <number>                   Poll as instance <number> of <instances>\n");
   echo("                                             Instances start at 0. 0-3 for -n 4\n\n");
-  echo("-d                                           Enable some debugging output\n");
+  echo("Debugging and testing options:\n");
+  echo("-d                                           Enable debugging output\n");
+  echo("-m                                           Specify single module to be run\n");
   echo("\n");
   echo("No polling type specified!\n");
   exit;
@@ -212,32 +214,40 @@ while ($device = mysql_fetch_assoc($device_query))
     $sysLocation = str_replace("\"","", $sysLocation);
     $sysContact  = str_replace("\"","", $sysContact);
 
-    include("includes/polling/ipmi.inc.php");
-    include("includes/polling/temperatures.inc.php");
-    include("includes/polling/humidity.inc.php");
-    include("includes/polling/fanspeeds.inc.php");
-    include("includes/polling/voltages.inc.php");
-    include("includes/polling/frequencies.inc.php");
-    include("includes/polling/current.inc.php");
-    include("includes/polling/processors.inc.php");
-    include("includes/polling/mempools.inc.php");
-    include("includes/polling/storage.inc.php");
-    include("includes/polling/netstats.inc.php");
-    include("includes/polling/hr-mib.inc.php");
-    include("includes/polling/ucd-mib.inc.php");
-    include("includes/polling/ipSystemStats.inc.php");
-    include("includes/polling/ports.inc.php");
-    include("includes/polling/cisco-mac-accounting.inc.php");
-    include("includes/polling/bgp-peers.inc.php");
-    include("includes/polling/junose-atm-vp.inc.php");
-    include("includes/polling/toner.inc.php");
-    include("includes/polling/ucd-diskio.inc.php");
-    include("includes/polling/applications.inc.php");
-    include("includes/polling/wifi.inc.php");
+    if ($options['m'])
+    {
+      if (is_file("includes/polling/".$options['m'].".inc.php"))
+      {
+        include("includes/polling/".$options['m'].".inc.php");
+      }
+    } else {
+      include("includes/polling/ipmi.inc.php");
+      include("includes/polling/temperatures.inc.php");
+      include("includes/polling/humidity.inc.php");
+      include("includes/polling/fanspeeds.inc.php");
+      include("includes/polling/voltages.inc.php");
+      include("includes/polling/frequencies.inc.php");
+      include("includes/polling/current.inc.php");
+      include("includes/polling/processors.inc.php");
+      include("includes/polling/mempools.inc.php");
+      include("includes/polling/storage.inc.php");
+      include("includes/polling/netstats.inc.php");
+      include("includes/polling/hr-mib.inc.php");
+      include("includes/polling/ucd-mib.inc.php");
+      include("includes/polling/ipSystemStats.inc.php");
+      include("includes/polling/ports.inc.php");
+      include("includes/polling/cisco-mac-accounting.inc.php");
+      include("includes/polling/bgp-peers.inc.php");
+      include("includes/polling/junose-atm-vp.inc.php");
+      include("includes/polling/toner.inc.php");
+      include("includes/polling/ucd-diskio.inc.php");
+      include("includes/polling/applications.inc.php");
+      include("includes/polling/wifi.inc.php");
 
-    #include("includes/polling/altiga-ssl.inc.php");
-    include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
-    include("includes/polling/cisco-remote-access-monitor.inc.php");
+      #include("includes/polling/altiga-ssl.inc.php");
+      include("includes/polling/cisco-ipsec-flow-monitor.inc.php");
+      include("includes/polling/cisco-remote-access-monitor.inc.php");
+    }
     include("includes/polling/cisco-cef.inc.php");
 
     unset($update);
