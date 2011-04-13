@@ -41,7 +41,7 @@ $config['mono_font']        = "DejaVuSansMono";
 $config['favicon']          = "images/observium-icon.png";
 $config['header_color']     = "#1F334E";
 $config['page_refresh']     = "300";  ## Refresh the page every xx seconds
-$config['frong_page']       = "pages/front/default.php";
+$config['front_page']       = "pages/front/default.php";
 $config['page_title']       = "Observium :: Network Observation and Monitoring";
 $config['timestamp_format'] = 'd-m-Y H:i:s';
 $config['page_gen']         = 1;
@@ -77,6 +77,7 @@ $config['discover_services']      = false; ## Autodiscover services via SNMP on 
 $config['alerts']['email']['default']      = NULL;    ## Default alert recipient
 $config['alerts']['email']['default_only'] = FALSE;   ## Only use default recipient
 $config['alerts']['email']['enable']	   = TRUE;    ## Enable email alerts
+$config['uptime_warning']                  = "84600"; ## Time in seconds to display a "Device Rebooted" Alert. 0 to disable warnings.
 
 ### Cosmetics
 

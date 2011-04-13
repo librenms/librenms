@@ -74,15 +74,17 @@ while ($peer = mysql_fetch_assoc($sql)){
 
 }
 
-$sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '84600'");
-while ($device = mysql_fetch_assoc($sql)){
+if (filter_var($config['uptime_warning'], FILTER_VALIDATE_FLOAT) !== FALSE && $config['uptime_warning'] > 0)  
+{
+  $sql = mysql_query("SELECT * FROM `devices` AS D, devices_attribs AS A WHERE A.device_id = D.device_id AND A.attrib_type = 'uptime' AND A.attrib_value < '" . $config['uptime_warning'] . "'");
+  while ($device = mysql_fetch_assoc($sql)){
 
-      echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
-      <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
-      <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
-      <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
-      </center></div>");
-
+        echo("<div style='border: solid 2px #d0D0D0; float: left; padding: 5px; width: 120px; height: 90px; background: #ddffdd; margin: 4px;'>
+        <center><strong>".generate_device_link($device, shorthost($device['hostname']))."</strong><br />
+        <span style='font-size: 14px; font-weight: bold; margin: 5px; color: #090;'>Device<br />Rebooted</span><br />
+        <span class=body-date-1>".formatUptime($device['attrib_value'])."</span>
+        </center></div>");
+  }
 }
 
 echo("
