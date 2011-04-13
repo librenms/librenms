@@ -84,7 +84,7 @@ switch ($_GET['opta'])
     include('pages/health/'.$_GET['opta'].'.inc.php');
     break;
   default:
-    include('pages/health/temperature.inc.php');
+    include('pages/health/temperature.inc.php'); # FIXME perhaps an error message instead?
     break;
 }
 
