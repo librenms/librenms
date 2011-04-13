@@ -90,6 +90,23 @@ while ($cef = mysql_fetch_assoc($cef_query))
 
         echo("</tr>
        ");
+
+  if($_GET['opta'] == "graphs")
+  {
+    $graph_array['height'] = "100";
+    $graph_array['width']  = "215";
+    $graph_array['to']     = $now;
+    $graph_array['id']     = $cef['cef_switching_id'];
+    $graph_array['type']   = "cefswitching_graph";
+
+    echo("<tr bgcolor='$bg_colour'><td colspan=6>");
+
+    include("includes/print-quadgraphs.inc.php");
+
+    echo("</td></tr>");
+  }
+
+
   $i++;
 }
 
