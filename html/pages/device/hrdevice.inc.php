@@ -1,17 +1,17 @@
 <?php
 
-echo("<table width=100%>");
+echo('<table width="100%">');
 
 $hrdevices = mysql_query("SELECT * FROM `hrDevice` WHERE `device_id` = '".$device['device_id']."' ORDER BY `hrDeviceIndex`");
+
 while ($hrdevice = mysql_fetch_assoc($hrdevices))
 {
-
   echo("<tr><td>".$hrdevice['hrDeviceIndex']."</td>");
 
   if ($hrdevice['hrDeviceType'] == "hrDeviceProcessor")
   {
     $proc_id = mysql_result(mysql_query("SELECT processor_id FROM processors WHERE device_id = '".$device['device_id']."' AND hrDeviceIndex = '".$hrdevice['hrDeviceIndex']."'"),0);
-    $proc_url   = $config['base_url'] . "/device/".$device['device_id']."/health/processors/";
+    $proc_url   = "device/".$device['device_id']."/health/processor/";
     $proc_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$hrdevice['hrDeviceDescr'];
     $proc_popup .= "</div><img src=\'".$config['base_url']."/graph.php?id=" . $proc_id . "&amp;type=processor_usage&amp;from=$month&amp;to=$now&amp;width=400&amp;height=125\'>";
     $proc_popup .= "', RIGHT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"";
@@ -28,7 +28,9 @@ while ($hrdevice = mysql_fetch_assoc($hrdevices))
     $mini_graph = overlib_link($_SERVER['REQUEST_URI'], generate_graph_tag($graph_array), generate_graph_tag($graph_array_zoom),  NULL);
 
     echo('<td>'.$mini_graph.'</td>');
-  } elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork") {
+  }
+  elseif ($hrdevice['hrDeviceType'] == "hrDeviceNetwork")
+  {
     $int = str_replace("network interface ", "", $hrdevice['hrDeviceDescr']);
     $interface = mysql_fetch_assoc(mysql_query("SELECT * FROM ports WHERE device_id = '".$device['device_id']."' AND ifDescr = '".$int."'"));
     if ($interface['ifIndex'])
@@ -58,9 +60,8 @@ while ($hrdevice = mysql_fetch_assoc($hrdevices))
   echo("<td>".$hrdevice['hrDeviceType']."</td><td>".$hrdevice['hrDeviceStatus']."</td>");
   echo("<td>".$hrdevice['hrDeviceErrors']."</td><td>".$hrdevice['hrProcessorLoad']."</td>");
   echo("</tr>");
-
 }
 
-echo("</table>");
+echo('</table>');
 
 ?>

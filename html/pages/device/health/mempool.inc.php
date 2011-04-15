@@ -14,7 +14,7 @@ while ($mempool = mysql_fetch_assoc($mempools))
 
   $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
-  $mempool_url   = "device/".$device['device_id']."/health/memory/";
+  $mempool_url   = "device/".$device['device_id']."/health/mempool/";
   $mini_url = "graph.php?id=".$mempool['mempool_id']."&amp;type=".$graph_type."&amp;from=".$day."&amp;to=".$now."&amp;width=80&amp;height=20&amp;bg=f4f4f4";
 
   $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname']." - ".$text_descr;

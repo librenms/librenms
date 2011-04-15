@@ -29,9 +29,9 @@ foreach ($datas as $texttype)
     echo("<span class='pagemenu-selected'>"); 
   }
 
-  echo('<a href="'.$config['base_url'].'/health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $type_text[$type] ."</a>");
+  echo('<a href="health/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $type_text[$type] .'</a>');
  
- if ($_GET['opta'] == $type) { echo("</span>"); }
+  if ($_GET['opta'] == $type) { echo("</span>"); }
 
   $sep = ' | ';
 }
