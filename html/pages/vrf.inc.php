@@ -2,12 +2,12 @@
 
 echo("
 <div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
-<a href='/vrf/" . $device['device_id'] . "/'>Basic</a> |
-<a href='/vrf/" . $device['device_id'] . "/details/'>Details</a> | Graphs:
-<a href='/vrf/" . $device['device_id'] . "/graphs/bits/'>Bits</a> |
-<a href='/vrf/" . $device['device_id'] . "/graphs/pkts/'>Packets</a> |
-<a href='/vrf/" . $device['device_id'] . "/graphs/nupkts/'>NU Packets</a> |
-<a href='/vrf/" . $device['device_id'] . "/graphs/errors/'>Errors</a>
+<a href='/vrf/" . $_GET['id'] . "/'>Basic</a> |
+<a href='/vrf/" . $_GET['id'] . "/details/'>Details</a> | Graphs:
+<a href='/vrf/" . $_GET['id'] . "/graphs/bits/'>Bits</a> |
+<a href='/vrf/" . $_GET['id'] . "/graphs/pkts/'>Packets</a> |
+<a href='/vrf/" . $_GET['id'] . "/graphs/nupkts/'>NU Packets</a> |
+<a href='/vrf/" . $_GET['id'] . "/graphs/errors/'>Errors</a>
 </div>");
 
 if ($_GET['opta'] == 'graphs')
@@ -27,7 +27,7 @@ if ($_GET['opta'] == "details" )
 }
 
 echo("<div style='background: $list_colour_b; padding: 10px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>");
-$vrf_query = mysql_query("SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = '".$device['device_id']."'");
+$vrf_query = mysql_query("SELECT * FROM `vrfs` WHERE mplsVpnVrfRouteDistinguisher = '".$_GET['id']."'");
 $vrf = mysql_fetch_assoc($vrf_query);
 echo("<tr valign=top bgcolor='$bg_colour'>");
 echo("<td width=200 class=list-large><a href='vrf/".$vrf['mplsVpnVrfRouteDistinguisher']."/'>" . $vrf['vrf_name'] . "</a></td>");
