@@ -16,6 +16,7 @@ if ($interface['ifInErrors_delta'] > 0 || $interface['ifOutErrors_delta'] > 0)
   $error_img = generate_port_link($interface,"<img src='images/16/chart_curve_error.png' alt='Interface Errors' border=0>","port_errors");
 } else { $error_img = ""; }
 
+# FIXME leading slash - does javascript honor base tag?
 echo("<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='$list_highlight';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
 onclick=\"location.href='/device/".$device['device_id']."/port/".$interface['interface_id']."/'\" style='cursor: pointer;'>
  <td valign=top width=350>");
@@ -31,12 +32,14 @@ if ($port_details)
   $ipdata = mysql_query("SELECT * FROM `ipv4_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
   while ($ip = mysql_fetch_Array($ipdata))
   {
+    # FIXME leading slash - does javascript honor base tag?
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=$ip[ipv4_address]')\">$ip[ipv4_address]/$ip[ipv4_prefixlen]</a>");
     $break = ",";
   }
   $ip6data = mysql_query("SELECT * FROM `ipv6_addresses` WHERE `interface_id` = '" . $interface['interface_id'] . "'");
   while ($ip6 = mysql_fetch_Array($ip6data))
   {
+    # FIXME leading slash - does javascript honor base tag?
     echo("$break <a class=interface-desc href=\"javascript:popUp('/netcmd.php?cmd=whois&amp;query=".$ip6['ipv6_address']."')\">".Net_IPv6::compress($ip6['ipv6_address'])."/".$ip6['ipv6_prefixlen']."</a>");
     $break = ",";
   }
