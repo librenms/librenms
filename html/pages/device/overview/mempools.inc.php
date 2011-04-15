@@ -6,7 +6,7 @@ if (mysql_result(mysql_query("SELECT count(*) from mempools WHERE device_id = '"
 {
   echo("<div style='background-color: #eeeeee; margin: 5px; padding: 5px;'>");
   echo("<p style='padding: 0px 5px 5px;' class=sectionhead>");
-  echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/mempools/">');
+  echo('<a class="sectionhead" href="device/'.$device['device_id'].'/health/mempool/">');
   echo("<img align='absmiddle' src='".$config['base_url']."/images/icons/memory.png'> Memory Pools</a></p>");
   echo("<table width=100% cellspacing=0 cellpadding=5>");
   $mempool_rows = '0';
