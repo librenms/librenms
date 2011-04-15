@@ -2,12 +2,12 @@
 
 echo("
 <div style='width: 100%; text-align: right; padding-bottom: 10px; clear: both; display:block; height:20px;'>
-<a href='/vrf/" . $_GET['id'] . "/'>Basic</a> |
-<a href='/vrf/" . $_GET['id'] . "/details/'>Details</a> | Graphs:
-<a href='/vrf/" . $_GET['id'] . "/graphs/bits/'>Bits</a> |
-<a href='/vrf/" . $_GET['id'] . "/graphs/pkts/'>Packets</a> |
-<a href='/vrf/" . $_GET['id'] . "/graphs/nupkts/'>NU Packets</a> |
-<a href='/vrf/" . $_GET['id'] . "/graphs/errors/'>Errors</a>
+<a href='vrf/" . $_GET['id'] . "/'>Basic</a> |
+<a href='vrf/" . $_GET['id'] . "/details/'>Details</a> | Graphs:
+<a href='vrf/" . $_GET['id'] . "/graphs/bits/'>Bits</a> |
+<a href='vrf/" . $_GET['id'] . "/graphs/pkts/'>Packets</a> |
+<a href='vrf/" . $_GET['id'] . "/graphs/nupkts/'>NU Packets</a> |
+<a href='vrf/" . $_GET['id'] . "/graphs/errors/'>Errors</a>
 </div>");
 
 if ($_GET['opta'] == 'graphs')
