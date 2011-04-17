@@ -11,12 +11,12 @@ else
 
   $i = "1";
 
-  if ($_GET['opta'] == "alerts")
+  if ($_GET['optb'] == "alerts")
   {
    $where = "AND (B.bgpPeerAdminStatus = 'start' or B.bgpPeerAdminStatus = 'running') AND B.bgpPeerState != 'established'";
-  } elseif ($_GET['opta'] == "external") {
+  } elseif ($_GET['optb'] == "external") {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
-  } elseif ($_GET['opta'] == "internal") {
+  } elseif ($_GET['optb'] == "internal") {
    $where = "AND D.bgpLocalAs = B.bgpPeerRemoteAs";
   }
 
