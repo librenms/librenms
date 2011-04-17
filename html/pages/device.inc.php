@@ -118,11 +118,22 @@ if (device_permitted($_GET['id']) || $check_device == $_GET['id'])
   </li>');
     }
 
+    
+
     if ($config['enable_bgp'] && $device['bgpLocalAs'])
     {
-      echo('<li class="' . $select['bgp'] . '">
+      $bgp_menu = '<li class="' . $select['bgp'] . '">
     <a href="device/' . $device['device_id'] . '/bgp/">
       <img src="images/16/link.png" align="absmiddle" border="0" /> BGP
+    </a>
+  </li>';
+    }
+
+    if(isset($bgp_menu) || isset($ospf_menu) || isset($isis_menu) || isset($eigrp_menu) || isset($bgp_menu)) 
+    {
+      echo('<li class="' . $select['routing'] . '">
+    <a href="'.$config['base_url'].'/device/' . $device['device_id'] . '/routing/">
+      <img src="images/16/arrow_branch.png" align="absmiddle" border="0" /> Routing
     </a>
   </li>');
     }

@@ -229,21 +229,22 @@ if ($deleted_ports) { echo('<li><a href="ports/deleted/"><img src="images/16/cro
 if ($_SESSION['userlevel'] >= '5')
 {
     echo('
-      <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" /> Routing</a>
+      <li><a class="menu2four" href="routing/"><img src="images/16/arrow_branch.png" border="0" align="absmiddle" />Routing</a>
         <table><tr><td>
         <ul>');
 
-
-
+  ## BGP Sessions
   if ($_SESSION['userlevel'] >= '5' && (isset($config['enable_bgp']) && $config['enable_bgp']))
   {
     echo('
-        <li><a href="bgp/"><img src="images/16/link.png" border="0" align="absmiddle" /> All BGP Sessions </a></li>
+        <li>&nbsp;BGP</li>
+        <li><a href="bgp/"><img src="images/16/link.png" border="0" align="absmiddle" /> All Sessions </a></li>
 
-        <li><a href="bgp/external/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> External BGP</a></li>
-        <li><a href="bgp/internal/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> Internal BGP</a></li>');
+        <li><a href="bgp/external/"><img src="images/16/world_link.png" border="0" align="absmiddle" /> External Sessions</a></li>
+        <li><a href="bgp/internal/"><img src="images/16/brick_link.png" border="0" align="absmiddle" /> Internal Sessions</a></li>');
 
-    echo('        <li><hr /></li>');
+    echo('
+        <li><hr /></li>');
   }
 
   ## Do Alerts at the bottom
