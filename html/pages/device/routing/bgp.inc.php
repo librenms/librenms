@@ -7,17 +7,17 @@ print_optionbar_start();
 
 echo("
   <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>
-  <a href='device/" . $device['device_id'] . "/bgp/'>No Graphs</a> |
-  <a href='device/" . $device['device_id'] . "/bgp/updates/'>Updates</a>");
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/'>No Graphs</a> |
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
 
 echo(" | Prefixes:
-  <a href='device/" . $device['device_id'] . "/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
-  <a href='device/" . $device['device_id'] . "/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
-  <a href='device/" . $device['device_id'] . "/bgp/prefixes/ipv6.unicast/'>IPv6</a>
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv6.unicast/'>IPv6</a>
   ");
 
 echo("| Traffic:
-  <a href='device/" . $device['device_id'] . "/bgp/macaccounting/'>Mac Accounting</a>");
+  <a href='/device/" . $device['device_id'] . "/routing/bgp/macaccounting/'>Mac Accounting</a>");
 
 echo("</div>
 ");
@@ -96,7 +96,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
 
   $graph_type       = "bgp_updates";
   $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
-  $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
+  $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
   echo("<tr bgcolor=$bg_colour background=$bg_image>
            <td width=20><span class=list-large>$i</span></td>
@@ -109,11 +109,11 @@ while ($peer = mysql_fetch_assoc($peer_query))
                Updates <img src='images/16/arrow_down.png' align=absmiddle> " . $peer['bgpPeerInUpdates'] . "
                        <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td></tr>");
 
-  if (isset($_GET['opta']) && $_GET['opta'] != "macaccounting")
+  if (isset($_GET['optb']) && $_GET['optb'] != "macaccounting")
   {
-    foreach (explode(" ", $_GET['opta']) as $graph_type)
+    foreach (explode(" ", $_GET['optb']) as $graph_type)
     {
-      if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optb']); $afisafi = "&amp;afi=$afi&amp;safi=$safi"; }
+      if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optc']); $afisafi = "&amp;afi=$afi&amp;safi=$safi"; }
       if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi])
       {
         $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100$afisafi";
