@@ -6,18 +6,41 @@
 print_optionbar_start();
 
 echo("
-  <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/'>No Graphs</a> |
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
+  <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>");
 
-echo(" | Prefixes:
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv4.unicast/'>IPv4</a> |
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv4.vpn/'>VPNv4</a> |
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv6.unicast/'>IPv6</a>
-  ");
+  if (!isset($_GET['optb'])) { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='/device/" . $device['device_id'] . "/routing/bgp/'>Basic</a>");
+  if (!isset($_GET['optb'])) { echo("</span>"); }
 
-echo("| Traffic:
-  <a href='/device/" . $device['device_id'] . "/routing/bgp/macaccounting/'>Mac Accounting</a>");
+  echo(" | ");
+
+  if ($_GET['optb'] == "updates") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='/device/" . $device['device_id'] . "/routing/bgp/updates/'>Updates</a>");
+  if ($_GET['optb'] == "updates") { echo("</span>"); }
+
+  echo(" | Prefixes: ");
+
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "ipv4.unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv4.unicast/'>IPv4</a>");
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "ipv4.unicast") { echo("</span>"); }
+
+  echo(" | ");
+
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "vpnv4.unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes/vpnv4.unicast/'>VPNv4</a>");
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "vpnv4.unicast") { echo("</span>"); }
+
+  echo(" | ");
+
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "ipv6.unicast") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/prefixes/ipv6.unicast/'>IPv6</a>");
+  if ($_GET['optb'] == "prefixes" && $_GET['optc'] == "ipv6.unicast") { echo("</span>"); }
+
+  echo(" | Traffic: ");
+
+  if ($_GET['optb'] == "macaccounting") { echo("<span class='pagemenu-selected'>"); }
+  echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/macaccounting/'>Mac Accounting</a>");
+  if ($_GET['optb'] == "macaccounting") { echo("</span>"); }
 
 echo("</div>
 ");
@@ -71,7 +94,7 @@ while ($peer = mysql_fetch_assoc($peer_query))
   }
   else
   {
-    $peername = gethostbyaddr($peer['bgpPeerIdentifier']);
+    #$peername = gethostbyaddr($peer['bgpPeerIdentifier']); ## FFffuuu DNS
     if ($peername == $peer['bgpPeerIdentifier'])
     {
       unset($peername);
