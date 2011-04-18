@@ -1,58 +1,68 @@
 <?php
 
-$datas = array('overview', 'bgp');
-
-$type_text['overview'] = "Overview";
-$type_text['bgp'] = "BGP";
-
 if (!$_GET['opta']) { $_GET['opta'] = "overview"; }
-if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }
+if ($_GET['optb'] == "graphs" || $_GET['optc'] == "graphs") { $graphs = "graphs"; } else { $graphs = "nographs"; }
 
 print_optionbar_start('', '');
 
-$sep = "";
-foreach ($datas as $texttype)
-{
-  $type = strtolower($texttype);
-  echo($sep);
-  if ($_GET['opta'] == $type)
-  {
-    echo("<span class='pagemenu-selected'>"); 
-  }
+  if ($_GET['opta'] == "overview") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/overview/'.$graphs.'/">Overview</a>');
+  if ($_GET['opta'] == "overview") { echo("</span>"); }
 
-  echo('<a href="'.$config['base_url'].'/routing/' . $type . ($_GET['optb'] ? '/' . $_GET['optb'] : ''). '/">' . $type_text[$type] ."</a>");
- 
- if ($_GET['opta'] == $type) { echo("</span>"); }
+  echo(" | ");
 
-  $sep = ' | ';
-}
+  ## Start BGP Menu -- FIXME only show if BGP enabled?
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/all/'.$graphs.'/">BGP</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("</span>"); }
+  echo('(');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/internal/'.$graphs.'/">Internal</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("</span>"); }
+  echo("|");
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/external/'.$graphs.'/">External</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("</span>"); }
+  echo(')');
+  ## End BGP Menu
 
-unset ($sep);
+
+if(!isset($graphs)) { $graphs == "nographs"; }
 
 echo('<div style="float: right;">');
 
-if ($_GET['optb'] == "graphs")
+if ($graphs == "graphs")
 {
   echo('<span class="pagemenu-selected">');
 }
 
-echo('<a href="routing/'. $_GET['opta'].'/graphs/"> Graphs</a>');
+if(isset($_GET['optc']))
+{
+  echo('<a href="routing/'. $_GET['opta'].'/graphs/"> Graphs</a>');
+} else {
+  echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/graphs/"> Graphs</a>');
+}
 
-if ($_GET['optb'] == "graphs")
+if ($graphs == "graphs")
 {
   echo('</span>');
 }
 
 echo(' | ');
 
-if ($_GET['optb'] == "nographs")
+if ($graphs == "nographs")
 {
   echo('<span class="pagemenu-selected">');
 }
 
-echo('<a href="routing/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+if(isset($_GET['optc']))
+{
+  echo('<a href="routing/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+} else {
+  echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/nographs/"> No Graphs</a>');
+}
 
-if ($_GET['optb'] == "nographs") 
+if ($graphs == "nographs") 
 { 
   echo('</span>'); 
 }
