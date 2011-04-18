@@ -6,7 +6,78 @@ if ($_SESSION['userlevel'] < '5')
 }
 else
 {
-  echo("<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
+
+  print_optionbar_start('', '');
+
+  echo('<span style="font-weight: bold;">BGP</span> &#187; ');
+
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/all/'.$graphs.'/">All</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "all") { echo("</span>"); }
+  echo(' | ');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/internal/'.$graphs.'/">Internal</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "internal") { echo("</span>"); }
+  echo(" | ");
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/external/'.$graphs.'/">External</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "external") { echo("</span>"); }
+  echo(" | ");
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "disabled") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/disabled/'.$graphs.'/">Disabled</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "disabled") { echo("</span>"); }
+  echo(" | ");
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "alerts") { echo("<span class='pagemenu-selected'>"); }
+  echo('<a href="routing/bgp/alerts/'.$graphs.'/">Alerts</a>');
+  if ($_GET['opta'] == "bgp" && $_GET['optb'] == "alerts") { echo("</span>"); }
+
+  echo('');
+  ## End BGP Menu
+
+  if(!isset($graphs)) { $graphs == "nographs"; }
+
+  echo('<div style="float: right;">');
+
+  if ($graphs == "graphs") { echo('<span class="pagemenu-selected">'); }
+
+  if(!isset($_GET['optc']))
+  {
+    echo('<a href="routing/'. $_GET['opta'].'/graphs/"> Graphs</a>');
+  } else {
+    echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/graphs/"> Graphs</a>');
+  }
+
+  if ($graphs == "graphs")
+  {
+    echo('</span>');
+  }
+
+  echo(' | ');
+
+  if ($graphs == "nographs")
+  {
+    echo('<span class="pagemenu-selected">');
+  }
+
+  if(!isset($_GET['optc']))
+  {
+    echo('<a href="routing/'. $_GET['opta'].'/nographs/"> No Graphs</a>');
+  } else {
+    echo('<a href="routing/'. $_GET['opta'].'/'.$_GET['optb'].'/nographs/"> No Graphs</a>');
+  }
+
+  if ($graphs == "nographs")
+  {
+    echo('</span>');
+  }
+
+  echo('</div>');
+
+  print_optionbar_end();
+
+
+  echo("<div style='margin: 5px;'>");
+  echo("<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
   echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>');
 
   $i = "1";
@@ -14,6 +85,8 @@ else
   if ($_GET['optb'] == "alerts")
   {
    $where = "AND (B.bgpPeerAdminStatus = 'start' or B.bgpPeerAdminStatus = 'running') AND B.bgpPeerState != 'established'";
+  } elseif ($_GET['optb'] == "disabled") {
+   $where = "AND B.bgpPeerAdminStatus = 'stop'";
   } elseif ($_GET['optb'] == "external") {
    $where = "AND D.bgpLocalAs != B.bgpPeerRemoteAs";
   } elseif ($_GET['optb'] == "internal") {
@@ -27,9 +100,9 @@ else
 
     if (!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
 
-    if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; if ($_GET['optb'] != "alerts") { $alert=1; $bg_image = "images/1px-pink.png"; } }
+    if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $peer['alert']=1; }
     if ($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
-
+    if ($peer['bgpPeerAdminStatus'] == "stop") { $peer['alert']=0; $peer['disabled']=1; }
     if ($peer['bgpPeerRemoteAs'] == $peer['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>";
      if ($peer['bgpPeerRemoteAS'] >= '64512' && $peer['bgpPeerRemoteAS'] <= '65535') { $peer_type = "<span style='color: #f00;'>Priv eBGP</span>"; }
     }
@@ -48,7 +121,8 @@ else
     $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
     $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
-    echo('<tr bgcolor="'.$bg_colour.'"' . ($alert ? ' bordercolor="#cc0000"' : '') . ">
+    echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . 
+                                          ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">
             <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>
 	     <td width=30>-></td>
