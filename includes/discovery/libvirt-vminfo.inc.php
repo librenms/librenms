@@ -77,7 +77,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == "linux" )
           mysql_query("INSERT INTO vminfo (device_id, vm_type, vmwVmVMID, vmwVmDisplayName, vmwVmGuestOS, vmwVmMemSize, vmwVmCpus, vmwVmState) VALUES (" . $device["device_id"] . ", 'libvirt',
               '" . $dom_id . "', '" . mres($vmwVmDisplayName) . "', '" . mres($vmwVmGuestOS) . "', '" . $vmwVmMemSize . "', '" . $vmwVmCpus . "', '" . mres($vmwVmState) . "')");
           echo("+");
-          log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVMMemSize MB)", $device, 'vm', mysql_insert_id());
+          log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', mysql_insert_id());
         } else {
           $row = mysql_fetch_assoc($result);
           if ($row['vmwVmState'] != $vmwVmState
