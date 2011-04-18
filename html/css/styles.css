@@ -552,15 +552,16 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 #text { width: 1100px; }
 
 #menubar ul { margin: 0px 10px; padding: 0px; }
-#menubar ul li { list-style: none; display: inline; text-indent: 0px; text-align: left; padding-right: 10px; }
+#menubar ul li { list-style: none; display: inline; text-indent: 0px; text-align: left; padding-right: 10px; color: #666; }
 #menubar a { color: #666; }
 
 #popupmenu a { color: #aaa; }
+#popupmenu li { color: #aaa; }
 #popupmenu a:hover { color: #fff; }
 #popupmenu li:hover { background: #444; color: #eec; }
 #popupmenu li:hover ul { display: block; }
 #popupmenu ul { padding: 0px; margin: 0px; list-style: none; }
-#popupmenu ul li { padding: 0px 8px; float: left; position: relative; }
+#popupmenu ul li { padding: 0px 8px; float: left; position: relative;}
 
 #popupmenu li ul {
     display: none;
