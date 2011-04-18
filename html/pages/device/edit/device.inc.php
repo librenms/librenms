@@ -12,7 +12,7 @@ if ($_POST['editing'])
     $disabled = mres($_POST['disabled']);
 
     $override_sysLocation_bool = mres($_POST['override_sysLocation']);
-    if (isset($_POST['sysLocation'])) { $override_sysLocation_string  = mres($_POST['sysLocation']); }
+    if (isset($_POST['sysLocation'])) { $override_sysLocation_string = mres($_POST['sysLocation']); }
 
     if (get_dev_attrib($device,'override_sysLocation_bool') != $override_sysLocation_bool
      || get_dev_attrib($device,'override_sysLocation_string') != $override_sysLocation_string)
@@ -31,10 +31,13 @@ if ($_POST['editing'])
 
     $rows_updated = mysql_affected_rows();
 
-    if ($rows_updated != 0)
+    if ($rows_updated > 0 || $updated)
     {
       $update_message = "Device record updated.";
       $updated = 1;
+    } elseif ($rows_updated = '-1') {
+      $update_message = "Device record unchanged. No update necessary.";
+      $updated = -1;
     } else {
       $update_message = "Device record update error.";
     }
