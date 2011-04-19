@@ -76,7 +76,6 @@ else
   print_optionbar_end();
 
 
-  echo("<div style='margin: 5px;'>");
   echo("<table border=0 cellspacing=0 cellpadding=5 width=100% class='sortable'>");
   echo('<tr style="height: 30px"><td width=1></td><th>Local address</th><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>');
 
@@ -121,9 +120,9 @@ else
     $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
     $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
-    echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . 
-                                          ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">
-            <td></td>
+    echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') . ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">");
+
+    echo("  <td></td>
             <td width=150>" . $localaddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'routing/bgp/')."</td>
 	     <td width=30>-></td>
             <td width=150>" . $peeraddresslink . "</td>
@@ -138,7 +137,7 @@ else
     if($graphs == "graphs")
     {
       $graph_array['height'] = "100";
-      $graph_array['width']  = "215";
+      $graph_array['width']  = "216";
       $graph_array['to']     = $now;
       $graph_array['id']     = $peer['bgpPeer_id'];
       $graph_array['type']   = "bgp_updates";
@@ -153,7 +152,7 @@ else
     $i++;
   }
 
-  echo("</table></div>");
+  echo("</table>");
 }
 
 ?>

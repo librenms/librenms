@@ -78,6 +78,7 @@ $config['os'][$os]['type']              = "server";
 $os = "adva";
 $config['os'][$os]['type']              = "network";
 $config['os'][$os]['text']  		= "Adva Optical";
+
 $config['os'][$os]['over'][0]['graph']  = "device_bits";
 $config['os'][$os]['over'][0]['text']   = "Device Traffic";
 

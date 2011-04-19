@@ -1,12 +1,17 @@
 <?php
 
-$bgp_count = mysql_result(mysql_query("select count(*) from bgpPeers WHERE device_id = '" . $device['device_id'] . "'"), 0);
 
 $datas[] = 'overview';
+
+$bgp_count = mysql_result(mysql_query("select count(*) from bgpPeers WHERE device_id = '" . $device['device_id'] . "'"), 0);
 if ($bgp_count) { $datas[] = 'bgp'; }
+
+$bgp_count = mysql_result(mysql_query("select count(*) from cef_switching WHERE device_id = '" . $device['device_id'] . "'"), 0);
+if ($cef_count) { $datas[] = 'cef'; }
 
 $type_text['overview'] = "Overview";
 $type_text['bgp'] = "BGP";
+$type_text['cef'] = "CEF";
 
 print_optionbar_start();
 
