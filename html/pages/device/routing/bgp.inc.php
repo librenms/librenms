@@ -5,8 +5,7 @@
 <?php
 print_optionbar_start();
 
-echo("
-  <div style='margin: auto; text-align: left; padding-left: 11px; clear: both; display:block; height:20px;'>");
+  echo("<span style='font-weight: bold;'>BGP</span> &#187; ");
 
   if (!isset($_GET['optb'])) { echo("<span class='pagemenu-selected'>"); }
   echo("<a href='/device/" . $device['device_id'] . "/routing/bgp/'>Basic</a>");
@@ -42,15 +41,11 @@ echo("
   echo("<a href='".$config['base_url']."/device/" . $device['device_id'] . "/routing/bgp/macaccounting/'>Mac Accounting</a>");
   if ($_GET['optb'] == "macaccounting") { echo("</span>"); }
 
-echo("</div>
-");
-
 print_optionbar_end();
-?>
 
-<div style="margin: 5px;"><table border="0" cellspacing="0" cellpadding="5" width="100%">
+echo('<table border="0" cellspacing="0" cellpadding="5" width="100%">');
+echo('<tr style="height: 30px"><td width=1></td><th></th><th>Peer address</th><th>Type</th><th>Remote AS</th><th>State</th><th>Uptime</th></tr>');
 
-<?php
 $i = "1";
 $peer_query = mysql_query("select * from bgpPeers WHERE device_id = '".$device['device_id']."' ORDER BY bgpPeerRemoteAs, bgpPeerIdentifier");
 
@@ -59,9 +54,14 @@ while ($peer = mysql_fetch_assoc($peer_query))
   $has_macaccounting = mysql_result(mysql_query("SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = '".$peer['bgpPeerIdentifier']."' AND M.mac = I.mac_address"),0);
   unset($bg_image);
   if (!is_integer($i/2)) { $bg_colour = $list_colour_a; } else { $bg_colour = $list_colour_b; }
-  #if ($peer['bgpPeerAdminStatus'] == "start") { $img = "images/16/accept.png"; } else { $img = "images/16/delete.png"; }
-  if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $bg_image = "images/warning-background.png"; }
-  if ($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "red"; $bg_image = "images/warning-background.png"; }
+
+
+  unset ($alert, $bg_image);
+
+  if (!is_integer($i/2)) { $bg_colour = $list_colour_b; } else { $bg_colour = $list_colour_a; }
+  if ($peer['bgpPeerState'] == "established") { $col = "green"; } else { $col = "red"; $peer['alert']=1; }
+  if ($peer['bgpPeerAdminStatus'] == "start" || $peer['bgpPeerAdminStatus'] == "running") { $admin_col = "green"; } else { $admin_col = "gray"; }
+  if ($peer['bgpPeerAdminStatus'] == "stop") { $peer['alert']=0; $peer['disabled']=1; }
 
   if ($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) { $peer_type = "<span style='color: #00f;'>iBGP</span>"; } else { $peer_type = "<span style='color: #0a0;'>eBGP</span>"; }
 
@@ -121,8 +121,12 @@ while ($peer = mysql_fetch_assoc($peer_query))
   $peer_daily_url   = "graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=" . $graph_type . "&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
   $peeraddresslink  = "<span class=list-large><a href='device/" . $peer['device_id'] . "/routing/bgp/updates/' onmouseover=\"return overlib('<img src=\'$peer_daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">" . $peer['bgpPeerIdentifier'] . "</a></span>";
 
-  echo("<tr bgcolor=$bg_colour background=$bg_image>
-           <td width=20><span class=list-large>$i</span></td>
+  echo('<tr bgcolor="'.$bg_colour.'"' . ($peer['alert'] ? ' bordercolor="#cc0000"' : '') .
+                                        ($peer['disabled'] ? ' bordercolor="#cccccc"' : '') . ">
+  ");
+
+
+  echo("   <td width=20><span class=list-large>".$i."</span></td>
            <td>" . $peeraddresslink . "<br />".generate_device_link($peer, shorthost($peer['hostname']), 'bgp/')."</td>
 	     <td>$peer_type</td>
            <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer_af) ? $peer_af : '') . "</td>
@@ -130,31 +134,40 @@ while ($peer = mysql_fetch_assoc($peer_query))
            <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . "</span></strong></td>
            <td>" .formatUptime($peer['bgpPeerFsmEstablishedTime']). "<br />
                Updates <img src='images/16/arrow_down.png' align=absmiddle> " . $peer['bgpPeerInUpdates'] . "
-                       <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td></tr>");
+                       <img src='images/16/arrow_up.png' align=absmiddle> " . $peer['bgpPeerOutUpdates'] . "</td>
+          </tr>");
 
-  if (isset($_GET['optb']) && $_GET['optb'] != "macaccounting")
+  if ($_GET['optb'] != "basic" && isset($_GET['optb']) && $_GET['optb'] != "macaccounting")
   {
+
+    unset($graph_array);
     foreach (explode(" ", $_GET['optb']) as $graph_type)
     {
-      if ($graph_type == "prefixes") { list($afi, $safi) = explode(".", $_GET['optc']); $afisafi = "&amp;afi=$afi&amp;safi=$safi"; }
-      if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi])
-      {
-        $daily_traffic   = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100$afisafi";
-        $daily_url       = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150$afisafi";
-        $weekly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100$afisafi";
-        $weekly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150$afisafi";
-        $monthly_traffic = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100$afisafi";
-        $monthly_url     = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150$afisafi";
-        $yearly_traffic  = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100$afisafi";
-        $yearly_url      = $config['base_url'] . "/graph.php?id=" . $peer['bgpPeer_id'] . "&amp;type=bgp_$graph_type&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150$afisafi";
-        echo("<tr bgcolor=$bg_colour><td colspan=7>");
-        echo("<a href='' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$daily_traffic' border=0></a> ");
-        echo("<a href='' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\"><img src='$weekly_traffic' border=0></a> ");
-        echo("<a href='' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\"><img src='$monthly_traffic' border=0></a> ");
-        echo("<a href='' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\"><img src='$yearly_traffic' border=0></a>");
-        echo("</td></tr>");
+
+      if ($graph_type == "prefixes") 
+      { 
+        $graph_array['type']   = "bgp_prefixes";
+        list($afi, $safi) = explode(".", $_GET['optc']); 
+        $graph_array['afi']  = $afi;
+        $graph_array['safi'] = $safi;
+      } else {
+       $graph_array['type']   = "bgp_updates";
       }
+
+      $graph_array['height'] = "100";
+      $graph_array['width']  = "215";
+      $graph_array['to']     = $now;
+      $graph_array['id']     = $peer['bgpPeer_id'];
+     
+      if ($graph_type == "updates" || $valid_afi_safi[$afi][$safi])      
+      {
+        echo('<tr bgcolor="'.$bg_colour.'"><td colspan="7">');
+        include("includes/print-quadgraphs.inc.php");
+        echo("</td></tr>");
+      }      
+
     }
+
   }
 
   if ($_GET['opta'] == "macaccounting" && $has_macaccounting)
@@ -164,24 +177,18 @@ while ($peer = mysql_fetch_assoc($peer_query))
     $database = $config['rrd_dir'] . "/" . $device['hostname'] . "/cip-" . $acc['ifIndex'] . "-" . $acc['mac'] . ".rrd";
     if (is_file($database))
     {
-      $daily_traffic   = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=210&amp;height=100";
-      $daily_url       = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$day&amp;to=$now&amp;width=500&amp;height=150";
-      $weekly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=210&amp;height=100";
-      $weekly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$week&amp;to=$now&amp;width=500&amp;height=150";
-      $monthly_traffic = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=210&amp;height=100";
-      $monthly_url     = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$month&amp;to=$now&amp;width=500&amp;height=150";
-      $yearly_traffic  = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=210&amp;height=100";
-      $yearly_url      = "graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=$year&amp;to=$now&amp;width=500&amp;height=150";
-      echo("<tr bgcolor=$bg_colour><td colspan=7>");
-      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$daily_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
-        <img src='$daily_traffic' border=0></a> ");
-      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$weekly_url\'>', LEFT".$config['overlib_defaults'].");\" onmouseout=\"return nd();\">
-        <img src='$weekly_traffic' border=0></a> ");
-      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$monthly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
-        <img src='$monthly_traffic' border=0></a> ");
-      echo("<a href='?page=interface&amp;id=" . $interface['ma_id'] . "' onmouseover=\"return overlib('<img src=\'$yearly_url\'>', LEFT".$config['overlib_defaults'].", WIDTH, 350);\" onmouseout=\"return nd();\">
-        <img src='$yearly_traffic' border=0></a>");
+
+      $graph_array['graph_type'] = $graph_type; 
+
+      $graph_array['height'] = "100";
+      $graph_array['width']  = "215";
+      $graph_array['to']     = $now;
+      $graph_array['id']     = $acc['ma_id'];
+
+      echo('<tr bgcolor="'.$bg_colour.'"><td colspan="8">');
+      include("includes/print-quadgraphs.inc.php");
       echo("</td></tr>");
+
     }
   }
 
@@ -190,4 +197,4 @@ while ($peer = mysql_fetch_assoc($peer_query))
 }
 ?>
 
-</table></div>
+</table>

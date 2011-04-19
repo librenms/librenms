@@ -252,7 +252,7 @@ if ($_SESSION['userlevel'] >= '5')
   if ($bgp_alerts)
   {
     echo('
-      <li><a href="bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
+      <li><a href="routing/bgp/alerts/"><img src="images/16/link_error.png" border="0" align="absmiddle" /> Alerted BGP (' . $bgp_alerts . ')</a></li>
    ');
   }
 
