@@ -114,7 +114,7 @@ foreach (getlocations() as $location)
 <?php
 print_optionbar_end();
 
-$sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `ignore`, `status`, `hostname`";
+$sql = "SELECT * FROM devices WHERE 1 $where ORDER BY `disabled` ASC, `ignore`, `status`, `hostname`";
 if ($_GET['status'] == "alerted")
 {
   $sql = "SELECT * FROM devices " . $device_alert_sql . " GROUP BY `device_id` ORDER BY `ignore`, `status`, `os`, `hostname`";
