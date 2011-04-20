@@ -326,19 +326,19 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
         font-weight: bold;
 }
 
-.list-device, .list-device-ignored, .list-device-down, .list-device-ignored-up {
+a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up {
         font-weight: bold;
 }
 
-.row-alert {
+tr.list-device-down {
 	border: 2px solid #cc0000;
 }
 
-.device-head, .list-device {
+.device-head, a.list-device {
 	color: #000ccc;
 }
 
-.list-device-down, a.list-device-down, a.list-device-down:visited {
+a.list-device-down, a.list-device-down, a.list-device-down:visited {
  color: #cc0000;
 }
 
