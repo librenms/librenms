@@ -326,12 +326,28 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
         font-weight: bold;
 }
 
-a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up {
+a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
         font-weight: bold;
+	font-size: 15px;
+}
+
+tr.list-device, tr.list-device-ignored, tr.list-device-down, tr.list-device-ignored-up, tr.list-device-disabled {
 }
 
 tr.list-device-down {
 	border: 2px solid #cc0000;
+}
+
+tr.list-device-disabled {
+        border: 2px solid #aaaaaa;
+}
+
+tr.list-device-ignored {
+        border: 2px dashed #cc0000;
+}
+
+tr.list-device-ignored-up {
+	border: 2px dashed #aaaaaa;
 }
 
 .device-head, a.list-device {
@@ -339,14 +355,14 @@ tr.list-device-down {
 }
 
 a.list-device-down, a.list-device-down, a.list-device-down:visited {
- color: #cc0000;
+ 	color: #cc0000;
 }
 
 a.list-device-ignored-up {
-	color: #009900;
+	color: #006600;
 }
 
-a.list-device-disabled {
+a.list-device-disabled, a.list-device-disabled:visited {
 	color: #999999;
 }
 
