@@ -79,7 +79,7 @@ if (isset($options['d']))
 
 echo("Starting polling run:\n\n");
 $polled_devices = 0;
-$device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `ignore` = 0 AND `disabled` = 0 $where  ORDER BY `device_id` ASC");
+$device_query = mysql_query("SELECT `device_id` FROM `devices` WHERE `disabled` = 0 $where  ORDER BY `device_id` ASC");
 
 while ($device = mysql_fetch_assoc($device_query))
 {
