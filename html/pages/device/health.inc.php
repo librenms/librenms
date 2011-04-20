@@ -11,7 +11,6 @@ $fans = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_clas
 $volts = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='voltage' AND device_id = '" . $device['device_id'] . "'"), 0);
 $current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'"), 0);
 $freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = '" . $device['device_id'] . "'"), 0);
-
 $power = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='power' AND device_id = '" . $device['device_id'] . "'"), 0);
 
 
