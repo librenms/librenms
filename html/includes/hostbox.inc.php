@@ -22,31 +22,25 @@ echo('  <tr background="'.$bg_image.'" bgcolor="' . $bg . '" onmouseover="this.s
           onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
           <td width="40" align="center" valign="middle">' . $image . '</td>
           <td width="300"><span style="font-weight: bold; font-size: 14px;">' . generate_device_link($device) . '</span>
-          <br />' . $device['sysName'] . '</td>
-	     <td width=55>');
+          <br />' . $device['sysName'] . '</td>'
+	);
 
+echo ('<td width="55">');
 if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.$port_count); }
 echo('<br />');
 if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
+echo ('</td>');
 
-echo('   </td>
-          <td width="200">' . $device['os_text'] . '<br />
-          ' . $device['version'] . '</td>
-          <td width="200">' . $device['hardware'] . '<br />
-          ' . $device['features'] . '</td>
-          <td>' . formatUptime($device['uptime']) . '
-          <br />');
-if (get_dev_attrib($device,'override_sysLocation_bool'))
-{
-  echo(get_dev_attrib($device,'override_sysLocation_string'));
-}
-else
-{
-  echo($device['location']);
-}
-echo('</td>
-          <td width="10">
-          </td>
-        </tr>');
+echo('    <td>' . $device['hardware'] . '<br />' . $device['features'] . '</td>');
+
+echo('    <td>' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
+
+echo('    <td>' . formatUptime($device['uptime']) . ' <br /></td>');
+
+$location = $device['location'];
+if (get_dev_attrib($device,'override_sysLocation_bool')) {  $location = get_dev_attrib($device,'override_sysLocation_string'); }
+echo('    <td>' . $location . '<br /></td>');
+
+echo (' </tr>');
 
 ?>
