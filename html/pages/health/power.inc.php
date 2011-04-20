@@ -1,7 +1,7 @@
 <?php
 
 $graph_type = "sensor_power";
-$unit = "V";
+$unit = "W";
 
 if ($_SESSION['userlevel'] >= '5')
 {
