@@ -1,6 +1,6 @@
 <?php
 
-$datas = array('processor','mempool','storage','temperature', 'humidity', 'fanspeed', 'voltage', 'frequency', 'current');
+$datas = array('processor','mempool','storage','temperature', 'humidity', 'fanspeed', 'voltage', 'frequency', 'current', 'power');
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -13,6 +13,7 @@ $type_text['voltage'] = "Voltage";
 $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
+$type_text['power'] = "Power";
 
 if (!$_GET['opta']) { $_GET['opta'] = "processor"; }
 if (!$_GET['optb']) { $_GET['optb'] = "nographs"; }

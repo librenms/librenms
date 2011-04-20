@@ -12,6 +12,9 @@ $volts = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_cla
 $current = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='current' AND device_id = '" . $device['device_id'] . "'"), 0);
 $freqs = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='frequency' AND device_id = '" . $device['device_id'] . "'"), 0);
 
+$power = mysql_result(mysql_query("select count(*) from sensors WHERE sensor_class='power' AND device_id = '" . $device['device_id'] . "'"), 0);
+
+
 $datas[] = 'overview';
 if ($processor) { $datas[] = 'processor'; }
 if ($mempools) { $datas[] = 'mempool'; }
@@ -23,6 +26,7 @@ if ($fans) { $datas[] = 'fanspeed'; }
 if ($volts) { $datas[] = 'voltage'; }
 if ($freqs) { $datas[] = 'frequency'; }
 if ($current) { $datas[] = 'current'; }
+if ($power) { $datas[] = 'power'; }
 
 $type_text['overview'] = "Overview";
 $type_text['temperature'] = "Temperature";
@@ -35,6 +39,7 @@ $type_text['voltage'] = "Voltage";
 $type_text['fanspeed'] = "Fanspeed";
 $type_text['frequency'] = "Frequency";
 $type_text['current'] = "Current";
+$type_text['power'] = "Power";
 
 print_optionbar_start();
 

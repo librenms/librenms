@@ -20,12 +20,16 @@ function poll_sensor($device, $class, $unit)
 
     if (!is_file($rrd_file))
     {
+
       rrdtool_create($rrd_file,"--step 300 \
-         DS:sensor:GAUGE:600:-273:20000 \
-         RRA:AVERAGE:0.5:1:1200 \
-         RRA:MIN:0.5:12:2400 \
-         RRA:MAX:0.5:12:2400 \
-         RRA:AVERAGE:0.5:12:2400");
+      DS:sensor:GAUGE:600:-20000:20000 \
+      RRA:AVERAGE:0.5:1:1200 \
+      RRA:AVERAGE:0.5:12:2400 \
+      RRA:AVERAGE:0.5:288:750 \
+      RRA:MAX:0.5:12:2400 \
+      RRA:MAX:0.5:288:750 \
+      RRA:MIN:0.5:12:2400 \
+      RRA:MIN:0.5:288:750");
     }
 
     echo("$sensor_value $unit\n");

@@ -920,7 +920,7 @@ $config['year']       = time() - (365 * 24 * 60 * 60);
 $ipmi_unit['Volts']     = 'voltage';
 $ipmi_unit['degrees C'] = 'temperature';
 $ipmi_unit['RPM']       = 'fanspeed';
-$ipmi_unit['Watts']     = '';
+$ipmi_unit['Watts']     = 'power';
 $ipmi_unit['discrete']  = '';
 
 ## INCLUDE THE VMWARE DEFINITION FILE.
