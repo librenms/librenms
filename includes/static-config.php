@@ -1,5 +1,11 @@
 <?php
 
+#########################################################
+#    NO CHANGES TO THIS FILE, IT IS NOT USER-EDITABLE   #
+#########################################################
+#                 YES, THAT MEANS YOU                   #
+#########################################################
+
 ## AFI / SAFI pairs for BGP (and other stuff, perhaps)
 $config['afi']['ipv4']['unicast']    = "IPv4";
 $config['afi']['ipv4']['multiicast'] = "IPv4 Multicast";
@@ -925,4 +931,5 @@ $ipmi_unit['discrete']  = '';
 
 ## INCLUDE THE VMWARE DEFINITION FILE.
 require_once("vmware_guestid.inc.php");
+
 ?>
