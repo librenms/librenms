@@ -35,11 +35,10 @@ echo('    <td>' . $device['hardware'] . '<br />' . $device['features'] . '</td>'
 
 echo('    <td>' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
 
-echo('    <td>' . formatUptime($device['uptime']) . ' <br /></td>');
+echo('    <td>' . formatUptime($device['uptime']) . ' <br />');
 
-$location = $device['location'];
-if (get_dev_attrib($device,'override_sysLocation_bool')) {  $location = get_dev_attrib($device,'override_sysLocation_string'); }
-echo('    <td>' . $location . '<br /></td>');
+if (get_dev_attrib($device,'override_sysLocation_bool')) {  $device['location'] = get_dev_attrib($device,'override_sysLocation_string'); }
+echo('    ' . $device['location'] . '</td>');
 
 echo (' </tr>');
 
