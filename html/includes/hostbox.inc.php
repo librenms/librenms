@@ -6,7 +6,7 @@ if ($device['status'] == '0')
 {
   $class = "list-device-down"; 
 } else { 
-  $class = "list-device"; unset ($tr); 
+  $class = "list-device";
 }
 if ($device['ignore'] == '1') 
 {
@@ -43,12 +43,9 @@ if ($port_count) { echo(' <img src="images/icons/port.png" align=absmiddle /> '.
 echo('<br />');
 if ($sensor_count) { echo(' <img src="images/icons/sensors.png" align=absmiddle /> '.$sensor_count); }
 echo ('</td>');
-
 echo('    <td>' . $device['hardware'] . '<br />' . $device['features'] . '</td>');
-
 echo('    <td>' . $device['os_text'] . '<br />' . $device['version'] . '</td>');
-
-echo('    <td>' . formatUptime($device['uptime']) . ' <br />');
+echo('    <td>' . formatUptime($device['uptime'], 'short') . ' <br />');
 
 if (get_dev_attrib($device,'override_sysLocation_bool')) {  $device['location'] = get_dev_attrib($device,'override_sysLocation_string'); }
 echo('    ' . truncate($device['location'],32, '') . '</td>');
