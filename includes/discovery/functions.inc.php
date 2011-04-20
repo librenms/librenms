@@ -101,6 +101,9 @@ function sensor_low_limit($class, $current)
     case 'fanspeed':
       $limit = $current * 0.80;
       break;
+    case 'power':
+      $limit = NULL;
+      break;
   }
   return $limit;
 }
@@ -129,6 +132,9 @@ function sensor_limit($class, $current)
       break;
     case 'fanspeed':
       $limit = $current * 1.30;
+      break;
+    case 'power':
+      $limit = $current * 1.50;
       break;
   }
   return $limit;

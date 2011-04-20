@@ -49,7 +49,7 @@ if ($device['os'] == "ios" || $device['os_group'] == "ios")
   $entitysensor['percentRH'] = "humidity";
   $entitysensor['rpm']       = "fanspeed";
   $entitysensor['celsius']   = "temperature";
-  $entitysensor['watts']     = "watts";
+  $entitysensor['watts']     = "power";
 
   if (is_array($oids))
   {
