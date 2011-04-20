@@ -82,6 +82,7 @@ switch ($_GET['opta'])
   case 'fanspeed':
   case 'frequency':
   case 'current':
+  case 'power':
     include('pages/health/'.$_GET['opta'].'.inc.php');
     break;
   default:
