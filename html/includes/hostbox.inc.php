@@ -4,7 +4,7 @@ if ($bg == $list_colour_b) { $bg = $list_colour_a; } else { $bg = $list_colour_b
 
 if ($device['status'] == '0') 
 {
-  $tr = "bordercolor=#cc0000";
+  $tr = "row-alert";
   $class = "list-device-down"; 
 } else { 
   $class = "list-device"; unset ($tr); 
@@ -26,7 +26,7 @@ $device['os_text'] = $config['os'][$device['os']]['text'];
 $port_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `ports` WHERE `device_id` = '".$device['device_id']."'"),0);
 $sensor_count = mysql_result(mysql_query("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = '".$device['device_id']."'"),0);
 
-echo('  <tr '.$tr.' bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
+echo('  <tr class="'.$tr.'" bgcolor="' . $bg . '" onmouseover="this.style.backgroundColor=\'#fdd\';" onmouseout="this.style.backgroundColor=\'' . $bg . '\';"
           onclick="location.href=\'device/'.$device['device_id'].'/\'" style="cursor: pointer;">
           <td width="40" align="center" valign="middle">' . $image . '</td>
           <td width="300"><span style="font-weight: bold; font-size: 14px;">' . generate_device_link($device) . '</span>
