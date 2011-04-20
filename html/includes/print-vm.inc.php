@@ -20,9 +20,9 @@ else if ($vm['vmwVmGuestOS'] == "")
 
 if ($vm['vmwVmMemSize'] >= 1024)
 {
-  echo("<td class=list>" . $vm['vmwVmMemSize']/1024 . " GB</td>");
+  echo("<td class=list>" . sprintf("%.2f",$vm['vmwVmMemSize']/1024) . " GB</td>");
 } else {
-  echo("<td class=list>" . $vm['vmwVmMemSize'] . " MB</td>");
+  echo("<td class=list>" . sprintf("%.2f",$vm['vmwVmMemSize']) . " MB</td>");
 }
 
 echo('<td class="list">' . $vm['vmwVmCpus'] . " CPU</td>");

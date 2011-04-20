@@ -131,7 +131,6 @@ $config['enable_inventory']     	= 1; # Enable Inventory
 $config['enable_pseudowires']   	= 1; # Enable Pseudowires
 $config['enable_vrfs']   		= 1; # Enable VRFs
 $config['enable_printers']  		= 0; # Enable Printer support
-$config['enable_libvirt']  		= 0; # Enable Libvirt VM support
 
 ### Ports extension modules
 
@@ -217,6 +216,11 @@ $config['syslog_age']       = "1 month";        ## Entries older than this will 
 $config['syslog_filter'] = array("last message repeated", "Connection from UDP: [",
                                  "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
                                  "diskio.c: don't know how to handle");  ## Ignore some crappy stuff from SNMP daemon
+
+### Virtualization
+
+$config['enable_libvirt'] = 0; # Enable Libvirt VM support
+$config['libvirt_protocols']    = array("qemu+ssh","xen+ssh"); # Mechanisms used, add or remove if not using this on any of your machines.
 
 ### LDAP Authentication
 
