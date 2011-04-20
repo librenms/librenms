@@ -91,7 +91,7 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $dst = mysql_result(mysql_query("SELECT `hostname` FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
               $dst_host = mysql_result(mysql_query("SELECT D.device_id FROM `devices` AS D, `ports` AS I WHERE I.interface_id = '$remote_interface_id'  AND D.device_id = I.device_id"),0);
             } else {
-	      $dst_host = $link['remote_hostname'];
+	      #$dst_host = $link['remote_hostname'];
               $dst = $link['remote_hostname'];
             }
 
@@ -111,7 +111,11 @@ if (isset($_GET['format']) && preg_match("/^[a-z]*$/", $_GET['format']))
               $ifdone[$src][$sif['interface_id']] = 1;
             }
 
-            $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
+            if($dst_host) {
+              $map .= "\"$dst\" [URL=\"{$config['base_url']}/device/$dst_host/map/\" fontsize=20 shape=box3d]\n";
+            } else {
+              $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
+            }
 
             if ($dst_host == $device['device_id'] || $where == '')
             {
