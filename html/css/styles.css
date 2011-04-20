@@ -330,6 +330,10 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
         font-weight: bold;
 }
 
+.row-alert {
+	border: 2px solid red;
+}
+
 .device-head, .list-device {
 	color: #000ccc;
 }
