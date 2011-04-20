@@ -331,7 +331,7 @@ A.orange:visited, a.orange, .orange { color: #FF7400; }
 }
 
 .row-alert {
-	border: 2px solid red;
+	border: 2px solid #cc0000;
 }
 
 .device-head, .list-device {
